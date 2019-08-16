@@ -197,7 +197,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus HTTP Requests",
+        "title": "HTTP Requests [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -252,7 +252,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus HTTP Requests",
+          "title": "HTTP Requests [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },
@@ -277,7 +277,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus Query Durations",
+        "title": "Query Durations [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -341,7 +341,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus Query Durations",
+          "title": "Query Durations [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },
@@ -366,7 +366,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus Number of Targets",
+        "title": "Number of Targets [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -421,7 +421,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus Number of Targets",
+          "title": "Number of Targets [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },
@@ -446,7 +446,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus Head Chunks",
+        "title": "Head Chunks [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -493,7 +493,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus Head Chunks",
+          "title": "Head Chunks [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },
@@ -518,7 +518,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus WAL",
+        "title": "WAL [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -592,7 +592,7 @@
             "time_field": "@timestamp",
             "type": "top_n"
           },
-          "title": "[Metricbeat] Prometheus WAL",
+          "title": "WAL [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },
@@ -617,7 +617,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus Reload Count",
+        "title": "Reload Count [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -710,7 +710,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus Reload Count",
+          "title": "Reload Count [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },
@@ -735,7 +735,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus Remote API Reads",
+        "title": "Remote API Reads [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -793,7 +793,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus Remote API Reads",
+          "title": "Remote API Reads [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },
@@ -818,7 +818,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus Alert Notifications",
+        "title": "Alert Notifications [Metricbeat Prometheus]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -887,7 +887,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus Alert Notifications",
+          "title": "Alert Notifications [Metricbeat Prometheus]",
           "type": "metrics"
         }
       },

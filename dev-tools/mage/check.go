@@ -47,7 +47,7 @@ import (
 func Check() error {
 	fmt.Println(">> check: Checking source code for common problems")
 
-	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable, DashboardsFormat)
+	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
 
 	changes, err := GitDiffIndex()
 	if err != nil {
@@ -189,10 +189,13 @@ func GoVet() error {
 	return errors.Wrap(err, "failed running go vet, please fix the issues reported")
 }
 
-// DashboardsFormat checks the format of dashboards
-func DashboardsFormat() error {
+// CheckDashboardsFormat checks the format of dashboards
+func CheckDashboardsFormat() error {
 	dashboardSubDir := "/_meta/kibana/"
 	dashboardFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+		if strings.HasPrefix(path, "vendor") {
+			return false
+		}
 		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
 	})
 	if err != nil {
