@@ -392,6 +392,22 @@ func TestParseSyslog(t *testing.T) {
 			},
 		},
 		{
+			title: "Space after priority",
+			log:   []byte("<13> Aug 16 12:25:24 10.12.255.2-1 TRAPMGR[53034492]: traputil.c(696) 135956 %% Link Up: g5.\000"),
+			syslog: event{
+				priority: 13,
+				message:  "traputil.c(696) 135956 %% Link Up: g5.\000",
+				hostname: "10.12.255.2-1",
+				program:  "TRAPMGR",
+				pid:      53034492,
+				month:    8,
+				day:      16,
+				hour:     12,
+				minute:   25,
+				second:   24,
+			},
+		},
+		{
 			log: []byte("<34>Oct 11 22:14:15 mymachine su[230]: 'su root' failed for lonvick on /dev/pts/8"),
 			syslog: event{
 				priority: 34,
