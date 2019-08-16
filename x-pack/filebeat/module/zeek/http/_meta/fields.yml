@@ -3,101 +3,208 @@
   description: >
     Fields exported by the Zeek HTTP log
   fields:
-    - name: trans_depth
+    - name: transaction_depth
       type: integer
       description: >
-        Represents the pipelined depth into the connection of this request/response transaction
-    
-    - name: status_msg
-      type: keyword
-      description: >
-        Status message returned by the server
-    
-    - name: info_code
-      type: integer
-      description: >
-        Last seen 1xx informational reply code returned by the server.
-    
-    - name: info_msg
-      type: keyword
-      description: >
-        Last seen 1xx informational reply message returned by the server.
-  
-    - name: tags
-      type: keyword
-      description: |
-        A set of indicators of various attributes discovered and related to a particular 
-        request/response pair.
-  
-    - name: password
-      type: keyword
-      description: >
-        Password if basic-auth is performed for the request
-  
-    - name: captured_password
-      type: boolean
-      description: >
-        Determines if the password will be captured for this request
-  
+        Represents the pipelined depth into the connection of this request/response transaction.
+
+    - name: request
+      type: group
+      fields:
+        - name: method
+          type: keyword
+          description: >
+            Verb used in the HTTP request (GET, POST, HEAD, etc.).
+
+        - name: host
+          type: keyword
+          descripion: >
+            Value of the HOST header.
+
+        - name: uri
+          type: keyword
+          description: >
+            URI used in the request.
+
+        - name: referrer
+          type: keyword
+          description: >
+            Value of the “referer” header. The comment is deliberately misspelled like the standard declares, but the name used here is “referrer” spelled correctly.
+
+        - name: version
+          type: keyword
+          description: >
+            Value of the version portion of the request.
+
+        - name: user_agent
+          type: group
+          description: >
+            Fields carved from the raw User-Agent string
+          fields:
+            - name: original
+              type: keyword
+              description: >
+                Value of the User-Agent header from the client.
+
+        - name: body_length
+          type: integer
+          description: >
+            Actual uncompressed content size of the data transferred from the client.
+
+        - name: username
+          type: keyword
+          description: >
+            Username if basic-auth is performed for the request.
+
+        - name: password
+          type: keyword
+          description: >
+            Password if basic-auth is performed for the request.
+
+        - name: capture_password
+          type: boolean
+          description: >
+            Determines if the password will be captured for this request.
+
+        - name: range
+          type: boolean
+          description: >
+            Indicates if this request can assume 206 partial content in response.
+
+        - name: file
+          type: group
+          fields:
+            - name: uid
+              type: keyword
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                An ordered vector of file unique IDs.
+
+            - name: name
+              type: keyword
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                An ordered vector of filenames from the client.
+
+        - name: mime
+          type: group
+          fields:
+            - name: type
+              type: keyword
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                An ordered vector of mime types.
+
+            - name: depth
+              type: integer
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                Current number of MIME entities in the HTTP request message body.
+
+        - name: headers
+          type: keyword
+          description: |
+            (present if policy/protocols/http/header-names.bro is loaded)
+            The vector of HTTP header names sent by the client. No header values are included here, just the header names.
+
+    - name: response
+      type: group
+      fields:
+        - name: status
+          type: group
+          fields:
+            - name: code
+              type: integer
+              description: >
+                Status code returned by the server.
+
+            - name: msg
+              type: keyword
+              description: >
+                Status message returned by the server.
+
+        - name: info
+          type: group
+          fields:
+            - name: code
+              type: integer
+              description: >
+                Last seen 1xx informational reply code returned by the server.
+
+            - name: msg
+              type: keyword
+              description: >
+                Last seen 1xx informational reply message returned by the server.
+
+        - name: body_length
+          type: integer
+          description: >
+            Actual uncompressed content size of the data transferred from the server.
+
+        - name: file
+          type: group
+          fields:
+            - name: uid
+              type: keyword
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                An ordered vector of file unique IDs.
+
+            - name: name
+              type: keyword
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                An ordered vector of filenames from the server.
+
+        - name: mime
+          type: group
+          fields:
+            - name: type
+              type: keyword
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                An ordered vector of mime types.
+
+            - name: depth
+              type: integer
+              description: |
+                (present if base/protocols/http/entities.bro is loaded)
+                Current number of MIME entities in the HTTP response message body.
+
+        - name: headers
+          type: keyword
+          description: |
+            (present if policy/protocols/http/header-names.bro is loaded)
+            The vector of HTTP header names sent by the server. No header values are included here, just the header names.
+
     - name: proxied
       type: keyword
       description: >
-        All of the headers that may indicate if the HTTP request was proxied
-  
-    - name: range_request
+        All of the headers that may indicate if the request was proxied.
+
+    - name: omniture
       type: boolean
-      description: >
-        Indicates if this request can assume 206 partial content in response
-  
-    - name: client_header_names
+      description: |
+        (present if policy/protocols/http/software-browser-plugins.bro is loaded)
+        Indicates if the server is an omniture advertising server.
+
+    - name: flash_version
       type: keyword
       description: |
-        The vector of HTTP header names sent by the client. No header values 
-        are included here, just the header names.
-  
-    - name: server_header_names
-      type: keyword
-      description: |
-        The vector of HTTP header names sent by the server. No header values 
-        are included here, just the header names
-  
-    - name: orig_fuids
-      type: keyword
-      description: >
-        An ordered vector of file unique IDs from the originator
-  
-    - name: orig_mime_types
-      type: keyword
-      description: >
-        An ordered vector of mime types from the originator
-  
-    - name: orig_filenames
-      type: keyword
-      description: >
-        An ordered vector of filenames from the originator
-  
-    - name: resp_fuids
-      type: keyword
-      description: >
-        An ordered vector of file unique IDs from the responder
-  
-    - name: resp_mime_types
-      type: keyword
-      description: >
-        An ordered vector of mime types from the responder
-  
-    - name: resp_filenames
-      type: keyword
-      description: >
-        An ordered vector of filenames from the responder
-  
-    - name: orig_mime_depth
-      type: integer
-      description: >
-        Current number of MIME entities in the HTTP request message body
-  
-    - name: resp_mime_depth
-      type: integer
-      description: >
-        Current number of MIME entities in the HTTP response message body
-  
+        (present if policy/protocols/http/software-browser-plugins.bro is loaded)
+        The unparsed Flash version, if detected.
+
+    - name: vars
+      type: group
+      fields:
+        - name: cookie
+          type: keyword
+          description: |
+            (present if policy/protocols/http/var-extraction-cookies.bro is loaded)
+            Variable names extracted from all cookies.
+
+        - name: uri
+          type: keyword
+          description: |
+            (present if policy/protocols/http/var-extraction-uri.bro is loaded)
+            Variable names from the URI.

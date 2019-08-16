@@ -19,31 +19,6 @@
       }
     },
     {
-      "set": {
-        "field": "event.id",
-        "value": "{{zeek.session_id}}",
-        "if": "ctx.zeek.session_id != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}"
-      }
-    },
-    {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}"
-      }
-    },
-    {
-      "set": {
-        "field": "url.port",
-        "value": "{{destination.port}}"
-      }
-    },
-    {
       "geoip": {
         "field": "destination.ip",
         "target_field": "destination.geo"
@@ -57,7 +32,8 @@
     },
     {
       "user_agent": {
-        "field": "user_agent.original",
+        "field": "zeek.http.request.user_agent.raw",
+        "target_field": "zeek.http.request.user_agent",
         "ignore_missing": true
       }
     }

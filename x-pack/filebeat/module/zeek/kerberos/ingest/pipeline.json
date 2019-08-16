@@ -22,7 +22,8 @@
       "grok": {
         "field": "zeek.kerberos.client",
         "patterns": ["%{GREEDYDATA:zeek.kerberos.username}/%{GREEDYDATA:zeek.kerberos.domain}"],
-        "ignore_missing": true
+        "ignore_missing": true,
+        "ignore_failure": true
       }
     },
     {
@@ -35,7 +36,8 @@
       "grok": {
         "field": "zeek.kerberos.service",
         "patterns": ["%{GREEDYDATA:tmp_service}/%{GREEDYDATA:zeek.kerberos.hostname}"],
-        "ignore_missing": true
+        "ignore_missing": true,
+        "ignore_failure": true
       }
     },
     {

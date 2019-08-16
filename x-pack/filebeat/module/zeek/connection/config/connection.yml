@@ -20,13 +20,13 @@ processors:
           to: "temp.duration"
 
         - from: "zeek.connection.id.orig_h"
-          to: "source.address"
+          to: "source.ip"
 
         - from: "zeek.connection.id.orig_p"
           to: "source.port"
 
         - from: "zeek.connection.id.resp_h"
-          to: "destination.address"
+          to: "destination.ip"
 
         - from: "zeek.connection.id.resp_p"
           to: "destination.port"
@@ -55,21 +55,29 @@ processors:
         - from: "zeek.connection.conn_state"
           to: "zeek.connection.state.code"
 
+        - from: "zeek.connection.local_orig"
+          to: "zeek.connection.originator.local"
+
+        - from: "zeek.connection.local_resp"
+          to: "zeek.connection.responder.local"
+
+        - from: "zeek.connection.orig_l2_addr"
+          to: "zeek.connection.originator.l2_address"
+
+        - from: "zeek.connection.resp_l2_addr"
+          to: "zeek.connection.responder.l2_address"
+
       ignore_missing: true
       fail_on_error: false
+
 {{ if .community_id }}
   - if:
       equals.network.transport: icmp
     then:
       community_id:
         fields:
-          source_ip: source.address
-          destination_ip: destination.address
           icmp_type: source.port
           icmp_code: destination.port
     else:
       community_id:
-        fields:
-          source_ip: source.address
-          destination_ip: destination.address
 {{ end }}

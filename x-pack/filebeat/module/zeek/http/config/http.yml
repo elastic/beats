@@ -13,19 +13,21 @@ fields:
   network.transport: tcp
 
 processors:
+  - drop_fields:
+      fields: ["json.tags"]
   - rename:
       fields:
         - from: "json"
           to: "zeek.http"
 
         - from: "zeek.http.id.orig_h"
-          to: "source.address"
+          to: "source.ip"
 
         - from: "zeek.http.id.orig_p"
           to: "source.port"
 
         - from: "zeek.http.id.resp_h"
-          to: "destination.address"
+          to: "destination.ip"
 
         - from: "zeek.http.id.resp_p"
           to: "destination.port"
@@ -33,44 +35,96 @@ processors:
         - from: "zeek.http.uid"
           to: "zeek.session_id"
 
+        - from: "zeek.http.trans_depth"
+          to: "zeek.http.transaction_depth"
+
         - from: "zeek.http.method"
-          to: "http.request.method"
-
-        - from: "zeek.http.referrer"
-          to: "http.request.referrer"
-
-        - from: "zeek.http.status_code"
-          to: "http.response.status_code"
-
-        - from: "zeek.http.version"
-          to: "http.version"
-
-        - from: "zeek.http.request_body_len"
-          to: "http.request.body.bytes"
-
-        - from: "zeek.http.response_body_len"
-          to: "http.response.body.bytes"
-
-        - from: "zeek.http.uri"
-          to: "url.original"
+          to: "zeek.http.request.method"
 
         - from: "zeek.http.host"
-          to: "url.domain"
+          to: "zeek.http.request.host"
+
+        - from: "zeek.http.uri"
+          to: "zeek.http.request.uri"
+
+        - from: "zeek.http.referrer"
+          to: "zeek.http.request.referrer"
+
+        - from: "zeek.http.version"
+          to: "zeek.http.request.version"
+
+        - from: "zeek.http.user_agent"
+          to: "zeek.http.request.user_agent.raw"
+
+        - from: "zeek.http.request_body_len"
+          to: "zeek.http.request.body_length"
 
         - from: "zeek.http.username"
-          to: "url.username"
+          to: "zeek.http.request.username"
 
         - from: "zeek.http.password"
-          to: "url.password"
-        
-        - from: "zeek.http.user_agent"
-          to: "user_agent.original"
+          to: "zeek.http.request.password"
+
+        - from: "zeek.http.capture_password"
+          to: "zeek.http.request.capture_password"
+
+        - from: "zeek.http.range_request"
+          to: "zeek.http.request.range"
+
+        - from: "zeek.http.orig_fuids"
+          to: "zeek.http.request.file.uid"
+
+        - from: "zeek.http.orig_filenames"
+          to: "zeek.http.request.file.name"
+
+        - from: "zeek.http.orig_mime_types"
+          to: "zeek.http.request.mime.type"
+
+        - from: "zeek.http.orig_mime_depth"
+          to: "zeek.http.request.mime.depth"
+
+        - from: "zeek.http.client_header_names"
+          to: "zeek.http.request.headers"
+
+        - from: "zeek.http.status_code"
+          to: "zeek.http.response.status.code"
+
+        - from: "zeek.http.status_msg"
+          to: "zeek.http.response.status.msg"
+
+        - from: "zeek.http.info_code"
+          to: "zeek.http.response.info.code"
+
+        - from: "zeek.http.info_msg"
+          to: "zeek.http.response.info.msg"
+
+        - from: "zeek.http.response_body_len"
+          to: "zeek.http.response.body_length"
+
+        - from: "zeek.http.resp_fuids"
+          to: "zeek.http.response.file.uid"
+
+        - from: "zeek.http.resp_filenames"
+          to: "zeek.http.response.file.name"
+
+        - from: "zeek.http.resp_mime_types"
+          to: "zeek.http.response.mime.type"
+
+        - from: "zeek.http.resp_mime_depth"
+          to: "zeek.http.response.mime.depth"
+
+        - from: "zeek.http.server_header_names"
+          to: "zeek.http.response.headers"
+
+        - from: "zeek.http.cookie_vars"
+          to: "zeek.http.vars.cookie"
+
+        - from: "zeek.http.uri_vars"
+          to: "zeek.http.vars.uri"
 
       ignore_missing: true
       fail_on_error: false
+
 {{ if .community_id }}
   - community_id:
-      fields:
-        source_ip: source.address
-        destination_ip: destination.address
 {{ end }}

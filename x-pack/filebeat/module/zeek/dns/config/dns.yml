@@ -17,13 +17,13 @@ processors:
           to: "zeek.dns"
 
         - from: "zeek.dns.id.orig_h"
-          to: "source.address"
+          to: "source.ip"
 
         - from: "zeek.dns.id.orig_p"
           to: "source.port"
 
         - from: "zeek.dns.id.resp_h"
-          to: "destination.address"
+          to: "destination.ip"
 
         - from: "zeek.dns.id.resp_p"
           to: "destination.port"
@@ -33,12 +33,52 @@ processors:
 
         - from: "zeek.dns.uid"
           to: "zeek.session_id"
-          
+
+        - from: "zeek.dns.AA"
+          to: "zeek.dns.authoritative_answer"
+
+        - from: "zeek.dns.RA"
+          to: "zeek.dns.recursion.available"
+
+        - from: "zeek.dns.RD"
+          to: "zeek.dns.recursion.desired"
+
+        - from: "zeek.dns.TC"
+          to: "zeek.dns.truncated"
+
+        - from: "zeek.dns.TTLs"
+          to: "zeek.dns.ttl"
+
+        - from: "zeek.dns.query"
+          to: "zeek.dns.query.value"
+
+        - from: "zeek.dns.qclass"
+          to: "zeek.dns.query.class.value"
+
+        - from: "zeek.dns.qclass_name"
+          to: "zeek.dns.query.class.name"
+
+        - from: "zeek.dns.qtype"
+          to: "zeek.dns.query.type.value"
+
+        - from: "zeek.dns.qtype_name"
+          to: "zeek.dns.query.type.name"
+
+        - from: "zeek.dns.rcode"
+          to: "zeek.dns.response_code.value"
+
+        - from: "zeek.dns.rcode_name"
+          to: "zeek.dns.response_code.name"
+
+        - from: "zeek.dns.trans_id"
+          to: "zeek.dns.transaction_id"
+
+        - from: "zeek.dns.rtt"
+          to: "zeek.dns.round_trip_time"
+
       ignore_missing: true
       fail_on_error: false
+
 {{ if .community_id }}
   - community_id:
-      fields:
-        source_ip: source.address
-        destination_ip: destination.address
 {{ end }}

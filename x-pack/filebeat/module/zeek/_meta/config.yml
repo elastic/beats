@@ -29,6 +29,8 @@
     enabled: true
   ssl:
     enabled: true
+  x509:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

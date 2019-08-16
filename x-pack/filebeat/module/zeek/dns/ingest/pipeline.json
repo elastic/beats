@@ -19,34 +19,17 @@
       }
     },
     {
-      "set": {
-        "field": "event.id",
-        "value": "{{zeek.session_id}}",
-        "if": "ctx.zeek.session_id != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}"
-      }
-    },
-    {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}"
-      }
-    },
-    {
-      "geoip": {
-        "field": "destination.ip",
-        "target_field": "destination.geo"
-      }
-    },
-    {
-      "geoip": {
-        "field": "source.ip",
-        "target_field": "source.geo"
+      "foreach": {
+        "field": "zeek.dns.answers",
+        "if": "ctx.zeek.dns.response_code?.name == \"NOERROR\" && ctx.zeek.dns.query?.class?.name == \"C_INTERNET\"",
+        "ignore_missing": true,
+        "processor": {
+          "geoip": {
+            "field": "_ingest._value",
+            "target_field": "zeek.dns.geo",
+            "ignore_failure": true
+          }
+        }
       }
     }
   ],

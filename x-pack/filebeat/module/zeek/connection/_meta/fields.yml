@@ -3,15 +3,31 @@
   description: >
     Fields exported by the Zeek Connection log
   fields:
-    - name: local_orig
-      type: boolean
-      description: >
-        Indicates whether the session is originated locally
+    - name: originator
+      type: group
+      fields:
+        - name: local
+          type: boolean
+          description: >
+            Indicates whether the session is originated locally
 
-    - name: local_resp
-      type: boolean
-      description: >
-        Indicates whether the session is responded locally
+        - name: l2_address
+          type: keyword
+          description: >
+            Link-layer address of the originator, if available
+
+    - name: responder
+      type: group
+      fields:
+        - name: local
+          type: boolean
+          description: >
+            Indicates whether the session is responded locally
+
+        - name: l2_address
+          type: keyword
+          description: >
+            Link-layer address of the responder, if available
 
     - name: missed_bytes
       type: long
@@ -35,16 +51,6 @@
       type: keyword
       description: >
         Flags indicating the history of the session
-
-    - name: orig_l2_addr
-      type: keyword
-      description: >
-        Link-layer address of the originator, if available
-
-    - name: resp_l2_addr
-      type: keyword
-      description: >
-        Link-layer address of the responder, if available
 
     - name: vlan
       type: integer

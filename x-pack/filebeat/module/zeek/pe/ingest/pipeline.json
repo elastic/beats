@@ -22,7 +22,8 @@
       "date": {
         "field": "zeek.pe.compile_time",
         "target_field": "zeek.pe.compile_time",
-        "formats": ["UNIX"]
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.pe.compile_time != null"
       }
     }
   ],

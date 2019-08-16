@@ -19,34 +19,277 @@
       }
     },
     {
-      "set": {
-        "field": "event.id",
-        "value": "{{zeek.session_id}}",
-        "if": "ctx.zeek.session_id != null"
+      "remove": {
+        "field": "zeek.ssl.client.cert_chain_fuids",
+        "if": "ctx.zeek.ssl.client?.cert_chain_fuids?.length == 0",
+        "ignore_missing": true
+      }
+    },
+
+    {
+      "gsub": {
+        "field": "zeek.ssl.issuer",
+        "pattern": "\\\\,",
+        "replacement": "",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}"
+      "kv": {
+        "field": "zeek.ssl.issuer",
+        "field_split": ",",
+        "value_split": "=",
+        "target_field": "zeek.ssl.server.issuer",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}"
+      "remove": {
+        "field": "zeek.ssl.issuer",
+        "ignore_missing": true
       }
     },
     {
-      "geoip": {
-        "field": "destination.ip",
-        "target_field": "destination.geo"
+      "rename": {
+        "field": "zeek.ssl.server.issuer.C",
+        "target_field": "zeek.ssl.server.issuer.country",
+        "ignore_missing": true
       }
     },
     {
-      "geoip": {
-        "field": "source.ip",
-        "target_field": "source.geo"
+      "rename": {
+        "field": "zeek.ssl.server.issuer.CN",
+        "target_field": "zeek.ssl.server.issuer.common_name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.issuer.L",
+        "target_field": "zeek.ssl.server.issuer.locality",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.issuer.O",
+        "target_field": "zeek.ssl.server.issuer.organization",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.issuer.OU",
+        "target_field": "zeek.ssl.server.issuer.organizational_unit",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.issuer.ST",
+        "target_field": "zeek.ssl.server.issuer.state",
+        "ignore_missing": true
+      }
+    },
+
+
+    {
+      "gsub": {
+        "field": "zeek.ssl.subject",
+        "pattern": "\\\\,",
+        "replacement": "",
+        "ignore_missing": true
+      }
+    },
+    {
+      "kv": {
+        "field": "zeek.ssl.subject",
+        "field_split": ",",
+        "value_split": "=",
+        "target_field": "zeek.ssl.server.subject",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.ssl.subject",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.subject.C",
+        "target_field": "zeek.ssl.server.subject.country",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.subject.CN",
+        "target_field": "zeek.ssl.server.subject.common_name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.subject.L",
+        "target_field": "zeek.ssl.server.subject.locality",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.subject.O",
+        "target_field": "zeek.ssl.server.subject.organization",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.subject.OU",
+        "target_field": "zeek.ssl.server.subject.organizational_unit",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.server.subject.ST",
+        "target_field": "zeek.ssl.server.subject.state",
+        "ignore_missing": true
+      }
+    },
+
+
+    {
+      "gsub": {
+        "field": "zeek.ssl.client_issuer",
+        "pattern": "\\\\,",
+        "replacement": "",
+        "ignore_missing": true
+      }
+    },
+    {
+      "kv": {
+        "field": "zeek.ssl.client_issuer",
+        "field_split": ",",
+        "value_split": "=",
+        "target_field": "zeek.ssl.client.issuer",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.ssl.client_issuer",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.issuer.C",
+        "target_field": "zeek.ssl.client.issuer.country",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.issuer.CN",
+        "target_field": "zeek.ssl.client.issuer.common_name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.issuer.L",
+        "target_field": "zeek.ssl.client.issuer.locality",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.issuer.O",
+        "target_field": "zeek.ssl.client.issuer.organization",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.issuer.OU",
+        "target_field": "zeek.ssl.client.issuer.organizational_unit",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.issuer.ST",
+        "target_field": "zeek.ssl.client.issuer.state",
+        "ignore_missing": true
+      }
+    },
+
+
+    {
+      "gsub": {
+        "field": "zeek.ssl.client_subject",
+        "pattern": "\\\\,",
+        "replacement": "",
+        "ignore_missing": true
+      }
+    },
+    {
+      "kv": {
+        "field": "zeek.ssl.client_subject",
+        "field_split": ",",
+        "value_split": "=",
+        "target_field": "zeek.ssl.client.subject",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.ssl.client_subject",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.subject.C",
+        "target_field": "zeek.ssl.client.subject.country",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.subject.CN",
+        "target_field": "zeek.ssl.client.subject.common_name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.subject.L",
+        "target_field": "zeek.ssl.client.subject.locality",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.subject.O",
+        "target_field": "zeek.ssl.client.subject.organization",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.subject.OU",
+        "target_field": "zeek.ssl.client.subject.organizational_unit",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.ssl.client.subject.ST",
+        "target_field": "zeek.ssl.client.subject.state",
+        "ignore_missing": true
       }
     }
   ],
