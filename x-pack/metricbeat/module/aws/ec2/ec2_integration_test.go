@@ -67,7 +67,6 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	config, info := mtest.GetConfigForTest("ec2", "300s")
-	config["calculate_rate"] = true
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}

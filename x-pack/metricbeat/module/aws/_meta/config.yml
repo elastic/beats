@@ -4,7 +4,6 @@
     - ec2
   regions:
     - us-east-1
-  calculate_rate: false
 - module: aws
   period: 300s
   metricsets:
