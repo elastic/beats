@@ -45,6 +45,7 @@ type moduleData struct {
 	Settings   []string `yaml:"settings"`
 	CfgFile    string
 	Asciidoc   string
+	IsXpack    bool
 	Metricsets []metricsetData
 }
 
@@ -84,6 +85,14 @@ var funcMap = template.FuncMap{
 		return mage.BeatName
 	},
 	"title": strings.Title,
+}
+
+// checkXpack checks to see if the module belongs to x-pack
+func checkXpack(path string) bool {
+	if strings.Contains(path, "x-pack") {
+		return true
+	}
+	return false
 }
 
 // setupDirectory clears and re-creates the docs/modules directory.
@@ -328,6 +337,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 			return moduleList, err
 		}
 
+		fieldsm.IsXpack = checkXpack(module)
 		fieldsm.Path = module
 		fieldsm.CfgFile = cfgPath
 		fieldsm.Metricsets = metricsets
