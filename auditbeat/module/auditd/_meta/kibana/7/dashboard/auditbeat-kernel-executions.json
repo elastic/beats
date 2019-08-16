@@ -251,7 +251,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of kernel executions", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
