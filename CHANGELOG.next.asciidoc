@@ -63,7 +63,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
-- Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
 
 *Auditbeat*
 
@@ -75,7 +74,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve detection of file deletion on Windows. {pull}10747[10747]
 - Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
 - Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
-- Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 
 *Heartbeat*
 

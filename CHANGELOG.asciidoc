@@ -3,6 +3,21 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.3.1]]
+=== Beats version 7.3.1
+https://github.com/elastic/beats/compare/v7.3.0...v7.3.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
+
+*Filebeat*
+
+- Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
+
+
 [[release-notes-7.3.0]]
 === Beats version 7.3.0
 https://github.com/elastic/beats/compare/v7.2.0...v7.3.0[View commits]
