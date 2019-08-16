@@ -33,7 +33,7 @@ import (
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 
 	// mage:import
-	common "github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {

@@ -35,7 +35,7 @@ import (
 	packetbeat "github.com/elastic/beats/packetbeat/scripts/mage"
 
 	// mage:import
-	common "github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {

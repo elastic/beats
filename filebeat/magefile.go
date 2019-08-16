@@ -30,7 +30,7 @@ import (
 	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
 
 	// mage:import
-	common "github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
