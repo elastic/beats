@@ -141,6 +141,11 @@ func NewInput(
 				},
 				Fields: common.MapStr{
 					"message": string(data),
+					"log": common.MapStr{
+						"source": common.MapStr{
+							"address": metadata.RemoteAddr.String(),
+						},
+					},
 				},
 			})
 		} else {
