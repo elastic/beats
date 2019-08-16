@@ -4,11 +4,11 @@
         "ec2": {
             "cpu": {
                 "credit_balance": 576,
-                "credit_usage": 0.194305,
+                "credit_usage": 0.186525,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 2.0499999999883576
+                    "pct": 2.0000740946562456
                 }
             },
             "diskio": {
@@ -51,14 +51,16 @@
             },
             "network": {
                 "in": {
-                    "bytes": 1297480,
-                    "bytes_per_sec": 4324.933333333333,
-                    "packets": 2734.8
+                    "bytes": 1368258.2,
+                    "bytes_per_sec": 4560.8606666666665,
+                    "packets": 2904.6,
+                    "packets_per_sec": 9.682
                 },
                 "out": {
-                    "bytes": 395706.4,
-                    "bytes_per_sec": 1319.0213333333334,
-                    "packets": 2672.8
+                    "bytes": 425826.8,
+                    "bytes_per_sec": 1419.4226666666666,
+                    "packets": 2910,
+                    "packets_per_sec": 9.7
                 }
             },
             "status": {

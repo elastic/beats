@@ -44,7 +44,6 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	CalculateRate bool `config:"calculate_rate"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -65,18 +64,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		base.Logger().Info(err)
 	}
 
-	config := struct {
-		CalculateRate bool `config:"calculate_rate"`
-	}{}
-
-	err = base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
-	}
-
 	return &MetricSet{
-		MetricSet:     metricSet,
-		CalculateRate: config.CalculateRate,
+		MetricSet: metricSet,
 	}, nil
 }
 
@@ -245,9 +234,8 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				return events, errors.Wrap(err, "EventMapping failed")
 			}
 
-			if m.CalculateRate {
-				calculateRate(resultMetricsetFields, monitoringStates[instanceID])
-			}
+			// add rate metrics
+			calculateRate(resultMetricsetFields, monitoringStates[instanceID])
 
 			events[instanceID].MetricSetFields.Update(resultMetricsetFields)
 			if len(events[instanceID].MetricSetFields) < 5 {
@@ -267,40 +255,16 @@ func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) 
 		period = 60.0
 	}
 
-	networkIn, err := resultMetricsetFields.GetValue("network.in.bytes")
-	if err == nil && networkIn != nil {
-		networkInRate := networkIn.(float64) / period
-		resultMetricsetFields.Put("network.in.bytes_per_sec", networkInRate)
-	}
+	metricList := []string{"network.in.bytes", "network.out.bytes",
+		"network.in.packets", "network.out.packets", "diskio.read.bytes",
+		"diskio.write.bytes", "diskio.read.count", "diskio.write.count"}
 
-	networkOut, err := resultMetricsetFields.GetValue("network.out.bytes")
-	if err == nil && networkOut != nil {
-		networkOutRate := networkOut.(float64) / period
-		resultMetricsetFields.Put("network.out.bytes_per_sec", networkOutRate)
-	}
-
-	diskReadBytes, err := resultMetricsetFields.GetValue("diskio.read.bytes")
-	if err == nil && networkOut != nil {
-		diskReadBytesRate := diskReadBytes.(float64) / period
-		resultMetricsetFields.Put("diskio.read.bytes_per_sec", diskReadBytesRate)
-	}
-
-	diskWriteBytes, err := resultMetricsetFields.GetValue("diskio.write.bytes")
-	if err == nil && networkOut != nil {
-		diskWriteBytesRate := diskWriteBytes.(float64) / period
-		resultMetricsetFields.Put("diskio.write.bytes_per_sec", diskWriteBytesRate)
-	}
-
-	diskReadOps, err := resultMetricsetFields.GetValue("diskio.read.count")
-	if err == nil && networkOut != nil {
-		diskReadOpsRate := diskReadOps.(float64) / period
-		resultMetricsetFields.Put("diskio.read.count_per_sec", diskReadOpsRate)
-	}
-
-	diskWriteOps, err := resultMetricsetFields.GetValue("diskio.write.count")
-	if err == nil && networkOut != nil {
-		diskWriteOpsRate := diskWriteOps.(float64) / period
-		resultMetricsetFields.Put("diskio.write.count_per_sec", diskWriteOpsRate)
+	for _, metricName := range metricList {
+		metricValue, err := resultMetricsetFields.GetValue(metricName)
+		if err == nil && metricValue != nil {
+			rateValue := metricValue.(float64) / period
+			resultMetricsetFields.Put(metricName+"_per_sec", rateValue)
+		}
 	}
 }
 

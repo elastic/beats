@@ -48,20 +48,6 @@ The aws ec2 metricset comes with a predefined dashboard. For example:
 image::./images/metricbeat-aws-ec2-overview.png[]
 
 [float]
-=== Metricset-specific configuration notes
-* *calculate_rate*: If calculate_rate is true, 6 rate metrics will be calculated:
-|===
-|Rate Metric Name | Equation | Equation with Detailed Monitoring
-|network.in.bytes_per_sec | network.in.bytes / 300 | network.in.bytes / 60
-|network.out.bytes_per_sec | network.out.bytes / 300 | network.out.bytes / 60
-|diskio.read.bytes_per_sec | diskio.read.bytes / 300 | diskio.read.bytes / 60
-|diskio.write.bytes_per_sec | diskio.write.bytes / 300 | diskio.write.bytes / 60
-|diskio.read.ops_per_sec | diskio.read.ops / 300 | diskio.read.ops / 60
-|diskio.write.ops_per_sec | diskio.write.ops / 300 | diskio.write.ops / 60
-|===
-Default calculate_rate is false.
-
-[float]
 === Configuration example
 [source,yaml]
 ----
@@ -72,5 +58,4 @@ Default calculate_rate is false.
   access_key_id: '<access_key_id>'
   secret_access_key: '<secret_access_key>'
   session_token: '<session_token>'
-  calculate_rate: false
 ----
