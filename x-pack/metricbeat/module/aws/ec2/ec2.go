@@ -255,9 +255,15 @@ func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) 
 		period = 60.0
 	}
 
-	metricList := []string{"network.in.bytes", "network.out.bytes",
-		"network.in.packets", "network.out.packets", "diskio.read.bytes",
-		"diskio.write.bytes", "diskio.read.count", "diskio.write.count"}
+	metricList := []string{
+		"network.in.bytes",
+		"network.out.bytes",
+		"network.in.packets",
+		"network.out.packets",
+		"diskio.read.bytes",
+		"diskio.write.bytes",
+		"diskio.read.count",
+		"diskio.write.count"}
 
 	for _, metricName := range metricList {
 		metricValue, err := resultMetricsetFields.GetValue(metricName)
