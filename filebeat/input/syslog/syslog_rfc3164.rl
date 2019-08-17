@@ -45,8 +45,8 @@
   syncflag = " " | "*" | ".";
   timestamp = syncflag? (timestamp_rfc3339 | timestamp_rfc3164) ":"?;
 
-  hostname = ([a-zA-Z0-9\.\-_:]*([a-zA-Z0-9] | "::"))+>tok $lookahead_duplicates %hostname;
-  header = timestamp space hostname space;
+  hostname = ([a-zA-Z0-9\.\-_:]*([a-zA-Z0-9] | "::")) >start_hostname $lookahead_duplicates %hostname;
+  header = timestamp space (hostname space)?;
 
   # MSG
   # https://tools.ietf.org/html/rfc3164#section-4.1.3
@@ -57,7 +57,7 @@
   msg = syslogprog? message>tok %message;
   sequence = digit+ ":" space>tok %sequence;
 
-  main := (prio)?(sequence)? (header msg | timestamp space message | message);
+  main := prio? sequence? (header msg | message);
   catch_all := message;
 
 }%%

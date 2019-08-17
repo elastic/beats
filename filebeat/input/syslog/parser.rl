@@ -17,10 +17,15 @@ func Parse(data []byte, event *event) {
     var p, cs int
     pe := len(data)
     tok := 0
+    start_hostname := 0
     eof := len(data)
     %%{
       action tok {
         tok = p
+      }
+
+      action start_hostname {
+        start_hostname = p
       }
 
       action priority {
@@ -71,7 +76,7 @@ func Parse(data []byte, event *event) {
         if p-1 > 0 {
           for _, b := range noDuplicates {
             if data[p] == b && data[p-1] == b {
-              p = tok -1
+              p = start_hostname -1
               fgoto catch_all;
             }
           }
@@ -79,7 +84,11 @@ func Parse(data []byte, event *event) {
       }
 
       action hostname {
-        event.SetHostname(data[tok:p])
+        event.SetHostname(data[start_hostname:p])
+        // Since hostname is optional, Hostname and Program/Pid branches
+        // may have been matching concurrently
+        event.program = ""
+        event.pid = -1
       }
 
       action program {
