@@ -97,7 +97,7 @@ func main() {
 	}
 
 	_, err = mapping.LoadFieldsYaml(output)
-	if err != nil {
+	if output != "-" && err != nil {
 		fmt.Fprintf(os.Stderr, "Generated global fields.yml file for %s is invalid: %+v\n", name, err)
 		os.Exit(3)
 	}
