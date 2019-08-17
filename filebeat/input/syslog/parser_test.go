@@ -408,6 +408,42 @@ func TestParseSyslog(t *testing.T) {
 			},
 		},
 		{
+			// For FreeBSD: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=194231
+			title: "Missing hostname",
+			log:   []byte("<30>Aug 14 13:10:13 charon: 13[MGR] checkout IKEv1 SA by message with SPIs 7f414ab798e5a7e4_i 49d7356aa8e75809_r"),
+			syslog: event{
+				priority: 30,
+				//message:  "13[MGR] checkout IKEv1 SA by message with SPIs 7f414ab798e5a7e4_i 49d7356aa8e75809_r",
+				message:  "charon: 13[MGR] checkout IKEv1 SA by message with SPIs 7f414ab798e5a7e4_i 49d7356aa8e75809_r",
+				hostname: "",
+				//program:  "charon",
+				pid:    -1,
+				month:  8,
+				day:    14,
+				hour:   13,
+				minute: 10,
+				second: 13,
+			},
+		},
+		{
+			title: "Missing hostname with pid",
+			log:   []byte("<38>Aug 16 21:53:20 sshd[2790]: Accepted publickey for admin from 2001:db8::1 port 53112 ssh2: RSA SHA256:xyz/"),
+			syslog: event{
+				priority: 38,
+				//message:  "Accepted publickey for admin from 2001:db8::1 port 53112 ssh2: RSA SHA256:xyz/",
+				message:  "sshd[2790]: Accepted publickey for admin from 2001:db8::1 port 53112 ssh2: RSA SHA256:xyz/",
+				hostname: "",
+				//program:  "sshd",
+				//pid:      2790,
+				pid:    -1,
+				month:  8,
+				day:    16,
+				hour:   21,
+				minute: 53,
+				second: 20,
+			},
+		},
+		{
 			log: []byte("<34>Oct 11 22:14:15 mymachine su[230]: 'su root' failed for lonvick on /dev/pts/8"),
 			syslog: event{
 				priority: 34,
