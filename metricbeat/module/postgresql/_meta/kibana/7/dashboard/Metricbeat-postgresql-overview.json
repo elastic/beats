@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "This PostgreSQL dashboard shows the most important database related metrics.\n\n",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -220,8 +220,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-09T14:21:58.793Z",
-      "version": "WzEzMzgsMV0="
+      "updated_at": "2019-08-19T14:53:17.203Z",
+      "version": "WzE1NjQsMV0="
     },
     {
       "attributes": {
