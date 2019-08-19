@@ -1,19 +1,14 @@
-- key: aws
-  title: "aws"
+- key: s3
+  title: "s3"
   description: >
-    AWS fields from s3 input.
+    S3 fields from s3 input.
   release: beta
   fields:
-    - name: s3
-      type: group
+    - name: bucket_name
+      type: keyword
       description: >
-        S3 related information.
-      fields:
-        - name: bucket_name
-          type: keyword
-          description: >
-            Name of the S3 bucket that this log retrieved from.
-        - name: object_key
-          type: keyword
-          description: >
-            Name of the S3 object that this log retrieved from.
+        Name of the S3 bucket that this log retrieved from.
+    - name: object_key
+      type: keyword
+      description: >
+        Name of the S3 object that this log retrieved from.

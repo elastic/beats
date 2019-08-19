@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
 - Fix some incorrect types and formats in field.yml files. {pull}13188[13188]
 - Load DLLs only from Windows system directory. {pull}13234[13234]
+- Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
 
 *Auditbeat*
 
@@ -258,6 +259,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update module pipelines to enrich events with autonomous system fields. {pull}13036[13036]
 - Add module for ingesting IBM MQ logs. {pull}8782[8782]
 - Add S3 input to retrieve logs from AWS S3 buckets. {pull}12640[12640] {issue}12582[12582]
+- Add aws module s3access metricset. {pull}13170[13170] {issue}12880[12880]
 
 *Heartbeat*
 
@@ -311,6 +313,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
 - Add AWS ebs metricset. {pull}13167[13167] {issue}11699[11699]
 - Add `metricset.period` field with the configured fetching period. {pull}13242[13242] {issue}12616[12616]
+- Add rate metrics for ec2 metricset. {pull}13203[13203]
 
 *Packetbeat*
 

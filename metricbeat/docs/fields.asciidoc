@@ -954,10 +954,30 @@ type: long
 
 --
 
+*`aws.ec2.network.in.packets_per_sec`*::
++
+--
+The number of packets per second sent out on all network interfaces by the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.network.out.packets`*::
 +
 --
 The number of packets sent out on all network interfaces by the instance.
+
+
+type: long
+
+--
+
+*`aws.ec2.network.out.packets_per_sec`*::
++
+--
+The number of packets per second sent out on all network interfaces by the instance.
 
 
 type: long
@@ -976,6 +996,16 @@ format: bytes
 
 --
 
+*`aws.ec2.network.in.bytes_per_sec`*::
++
+--
+The number of bytes per second received on all network interfaces by the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.network.out.bytes`*::
 +
 --
@@ -985,6 +1015,16 @@ The number of bytes sent out on all network interfaces by the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.network.out.bytes_per_sec`*::
++
+--
+The number of bytes per second sent out on all network interfaces by the instance.
+
+
+type: long
 
 --
 
@@ -1000,6 +1040,16 @@ format: bytes
 
 --
 
+*`aws.ec2.diskio.read.bytes_per_sec`*::
++
+--
+Bytes read per second from all instance store volumes available to the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.bytes`*::
 +
 --
@@ -1009,6 +1059,16 @@ Bytes written to all instance store volumes available to the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.diskio.write.bytes_per_sec`*::
++
+--
+Bytes written per second to all instance store volumes available to the instance.
+
+
+type: long
 
 --
 
@@ -1022,10 +1082,30 @@ type: long
 
 --
 
+*`aws.ec2.diskio.read.ops_per_sec`*::
++
+--
+Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.ops`*::
 +
 --
 Completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+
+type: long
+
+--
+
+*`aws.ec2.diskio.write.ops_per_sec`*::
++
+--
+Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
 
 
 type: long
@@ -13588,7 +13668,7 @@ type: keyword
 
 --
 
-*`kubernetes.labels`*::
+*`kubernetes.labels.*`*::
 +
 --
 Kubernetes labels map
@@ -13598,7 +13678,7 @@ type: object
 
 --
 
-*`kubernetes.annotations`*::
+*`kubernetes.annotations.*`*::
 +
 --
 Kubernetes annotations map
