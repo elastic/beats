@@ -33,8 +33,8 @@ import (
 )
 
 var (
-	// Beats is a list of Beats to collect dashboards from.
-	Beats = []string{
+	// BeatsWithDashboards is a list of Beats to collect dashboards from.
+	BeatsWithDashboards = []string{
 		"heartbeat",
 		"journalbeat",
 		"packetbeat",
@@ -42,7 +42,6 @@ var (
 		"x-pack/auditbeat",
 		"x-pack/filebeat",
 		"x-pack/metricbeat",
-		"x-pack/functionbeat",
 	}
 )
 
@@ -66,7 +65,7 @@ func PackageBeatDashboards() error {
 		OutputFile: "build/distributions/dashboards/{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}",
 	}
 
-	for _, beatDir := range Beats {
+	for _, beatDir := range BeatsWithDashboards {
 		// The generated dashboard content is moving in the build dir, but
 		// not all projects have been updated so detect which dir to use.
 		dashboardDir := filepath.Join(beatDir, "build/kibana")

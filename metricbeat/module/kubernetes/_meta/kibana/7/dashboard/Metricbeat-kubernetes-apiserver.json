@@ -2,11 +2,11 @@
     "objects": [
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Kubernetes API Server", 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Top clients by number of requests ECS", 
+                "title": "API Server Top clients by number of requests [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -66,7 +66,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Kubernetes API Server: Top clients by number of requests ECS", 
+                    "title": "API Server Top clients by number of requests [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
@@ -81,7 +81,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Requests ECS", 
+                "title": "API Server Requests [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -171,7 +171,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Kubernetes API Server: Requests ECS", 
+                    "title": "API Server Requests [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
@@ -186,7 +186,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Top clients by resource ECS", 
+                "title": "API Server Top clients by resource [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -248,7 +248,7 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Kubernetes API Server: Top clients by resource ECS", 
+                    "title": "API Server Top clients by resource [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 

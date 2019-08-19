@@ -1,3 +1,4 @@
 name: aws
 metricsets:
   - elb
+  - ebs

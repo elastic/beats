@@ -2,7 +2,7 @@
     "objects": [
         {
             "attributes": {
-                "description": "", 
+                "description": "Command executions", 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": [], 
@@ -13,7 +13,7 @@
                     }
                 }, 
                 "savedSearchId": "d382f5b0-c1c6-11e7-8995-936807a28b16-ecs", 
-                "title": "Error Codes [Auditbeat Auditd Executions] ECS", 
+                "title": "Error Codes [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -46,7 +46,7 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Error Codes [Auditbeat Auditd Executions] ECS", 
+                    "title": "Error Codes [Auditbeat Auditd] ECS", 
                     "type": "pie"
                 }
             }, 
@@ -121,7 +121,7 @@
                     }
                 }, 
                 "savedSearchId": "d382f5b0-c1c6-11e7-8995-936807a28b16-ecs", 
-                "title": "Exe Name Tag Cloud [Auditbeat Auditd Executions] ECS", 
+                "title": "Exe Name Tag Cloud [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -152,7 +152,7 @@
                         "orientation": "single", 
                         "scale": "linear"
                     }, 
-                    "title": "Exe Name Tag Cloud [Auditbeat Auditd Executions] ECS", 
+                    "title": "Exe Name Tag Cloud [Auditbeat Auditd] ECS", 
                     "type": "tagcloud"
                 }
             }, 
@@ -251,7 +251,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of kernel executions", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
