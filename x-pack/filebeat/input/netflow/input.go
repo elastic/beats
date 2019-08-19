@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/udp"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -67,13 +66,18 @@ func init() {
 // NewInput creates a new Netflow input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	initLogger.Do(func() {
 		logger = logp.NewLogger(inputName)
 	})
-	out, err := outlet(cfg, context.DynamicFields)
+
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -113,10 +117,8 @@ func NewInput(
 }
 
 func (p *netflowInput) Publish(events []beat.Event) error {
-	for _, ev := range events {
-		e := util.NewData()
-		e.Event = ev
-		p.forwarder.Send(e)
+	for _, evt := range events {
+		p.forwarder.Send(evt)
 	}
 	return nil
 }

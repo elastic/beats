@@ -7,6 +7,8 @@
         "client.port": 59309,
         "client.user.name": "crusher",
         "destination.address": "204.232.231.46",
+        "destination.as.number": 27357,
+        "destination.as.organization.name": "Rackspace Hosting",
         "destination.bytes": 78,
         "destination.geo.city_name": "Charlotte",
         "destination.geo.continent_name": "North America",

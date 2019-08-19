@@ -50,10 +50,10 @@ func verifySendMessageBatch(r *request.Request) {
 
 		in := r.Params.(*SendMessageBatchInput)
 		for _, entry := range in.Entries {
-			e := entries[*entry.Id]
-			err := checksumsMatch(entry.MessageBody, e.MD5OfMessageBody)
-			if err != nil {
-				ids = append(ids, *e.MessageId)
+			if e, ok := entries[*entry.Id]; ok {
+				if err := checksumsMatch(entry.MessageBody, e.MD5OfMessageBody); err != nil {
+					ids = append(ids, *e.MessageId)
+				}
 			}
 		}
 		if len(ids) > 0 {

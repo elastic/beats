@@ -19,7 +19,7 @@ under `output.elasticsearch`. For example:
 ----
 output.elasticsearch:
   hosts: ["localhost:9200"]
-  username: "{beat_default_index_prefix}_internal" <1>
+  username: "{beat_default_index_prefix}_writer" <1>
   password: "{pwd}" <2>
 ----
 <1> Let's assume this user has the privileges required to publish events to
@@ -36,7 +36,7 @@ authenticating with {kib}. For example:
 ----
 setup.kibana:
   host: "mykibanahost:5601"
-  username: "{beat_default_index_prefix}_internal" <1>
+  username: "{beat_default_index_prefix}_setup" <1>
   password: "{pwd}" 
 ----
 <1> Let's assume this user has the privileges required to set up dashboards.

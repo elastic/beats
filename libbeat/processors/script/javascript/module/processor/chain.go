@@ -98,9 +98,7 @@ func (b *chainBuilder) Build(call goja.FunctionCall) goja.Value {
 	}
 
 	p := &beatProcessor{b.runtime, &b.chain}
-	o := b.runtime.NewObject()
-	o.Set("Run", p.Run)
-	return o
+	return b.runtime.ToValue(p)
 }
 
 type gojaCall interface {
@@ -126,6 +124,7 @@ func newJSProcessor(fn jsFunction) *jsProcessor {
 func (p *jsProcessor) run(event javascript.Event) error {
 	p.call.Arguments[0] = event.JSObject()
 	p.fn(p.call)
+	p.call.Arguments[0] = nil
 	return nil
 }
 

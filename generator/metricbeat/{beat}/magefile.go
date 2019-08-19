@@ -28,12 +28,21 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
 	devtools.SetBuildVariableSources(devtools.DefaultBeatBuildVariableSources)
 
 	devtools.BeatDescription = "One sentence description of the Beat."
+}
+
+//CollectAll generates the docs and the fields.
+func CollectAll() {
+	mg.Deps(CollectDocs, FieldsDocs)
 }
 
 // Build builds the Beat binary.
@@ -60,11 +69,6 @@ func CrossBuild() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -107,6 +111,11 @@ func FieldsDocs() error {
 		return err
 	}
 	return devtools.Docs.FieldDocs(output)
+}
+
+// CollectDocs creates the documentation under docs/
+func CollectDocs() error {
+	return metricbeat.CollectDocs()
 }
 
 // GoTestUnit executes the Go unit tests.

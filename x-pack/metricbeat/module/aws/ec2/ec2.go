@@ -5,10 +5,13 @@
 package ec2
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -155,9 +158,12 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
 	for instanceID := range instanceOutput {
-		events[instanceID] = aws.InitEvent(metricsetName, regionName)
+		events[instanceID] = aws.InitEvent(regionName)
 		metricSetFieldResults[instanceID] = map[string]interface{}{}
 	}
+
+	// monitoring state for each instance
+	monitoringStates := map[string]string{}
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(getMetricDataResults)
@@ -191,6 +197,8 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				if err != nil {
 					return events, errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
 				}
+
+				monitoringStates[instanceID] = monitoringState
 
 				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
 				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
@@ -226,6 +234,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				return events, errors.Wrap(err, "EventMapping failed")
 			}
 
+			// add rate metrics
+			calculateRate(resultMetricsetFields, monitoringStates[instanceID])
+
 			events[instanceID].MetricSetFields.Update(resultMetricsetFields)
 			if len(events[instanceID].MetricSetFields) < 5 {
 				m.Logger().Info("Missing Cloudwatch data, this is expected for non-running instances" +
@@ -238,7 +249,32 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 	return events, nil
 }
 
-func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
+func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) {
+	var period = 300.0
+	if monitoringState != "disabled" {
+		period = 60.0
+	}
+
+	metricList := []string{
+		"network.in.bytes",
+		"network.out.bytes",
+		"network.in.packets",
+		"network.out.packets",
+		"diskio.read.bytes",
+		"diskio.write.bytes",
+		"diskio.read.count",
+		"diskio.write.count"}
+
+	for _, metricName := range metricList {
+		metricValue, err := resultMetricsetFields.GetValue(metricName)
+		if err == nil && metricValue != nil {
+			rateValue := metricValue.(float64) / period
+			resultMetricsetFields.Put(metricName+"_per_sec", rateValue)
+		}
+	}
+}
+
+func getInstancesPerRegion(svc ec2iface.ClientAPI) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
 	instancesOutputs = map[string]ec2.Instance{}
 	output := ec2.DescribeInstancesOutput{NextToken: nil}
 	init := true
@@ -246,7 +282,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		init = false
 		describeInstanceInput := &ec2.DescribeInstancesInput{}
 		req := svc.DescribeInstancesRequest(describeInstanceInput)
-		output, err := req.Send()
+		output, err := req.Send(context.Background())
 		if err != nil {
 			err = errors.Wrap(err, "Error DescribeInstances")
 			return nil, nil, err

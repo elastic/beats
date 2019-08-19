@@ -17,7 +17,6 @@
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -32,12 +31,12 @@
     - state_statefulset
     - state_pod
     - state_container
+    - state_cronjob
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -49,8 +48,36 @@
     - event
 
 # Kubernetes API server
+# (when running metricbeat as a pod)
 - module: kubernetes
   enabled: true
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+# Kubernetes proxy server
+# (when running metricbeat locally at hosts or as a daemonset + host network)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - proxy
+  hosts: ["localhost:10249"]
+  period: 10s
+
+# Kubernetes controller manager
+# (URL and deployment will need to be modified to match the controller manager deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - controllermanager
+  hosts: ["http://localhost:10252"]
+  period: 10s
+
+# Kubernetes scheduler
+# (URL and deployment method will need to be adapted to match scheduler deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - scheduler
+  hosts: ["localhost:10251"]
+  period: 10s

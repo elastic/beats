@@ -1,4 +1,4 @@
-FROM golang:1.12.4
+FROM golang:1.12.8
 MAINTAINER Pier-Hugues Pellerin <ph@elastic.co>
 
 RUN set -x && \

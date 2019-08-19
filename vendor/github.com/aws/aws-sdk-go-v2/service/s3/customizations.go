@@ -9,7 +9,7 @@ func init() {
 	initRequest = defaultInitRequestFn
 }
 
-func defaultInitClientFn(c *S3) {
+func defaultInitClientFn(c *Client) {
 	// Require SSL when using SSE keys
 	c.Handlers.Validate.PushBack(validateSSERequiresSSL)
 	c.Handlers.Build.PushBack(computeSSEKeys)
@@ -19,7 +19,7 @@ func defaultInitClientFn(c *S3) {
 	c.Handlers.UnmarshalError.PushBack(unmarshalError)
 }
 
-func defaultInitRequestFn(c *S3, r *aws.Request) {
+func defaultInitRequestFn(c *Client, r *aws.Request) {
 	// Add reuest handlers for specific platforms.
 	// e.g. 100-continue support for PUT requests using Go 1.6
 	platformRequestHandlers(c, r)
@@ -30,6 +30,7 @@ func defaultInitRequestFn(c *S3, r *aws.Request) {
 	switch r.Operation.Name {
 	case opPutBucketCors, opPutBucketLifecycle, opPutBucketPolicy,
 		opPutBucketTagging, opDeleteObjects, opPutBucketLifecycleConfiguration,
+		opPutObjectLegalHold, opPutObjectRetention, opPutObjectLockConfiguration,
 		opPutBucketReplication:
 		// These S3 operations require Content-MD5 to be set
 		r.Handlers.Build.PushBack(contentMD5)

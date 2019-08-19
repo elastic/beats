@@ -93,7 +93,7 @@ func defaultConfig() kafkaConfig {
 				Backoff: 250 * time.Millisecond,
 			},
 			RefreshFreq: 10 * time.Minute,
-			Full:        true,
+			Full:        false,
 		},
 		KeepAlive:        0,
 		MaxMessageBytes:  nil, // use library default
@@ -225,8 +225,6 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		return nil, fmt.Errorf("Unknown/unsupported kafka version: %v", config.Version)
 	}
 	k.Version = version
-
-	k.MetricRegistry = kafkaMetricsRegistry()
 
 	k.Producer.Partitioner = partitioner
 	k.MetricRegistry = adapter.GetGoMetrics(

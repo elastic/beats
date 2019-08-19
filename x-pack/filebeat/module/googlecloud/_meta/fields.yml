@@ -1,0 +1,10 @@
+- key: googlecloud
+  title: Google Cloud
+  description: >
+    Module for handling logs from Google Cloud.
+  fields:
+    - name: googlecloud
+      type: group
+      description: >
+        Fields from Google Cloud logs.
+      fields:

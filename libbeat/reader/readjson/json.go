@@ -145,7 +145,7 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 			Timestamp: ts,
 			Fields:    data,
 		}
-		jsontransform.WriteJSONKeys(event, jsonFields, config.OverwriteKeys)
+		jsontransform.WriteJSONKeys(event, jsonFields, config.OverwriteKeys, config.AddErrorKey)
 
 		return event.Timestamp
 	}

@@ -182,7 +182,7 @@ configurations for all available {beatname_uc} modules.
 If you are using a Docker image, see <<running-on-docker>>.
 +
 The following examples enable the `apache` and `mysql` configs in the
-`modules.d` directory :
+`modules.d` directory:
 +
 *deb and rpm:*
 +
@@ -271,6 +271,10 @@ configuration file and any configurations enabled in the `modules.d` directory,
 or run {beatname_uc} with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
+
+:requires-sudo:
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+:requires-sudo!:
 
 *win:*
 
