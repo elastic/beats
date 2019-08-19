@@ -17,6 +17,16 @@ https://github.com/elastic/beats/compare/v7.3.0...v7.3.1[View commits]
 
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 
+*Metricbeat*
+
+- Fix `logstash/node_stats` metricset to also collect `logstash_stats.events.duration_in_millis` field when `xpack.enabled: true` is set. {pull}13082[13082]
+- Fix `logstash/node` metricset to also collect `logstash_state.pipeline.representation.{type,version,hash}` fields when `xpack.enabled: true` is set. {pull}13133[13133]
+
+==== Added
+
+*Metricbeat*
+
+- Make the `beat` module defensive about determine ES cluster UUID when `xpack.enabled: true` is set. {pull}13020[13020]
 
 [[release-notes-7.3.0]]
 === Beats version 7.3.0
