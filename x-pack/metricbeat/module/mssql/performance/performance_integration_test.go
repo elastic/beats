@@ -9,10 +9,9 @@ package performance
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
@@ -75,7 +74,7 @@ func TestFetch(t *testing.T) {
 	keys := []keyAssertion{
 		{key: "page_splits_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "buffer.page_life_expectancy.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "lock_waits_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "lock_waits_per_sec", assertion: int64Assertion(int64EqualOrHigherThanZero)},
 		{key: "user_connections", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "transactions", assertion: int64Assertion(int64EqualOrHigherThanZero)},
 		{key: "active_temp_tables", assertion: int64Assertion(int64EqualZero)},

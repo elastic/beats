@@ -35,7 +35,7 @@ type StateOS struct {
 }
 
 var (
-	modkernel32 = windows.NewLazyDLL("kernel32.dll")
+	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
 
 	procGetFileInformationByHandleEx = modkernel32.NewProc("GetFileInformationByHandleEx")
 )

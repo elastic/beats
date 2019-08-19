@@ -48,6 +48,9 @@ func DefaultBuildArgs() BuildArgs {
 	args := BuildArgs{
 		Name: BeatName,
 		CGO:  build.Default.CgoEnabled,
+		LDFlags: []string{
+			"-s", // Strip all debug symbols from binary (does not affect Go stack traces).
+		},
 		Vars: map[string]string{
 			"github.com/elastic/beats/libbeat/version.buildTime": "{{ date }}",
 			"github.com/elastic/beats/libbeat/version.commit":    "{{ commit }}",

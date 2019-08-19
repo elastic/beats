@@ -12,7 +12,7 @@
             }
           }
         },
-        "title": "Keyspace selector [Redis] ECS",
+        "title": "Keyspace selector [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -39,7 +39,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Keyspace selector [Redis] ECS",
+          "title": "Keyspace selector [Metricbeat Redis] ECS",
           "type": "input_control_vis"
         }
       },
@@ -88,7 +88,7 @@
             }
           }
         },
-        "title": "Lists length [Redis] ECS",
+        "title": "Lists length [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -228,7 +228,7 @@
               }
             ]
           },
-          "title": "Lists length [Redis] ECS",
+          "title": "Lists length [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
@@ -250,7 +250,7 @@
             }
           }
         },
-        "title": "Keys by type [Redis] ECS",
+        "title": "Keys by type [Metricbeat Redis] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -377,7 +377,7 @@
               }
             ]
           },
-          "title": "Keys by type [Redis] ECS",
+          "title": "Keys by type [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
@@ -426,7 +426,7 @@
             }
           }
         },
-        "title": "Average string key size [Redis] ECS",
+        "title": "Average string key size [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -548,7 +548,7 @@
               }
             ]
           },
-          "title": "Average string key size [Redis] ECS",
+          "title": "Average string key size [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
@@ -595,7 +595,7 @@
             }
           }
         },
-        "title": "Average keys TTL [Redis] ECS",
+        "title": "Average keys TTL [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -734,7 +734,7 @@
               }
             ]
           },
-          "title": "Average keys TTL [Redis] ECS",
+          "title": "Average keys TTL [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
