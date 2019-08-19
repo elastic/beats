@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "This Ceph dashboard that shows the most important cluster metrics.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -144,8 +144,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-09T15:43:56.608Z",
-      "version": "WzEzNjAsMV0="
+      "updated_at": "2019-08-19T15:00:55.571Z",
+      "version": "WzE1NzEsMV0="
     },
     {
       "attributes": {
