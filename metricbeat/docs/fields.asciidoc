@@ -59,6 +59,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-statsd>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
@@ -953,10 +954,30 @@ type: long
 
 --
 
+*`aws.ec2.network.in.packets_per_sec`*::
++
+--
+The number of packets per second sent out on all network interfaces by the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.network.out.packets`*::
 +
 --
 The number of packets sent out on all network interfaces by the instance.
+
+
+type: long
+
+--
+
+*`aws.ec2.network.out.packets_per_sec`*::
++
+--
+The number of packets per second sent out on all network interfaces by the instance.
 
 
 type: long
@@ -975,6 +996,16 @@ format: bytes
 
 --
 
+*`aws.ec2.network.in.bytes_per_sec`*::
++
+--
+The number of bytes per second received on all network interfaces by the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.network.out.bytes`*::
 +
 --
@@ -984,6 +1015,16 @@ The number of bytes sent out on all network interfaces by the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.network.out.bytes_per_sec`*::
++
+--
+The number of bytes per second sent out on all network interfaces by the instance.
+
+
+type: long
 
 --
 
@@ -999,6 +1040,16 @@ format: bytes
 
 --
 
+*`aws.ec2.diskio.read.bytes_per_sec`*::
++
+--
+Bytes read per second from all instance store volumes available to the instance.
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.bytes`*::
 +
 --
@@ -1008,6 +1059,16 @@ Bytes written to all instance store volumes available to the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.diskio.write.bytes_per_sec`*::
++
+--
+Bytes written per second to all instance store volumes available to the instance.
+
+
+type: long
 
 --
 
@@ -1021,10 +1082,30 @@ type: long
 
 --
 
+*`aws.ec2.diskio.read.ops_per_sec`*::
++
+--
+Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.ops`*::
 +
 --
 Completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+
+type: long
+
+--
+
+*`aws.ec2.diskio.write.ops_per_sec`*::
++
+--
+Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
 
 
 type: long
@@ -4797,7 +4878,7 @@ Percentage of time in kernel space.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4819,7 +4900,7 @@ Percentage of total CPU time in the system.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4841,7 +4922,7 @@ Percentage of time in user space.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4863,7 +4944,7 @@ Total CPU usage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4875,7 +4956,7 @@ Percentage of CPU time in this core.
 
 type: object
 
-format: percentage
+format: percent
 
 --
 
@@ -5485,7 +5566,7 @@ Memory resident set size percentage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -5516,7 +5597,7 @@ Memory usage percentage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -12009,7 +12090,7 @@ Current throttle percentage for the server when slowstart is active, or no value
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -13577,7 +13658,7 @@ type: keyword
 
 --
 
-*`kubernetes.labels`*::
+*`kubernetes.labels.*`*::
 +
 --
 Kubernetes labels map
@@ -13587,7 +13668,7 @@ type: object
 
 --
 
-*`kubernetes.annotations`*::
+*`kubernetes.annotations.*`*::
 +
 --
 Kubernetes annotations map
@@ -14135,7 +14216,7 @@ CPU usage as a percentage of the total node allocatable CPU
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14147,7 +14228,7 @@ CPU usage as a percentage of the defined limit for the container (or total node 
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14263,7 +14344,7 @@ Memory usage as a percentage of the total node allocatable memory
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14275,7 +14356,7 @@ Memory usage as a percentage of the defined limit for the container (or total no
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15252,7 +15333,7 @@ CPU usage as a percentage of the total node CPU
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15264,7 +15345,7 @@ CPU usage as a percentage of the defined limit for the pod containers (or total 
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15290,7 +15371,7 @@ Memory usage as a percentage of the total node allocatable memory
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15302,7 +15383,7 @@ Memory usage as a percentage of the defined limit for the pod containers (or tot
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -22951,8 +23032,6 @@ The date and time FPM has started.
 
 type: date
 
-format: epoch_second
-
 --
 
 [float]
@@ -22991,8 +23070,6 @@ The date and time the process has started
 
 
 type: date
-
-format: epoch_second
 
 --
 
@@ -24682,7 +24759,7 @@ Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately
 
 type: long
 
-format: percentage
+format: percent
 
 --
 
@@ -24956,11 +25033,12 @@ Redis memory stats.
 *`redis.info.memory.used.value`*::
 +
 --
+Total number of bytes allocated by Redis.
 
 
 type: long
 
-format: bytes Total number of bytes allocated by Redis.
+format: bytes
 
 --
 
@@ -26115,6 +26193,33 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-statsd]]
+== Statsd fields
+
+Statsd module
+
+
+
+*`statsd.*.count`*::
++
+--
+Statsd counters
+
+
+type: object
+
+--
+
+*`statsd.*.*`*::
++
+--
+Statsd metrics - release: beta
+
+
+type: object
 
 --
 

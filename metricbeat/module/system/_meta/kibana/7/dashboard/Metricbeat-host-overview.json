@@ -1633,7 +1633,7 @@
                         }
                     }
                 },
-                "title": "Memory usage vs total ECS",
+                "title": "Memory usage vs total [Metricbeat System] ECS",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
