@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "This CouchDB dashboard visualizes the most important CouchDB server metrics.\n\n",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -163,8 +163,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-09T15:30:31.126Z",
-      "version": "WzEzNTMsMV0="
+      "updated_at": "2019-08-19T15:05:11.218Z",
+      "version": "WzE1NzksMV0="
     },
     {
       "attributes": {
