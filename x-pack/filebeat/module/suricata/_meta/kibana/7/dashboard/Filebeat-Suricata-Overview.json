@@ -13,7 +13,7 @@
           }
         },
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-        "title": "Activity Types over Time [Suricata] ECS",
+        "title": "Activity Types over Time [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -123,7 +123,7 @@
               }
             ]
           },
-          "title": "Activity Types over Time [Suricata] ECS",
+          "title": "Activity Types over Time [Filebeat Suricata] ECS",
           "type": "histogram"
         }
       },
@@ -145,7 +145,7 @@
           }
         },
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-        "title": "Event Types [Suricata] ECS",
+        "title": "Event Types [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -187,7 +187,7 @@
             "legendPosition": "bottom",
             "type": "pie"
           },
-          "title": "Event Types [Suricata] ECS",
+          "title": "Event Types [Filebeat Suricata] ECS",
           "type": "pie"
         }
       },
@@ -209,7 +209,7 @@
           }
         },
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Application Protocols [Suricata] ECS",
+        "title": "Top Application Protocols [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -251,7 +251,7 @@
             "legendPosition": "bottom",
             "type": "pie"
           },
-          "title": "Top Application Protocols [Suricata] ECS",
+          "title": "Top Application Protocols [Filebeat Suricata] ECS",
           "type": "pie"
         }
       },
@@ -273,7 +273,7 @@
           }
         },
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Hosts Generating Events [Suricata] ECS",
+        "title": "Top Hosts Generating Events [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -383,7 +383,7 @@
               }
             ]
           },
-          "title": "Top Hosts Generating Events [Suricata] ECS",
+          "title": "Top Hosts Generating Events [Filebeat Suricata] ECS",
           "type": "histogram"
         }
       },
@@ -477,7 +477,7 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Events [Suricata] ECS",
+        "title": "Events [Filebeat Suricata] ECS",
         "version": 1
       },
       "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
@@ -498,7 +498,7 @@
           }
         },
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Connection Source Countries [Suricata] ECS",
+        "title": "Top Connection Source Countries [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -535,7 +535,7 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Top Connection Source Countries [Suricata] ECS",
+          "title": "Top Connection Source Countries [Filebeat Suricata] ECS",
           "type": "tagcloud"
         }
       },
@@ -557,7 +557,7 @@
           }
         },
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Connection Destination Countries [Suricata] ECS",
+        "title": "Top Connection Destination Countries [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -594,7 +594,7 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Top Connection Destination Countries [Suricata] ECS",
+          "title": "Top Connection Destination Countries [Filebeat Suricata] ECS",
           "type": "tagcloud"
         }
       },
@@ -616,7 +616,7 @@
           }
         },
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Network Protocols [Suricata] ECS",
+        "title": "Top Network Protocols [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -658,7 +658,7 @@
             "legendPosition": "bottom",
             "type": "pie"
           },
-          "title": "Top Network Protocols [Suricata] ECS",
+          "title": "Top Network Protocols [Filebeat Suricata] ECS",
           "type": "pie"
         }
       },
@@ -749,7 +749,7 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Host Stats [Suricata] ECS",
+        "title": "Host Stats [Filebeat Suricata] ECS",
         "version": 1
       },
       "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
@@ -906,7 +906,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Suricata] Events Overview ECS",
+        "title": "[Filebeat Suricata] Events Overview ECS",
         "version": 1
       },
       "id": "78289c40-86da-11e8-b59d-21efb914e65c-ecs",

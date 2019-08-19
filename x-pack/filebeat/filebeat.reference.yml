@@ -76,6 +76,17 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#--------------------------------- AWS Module ---------------------------------
+- module: aws
+  s3access:
+    enabled: true
+
+    # AWS SQS queue url
+    #var.queue_url: sqs_queue_url
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
