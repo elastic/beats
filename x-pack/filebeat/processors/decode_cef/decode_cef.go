@@ -70,7 +70,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	// Ignore any leading data before the CEF header.
 	idx := strings.Index(cefData, "CEF:")
 	if idx == -1 {
-		return event, errors.Errorf("%v is not a CEF message: header start not found", p.config.Field)
+		return event, errors.Errorf("%v field is not a CEF message: header start not found", p.config.Field)
 	}
 	cefData = cefData[idx:]
 
