@@ -14,12 +14,14 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/eventlog"
@@ -113,6 +115,10 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 
 		for _, r := range records {
 			record := r.ToEvent()
+
+			// Validate fields in event against fields.yml.
+			assertFieldsAreDocumented(t, record.Fields)
+
 			record.Delete("event.created")
 			record.Delete("log.file")
 
@@ -250,4 +256,36 @@ func lowercaseGUIDs(m common.MapStr) common.MapStr {
 		}
 	}
 	return m
+}
+
+var (
+	loadDocumentedFieldsOnce sync.Once
+	documentedFields         []string
+)
+
+// assertFieldsAreDocumented validates that all fields contained in the event
+// are documented in a fields.yml file.
+func assertFieldsAreDocumented(t testing.TB, m common.MapStr) {
+	t.Helper()
+
+	loadDocumentedFieldsOnce.Do(func() {
+		fieldsYml, err := mapping.LoadFieldsYaml("../../../build/fields/fields.all.yml")
+		if err != nil {
+			t.Fatal("Failed to load generated fields.yml data. Try running 'mage update'.", err)
+		}
+		documentedFields = fieldsYml.GetKeys()
+	})
+
+	for eventFieldName := range m.Flatten() {
+		found := false
+		for _, documentedFieldName := range documentedFields {
+			if strings.HasPrefix(eventFieldName, documentedFieldName) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			assert.Fail(t, "Field not documented", "Key '%v' found in event is not documented.", eventFieldName)
+		}
+	}
 }

@@ -47,3 +47,6 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Introduce beat.OutputChooses publisher mode. {pull}12996[12996]
 - Ensure that beat.Processor, beat.ProcessorList, and processors.ProcessorList are compatible and can be composed more easily. {pull}12996[12996]
 - Add support to close beat.Client via beat.CloseRef (a subset of context.Context). {pull}13031[13031]
+- Add checks for types and formats used in fields definitions in `fields.yml` files. {pull}13188[13188]
+- Makefile included in generator copies files from beats repository using `git archive` instead of cp. {pull}13193[13193]
+- Strip debug symbols from binaries to reduce binary sizes. {issue}12768[12768]

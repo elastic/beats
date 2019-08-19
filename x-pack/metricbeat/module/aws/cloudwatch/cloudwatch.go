@@ -123,15 +123,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
 
 	// Create events based on listMetricDetailTotal from configuration
-	for _, regionName := range m.MetricSet.RegionsList {
-		awsConfig := m.MetricSet.AwsConfig.Copy()
-		awsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(awsConfig)
-		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
+	if len(listMetricDetailTotal.metricsWithStats) != 0 {
+		for _, regionName := range m.MetricSet.RegionsList {
+			awsConfig := m.MetricSet.AwsConfig.Copy()
+			awsConfig.Region = regionName
+			svcCloudwatch := cloudwatch.New(awsConfig)
+			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 
-		err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime, report)
-		if err != nil {
-			return errors.Wrap(err, "createEvents failed")
+			err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime, report)
+			if err != nil {
+				return errors.Wrap(err, "createEvents failed")
+			}
 		}
 	}
 
@@ -362,6 +364,10 @@ func statisticLookup(stat string) (string, bool) {
 		"SampleCount": "count",
 	}
 	statMethod, ok := statisticLookupTable[stat]
+	if !ok {
+		ok = strings.HasPrefix(stat, "p")
+		statMethod = stat
+	}
 	return statMethod, ok
 }
 
@@ -369,15 +375,15 @@ func generateFieldName(labels []string) string {
 	stat := labels[statisticIdx]
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
 	if statMethod, ok := statisticLookup(stat); ok {
-		return "metrics." + labels[metricNameIdx] + "." + statMethod
+		return "aws.metrics." + labels[metricNameIdx] + "." + statMethod
 	}
 	// If not, then it should be a percentile in the form of pN
 	return "metrics." + labels[metricNameIdx] + "." + stat
 }
 
-func insertMetricSetFields(event mb.Event, metricValue float64, labels []string) mb.Event {
-	event.MetricSetFields.Put(generateFieldName(labels), metricValue)
-	event.MetricSetFields.Put("namespace", labels[namespaceIdx])
+func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.Event {
+	event.RootFields.Put(generateFieldName(labels), metricValue)
+	event.RootFields.Put("aws.cloudwatch.namespace", labels[namespaceIdx])
 	if len(labels) == 3 {
 		return event
 	}
@@ -385,7 +391,7 @@ func insertMetricSetFields(event mb.Event, metricValue float64, labels []string)
 	dimNames := strings.Split(labels[identifierNameIdx], ",")
 	dimValues := strings.Split(labels[identifierValueIdx], ",")
 	for i := 0; i < len(dimNames); i++ {
-		event.MetricSetFields.Put("dimensions."+dimNames[i], dimValues[i])
+		event.RootFields.Put("aws.cloudwatch.dimensions."+dimNames[i], dimValues[i])
 	}
 	return event
 }
@@ -403,7 +409,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	events := map[string]mb.Event{}
 	for _, values := range identifiers {
 		for _, v := range values {
-			events[v] = aws.InitEvent(metricsetName, regionName)
+			events[v] = aws.InitEvent(regionName)
 		}
 	}
 	// Initialize events for the ones without identifiers.
@@ -434,14 +440,14 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 				labels := strings.Split(*output.Label, " ")
 				if len(labels) == 5 {
 					identifierValue := labels[identifierValueIdx]
-					events[identifierValue] = insertMetricSetFields(events[identifierValue], output.Values[timestampIdx], labels)
+					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 					tags := resourceTagMap[identifierValue]
 					for _, tag := range tags {
-						events[identifierValue].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+						events[identifierValue].RootFields.Put("aws.tags."+*tag.Key, *tag.Value)
 					}
 				} else {
-					eventNew := aws.InitEvent(metricsetName, regionName)
-					eventNew = insertMetricSetFields(eventNew, output.Values[timestampIdx], labels)
+					eventNew := aws.InitEvent(regionName)
+					eventNew = insertRootFields(eventNew, output.Values[timestampIdx], labels)
 					eventsNoIdentifier = append(eventsNoIdentifier, eventNew)
 				}
 			}
@@ -449,18 +455,14 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	}
 
 	for _, event := range events {
-		if len(event.MetricSetFields) != 0 {
-			if reported := report.Event(event); !reported {
-				return nil
-			}
+		if reported := report.Event(event); !reported {
+			return nil
 		}
 	}
 
 	for _, event := range eventsNoIdentifier {
-		if len(event.MetricSetFields) != 0 {
-			if reported := report.Event(event); !reported {
-				return nil
-			}
+		if reported := report.Event(event); !reported {
+			return nil
 		}
 	}
 

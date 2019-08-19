@@ -49,6 +49,7 @@ type Provider struct {
 	templates template.Mapper
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
+	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -65,7 +66,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, errWrap(err)
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -75,7 +76,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, errWrap(err)
 	}
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
+	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
@@ -83,8 +84,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
-		return nil, errWrap(err)
+		return nil, errWrap(fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err))
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates)
@@ -114,20 +114,21 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		appenders: appenders,
 		metagen:   metagen,
 		watcher:   watcher,
+		logger:    logp.NewLogger("kubernetes"),
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj kubernetes.Resource) {
-			logp.Debug("kubernetes", "Watcher Pod add: %+v", obj)
+		AddFunc: func(obj interface{}) {
+			p.logger.Debugf("Watcher Pod add: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
-		UpdateFunc: func(obj kubernetes.Resource) {
-			logp.Debug("kubernetes", "Watcher Pod update: %+v", obj)
+		UpdateFunc: func(obj interface{}) {
+			p.logger.Debugf("Watcher Pod update: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "stop")
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
-		DeleteFunc: func(obj kubernetes.Resource) {
-			logp.Debug("kubernetes", "Watcher Pod delete: %+v", obj)
+		DeleteFunc: func(obj interface{}) {
+			p.logger.Debugf("Watcher Pod delete: %+v", obj)
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 		},
 	})
@@ -138,7 +139,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 // Start for Runner interface.
 func (p *Provider) Start() {
 	if err := p.watcher.Start(); err != nil {
-		logp.Err("Error starting kubernetes autodiscover provider: %s", err)
+		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
 	}
 }
 
@@ -150,9 +151,9 @@ func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
 }
 
-func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*kubernetes.Container,
-	containerstatuses []*kubernetes.PodContainerStatus) {
-	host := pod.Status.GetPodIP()
+func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
+	containerstatuses []kubernetes.PodContainerStatus) {
+	host := pod.Status.PodIP
 
 	// If the container doesn't exist in the runtime or its network
 	// is not configured, it won't have an IP. Skip it as we cannot
@@ -168,8 +169,8 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
 		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-		containerIDs[c.GetName()] = cid
-		runtimes[c.GetName()] = runtime
+		containerIDs[c.Name] = cid
+		runtimes[c.Name] = runtime
 	}
 
 	// Emit container and port information
@@ -177,22 +178,22 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		// If it doesn't have an ID, container doesn't exist in
 		// the runtime, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
-		cid := containerIDs[c.GetName()]
+		cid := containerIDs[c.Name]
 		if cid == "" && flag != "stop" {
 			continue
 		}
 
 		// This must be an id that doesn't depend on the state of the container
 		// so it works also on `stop` if containers have been already deleted.
-		eventID := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
+		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
 		cmeta := common.MapStr{
 			"id":      cid,
-			"name":    c.GetName(),
-			"image":   c.GetImage(),
-			"runtime": runtimes[c.GetName()],
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.ContainerMetadata(pod, c.GetName())
+		meta := p.metagen.ContainerMetadata(pod, c.Name)
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
@@ -200,7 +201,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 		// Pass annotations to all events so that it can be used in templating and by annotation builders.
 		annotations := common.MapStr{}
-		for k, v := range pod.GetMetadata().Annotations {
+		for k, v := range pod.GetObjectMeta().GetAnnotations() {
 			safemapstr.Put(annotations, k, v)
 		}
 		kubemeta["annotations"] = annotations
@@ -226,7 +227,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 				"id":         eventID,
 				flag:         true,
 				"host":       host,
-				"port":       port.GetContainerPort(),
+				"port":       port.ContainerPort,
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
@@ -285,12 +286,12 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	cname := builder.GetContainerName(container)
 	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
-	logp.Debug("kubernetes", "Generated hints %+v", hints)
+	p.logger.Debugf("Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
 
-	logp.Debug("kubernetes", "Generated builder event %+v", e)
+	p.logger.Debugf("Generated builder event %+v", e)
 
 	return e
 }

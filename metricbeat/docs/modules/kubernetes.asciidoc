@@ -77,7 +77,6 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -92,12 +91,12 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_cronjob
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -170,6 +169,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_container,state_container>>
 
+* <<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>
+
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
 
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
@@ -201,6 +202,8 @@ include::kubernetes/proxy.asciidoc[]
 include::kubernetes/scheduler.asciidoc[]
 
 include::kubernetes/state_container.asciidoc[]
+
+include::kubernetes/state_cronjob.asciidoc[]
 
 include::kubernetes/state_deployment.asciidoc[]
 

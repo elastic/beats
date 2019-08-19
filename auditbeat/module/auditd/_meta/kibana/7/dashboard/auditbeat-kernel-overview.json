@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Event Actions [Auditbeat Auditd Overview] ECS", 
+                "title": "Event Actions [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -65,7 +65,7 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Event Actions [Auditbeat Auditd Overview] ECS", 
+                    "title": "Event Actions [Auditbeat Auditd] ECS", 
                     "type": "metrics"
                 }
             }, 
