@@ -115,6 +115,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 		"ExcludeLogstash":      false,
 		"ExcludeRedis":         false,
 		"UseObserverProcessor": false,
+		"ExcludeDashboards":    false,
 	}
 	for k, v := range args.ExtraVars {
 		params[k] = v

@@ -20,7 +20,6 @@
 package connections
 
 import (
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -28,9 +27,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	err := mbtest.WriteEventsReporterV2Error(metricSet, t, "./test_data.json")
 	if err != nil {
 		t.Fatal("write", err)
@@ -38,39 +37,21 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats")
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "nats",
 		"metricsets": []string{"connections"},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":      []string{host},
 	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("NATS_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("NATS_PORT")
-
-	if len(port) == 0 {
-		port = "8222"
-	}
-	return port
 }

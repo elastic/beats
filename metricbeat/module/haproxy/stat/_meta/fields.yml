@@ -57,7 +57,7 @@
 
     - name: throttle.pct
       type: scaled_float
-      format: percentage
+      format: percent
       description: >
         Current throttle percentage for the server when slowstart
         is active, or no value if slowstart is inactive.

@@ -98,7 +98,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "Filebeat-Envoyproxy-Overview",
+        "title": "[Filebeat Envoyproxy] Overview",
         "version": 1
       },
       "id": "0c610510-5cbd-11e9-8477-077ec9664dbd",
@@ -829,7 +829,7 @@
             }
           }
         },
-        "title": "Proxy Request Distribution [Filebeat Envoyproxy] ",
+        "title": "Proxy Request Distribution [Filebeat Envoyproxy]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {

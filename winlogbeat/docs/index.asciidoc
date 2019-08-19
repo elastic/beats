@@ -17,6 +17,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_registry:
 :ignores_max_retries:
 :has_script_processor:
+:has_timestamp_processor:
 :win_os:
 :win_only:
 

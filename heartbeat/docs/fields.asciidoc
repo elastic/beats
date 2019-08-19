@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -3890,7 +3890,7 @@ type: keyword
 
 --
 
-*`kubernetes.labels`*::
+*`kubernetes.labels.*`*::
 +
 --
 Kubernetes labels map
@@ -3900,7 +3900,7 @@ type: object
 
 --
 
-*`kubernetes.annotations`*::
+*`kubernetes.annotations.*`*::
 +
 --
 Kubernetes annotations map

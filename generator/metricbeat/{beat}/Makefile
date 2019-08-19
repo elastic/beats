@@ -7,13 +7,17 @@ ES_BEATS?=./vendor/github.com/elastic/beats
 GOPACKAGES=$(shell govendor list -no-status +local)
 GOBUILD_FLAGS=-i -ldflags "-X $(BEAT_PATH)/vendor/github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X $(BEAT_PATH)/vendor/github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 MAGE_IMPORT_PATH=${BEAT_PATH}/vendor/github.com/magefile/mage
+CHECK_HEADERS_DISABLED=true
 
 # Path to the libbeat Makefile
 -include $(ES_BEATS)/metricbeat/Makefile
 
 # Initial beat setup
 .PHONY: setup
-setup: copy-vendor git-init create-metricset collect git-add
+setup: copy-vendor git-init
+	#call make recursively so we can reload the above include.
+	#Only needed during the first setup phase, before /vendor exists
+	$(MAKE) create-metricset collect git-add
 
 # Copy beats into vendor directory
 .PHONY: copy-vendor

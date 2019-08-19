@@ -14,7 +14,7 @@
 metricbeat.config.modules:
 
   # Glob pattern for configuration reloading
-  path: ${path.config}/conf.d/*.yml
+  path: ${path.config}/modules.d/*.yml
 
   # Period on which files under path should be checked for changes
   reload.period: 10s
@@ -173,8 +173,8 @@ metricbeat.modules:
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
+  regions:
+    - us-west-1
 - module: aws
   period: 86400s
   metricsets:
@@ -184,8 +184,6 @@ metricbeat.modules:
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
 - module: aws
   period: 300s
   metricsets:
@@ -203,9 +201,14 @@ metricbeat.modules:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
-  #regions:
-  #  - us-east-1
-  #  - us-east-2
+- module: aws
+  period: 60s
+  metricsets:
+    - rds
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
 
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
@@ -226,6 +229,16 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
+
+#----------------------------- CockroachDB Module -----------------------------
+- module: cockroachdb
+  metricsets: ['status']
+  period: 10s
+  hosts: ['localhost:8080']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  #metrics_path: /_status/vars
 
 #-------------------------------- Consul Module --------------------------------
 - module: consul
@@ -490,7 +503,6 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -505,12 +517,12 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_cronjob
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -522,11 +534,39 @@ metricbeat.modules:
     - event
 
 # Kubernetes API server
+# (when running metricbeat as a pod)
 - module: kubernetes
   enabled: true
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+# Kubernetes proxy server
+# (when running metricbeat locally at hosts or as a daemonset + host network)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - proxy
+  hosts: ["localhost:10249"]
+  period: 10s
+
+# Kubernetes controller manager
+# (URL and deployment will need to be modified to match the controller manager deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - controllermanager
+  hosts: ["http://localhost:10252"]
+  period: 10s
+
+# Kubernetes scheduler
+# (URL and deployment method will need to be adapted to match scheduler deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - scheduler
+  hosts: ["localhost:10251"]
+  period: 10s
 
 #--------------------------------- Kvm Module ---------------------------------
 - module: kvm
@@ -657,6 +697,17 @@ metricbeat.modules:
   # Path to server status. Default server-status
   server_status_path: "server-status"
 
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  metricsets: ["tablespace"]
+  enabled: false
+  period: 10s
+  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+
+  # username: ""
+  # password: ""
+
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:
@@ -752,6 +803,14 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+#-------------------------------- Statsd Module --------------------------------
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #reservoir_size: 1000
+  #ttl: "30s"
 
 #------------------------------- Traefik Module -------------------------------
 - module: traefik
@@ -1025,6 +1084,13 @@ metricbeat.modules:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 #
 # The following example copies the value of message to message_copied
 #
@@ -1357,8 +1423,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -1748,22 +1814,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'metricbeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "metricbeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'metricbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 

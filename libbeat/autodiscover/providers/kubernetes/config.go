@@ -26,12 +26,11 @@ import (
 
 // Config for kubernetes autodiscover provider
 type Config struct {
-	InCluster      bool          `config:"in_cluster"`
 	KubeConfig     string        `config:"kube_config"`
 	Host           string        `config:"host"`
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
-	CleanupTimeout time.Duration `config:"cleanup_timeout"`
+	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`
@@ -42,8 +41,7 @@ type Config struct {
 
 func defaultConfig() *Config {
 	return &Config{
-		InCluster:      true,
-		SyncPeriod:     1 * time.Second,
+		SyncPeriod:     10 * time.Minute,
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
 	}

@@ -5,6 +5,7 @@
 package sqs
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -15,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -29,9 +29,7 @@ var metricsetName = "sqs"
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-	)
+	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -127,11 +125,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
+func getQueueUrls(svc sqsiface.ClientAPI) ([]string, error) {
 	// ListQueues
 	listQueuesInput := &sqs.ListQueuesInput{}
 	req := svc.ListQueuesRequest(listQueuesInput)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		err = errors.Wrap(err, "Error DescribeInstances")
 		return nil, err
@@ -175,10 +173,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 }
 
 func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
+	event = aws.InitEvent(regionName)
 
 	// AWS sqs metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})

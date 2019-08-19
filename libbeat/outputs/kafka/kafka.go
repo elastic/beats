@@ -19,11 +19,9 @@ package kafka
 
 import (
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/Shopify/sarama"
-	gometrics "github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -41,9 +39,6 @@ const (
 	defaultMaxWaitRetry = 60 * time.Second
 )
 
-var kafkaMetricsOnce sync.Once
-var kafkaMetricsRegistryInstance gometrics.Registry
-
 var debugf = logp.MakeDebug("kafka")
 
 var (
@@ -54,19 +49,7 @@ var (
 func init() {
 	sarama.Logger = kafkaLogger{}
 
-	reg := gometrics.NewPrefixedRegistry("libbeat.kafka.")
-
-	// Note: registers /debug/metrics handler for displaying all expvar counters
-	// TODO: enable
-	//exp.Exp(reg)
-
-	kafkaMetricsRegistryInstance = reg
-
 	outputs.RegisterType("kafka", makeKafka)
-}
-
-func kafkaMetricsRegistry() gometrics.Registry {
-	return kafkaMetricsRegistryInstance
 }
 
 func makeKafka(
