@@ -4,4 +4,3 @@
 172.17.0.1 - - [29/May/2017:19:02:48 +0000] "GET /stringpatch HTTP/1.1" 404 612 "-" "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2" "-"
 monitoring-server - - [29/May/2017:19:02:48 +0000] "GET /status HTTP/1.1" 200 612 "-" "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2" "-"
 127.0.0.1 - - [02/Feb/2019:05:38:45 +0100] "-" 408 152 "-" "-"
-vhost1.domaine.fr 123.123.123.123 - - [04/Jul/2019:09:20:46 +0200] "GET / HTTP/1.1" 200 32953 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
