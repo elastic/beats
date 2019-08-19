@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "This Couchbase dashboard visualizes the most relevant metrics for cluster, nodes and buckets. ",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -29,7 +29,7 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
-            "title": "Bucket RAM Used",
+            "title": "Buckets RAM Used",
             "version": "7.3.0"
           },
           {
@@ -239,8 +239,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-09T15:27:49.989Z",
-      "version": "WzEzNDcsMV0="
+      "updated_at": "2019-08-19T14:28:56.796Z",
+      "version": "WzE1NDYsMV0="
     },
     {
       "attributes": {
@@ -254,7 +254,7 @@
             }
           }
         },
-        "title": "Bucket RAM Used [Metricbeat Couchbase] ECS",
+        "title": "Buckets RAM Used [Metricbeat Couchbase] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -308,7 +308,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Bucket RAM Used [Metricbeat Couchbase] ECS",
+          "title": "Buckets RAM Used [Metricbeat Couchbase] ECS",
           "type": "metrics"
         }
       },
@@ -318,8 +318,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-09T09:59:14.868Z",
-      "version": "Wzk4NywxXQ=="
+      "updated_at": "2019-08-19T14:26:15.240Z",
+      "version": "WzE0NzgsMV0="
     },
     {
       "attributes": {
