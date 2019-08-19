@@ -216,6 +216,30 @@ func TestMatchers(t *testing.T) {
 			[]string{"case", "Case", "CaSe", "cAsE"},
 			nil,
 		},
+		{
+			`(?i)case`,
+			typeOf((*regexp.Regexp)(nil)),
+			[]string{"case", "Case", "CaSe", "cAsE"},
+			nil,
+		},
+		{
+			`(?i)[a-z]`,
+			typeOf((*regexp.Regexp)(nil)),
+			[]string{"case", "Case", "CaSe", "cAsE"},
+			nil,
+		},
+		{
+			`(?i)[A-Z]`,
+			typeOf((*regexp.Regexp)(nil)),
+			[]string{"case", "Case", "CaSe", "cAsE"},
+			nil,
+		},
+		{
+			`(c[aA]se)`,
+			typeOf((*regexp.Regexp)(nil)),
+			[]string{"case", "cAse"},
+			[]string{"Case", "CaSe", "cAsE"},
+		},
 	}
 
 	for i, test := range tests {
