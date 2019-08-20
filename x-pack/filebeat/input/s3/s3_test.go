@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/resources"
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 )
 
@@ -285,7 +286,7 @@ func TestS3Input(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			input.Run()
+			input.run(svcSQS, svcS3, 300)
 		}()
 
 		time.AfterFunc(10*time.Second, func() { out.Close() })
@@ -360,6 +361,7 @@ func (m *MockSQSClient) DeleteMessageRequest(input *sqs.DeleteMessageInput) sqs.
 }
 
 func TestS3InputWithMock(t *testing.T) {
+	defer resources.NewGoroutinesChecker().Check(t)
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"queue_url": "https://sqs.ap-southeast-1.amazonaws.com/123456/test",
 	})

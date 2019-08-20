@@ -82,10 +82,10 @@ filebeat.modules:
     enabled: true
 
     # AWS SQS queue url
-    #var.queue_url: sqs_queue_url
+    #var.queue_url: <sqs_queue_url>
 
     # Profile name for aws credential
-    #var.credential_profile_name: fb-aws
+    #var.credential_profile_name: <fb-aws>
 
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco

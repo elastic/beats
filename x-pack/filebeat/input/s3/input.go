@@ -182,12 +182,13 @@ func (p *s3Input) Run() {
 
 		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)
+		p.workerWg.Done()
 	})
 }
 
 func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibilityTimeout int64) {
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
-	defer p.workerWg.Done()
+
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 	for p.context.Err() == nil {
 		// receive messages from sqs
@@ -239,13 +240,13 @@ func (p *s3Input) Wait() {
 func (p *s3Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 s3iface.ClientAPI, svcSQS sqsiface.ClientAPI) {
 	var wg sync.WaitGroup
 	numMessages := len(messages)
-	wg.Add(numMessages)
+	wg.Add(numMessages * 2)
 
 	// process messages received from sqs
 	for i := range messages {
 		errC := make(chan error)
 		go p.processMessage(svcS3, messages[i], &wg, errC)
-		go p.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
+		go p.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, &wg, errC)
 	}
 	wg.Wait()
 }
@@ -268,7 +269,8 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 	}
 }
 
-func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) {
+func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, wg *sync.WaitGroup, errC chan error) {
+	defer wg.Done()
 	for {
 		select {
 		case <-p.close:
