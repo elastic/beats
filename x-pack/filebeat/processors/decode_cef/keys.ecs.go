@@ -123,7 +123,7 @@ var ecsKeyMapping = map[string]mappedField{
 		Type:   Integer,
 	},
 	"destinationProcessId": {
-		Target: "process.pid",
+		Target: "destination.process.pid",
 		Type:   Integer,
 	},
 	"destinationProcessName": {
@@ -164,11 +164,16 @@ var ecsKeyMapping = map[string]mappedField{
 	},
 	"deviceDirection": {
 		Target: "network.direction",
-		Type:   Integer,
-	},
-	"deviceEventCategory": {
-		Target: "event.category",
-		Type:   String,
+		Translate: func(in string) (interface{}, error) {
+			switch in {
+			case "0":
+				return "inbound", nil
+			case "1":
+				return "outbound", nil
+			default:
+				return nil, errors.Errorf("deviceDirection must be 0 or 1")
+			}
+		},
 	},
 	"deviceExternalId": {
 		Target: "host.id",
@@ -215,7 +220,7 @@ var ecsKeyMapping = map[string]mappedField{
 		Type:   String,
 	},
 	"fileCreateTime": {
-		Target: "file.ctime",
+		Target: "file.created",
 		Type:   Timestamp,
 	},
 	"fileId": {
@@ -248,6 +253,10 @@ var ecsKeyMapping = map[string]mappedField{
 	},
 	"message": {
 		Target: "message",
+		Type:   String,
+	},
+	"rawEvent": {
+		Target: "event.original",
 		Type:   String,
 	},
 	"requestClientApplication": {
