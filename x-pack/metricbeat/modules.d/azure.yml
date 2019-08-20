@@ -2,18 +2,19 @@
   metricsets:
   - monitor
   enabled: true
-  period: 60s
+  period: 360s
   client_id: ''
   client_secret: ''
   tenant_id: ''
   subscription_id: ''
-  refresh_list_interval: 120s
+  #refresh_list_interval: 120s
   resources:
-  - resource_id: "subscriptions/xxxxx/resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/obsapimanagement11"
+  - resource_id: "subscriptions/.../resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/obsapimanagement"
     metrics:
     - name: "Requests"
       namespace: "Microsoft.ApiManagement/service"
       aggregations: ["Maximum"]
+      timegrain: "PT1M"
       dimensions:
       - name: "Hostname"
         value: "obsapimanagement.azure-api.net"
@@ -29,13 +30,18 @@
     - name: "Percentage CPU"
       namespace: "Microsoft.Compute/virtualMachines"
       aggregations: ["Average", "Minimum", "Maximum"]
+      timegrain: "PT1M"
     - name: ["Disk Read Bytes", "Data Disk Write Operations/Sec", "Network Out"]
       namespace: "Microsoft.Compute/virtualMachines"
       aggregations: ["Average", "Maximum"]
-  - resource_query: "resourceType eq 'Microsoft.Storage/storageAccounts' and resourceGroup eq 'obs-infrastructure'"
+  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts' and name eq 'obsaccount'"
+    metrics:
+    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+      namespace: "Microsoft.DocumentDb/databaseAccounts"
+      aggregations:  ["Average", "Total"]
+  - resource_id: "subscriptions/70bd6e77-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.Storage/storageAccounts/obsinfrastructurediag"
     metrics:
     - name: ["*"]
       namespace: "Microsoft.Storage/storageAccounts"
-      aggregations:  ["Total", "Average"]
-
+      aggregations:  ["Average"]
 

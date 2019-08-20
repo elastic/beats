@@ -210,6 +210,16 @@ metricbeat.modules:
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
 
+#-------------------------------- Azure Module --------------------------------
+- module: azure
+  metricsets: ["monitor"]
+  enabled: true
+  period: 30s
+  client_id: ''
+  client_secret: ''
+  tenant_id: ''
+  subscription_id: ''
+
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
@@ -222,15 +232,6 @@ metricbeat.modules:
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
-
-#-------------------------------- Azure Module --------------------------------
-- module: azure
-  metricsets: ["monitor"]
-  enabled: true
-  period: 30s
-  client_id: ''
-  client_secret: ''
-  tenant_id: ''
 
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph

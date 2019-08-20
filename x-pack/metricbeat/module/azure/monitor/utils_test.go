@@ -45,6 +45,13 @@ func TestIntersections(t *testing.T) {
 	intersection, difference := intersections(firstStr, sercondStr)
 	assert.Equal(t, intersection, []string{"test2", "test3"})
 	assert.Equal(t, difference, []string{"test4", "test5"})
+
+	firstStr = []string{"test1", "test2", "test2", "test3"}
+	sercondStr = []string{"test4", "test5", "test5"}
+	intersection, difference = intersections(firstStr, sercondStr)
+	assert.Equal(t, intersection, []string{"test2", "test3"})
+	assert.Equal(t, difference, []string{"test4", "test5"})
+
 }
 
 func TestGetMetricDefinitionsByNames(t *testing.T) {

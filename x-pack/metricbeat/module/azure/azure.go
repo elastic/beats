@@ -36,6 +36,7 @@ type MetricConfig struct {
 	Namespace    string            `config:"namespace"`
 	Aggregations []string          `config:"aggregations"`
 	Dimensions   []DimensionConfig `config:"dimensions"`
+	Timegrain    string            `config:"timegrain"`
 }
 
 // DimensionConfig contains dimensions specific configuration.

@@ -691,7 +691,7 @@ func (client Client) GetByIDPreparer(ctx context.Context, resourceID string) (*h
 		"resourceId": resourceID,
 	}
 
-	const APIVersion = "2019-01-01"
+	const APIVersion = "2019-03-01"
 	queryParameters := map[string]interface{}{
 		"api-version": APIVersion,
 	}

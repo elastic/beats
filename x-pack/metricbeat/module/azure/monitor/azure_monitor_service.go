@@ -11,6 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/elastic/beats/libbeat/logp"
+	"strings"
 )
 
 type AzureMonitorService struct {
@@ -37,36 +38,29 @@ func Init(clientID string, clientSecret string, tenantID string, subscriptionID 
 		metricDefinitionClient: &metricsDefinitionClient,
 		metricsClient:          &metricsClient,
 		resourceClient:         &resourceClient,
-		log:                    logp.NewLogger("azure monitor"),
+		log:                    logp.NewLogger("azure monitor service"),
 	}
 	return client, nil
 }
 
-// GetResourceById will retrieve the azure resource details based on the id entered
-func (client AzureMonitorService) GetResourceById(resourceID string) (resources.GenericResource, error) {
-	resource, err := client.resourceClient.GetByID(context.Background(), resourceID)
-	if err != nil {
-		client.log.Errorf(" error while retrieving resource by id  %s : %v", resourceID, err)
+// GetResourceDefinitions will retrieve the azure resources based on the options entered
+func (client AzureMonitorService) GetResourceDefinitions(ID string, group string, rType string, query string) ([]resources.GenericResource, error) {
+	var resourceQuery string
+	if ID != "" {
+		resourceQuery = fmt.Sprintf("resourceID eq '%s'", ID)
 	}
-	return resource, err
-}
-
-// GetResourcesByResourceGroup will retrieve the list of resources that match the resource group and type
-func (client *AzureMonitorService) GetResourcesByResourceGroup(resourceGroup string, resourceType string) ([]resources.GenericResource, error) {
-	var top int32 = 500
-	result, err := client.resourceClient.ListByResourceGroup(context.Background(), resourceGroup, fmt.Sprintf("resourceType eq '%s'", resourceType), "true", &top)
-	if err != nil {
-		client.log.Errorf("error while listing resources by resource group %s  and filter %s : %s", resourceGroup, resourceType, err)
+	if group != "" {
+		resourceQuery = fmt.Sprintf("resourceGroup eq '%s'", group)
+		if rType != "" {
+			resourceQuery += fmt.Sprintf(" AND resourceType eq '%s'", rType)
+		}
 	}
-	return result.Values(), err
-}
-
-// GetResourcesByResourceQuery will retrieve the list of resources that match the filter entered by the user
-func (client *AzureMonitorService) GetResourcesByResourceQuery(resourceQury string) ([]resources.GenericResource, error) {
-	var top int32 = 500
-	result, err := client.resourceClient.List(context.Background(), resourceQury, "true", &top)
+	if query != "" {
+		resourceQuery = query
+	}
+	result, err := client.resourceClient.List(context.Background(), resourceQuery, "true", nil)
 	if err != nil {
-		client.log.Errorf("error while listing resources by resource query  %s : %s", resourceQury, err)
+		client.log.Errorf("error while listing resources by resource query  %s : %s", resourceQuery, err)
 	}
 	return result.Values(), err
 }
@@ -81,11 +75,26 @@ func (client *AzureMonitorService) GetMetricDefinitions(resourceID string, names
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details
-func (client *AzureMonitorService) GetMetricValues(resourceID string, namespace string, timespan string, metricNames string, aggregations string, filter string) ([]insights.Metric, error) {
-	resp, err := client.metricsClient.List(context.Background(), resourceID, timespan, nil, metricNames,
-		aggregations, nil, "", filter, insights.Data, namespace)
-	if err != nil {
-		return nil, err
+func (client *AzureMonitorService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
+	var tg *string
+	if timegrain != "" {
+		tg = &timegrain
 	}
-	return *resp.Value, nil
+	// check for limit of requested metrics (20)
+	var metrics []insights.Metric
+	for i := 0; i < len(metricNames); i += 20 {
+		end := i + 20
+		if end > len(metricNames) {
+			end = len(metricNames)
+		}
+		resp, err := client.metricsClient.List(context.Background(), resourceID, timespan, tg, strings.Join(metricNames[i:end], ","),
+			aggregations, nil, "", filter, insights.Data, namespace)
+		if err != nil {
+			client.log.Errorf("error while listing metric values by resource ID %s and namespace  %s : %s", resourceID, namespace, err)
+		} else {
+			metrics = append(metrics, *resp.Value...)
+		}
+
+	}
+	return metrics, nil
 }

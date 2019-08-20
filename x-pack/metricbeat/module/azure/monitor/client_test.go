@@ -20,21 +20,9 @@ type AzureMockService struct {
 	mock.Mock
 }
 
-// GetResourceById is a mock function for the azure service
-func (client *AzureMockService) GetResourceById(resourceID string) (resources.GenericResource, error) {
-	args := client.Called(resourceID)
-	return args.Get(0).(resources.GenericResource), args.Error(1)
-}
-
-// GetResourcesByResourceGroup is a mock function for the azure service
-func (client AzureMockService) GetResourcesByResourceGroup(resourceGroup string, resourceType string) ([]resources.GenericResource, error) {
-	args := client.Called(resourceGroup, resourceType)
-	return args.Get(0).([]resources.GenericResource), args.Error(1)
-}
-
-// GetResourcesByResourceQuery is a mock function for the azure service
-func (client AzureMockService) GetResourcesByResourceQuery(resourceQuery string) ([]resources.GenericResource, error) {
-	args := client.Called(resourceQuery)
+// GetResourceDefinitions is a mock function for the azure service
+func (client AzureMockService) GetResourceDefinitions(ID string, group string, rType string, query string) ([]resources.GenericResource, error) {
+	args := client.Called(ID, group, rType, query)
 	return args.Get(0).([]resources.GenericResource), args.Error(1)
 }
 
@@ -45,7 +33,7 @@ func (client AzureMockService) GetMetricDefinitions(resourceID string, namespace
 }
 
 // GetMetricValues is a mock function for the azure service
-func (client AzureMockService) GetMetricValues(resourceID string, namespace string, timespan string, metricNames string, aggregations string, filter string) ([]insights.Metric, error) {
+func (client AzureMockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
 	args := client.Called(resourceID, namespace)
 	return args.Get(0).([]insights.Metric), args.Error(1)
 }
@@ -133,33 +121,11 @@ func TestInitResources(t *testing.T) {
 		err := client.InitResources()
 		assert.Error(t, err, "no resource options were configured")
 	})
-	t.Run("return no error but log message when the resource id is invalid", func(t *testing.T) {
-		client := MockClient()
-		client.config = resourceIDConfig
-		m := &AzureMockService{}
-		m.On("GetResourceById", "123").Return(resources.GenericResource{}, errors.New("invalid resource ID"))
-		client.azureMonitorService = m
-		err := client.InitResources()
-		assert.NoError(t, err)
-		assert.Equal(t, len(client.resources.metrics), 0)
-		m.AssertExpectations(t)
-	})
-	t.Run("return no error but log message when the resource group or type is invalid or no resources were found", func(t *testing.T) {
-		client := MockClient()
-		client.config = resourceGroupConfig
-		m := &AzureMockService{}
-		m.On("GetResourcesByResourceGroup", "groupName", "resourceType eq 'typeName'").Return([]resources.GenericResource{}, errors.New("invalid resource group"))
-		client.azureMonitorService = m
-		err := client.InitResources()
-		assert.NoError(t, err)
-		assert.Equal(t, len(client.resources.metrics), 0)
-		m.AssertExpectations(t)
-	})
 	t.Run("return no error but log message when the resource query is invalid or no resources were found", func(t *testing.T) {
 		client := MockClient()
 		client.config = resourceQueryConfig
 		m := &AzureMockService{}
-		m.On("GetResourcesByResourceQuery", "query").Return([]resources.GenericResource{}, errors.New("invalid resource query"))
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]resources.GenericResource{}, errors.New("invalid resource query"))
 		client.azureMonitorService = m
 		err := client.InitResources()
 		assert.NoError(t, err)
@@ -193,8 +159,8 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metric.resource.Type, "resourceType")
 		assert.Equal(t, metric.resource.Location, "resourceLocation")
 		assert.Equal(t, metric.namespace, "namespace")
-		assert.Equal(t, metric.names, "TotalRequests,Capacity,BytesRead")
-		assert.Equal(t, metric.aggregations, "Count,Average")
+		assert.Equal(t, metric.names, []string{"TotalRequests", "Capacity", "BytesRead"})
+		assert.Equal(t, metric.aggregations, "Average,Count")
 		assert.Equal(t, metric.dimensions, []Dimension{{name: "location", value: "West Europe"}})
 		m.AssertExpectations(t)
 	})
@@ -211,7 +177,7 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metric.resource.Type, "resourceType")
 		assert.Equal(t, metric.resource.Location, "resourceLocation")
 		assert.Equal(t, metric.namespace, "namespace")
-		assert.Equal(t, metric.names, "TotalRequests")
+		assert.Equal(t, metric.names, []string{"TotalRequests"})
 		assert.Equal(t, metric.aggregations, "Average,Total")
 		assert.Equal(t, metric.dimensions, []Dimension{{name: "location", value: "West Europe"}})
 		m.AssertExpectations(t)
@@ -226,7 +192,7 @@ func TestGetMetricValues(t *testing.T) {
 			metrics: []Metric{
 				{
 					namespace:    "namespace",
-					names:        "TotalRequests,Capacity",
+					names:        []string{"TotalRequests,Capacity"},
 					aggregations: "Average,Total",
 					dimensions:   []Dimension{{name: "location", value: "West Europe"}},
 				},

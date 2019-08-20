@@ -3,7 +3,20 @@
   description: >
     monitor
   fields:
-    - name: example
-      type: keyword
+    - name: resource
+      type: object
       description: >
-        Example field
+        The resource specified
+    - name: metrics.*.*
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        Metrics returned.
+    - name: dimensions.*
+      type: object
+      object_type: keyword
+      object_type_mapping_type: "*"
+      description: >
+          Azure metric dimensions.
+

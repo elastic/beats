@@ -31,17 +31,20 @@ func filterMetrics(selectedRange []string, allRange []insights.MetricDefinition)
 
 // filterAggregations will filter out any unsupported aggregations based on the metrics selected
 func filterAggregations(selectedRange []string, metrics []insights.MetricDefinition) ([]string, []string) {
-	var unsupported []string
 	var difference []string
+	var supported = []string{"Average", "Maximum", "Minimum", "Count", "Total"}
+
 	for _, metric := range metrics {
-		var supported []string
+		var metricSupported []string
 		for _, agg := range *metric.SupportedAggregationTypes {
-			supported = append(supported, string(agg))
+			metricSupported = append(metricSupported, string(agg))
 		}
-		selectedRange, unsupported = intersections(supported, selectedRange)
-		difference = append(difference, unsupported...)
+		supported, _ = intersections(metricSupported, supported)
 	}
-	return selectedRange, difference
+	if len(selectedRange) != 0 {
+		supported, difference = intersections(supported, selectedRange)
+	}
+	return supported, difference
 }
 
 // stringInSlice is a helper method, will check if string is part of a slice
@@ -67,9 +70,6 @@ func filter(src []string) (res []string) {
 
 // intersections is a helper method, will compare 2 slices and return their intersection and difference records
 func intersections(supported, selected []string) ([]string, []string) {
-	if len(selected) == 0 {
-		return supported, nil
-	}
 	var intersection []string
 	var difference []string
 	str1 := strings.Join(filter(supported), " ")

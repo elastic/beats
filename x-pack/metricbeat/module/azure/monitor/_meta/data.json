@@ -10,7 +10,7 @@
         "name":"monitor",
         "rtt":44269
     },
-    "x-pack/azure":{
+    "azure":{
         "monitor":{
             "example": "monitor"
         }

@@ -20,7 +20,7 @@ import (
 type Client struct {
 	azureMonitorService AzureService
 	config              azure.Config
-	resources      ResourceConfiguration
+	resources           ResourceConfiguration
 	log                 *logp.Logger
 }
 
@@ -46,7 +46,7 @@ type Resource struct {
 type Metric struct {
 	resource     Resource
 	namespace    string
-	names        string
+	names        []string
 	aggregations string
 	dimensions   []Dimension
 	values       []MetricValue
@@ -79,6 +79,7 @@ func NewClient(config azure.Config) (*Client, error) {
 	client := &Client{
 		azureMonitorService: azureMonitorService,
 		config:              config,
+		log:                 logp.NewLogger("azure monitor client"),
 	}
 	client.resources.refreshInterval = config.RefreshListInterval
 	return client, nil
@@ -94,45 +95,15 @@ func (client *Client) InitResources() error {
 		return errors.New("no resource options were configured")
 	}
 	for _, resource := range client.config.Resources {
-		//check all configuration options in order to identify resources : resourceid, resource group and resource query
-		if resource.ID != "" {
-			for _, metric := range resource.Metrics {
-				re, err := client.azureMonitorService.GetResourceById(resource.ID)
-				if err == nil {
-					met, err := client.mapMetric(metric, re)
+		resourceList, err := client.azureMonitorService.GetResourceDefinitions(resource.ID, resource.Group, resource.Type, resource.Query)
+		if err == nil {
+			for _, res := range resourceList {
+				for _, metric := range resource.Metrics {
+					met, err := client.mapMetric(metric, res)
 					if err != nil {
 						return err
 					}
 					metrics = append(metrics, met)
-				}
-			}
-		}
-		if resource.Group != "" {
-			resourceList, err := client.azureMonitorService.GetResourcesByResourceGroup(resource.Group, fmt.Sprintf("resourceType eq '%s'", resource.Type))
-			if err == nil {
-				for _, res := range resourceList {
-					for _, metric := range resource.Metrics {
-						met, err := client.mapMetric(metric, res)
-						if err != nil {
-							return err
-						}
-						metrics = append(metrics, met)
-					}
-				}
-			}
-
-		}
-		if resource.Query != "" {
-			resourceList, err := client.azureMonitorService.GetResourcesByResourceQuery(resource.Query)
-			if err == nil {
-				for _, res := range resourceList {
-					for _, metric := range resource.Metrics {
-						met, err := client.mapMetric(metric, res)
-						if err != nil {
-							return err
-						}
-						metrics = append(metrics, met)
-					}
 				}
 			}
 		}
@@ -158,10 +129,10 @@ func (client *Client) GetMetricValues() error {
 			}
 			filter = strings.Join(filterList, " AND ")
 		}
-		resp, err := client.azureMonitorService.GetMetricValues(metric.resource.ID, metric.namespace, timespan, metric.names,
+		resp, err := client.azureMonitorService.GetMetricValues(metric.resource.ID, metric.namespace, metric.timeGrain, timespan, metric.names,
 			metric.aggregations, filter)
 		if err != nil {
-			return err
+			continue
 		}
 		for _, v := range resp {
 			for _, t := range *v.Timeseries {
@@ -233,6 +204,6 @@ func (client *Client) mapMetric(metric azure.MetricConfig, resource resources.Ge
 		}
 	}
 	return Metric{resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type},
-		namespace: metric.Namespace, names: strings.Join(supportedMetricNames, ","), aggregations: strings.Join(supportedAggregations, ","), dimensions: dim}, nil
+		namespace: metric.Namespace, names: supportedMetricNames, aggregations: strings.Join(supportedAggregations, ","), dimensions: dim, timeGrain: metric.Timegrain}, nil
 
 }
