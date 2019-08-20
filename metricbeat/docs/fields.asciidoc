@@ -3410,7 +3410,7 @@ The name of the metricset that generated the event.
 *`metricset.period`*::
 +
 --
-Current data collection period for this events in microseconds.
+Current data collection period for this event in microseconds.
 
 
 type: long

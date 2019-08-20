@@ -18,7 +18,7 @@
     - name: metricset.period
       type: long
       description: >
-        Current data collection period for this events in microseconds.
+        Current data collection period for this event in microseconds.
 
     - name: process.pgid
       type: long
