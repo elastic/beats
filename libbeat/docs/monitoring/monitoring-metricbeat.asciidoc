@@ -156,11 +156,12 @@ you enabled the HTTP endpoint, update the `hosts` setting.
 To monitor multiple 
 ifndef::apm-server[]
 {beats} agents,
-endif:[]
+endif::[]
 ifdef::apm-server[]
 APM Server instances,
-endif:[]
+endif::[]
 specify a list of hosts, for example:
+
 [source,yaml]
 ----------------------------------
 hosts: ["http://localhost:5066","http://localhost:5067","http://localhost:5068"]
