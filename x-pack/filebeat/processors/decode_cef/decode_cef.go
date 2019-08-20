@@ -6,6 +6,7 @@ package decode_cef
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -86,6 +87,10 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	// Map CEF extension fields to ECS fields.
 	if p.ECS {
+		if sev, ok := cefSeverityToNumber(ce.Severity); ok {
+			event.PutValue("event.severity", sev)
+		}
+
 		for key, v := range ce.Extensions {
 			mapping, found := ecsKeyMapping[key]
 			if !found {
@@ -187,4 +192,26 @@ func appendErrorMessage(m common.MapStr, msg string) error {
 		return errors.Errorf("unexpected type %T found for %v field", list, field)
 	}
 	return nil
+}
+
+// cefSeverityToNumber converts the CEF severity string to a numeric value. The
+// returned boolean indicates if the conversion was successful.
+func cefSeverityToNumber(severity string) (int, bool) {
+	// From CEF spec:
+	// Severity is a string or integer and reflects the importance of the event.
+	// The valid string values are Unknown, Low, Medium, High, and Very-High.
+	// The valid integer values are 0-3=Low, 4-6=Medium, 7- 8=High, and 9-10=Very-High.
+	switch strings.ToLower(severity) {
+	case "low":
+		return 0, true
+	case "medium":
+		return 4, true
+	case "high":
+		return 7, true
+	case "very-high":
+		return 9, true
+	default:
+		s, err := strconv.Atoi(severity)
+		return s, err == nil
+	}
 }

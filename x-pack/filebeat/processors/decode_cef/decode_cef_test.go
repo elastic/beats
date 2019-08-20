@@ -44,6 +44,7 @@ func TestProcessorRun(t *testing.T) {
 				"device.version":            "1.2.3",
 				"name":                      "User Signed In",
 				"severity":                  "3",
+				"event.severity":            3,
 				"extensions.message":        "User signed in from 2001:db8::5",
 				"extensions.sourceAddress":  "10.52.116.160",
 				"extensions.sourceUserName": "admin",
@@ -54,7 +55,7 @@ func TestProcessorRun(t *testing.T) {
 			},
 		},
 		"parse_errors": {
-			message: "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|msg=User signed in with =xyz",
+			message: "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|Low|msg=User signed in with =xyz",
 			fields: common.MapStr{
 				"cef.version":               0,
 				"cef.device.event_class_id": "600",
@@ -62,10 +63,11 @@ func TestProcessorRun(t *testing.T) {
 				"cef.device.vendor":         "Trend Micro",
 				"cef.device.version":        "1.2.3",
 				"cef.name":                  "User Signed In",
-				"cef.severity":              "3",
-				"message":                   "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|msg=User signed in with =xyz",
+				"cef.severity":              "Low",
+				"event.severity":            0,
+				"message":                   "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|Low|msg=User signed in with =xyz",
 				"error.message": []string{
-					"malformed value for msg at pos 92",
+					"malformed value for msg at pos 94",
 					"unexpected end of CEF event",
 				},
 			},
@@ -120,7 +122,7 @@ func TestProcessorRun(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, tc.fields, evt.Fields.Flatten())
+			assertEqual(t, tc.fields, evt.Fields.Flatten())
 		})
 	}
 
