@@ -13,12 +13,12 @@
 # /winlogbeat/ @elastic/beats
 
 # Auditbeat
-/auditbeat/module/ @elastic/secops
-/x-pack/auditbeat/ @elastic/secops
+/auditbeat/module/ @elastic/siem
+/x-pack/auditbeat/ @elastic/siem
 
 # Packetbeat
-/packetbeat/protos/ @elastic/secops
-/x-pack/packetbeat/ @elastic/secops
+/packetbeat/protos/ @elastic/siem
+/x-pack/packetbeat/ @elastic/siem
 
 # Filebeat
 /filebeat/module/ @elastic/infrastructure
@@ -38,3 +38,6 @@
 
 # Heartbeat
 /heartbeat/ @elastic/uptime
+
+# Winlogbeat
+/x-pack/winlogbeat/ @elastic/siem
