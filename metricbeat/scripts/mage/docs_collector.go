@@ -87,12 +87,10 @@ var funcMap = template.FuncMap{
 	"title": strings.Title,
 }
 
-// checkXpack checks to see if the module belongs to x-pack
+// checkXpack checks to see if the module belongs to x-pack.
 func checkXpack(path string) bool {
-	if strings.Contains(path, "x-pack") {
-		return true
-	}
-	return false
+	return strings.Contains(path, "x-pack")
+
 }
 
 // setupDirectory clears and re-creates the docs/modules directory.
