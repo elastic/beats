@@ -1,19 +1,68 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
-    },
-    "metricset":{
-        "host":"localhost",
-        "module":"azure",
-        "name":"monitor",
-        "rtt":44269
-    },
-    "azure":{
-        "monitor":{
-            "example": "monitor"
+    "_index" : "metricbeat-8.0.0-2019.08.20-000001",
+    "_type" : "_doc",
+    "_id" : "YxBPr2wBJIhUHMzMKj_R",
+    "_score" : null,
+    "_source" : {
+        "@timestamp" : "2019-08-20T13:52:00.000Z",
+        "service" : {
+            "type" : "azure"
+        },
+        "azure" : {
+            "monitor" : {
+                "subscriptionID" : "unique identifier",
+                "metrics" : {
+                    "percentage_cpu" : {
+                        "min" : 1.86,
+                        "max" : 2.8,
+                        "avg" : 2.535
+                    }
+                },
+                "resource" : {
+                    "name" : "obstestmemleak",
+                    "type" : "Microsoft.Compute/virtualMachines"
+                },
+                "namespace" : "Microsoft.Compute/virtualMachines"
+            }
+        },
+        "cloud" : {
+            "provider" : "azure",
+            "region" : "westeurope"
+        },
+        "metricset" : {
+            "name" : "monitor"
+        },
+        "event" : {
+            "module" : "azure",
+            "duration" : 40189255100,
+            "dataset" : "azure.monitor"
+        },
+        "ecs" : {
+            "version" : "1.0.1"
+        },
+        "host" : {
+            "name" : "DESKTOP-RFOOE09",
+            "architecture" : "x86_64",
+            "os" : {
+                "family" : "windows",
+                "name" : "Windows 10 Pro",
+                "kernel" : "10.0.17134.950 (WinBuild.160101.0800)",
+                "build" : "17134.950",
+                "platform" : "windows",
+                "version" : "10.0"
+            },
+            "id" : "1e50b6e1-9710-4164-a8f0-032b3c721dc3",
+            "hostname" : "DESKTOP-RFOOE09"
+        },
+        "agent" : {
+            "ephemeral_id" : "64c90a37-adff-4626-a8c1-547afee4da40",
+            "hostname" : "DESKTOP-RFOOE09",
+            "id" : "c37eab42-cf23-4b61-b4ad-640ff07dc267",
+            "version" : "8.0.0",
+            "type" : "metricbeat"
         }
     },
-    "type":"metricsets"
+    "sort" : [
+        1566309120000
+    ]
 }

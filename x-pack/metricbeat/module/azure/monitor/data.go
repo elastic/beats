@@ -52,7 +52,7 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 						"type": metric.resource.Type,
 					},
 					"namespace":      metric.namespace,
-					"subscriptionId": "unique identifier",
+					"subscriptionID": "unique identifier",
 					"metrics":        metricList,
 				},
 			}

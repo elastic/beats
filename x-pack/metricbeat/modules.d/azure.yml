@@ -1,3 +1,6 @@
+# Module: azure
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-azure.html
+
 - module: azure
   metricsets:
   - monitor
@@ -9,7 +12,7 @@
   subscription_id: ''
   #refresh_list_interval: 120s
   resources:
-  - resource_id: "subscriptions/.../resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/obsapimanagement"
+  - resource_id: "subscriptions/..../resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/obsapimanagement"
     metrics:
     - name: "Requests"
       namespace: "Microsoft.ApiManagement/service"
@@ -44,4 +47,3 @@
     - name: ["*"]
       namespace: "Microsoft.Storage/storageAccounts"
       aggregations:  ["Average"]
-
