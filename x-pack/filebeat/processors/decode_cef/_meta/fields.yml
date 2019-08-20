@@ -1,0 +1,55 @@
+- key: cef
+  title: Decode CEF processor fields
+  description: >
+    Common Event Format (CEF) data.
+  fields:
+    - name: cef
+      type: group
+      description: >
+        By default the `decode_cef` processor writes all data from the CEF
+        message to this `cef` object. It contains the CEF header fields and the
+        extension data.
+      fields:
+        - name: version
+          type: keyword
+          description: >
+            Version of the CEF specification used by the message.
+
+        - name: device.vendor
+          type: keyword
+          description: >
+            Vendor of the device that produced the message.
+
+        - name: device.product
+          type: keyword
+          description: >
+            Product of the device that produced the message.
+
+        - name: device.version
+          type: keyword
+          description: >
+            Version of the product that produced the message.
+
+        - name: device.event_class_id
+          type: keyword
+          description: >
+            Unique identifier of the event type.
+
+        - name: severity
+          type: keyword
+          example: Very-High
+          description: >
+            Importance of the event. The valid string values are Unknown, Low,
+            Medium, High, and Very-High. The valid integer values are 0-3=Low,
+            4-6=Medium, 7- 8=High, and 9-10=Very-High.
+
+        - name: name
+          type: keyword
+          description: >
+            Short description of the event.
+
+        - name: extensions
+          type: object
+          object_type: keyword
+          description: >
+            Collection of key-value pairs carried in the CEF extension field.
