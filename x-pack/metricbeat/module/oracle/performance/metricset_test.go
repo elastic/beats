@@ -27,7 +27,7 @@ func TestData(t *testing.T) {
 	}
 	assert.NotEmpty(t, events)
 
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
