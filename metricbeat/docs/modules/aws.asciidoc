@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-aws]]
+[role="xpack"]
 == aws module
 
 This module periodically fetches monitoring metrics from AWS Cloudwatch using
