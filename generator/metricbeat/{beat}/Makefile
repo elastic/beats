@@ -24,6 +24,7 @@ setup: copy-vendor git-init
 copy-vendor:
 	mkdir -p vendor/github.com/elastic
 	cp -R ${GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
+	cp -R vendor/github.com/elastic/beats/vendor/github.com/spf13 vendor/github.com/
 	ln -sf ${PWD}/vendor/github.com/elastic/beats/metricbeat/scripts/generate_imports_helper.py ${PWD}/vendor/github.com/elastic/beats/script/generate_imports_helper.py
 	rm -rf vendor/github.com/elastic/beats/.git vendor/github.com/elastic/beats/x-pack
 	mkdir -p vendor/github.com/magefile
