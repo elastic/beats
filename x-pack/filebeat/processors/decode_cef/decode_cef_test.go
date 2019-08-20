@@ -32,7 +32,7 @@ func TestProcessorRun(t *testing.T) {
 		"custom_target_root": {
 			config: func() config {
 				c := defaultConfig()
-				c.Target = ""
+				c.TargetField = ""
 				return c
 			},
 			message: "CEF:1|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5",
@@ -135,7 +135,7 @@ func TestProcessorRun(t *testing.T) {
 
 		evt, err = dec.Run(evt)
 		if assert.Error(t, err) {
-			assert.Contains(t, err.Error(), "header start not found")
+			assert.Contains(t, err.Error(), "does not contain a CEF header")
 		}
 	})
 

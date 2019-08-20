@@ -45,8 +45,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 func newDecodeCEF(c config) (*processor, error) {
 	log := logp.NewLogger(logName)
-	if c.Tag != "" {
-		log = log.With("instance_id", c.Tag)
+	if c.ID != "" {
+		log = log.With("instance_id", c.ID)
 	}
 
 	return &processor{config: c, log: log}, nil
@@ -58,32 +58,44 @@ func (p *processor) String() string {
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	v, err := event.GetValue(p.config.Field)
+	v, err := event.GetValue(p.Field)
 	if err != nil {
-		return event, nil
+		if p.IgnoreMissing {
+			return event, nil
+		}
+		return event, errors.Wrapf(err, "decode_cef field [%v] not found", p.Field)
 	}
 
 	cefData, ok := v.(string)
 	if !ok {
-		return event, nil
+		if p.IgnoreFailure {
+			return event, nil
+		}
+		return event, errors.Wrapf(err, "decode_cef field [%v] is not a string", p.Field)
 	}
 
 	// Ignore any leading data before the CEF header.
 	idx := strings.Index(cefData, "CEF:")
 	if idx == -1 {
-		return event, errors.Errorf("%v field is not a CEF message: header start not found", p.config.Field)
+		if p.IgnoreFailure {
+			return event, nil
+		}
+		return event, errors.Errorf("decode_cef field [%v] does not contain a CEF header", p.Field)
 	}
 	cefData = cefData[idx:]
 
 	// If the version < 0 after parsing then none of the data is valid so return here.
 	var ce cef.Event
 	if err = ce.Unpack([]byte(cefData), cef.WithFullExtensionNames()); ce.Version < 0 && err != nil {
-		return event, err
+		if p.IgnoreFailure {
+			return event, nil
+		}
+		return event, errors.Wrap(err, "decode_cef failed to parse message")
 	}
 
 	cefErrors := multierr.Errors(err)
 	cefObject := toCEFObject(&ce)
-	event.PutValue(p.Target, cefObject)
+	event.PutValue(p.TargetField, cefObject)
 
 	// Map CEF extension fields to ECS fields.
 	if p.ECS {
