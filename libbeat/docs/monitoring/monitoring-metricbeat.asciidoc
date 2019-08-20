@@ -82,7 +82,7 @@ For more information, see
 
 ifndef::serverless[]
 . <<{beatname_lc}-starting,Start {beatname_uc}>>.
-endif::serverless[]
+endif::[]
 
 [float]
 [[configure-metricbeat]]
@@ -108,7 +108,6 @@ locations.
 endif::[]
 
 . Enable the `beat-xpack` module in {metricbeat}. +
-endif::[]
 +
 --
 // tag::enable-beat-module[]
