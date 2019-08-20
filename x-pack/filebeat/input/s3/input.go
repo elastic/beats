@@ -192,16 +192,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 	for p.context.Err() == nil {
 		// receive messages from sqs
-		req := svcSQS.ReceiveMessageRequest(
-			&sqs.ReceiveMessageInput{
-				QueueUrl:              &p.config.QueueURL,
-				MessageAttributeNames: []string{"All"},
-				MaxNumberOfMessages:   &maxNumberOfMessage,
-				VisibilityTimeout:     &visibilityTimeout,
-				WaitTimeSeconds:       &waitTimeSecond,
-			})
-
-		output, err := req.Send(p.context)
+		output, err := p.receiveMessage(svcSQS, visibilityTimeout)
 		if err != nil {
 			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 				continue
@@ -302,6 +293,20 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 			p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 		}
 	}
+}
+
+func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout int64) (*sqs.ReceiveMessageResponse, error) {
+	// receive messages from sqs
+	req := svcSQS.ReceiveMessageRequest(
+		&sqs.ReceiveMessageInput{
+			QueueUrl:              &p.config.QueueURL,
+			MessageAttributeNames: []string{"All"},
+			MaxNumberOfMessages:   &maxNumberOfMessage,
+			VisibilityTimeout:     &visibilityTimeout,
+			WaitTimeSeconds:       &waitTimeSecond,
+		})
+
+	return req.Send(p.context)
 }
 
 func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI, receiptHandle *string) error {
@@ -415,6 +420,9 @@ func newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info, context *channelCon
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
 
+	if resp.Body == nil {
+		return nil, errors.New("s3 get object response body is empty")
+	}
 	return bufio.NewReader(resp.Body), nil
 }
 
