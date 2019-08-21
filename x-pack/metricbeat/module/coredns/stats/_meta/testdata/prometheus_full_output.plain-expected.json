@@ -45,7 +45,7 @@
         },
         "metricset": {
             "name": "stats",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -74,7 +74,7 @@
         },
         "metricset": {
             "name": "stats",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -148,7 +148,7 @@
         },
         "metricset": {
             "name": "stats",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -177,7 +177,29 @@
         },
         "metricset": {
             "name": "stats",
-            "period": 10000000
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "panic": {
+                    "count": 0
+                }
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -205,29 +227,7 @@
         },
         "metricset": {
             "name": "stats",
-            "period": 10000000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "coredns"
-        }
-    },
-    {
-        "coredns": {
-            "stats": {
-                "panic": {
-                    "count": 0
-                }
-            }
-        },
-        "event": {
-            "dataset": "coredns.stats",
-            "duration": 115000,
-            "module": "coredns"
-        },
-        "metricset": {
-            "name": "stats",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",

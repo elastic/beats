@@ -17,7 +17,7 @@
     },
     "metricset": {
         "name": "process",
-        "period": 10000000
+        "period": 10000
     },
     "php_fpm": {
         "pool": {
@@ -25,24 +25,24 @@
         },
         "process": {
             "last_request_cpu": 0,
-            "last_request_memory": 2097152,
-            "request_duration": 811,
-            "requests": 8,
+            "last_request_memory": 0,
+            "request_duration": 135,
+            "requests": 9,
             "script": "-",
             "start_since": 3471,
             "start_time": 1551792028,
-            "state": "Idle"
+            "state": "Running"
         }
     },
     "process": {
-        "pid": 25
+        "pid": 24
     },
     "service": {
         "address": "127.0.0.1:55555",
         "type": "php_fpm"
     },
     "url": {
-        "original": "/status?full"
+        "original": "/status?full\u0026json"
     },
     "user": {
         "name": "-"

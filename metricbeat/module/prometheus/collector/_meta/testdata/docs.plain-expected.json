@@ -7,7 +7,7 @@
         },
         "metricset": {
             "name": "collector",
-            "period": 10000000
+            "period": 10000
         },
         "prometheus": {
             "labels": {

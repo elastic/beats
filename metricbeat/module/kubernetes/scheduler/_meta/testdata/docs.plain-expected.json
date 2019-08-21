@@ -51,7 +51,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -126,7 +126,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -149,7 +149,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -176,7 +176,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -203,7 +203,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -230,7 +230,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -263,7 +263,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -290,7 +290,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -323,7 +323,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -350,34 +350,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "result": "scheduled",
-                "scheduling": {
-                    "pod": {
-                        "attempts": {
-                            "count": 3
-                        }
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -410,7 +383,34 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "result": "scheduled",
+                "scheduling": {
+                    "pod": {
+                        "attempts": {
+                            "count": 3
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -437,7 +437,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -464,7 +464,7 @@
         },
         "metricset": {
             "name": "scheduler",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",

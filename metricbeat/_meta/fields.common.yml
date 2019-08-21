@@ -16,9 +16,9 @@
         The name of the metricset that generated the event.
 
     - name: metricset.period
-      type: long
+      type: integer
       description: >
-        Current data collection period for this event in microseconds.
+        Current data collection period for this event in milliseconds.
 
     - name: process.pgid
       type: long

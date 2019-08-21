@@ -8,21 +8,21 @@
     "kubernetes": {
         "namespace": "default",
         "statefulset": {
-            "created": 1511973651,
+            "created": 1511989697,
             "generation": {
-                "desired": 3,
-                "observed": 1
-            },
-            "name": "elasticsearch",
-            "replicas": {
                 "desired": 4,
-                "observed": 1
+                "observed": 2
+            },
+            "name": "mysql",
+            "replicas": {
+                "desired": 5,
+                "observed": 2
             }
         }
     },
     "metricset": {
         "name": "state_statefulset",
-        "period": 10000000
+        "period": 10000
     },
     "service": {
         "address": "127.0.0.1:55555",

@@ -11,13 +11,13 @@
                     "count": 1
                 },
                 "created": {
-                    "sec": 1563559848
+                    "sec": 1563559712
                 },
                 "is_suspended": false,
                 "last_schedule": {
                     "sec": 1563561180
                 },
-                "name": "bye",
+                "name": "hello",
                 "next_schedule": {
                     "sec": 1563561240
                 }
@@ -26,7 +26,7 @@
         },
         "metricset": {
             "name": "state_cronjob",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -45,13 +45,13 @@
                     "count": 1
                 },
                 "created": {
-                    "sec": 1563559712
+                    "sec": 1563559848
                 },
                 "is_suspended": false,
                 "last_schedule": {
                     "sec": 1563561180
                 },
-                "name": "hello",
+                "name": "bye",
                 "next_schedule": {
                     "sec": 1563561240
                 }
@@ -60,7 +60,7 @@
         },
         "metricset": {
             "name": "state_cronjob",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",

@@ -72,7 +72,7 @@
         },
         "metricset": {
             "name": "cluster",
-            "period": 10000000
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",

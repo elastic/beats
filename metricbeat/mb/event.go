@@ -111,8 +111,9 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 
 // AddMetricSetInfo is an EventModifier that adds information about the
 // MetricSet that generated the event. It will always add the metricset and
-// module names. And it will add the host, period, and duration (round-trip
-// time in microseconds) values if they are non-zero values.
+// module names. And it will add the host, period (in milliseconds), and
+// duration (round-trip time in nanoseconds) values if they are non-zero
+// values.
 //
 //   {
 //     "event": {
@@ -125,7 +126,7 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 //     },
 //     "metricset": {
 //       "name": "status",
-//       "period": 10000000
+//       "period": 10000
 //     }
 //   }
 //
@@ -151,7 +152,7 @@ func AddMetricSetInfo(module, metricset string, event *Event) {
 		e.Put("event.duration", event.Took/time.Nanosecond)
 	}
 	if event.Period > 0 {
-		e.Put("metricset.period", event.Period/time.Microsecond)
+		e.Put("metricset.period", event.Period/time.Millisecond)
 	}
 
 	if event.RootFields == nil {

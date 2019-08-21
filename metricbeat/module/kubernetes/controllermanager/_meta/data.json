@@ -7,29 +7,19 @@
     },
     "kubernetes": {
         "controllermanager": {
-            "name": "pvprotection",
-            "workqueue": {
-                "adds": {
-                    "count": 0
-                },
-                "depth": {
-                    "count": 0
-                },
-                "longestrunning": {
-                    "sec": 0
-                },
-                "retries": {
-                    "count": 0
-                },
-                "unfinished": {
-                    "sec": 0
+            "client": {
+                "request": {
+                    "count": 1113352
                 }
-            }
+            },
+            "code": "200",
+            "host": "192.168.205.10:6443",
+            "method": "GET"
         }
     },
     "metricset": {
         "name": "controllermanager",
-        "period": 10000000
+        "period": 10000
     },
     "service": {
         "address": "127.0.0.1:55555",
