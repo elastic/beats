@@ -328,7 +328,7 @@ func checkDashboardIndexPattern(expectedIndex string, o *dashboardObject) error 
 	if visState := o.Attributes.VisState; visState != nil {
 		for _, control := range visState.Params.Controls {
 			if index := control.IndexPattern; index != "" && index != expectedIndex {
-				return errors.Errorf("unexpected index pattern referende found in visualization state: %s", index)
+				return errors.Errorf("unexpected index pattern reference found in visualization state: %s", index)
 			}
 		}
 	}
