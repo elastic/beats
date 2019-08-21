@@ -72,7 +72,7 @@ type MetricValue struct {
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config azure.Config) (*Client, error) {
-	azureMonitorService, err := Init(config.ClientID, config.ClientSecret, config.TenantID, config.SubscriptionID)
+	azureMonitorService, err := NewAzureService(config.ClientID, config.ClientSecret, config.TenantID, config.SubscriptionID)
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +119,6 @@ func (client *Client) GetMetricValues() error {
 		endTime := time.Now().UTC()
 		startTime := endTime.Add(client.config.Period * (-1))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-		//interval := "PT1M"
-		//interval=""
 		var filter string
 		if len(metric.dimensions) > 0 {
 			var filterList []string

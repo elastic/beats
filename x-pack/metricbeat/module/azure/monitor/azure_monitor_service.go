@@ -21,8 +21,8 @@ type AzureMonitorService struct {
 	log                    *logp.Logger
 }
 
-// Init instantiates the an Azure monitoring service
-func Init(clientID string, clientSecret string, tenantID string, subscriptionID string) (*AzureMonitorService, error) {
+// NewAzureService instantiates the an Azure monitoring service
+func NewAzureService(clientID string, clientSecret string, tenantID string, subscriptionID string) (*AzureMonitorService, error) {
 	clientConfig := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
 	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
