@@ -205,6 +205,8 @@ before_install:
       # curl "https://api.github.com/repos/elastic/beats/${TRAVIS_PULL_REQUEST}" > .pr_details.json
       # cat .pr_details.json
       git log -p ${TRAVIS_COMMIT_RANGE}
+      git diff --name-only ${TRAVIS_COMMIT_RANGE} > .pr_modified.txt
+      cat .pr_modified.txt
     fi
   # check we're testing the correct commit
   - |
