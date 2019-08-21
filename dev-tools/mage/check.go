@@ -260,6 +260,10 @@ type dashboardObject struct {
 			} `json:"params"`
 		} `json:"visState,omitempty"`
 	} `json:"attributes"`
+	References []struct {
+		Type string `json:"type"`
+		ID   string `json:"id"`
+	} `json:"references"`
 }
 
 var (
@@ -330,6 +334,11 @@ func checkDashboardIndexPattern(expectedIndex string, o *dashboardObject) error 
 			if index := control.IndexPattern; index != "" && index != expectedIndex {
 				return errors.Errorf("unexpected index pattern reference found in visualization state: %s", index)
 			}
+		}
+	}
+	for _, reference := range o.References {
+		if reference.Type == "index-pattern" && reference.ID != expectedIndex {
+			return errors.Errorf("unexpected reference to index pattern %s", reference.ID)
 		}
 	}
 	return nil
