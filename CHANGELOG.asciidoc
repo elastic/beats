@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v7.3.0...v7.3.1[View commits]
 *Affecting all Beats*
 
 - Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
+- Fix `decode_base64_field` processor. {pull}13092[13092], {pull}13144[13144]
 
 *Filebeat*
 
