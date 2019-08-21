@@ -202,9 +202,9 @@ before_install:
   # collect PR details
   - |
     if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-      curl "https://api.github.com/repos/elastic/beats/${TRAVIS_PULL_REQUEST}" > .pr_details.json
-      cat .pr_details.json
-      git diff
+      # curl "https://api.github.com/repos/elastic/beats/${TRAVIS_PULL_REQUEST}" > .pr_details.json
+      # cat .pr_details.json
+      git diff ${TRAVIS_COMMIT_RANGE}
     fi
   # check we're testing the correct commit
   - |
