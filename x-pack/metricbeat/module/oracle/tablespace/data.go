@@ -79,9 +79,9 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
-				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{tempFreeSpaceTable.TablespaceSize})
-				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{tempFreeSpaceTable.UsedSpaceBytes})
-				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{tempFreeSpaceTable.FreeSpace})
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TablespaceSize})
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.UsedSpaceBytes})
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.FreeSpace})
 			}
 		}
 	}
@@ -100,8 +100,8 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 		if name != "" {
 			for _, freeSpaceTable := range freeSpaces {
 				if name == freeSpaceTable.TablespaceName {
-					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{freeSpaceTable.TotalFreeBytes})
-					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{freeSpaceTable.TotalUsedBytes})
+					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalFreeBytes})
+					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalUsedBytes})
 				}
 			}
 		}
@@ -116,13 +116,13 @@ func (m *MetricSet) addDataFileData(d *dataFile, output map[string]common.MapStr
 
 	_, _ = output[d.hash()].Put("name", d.eventKey())
 
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{d.FileName})
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{d.FileName})
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.status", &oracle.StringValue{d.Status})
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.online_status", &oracle.StringValue{d.OnlineStatus})
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.id", &oracle.Int64Value{d.FileID})
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.bytes", &oracle.Int64Value{d.FileSizeBytes})
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.max.bytes", &oracle.Int64Value{d.MaxFileSizeBytes})
-	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.free.bytes", &oracle.Int64Value{d.AvailableForUserBytes})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{NullString: d.FileName})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{NullString: d.FileName})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.status", &oracle.StringValue{NullString: d.Status})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.online_status", &oracle.StringValue{NullString: d.OnlineStatus})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.id", &oracle.Int64Value{NullInt64: d.FileID})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.bytes", &oracle.Int64Value{NullInt64: d.FileSizeBytes})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.max.bytes", &oracle.Int64Value{NullInt64: d.MaxFileSizeBytes})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.free.bytes", &oracle.Int64Value{NullInt64: d.AvailableForUserBytes})
 
 }

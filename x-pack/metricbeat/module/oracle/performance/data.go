@@ -70,19 +70,18 @@ func (m *MetricSet) transform(in *extractedData) []mb.Event {
 		events = append(events, mb.Event{MetricSetFields: v})
 	}
 
-
 	return events
 }
 
 func (m *MetricSet) addCursorData(cs *totalCursors) common.MapStr {
 	out := make(common.MapStr)
 
-	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.total", &oracle.Int64Value{cs.totalCursors})
-	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.current", &oracle.Int64Value{cs.currentCursors})
-	oracle.SetSqlValue(m.Logger(), out, "cursors.session.cache_hits", &oracle.Int64Value{cs.sessCurCacheHits})
-	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.total", &oracle.Int64Value{cs.parseCountTotal})
-	oracle.SetSqlValue(m.Logger(), out, "cursors.total.cache_hit.pct", &oracle.Float64Value{cs.cacheHitsTotalCursorsRatio})
-	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.real", &oracle.Int64Value{cs.realParses})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.total", &oracle.Int64Value{NullInt64: cs.totalCursors})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.current", &oracle.Int64Value{NullInt64: cs.currentCursors})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.session.cache_hits", &oracle.Int64Value{NullInt64: cs.sessCurCacheHits})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.total", &oracle.Int64Value{NullInt64: cs.parseCountTotal})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.total.cache_hit.pct", &oracle.Float64Value{NullFloat64: cs.cacheHitsTotalCursorsRatio})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.real", &oracle.Int64Value{NullInt64: cs.realParses})
 
 	return out
 }
@@ -93,11 +92,11 @@ func (m *MetricSet) addCursorByUsernameAndMachine(cs []cursorsByUsernameAndMachi
 	for _, v := range cs {
 		ms := common.MapStr{}
 
-		oracle.SetSqlValue(m.Logger(), ms, "username", &oracle.StringValue{v.username})
-		oracle.SetSqlValue(m.Logger(), ms, "machine", &oracle.StringValue{v.machine})
-		oracle.SetSqlValue(m.Logger(), ms, "cursors.total", &oracle.Int64Value{v.total})
-		oracle.SetSqlValue(m.Logger(), ms, "cursors.max", &oracle.Int64Value{v.max})
-		oracle.SetSqlValue(m.Logger(), ms, "cursors.avg", &oracle.Float64Value{v.avg})
+		oracle.SetSqlValue(m.Logger(), ms, "username", &oracle.StringValue{NullString: v.username})
+		oracle.SetSqlValue(m.Logger(), ms, "machine", &oracle.StringValue{NullString: v.machine})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.total", &oracle.Int64Value{NullInt64: v.total})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.max", &oracle.Int64Value{NullInt64: v.max})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.avg", &oracle.Float64Value{NullFloat64: v.avg})
 
 		out = append(out, ms)
 	}
@@ -110,7 +109,7 @@ func (m *MetricSet) addLibraryData(ls []library) common.MapStr {
 
 	for _, v := range ls {
 		if v.name.Valid {
-			oracle.SetSqlValue(m.Logger(), out, v.name.String, &oracle.Float64Value{v.value})
+			oracle.SetSqlValue(m.Logger(), out, v.name.String, &oracle.Float64Value{NullFloat64: v.value})
 		}
 	}
 
@@ -128,10 +127,10 @@ func (m *MetricSet) addBufferCacheRatioData(bs []bufferCacheHitRatio) map[string
 
 		_, _ = out[bufferCacheHitRatio.name.String].Put("buffer_pool", bufferCacheHitRatio.name.String)
 
-		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.buffer.hit.pct", &oracle.Float64Value{bufferCacheHitRatio.hitRatio})
-		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.get.consistent", &oracle.Int64Value{bufferCacheHitRatio.consistentGets})
-		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.get.db_blocks", &oracle.Int64Value{bufferCacheHitRatio.dbBlockGets})
-		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.physical_reads", &oracle.Int64Value{bufferCacheHitRatio.physicalReads})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.buffer.hit.pct", &oracle.Float64Value{NullFloat64: bufferCacheHitRatio.hitRatio})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.get.consistent", &oracle.Int64Value{NullInt64: bufferCacheHitRatio.consistentGets})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.get.db_blocks", &oracle.Int64Value{NullInt64: bufferCacheHitRatio.dbBlockGets})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.physical_reads", &oracle.Int64Value{NullInt64: bufferCacheHitRatio.physicalReads})
 
 	}
 
