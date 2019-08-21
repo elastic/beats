@@ -27,12 +27,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_handleRespBody(t *testing.T) {
@@ -43,37 +44,100 @@ func Test_handleRespBody(t *testing.T) {
 		errReason      reason.Reason
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name          string
+		args          args
+		wantErr       bool
+		wantFieldsSet bool
 	}{
-		// TODO: Add test cases.
+		{
+			"on_error with error",
+			args{
+				&beat.Event{},
+				simpleHTTPResponse("hello"),
+				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
+				reason.IOFailed(fmt.Errorf("something happened")),
+			},
+			false,
+			true,
+		},
+		{
+			"on_error with success",
+			args{
+				&beat.Event{},
+				simpleHTTPResponse("hello"),
+				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
+				nil,
+			},
+			false,
+			false,
+		},
+		{
+			"always with error",
+			args{
+				&beat.Event{},
+				simpleHTTPResponse("hello"),
+				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
+				reason.IOFailed(fmt.Errorf("something happened")),
+			},
+			false,
+			true,
+		},
+		{
+			"always with success",
+			args{
+				&beat.Event{},
+				simpleHTTPResponse("hello"),
+				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
+				nil,
+			},
+			false,
+			true,
+		},
+		{
+			"never with error",
+			args{
+				&beat.Event{},
+				simpleHTTPResponse("hello"),
+				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
+				reason.IOFailed(fmt.Errorf("something happened")),
+			},
+			false,
+			false,
+		},
+		{
+			"never with success",
+			args{
+				&beat.Event{},
+				simpleHTTPResponse("hello"),
+				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
+				nil,
+			},
+			false,
+			false,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			event := tt.args.event
 			if err := handleRespBody(tt.args.event, tt.args.resp, tt.args.responseConfig, tt.args.errReason); (err != nil) != tt.wantErr {
 				t.Errorf("handleRespBody() error = %v, wantErr %v", err, tt.wantErr)
 			}
-		})
-	}
-}
-
-func Test_addRespBodyFields(t *testing.T) {
-	type args struct {
-		event     *beat.Event
-		sampleStr string
-		bodyBytes int64
-		bodyHash  string
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			addRespBodyFields(tt.args.event, tt.args.sampleStr, tt.args.bodyBytes, tt.args.bodyHash)
+			if tt.wantFieldsSet {
+				testslike.Test(t,
+					lookslike.MustCompile(
+						map[string]interface{}{
+							"http.response.body": map[string]interface{}{
+								"content": "hel",
+								"hash":    "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+								"bytes":   int64(5),
+							},
+						}),
+					event.Fields)
+			} else {
+				b, _ := event.GetValue("http.response.body")
+				assert.Nil(t, b)
+			}
 		})
 	}
 }
@@ -91,7 +155,28 @@ func Test_readResp(t *testing.T) {
 		wantHashStr    string
 		wantErr        bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "response exists",
+			args: args{
+				resp:           simpleHTTPResponse("hello"),
+				maxSampleBytes: 3,
+			},
+			wantBodySample: "hel",
+			wantBodySize:   5,
+			wantHashStr:    "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+			wantErr:        false,
+		},
+		{
+			name: "no resp",
+			args: args{
+				resp:           nil,
+				maxSampleBytes: 3,
+			},
+			wantBodySample: "",
+			wantBodySize:   -1,
+			wantHashStr:    "",
+			wantErr:        true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -182,4 +267,8 @@ func Test_readPrefixAndHash(t *testing.T) {
 			assert.Nil(t, err)
 		})
 	}
+}
+
+func simpleHTTPResponse(body string) *http.Response {
+	return &http.Response{Body: ioutil.NopCloser(strings.NewReader(body))}
 }

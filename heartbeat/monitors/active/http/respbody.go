@@ -50,26 +50,20 @@ func handleRespBody(event *beat.Event, resp *http.Response, responseConfig respo
 	}
 
 	if includeSample {
-		addRespBodyFields(event, sampleStr, bodyBytes, bodyHash)
+		eventext.MergeEventFields(event, common.MapStr{
+			"http": common.MapStr{
+				"response": common.MapStr{
+					"body": common.MapStr{
+						"content": sampleStr,
+						"hash":    bodyHash,
+						"bytes":   bodyBytes,
+					},
+				},
+			},
+		})
 	}
 
 	return nil
-}
-
-func addRespBodyFields(event *beat.Event, sampleStr string, bodyBytes int64, bodyHash string) {
-	body := common.MapStr{"bytes": bodyBytes}
-	if sampleStr != "" {
-		body["content"] = sampleStr
-	}
-	if bodyHash != "" {
-		body["hash"] = bodyHash
-	}
-
-	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-		"response": common.MapStr{
-			"body": body,
-		},
-	}})
 }
 
 // readResp reads the first sampleSize bytes from the httpResponse,
