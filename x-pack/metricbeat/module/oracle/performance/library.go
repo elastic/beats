@@ -21,9 +21,7 @@ func (e *performanceExtractor) library(ctx context.Context) ([]library, error) {
 		UNION
 		SELECT 'pin_requests' "Ratio", AVG(pinhitratio) FROM V$LIBRARYCACHE
 		UNION
-		SELECT 'io_reloads' "Ratio", (SUM(reloads) / SUM(pins)) FROM V$LIBRARYCACHE
-		UNION
-		SELECT 'reparses' "Ratio", (SUM(reloads) / SUM(pins)) FROM V$LIBRARYCACHE;`)
+		SELECT 'io_reloads' "Ratio", (SUM(reloads) / SUM(pins)) FROM V$LIBRARYCACHE`)
 	if err != nil {
 		return nil, errors.Wrap(err, "error executing query")
 	}

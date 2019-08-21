@@ -22,7 +22,7 @@ type bufferCacheHitRatio struct {
 func (e *performanceExtractor) bufferCacheHitRatio(ctx context.Context) ([]bufferCacheHitRatio, error) {
 	rows, err := e.db.QueryContext(ctx, `SELECT name, physical_reads, db_block_gets, consistent_gets,
        1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit Ratio"
-FROM V$BUFFER_POOL_STATISTICS;`)
+FROM V$BUFFER_POOL_STATISTICS`)
 	if err != nil {
 		return nil, errors.Wrap(err, "error executing query")
 	}

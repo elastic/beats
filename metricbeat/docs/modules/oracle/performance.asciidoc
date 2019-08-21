@@ -1,11 +1,11 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-oracle-performance]]
 === Oracle performance metricset
 
-experimental[]
+beta[]
 
 include::../../../../x-pack/metricbeat/module/oracle/performance/_meta/docs.asciidoc[]
 

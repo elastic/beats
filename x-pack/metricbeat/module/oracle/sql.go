@@ -1,19 +1,33 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package oracle
 
 import (
 	"database/sql"
 	"errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// checkNullString avoid setting an invalid empty string value on Metricbeat event
-func CheckNullSqlValue(logger *logp.Logger, output map[string]common.MapStr, parentTargetFieldName, targetFieldName string, v SqlValue) {
+// SetSqlValueWithParentKey avoid setting an invalid empty value value on Metricbeat event
+func SetSqlValueWithParentKey(logger *logp.Logger, output map[string]common.MapStr, parentTargetFieldName, targetFieldName string, v SqlValue) {
+	ms, ok := output[parentTargetFieldName]
+	if !ok {
+		logger.Debug(errors.New("no parent key found"))
+		return
+	}
+
+	SetSqlValue(logger, ms, targetFieldName, v)
+}
+
+//SetSqlValue avoid setting an invalid empty value value on Metricbeat event
+func SetSqlValue(logger *logp.Logger, output common.MapStr, targetFieldName string, v SqlValue) {
 	if v.isValid() {
-		if _, ok := output[parentTargetFieldName]; ok {
-			if _, err := output[parentTargetFieldName].Put(targetFieldName, v.Value()); err != nil {
-				logger.Debug(errors.New("error trying to set value on common.Mapstr"))
-			}
+		if _, err := output.Put(targetFieldName, v.Value()); err != nil {
+			logger.Debug(errors.New("error trying to set value on common.Mapstr"))
 		}
 	} else {
 		logger.Debug(errors.New("invalid value returned from database (null)"))

@@ -6,6 +6,7 @@ package performance
 
 import (
 	"context"
+
 	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 
 	"github.com/pkg/errors"
@@ -20,31 +21,20 @@ func (m *MetricSet) extract(ctx context.Context, extractor performanceExtractMet
 	out = &extractedData{}
 
 	if out.bufferCacheHitRatios, err = extractor.bufferCacheHitRatio(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting data_files")
+		return nil, errors.Wrap(err, "error getting buffer cache hit ratio")
 	}
 
 	if out.libraryData, err = extractor.library(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting temp_free_space")
+		return nil, errors.Wrap(err, "error getting library data")
 	}
 
 	if out.cursorsByUsernameAndMachine, err = extractor.cursorsByUsernameAndMachine(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting temp_free_space")
+		return nil, errors.Wrap(err, "error getting cursors by username and machine")
 	}
 
 	if out.totalCursors, err = extractor.totalCursors(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting temp_free_space")
+		return nil, errors.Wrap(err, "error getting total cursors")
 	}
-
-	return
-}
-
-// transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
-// to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
-// was necessary. Data is organized by Tablespace entity (Tablespaces might contain one or more data files)
-func (m *MetricSet) transform(in *extractedData) (out map[string]common.MapStr) {
-	out = make(map[string]common.MapStr, 0)
-
-	m.addBufferCacheRatioData(in.bufferCacheHitRatios, out)
 
 	return
 }
@@ -55,33 +45,95 @@ func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error)
 		return nil, errors.Wrap(err, "error extracting data")
 	}
 
-	out := m.transform(extractedMetricsData)
+	return m.transform(extractedMetricsData), nil
+}
+
+// transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
+// to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
+// was necessary. Data is organized by Tablespace entity (Tablespaces might contain one or more data files)
+func (m *MetricSet) transform(in *extractedData) []mb.Event {
+	bufferCache := m.addBufferCacheRatioData(in.bufferCacheHitRatios)
+	cursorByUsernameAndMachineEvents := m.addCursorByUsernameAndMachine(in.cursorsByUsernameAndMachine)
+
+	cursorEvent := m.addCursorData(in.totalCursors)
+	cursorEvent.Update(m.addLibraryData(in.libraryData))
 
 	events := make([]mb.Event, 0)
-	for _, v := range out {
+
+	events = append(events, mb.Event{MetricSetFields: cursorEvent})
+
+	for _, v := range cursorByUsernameAndMachineEvents {
 		events = append(events, mb.Event{MetricSetFields: v})
 	}
 
-	return events, nil
+	for _, v := range bufferCache {
+		events = append(events, mb.Event{MetricSetFields: v})
+	}
+
+
+	return events
+}
+
+func (m *MetricSet) addCursorData(cs *totalCursors) common.MapStr {
+	out := make(common.MapStr)
+
+	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.total", &oracle.Int64Value{cs.totalCursors})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.current", &oracle.Int64Value{cs.currentCursors})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.session.cache_hits", &oracle.Int64Value{cs.sessCurCacheHits})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.total", &oracle.Int64Value{cs.parseCountTotal})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.total.cache_hit.pct", &oracle.Float64Value{cs.cacheHitsTotalCursorsRatio})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.real", &oracle.Int64Value{cs.realParses})
+
+	return out
+}
+
+func (m *MetricSet) addCursorByUsernameAndMachine(cs []cursorsByUsernameAndMachine) []common.MapStr {
+	out := make([]common.MapStr, 0)
+
+	for _, v := range cs {
+		ms := common.MapStr{}
+
+		oracle.SetSqlValue(m.Logger(), ms, "username", &oracle.StringValue{v.username})
+		oracle.SetSqlValue(m.Logger(), ms, "machine", &oracle.StringValue{v.machine})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.total", &oracle.Int64Value{v.total})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.max", &oracle.Int64Value{v.max})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.avg", &oracle.Float64Value{v.avg})
+
+		out = append(out, ms)
+	}
+
+	return out
+}
+
+func (m *MetricSet) addLibraryData(ls []library) common.MapStr {
+	out := common.MapStr{}
+
+	for _, v := range ls {
+		if v.name.Valid {
+			oracle.SetSqlValue(m.Logger(), out, v.name.String, &oracle.Float64Value{v.value})
+		}
+	}
+
+	return out
 }
 
 // addTempFreeSpaceData is specific to the TEMP Tablespace.
-func (m *MetricSet) addBufferCacheRatioData(bs []bufferCacheHitRatio, out map[string]common.MapStr) {
-	for key, cm := range out {
-		val, err := cm.GetValue("name")
-		if err != nil {
-			m.Logger().Debug("error getting tablespace name")
-			continue
+func (m *MetricSet) addBufferCacheRatioData(bs []bufferCacheHitRatio) map[string]common.MapStr {
+	out := make(map[string]common.MapStr)
+
+	for _, bufferCacheHitRatio := range bs {
+		if _, found := out[bufferCacheHitRatio.name.String]; !found {
+			out[bufferCacheHitRatio.name.String] = common.MapStr{}
 		}
 
-		name := val.(string)
-		if name == "TEMP" {
-			for _, bufferCacheHitRatio := range bs {
-				oracle.CheckNullSqlValue(m.Logger(), out, key, "cache.buffer.hit.pct", &oracle.Float64Value{bufferCacheHitRatio.hitRatio})
-				oracle.CheckNullSqlValue(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{bufferCacheHitRatio.consistentGets})
-				oracle.CheckNullSqlValue(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{bufferCacheHitRatio.dbBlockGets})
-				oracle.CheckNullSqlValue(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{bufferCacheHitRatio.physicalReads})
-			}
-		}
+		_, _ = out[bufferCacheHitRatio.name.String].Put("buffer_pool", bufferCacheHitRatio.name.String)
+
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.buffer.hit.pct", &oracle.Float64Value{bufferCacheHitRatio.hitRatio})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.get.consistent", &oracle.Int64Value{bufferCacheHitRatio.consistentGets})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.get.db_blocks", &oracle.Int64Value{bufferCacheHitRatio.dbBlockGets})
+		oracle.SetSqlValueWithParentKey(m.Logger(), out, bufferCacheHitRatio.name.String, "cache.physical_reads", &oracle.Int64Value{bufferCacheHitRatio.physicalReads})
+
 	}
+
+	return out
 }

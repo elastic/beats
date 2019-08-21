@@ -41,7 +41,7 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 		  AND b.name = 'opened cursors current'
 		GROUP BY s.username, 
 		         s.machine
-		ORDER BY 1 DESC;`)
+		ORDER BY 1 DESC`)
 	if err != nil {
 		return nil, errors.Wrap(err, "error executing query")
 	}
@@ -55,12 +55,12 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 		}
 
 		// Username could be nil if it's unknown. If any value of username is nil, set it as unknown instead. Same for machine
-		if !dest.username.Valid {
+		if !dest.username.Valid || dest.username.String == "" {
 			dest.username.String = "Unknown"
 			dest.username.Valid = true
 		}
 
-		if !dest.machine.Valid {
+		if !dest.machine.Valid || dest.machine.String == "" {
 			dest.machine.String = "Unknown"
 			dest.machine.Valid = true
 		}
@@ -72,7 +72,7 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 }
 
 func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors, error) {
-	rows, err := e.db.QueryContext(ctx, `
+	rows := e.db.QueryRowContext(ctx, `
 		SELECT total_cursors, 
 		       current_cursors, 
 		       sess_cur_cache_hits, 
@@ -85,13 +85,12 @@ func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors,
 			   sum ( decode ( name, 'session cursor cache hits',value,0)) sess_cur_cache_hits,
 			   sum ( decode ( name, 'parse count (total)',value,0)) parse_count_total
 			FROM v$sysstat
-			WHERE name IN ( 'opened cursors cumulative','opened cursors current','session cursor cache hits', 'parse count (total)' ));`)
-	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
-	}
+			WHERE name IN ( 'opened cursors cumulative','opened cursors current','session cursor cache hits', 'parse count (total)' ))`)
 
 	dest := totalCursors{}
-	if err = rows.Scan(&dest.totalCursors, &dest.currentCursors, &dest.sessCurCacheHits, &dest.parseCountTotal, &dest.cacheHitsTotalCursorsRatio, &dest.realParses); err != nil {
+
+	err := rows.Scan(&dest.totalCursors, &dest.currentCursors, &dest.sessCurCacheHits, &dest.parseCountTotal, &dest.cacheHitsTotalCursorsRatio, &dest.realParses)
+	if err != nil {
 		return nil, err
 	}
 

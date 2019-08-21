@@ -35,8 +35,8 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "oracle",
-		"metricsets": []string{"tablespace"},
-		"hosts":      []string{oracle.GetOracleConnectionDetails()},
+		"metricsets": []string{"performance"},
+		"hosts":      []string{oracle.GetOracleConnectionDetails("localhost")},
 		"username":   "sys",
 		"password":   "Oradoc_db1",
 	}
