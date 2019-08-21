@@ -20,11 +20,14 @@ package mage
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -44,7 +47,7 @@ import (
 func Check() error {
 	fmt.Println(">> check: Checking source code for common problems")
 
-	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable)
+	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
 
 	changes, err := GitDiffIndex()
 	if err != nil {
@@ -184,4 +187,117 @@ func CheckYAMLNotExecutable() error {
 func GoVet() error {
 	err := sh.RunV("go", "vet", "./...")
 	return errors.Wrap(err, "failed running go vet, please fix the issues reported")
+}
+
+// CheckDashboardsFormat checks the format of dashboards
+func CheckDashboardsFormat() error {
+	dashboardSubDir := "/_meta/kibana/"
+	dashboardFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+		if strings.HasPrefix(path, "vendor") {
+			return false
+		}
+		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to find dashboards")
+	}
+
+	hasErrors := false
+	for _, file := range dashboardFiles {
+		d, err := ioutil.ReadFile(file)
+		if err != nil {
+			return errors.Wrapf(err, "failed to read dashboard file %s", file)
+		}
+		var dashboard Dashboard
+		err = json.Unmarshal(d, &dashboard)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse dashboard from %s", file)
+		}
+
+		module := moduleNameFromDashboard(file)
+		errs := dashboard.CheckFormat(module)
+		if len(errs) > 0 {
+			hasErrors = true
+			fmt.Printf(">> Dashboard format - %s:\n", file)
+			for _, err := range errs {
+				fmt.Println("  ", err)
+			}
+		}
+	}
+
+	if hasErrors {
+		return errors.New("there are format errors in dashboards")
+	}
+	return nil
+}
+
+func moduleNameFromDashboard(path string) string {
+	moduleDir := filepath.Clean(filepath.Join(filepath.Dir(path), "../../../.."))
+	return filepath.Base(moduleDir)
+}
+
+// Dashboard is a dashboard
+type Dashboard struct {
+	Version string            `json:"version"`
+	Objects []dashboardObject `json:"objects"`
+}
+
+type dashboardObject struct {
+	Type       string `json:"type"`
+	Attributes struct {
+		Description string `json:"description"`
+		Title       string `json:"title"`
+	} `json:"attributes"`
+}
+
+var (
+	visualizationTitleRegexp = regexp.MustCompile(`^.+\[([^\s]+) (.+)\]( ECS)?$`)
+	dashboardTitleRegexp     = regexp.MustCompile(`^\[([^\s]+) (.+)\].+$`)
+)
+
+// CheckFormat checks the format of a dashboard
+func (d *Dashboard) CheckFormat(module string) []error {
+	checkObject := func(o *dashboardObject) error {
+		switch o.Type {
+		case "dashboard":
+			if o.Attributes.Description == "" {
+				return errors.Errorf("empty description on dashboard '%s'", o.Attributes.Title)
+			}
+			if err := checkTitle(dashboardTitleRegexp, o.Attributes.Title, module); err != nil {
+				return errors.Wrapf(err, "expected title with format '[%s Module] Some title', found '%s'", strings.Title(BeatName), o.Attributes.Title)
+			}
+		case "visualization":
+			if err := checkTitle(visualizationTitleRegexp, o.Attributes.Title, module); err != nil {
+				return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", strings.Title(BeatName), o.Attributes.Title)
+			}
+		}
+		return nil
+	}
+	var errs []error
+	for _, o := range d.Objects {
+		if err := checkObject(&o); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs
+}
+
+func checkTitle(re *regexp.Regexp, title string, module string) error {
+	match := re.FindStringSubmatch(title)
+	if len(match) < 3 {
+		return errors.New("title doesn't match pattern")
+	}
+	beatTitle := strings.Title(BeatName)
+	if match[1] != beatTitle {
+		return errors.Errorf("expected: '%s', found: '%s'", beatTitle, match[1])
+	}
+
+	// Compare case insensitive, and ignore spaces and underscores in module names
+	replacer := strings.NewReplacer("_", "", " ", "")
+	expectedModule := replacer.Replace(strings.ToLower(module))
+	foundModule := replacer.Replace(strings.ToLower(match[2]))
+	if expectedModule != foundModule {
+		return errors.Errorf("expected module name (%s), found '%s'", module, match[2])
+	}
+	return nil
 }

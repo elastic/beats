@@ -21,6 +21,8 @@ grouped in the following categories:
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
+* <<exported-fields-security>>
+* <<exported-fields-sysmon>>
 * <<exported-fields-winlog>>
 
 --
@@ -3431,9 +3433,9 @@ example: 12.0
 --
 
 [[exported-fields-eventlog]]
-== Event log record fields
+== Legacy Winlogbeat alias fields
 
-Contains data from a Windows event log record.
+Field aliases based on Winlogbeat 6.x that point to the fields for this version of Winlogbeat. These are added to the index template when `migration.6_to_7.enable: true` is set in the configuration.
 
 
 
@@ -3784,7 +3786,7 @@ type: keyword
 
 --
 
-*`kubernetes.labels`*::
+*`kubernetes.labels.*`*::
 +
 --
 Kubernetes labels map
@@ -3794,7 +3796,7 @@ type: object
 
 --
 
-*`kubernetes.annotations`*::
+*`kubernetes.annotations.*`*::
 +
 --
 Kubernetes annotations map
@@ -3871,8 +3873,149 @@ alias to: process.executable
 
 --
 
+[[exported-fields-security]]
+== Security module fields
+
+These are the event fields specific to the module for the Security log.
+
+
+
+[float]
+=== winlog.logon
+
+Data related to a Windows logon.
+
+
+*`winlog.logon.type`*::
++
+--
+Logon type name. This is the descriptive version of the `winlog.event_data.LogonType` ordinal. This is an enrichment added by the Security module.
+
+
+type: keyword
+
+example: RemoteInteractive
+
+--
+
+*`winlog.logon.id`*::
++
+--
+Logon ID that can be used to associate this logon with other events related to the same logon session.
+
+
+type: keyword
+
+--
+
+*`winlog.logon.failure.reason`*::
++
+--
+The reason the logon failed.
+
+
+type: keyword
+
+--
+
+*`winlog.logon.failure.status`*::
++
+--
+The reason the logon failed. This is textual description based on the value of the hexadecimal `Status` field.
+
+
+type: keyword
+
+--
+
+*`winlog.logon.failure.sub_status`*::
++
+--
+Additional information about the logon failure. This is a textual description based on the value of the hexidecimal `SubStatus` field.
+
+
+type: keyword
+
+--
+
+[[exported-fields-sysmon]]
+== Sysmon module fields
+
+These are the event fields specific to the Sysmon module.
+
+
+
+*`sysmon.dns.status`*::
++
+--
+Windows status code returned for the DNS query.
+
+type: keyword
+
+--
+
+*`dns.question.name`*::
++
+--
+The name being queried.
+
+
+type: keyword
+
+--
+
+*`dns.answers`*::
++
+--
+An array containing a dictionary about each answer section returned by the server.
+
+
+type: object
+
+--
+
+*`dns.answers.type`*::
++
+--
+The type of data contained in this resource record.
+
+type: keyword
+
+example: CNAME
+
+--
+
+*`dns.answers.data`*::
++
+--
+type: keyword
+
+--
+
+*`dns.answers_count`*::
++
+--
+The number of resource records contained in the `dns.answers` field.
+
+
+type: long
+
+example: 3
+
+--
+
+*`dns.grouped.ip`*::
++
+--
+Array containing all IPs seen in `dns.answers.data`.
+
+
+type: ip
+
+--
+
 [[exported-fields-winlog]]
-== Windows Event Log fields emitted by Winlogbeat fields
+== Winlogbeat fields
 
 Fields from the Windows Event Log.
 
@@ -4110,7 +4253,6 @@ required: False
 +
 --
 The Windows security identifier (SID) of the account associated with this event.
-
 If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
 
 
@@ -4119,6 +4261,16 @@ type: keyword
 example: S-1-5-21-3541430928-2051711210-1391384369-1001
 
 required: False
+
+--
+
+*`winlog.user.name`*::
++
+--
+Name of the user associated with this event.
+
+
+type: keyword
 
 --
 
@@ -4154,16 +4306,6 @@ The version number of the event's definition.
 type: long
 
 required: False
-
---
-
-*`winlog.logon.type`*::
-+
---
-Logon type name. This is the descriptive version of the `winlog.event_data.LogonType` ordinal. This is an enrichment added by the Security module.
-
-
-type: keyword
 
 --
 

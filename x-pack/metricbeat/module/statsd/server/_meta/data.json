@@ -1,0 +1,104 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "labels": {
+        "k1": "v1",
+        "k2": "v2"
+    },
+    "service": {
+        "type": "statsd"
+    },
+    "statsd": {
+        "metric01": {
+            "value": 1
+        },
+        "metric02": {
+            "count": 2
+        },
+        "metric03": {
+            "count": 3
+        },
+        "metric04": {
+            "15m_rate": 0,
+            "1m_rate": 0,
+            "5m_rate": 0,
+            "count": 1,
+            "max": 4,
+            "mean": 4,
+            "mean_rate": 153468.3855125844,
+            "median": 4,
+            "min": 4,
+            "p75": 4,
+            "p95": 4,
+            "p99": 4,
+            "p99_9": 4,
+            "stddev": 0
+        },
+        "metric05": {
+            "count": 1,
+            "max": 0,
+            "mean": 0,
+            "median": 0,
+            "min": 0,
+            "p75": 0,
+            "p95": 0,
+            "p99": 0,
+            "p99_9": 0,
+            "stddev": 0
+        },
+        "metric06": {
+            "count": 1,
+            "max": 0,
+            "mean": 0,
+            "median": 0,
+            "min": 0,
+            "p75": 0,
+            "p95": 0,
+            "p99": 0,
+            "p99_9": 0,
+            "stddev": 0
+        },
+        "metric07": {
+            "15m_rate": 0,
+            "1m_rate": 0,
+            "5m_rate": 0,
+            "count": 1,
+            "max": 7,
+            "mean": 7,
+            "mean_rate": 298329.3556085919,
+            "median": 7,
+            "min": 7,
+            "p75": 7,
+            "p95": 7,
+            "p99": 7,
+            "p99_9": 7,
+            "stddev": 0
+        },
+        "metric08": {
+            "count": 1
+        },
+        "metric09": {
+            "count": 1,
+            "max": 0,
+            "mean": 0,
+            "median": 0,
+            "min": 0,
+            "p75": 0,
+            "p95": 0,
+            "p99": 0,
+            "p99_9": 0,
+            "stddev": 0
+        },
+        "metric10_with_dots": {
+            "count": 1,
+            "max": 0,
+            "mean": 0,
+            "median": 0,
+            "min": 0,
+            "p75": 0,
+            "p95": 0,
+            "p99": 0,
+            "p99_9": 0,
+            "stddev": 0
+        }
+    }
+}

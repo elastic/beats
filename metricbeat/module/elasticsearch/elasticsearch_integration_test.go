@@ -24,9 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
@@ -63,9 +61,9 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch")
+	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 
-	host := net.JoinHostPort(getEnvHost(), getEnvPort())
+	host := service.Host()
 	err := createIndex(host)
 	assert.NoError(t, err)
 
@@ -86,7 +84,7 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
 			assert.Empty(t, errs)
@@ -100,9 +98,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch")
+	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 
-	host := net.JoinHostPort(getEnvHost(), getEnvPort())
+	host := service.Host()
 
 	version, err := getElasticsearchVersion(host)
 	if err != nil {
@@ -112,7 +110,7 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			if err != nil {
 				t.Fatal("write", err)
@@ -121,32 +119,12 @@ func TestData(t *testing.T) {
 	}
 }
 
-// GetEnvHost returns host for Elasticsearch
-func getEnvHost() string {
-	host := os.Getenv("ES_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-// GetEnvPort returns port for Elasticsearch
-func getEnvPort() string {
-	port := os.Getenv("ES_PORT")
-
-	if len(port) == 0 {
-		port = "9200"
-	}
-	return port
-}
-
 // GetConfig returns config for elasticsearch module
-func getConfig(metricset string) map[string]interface{} {
+func getConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{metricset},
-		"hosts":                      []string{getEnvHost() + ":" + getEnvPort()},
+		"hosts":                      []string{host},
 		"index_recovery.active_only": false,
 	}
 }
@@ -177,9 +155,17 @@ func createIndex(host string) error {
 	return nil
 }
 
-// createIndex creates and elasticsearch index in case it does not exit yet
+// enableTrialLicense creates and elasticsearch index in case it does not exit yet
 func enableTrialLicense(host string, version *common.Version) error {
 	client := &http.Client{}
+
+	enabled, err := checkTrialLicenseEnabled(host, version)
+	if err != nil {
+		return err
+	}
+	if enabled {
+		return nil
+	}
 
 	var enableXPackURL string
 	if version.Major < 7 {
@@ -208,6 +194,42 @@ func enableTrialLicense(host string, version *common.Version) error {
 	}
 
 	return nil
+}
+
+// checkTrialLicenseEnabled creates and elasticsearch index in case it does not exit yet
+func checkTrialLicenseEnabled(host string, version *common.Version) (bool, error) {
+	var licenseURL string
+	if version.Major < 7 {
+		licenseURL = "/_xpack/license"
+	} else {
+		licenseURL = "/_license"
+	}
+
+	resp, err := http.Get("http://" + host + licenseURL)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	var data struct {
+		License struct {
+			Status string `json:"status"`
+			Type   string `json:"type"`
+		} `json:"license"`
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return false, err
+	}
+
+	active := data.License.Status == "active"
+	isTrial := data.License.Type == "trial"
+	return active && isTrial, nil
 }
 
 func createMLJob(host string, version *common.Version) error {
@@ -261,7 +283,7 @@ func createCCRStats(host string) error {
 		return checkCCRStatsExists(host)
 	}
 
-	exists, err := waitForSuccess(checkCCRStats, 300, 5)
+	exists, err := waitForSuccess(checkCCRStats, 500*time.Millisecond, 10)
 	if err != nil {
 		return errors.Wrap(err, "error checking if CCR stats exist")
 	}
@@ -407,7 +429,7 @@ func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error)
 
 type checkSuccessFunction func() (bool, error)
 
-func waitForSuccess(f checkSuccessFunction, retryIntervalMs time.Duration, numAttempts int) (bool, error) {
+func waitForSuccess(f checkSuccessFunction, retryInterval time.Duration, numAttempts int) (bool, error) {
 	for numAttempts > 0 {
 		success, err := f()
 		if err != nil {
@@ -418,7 +440,7 @@ func waitForSuccess(f checkSuccessFunction, retryIntervalMs time.Duration, numAt
 			return success, nil
 		}
 
-		time.Sleep(retryIntervalMs * time.Millisecond)
+		time.Sleep(retryInterval)
 		numAttempts--
 	}
 

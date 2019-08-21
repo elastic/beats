@@ -38,10 +38,8 @@ func TestData(t *testing.T) {
 	}
 
 	config = addCloudwatchMetricsToConfig(config)
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }
 
 func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]interface{} {
@@ -49,6 +47,6 @@ func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]inte
 	cloudwatchMetric := map[string]interface{}{}
 	cloudwatchMetric["namespace"] = "AWS/RDS"
 	cloudwatchMetricsConfig = append(cloudwatchMetricsConfig, cloudwatchMetric)
-	config["cloudwatch_metrics"] = cloudwatchMetricsConfig
+	config["metrics"] = cloudwatchMetricsConfig
 	return config
 }

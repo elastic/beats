@@ -1,0 +1,118 @@
+[[release-highlights-7.3.0]]
+=== 7.3.0 release highlights
+++++
+<titleabbrev>7.3.0</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Here are the highlights of the new features and enhancements in 7.3.0.
+
+Refer to the {beats} <<breaking-changes-7.3, Breaking Changes>> and
+<<release-notes, Release Notes>> for a list of bug fixes and other changes.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+// ADD NOTABLE HIGHLIGHTS HERE
+[float]
+==== Automated {functionbeat} deployment with CloudFormation templates
+
+{functionbeat} 7.3.0 introduces the ability to export a CloudFormation
+template for integration with automation systems. Previously, {functionbeat} was
+only available for manual command line deployment, but with this new
+functionality, you can more easily automate {functionbeat} deployments through
+their own CloudFormation stacks.
+
+To export CloudFormation templates, use the following command:
+
+[source,shell]
+----
+$ ./functionbeat export function <FUNCTION_NAME>
+----
+
+[float]
+==== Google Cloud integrations
+
+{filebeat} 7.3.0 introduces a
+{filebeat-ref}/filebeat-module-googlecloud.html[Google Cloud module] that
+monitors Virtual Private Cloud (VPC) flow logs from Google Cloud through
+Stackdriver. It ships data to {es} in ECS format, so it’s immediately available
+for analysis in the https://www.elastic.co/products/siem[SIEM app] (or with
+https://www.elastic.co/products/maps[Maps] or a
+https://www.elastic.co/what-is/kibana-canvas[Canvas] workpad).
+
+Along with the module, {filebeat} also introduces a
+{filebeat-ref}/filebeat-input-google-pubsub.html[Google Cloud Pub/Sub] input for
+consuming from Google Cloud Pub/Sub topics. You can use this input to ingest all
+your events from Google Cloud for real-time analytics with the {stack}.
+
+[float]
+==== Expanded database monitoring
+
+7.3.0 introduces support for three new databases in {metricbeat} and a new
+database source in {filebeat}.
+
+* *Oracle Database*
++
+The {metricbeat} {metricbeat-ref}/metricbeat-module-oracle.html[Oracle
+module] provides the
+{metricbeat-ref}/metricbeat-metricset-oracle-tablespace.html[`tablespace`]
+metricset, which includes information about data files and temp files, grouped
+by tablespace. This module includes information about used and free space, the
+status of the data files, and the status of the tablespace itself.
+
+* *Amazon RDS*
++
+If you’re using https://aws.amazon.com/rds/[Amazon Relational Database Service
+(RDS)], you can now collect a rich set of metrics about your deployment, from
+CPU and memory usage, to disk and network throughput and latency. See all the
+details in the {metricbeat-ref}/metricbeat-metricset-aws-rds.html[`RDS`]
+metricset, now available in the {metricbeat}
+{metricbeat-ref}/metricbeat-module-aws.html[AWS module].
+
+* *CockroachDB*
++
+The {metricbeat} {metricbeat-ref}/metricbeat-module-cockroachdb.html[CockroachDB
+module] exposes the
+{metricbeat-ref}/metricbeat-metricset-cockroachdb-status.html[`status`]
+metricset, which is compatible with any CockroachDB version exposing metrics in
+Prometheus format.
+
+* *Microsoft SQL Server*
++
+The {filebeat} {filebeat-ref}/filebeat-module-mssql.html[MS SQL module] monitors
+the Microsoft SQL Server error logs with the {stack}.
+
+[float]
+==== Improved Kubernetes monitoring
+
+{metricbeat} 7.3.0 strengthens Kubernetes observability by introducing
+metricsets for three additional Kubernetes components:
+
+* The {metricbeat-ref}/metricbeat-metricset-kubernetes-controllermanager.html[`controllermanager`]
+metricset captures metrics from
+https://kubernetes.io/docs/reference/command-line-tools-reference/cloud-controller-manager/[kube-controller-manager].
+
+* The {metricbeat-ref}/metricbeat-metricset-kubernetes-proxy.html[`proxy`]
+metricset covers
+https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/[kube-proxy],
+the network proxy component in Kubernetes.
+
+* The {metricbeat-ref}/metricbeat-metricset-kubernetes-scheduler.html[`scheduler`]
+metricset provides visibility into the
+https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/[kube-scheduler].
+
+[float]
+==== Configuration-only {metricbeat} modules
+
+For developers, we've streamlined the process of adding new data sources. 7.3.0
+introduces a new way of creating {metricbeat} modules, called _light modules_,
+that doesn’t require a single line of Go code. Light modules provide pre-defined
+configurations on top of existing, more generic modules, such as
+{metricbeat-ref}/metricbeat-module-prometheus.html[Prometheus] or
+{metricbeat-ref}/metricbeat-module-jolokia.html[Jolokia]. In fact, the
+{metricbeat-ref}/metricbeat-module-cockroachdb.html[CockroachDB] module,
+introduced in this release, is a light module.
+
+// end::notable-highlights[]

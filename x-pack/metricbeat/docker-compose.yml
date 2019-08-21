@@ -8,13 +8,8 @@ services:
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
     command: make
-    env_file:
-      - ../../metricbeat/module/elasticsearch/_meta/env
-      - ../../metricbeat/module/kibana/_meta/env
-      - ./module/cockroachdb/_meta/env
-      - ./module/coredns/_meta/env
-      - ./module/mssql/_meta/env
 
   # Modules
   cockroachdb:
