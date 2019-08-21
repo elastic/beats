@@ -329,11 +329,6 @@ type MockSQSClient struct {
 	sqsiface.ClientAPI
 }
 
-// MockS3ClientErr struct is used for unit tests.
-type MockS3ClientErr struct {
-	s3iface.ClientAPI
-}
-
 var (
 	sqsMessageTest = "{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\"," +
 		"\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\"," +
@@ -365,16 +360,6 @@ func (m *MockSQSClient) DeleteMessageRequest(input *sqs.DeleteMessageInput) sqs.
 	}
 }
 
-func (m *MockS3ClientErr) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	return s3.GetObjectRequest{
-		Request: &awssdk.Request{
-			Data:        &s3.GetObjectOutput{},
-			HTTPRequest: httpReq,
-		},
-	}
-}
-
 func (m *MockSQSClient) ChangeMessageVisibilityRequest(input *sqs.ChangeMessageVisibilityInput) sqs.ChangeMessageVisibilityRequest {
 	httpReq, _ := http.NewRequest("", "", nil)
 	return sqs.ChangeMessageVisibilityRequest{
@@ -383,32 +368,6 @@ func (m *MockSQSClient) ChangeMessageVisibilityRequest(input *sqs.ChangeMessageV
 			HTTPRequest: httpReq,
 		},
 	}
-}
-
-func TestMockS3InputWithError(t *testing.T) {
-	defer resources.NewGoroutinesChecker().Check(t)
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"queue_url": "https://sqs.ap-southeast-1.amazonaws.com/123456/test",
-	})
-
-	runTest(t, cfg, func(input *s3Input, out *stubOutleter, t *testing.T) {
-		svcS3 := &MockS3ClientErr{}
-		svcSQS := &MockSQSClient{}
-
-		wg := sync.WaitGroup{}
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			input.run(svcSQS, svcS3, 300)
-		}()
-
-		time.AfterFunc(1*time.Second, func() { out.Close() })
-		events, ok := out.waitForEvents(0)
-		if !ok {
-			t.Fatalf("Expected 0 events, but got %d.", len(events))
-		}
-		input.Stop()
-	})
 }
 
 func TestMockS3Input(t *testing.T) {
