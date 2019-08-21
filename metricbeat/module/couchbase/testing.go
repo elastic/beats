@@ -17,13 +17,11 @@
 
 package couchbase
 
-import "os"
+import (
+	"fmt"
+)
 
-func GetEnvDSN() string {
-	dsn := os.Getenv("COUCHBASE_DSN")
-
-	if len(dsn) == 0 {
-		dsn = "http://Administrator:password@localhost:8091"
-	}
-	return dsn
+// GetDSN returns a complete DSN for a given host
+func GetDSN(host string) string {
+	return fmt.Sprintf("http://Administrator:password@%s", host)
 }

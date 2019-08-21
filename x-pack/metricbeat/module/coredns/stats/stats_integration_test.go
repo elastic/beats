@@ -7,7 +7,6 @@
 package stats
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,9 +16,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "coredns")
+	service := compose.EnsureUp(t, "coredns")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -28,19 +27,10 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func getConfig() map[string]interface{} {
-
-	host := os.Getenv("COREDNS_HOST")
-	port := os.Getenv("COREDNS_PORT")
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	if len(port) == 0 {
-		port = "9153"
-	}
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "coredns",
 		"metricsets": []string{"stats"},
-		"hosts":      []string{host + ":" + port},
+		"hosts":      []string{host},
 	}
 }

@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-aws]]
+[role="xpack"]
 == aws module
 
 This module periodically fetches monitoring metrics from AWS Cloudwatch using
@@ -88,7 +89,7 @@ for a list of AWS services that publish metrics to CloudWatch.
 dimensions to Amazon CloudWatch every minute.
 
 [id="aws-credentials-config"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+include::../../../../../metricbeat/docs/aws-credentials-examples.asciidoc
 
 
 [float]
@@ -161,7 +162,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
 
+* <<metricbeat-metricset-aws-ebs,ebs>>
+
 * <<metricbeat-metricset-aws-ec2,ec2>>
+
+* <<metricbeat-metricset-aws-elb,elb>>
 
 * <<metricbeat-metricset-aws-rds,rds>>
 
@@ -173,7 +178,11 @@ The following metricsets are available:
 
 include::aws/cloudwatch.asciidoc[]
 
+include::aws/ebs.asciidoc[]
+
 include::aws/ec2.asciidoc[]
+
+include::aws/elb.asciidoc[]
 
 include::aws/rds.asciidoc[]
 

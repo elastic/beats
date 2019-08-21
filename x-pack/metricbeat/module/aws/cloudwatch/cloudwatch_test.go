@@ -378,32 +378,32 @@ func TestGenerateFieldName(t *testing.T) {
 		{
 			"test Average",
 			[]string{"CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
-			"metrics.CPUUtilization.avg",
+			"aws.metrics.CPUUtilization.avg",
 		},
 		{
 			"test Maximum",
 			[]string{"CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
-			"metrics.CPUUtilization.max",
+			"aws.metrics.CPUUtilization.max",
 		},
 		{
 			"test Minimum",
 			[]string{"CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
-			"metrics.CPUUtilization.min",
+			"aws.metrics.CPUUtilization.min",
 		},
 		{
 			"test Sum",
 			[]string{"CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
-			"metrics.CPUUtilization.sum",
+			"aws.metrics.CPUUtilization.sum",
 		},
 		{
 			"test SampleCount",
 			[]string{"CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
-			"metrics.CPUUtilization.count",
+			"aws.metrics.CPUUtilization.count",
 		},
 		{
 			"test extended statistic",
 			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
-			"metrics.CPUUtilization.p10",
+			"aws.metrics.CPUUtilization.p10",
 		},
 	}
 

@@ -13,7 +13,7 @@
           }
         },
         "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Source Port and Transport [Filebeat Flows]",
+        "title": "Source Port and Transport [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -73,7 +73,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Source Port and Transport [Filebeat Flows]",
+          "title": "Source Port and Transport [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -158,7 +158,7 @@
             }
           }
         },
-        "title": "Flow Selectors [Filebeat Flows]",
+        "title": "Flow Selectors [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -200,7 +200,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Flow Selectors [Filebeat Flows]",
+          "title": "Flow Selectors [Filebeat Netflow]",
           "type": "input_control_vis"
         }
       },
@@ -222,7 +222,7 @@
           }
         },
         "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Destination Port and Transport [Filebeat Flows]",
+        "title": "Destination Port and Transport [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -282,7 +282,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Destination Port and Transport [Filebeat Flows]",
+          "title": "Destination Port and Transport [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -304,7 +304,7 @@
           }
         },
         "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Top Sources Table [Filebeat Flows]",
+        "title": "Top Sources Table [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -394,7 +394,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Sources Table [Filebeat Flows]",
+          "title": "Top Sources Table [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -416,7 +416,7 @@
           }
         },
         "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Top Destinations Table [Filebeat Flows]",
+        "title": "Top Destinations Table [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -506,7 +506,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Destinations Table [Filebeat Flows]",
+          "title": "Top Destinations Table [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -528,7 +528,7 @@
           }
         },
         "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Flows Over Time [Filebeat Flows]",
+        "title": "Flows Over Time [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -680,7 +680,7 @@
               }
             ]
           },
-          "title": "Flows Over Time [Filebeat Flows]",
+          "title": "Flows Over Time [Filebeat Netflow]",
           "type": "area"
         }
       },
@@ -753,7 +753,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Top N network flows",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -856,7 +856,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "Top-N Flows [Filebeat Flows]",
+        "title": "[Filebeat Netflow] Top-N Flows",
         "version": 1
       },
       "id": "1374fe40-1ae8-11e9-9eb0-d1ab52900288",

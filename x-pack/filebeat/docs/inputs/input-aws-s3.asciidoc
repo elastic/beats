@@ -1,0 +1,74 @@
+[role="xpack"]
+
+:libbeat-xpack-dir: ../../../../x-pack/libbeat
+
+:type: s3
+
+[id="{beatname_lc}-input-{type}"]
+=== s3 input
+
+++++
+<titleabbrev>s3</titleabbrev>
+++++
+
+beta[]
+
+Use the `s3` input to retrieve logs from S3 objects that are pointed by messages
+from specific SQS queues. This input can, for example, be used to receive S3
+server access logs to monitor detailed records for the requests that are made to
+a bucket.
+
+When processing a s3 object which pointed by a sqs message, if half of the set
+visibility timeout passed and the processing is still ongoing, then the
+visibility timeout of that sqs message will be reset to make sure the message
+does not go back to the queue in the middle of the processing. If there are
+errors happening during the processing of the s3 object, then the process will be
+stopped and the sqs message will be returned back to the queue.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: s3
+  queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
+  access_key_id: my-access-key
+  secret_access_key: my-secret-access-key
+----
+
+The `s3` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `queue_url`
+
+URL of the AWS SQS queue that messages will be received from. Required.
+
+[float]
+==== `visibility_timeout`
+
+The duration (in seconds) that the received messages are hidden from subsequent
+retrieve requests after being retrieved by a ReceiveMessage request.
+This value needs to be a lot bigger than filebeat collection frequency so
+if it took too long to read the s3 log, this sqs message will not be reprocessed.
+The default visibility timeout for a message is 300 seconds. The minimum
+is 0 seconds. The maximum is 12 hours.
+
+[float]
+==== `aws credentials`
+
+In order to make AWS API calls, `s3` input requires AWS credentials.Please see
+ <<aws-credentials-config,AWS credentials options>> for more details.
+
+[float]
+=== S3 and SQS setup
+Enable bucket notification: any new object creation in S3 bucket will also
+create a notification through SQS. Please see
+https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
+for more details.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+
+:type!:

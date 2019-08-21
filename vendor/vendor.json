@@ -336,6 +336,7 @@
 			"path": "github.com/aws/aws-sdk-go-v2/aws/awserr",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
 			"revisionTime": "2019-05-28T21:51:27Z",
+			"tree": true,
 			"version": "v0.9.0",
 			"versionExact": "v0.9.0"
 		},
@@ -596,7 +597,15 @@
 			"versionExact": "v0.9.0"
 		},
 		{
-			"checksumSHA1": "VOdJIdzSIvHiu23lwsxFOTeBrWk=",
+			"checksumSHA1": "e0qV+W56A3/QgA1xDkaAwTIffAw=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/s3/s3iface",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
+			"checksumSHA1": "Y+mpKnu57hYbC4z3nrSFR9BkAec=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/sqs",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
 			"revisionTime": "2019-05-28T21:51:27Z",

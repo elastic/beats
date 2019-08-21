@@ -134,20 +134,25 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatVersion string, init 
 			return nil, err
 		}
 	}
-	mcfgs := []*ModuleConfig{}
-	for _, moduleConfig := range moduleConfigs {
-		mcfg, err := mcfgFromConfig(moduleConfig)
+	var mcfgs []*ModuleConfig
+	for _, cfg := range moduleConfigs {
+		cfg, err = mergePathDefaults(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("Error unpacking module config: %v", err)
+			return nil, err
 		}
-		mcfgs = append(mcfgs, mcfg)
+
+		moduleConfig, err := mcfgFromConfig(cfg)
+		if err != nil {
+			return nil, errors.Wrap(err, "error unpacking module config")
+		}
+		mcfgs = append(mcfgs, moduleConfig)
 	}
 
 	mcfgs, err = appendWithoutDuplicates(mcfgs, modulesCLIList)
-
 	if err != nil {
 		return nil, err
 	}
+
 	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatVersion)
 }
 
@@ -168,7 +173,7 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
 	for name, filesetConfig := range dict {
-		if name == "module" || name == "enabled" {
+		if name == "module" || name == "enabled" || name == "path" {
 			continue
 		}
 
