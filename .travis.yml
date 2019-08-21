@@ -196,8 +196,22 @@ addons:
 
 before_install:
   - python --version
+  - printenv
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
+  # collect PR details
+  - |
+    if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+      curl "https://api.github.com/repos/elastic/beats/${TRAVIS_PULL_REQUEST}" > .pr_details.json
+      cat .pr_details.json
+      git diff
+    fi
+  # check we're testing the correct commit
+  - |
+    if [[ "$TRAVIS_COMMIT" != "$(git rev-parse HEAD)" ]]; then
+      echo "Commit $(git rev-parse HEAD) doesn't match expected commit $TRAVIS_COMMIT"
+      exit 1
+    fi
   # Docker-compose installation
   - sudo rm /usr/local/bin/docker-compose || true
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
