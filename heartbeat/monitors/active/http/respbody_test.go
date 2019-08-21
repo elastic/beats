@@ -120,7 +120,7 @@ func Test_readPrefixAndHash(t *testing.T) {
 	}
 
 	longBytes := make([]byte, 2*1024*1024) //2MiB
-	for idx, _ := range longBytes {
+	for idx := range longBytes {
 		longBytes[idx] = 'x'
 	}
 	longStr := string(longBytes)
