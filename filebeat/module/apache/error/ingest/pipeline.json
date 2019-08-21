@@ -16,13 +16,33 @@
         },
         {
             "date": {
+                "if": "ctx.event.timezone != null",
                 "field": "apache.error.timestamp",
                 "target_field": "@timestamp",
                 "formats": [
                     "EEE MMM dd H:m:s yyyy",
                     "EEE MMM dd H:m:s.SSSSSS yyyy"
                 ],
+                "timezone": "{{ event.timezone }}",
                 "ignore_failure": true
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.event.timezone != null",
+                "field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                "timezone": "{{ event.timezone }}",
+                "on_failure": [
+                    {
+                        "append": {
+                            "field": "error.message",
+                            "value": "{{ _ingest.on_failure_message }}"
+                        }
+                    }
+                ]
             }
         },
         {
