@@ -26,7 +26,7 @@ https://github.com/elastic/beats/compare/v7.3.0...v7.3.1[View commits]
 
 *Metricbeat*
 
-- Make the `beat` module defensive about determine ES cluster UUID when `xpack.enabled: true` is set. {pull}13020[13020]
+- Make the `beat` module defensive about determining ES cluster UUID when `xpack.enabled: true` is set. {pull}13020[13020]
 
 [[release-notes-7.3.0]]
 === Beats version 7.3.0
