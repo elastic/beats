@@ -102,7 +102,7 @@ func ExampleWrapper() {
 	//   },
 	//   "metricset": {
 	//     "name": "eventfetcher",
-	//     "period": 10000000
+	//     "period": 10000
 	//   },
 	//   "service": {
 	//     "type": "fake"
