@@ -135,9 +135,9 @@ func GoTestIntegration(ctx context.Context) error {
 // Config generates both the short/reference/docker configs.
 func Config() error {
 	customDeps := devtools.ConfigFileParams{
-		ShortParts:     []string{"_meta/setup.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
-		ReferenceParts: []string{"_meta/common.reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
-		DockerParts:    []string{"_meta/beat.docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
+		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
+		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
+		DockerParts:    []string{"_meta/docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
 		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
 	}
 	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
