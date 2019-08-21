@@ -123,21 +123,21 @@ func Test_handleRespBody(t *testing.T) {
 			if err := handleRespBody(tt.args.event, tt.args.resp, tt.args.responseConfig, tt.args.errReason); (err != nil) != tt.wantErr {
 				t.Errorf("handleRespBody() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if tt.wantFieldsSet {
-				testslike.Test(t,
-					lookslike.MustCompile(
-						map[string]interface{}{
-							"http.response.body": map[string]interface{}{
-								"content": "hel",
-								"hash":    "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
-								"bytes":   int64(5),
-							},
-						}),
-					event.Fields)
-			} else {
-				b, _ := event.GetValue("http.response.body")
-				assert.Nil(t, b)
+
+			bodyMatch := map[string]interface{}{
+				"hash":  "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+				"bytes": int64(5),
 			}
+			if tt.wantFieldsSet {
+				bodyMatch["content"] = "hel"
+			}
+
+			testslike.Test(t,
+				lookslike.MustCompile(
+					map[string]interface{}{
+						"http.response.body": bodyMatch,
+					}),
+				event.Fields)
 		})
 	}
 }

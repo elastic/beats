@@ -49,19 +49,19 @@ func handleRespBody(event *beat.Event, resp *http.Response, responseConfig respo
 		return err
 	}
 
-	if includeSample {
-		eventext.MergeEventFields(event, common.MapStr{
-			"http": common.MapStr{
-				"response": common.MapStr{
-					"body": common.MapStr{
-						"content": sampleStr,
-						"hash":    bodyHash,
-						"bytes":   bodyBytes,
-					},
-				},
-			},
-		})
+	evtBodyMap := common.MapStr{
+		"hash":  bodyHash,
+		"bytes": bodyBytes,
 	}
+	if includeSample {
+		evtBodyMap["content"] = sampleStr
+	}
+
+	eventext.MergeEventFields(event, common.MapStr{
+		"http": common.MapStr{
+			"response": common.MapStr{"body": evtBodyMap},
+		},
+	})
 
 	return nil
 }
