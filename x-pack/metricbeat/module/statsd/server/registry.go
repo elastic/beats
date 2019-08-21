@@ -53,6 +53,22 @@ func newSetMetric() *setMetric {
 	return &s
 }
 
+type deltaGaugeMetric struct {
+	value float64
+}
+
+func (d *deltaGaugeMetric) Inc(val float64) {
+	d.value += val
+}
+
+func (d *deltaGaugeMetric) Set(val float64) {
+	d.value = val
+}
+
+func (d *deltaGaugeMetric) Value() float64 {
+	return d.value
+}
+
 type metricsGroup struct {
 	tags    map[string]string
 	metrics common.MapStr
@@ -63,7 +79,8 @@ func (r *registry) getMetric(metric interface{}) map[string]interface{} {
 	switch m := metric.(type) {
 	case metrics.Counter:
 		values["count"] = m.Count()
-	case metrics.GaugeFloat64:
+		m.Clear()
+	case *deltaGaugeMetric:
 		values["value"] = m.Value()
 	case metrics.Histogram:
 		h := m.Snapshot()
@@ -211,8 +228,8 @@ func (r *registry) GetOrNewTimer(name string, tags map[string]string) metrics.Ti
 	return r.GetOrNewTimer(name, tags)
 }
 
-func (r *registry) GetOrNewGauge64(name string, tags map[string]string) metrics.GaugeFloat64 {
-	gauge, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewGaugeFloat64() }).(metrics.GaugeFloat64)
+func (r *registry) GetOrNewGauge64(name string, tags map[string]string) *deltaGaugeMetric {
+	gauge, ok := r.getOrNew(name, tags, func() interface{} { return &deltaGaugeMetric{} }).(*deltaGaugeMetric)
 	if ok {
 		return gauge
 	}
