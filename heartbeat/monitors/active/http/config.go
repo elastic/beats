@@ -31,12 +31,11 @@ import (
 )
 
 type Config struct {
-	URLs                 []string       `config:"urls" validate:"required"`
-	ProxyURL             string         `config:"proxy_url"`
-	Timeout              time.Duration  `config:"timeout"`
-	MaxRedirects         int            `config:"max_redirects"`
-	Response             responseConfig `config:"response"`
-	TruncateResponseBody string         `config:"truncate_response_body"`
+	URLs         []string       `config:"urls" validate:"required"`
+	ProxyURL     string         `config:"proxy_url"`
+	Timeout      time.Duration  `config:"timeout"`
+	MaxRedirects int            `config:"max_redirects"`
+	Response     responseConfig `config:"response"`
 
 	Mode monitors.IPSettings `config:",inline"`
 
@@ -121,7 +120,7 @@ func (r *responseConfig) Validate() error {
 		return fmt.Errorf("unknown option for `include_body`: '%s', please use one of 'always', 'on_error', 'never'", r.IncludeBody)
 	}
 
-	if r.IncludeBodyMaxBytes < 0 {
+	if r.IncludeBodyMaxBytes <= 0 {
 		return fmt.Errorf("include_body_max_bytes must be a positive integer, got %d", r.IncludeBodyMaxBytes)
 	}
 
