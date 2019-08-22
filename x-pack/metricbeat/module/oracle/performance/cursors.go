@@ -43,8 +43,8 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 		SELECT sum(a.value) total_cur, 
 		       avg(a.value) avg_cur, 
 		       max(a.value) max_cur,
-       		   s.username,
-               s.machine
+           s.username,
+           s.machine
 		FROM v$sesstat a, v$statname b, v$session s
 		WHERE a.statistic# = b.statistic#  
 		  AND s.sid = a.sid
