@@ -373,10 +373,9 @@ var sysmon = (function () {
 
         if (answers.length > 0) {
             evt.Put("dns.answers", answers);
-            evt.Put("dns.answers_count", answers.length);
         }
         if (ips.length > 0) {
-            evt.Put("dns.grouped.ip", ips);
+            evt.Put("dns.resolved_ip", ips);
         }
         evt.Delete("winlog.event_data.QueryResults");
     };
