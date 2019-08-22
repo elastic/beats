@@ -6,3 +6,11 @@ The default metricset is `server`.
 === Compatibility
 
 The Couchdb module is tested with Couchdb 1.7.
+
+
+[float]
+=== Dashboard
+
+The CouchDB module comes with a predefined dashboard for CouchDB database specific stats. For example:
+
+image::./images/metricbeat-couchdb-overview.png[]

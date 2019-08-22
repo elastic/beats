@@ -48,9 +48,13 @@ monitoring:
     password: somepassword
 --------------------
 +
-If you configured a different output, such as {ls} or you want to send {beatname_uc}
-monitoring events to a separate {es} cluster (referred to as the _monitoring cluster_),
-you must specify additional configuration options. For example:
+If you
+ifndef::only-elasticsearch[]
+configured a different output, such as {ls} or you
+endif::only-elasticsearch[]
+want to send {beatname_uc} monitoring events to a separate {es} cluster
+(referred to as the _monitoring cluster_), you must specify additional
+configuration options. For example:
 +
 ["source","yml",subs="attributes"]
 --------------------

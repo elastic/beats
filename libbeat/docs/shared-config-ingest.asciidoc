@@ -13,13 +13,15 @@
 == Parse data by using ingest node
 
 When you use Elasticsearch for output, you can configure {beatname_uc} to use
-{ref}/ingest.html[ingest node] to pre-process documents before the
-actual indexing takes place in Elasticsearch. Ingest node is a convenient
-processing option when you want to do some extra processing on your data, but
-you do not require the full power of Logstash. For example, you can create an
-ingest node pipeline in Elasticsearch that consists of one processor that
-removes a field in a document followed by another processor that renames a
-field.
+{ref}/ingest.html[ingest node] to pre-process documents before the actual
+indexing takes place in Elasticsearch.
+ifndef::only-elasticsearch[]
+Ingest node is a convenient processing option when you want to do some extra
+processing on your data, but you do not require the full power of Logstash.
+endif::only-elasticsearch[]
+For example, you can create an ingest node pipeline
+in Elasticsearch that consists of one processor that removes a field in a
+document followed by another processor that renames a field.
 
 After defining the pipeline in Elasticsearch, you simply configure {beatname_uc}
 to use the pipeline. To configure {beatname_uc}, you specify the pipeline ID in

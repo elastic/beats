@@ -38,6 +38,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - Add new Dashboard for PostgreSQL database stats {pull}13187[13187]
+- Add new dashboard for CouchDB database {pull}13198[13198]
+- Add new dashboard for Ceph cluster stats {pull}13216[13216]
+- Add new dashboard for Aerospike database stats {pull}13217[13217]
+- Add new dashboard for Couchbase cluster stats {pull}13212[13212]
 - Add new dashboard for Prometheus server stats {pull}13126[13126]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
@@ -90,6 +94,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix some incorrect types and formats in field.yml files. {pull}13188[13188]
 - Load DLLs only from Windows system directory. {pull}13234[13234]
 - Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
+- Fix case insensitive regular expressions not working correctly. {pull}13250[13250]
 
 *Auditbeat*
 
@@ -127,6 +132,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
+- Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 
 *Heartbeat*
 
@@ -165,7 +171,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incoherent behaviour in redis key metricset when keyspace is specified both in host URL and key pattern {pull}12913[12913]
 - Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
-- Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+- Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
+- Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
 
 *Packetbeat*
 
