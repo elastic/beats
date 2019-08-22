@@ -22,7 +22,10 @@ package memory
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	sysinfo "github.com/elastic/go-sysinfo"
+	sit "github.com/elastic/go-sysinfo/types"
 	sigar "github.com/elastic/gosigar"
+	"github.com/pkg/errors"
 )
 
 // MemStat includes the memory usage statistics and ratios of usage and total memory usage
@@ -147,4 +150,21 @@ func AddHugeTLBPagesPercentage(s *HugeTLBPagesStat) {
 
 	perc := float64(s.Total-s.Free+s.Reserved) / float64(s.Total)
 	s.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
+}
+
+// GetVMStat gets linux vmstat metrics
+func GetVMStat() (*sit.VMStatInfo, error) {
+	h, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read self process information")
+	}
+	if vmstatHandle, ok := h.(sit.VMStat); ok {
+		info, err := vmstatHandle.VMStat()
+		if err != nil {
+			return nil, errors.Wrap(err, "Error getting VMStat info")
+		}
+		return info, nil
+	}
+	return nil, nil
+
 }

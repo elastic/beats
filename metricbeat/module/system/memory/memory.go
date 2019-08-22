@@ -75,6 +75,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		},
 	}
 
+	vmstat, err := mem.GetVMStat()
+	if err != nil {
+		return errors.Wrap(err, "VMStat")
+	}
+
 	swap := common.MapStr{
 		"total": swapStat.Total,
 		"used": common.MapStr{
@@ -83,6 +88,21 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		},
 		"free": swapStat.Free,
 	}
+
+	if vmstat != nil {
+		swap["vmstat"] = common.MapStr{
+			// Swap in and swap out numbers
+			"pswpin":  vmstat.Pswpin,
+			"pswpout": vmstat.Pswpout,
+			// Hugepage swap stats
+			"thp_swpout":          vmstat.ThpSwpout,
+			"thp_swpout_fallback": vmstat.ThpSwpoutFallback,
+			//Swap readahead
+			"swap_ra":     vmstat.SwapRa,
+			"swap_ra_hit": vmstat.SwapRaHit,
+		}
+	}
+
 	memory["swap"] = swap
 
 	hugePagesStat, err := mem.GetHugeTLBPages()

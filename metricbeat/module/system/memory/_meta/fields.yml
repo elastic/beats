@@ -79,6 +79,29 @@
           description: >
             Available swap memory.
 
+        - name: vmstat
+          type: group
+          description: This group contains swap stats from vmstats on linux
+          fields:
+            - name: pswpin
+              type: long
+              description: Pages swapped in
+            - name: pswpout
+              type: long
+              description: Pages swapped out
+            - name: thp_swpout
+              type: long
+              description: Huge page swap stats
+            - name: thp_swpout_fallback
+              type: long
+              description: Huge page swap stats
+            - name: swap_ra
+              type: long
+              description: Swap readahead stats
+            - name: swap_ra_hit
+              type: long
+              description: Swap readahead stats
+
         - name: used.pct
           type: scaled_float
           format: percent

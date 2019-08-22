@@ -28371,6 +28371,66 @@ format: bytes
 
 --
 
+[float]
+=== vmstat
+
+This group contains swap stats from vmstats on linux
+
+
+*`system.memory.swap.vmstat.pswpin`*::
++
+--
+Pages swapped in
+
+type: long
+
+--
+
+*`system.memory.swap.vmstat.pswpout`*::
++
+--
+Pages swapped out
+
+type: long
+
+--
+
+*`system.memory.swap.vmstat.thp_swpout`*::
++
+--
+Huge page swap stats
+
+type: long
+
+--
+
+*`system.memory.swap.vmstat.thp_swpout_fallback`*::
++
+--
+Huge page swap stats
+
+type: long
+
+--
+
+*`system.memory.swap.vmstat.swap_ra`*::
++
+--
+Swap readahead stats
+
+type: long
+
+--
+
+*`system.memory.swap.vmstat.swap_ra_hit`*::
++
+--
+Swap readahead stats
+
+type: long
+
+--
+
 *`system.memory.swap.used.pct`*::
 +
 --
