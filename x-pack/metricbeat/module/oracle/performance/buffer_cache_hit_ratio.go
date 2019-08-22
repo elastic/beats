@@ -19,6 +19,14 @@ type bufferCacheHitRatio struct {
 	hitRatio       sql.NullFloat64
 }
 
+/*
+	The following function executes a query that produces the following result
+
+	NAME	PHYSICAL_READS	DB_BLOCK_GETS	CONSISTENT_GETS	Hit Ratio
+	DEFAULT	19024			17195			379538			0.9520483549389639883750532473981241792339
+
+	Each instance of bufferCacheHitRatio represents a row from the previous results
+*/
 func (e *performanceExtractor) bufferCacheHitRatio(ctx context.Context) ([]bufferCacheHitRatio, error) {
 	rows, err := e.db.QueryContext(ctx, `SELECT name, physical_reads, db_block_gets, consistent_gets,
        1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit Ratio"

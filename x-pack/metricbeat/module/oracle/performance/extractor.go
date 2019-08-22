@@ -12,16 +12,16 @@ import (
 // performanceExtractMethods contains the methods needed to extract the necessary information about a the performance of the database
 type performanceExtractMethods interface {
 	bufferCacheHitRatio(context.Context) ([]bufferCacheHitRatio, error)
-	library(context.Context) ([]library, error)
-	cursorsByUsernameAndMachine(ctx context.Context) ([]cursorsByUsernameAndMachine, error)
-	totalCursors(ctx context.Context) (*totalCursors, error)
+	libraryCache(context.Context) ([]libraryCache, error)
+	cursorsByUsernameAndMachine(context.Context) ([]cursorsByUsernameAndMachine, error)
+	totalCursors(context.Context) (*totalCursors, error)
 }
 
 // extractedData contains the necessary performance information. Can be updated with more data without affecting methods
 // signatures.
 type extractedData struct {
 	bufferCacheHitRatios        []bufferCacheHitRatio
-	libraryData                 []library
+	libraryData                 []libraryCache
 	cursorsByUsernameAndMachine []cursorsByUsernameAndMachine
 	totalCursors                *totalCursors
 }

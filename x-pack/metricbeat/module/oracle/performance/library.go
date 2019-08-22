@@ -11,12 +11,22 @@ import (
 	"github.com/pkg/errors"
 )
 
-type library struct {
+type libraryCache struct {
 	name  sql.NullString
 	value sql.NullFloat64
 }
 
-func (e *performanceExtractor) library(ctx context.Context) ([]library, error) {
+/*
+	The following function executes a query that produces the following result
+
+	Ratio			AVG(GETHITRATIO)
+	io_reloads		0.004130404962582493789151209400862660224657
+	lock_requests	0.4902639097748147904635170747058646829122
+	pin_requests	0.755804477116177544453478080666426614297
+
+	Which is parsed into libraryCache instances
+*/
+func (e *performanceExtractor) libraryCache(ctx context.Context) ([]libraryCache, error) {
 	rows, err := e.db.QueryContext(ctx, `SELECT 'lock_requests' "Ratio" , AVG(gethitratio) FROM V$LIBRARYCACHE
 		UNION
 		SELECT 'pin_requests' "Ratio", AVG(pinhitratio) FROM V$LIBRARYCACHE
@@ -26,10 +36,10 @@ func (e *performanceExtractor) library(ctx context.Context) ([]library, error) {
 		return nil, errors.Wrap(err, "error executing query")
 	}
 
-	results := make([]library, 0)
+	results := make([]libraryCache, 0)
 
 	for rows.Next() {
-		dest := library{}
+		dest := libraryCache{}
 		if err = rows.Scan(&dest.name, &dest.value); err != nil {
 			return nil, err
 		}

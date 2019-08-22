@@ -28,13 +28,23 @@ type totalCursors struct {
 	realParses                 sql.NullInt64
 }
 
+/*
+	The following function executes a query that produces the following result
+
+	TOTAL_CUR	AVG_CUR	MAX_CUR	USERNAME	MACHINE
+	25			0.6410	17					2ed9ac3a4c3d
+	2			2		2		SYS			mcastro
+	0			0		0		SYS			2ed9ac3a4c3d
+
+	Which are parsed into different cursorsByUsernameAndMachine instances
+*/
 func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) ([]cursorsByUsernameAndMachine, error) {
 	rows, err := e.db.QueryContext(ctx, `
 		SELECT sum(a.value) total_cur, 
 		       avg(a.value) avg_cur, 
 		       max(a.value) max_cur,
        		   s.username,
-		       s.machine
+               s.machine
 		FROM v$sesstat a, v$statname b, v$session s
 		WHERE a.statistic# = b.statistic#  
 		  AND s.sid = a.sid
@@ -71,6 +81,14 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 	return results, nil
 }
 
+/*
+	The following function executes a query that produces the following result
+
+	TOTAL_CURSORS	CURRENT_CURSORS	SESS_CUR_CACHE_HITS	PARSE_COUNT_TOTAL	SESS_CUR_CACHE_HITS/TOTAL_CURSORS	SESS_CUR_CACHE_HITS-PARSE_COUNT_TOTAL
+	2278			3				2814				992					1.23529411764705882352941176		1822
+
+	Which is parsed into a totalCursors instance
+*/
 func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors, error) {
 	rows := e.db.QueryRowContext(ctx, `
 		SELECT total_cursors, 

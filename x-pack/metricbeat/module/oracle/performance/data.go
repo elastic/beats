@@ -24,8 +24,8 @@ func (m *MetricSet) extract(ctx context.Context, extractor performanceExtractMet
 		return nil, errors.Wrap(err, "error getting buffer cache hit ratio")
 	}
 
-	if out.libraryData, err = extractor.library(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting library data")
+	if out.libraryData, err = extractor.libraryCache(ctx); err != nil {
+		return nil, errors.Wrap(err, "error getting libraryCache data")
 	}
 
 	if out.cursorsByUsernameAndMachine, err = extractor.cursorsByUsernameAndMachine(ctx); err != nil {
@@ -60,13 +60,13 @@ func (m *MetricSet) transform(in *extractedData) []mb.Event {
 
 	events := make([]mb.Event, 0)
 
-	events = append(events, mb.Event{MetricSetFields: cursorEvent})
-
-	for _, v := range cursorByUsernameAndMachineEvents {
+	for _, v := range bufferCache {
 		events = append(events, mb.Event{MetricSetFields: v})
 	}
 
-	for _, v := range bufferCache {
+	events = append(events, mb.Event{MetricSetFields: cursorEvent})
+
+	for _, v := range cursorByUsernameAndMachineEvents {
 		events = append(events, mb.Event{MetricSetFields: v})
 	}
 
@@ -104,7 +104,7 @@ func (m *MetricSet) addCursorByUsernameAndMachine(cs []cursorsByUsernameAndMachi
 	return out
 }
 
-func (m *MetricSet) addLibraryData(ls []library) common.MapStr {
+func (m *MetricSet) addLibraryData(ls []libraryCache) common.MapStr {
 	out := common.MapStr{}
 
 	for _, v := range ls {
