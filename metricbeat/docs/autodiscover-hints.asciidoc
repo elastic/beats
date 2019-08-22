@@ -130,7 +130,7 @@ You can label Docker containers with useful info to spin up {beatname_uc} module
 -------------------------------------------------------------------------------------
   co.elastic.metrics/module: nginx
   co.elastic.metrics/metricsets: stubstatus
-  co.elastic.metrics/hosts: '${data.host}:80'
+  co.elastic.metrics/hosts: '${data.host}:9090'
   co.elastic.metrics/period: 10s
 -------------------------------------------------------------------------------------
 
