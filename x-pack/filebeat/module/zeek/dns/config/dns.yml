@@ -6,39 +6,132 @@ paths:
 exclude_files: [".gz$"]
 tags: {{.tags}}
 
-json.keys_under_root: false
-
 processors:
-  - drop_fields:
-      fields: ["json.Z","json.auth","json.addl"]
   - rename:
       fields:
-        - from: "json"
-          to: "zeek.dns"
-
-        - from: "zeek.dns.id.orig_h"
-          to: "source.address"
-
-        - from: "zeek.dns.id.orig_p"
-          to: "source.port"
-
-        - from: "zeek.dns.id.resp_h"
-          to: "destination.address"
-
-        - from: "zeek.dns.id.resp_p"
-          to: "destination.port"
-
-        - from: "zeek.dns.proto"
-          to: "network.transport"
-
-        - from: "zeek.dns.uid"
-          to: "zeek.session_id"
-          
+        - {from: message, to: log.original}
+  - decode_json_fields:
+      fields: [log.original]
+      target: zeek.dns
+  - timestamp:
       ignore_missing: true
-      fail_on_error: false
-{{ if .community_id }}
-  - community_id:
+      field: zeek.dns.ts
+      layouts:
+        - UNIX
+  - script:
+      lang: javascript
+      id: zeek_dns_flags
+      source: >
+        function addDnsHeaderFlags(evt) {
+            var flag = evt.Get("zeek.dns.AA");
+            if (flag === true) {
+                evt.AppendTo("dns.header_flags", "AA");
+            }
+            flag = evt.Get("zeek.dns.TC");
+            if (flag === true) {
+                evt.AppendTo("dns.header_flags", "TC");
+            }
+            flag = evt.Get("zeek.dns.RD");
+            if (flag === true) {
+                evt.AppendTo("dns.header_flags", "RD");
+            }
+            flag = evt.Get("zeek.dns.RA");
+            if (flag === true) {
+                evt.AppendTo("dns.header_flags", "RA");
+            }
+            flag = evt.Get("zeek.dns.Z");
+            if (flag === true) {
+                evt.AppendTo("dns.header_flags", "Z");
+            }
+        }
+
+        function addDnsQuestionClass(evt) {
+            var qclass = evt.Get("zeek.dns.qclass");
+            if (!qclass) {
+                return;
+            }
+            switch (qclass) {
+                case 1:
+                    qclass = "IN";
+                    break;
+                case 3:
+                    qclass = "CH";
+                    break;
+                case 4:
+                    qclass = "HS";
+                    break;
+                case 254:
+                    qclass = "NONE";
+                    break;
+                case 255:
+                    qclass = "ANY";
+                    break;
+            }
+            evt.Put("dns.question.class", qclass);
+        }
+
+        function addDnsAnswers(evt) {
+            var answers = evt.Get("zeek.dns.answers");
+            var ttls = evt.Get("zeek.dns.TTLs");
+            if (!answers || !ttls || answers.length != ttls.length) {
+                return;
+            }
+
+            var answersObjs = [];
+            for (var i = 0; i < answers.length; i++) {
+                answersObjs.push({
+                    data: answers[i],
+                    ttl: ttls[i],
+                })
+            }
+            evt.Put("dns.answers", answersObjs);
+        }
+
+        function addEventDuration(evt) {
+            var rttSec = evt.Get("zeek.dns.rtt");
+            if (!rttSec) {
+                return;
+            }
+            evt.Put("event.duration", rttSec * 1000000000);
+        }
+
+        function process(evt) {
+            addDnsHeaderFlags(evt);
+            addDnsQuestionClass(evt);
+            addDnsAnswers(evt);
+            addEventDuration(evt);
+        }
+  - drop_fields:
+      ignore_missing: true
       fields:
-        source_ip: source.address
-        destination_ip: destination.address
+        - zeek.dns.Z
+        - zeek.dns.auth
+        - zeek.dns.addl
+        - zeek.dns.ts
+  - convert:
+      ignore_missing: true
+      ignore_failure: true
+      mode: rename
+      fields:
+        - {from: zeek.dns.id.orig_h, to: source.address}
+        - {from: zeek.dns.id.orig_p, to: source.port, type: long}
+        - {from: zeek.dns.id.resp_h, to: destination.address}
+        - {from: zeek.dns.id.resp_p, to: destination.port}
+        - {from: zeek.dns.uid, to: zeek.session_id}
+        - {from: zeek.dns.proto, to: network.transport}
+  - convert:
+      ignore_missing: true
+      ignore_failure: true
+      mode: copy
+      fields:
+        - {from: source.address, to: source.ip, type: ip}
+        - {from: destination.address, to: destination.ip, type: ip}
+        - {from: zeek.session_id, to: event.id}
+        - {from: '@timestamp', to: event.created}
+        - {from: zeek.dns.trans_id, to: dns.id}
+        - {from: zeek.dns.query, to: dns.question.name}
+        - {from: zeek.dns.qtype_name, to: dns.question.type}
+        - {from: zeek.dns.rcode_name, to: dns.response_code}
+{{ if .community_id }}
+  - community_id: ~
 {{ end }}

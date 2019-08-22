@@ -1,15 +1,40 @@
 [
     {
-        "@timestamp": 1547188415000,
+        "@timestamp": "2019-01-11T06:33:35.857Z",
         "destination.address": "192.168.86.1",
         "destination.ip": "192.168.86.1",
         "destination.port": 53,
+        "dns.answers": [
+            {
+                "data": "proxy-production-us-west1.gcp.cloud.es.io",
+                "ttl": 119
+            },
+            {
+                "data": "proxy-production-us-west1-v1-009.gcp.cloud.es.io",
+                "ttl": 119
+            },
+            {
+                "data": "35.199.178.4",
+                "ttl": 59
+            }
+        ],
+        "dns.header_flags": [
+            "RD",
+            "RA"
+        ],
+        "dns.id": 15209,
+        "dns.question.class": "IN",
+        "dns.question.name": "dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io",
+        "dns.question.type": "A",
+        "dns.response_code": "NOERROR",
         "event.dataset": "zeek.dns",
+        "event.duration": 76967000,
         "event.id": "CAcJw21BbVedgFnYH3",
         "event.module": "zeek",
         "fileset.name": "dns",
         "input.type": "log",
         "log.offset": 0,
+        "log.original": "{\"ts\":1547188415.857497,\"uid\":\"CAcJw21BbVedgFnYH3\",\"id.orig_h\":\"192.168.86.167\",\"id.orig_p\":38339,\"id.resp_h\":\"192.168.86.1\",\"id.resp_p\":53,\"proto\":\"udp\",\"trans_id\":15209,\"rtt\":0.076967,\"query\":\"dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io\",\"qclass\":1,\"qclass_name\":\"C_INTERNET\",\"qtype\":1,\"qtype_name\":\"A\",\"rcode\":0,\"rcode_name\":\"NOERROR\",\"AA\":false,\"TC\":false,\"RD\":true,\"RA\":true,\"Z\":0,\"answers\":[\"proxy-production-us-west1.gcp.cloud.es.io\",\"proxy-production-us-west1-v1-009.gcp.cloud.es.io\",\"35.199.178.4\"],\"TTLs\":[119.0,119.0,59.0],\"rejected\":false}",
         "network.community_id": "1:Z26DBGVYoBKQ1FT6qfPaAqBnJik=",
         "network.transport": "udp",
         "service.type": "zeek",
