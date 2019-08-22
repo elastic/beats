@@ -27,6 +27,9 @@ var bundle = provider.MustCreate(
 ).MustAddFunction("sqs",
 	aws.NewSQS,
 	aws.SQSDetails(),
+).MustAddFunction("cloudwatch_kinesis",
+	aws.NewCloudwatchKinesis,
+	aws.CloudwatchKinesisDetails(),
 ).Bundle()
 
 func init() {

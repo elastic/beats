@@ -5,6 +5,10 @@
 package transformer
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
+	"io"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -80,6 +84,59 @@ func KinesisEvent(request events.KinesisEvent) []beat.Event {
 		}
 	}
 	return events
+}
+
+func CloudwatchKinesisEvent(request events.KinesisEvent, compressed bool) ([]beat.Event, error) {
+	var evts []beat.Event
+	for _, record := range request.Records {
+		envelopeFields := common.MapStr{
+			"event_id":                record.EventID,
+			"event_name":              record.EventName,
+			"event_source":            record.EventSource,
+			"event_source_arn":        record.EventSourceArn,
+			"event_version":           record.EventVersion,
+			"aws_region":              record.AwsRegion,
+			"kinesis_partition_key":   record.Kinesis.PartitionKey,
+			"kinesis_schema_version":  record.Kinesis.KinesisSchemaVersion,
+			"kinesis_sequence_number": record.Kinesis.SequenceNumber,
+			"kinesis_encryption_type": record.Kinesis.EncryptionType,
+		}
+
+		kinesisData := record.Kinesis.Data
+		if compressed {
+			inBuf := bytes.NewBuffer(record.Kinesis.Data)
+			r, err := gzip.NewReader(inBuf)
+			if err != nil {
+				return nil, err
+			}
+
+			var outBuf bytes.Buffer
+			_, err = io.Copy(&outBuf, r)
+			if err != nil {
+				r.Close()
+				return nil, err
+			}
+
+			err = r.Close()
+			if err != nil {
+				return nil, err
+			}
+			kinesisData = outBuf.Bytes()
+		}
+
+		var cloudwatchEvents events.CloudwatchLogsData
+		err := json.Unmarshal(kinesisData, &cloudwatchEvents)
+		if err != nil {
+			return nil, err
+		}
+
+		cwEvts := CloudwatchLogs(cloudwatchEvents)
+		for _, cwe := range cwEvts {
+			cwe.Fields.DeepUpdate(envelopeFields)
+			evts = append(evts, cwe)
+		}
+	}
+	return evts, nil
 }
 
 // SQS takes a SQS event and create multiples beat events.
