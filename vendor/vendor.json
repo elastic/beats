@@ -1025,6 +1025,12 @@
 			"revisionTime": "2016-06-17T14:03:01Z"
 		},
 		{
+			"checksumSHA1": "8cCK0nrEedpDsGzQf2hAOjTWfZs=",
+			"path": "github.com/elastic/go-perf",
+			"revision": "9bc9b58a3de9e63a1a8e27241ae3c61d3449782b",
+			"revisionTime": "2019-08-22T17:42:12Z"
+		},
+		{
 			"checksumSHA1": "3e1eGhr4UUQOQffSHkoycT18inA=",
 			"path": "github.com/elastic/go-seccomp-bpf",
 			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
