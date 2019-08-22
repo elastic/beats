@@ -441,6 +441,40 @@ func TestParseSyslog(t *testing.T) {
 			},
 		},
 		{
+			// pfSense filterlog does *not* include hostname
+			title: "pfSense filterlog",
+			log:   []byte("<134>Aug 22 11:53:26 filterlog: 59,,,11000,ix0.256,match,block,in,6,0xc0,0x00000,1,OSPF,89,40,fe80::ce2d:e0ff:fe26:16d3,ff02::5,"),
+			syslog: event{
+				priority: 134,
+				message:  "59,,,11000,ix0.256,match,block,in,6,0xc0,0x00000,1,OSPF,89,40,fe80::ce2d:e0ff:fe26:16d3,ff02::5,",
+				hostname: "",
+				program:  "filterlog",
+				pid:      -1,
+				month:    8,
+				day:      22,
+				hour:     11,
+				minute:   53,
+				second:   26,
+			},
+		},
+		{
+			// pfSense nginx log *does* include hostname
+			title: "pfSense webUI log",
+			log:   []byte("<174>Aug 22 11:52:25 dc-fw2.int.example.net nginx: 2001:db8:1234:5678:a89c:b36c:b823:e990 - - [22/Aug/2019:11:52:25 +0100] \"HEAD /index.php HTTP/2.0\" 200 0 \"https://dc-fw2.example.net/diag_reboot.php\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36\""),
+			syslog: event{
+				priority: 174,
+				message:  "2001:db8:1234:5678:a89c:b36c:b823:e990 - - [22/Aug/2019:11:52:25 +0100] \"HEAD /index.php HTTP/2.0\" 200 0 \"https://dc-fw2.example.net/diag_reboot.php\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36\"",
+				hostname: "dc-fw2.int.example.net",
+				program:  "nginx",
+				pid:      -1,
+				month:    8,
+				day:      22,
+				hour:     11,
+				minute:   52,
+				second:   25,
+			},
+		},
+		{
 			log: []byte("<34>Oct 11 22:14:15 mymachine su[230]: 'su root' failed for lonvick on /dev/pts/8"),
 			syslog: event{
 				priority: 34,
