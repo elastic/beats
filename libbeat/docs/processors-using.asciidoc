@@ -1904,15 +1904,15 @@ If a layout does not contain a year then the current year in the specified
 .Timestamp options
 [options="header"]
 |======
-| Name             | Required | Default    | Description                                                                                 |
-| `field`          | yes      |            | Source field containing the time to be parsed.                                              |
-| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.          |
-| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format.                               |
-| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone. |
-| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                             |
-| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                |
-| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.               |
-| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                            |
+| Name             | Required | Default    | Description                                                                                                           |
+| `field`          | yes      |            | Source field containing the time to be parsed.                                                                        |
+| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.                                    |
+| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |
+| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone.                           |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                                                       |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                                          |
+| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.                                         |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                                                      |
 |======
 
 Here is an example that parses the `start_time` field and writes the result
