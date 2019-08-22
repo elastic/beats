@@ -20,12 +20,13 @@
 package memory
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sit "github.com/elastic/go-sysinfo/types"
 	sigar "github.com/elastic/gosigar"
-	"github.com/pkg/errors"
 )
 
 // MemStat includes the memory usage statistics and ratios of usage and total memory usage
