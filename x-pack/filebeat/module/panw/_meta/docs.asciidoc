@@ -172,6 +172,8 @@ The UDP port to listen for syslog traffic. Defaults to `9001`
 
 NOTE: Ports below 1024 require {beatname_uc} to run as root.
 
+include::../include/timezone-support.asciidoc[]
+
 :has-dashboards!:
 
 :fileset_ex!:

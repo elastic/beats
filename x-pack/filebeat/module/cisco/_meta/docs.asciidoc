@@ -125,6 +125,8 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9002.
 
+include::../include/timezone-support.asciidoc[]
+
 :has-dashboards!:
 
 :fileset_ex!:
