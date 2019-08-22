@@ -74,7 +74,7 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "process", COMMON_FIELDS + fields, {"process.hash.max_file_size": 1},
                              errors_allowed=True, warnings_allowed=True)
 
-    @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
+    @unittest.skip("Needs a new test")
     def test_metricset_socket(self):
         """
         socket metricset collects information about open sockets on a system.
