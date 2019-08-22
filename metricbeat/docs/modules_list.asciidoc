@@ -21,7 +21,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   
-|<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
 |<<metricbeat-metricset-ceph-cluster_status,cluster_status>>   
