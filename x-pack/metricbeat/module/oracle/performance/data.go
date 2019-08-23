@@ -7,7 +7,6 @@ package performance
 import (
 	"context"
 
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"

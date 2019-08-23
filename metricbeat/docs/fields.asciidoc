@@ -22786,7 +22786,7 @@ Statistics about all buffer pools available for the instance
 --
 The cache hit ratio of the specified buffer pool.
 
-type: keyword
+type: double
 
 --
 

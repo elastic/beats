@@ -26,7 +26,7 @@
       description: Statistics about all buffer pools available for the instance
       fields:
         - name: buffer.hit.pct
-          type: keyword
+          type: double
           description: The cache hit ratio of the specified buffer pool.
         - name: physical_reads
           type: long
