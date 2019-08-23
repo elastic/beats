@@ -14,14 +14,14 @@
             "cache": {
                 "buffer": {
                     "hit": {
-                        "pct": 0.9510712759136568
+                        "pct": 0.9597508766420684
                     }
                 },
                 "get": {
-                    "consistent": 358125,
-                    "db_blocks": 16195
+                    "consistent": 436162,
+                    "db_blocks": 41513
                 },
-                "physical_reads": 18315
+                "physical_reads": 19226
             }
         }
     },

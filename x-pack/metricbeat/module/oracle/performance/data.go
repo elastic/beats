@@ -80,7 +80,7 @@ func (m *MetricSet) addCursorData(cs *totalCursors) common.MapStr {
 	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.current", &oracle.Int64Value{NullInt64: cs.currentCursors})
 	oracle.SetSqlValue(m.Logger(), out, "cursors.session.cache_hits", &oracle.Int64Value{NullInt64: cs.sessCurCacheHits})
 	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.total", &oracle.Int64Value{NullInt64: cs.parseCountTotal})
-	oracle.SetSqlValue(m.Logger(), out, "cursors.total.cache_hit.pct", &oracle.Float64Value{NullFloat64: cs.cacheHitsTotalCursorsRatio})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.cache_hit.pct", &oracle.Float64Value{NullFloat64: cs.cacheHitsTotalCursorsRatio})
 	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.real", &oracle.Int64Value{NullInt64: cs.realParses})
 
 	return out

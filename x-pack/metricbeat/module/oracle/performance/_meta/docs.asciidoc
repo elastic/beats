@@ -21,7 +21,7 @@
 * *cursors.parse.real*: Real number of parses that occurred: session cursor cache hits - parse count (total)
 * *cursors.parse.total*: Total number of parse calls (hard and soft). A soft parse is a check on an object already in the shared pool, to verify that the permissions on the underlying object have not changed.
 * *cursors.session.cache_hits*: Number of hits in the session cursor cache. A hit means that the SQL statement did not have to be reparsed.
-* *cursors.total.cache_hit.pct*: Ratio of session cursor cache hits from total number of cursors
+* *cursors.cache_hit.pct*: Ratio of session cursor cache hits from total number of cursors
 
 [float]
 === Example events

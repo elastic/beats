@@ -9,9 +9,9 @@ package performance
 import (
 	"testing"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/beats/libbeat/common"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 
 	_ "gopkg.in/goracle.v2"
 
@@ -22,14 +22,37 @@ func TestData(t *testing.T) {
 	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
 
-	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	findKey := func(key string) func(common.MapStr) bool {
+		return func(in common.MapStr) bool {
+			_, err := in.GetValue("oracle.performance." + key)
+			return err == nil
+		}
 	}
-	assert.NotEmpty(t, events)
 
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
+	dataFiles := []struct {
+		keyToFind string
+		filePath  string
+	}{
+		{
+			keyToFind: "buffer_pool",
+			filePath:  "./_meta/cache_data.json",
+		},
+		{
+			keyToFind: "username",
+			filePath:  "./_meta/cursor_by_username_and_machine_data.json",
+		},
+		{
+			keyToFind: "lock_requests",
+			filePath:  "",
+		},
+	}
+
+	for _, dataFile := range dataFiles {
+		t.Run(dataFile.filePath, func(t *testing.T) {
+			if err := mbtest.WriteEventsReporterV2WithContextCond(f, t, dataFile.filePath, findKey(dataFile.keyToFind)); err != nil {
+				t.Fatal("write", err)
+			}
+		})
 	}
 }
 

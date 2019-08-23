@@ -22894,7 +22894,7 @@ type: long
 
 --
 
-*`oracle.performance.cursors.total.cache_hit.pct`*::
+*`oracle.performance.cursors.cache_hit.pct`*::
 +
 --
 Ratio of session cursor cache hits from total number of cursors

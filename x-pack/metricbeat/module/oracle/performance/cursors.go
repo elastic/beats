@@ -41,16 +41,16 @@ type totalCursors struct {
 func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) ([]cursorsByUsernameAndMachine, error) {
 	rows, err := e.db.QueryContext(ctx, `
 		SELECT sum(a.value) total_cur, 
-		       avg(a.value) avg_cur, 
-		       max(a.value) max_cur,
-           s.username,
-           s.machine
+					 avg(a.value) avg_cur, 
+					 max(a.value) max_cur,
+					 s.username,
+					 s.machine
 		FROM v$sesstat a, v$statname b, v$session s
 		WHERE a.statistic# = b.statistic#  
-		  AND s.sid = a.sid
-		  AND b.name = 'opened cursors current'
+			AND s.sid = a.sid
+			AND b.name = 'opened cursors current'
 		GROUP BY s.username, 
-		         s.machine
+						 s.machine
 		ORDER BY 1 DESC`)
 	if err != nil {
 		return nil, errors.Wrap(err, "error executing query")
@@ -92,16 +92,16 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors, error) {
 	rows := e.db.QueryRowContext(ctx, `
 		SELECT total_cursors, 
-		       current_cursors, 
-		       sess_cur_cache_hits, 
-		       parse_count_total, 
-		       sess_cur_cache_hits / total_cursors, 
-		       sess_cur_cache_hits - parse_count_total
+					 current_cursors, 
+					 sess_cur_cache_hits, 
+					 parse_count_total, 
+					 sess_cur_cache_hits / total_cursors, 
+					 sess_cur_cache_hits - parse_count_total
 		FROM (
-		    SELECT sum ( decode ( name, 'opened cursors cumulative', value, 0)) total_cursors,
-			   sum ( decode ( name, 'opened cursors current',value,0)) current_cursors,
-			   sum ( decode ( name, 'session cursor cache hits',value,0)) sess_cur_cache_hits,
-			   sum ( decode ( name, 'parse count (total)',value,0)) parse_count_total
+				SELECT sum ( decode ( name, 'opened cursors cumulative', value, 0)) total_cursors,
+				 sum ( decode ( name, 'opened cursors current',value,0)) current_cursors,
+				 sum ( decode ( name, 'session cursor cache hits',value,0)) sess_cur_cache_hits,
+				 sum ( decode ( name, 'parse count (total)',value,0)) parse_count_total
 			FROM v$sysstat
 			WHERE name IN ( 'opened cursors cumulative','opened cursors current','session cursor cache hits', 'parse count (total)' ))`)
 

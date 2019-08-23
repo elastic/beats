@@ -77,6 +77,6 @@
         - name: session.cache_hits
           type: long
           description: Number of hits in the session cursor cache. A hit means that the SQL statement did not have to be reparsed.
-        - name: total.cache_hit.pct
+        - name: cache_hit.pct
           type: double
           description: Ratio of session cursor cache hits from total number of cursors
