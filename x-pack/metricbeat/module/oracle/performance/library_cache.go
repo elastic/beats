@@ -7,10 +7,11 @@ package performance
 import (
 	"context"
 	"database/sql"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 )
 
 type libraryCache struct {
