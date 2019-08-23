@@ -22726,6 +22726,194 @@ Oracle module
 
 
 [float]
+=== performance
+
+Performance related metrics on a single database instance
+
+
+*`oracle.performance.machine`*::
++
+--
+Operating system machine name
+
+type: keyword
+
+--
+
+*`oracle.performance.buffer_pool`*::
++
+--
+Name of the buffer pool in the instance
+
+type: keyword
+
+--
+
+*`oracle.performance.username`*::
++
+--
+Oracle username
+
+type: keyword
+
+--
+
+*`oracle.performance.io_reloads`*::
++
+--
+Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are tumber of times a PIN was requested for objects of this namespace
+
+type: double
+
+--
+
+*`oracle.performance.lock_requests`*::
++
+--
+Average of the ratio between 'gethits' and 'gets' being 'Gethits' the number of times an object's handle was found in memory and 'gets' the number of times a lock was requested for objects of this namespace.
+
+type: long
+
+--
+
+*`oracle.performance.pin_requests`*::
++
+--
+Average of all pinhits/pins ratios being 'PinHits' the number of times all of the metadata pieces of the library object were found in memory and 'pins' the number of times a PIN was requested for objects of this namespace
+
+type: double
+
+--
+
+[float]
+=== cache
+
+Statistics about all buffer pools available for the instance
+
+
+*`oracle.performance.cache.buffer.hit.pct`*::
++
+--
+The cache hit ratio of the specified buffer pool.
+
+type: double
+
+--
+
+*`oracle.performance.cache.physical_reads`*::
++
+--
+Physical reads
+
+type: long
+
+--
+
+[float]
+=== get
+
+Buffer pool 'get' statistics
+
+
+*`oracle.performance.cache.get.consistent`*::
++
+--
+Consistent gets statistic
+
+type: long
+
+--
+
+*`oracle.performance.cache.get.db_blocks`*::
++
+--
+Database blocks gotten
+
+type: long
+
+--
+
+[float]
+=== cursors
+
+Cursors information
+
+
+*`oracle.performance.cursors.avg`*::
++
+--
+Average cursors opened by username and machine
+
+type: double
+
+--
+
+*`oracle.performance.cursors.max`*::
++
+--
+Max cursors opened by username and machine
+
+type: double
+
+--
+
+*`oracle.performance.cursors.total`*::
++
+--
+Total opened cursors by username and machine
+
+type: double
+
+--
+
+[float]
+=== opened
+
+Opened cursors statistic
+
+
+*`oracle.performance.cursors.opened.current`*::
++
+--
+Total number of current open cursors
+
+type: long
+
+--
+
+*`oracle.performance.cursors.opened.total`*::
++
+--
+Total number of cursors opened since the instance started
+
+type: long
+
+--
+
+[float]
+=== parse
+
+Parses statistic information that occured in the current session
+
+*`oracle.performance.cursors.session.cache_hits`*::
++
+--
+Number of hits in the session cursor cache. A hit means that the SQL statement did not have to be reparsed.
+
+type: long
+
+--
+
+*`oracle.performance.cursors.cache_hit.pct`*::
++
+--
+Ratio of session cursor cache hits from total number of cursors
+
+type: double
+
+--
+
+[float]
 === tablespace
 
 tablespace
