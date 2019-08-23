@@ -107,12 +107,11 @@ func CloudwatchKinesisEvent(request events.KinesisEvent, base64Encoded, compress
 
 		kinesisData := record.Kinesis.Data
 		if base64Encoded {
-			decoded := make([]byte, 0)
-			n, err := base64.StdEncoding.Decode(decoded, kinesisData)
+			var err error
+			kinesisData, err = base64.StdEncoding.DecodeString(string(kinesisData))
 			if err != nil {
 				return nil, err
 			}
-			kinesisData = decoded[:n]
 		}
 
 		if compressed {
