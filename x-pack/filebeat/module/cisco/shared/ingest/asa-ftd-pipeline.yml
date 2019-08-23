@@ -953,6 +953,29 @@ processors:
      ignore_missing: true
 
 #
+# NAT fields
+#
+# The firewall always populates mapped ip and port even if there was no NAT.
+# This populates both nat.ip and nat.port only when some translation is done.
+# Fills nat.ip and nat.port even when only the ip or port changed.
+ - set:
+     field: source.nat.ip
+     value: "{{_temp_.cisco.mapped_source_ip}}"
+     if: "ctx._temp_.cisco.mapped_source_ip != null && (ctx._temp_.cisco.mapped_source_ip != ctx.source.ip || ctx._temp_.cisco.mapped_source_port != ctx.source.port)"
+ - set:
+     field: source.nat.port
+     value: "{{_temp_.cisco.mapped_source_port}}"
+     if: "ctx._temp_.cisco.mapped_source_port != null && (ctx._temp_.cisco.mapped_source_ip != ctx.source.ip || ctx._temp_.cisco.mapped_source_port != ctx.source.port)"
+ - set:
+     field: destination.nat.ip
+     value: "{{_temp_.cisco.mapped_destination_ip}}"
+     if: "ctx._temp_.cisco.mapped_destination_ip != null && (ctx._temp_.cisco.mapped_destination_ip != ctx.destination.ip || ctx._temp_.cisco.mapped_destination_port != ctx.destination.port)"
+ - set:
+     field: destination.nat.port
+     value: "{{_temp_.cisco.mapped_destination_port}}"
+     if: "ctx._temp_.cisco.mapped_destination_port != null && (ctx._temp_.cisco.mapped_destination_ip != ctx.destination.ip || ctx._temp_.cisco.mapped_destination_port != ctx.destination.port)"
+
+#
 # Populate ECS event.code
 #
  - set:

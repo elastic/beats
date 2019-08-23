@@ -65,8 +65,8 @@ Sep 12 2014 06:53:01 GIFRCHN01 : %FTD-4-106023: Deny tcp src outside:192.0.2.95/
 Sep 12 2014 06:53:02 GIFRCHN01 : %FTD-3-313001: Denied ICMP type=3, code=3 from 10.2.3.5 on interface Outside
 Jan 14 2015 13:16:13: %FTD-4-313004: Denied ICMP type=0, from laddr 172.16.30.2 on interface inside to 172.16.1.10: no matching session
 Jan 14 2015 13:16:14: %FTD-4-338002: Dynamic Filter permitted black listed TCP traffic from inside:10.1.1.45/6798 (192.88.99.1/7890) to outside:192.88.99.129/80 (192.88.99.129/80), destination 192.88.99.129 resolved from dynamic list: bad.example.com
-Jan 14 2015 13:16:14: %FTD-4-338004: Dynamic Filter monitored blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.223/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware
-Jan 14 2015 13:16:14: %FTD-4-338008: Dynamic Filter dropped blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.223/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware
+Jan 14 2015 13:16:14: %FTD-4-338004: Dynamic Filter monitored blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.225/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware
+Jan 14 2015 13:16:14: %FTD-4-338008: Dynamic Filter dropped blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.223/8080), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware
 Nov 16 2009 14:12:35: %FTD-5-304001: 10.30.30.30 Accessed URL 192.0.2.1:/app
 Nov 16 2009 14:12:36: %FTD-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://example.com
 Nov 16 2009 14:12:37: %FTD-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside

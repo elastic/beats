@@ -1791,6 +1791,8 @@
         "server.domain": "bad.example.com",
         "service.type": "cisco",
         "source.ip": "10.1.1.45",
+        "source.nat.ip": "192.88.99.1",
+        "source.nat.port": "7890",
         "source.port": 6798,
         "tags": [
             "cisco-asa"
@@ -1826,6 +1828,8 @@
         "network.transport": "tcp",
         "service.type": "cisco",
         "source.ip": "10.1.1.1",
+        "source.nat.ip": "10.2.1.1",
+        "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
             "cisco-asa"
@@ -1861,6 +1865,8 @@
         "network.transport": "tcp",
         "service.type": "cisco",
         "source.ip": "10.1.1.1",
+        "source.nat.ip": "10.2.1.1",
+        "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
             "cisco-asa"

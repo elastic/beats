@@ -42,22 +42,22 @@
   - name: mapped_source_ip
     type: ip
     description: >
-      The translated source IP address.
+      The translated source IP address. Use ECS source.ip.
 
   - name: mapped_source_port
     type: long
     description: >
-      The translated source port.
+      The translated source port. Use ECS source.port.
 
   - name: mapped_destination_ip
     type: ip
     description: >
-      The translated destination IP address.
+      The translated destination IP address. Use ECS destination.ip.
 
   - name: mapped_destination_port
     type: long
     description: >
-      The translated destination port.
+      The translated destination port. Use ECS destination.port.
 
   - name: threat_level
     type: keyword
