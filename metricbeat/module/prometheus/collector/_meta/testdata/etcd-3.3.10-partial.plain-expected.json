@@ -6,7 +6,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -28,7 +29,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -50,7 +52,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -72,7 +75,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -94,7 +98,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -116,7 +121,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "metrics": {
@@ -199,14 +205,15 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
-                "version": "go1.10.4"
+                "server_go_version": "go1.10.4"
             },
             "metrics": {
-                "go_info": 1
+                "etcd_server_go_version": 1
             }
         },
         "service": {
@@ -221,14 +228,15 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
-                "server_go_version": "go1.10.4"
+                "version": "go1.10.4"
             },
             "metrics": {
-                "etcd_server_go_version": 1
+                "go_info": 1
             }
         },
         "service": {
