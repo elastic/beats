@@ -172,7 +172,7 @@
       },
       "references": [
         {
-          "id": "8d890080-413c-11e9-8548-ab7fbe04f038",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
@@ -245,7 +245,7 @@
       },
       "references": [
         {
-          "id": "8d890080-413c-11e9-8548-ab7fbe04f038",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
@@ -344,7 +344,7 @@
       },
       "references": [
         {
-          "id": "8d890080-413c-11e9-8548-ab7fbe04f038",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
