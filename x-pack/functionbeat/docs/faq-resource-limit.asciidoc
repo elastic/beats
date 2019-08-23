@@ -14,9 +14,6 @@ The AWS limit on subscription filters is one per log group. If you've already
 deployed a Lambda function that monitors the log group, even if you deleted the
 function, the filter subscription might still exist.
 
-//REVIEWERS: Not sure if this is the best approach to resolve this issue, but
-//it worked for me. Please advise if you have a better approach. 
-
 To resolve this issue, use the AWS logs
 https://docs.aws.amazon.com/cli/latest/reference/logs/describe-subscription-filters.html[`describe-subscription-filters`]
 command on the log group. For example, if you're using the AWS CLI, run:
@@ -52,11 +49,6 @@ command to delete it. For example:
 ----
 aws logs delete-subscription-filter --log-group-name /aws/lambda/hello-world-python --filter-name fnb-cloudwatch-stack-fnbcloudwatch3SFawslambdahelloworldpython-11WH0BC1BM1NP
 ----
-
-
-//REVIEWERS: Is this the following approach the right way to handle the problem
-// with the stack already existing if deployment failed and you need to
-//redeploy? 
 
 Before attempting to redeploy the function, you might need to go to the
 CloudFormation console in AWS and delete the stack that {beatname_uc}

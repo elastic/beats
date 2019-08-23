@@ -75,9 +75,6 @@ function that collects events from CloudWatch logs.
 The following policy grants the permissions required to deploy and run a Lambda
 function that reads from SQS queues or Kinesis data streams.
 
-//REVIEWERS: I verified that the following policy works for sqs, but not
-//kinesis. Please confirm that it works on kinesis.  
-
 [source,yaml]
 ----
 {
