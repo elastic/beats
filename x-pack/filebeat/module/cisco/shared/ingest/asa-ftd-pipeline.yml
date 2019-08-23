@@ -469,7 +469,7 @@ processors:
          id: ["430004", "430005"]
        ArchiveSHA256:
          id: ["430004", "430005"]
-         ecs: [file.hash]
+         ecs: [file.hash.sha256]
        Classification:
          id: ["430001"]
        Client:
@@ -520,6 +520,7 @@ processors:
          ecs: [_temp_.cisco.list_id]
        FileSHA256:
          id: ["430004", "430005"]
+         ecs: [file.hash.sha256]
        FileSandboxStatus:
          id: ["430004", "430005"]
        FileSize:
@@ -778,6 +779,9 @@ processors:
      ignore_failure: true
  - lowercase:
      field: "network.application"
+     ignore_failure: true
+ - lowercase:
+     field: "file.type"
      ignore_failure: true
 
 #

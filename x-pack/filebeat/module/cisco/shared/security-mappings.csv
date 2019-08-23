@@ -157,7 +157,7 @@ file,430004,ApplicationProtocol,network.protocol
 file,430004,ArchiveDepth,
 file,430004,ArchiveFileName,file.path
 file,430004,ArchiveFileStatus,
-file,430004,ArchiveSHA256,file.hash
+file,430004,ArchiveSHA256,file.hash.sha256
 file,430004,Client,network.application
 file,430004,DstIP,destination.ip
 file,430004,DstPort,destination.port
@@ -166,7 +166,7 @@ file,430004,FileDirection,
 file,430004,FileName,file.path
 file,430004,FilePolicy,cisco.ftd.list_id
 file,430004,FileSandboxStatus,
-file,430004,FileSHA256,
+file,430004,FileSHA256,file.hash.sha256
 file,430004,FileSize,file.size
 file,430004,FileStorageStatus,
 file,430004,FileType,file.type
@@ -186,7 +186,7 @@ malware,430005,ApplicationProtocol,network.protocol
 malware,430005,ArchiveDepth,
 malware,430005,ArchiveFileName,file.path
 malware,430005,ArchiveFileStatus,
-malware,430005,ArchiveSHA256,file.hash
+malware,430005,ArchiveSHA256,file.hash.sha256
 malware,430005,Client,network.application
 malware,430005,DstIP,destination.ip
 malware,430005,DstPort,destination.port
@@ -195,7 +195,7 @@ malware,430005,FileDirection,
 malware,430005,FileName,file.path
 malware,430005,FilePolicy,cisco.ftd.list_id
 malware,430005,FileSandboxStatus,
-malware,430005,FileSHA256,
+malware,430005,FileSHA256,file.hash.sha256
 malware,430005,FileSize,file.size
 malware,430005,FileStorageStatus,
 malware,430005,FileType,file.type
