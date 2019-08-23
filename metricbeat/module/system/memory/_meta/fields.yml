@@ -79,28 +79,21 @@
           description: >
             Available swap memory.
 
-        - name: vmstat
-          type: group
-          description: This group contains swap stats from vmstats on linux
-          fields:
-            - name: pswpin
-              type: long
-              description: Pages swapped in
-            - name: pswpout
-              type: long
-              description: Pages swapped out
-            - name: thp_swpout
-              type: long
-              description: Huge page swap stats
-            - name: thp_swpout_fallback
-              type: long
-              description: Huge page swap stats
-            - name: swap_ra
-              type: long
-              description: Swap readahead stats
-            - name: swap_ra_hit
-              type: long
-              description: Swap readahead stats
+        - name: out.pages
+          type: long
+          description: count of pages swapped out
+
+        - name: in.pages
+          type: long
+          description: count of pages swapped in
+
+        - name: readahead.pages
+          type: long
+          description: swap readahead pages
+
+        - name: readahead.cached
+          type: long
+          description: swap readahead cache hits
 
         - name: used.pct
           type: scaled_float
@@ -154,3 +147,14 @@
           format: bytes
           description: >
             Default size for huge pages.
+
+        - name: swap.out
+          type: group
+          description: huge pages swapped out
+          fields:
+            - name: pages
+              type: long
+              description: pages swapped out
+            - name: fallback
+              type: long
+              description: Count of huge pages that must be split before swapout

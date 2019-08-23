@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	sysinfo "github.com/elastic/go-sysinfo"
-	sit "github.com/elastic/go-sysinfo/types"
+	sysinfotypes "github.com/elastic/go-sysinfo/types"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -154,12 +154,12 @@ func AddHugeTLBPagesPercentage(s *HugeTLBPagesStat) {
 }
 
 // GetVMStat gets linux vmstat metrics
-func GetVMStat() (*sit.VMStatInfo, error) {
+func GetVMStat() (*sysinfotypes.VMStatInfo, error) {
 	h, err := sysinfo.Host()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read self process information")
 	}
-	if vmstatHandle, ok := h.(sit.VMStat); ok {
+	if vmstatHandle, ok := h.(sysinfotypes.VMStat); ok {
 		info, err := vmstatHandle.VMStat()
 		if err != nil {
 			return nil, errors.Wrap(err, "Error getting VMStat info")

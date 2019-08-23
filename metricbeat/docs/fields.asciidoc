@@ -28371,61 +28371,37 @@ format: bytes
 
 --
 
-[float]
-=== vmstat
-
-This group contains swap stats from vmstats on linux
-
-
-*`system.memory.swap.vmstat.pswpin`*::
+*`system.memory.swap.out.pages`*::
 +
 --
-Pages swapped in
+count of pages swapped out
 
 type: long
 
 --
 
-*`system.memory.swap.vmstat.pswpout`*::
+*`system.memory.swap.in.pages`*::
 +
 --
-Pages swapped out
+count of pages swapped in
 
 type: long
 
 --
 
-*`system.memory.swap.vmstat.thp_swpout`*::
+*`system.memory.swap.readahead.pages`*::
 +
 --
-Huge page swap stats
+swap readahead pages
 
 type: long
 
 --
 
-*`system.memory.swap.vmstat.thp_swpout_fallback`*::
+*`system.memory.swap.readahead.cached`*::
 +
 --
-Huge page swap stats
-
-type: long
-
---
-
-*`system.memory.swap.vmstat.swap_ra`*::
-+
---
-Swap readahead stats
-
-type: long
-
---
-
-*`system.memory.swap.vmstat.swap_ra_hit`*::
-+
---
-Swap readahead stats
+swap readahead cache hits
 
 type: long
 
@@ -28530,6 +28506,30 @@ Default size for huge pages.
 type: long
 
 format: bytes
+
+--
+
+[float]
+=== swap.out
+
+huge pages swapped out
+
+
+*`system.memory.hugepages.swap.out.pages`*::
++
+--
+pages swapped out
+
+type: long
+
+--
+
+*`system.memory.hugepages.swap.out.fallback`*::
++
+--
+Count of huge pages that must be split before swapout
+
+type: long
 
 --
 
