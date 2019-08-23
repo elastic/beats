@@ -70,11 +70,11 @@ that are part of the monitoring cluster.
 
 ifndef::serverless[]
 . <<{beatname_lc}-starting,Start {beatname_uc}>>.
-endif::serverless[]
+endif::[]
 
 ifdef::serverless[]
 . <<{beatname_lc}-deploying,Deploy {beatname_uc}>>.
-endif::serverless[]
+endif::[]
 
 . {kibana-ref}/monitoring-data.html[View the monitoring data in {kib}]. 
 
