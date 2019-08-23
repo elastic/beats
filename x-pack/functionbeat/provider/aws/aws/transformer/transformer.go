@@ -7,6 +7,7 @@ package transformer
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"time"
@@ -86,7 +87,9 @@ func KinesisEvent(request events.KinesisEvent) []beat.Event {
 	return events
 }
 
-func CloudwatchKinesisEvent(request events.KinesisEvent, compressed bool) ([]beat.Event, error) {
+// CloudwatchKinesisEvent takes a Kinesis event containing Cloudwatch logs and creates events for all
+// Cloudwatch logs.
+func CloudwatchKinesisEvent(request events.KinesisEvent, base64Encoded, compressed bool) ([]beat.Event, error) {
 	var evts []beat.Event
 	for _, record := range request.Records {
 		envelopeFields := common.MapStr{
@@ -103,6 +106,15 @@ func CloudwatchKinesisEvent(request events.KinesisEvent, compressed bool) ([]bea
 		}
 
 		kinesisData := record.Kinesis.Data
+		if base64Encoded {
+			decoded := make([]byte, 0)
+			n, err := base64.StdEncoding.Decode(decoded, kinesisData)
+			if err != nil {
+				return nil, err
+			}
+			kinesisData = decoded[:n]
+		}
+
 		if compressed {
 			inBuf := bytes.NewBuffer(record.Kinesis.Data)
 			r, err := gzip.NewReader(inBuf)

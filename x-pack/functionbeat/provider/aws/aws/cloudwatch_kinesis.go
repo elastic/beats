@@ -26,18 +26,11 @@ type CloudwatchKinesis struct {
 	config *CloudwatchKinesisConfig
 }
 
+// CloudwatchKinesisConfig stores the configuration of Kinesis and additional options on decompressing data.
 type CloudwatchKinesisConfig struct {
 	*KinesisConfig `config:",inline"`
+	Base64Encoded  bool `config:"base64_encoded"`
 	Compressed     bool `config:"compressed"`
-}
-
-func defaultCloudwatchKinesisConfig() *CloudwatchKinesisConfig {
-	return &CloudwatchKinesisConfig{
-		&KinesisConfig{
-			LambdaConfig: DefaultLambdaConfig,
-		},
-		false,
-	}
 }
 
 // NewCloudwatchKinesis creates a new function to receives events from a kinesis stream.
@@ -47,6 +40,16 @@ func NewCloudwatchKinesis(provider provider.Provider, cfg *common.Config) (provi
 		return nil, err
 	}
 	return &CloudwatchKinesis{log: logp.NewLogger("cloudwatch_kinesis"), config: config}, nil
+}
+
+func defaultCloudwatchKinesisConfig() *CloudwatchKinesisConfig {
+	return &CloudwatchKinesisConfig{
+		&KinesisConfig{
+			LambdaConfig: DefaultLambdaConfig,
+		},
+		false,
+		true,
+	}
 }
 
 // CloudwatchKinesisDetails returns the details of the feature.
@@ -64,7 +67,7 @@ func (k *CloudwatchKinesis) createHandler(client core.Client) func(request event
 	return func(request events.KinesisEvent) error {
 		k.log.Debugf("The handler receives %d events", len(request.Records))
 
-		events, err := transformer.CloudwatchKinesisEvent(request, k.config.Compressed)
+		events, err := transformer.CloudwatchKinesisEvent(request, k.config.Base64Encoded, k.config.Compressed)
 		if err != nil {
 			return err
 		}

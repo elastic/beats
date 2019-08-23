@@ -188,7 +188,10 @@ functionbeat.provider.aws.functions:
     # Description of the method to help identify them when you run multiples functions.
     description: "lambda function for Cloudwatch logs in Kinesis events"
 
-    # Set compress if events are encoded.
+    # Set base64_encoded if your data is base64 encoded.
+    #base64_encoded: false
+
+    # Set compressed if your data is compressed with gzip.
     #compressed: true
 
     # Concurrency, is the reserved number of instances for that function.
