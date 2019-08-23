@@ -67,8 +67,8 @@ processors:
  - convert: { type: long, ignore_missing: true, field: event.duration }
  - convert: { type: long, ignore_missing: true, field: _temp_.labels }
  - convert: { type: long, ignore_missing: true, field: panw.panos.sequence_number }
- - convert: { type: long, ignore_missing: true, field: panw.panos.source.nat.port }
- - convert: { type: long, ignore_missing: true, field: panw.panos.destination.nat.port }
+ - convert: { type: long, ignore_missing: true, field: source.nat.port }
+ - convert: { type: long, ignore_missing: true, field: destination.nat.port }
 
 # Remove PCAP ID when zero (no packet capture).
  - remove:
@@ -298,15 +298,15 @@ processors:
      value:
        - '{{destination.ip}}'
  - append:
-     if: 'ctx?.panw?.panos?.source?.nat?.ip != null'
+     if: 'ctx?.source?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{panw.panos.source.nat.ip}}'
+       - '{{source.nat.ip}}'
  - append:
-     if: 'ctx?.panw?.panos?.destination?.nat?.ip != null'
+     if: 'ctx?.destination?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{panw.panos.destination.nat.ip}}'
+       - '{{destination.nat.ip}}'
 
 # Geolocation for source.
  - geoip:
