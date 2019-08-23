@@ -9,7 +9,8 @@ The System module allows you to monitor your servers. Because the System module
 always applies to the local server, the `hosts` config option is not needed.
 
 The default metricsets are `cpu`, `load`, `memory`, `network`, `process` and
-`process_summary`.
+`process_summary`. You can disable the default metricsets by commenting them out
+in the `modules.d/system.yml` file.
 
 Note that certain metricsets may access `/proc` to gather process information, and the resulting `ptrace_may_access()` call by the kernel to check for permissions can be blocked by https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor and other LSM software], even though the system module doesn't use `ptrace` directly.
 
