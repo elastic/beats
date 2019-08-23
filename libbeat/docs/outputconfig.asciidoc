@@ -498,6 +498,9 @@ output.elasticsearch:
 With this configuration, all events with `processor.event: transaction` are sent to a pipeline
 named `transaction_pipeline`. Similarly, all events with `processor.event: error` are sent to a
 pipeline named `error_pipeline`.
+
+The default pipeline is `apm`. It adds user agent and geo ip information to events.
+To disable this, or any other pipeline, set `output.elasticsearch.pipeline: _none`.
 endif::apm-server[]
 
 TIP: To learn how to add custom fields to events, see the
@@ -632,6 +635,8 @@ output.elasticsearch:
 With this configuration, all events with `processor.event: transaction` are sent to a pipeline
 named `transaction_pipeline`, all events with `processor.event: error` are sent to a
 pipeline named `error_pipeline`, etc.
+
+NOTE: Defining any pipeline will deactivate the default `apm` pipeline.
 endif::apm-server[]
 
 For more information about ingest node pipelines, see
