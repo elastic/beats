@@ -8,12 +8,12 @@ package performance
 
 import (
 	"testing"
-	
+
 	_ "gopkg.in/goracle.v2"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 )
 
 func TestData(t *testing.T) {
