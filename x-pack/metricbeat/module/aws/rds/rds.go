@@ -163,12 +163,16 @@ func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetail
 	for _, dbInstance := range output.DBInstances {
 		dbInstanceARNs = append(dbInstanceARNs, *dbInstance.DBInstanceArn)
 		dbDetails := DBDetails{
-			dbArn:              *dbInstance.DBInstanceArn,
-			dbAvailabilityZone: *dbInstance.AvailabilityZone,
-			dbClass:            *dbInstance.DBInstanceClass,
-			dbIdentifier:       *dbInstance.DBInstanceIdentifier,
-			dbStatus:           *dbInstance.DBInstanceStatus,
+			dbArn:        *dbInstance.DBInstanceArn,
+			dbClass:      *dbInstance.DBInstanceClass,
+			dbIdentifier: *dbInstance.DBInstanceIdentifier,
+			dbStatus:     *dbInstance.DBInstanceStatus,
 		}
+
+		if dbInstance.AvailabilityZone != nil {
+			dbDetails.dbAvailabilityZone = *dbInstance.AvailabilityZone
+		}
+
 		dbDetailsMap[*dbInstance.DBInstanceArn] = dbDetails
 	}
 	return dbInstanceARNs, dbDetailsMap, nil
