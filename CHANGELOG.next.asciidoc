@@ -37,6 +37,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add new Dashboard for PostgreSQL database stats {pull}13187[13187]
+- Add new dashboard for CouchDB database {pull}13198[13198]
+- Add new dashboard for Ceph cluster stats {pull}13216[13216]
 - Add new dashboard for Aerospike database stats {pull}13217[13217]
 - Add new dashboard for Couchbase cluster stats {pull}13212[13212]
 - Add new dashboard for Prometheus server stats {pull}13126[13126]
@@ -129,6 +132,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
+- Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
+- Change iis url.path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225]
 
 *Heartbeat*
 
@@ -167,7 +172,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incoherent behaviour in redis key metricset when keyspace is specified both in host URL and key pattern {pull}12913[12913]
 - Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
-- Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+- Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
+- Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
+- Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
 
 *Packetbeat*
 
@@ -200,7 +207,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
 - New processor: `truncate_fields`. {pull}11297[11297]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring cluster. {pull}9260[9260]
-- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
+- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}11394[11394]
 - Add `add_observer_metadata` processor. {pull}11394[11394]
 - Add `decode_csv_fields` processor. {pull}11753[11753]
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
@@ -216,7 +223,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
 - Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
 - Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
+- Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
+- add_host_metadata is now GA. {pull}13148[13148]
+- Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
 - add_host_metadata is no GA. {pull}13148[13148]
+- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
 
 *Auditbeat*
 
@@ -316,7 +327,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
 - Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
 - Add AWS ebs metricset. {pull}13167[13167] {issue}11699[11699]
+- Add `metricset.period` field with the configured fetching period. {pull}13242[13242] {issue}12616[12616]
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
+- Add Performance metricset to Oracle module {pull}12547[12547]
 
 *Packetbeat*
 
