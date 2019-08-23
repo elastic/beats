@@ -20,11 +20,6 @@
       description: >
         Current data collection period for this event in milliseconds.
 
-    - name: process.pgid
-      type: long
-      description: >
-        Process group id.
-
     - name: service.address
       description: >
         Address of the machine where the service is running. This

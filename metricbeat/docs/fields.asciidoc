@@ -3417,16 +3417,6 @@ type: integer
 
 --
 
-*`process.pgid`*::
-+
---
-Process group id.
-
-
-type: long
-
---
-
 *`service.address`*::
 +
 --
