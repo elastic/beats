@@ -18,7 +18,6 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 		if len(metric.values) == 0 {
 			continue
 		}
-
 		groupByTimeMetrics := make(map[time.Time][]MetricValue)
 		for _, m := range metric.values {
 			groupByTimeMetrics[m.timestamp] = append(groupByTimeMetrics[m.timestamp], m)
@@ -34,13 +33,13 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 					metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "max"), *value.max)
 				}
 				if value.average != nil {
-					metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "avg"), value.average)
+					metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "avg"), *value.average)
 				}
 				if value.total != nil {
-					metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "total"), value.total)
+					metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "total"), *value.total)
 				}
 				if value.count != nil {
-					metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "count"), value.count)
+					metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "count"), *value.count)
 				}
 			}
 			event := mb.Event{

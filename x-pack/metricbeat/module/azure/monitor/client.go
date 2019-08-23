@@ -7,6 +7,7 @@ package monitor
 import (
 	"errors"
 	"fmt"
+	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/elastic/beats/libbeat/logp"
 	"strings"
 	"sync"
@@ -115,9 +116,8 @@ func (client *Client) InitResources() error {
 // GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
 func (client *Client) GetMetricValues() error {
 	for i, metric := range client.resources.metrics {
-		client.resources.metrics[i].values = nil
-		endTime := time.Now().UTC()
-		startTime := endTime.Add(client.config.Period * (-1))
+		endTime := time.Now().UTC().Truncate(time.Minute).Truncate(time.Second)
+		startTime := endTime.Add(client.config.Period * (-2))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 		var filter string
 		if len(metric.dimensions) > 0 {
@@ -130,33 +130,10 @@ func (client *Client) GetMetricValues() error {
 		resp, err := client.azureMonitorService.GetMetricValues(metric.resource.ID, metric.namespace, metric.timeGrain, timespan, metric.names,
 			metric.aggregations, filter)
 		if err != nil {
+			//report
 			continue
 		}
-		for _, v := range resp {
-			for _, t := range *v.Timeseries {
-				for _, mv := range *t.Data {
-					var val MetricValue
-					val.name = *v.Name.Value
-					val.timestamp = mv.TimeStamp.Time
-					if mv.Minimum != nil {
-						val.min = mv.Minimum
-					}
-					if mv.Maximum != nil {
-						val.max = mv.Maximum
-					}
-					if mv.Average != nil {
-						val.average = mv.Average
-					}
-					if mv.Total != nil {
-						val.total = mv.Total
-					}
-					if mv.Count != nil {
-						val.count = mv.Count
-					}
-					client.resources.metrics[i].values = append(client.resources.metrics[i].values, val)
-				}
-			}
-		}
+		err = client.mapMetricValues(i, resp)
 	}
 	return nil
 }
@@ -201,7 +178,53 @@ func (client *Client) mapMetric(metric azure.MetricConfig, resource resources.Ge
 			dim = append(dim, Dimension{name: dimension.Name, value: dimension.Value})
 		}
 	}
-	return Metric{resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type},
-		namespace: metric.Namespace, names: supportedMetricNames, aggregations: strings.Join(supportedAggregations, ","), dimensions: dim, timeGrain: metric.Timegrain}, nil
+	met := Metric{resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type},
+		namespace: metric.Namespace, names: supportedMetricNames, aggregations: strings.Join(supportedAggregations, ","), dimensions: dim, timeGrain: metric.Timegrain}
 
+	//map previous metric values if existing
+	for _, prevMet := range client.resources.metrics {
+		if len(prevMet.values) != 0 && matchMetrics(prevMet, met) {
+			met.values = prevMet.values
+		}
+	}
+	return met, nil
+
+}
+
+func (client *Client) mapMetricValues(index int, metrics []insights.Metric) error {
+	if len(metrics) == 0 {
+		return errors.New("no found metrics")
+	}
+	var previousMetrics []MetricValue
+	previousMetrics = client.resources.metrics[index].values
+	client.resources.metrics[index].values = nil
+	for _, v := range metrics {
+		for _, t := range *v.Timeseries {
+			for _, mv := range *t.Data {
+				if metricExists(*v.Name.Value, mv, previousMetrics) || metricIsEmpty(mv) {
+					continue
+				}
+				var val MetricValue
+				val.name = *v.Name.Value
+				val.timestamp = mv.TimeStamp.Time
+				if mv.Minimum != nil {
+					val.min = mv.Minimum
+				}
+				if mv.Maximum != nil {
+					val.max = mv.Maximum
+				}
+				if mv.Average != nil {
+					val.average = mv.Average
+				}
+				if mv.Total != nil {
+					val.total = mv.Total
+				}
+				if mv.Count != nil {
+					val.count = mv.Count
+				}
+				client.resources.metrics[index].values = append(client.resources.metrics[index].values, val)
+			}
+		}
+	}
+	return nil
 }

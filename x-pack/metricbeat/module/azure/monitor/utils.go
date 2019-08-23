@@ -6,6 +6,7 @@ package monitor
 
 import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -94,6 +95,32 @@ func getMetricDefinitionsByNames(metricDefs []insights.MetricDefinition, names [
 		}
 	}
 	return metrics
+}
+
+// metricExists will check if the metric value has been retrieved in the past
+func metricExists(name string, metric insights.MetricValue, metrics []MetricValue) bool {
+	for _, met := range metrics {
+		if name == met.name && metric.TimeStamp.Time == met.timestamp && metric.Average == met.average && metric.Total == met.total && metric.Minimum == met.min && metric.Maximum == met.max && metric.Count == met.count {
+			return true
+		}
+	}
+	return false
+}
+
+// matchMetrics will compare current metrics
+func matchMetrics(prevMet Metric, met Metric) bool {
+	if prevMet.namespace == met.namespace && reflect.DeepEqual(prevMet.names, met.names) && prevMet.resource == met.resource && prevMet.aggregations == met.aggregations && prevMet.timeGrain == met.timeGrain {
+		return true
+	}
+	return false
+}
+
+// metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
+func metricIsEmpty(metric insights.MetricValue) bool {
+	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
+		return true
+	}
+	return false
 }
 
 // expired will check for an expiration time and assign a new one
