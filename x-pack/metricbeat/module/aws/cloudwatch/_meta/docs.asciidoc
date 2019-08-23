@@ -123,6 +123,3 @@ metric(average) from EC2 instance i-456.
           value: i-456
       statistic: ["Average"]
 ----
-
-[id="aws-credentials-config"]
-include::../../../../../libbeat/docs/aws-credentials-config.asciidoc
