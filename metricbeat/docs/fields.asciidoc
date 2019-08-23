@@ -3407,6 +3407,16 @@ The name of the metricset that generated the event.
 
 --
 
+*`metricset.period`*::
++
+--
+Current data collection period for this event in milliseconds.
+
+
+type: integer
+
+--
+
 *`process.pgid`*::
 +
 --
