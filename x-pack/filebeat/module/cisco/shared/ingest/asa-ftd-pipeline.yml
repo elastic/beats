@@ -483,16 +483,16 @@ processors:
          id: ["430002", "430003"]
        DNS_TTL:
          id: ["430002", "430003"]
-         ecs: [_temp_.cisco.dns.answers.ttl]
+         ecs: [dns.answers.ttl]
        DNSQuery:
          id: ["430002", "430003"]
-         ecs: [_temp_.cisco.dns.question.name]
+         ecs: [dns.question.name]
        DNSRecordType:
          id: ["430002", "430003"]
-         ecs: [_temp_.cisco.dns.question.type]
+         ecs: [dns.question.type]
        DNSResponseType:
          id: ["430002", "430003"]
-         ecs: [_temp_.cisco.dns.answers.type]
+         ecs: [dns.answers.type]
        DNSSICategory:
          id: ["430002", "430003"]
        DstIP:
@@ -952,11 +952,22 @@ processors:
      target_field: destination.as.organization.name
      ignore_missing: true
 
+#
+# Populate ECS event.code
+#
+ - set:
+     field: event.code
+     value: "{{_temp_.cisco.message_id}}"
 
  - remove:
-     field: _temp_.cisco.message_id
+     field:
+      - _temp_.cisco.message_id
+      - event.code
      if: 'ctx._temp_.cisco.message_id == ""'
 
+#
+# Copy _temp_.cisco to its final destination, cisco.asa or cisco.ftd.
+#
  - rename:
      field: _temp_.cisco
      target_field: 'cisco.{< .internal_prefix >}'
@@ -966,8 +977,7 @@ processors:
 # Remove temporary fields
 #
  - remove:
-     field:
-      - _temp_
+     field: _temp_
      ignore_missing: true
 
 on_failure:

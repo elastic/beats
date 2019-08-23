@@ -3,6 +3,7 @@
         "@timestamp": "2019-01-01T01:00:27.000Z",
         "cisco.ftd.message_id": "999999",
         "event.action": "firewall-rule",
+        "event.code": "999999",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.severity": 7,

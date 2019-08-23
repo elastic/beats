@@ -90,18 +90,3 @@
     type: object
     description:
       Raw fields for Security Events.
-
-
-  # TODO: These DNS fields must be moved outside cisco.ftd once dns support
-  #       is added to ECS.
-  - name: dns.question.name
-    type: keyword
-
-  - name: dns.question.type
-    type: keyword
-
-  - name: dns.answers.ttl
-    type: long
-
-  - name: dns.answers.type
-    type: keyword

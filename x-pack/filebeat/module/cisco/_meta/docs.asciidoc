@@ -144,10 +144,10 @@ Mappings for Connection and Security Intelligence events fields:
 | AccessControlRuleName | cisco.ftd.list_id
 | ApplicationProtocol | network.protocol
 | ConnectionDuration | event.duration
-| DNSQuery | cisco.ftd.dns.question.name
-| DNSRecordType | cisco.ftd.dns.question.type
-| DNSResponseType | cisco.ftd.dns.answers.type
-| DNS_TTL | cisco.ftd.dns.answers.ttl
+| DNSQuery | dns.question.name
+| DNSRecordType | dns.question.type
+| DNSResponseType | dns.answers.type
+| DNS_TTL | dns.answers.ttl
 | DstIP | destination.ip
 | DstPort | destination.port
 | EgressInterface | cisco.ftd.destination_interface
