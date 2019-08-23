@@ -172,7 +172,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
 - Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
 - Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
-- Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
 - Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
 
 *Packetbeat*
