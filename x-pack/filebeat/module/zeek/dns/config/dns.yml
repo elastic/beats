@@ -13,11 +13,6 @@ processors:
   - decode_json_fields:
       fields: [log.original]
       target: zeek.dns
-  - timestamp:
-      ignore_missing: true
-      field: zeek.dns.ts
-      layouts:
-        - UNIX
   - script:
       lang: javascript
       id: zeek_dns_flags
@@ -101,13 +96,6 @@ processors:
             addDnsAnswers(evt);
             addEventDuration(evt);
         }
-  - drop_fields:
-      ignore_missing: true
-      fields:
-        - zeek.dns.Z
-        - zeek.dns.auth
-        - zeek.dns.addl
-        - zeek.dns.ts
   - convert:
       ignore_missing: true
       ignore_failure: true
@@ -135,3 +123,15 @@ processors:
 {{ if .community_id }}
   - community_id: ~
 {{ end }}
+  - timestamp:
+      ignore_missing: true
+      field: zeek.dns.ts
+      layouts:
+        - UNIX
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - zeek.dns.Z
+        - zeek.dns.auth
+        - zeek.dns.addl
+        - zeek.dns.ts
