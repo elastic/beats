@@ -7,6 +7,8 @@ package performance
 import (
 	"context"
 	"database/sql"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 
 	"github.com/pkg/errors"
 )
@@ -17,15 +19,15 @@ type libraryCache struct {
 }
 
 /*
-	The following function executes a query that produces the following result
-
-	Ratio			AVG(GETHITRATIO)
-	io_reloads		0.004130404962582493789151209400862660224657
-	lock_requests	0.4902639097748147904635170747058646829122
-	pin_requests	0.755804477116177544453478080666426614297
-
-	Which is parsed into libraryCache instances
-*/
+ * The following function executes a query that produces the following result
+ *
+ * Ratio			AVG(GETHITRATIO)
+ * io_reloads		0.004130404962582493789151209400862660224657
+ * lock_requests	0.4902639097748147904635170747058646829122
+ * pin_requests	0.755804477116177544453478080666426614297
+ *
+ * Which is parsed into libraryCache instances
+ */
 func (e *performanceExtractor) libraryCache(ctx context.Context) ([]libraryCache, error) {
 	rows, err := e.db.QueryContext(ctx, `SELECT 'lock_requests' "Ratio" , AVG(gethitratio) FROM V$LIBRARYCACHE
 		UNION
@@ -48,4 +50,16 @@ func (e *performanceExtractor) libraryCache(ctx context.Context) ([]libraryCache
 	}
 
 	return results, nil
+}
+
+func (m *MetricSet) addLibraryCacheData(ls []libraryCache) common.MapStr {
+	out := common.MapStr{}
+
+	for _, v := range ls {
+		if v.name.Valid {
+			oracle.SetSqlValue(m.Logger(), out, v.name.String, &oracle.Float64Value{NullFloat64: v.value})
+		}
+	}
+
+	return out
 }

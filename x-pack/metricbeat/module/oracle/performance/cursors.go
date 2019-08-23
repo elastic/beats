@@ -7,6 +7,8 @@ package performance
 import (
 	"context"
 	"database/sql"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 
 	"github.com/pkg/errors"
 )
@@ -29,15 +31,15 @@ type totalCursors struct {
 }
 
 /*
-	The following function executes a query that produces the following result
-
-	TOTAL_CUR	AVG_CUR	MAX_CUR	USERNAME	MACHINE
-	25			0.6410	17					2ed9ac3a4c3d
-	2			2		2		SYS			mcastro
-	0			0		0		SYS			2ed9ac3a4c3d
-
-	Which are parsed into different cursorsByUsernameAndMachine instances
-*/
+ * The following function executes a query that produces the following result
+ *
+ * TOTAL_CUR	AVG_CUR	MAX_CUR	USERNAME	MACHINE
+ * 25			0.6410	17					2ed9ac3a4c3d
+ * 2			2		2		SYS			mcastro
+ * 0			0		0		SYS			2ed9ac3a4c3d
+ *
+ * Which are parsed into different cursorsByUsernameAndMachine instances
+ */
 func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) ([]cursorsByUsernameAndMachine, error) {
 	rows, err := e.db.QueryContext(ctx, `
 		SELECT sum(a.value) total_cur, 
@@ -81,14 +83,32 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 	return results, nil
 }
 
+func (m *MetricSet) addCursorByUsernameAndMachine(cs []cursorsByUsernameAndMachine) []common.MapStr {
+	out := make([]common.MapStr, 0)
+
+	for _, v := range cs {
+		ms := common.MapStr{}
+
+		oracle.SetSqlValue(m.Logger(), ms, "username", &oracle.StringValue{NullString: v.username})
+		oracle.SetSqlValue(m.Logger(), ms, "machine", &oracle.StringValue{NullString: v.machine})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.total", &oracle.Int64Value{NullInt64: v.total})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.max", &oracle.Int64Value{NullInt64: v.max})
+		oracle.SetSqlValue(m.Logger(), ms, "cursors.avg", &oracle.Float64Value{NullFloat64: v.avg})
+
+		out = append(out, ms)
+	}
+
+	return out
+}
+
 /*
-	The following function executes a query that produces the following result
-
-	TOTAL_CURSORS	CURRENT_CURSORS	SESS_CUR_CACHE_HITS	PARSE_COUNT_TOTAL	SESS_CUR_CACHE_HITS/TOTAL_CURSORS	SESS_CUR_CACHE_HITS-PARSE_COUNT_TOTAL
-	2278			3				2814				992					1.23529411764705882352941176		1822
-
-	Which is parsed into a totalCursors instance
-*/
+ * The following function executes a query that produces the following result
+ *
+ * TOTAL_CURSORS	CURRENT_CURSORS	SESS_CUR_CACHE_HITS	PARSE_COUNT_TOTAL	SESS_CUR_CACHE_HITS/TOTAL_CURSORS	SESS_CUR_CACHE_HITS-PARSE_COUNT_TOTAL
+ * 2278			3				2814				992					1.23529411764705882352941176		1822
+ *
+ * Which is parsed into a totalCursors instance
+ */
 func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors, error) {
 	rows := e.db.QueryRowContext(ctx, `
 		SELECT total_cursors, 
@@ -113,4 +133,17 @@ func (e *performanceExtractor) totalCursors(ctx context.Context) (*totalCursors,
 	}
 
 	return &dest, nil
+}
+
+func (m *MetricSet) addCursorData(cs *totalCursors) common.MapStr {
+	out := make(common.MapStr)
+
+	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.total", &oracle.Int64Value{NullInt64: cs.totalCursors})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.opened.current", &oracle.Int64Value{NullInt64: cs.currentCursors})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.session.cache_hits", &oracle.Int64Value{NullInt64: cs.sessCurCacheHits})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.total", &oracle.Int64Value{NullInt64: cs.parseCountTotal})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.cache_hit.pct", &oracle.Float64Value{NullFloat64: cs.cacheHitsTotalCursorsRatio})
+	oracle.SetSqlValue(m.Logger(), out, "cursors.parse.real", &oracle.Int64Value{NullInt64: cs.realParses})
+
+	return out
 }
