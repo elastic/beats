@@ -23639,6 +23639,25 @@ type: long
 
 Parses statistic information that occured in the current session
 
+
+*`oracle.performance.cursors.parse.real`*::
++
+--
+Real number of parses that occurred: session cursor cache hits - parse count (total)
+
+type: long
+
+--
+
+*`oracle.performance.cursors.parse.total`*::
++
+--
+Total number of parse calls (hard and soft). A soft parse is a check on an object already in the shared pool, to verify that the permissions on the underlying object have not changed.
+
+type: long
+
+--
+
 *`oracle.performance.cursors.session.cache_hits`*::
 +
 --
