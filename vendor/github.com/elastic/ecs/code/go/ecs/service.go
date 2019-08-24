@@ -24,11 +24,13 @@ package ecs
 // These fields help you find and correlate logs for a specific service and
 // version.
 type Service struct {
-	// Unique identifier of the running service.
-	// This id should uniquely identify this service. This makes it possible to
-	// correlate logs and metrics for one specific service.
-	// Example: If you are experiencing issues with one redis instance, you can
-	// filter on that id to see metrics and logs for that single instance.
+	// Unique identifier of the running service. If the service is comprised of
+	// many nodes, the `service.id` should be the same for all nodes.
+	// This id should uniquely identify the service. This makes it possible to
+	// correlate logs and metrics for one specific service, no matter which
+	// particular node emitted the event.
+	// Note that if you need to see the events from one specific host of the
+	// service, you should filter on that `host.name` or `host.id` instead.
 	ID string `ecs:"id"`
 
 	// Name of the service data is collected from.

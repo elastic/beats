@@ -19,5 +19,19 @@
 
 package ecs
 
-// Version is the Elastic Common Schema version from which this was generated.
-const Version = "1.1.0"
+// Distributed tracing makes it possible to analyze performance throughout a
+// microservice architecture all in one view. This is accomplished by tracing
+// all of the requests - from the initial web request in the front-end service
+// - to queries made through multiple back-end services.
+type Tracing struct {
+	// Unique identifier of the trace.
+	// A trace groups multiple events like transactions that belong together.
+	// For example, a user request handled by multiple inter-connected
+	// services.
+	TraceID string `ecs:"trace.id"`
+
+	// Unique identifier of the transaction.
+	// A transaction is the highest level of work measured within a service,
+	// such as a request to a server.
+	TransactionID string `ecs:"transaction.id"`
+}
