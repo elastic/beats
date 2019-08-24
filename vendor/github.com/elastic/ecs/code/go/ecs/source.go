@@ -47,4 +47,14 @@ type Source struct {
 
 	// Packets sent from the source to the destination.
 	Packets int64 `ecs:"packets"`
+
+	// Translated ip of source based NAT sessions (e.g. internal client to
+	// internet)
+	// Typically connections traversing load balancers, firewalls, or routers.
+	NatIP string `ecs:"nat.ip"`
+
+	// Translated port of source based NAT sessions. (e.g. internal client to
+	// internet)
+	// Typically used with load balancers, firewalls, or routers.
+	NatPort int64 `ecs:"nat.port"`
 }
