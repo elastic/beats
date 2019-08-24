@@ -19,5 +19,20 @@
 
 package ecs
 
-// Version is the Elastic Common Schema version from which this was generated.
-const Version = "1.1.0"
+// The hash fields represent different hash algorithms and their values.
+// Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields
+// for other hashes by lowercasing the hash algorithm name and using underscore
+// separators as appropriate (snake case, e.g. sha3_512).
+type Hash struct {
+	// MD5 hash.
+	Md5 string `ecs:"md5"`
+
+	// SHA1 hash.
+	Sha1 string `ecs:"sha1"`
+
+	// SHA256 hash.
+	Sha256 string `ecs:"sha256"`
+
+	// SHA512 hash.
+	Sha512 string `ecs:"sha512"`
+}
