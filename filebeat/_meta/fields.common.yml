@@ -35,12 +35,6 @@
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file.
 
-    - name: event.sequence
-      type: long
-      required: false
-      description: >
-        The sequence number of this event.
-
     - name: syslog.facility
       type: long
       required: false
@@ -111,11 +105,6 @@
         docker.attrs contains labels and environment variables written by docker's JSON File logging driver.
         These fields are only available when they are configured in the logging driver options.
 
-    - name: event.code
-      type: keyword
-      description: >
-        The code for the log message.
-
     - name: icmp.code
       type: keyword
       description: >
@@ -130,26 +119,6 @@
       type: keyword
       description: >
         IGMP type.
-
-    - name: source.as.number
-      type: long
-      description: >
-        Autonomous system number.
-
-    - name: destination.as.number
-      type: long
-      description: >
-        Autonomous system number.
-
-    - name: source.as.organization.name
-      type: keyword
-      description: >
-        Name of organization associated with the autonomous system.
-
-    - name: destination.as.organization.name
-      type: keyword
-      description: >
-        Name of organization associated with the autonomous system.
 
     - name: kafka
       type: group
