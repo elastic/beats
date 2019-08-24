@@ -207,7 +207,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
 - New processor: `truncate_fields`. {pull}11297[11297]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring cluster. {pull}9260[9260]
-- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
+- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}11394[11394]
 - Add `add_observer_metadata` processor. {pull}11394[11394]
 - Add `decode_csv_fields` processor. {pull}11753[11753]
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
@@ -227,7 +227,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - add_host_metadata is now GA. {pull}13148[13148]
 - Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
 - add_host_metadata is no GA. {pull}13148[13148]
-- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}NNNN[NNNN]
+- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
 
 *Auditbeat*
 
