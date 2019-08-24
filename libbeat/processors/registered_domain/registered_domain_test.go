@@ -41,6 +41,7 @@ func TestProcessorRun(t *testing.T) {
 
 		{true, "com", ""},
 		{true, "", ""},
+		{true, "localhost", ""},
 	}
 
 	c := defaultConfig()

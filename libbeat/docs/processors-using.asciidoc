@@ -1162,6 +1162,8 @@ For example, given `www.google.co.uk` the processor would output `google.co.uk`.
 In other words the "registered domain" is the effective top-level domain
 (`co.uk`) plus one level (`google`).
 
+This processor uses the Mozilla Public Suffix list to determine the value.
+
 [source,yaml]
 ----
 processors:

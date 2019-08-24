@@ -73,7 +73,7 @@ func (p *processor) String() string {
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	v, err := event.GetValue(p.Field)
 	if err != nil {
-		if p.IgnoreMissing {
+		if p.IgnoreMissing || p.IgnoreFailure {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "registered_domain source field [%v] not found", p.Field)
