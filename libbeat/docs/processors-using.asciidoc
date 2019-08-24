@@ -1071,12 +1071,18 @@ processors:
      when:
         condition
      fields: ["field1", "field2", ...]
+     ignore_missing: false
 -----------------------------------------------------
 
 See <<conditions>> for a list of supported conditions.
 
 NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
+
+The `drop_fields` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If `true` the processor will not return an error
+when a specified field does not exist. Defaults to `false`.
 
 [[extract-array]]
 === Extract array

@@ -189,6 +189,7 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 	e.Timestamp = startTime
 	e.Took = 115 * time.Microsecond
 	e.Host = ms.Host()
+	e.Period = 10 * time.Second
 	if e.Namespace == "" {
 		e.Namespace = ms.Registration().Namespace
 	}

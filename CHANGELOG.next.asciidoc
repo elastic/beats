@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add new Dashboard for PostgreSQL database stats {pull}13187[13187]
 - Add new dashboard for CouchDB database {pull}13198[13198]
 - Add new dashboard for Ceph cluster stats {pull}13216[13216]
 - Add new dashboard for Aerospike database stats {pull}13217[13217]
@@ -132,6 +133,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
+- Change iis url.path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225]
 
 *Heartbeat*
 
@@ -172,6 +174,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
 - Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
 - Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
+- Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
 
 *Packetbeat*
 
@@ -221,7 +224,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
 - Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
 - Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
-- add_host_metadata is no GA. {pull}13148[13148]
+- add_host_metadata is now GA. {pull}13148[13148]
+- Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
 
 *Auditbeat*
 
@@ -320,7 +324,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
 - Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
 - Add AWS ebs metricset. {pull}13167[13167] {issue}11699[11699]
+- Add `metricset.period` field with the configured fetching period. {pull}13242[13242] {issue}12616[12616]
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
+- Add Performance metricset to Oracle module {pull}12547[12547]
 
 *Packetbeat*
 
