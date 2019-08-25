@@ -8,6 +8,7 @@ package socket
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -145,6 +146,7 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 		m.log.Info("Bootstrapped process table using /proc")
 	}
 
+	m.log.Infof("%s dataset is running.", fullName)
 	// Dispatch loop.
 	for running := true; running; {
 		select {
@@ -235,7 +237,7 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	functions, err := LoadTracingFunctions(traceFS)
 	if err != nil {
-		return errors.Wrap(err, "cannot load available_filter_functions. Check the mount point for your tracefs/debugfs and permissions")
+		m.log.Debugf("Can't load available_tracing_functions. Using alternative. err=%v", err)
 	}
 
 	//
@@ -245,7 +247,13 @@ func (m *MetricSet) Setup() (err error) {
 		if exists, _ := m.templateVars.HasKey(varName); exists {
 			return fmt.Errorf("variable %s overwrites existing key", varName)
 		}
-		selected, found := functions.FirstOf(alternatives)
+		found := false
+		var selected string
+		for _, selected = range alternatives {
+			if found = m.isKernelFunctionAvailable(selected, functions); found {
+				break
+			}
+		}
 		if !found {
 			return fmt.Errorf("none of the required functions for %s is found. One of %v is required", varName, alternatives)
 		}
@@ -260,8 +268,9 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	for _, probeDef := range installKProbes {
 		probeDef = probeDef.ApplyTemplate(m.templateVars)
-		if !functions.Contains(probeDef.Probe.Address) {
-			return fmt.Errorf("required function '%s' is not available for tracing in the current kernel (%s)", probeDef.Probe.Address, kernelVersion)
+		name := probeDef.Probe.Address
+		if !m.isKernelFunctionAvailable(name, functions) {
+			return fmt.Errorf("required function '%s' is not available for tracing in the current kernel (%s)", name, kernelVersion)
 		}
 	}
 
@@ -278,9 +287,14 @@ func (m *MetricSet) Setup() (err error) {
 	}
 
 	if m.isDetailed {
+		names := make([]string, 0, len(m.templateVars))
+		for name := range m.templateVars {
+			names = append(names, name)
+		}
+		sort.Strings(names)
 		m.log.Debugf("%d template variables in use:", len(m.templateVars))
-		for key, value := range m.templateVars {
-			m.detailLog.Debugf("  %s = %v", key, value)
+		for _, key := range names {
+			m.detailLog.Debugf("  %s = %v", key, m.templateVars[key])
 		}
 	}
 
@@ -339,6 +353,23 @@ func (m *MetricSet) clockSyncLoop(interval time.Duration, done <-chan struct{}) 
 			triggerClockSync()
 		}
 	}
+}
+
+func (m *MetricSet) isKernelFunctionAvailable(name string, tracingFns common.StringSet) bool {
+	if tracingFns.Count() != 0 {
+		return tracingFns.Has(name)
+	}
+	defer m.installer.UninstallInstalled()
+	checkProbe := helper.ProbeDef{
+		Probe: tracing.Probe{
+			Name:      "check_" + name,
+			Address:   name,
+			Fetchargs: "%ax:u64", // dump decoder needs it.
+		},
+		Decoder: tracing.NewDumpDecoder,
+	}
+	_, _, err := m.installer.Install(checkProbe)
+	return err == nil
 }
 
 func triggerClockSync() {

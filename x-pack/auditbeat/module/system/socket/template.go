@@ -48,34 +48,16 @@ func syscallAlternatives(syscall string) []string {
 	}
 }
 
-type stringSet map[string]struct{}
-
-// Contains returns if a string is contained in the set.
-func (fns stringSet) Contains(fn string) bool {
-	_, found := fns[fn]
-	return found
-}
-
-// FirstOf returns the first string in the list that is contained in the set.
-func (fns stringSet) FirstOf(list []string) (string, bool) {
-	for _, alt := range list {
-		if fns.Contains(alt) {
-			return alt, true
-		}
-	}
-	return "", false
-}
-
-// LoadTracingFunctions reads <tracefs>/available_filter_functions which contains
-// all the symbols where kprobes can be attached.
-func LoadTracingFunctions(tfs *tracing.TraceFS) (stringSet, error) {
+func LoadTracingFunctions(tfs *tracing.TraceFS) (common.StringSet, error) {
 	fnList, err := tfs.AvailableFilterFunctions()
 	if err != nil {
 		return nil, err
 	}
-	functions := make(map[string]struct{}, len(fnList))
+	// This uses make() instead of common.MakeStringSet() because the later
+	// doesn't allow to create empty sets.
+	functions := common.StringSet(make(map[string]struct{}, len(fnList)))
 	for _, fn := range fnList {
-		functions[fn] = struct{}{}
+		functions.Add(fn)
 	}
 	return functions, nil
 }
