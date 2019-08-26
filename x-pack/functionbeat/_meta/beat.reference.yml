@@ -47,6 +47,10 @@ functionbeat.provider.aws.functions:
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
 
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
     # combination of these.
@@ -91,6 +95,10 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -141,6 +149,10 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested

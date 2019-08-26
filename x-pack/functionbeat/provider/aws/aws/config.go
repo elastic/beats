@@ -49,6 +49,7 @@ type LambdaConfig struct {
 	Timeout          time.Duration     `config:"timeout" validate:"nonzero,positive"`
 	Role             string            `config:"role"`
 	VPCConfig        *vpcConfig        `config:"virtual_private_cloud"`
+	Tags             map[string]string `config:"tags"`
 }
 
 // Validate checks a LambdaConfig
