@@ -61,7 +61,7 @@ func init() {
 	makePathFlag("path.logs", "Logs path")
 }
 
-// ConditionalOverrideChecker checks if a config should be overwritten.
+// OverrideChecker checks if a config should be overwritten.
 type OverrideChecker func(*common.Config) bool
 
 // ConditionalOverride stores a config which needs to overwrite the existing config based on the
