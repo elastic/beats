@@ -1,0 +1,44 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.modbus"
+
+        - from: "zeek.modbus.id.orig_h"
+          to: "source.ip"
+
+        - from: "zeek.modbus.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.modbus.id.resp_h"
+          to: "destination.ip"
+
+        - from: "zeek.modbus.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.modbus.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.modbus.func"
+          to: "zeek.modbus.function"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+{{ end }}

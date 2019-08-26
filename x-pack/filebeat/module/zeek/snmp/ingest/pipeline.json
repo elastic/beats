@@ -1,0 +1,36 @@
+{
+  "description": "Pipeline for normalizing Zeek snmp.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.snmp.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.snmp.ts"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.snmp.up_since",
+        "target_field": "zeek.snmp.up_since",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.snmp.up_since != null"
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

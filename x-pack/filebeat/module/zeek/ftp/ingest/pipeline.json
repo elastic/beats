@@ -1,0 +1,34 @@
+{
+  "description": "Pipeline for normalizing Zeek ftp.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.ftp.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.ftp.ts"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "data_channel.passive",
+        "path": "zeek.ftp"
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

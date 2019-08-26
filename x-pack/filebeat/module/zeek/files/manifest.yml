@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/files.log
   - name: tags
     default: [zeek.files]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.json
 input: config/files.yml

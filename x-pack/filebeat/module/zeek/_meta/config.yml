@@ -9,9 +9,17 @@
     enabled: true
   files:
     enabled: true
+  ftp:
+    enabled: true
   http:
     enabled: true
+  irc:
+    enabled: true
   kerberos:
+    enabled: true
+  modbus:
+    enabled: true
+  mysql:
     enabled: true
   notice:
     enabled: true
@@ -19,15 +27,27 @@
     enabled: true
   pe:
     enabled: true
+  radius:
+    enabled: true
   sip:
     enabled: true
   smb_files:
     enabled: true
   smb_mapping:
     enabled: true
+  smtp:
+    enabled: true
+  snmp:
+    enabled: true
+  socks:
+    enabled: true
   ssh:
     enabled: true
   ssl:
+    enabled: true
+  syslog:
+    enabled: true
+  weird:
     enabled: true
   x509:
     enabled: true

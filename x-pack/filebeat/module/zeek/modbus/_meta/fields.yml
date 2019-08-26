@@ -1,0 +1,20 @@
+- name: modbus
+  type: group
+  description: >
+    Fields exported by the Zeek SSH log
+  fields:
+    - name: function
+      type: keyword
+      description: |
+        The name of the function message that was sent.
+
+    - name: exception
+      type: keyword
+      description: |
+        The exception if the response was a failure.
+
+    - name: track_address
+      type: integer
+      description: |
+        (present if policy/protocols/modbus/track-memmap.bro is loaded)
+

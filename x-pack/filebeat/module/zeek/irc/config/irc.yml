@@ -1,0 +1,50 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.irc"
+
+        - from: "zeek.irc.id.orig_h"
+          to: "source.ip"
+
+        - from: "zeek.irc.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.irc.id.resp_h"
+          to: "destination.ip"
+
+        - from: "zeek.irc.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.irc.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.irc.dcc_file_name"
+          to: "zeek.irc.dcc.file.name"
+
+        - from: "zeek.irc.dcc_file_size"
+          to: "zeek.irc.dcc.file.size"
+
+        - from: "zee.irc.dcc_mime_type"
+          to: "zeek.irc.dcc.mime_type"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+{{ end }}

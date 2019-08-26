@@ -1,0 +1,45 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.syslog"
+
+        - from: "zeek.syslog.id.orig_h"
+          to: "source.ip"
+
+        - from: "zeek.syslog.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.syslog.id.resp_h"
+          to: "destination.ip"
+
+        - from: "zeek.syslog.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.syslog.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.syslog.proto"
+          to: "network.transport"
+
+        - from: "zeek.syslog.message"
+          to: "zeek.syslog.msg"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+{{ end }}

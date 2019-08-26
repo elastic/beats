@@ -1,7 +1,7 @@
 - name: x509
   type: group
   description: >
-    Fields exported by the Zeek SSH log
+    Fields exported by the Zeek x509 log
   fields:
     - name: id
       type: keyword
@@ -104,12 +104,12 @@
             Certificate validity timestamps
           fields:
             - name: from
-              type: keyword
+              type: date
               description: >
                 Timestamp before when certificate is not valid.
 
             - name: until
-              type: keyword
+              type: date
               description: >
                 Timestamp after when certificate is not valid.
 

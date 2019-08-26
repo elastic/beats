@@ -18,6 +18,21 @@ processors:
 
         - from: "zeek.files.conn_uids"
           to: "zeek.files.session_ids"
-              
+
+        - from: "zeek.files.missing_bytes"
+          to: "zeek.files.bytes.missing"
+
+        - from: "zeek.files.overflow_bytes"
+          to: "zeek.files.bytes.overflow"
+
+        - from: "zeek.files.seen_bytes"
+          to: "zeek.files.bytes.seen"
+
+        - from: "zeek.files.total_bytes"
+          to: "zeek.files.bytes.total"
+
+        - from: "zeek.files.timedout"
+          to: "zeek.files.timed_out"
+
       ignore_missing: true
       fail_on_error: false

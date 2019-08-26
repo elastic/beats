@@ -1,0 +1,53 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: udp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.snmp"
+
+        - from: "zeek.snmp.id.orig_h"
+          to: "source.ip"
+
+        - from: "zeek.snmp.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.snmp.id.resp_h"
+          to: "destination.ip"
+
+        - from: "zeek.snmp.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.snmp.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.snmp.get_requests"
+          to: "zeek.snmp.get.requests"
+
+        - from: "zeek.snmp.get_bulk_requests"
+          to: "zeek.snmp.get.bulk_requests"
+
+        - from: "zeek.snmp.get_responses"
+          to: "zeek.snmp.get.responses"
+
+        - from: "zeek.snmp.set_requests"
+          to: "zeek.snmp.set.requests"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+{{ end }}

@@ -39,22 +39,22 @@
         Timestamps of the file
       fields:
         - name: accessed
-          type: keyword
+          type: date
           description: >
             The file's access time
 
         - name: changed
-          type: keyword
+          type: date
           description: >
             The file's change time
 
         - name: created
-          type: keyword
+          type: date
           description: >
             The file's create time
 
         - name: modified
-          type: keyword
+          type: date
           description: >
             The file's modify time
 

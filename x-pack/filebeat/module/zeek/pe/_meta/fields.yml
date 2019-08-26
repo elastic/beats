@@ -19,7 +19,7 @@
         The target machine that the file was compiled for.
 
     - name: compile_time
-      type: keyword
+      type: date
       description: >
         The time that the file was created at.
 

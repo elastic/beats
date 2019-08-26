@@ -31,13 +31,6 @@
         "source": "ctx.zeek.files.tx_host = ctx.zeek.files.tx_hosts[0]; ctx.zeek.files.remove('tx_hosts');",
         "ignore_failure": true
       }
-    },
-    {
-      "set": {
-        "field": "event.id",
-        "value": "{{zeek.session_id}}",
-        "if": "ctx.zeek.session_id != null"
-      }
     }
   ],
   "on_failure" : [{

@@ -36,10 +36,10 @@
       type: group
       fields:
         - name: from
-          type: keyword
+          type: date
 
         - name: until
-          type: keyword
+          type: date
 
         - name: days
           type: integer

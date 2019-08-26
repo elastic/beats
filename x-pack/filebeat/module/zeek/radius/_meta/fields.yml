@@ -1,0 +1,49 @@
+- name: radius
+  type: group
+  description: >
+    Fields exported by the Zeek Radius log
+  fields:
+    - name: username
+      type: keyword
+      description: |
+        The username, if present.
+
+    - name: mac
+      type: keyword
+      description: |
+        MAC address, if present.
+
+    - name: framed_addr
+      type: ip
+      description: |
+        The address given to the network access server, if present. This is only a hint from the RADIUS server and the network access server is not required to honor the address.
+
+    - name: remote_ip
+      type: ip
+      description: |
+        Remote IP address, if present. This is collected from the Tunnel-Client-Endpoint attribute.
+
+    - name: connect_info
+      type: keyword
+      description: |
+        Connect info, if present.
+
+    - name: reply_msg
+      type: keyword
+      description: |
+        Reply message from the server challenge. This is frequently shown to the user authenticating.
+
+    - name: result
+      type: keyword
+      description: |
+        Successful or failed authentication.
+
+    - name: ttl
+      type: integer
+      description: |
+        The duration between the first request and either the “Access-Accept” message or an error. If the field is empty, it means that either the request or response was not seen.
+
+    - name: logged
+      type: boolean
+      description: |
+        Whether this has already been logged and can be ignored.
