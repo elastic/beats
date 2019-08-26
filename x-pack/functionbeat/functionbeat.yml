@@ -181,9 +181,9 @@ functionbeat.provider.aws.functions:
         #starting_position: "trim_horizon"
 
   # Create a function that accepts Cloudwatch logs from Kinesis streams.
-  - name: cloudwatch_kinesis
+  - name: cloudwatch_logs_kinesis
     enabled: false
-    type: cloudwatch_kinesis
+    type: cloudwatch_logs_kinesis
 
     # Description of the method to help identify them when you run multiples functions.
     description: "lambda function for Cloudwatch logs in Kinesis events"

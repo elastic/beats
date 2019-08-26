@@ -6,7 +6,6 @@ package aws
 
 import (
 	"context"
-	"sort"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -22,6 +21,7 @@ import (
 
 // CloudwatchKinesis receives events from a kinesis stream and forward them to elasticsearch.
 type CloudwatchKinesis struct {
+	*Kinesis
 	log    *logp.Logger
 	config *CloudwatchKinesisConfig
 }
@@ -39,7 +39,17 @@ func NewCloudwatchKinesis(provider provider.Provider, cfg *common.Config) (provi
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
 	}
-	return &CloudwatchKinesis{log: logp.NewLogger("cloudwatch_kinesis"), config: config}, nil
+
+	logger := logp.NewLogger("cloudwatch_logs_kinesis")
+
+	return &CloudwatchKinesis{
+		Kinesis: &Kinesis{
+			config: config.KinesisConfig,
+			log:    logger,
+		},
+		log:    logger,
+		config: config,
+	}, nil
 }
 
 func defaultCloudwatchKinesisConfig() *CloudwatchKinesisConfig {
@@ -58,22 +68,22 @@ func CloudwatchKinesisDetails() *feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (k *CloudwatchKinesis) Run(_ context.Context, client core.Client) error {
-	lambda.Start(k.createHandler(client))
+func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client) error {
+	lambda.Start(c.createHandler(client))
 	return nil
 }
 
-func (k *CloudwatchKinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
+func (c *CloudwatchKinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
 	return func(request events.KinesisEvent) error {
-		k.log.Debugf("The handler receives %d events", len(request.Records))
+		c.log.Debugf("The handler receives %d events", len(request.Records))
 
-		events, err := transformer.CloudwatchKinesisEvent(request, k.config.Base64Encoded, k.config.Compressed)
+		events, err := transformer.CloudwatchKinesisEvent(request, c.config.Base64Encoded, c.config.Compressed)
 		if err != nil {
 			return err
 		}
 
 		if err := client.PublishAll(events); err != nil {
-			k.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
+			c.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
 			return err
 		}
 		client.Wait()
@@ -82,65 +92,22 @@ func (k *CloudwatchKinesis) createHandler(client core.Client) func(request event
 }
 
 // Name return the name of the lambda function.
-func (k *CloudwatchKinesis) Name() string {
-	return "cloudwatch_kinesis"
+func (c *CloudwatchKinesis) Name() string {
+	return "cloudwatch_logs_kinesis"
 }
 
 // LambdaConfig returns the configuration to use when creating the lambda.
-func (k *CloudwatchKinesis) LambdaConfig() *LambdaConfig {
-	return k.config.LambdaConfig
+func (c *CloudwatchKinesis) LambdaConfig() *LambdaConfig {
+	return c.config.LambdaConfig
 }
 
 // Template returns the cloudformation template for configuring the service with the specified
 // triggers.
-func (k *CloudwatchKinesis) Template() *cloudformation.Template {
-	template := cloudformation.NewTemplate()
-	prefix := func(suffix string) string {
-		return NormalizeResourceName("fnb" + k.config.Name + suffix)
-	}
-
-	for _, trigger := range k.config.Triggers {
-		resourceName := prefix(k.Name() + trigger.EventSourceArn)
-		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
-			BatchSize:        trigger.BatchSize,
-			EventSourceArn:   trigger.EventSourceArn,
-			FunctionName:     cloudformation.GetAtt(prefix(""), "Arn"),
-			StartingPosition: trigger.StartingPosition.String(),
-		}
-	}
-
-	return template
+func (c *CloudwatchKinesis) Template() *cloudformation.Template {
+	return c.Kinesis.Template()
 }
 
 // Policies returns a slice of policy to add to the lambda role.
-func (k *CloudwatchKinesis) Policies() []cloudformation.AWSIAMRole_Policy {
-	resources := make([]string, len(k.config.Triggers))
-	for idx, trigger := range k.config.Triggers {
-		resources[idx] = trigger.EventSourceArn
-	}
-
-	// Give us a chance to generate the same document indenpendant of the changes,
-	// to help with updates.
-	sort.Strings(resources)
-
-	policies := []cloudformation.AWSIAMRole_Policy{
-		cloudformation.AWSIAMRole_Policy{
-			PolicyName: cloudformation.Join("-", []string{"fnb", "kinesis", k.config.Name}),
-			PolicyDocument: map[string]interface{}{
-				"Statement": []map[string]interface{}{
-					map[string]interface{}{
-						"Action": []string{
-							"kinesis:GetRecords",
-							"kinesis:GetShardIterator",
-							"Kinesis:DescribeStream",
-						},
-						"Effect":   "Allow",
-						"Resource": resources,
-					},
-				},
-			},
-		},
-	}
-
-	return policies
+func (c *CloudwatchKinesis) Policies() []cloudformation.AWSIAMRole_Policy {
+	return c.Kinesis.Policies()
 }

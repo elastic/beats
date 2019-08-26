@@ -27,7 +27,7 @@ var Bundle = provider.MustCreate(
 ).MustAddFunction("sqs",
 	aws.NewSQS,
 	aws.SQSDetails(),
-).MustAddFunction("cloudwatch_kinesis",
+).MustAddFunction("cloudwatch_logs_kinesis",
 	aws.NewCloudwatchKinesis,
 	aws.CloudwatchKinesisDetails(),
 ).Bundle()
