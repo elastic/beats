@@ -21,7 +21,6 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -30,13 +29,12 @@ import (
 
 // Settings contains basic settings for any beat to pass into GenRootCmd
 type Settings struct {
-	Name                       string
-	IndexPrefix                string
-	Version                    string
-	Monitoring                 report.Settings
-	RunFlags                   *pflag.FlagSet
-	ConfigOverrides            *common.Config
-	ConditionalConfigOverrides []cfgfile.ConditionalOverride
+	Name            string
+	IndexPrefix     string
+	Version         string
+	Monitoring      report.Settings
+	RunFlags        *pflag.FlagSet
+	ConfigOverrides []cfgfile.ConditionalOverride
 
 	DisableConfigResolver bool
 

@@ -78,7 +78,7 @@ func TestInitKibanaConfig(t *testing.T) {
 	assert.Equal(t, "testidx", b.Info.IndexPrefix)
 	assert.Equal(t, "0.9", b.Info.Version)
 
-	cfg, err := cfgfile.Load("../test/filebeat_test.yml", nil, nil)
+	cfg, err := cfgfile.Load("../test/filebeat_test.yml", nil)
 	err = cfg.Unpack(&b.Config)
 	assert.NoError(t, err)
 

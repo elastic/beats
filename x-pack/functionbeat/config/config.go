@@ -15,11 +15,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// ConfigOverrides overrides the defaults provided by libbeat.
 var (
 	functionPattern = "^[A-Za-z][A-Za-z0-9\\-]{0,139}$"
 	functionRE      = regexp.MustCompile(functionPattern)
-	ConfigOverrides = common.MustNewConfigFrom(map[string]interface{}{
+	configOverrides = common.MustNewConfigFrom(map[string]interface{}{
 		"path.data":              "/tmp",
 		"path.logs":              "/tmp/logs",
 		"logging.to_stderr":      true,
@@ -42,8 +41,12 @@ var (
 		},
 	})
 
-	// ConditionalOverrides contans the overrides based on the output.
-	ConditionalOverrides = []cfgfile.ConditionalOverride{
+	// Overrides overrides the default configuration provided by libbeat.
+	Overrides = []cfgfile.ConditionalOverride{
+		cfgfile.ConditionalOverride{
+			Check:  always,
+			Config: configOverrides,
+		},
 		cfgfile.ConditionalOverride{
 			Check:  isLogstash,
 			Config: logstashOverrides,
@@ -78,6 +81,10 @@ var DefaultConfig = Config{}
 // DefaultFunctionConfig is the default configuration for new function.
 var DefaultFunctionConfig = FunctionConfig{
 	Enabled: true,
+}
+
+var always = func(_ *common.Config) bool {
+	return true
 }
 
 var isLogstash = func(cfg *common.Config) bool {

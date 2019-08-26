@@ -121,7 +121,7 @@ func HandleFlags() error {
 // structure. If path is empty this method reads from the configuration
 // file specified by the '-c' command line flag.
 func Read(out interface{}, path string) error {
-	config, err := Load(path, nil, nil)
+	config, err := Load(path, nil)
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ func Read(out interface{}, path string) error {
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
-func Load(path string, beatOverrides *common.Config, conditionalOverrides []ConditionalOverride) (*common.Config, error) {
+func Load(path string, beatOverrides []ConditionalOverride) (*common.Config, error) {
 	var config *common.Config
 	var err error
 
@@ -159,9 +159,17 @@ func Load(path string, beatOverrides *common.Config, conditionalOverrides []Cond
 	}
 
 	if beatOverrides != nil {
+		merged := defaults
+		for _, o := range beatOverrides {
+			if o.Check(config) {
+				merged, err = common.MergeConfigs(merged, o.Config)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 		config, err = common.MergeConfigs(
-			defaults,
-			beatOverrides,
+			merged,
 			config,
 			overwrites,
 		)
@@ -174,17 +182,6 @@ func Load(path string, beatOverrides *common.Config, conditionalOverrides []Cond
 			config,
 			overwrites,
 		)
-	}
-
-	if conditionalOverrides != nil {
-		for _, o := range conditionalOverrides {
-			if o.Check(config) {
-				config, err = common.MergeConfigs(config, o.Config)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
 	}
 
 	config.PrintDebugf("Complete configuration loaded:")

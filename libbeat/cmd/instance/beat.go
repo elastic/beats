@@ -557,7 +557,7 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
-	cfg, err := cfgfile.Load("", settings.ConfigOverrides, settings.ConditionalConfigOverrides)
+	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
 	}
