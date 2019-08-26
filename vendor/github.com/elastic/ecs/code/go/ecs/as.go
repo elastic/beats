@@ -19,5 +19,15 @@
 
 package ecs
 
-// Version is the Elastic Common Schema version from which this was generated.
-const Version = "1.1.0"
+// An autonomous system (AS) is a collection of connected Internet Protocol
+// (IP) routing prefixes under the control of one or more network operators on
+// behalf of a single administrative entity or domain that presents a common,
+// clearly defined routing policy to the internet.
+type AS struct {
+	// Unique number allocated to the autonomous system. The autonomous system
+	// number (ASN) uniquely identifies each network on the Internet.
+	Number int64 `ecs:"number"`
+
+	// Organization name.
+	OrganizationName string `ecs:"organization.name"`
+}

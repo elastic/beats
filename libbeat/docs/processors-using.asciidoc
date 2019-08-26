@@ -222,6 +222,7 @@ endif::[]
  * <<drop-fields,`drop_fields`>>
  * <<extract-array,`extract_array`>>
  * <<include-fields,`include_fields`>>
+ * <<processor-registered-domain,`registered_domain`>>
  * <<rename-fields,`rename`>>
 ifdef::has_script_processor[]
  * <<processor-script,`script`>>
@@ -1071,12 +1072,18 @@ processors:
      when:
         condition
      fields: ["field1", "field2", ...]
+     ignore_missing: false
 -----------------------------------------------------
 
 See <<conditions>> for a list of supported conditions.
 
 NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
+
+The `drop_fields` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If `true` the processor will not return an error
+when a specified field does not exist. Defaults to `false`.
 
 [[extract-array]]
 === Extract array
@@ -1145,6 +1152,40 @@ section.
 
 NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
+
+[[processor-registered-domain]]
+=== Registered Domain
+
+The `registered_domain` processor reads a field containing a hostname and then
+writes the "registered domain" contained in the hostname to the target field.
+For example, given `www.google.co.uk` the processor would output `google.co.uk`.
+In other words the "registered domain" is the effective top-level domain
+(`co.uk`) plus one level (`google`).
+
+This processor uses the Mozilla Public Suffix list to determine the value.
+
+[source,yaml]
+----
+processors:
+- registered_domain:
+    field: dns.question.name
+    target_field: dns.question.registered_domain
+    ignore_missing: true
+    ignore_failure: true
+----
+
+The `registered_domain` processor has the following configuration settings:
+
+.Registered Domain options
+[options="header"]
+|======
+| Name             | Required | Default    | Description                                                      |
+| `field`          | yes      |            | Source field containing a fully qualified domain name (FQDN).    |
+| `target_field`   | yes      |            | Target field for the registered domain value.                    |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                  |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                     |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging. |
+|======
 
 [[rename-fields]]
 === Rename fields from events
@@ -1904,15 +1945,15 @@ If a layout does not contain a year then the current year in the specified
 .Timestamp options
 [options="header"]
 |======
-| Name             | Required | Default    | Description                                                                                 |
-| `field`          | yes      |            | Source field containing the time to be parsed.                                              |
-| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.          |
-| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format.                               |
-| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone. |
-| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                             |
-| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                |
-| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.               |
-| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                            |
+| Name             | Required | Default    | Description                                                                                                           |
+| `field`          | yes      |            | Source field containing the time to be parsed.                                                                        |
+| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.                                    |
+| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |
+| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone.                           |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                                                       |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                                          |
+| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.                                         |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                                                      |
 |======
 
 Here is an example that parses the `start_time` field and writes the result

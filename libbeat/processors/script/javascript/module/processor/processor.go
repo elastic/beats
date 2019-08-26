@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/dissect"
 	"github.com/elastic/beats/libbeat/processors/dns"
 	"github.com/elastic/beats/libbeat/processors/extract_array"
+	"github.com/elastic/beats/libbeat/processors/registered_domain"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/libbeat/processors/timestamp"
 )
@@ -61,6 +62,7 @@ var constructors = map[string]processors.Constructor{
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
 	"ExtractArray":          extract_array.New,
+	"RegisteredDomain":      registered_domain.New,
 	"Rename":                actions.NewRenameFields,
 	"Timestamp":             timestamp.New,
 	"TruncateFields":        actions.NewTruncateFields,
