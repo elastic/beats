@@ -791,6 +791,12 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .RegisteredDomain({
+            ignore_failure: true,
+            ignore_missing: true,
+            field: "dns.question.name",
+            target_field: "dns.question.registered_domain",
+        })
         .Add(translateDnsQueryStatus)
         .Add(splitDnsQueryResults)
         .Add(setProcessNameUsingExe)
