@@ -1007,6 +1007,18 @@ processors:
      field: _temp_
      ignore_missing: true
 
+#
+# Rename some 7.x fields
+#
+ - rename:
+     field: log.original
+     target_field: event.original
+     ignore_missing: true
+ - rename:
+     field: cisco.{< .internal_prefix >}.list_id
+     target_field: cisco.{< .internal_prefix >}.rule_name
+     ignore_missing: true
+
 on_failure:
  - set:
      field: "error.message"

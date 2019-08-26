@@ -2,11 +2,11 @@
     {
         "@timestamp": "2019-08-15T16:03:31.000Z",
         "cisco.ftd.destination_interface": "input",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430002",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430002",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -36,6 +36,7 @@
         "event.code": "430002",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: ICMP client, ApplicationProtocol: ICMP, InitiatorPackets: 1, ResponderPackets: 0, InitiatorBytes: 98, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -44,7 +45,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 0,
-        "log.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: ICMP client, ApplicationProtocol: ICMP, InitiatorPackets: 1, ResponderPackets: 0, InitiatorBytes: 98, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity",
         "network.application": "icmp client",
         "network.iana_number": 1,
         "network.protocol": "icmp",
@@ -62,11 +62,11 @@
     {
         "@timestamp": "2019-08-15T16:05:33.000Z",
         "cisco.ftd.destination_interface": "input",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430003",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430003",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -98,6 +98,7 @@
         "event.dataset": "cisco.ftd",
         "event.duration": "0",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: ICMP client, ApplicationProtocol: ICMP, ConnectionDuration: 0, InitiatorPackets: 1, ResponderPackets: 1, InitiatorBytes: 98, ResponderBytes: 98, NAPPolicy: Balanced Security and Connectivity",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -106,7 +107,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 579,
-        "log.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: ICMP client, ApplicationProtocol: ICMP, ConnectionDuration: 0, InitiatorPackets: 1, ResponderPackets: 1, InitiatorBytes: 98, ResponderBytes: 98, NAPPolicy: Balanced Security and Connectivity",
         "network.application": "icmp client",
         "network.iana_number": 1,
         "network.protocol": "icmp",
@@ -124,11 +124,11 @@
     {
         "@timestamp": "2019-08-15T16:05:37.000Z",
         "cisco.ftd.destination_interface": "outside",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430002",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430002",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -169,6 +169,7 @@
         "event.code": "430002",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 8.8.8.8, SrcPort: 50074, DstPort: 53, Protocol: udp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: DNS client, ApplicationProtocol: DNS, InitiatorPackets: 1, ResponderPackets: 0, InitiatorBytes: 106, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity, DNSQuery: eu-central-1.ec2.archive.ubuntu.com, DNSRecordType: a host address",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -177,7 +178,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 1182,
-        "log.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 8.8.8.8, SrcPort: 50074, DstPort: 53, Protocol: udp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: DNS client, ApplicationProtocol: DNS, InitiatorPackets: 1, ResponderPackets: 0, InitiatorBytes: 106, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity, DNSQuery: eu-central-1.ec2.archive.ubuntu.com, DNSRecordType: a host address",
         "network.application": "dns client",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -196,11 +196,11 @@
     {
         "@timestamp": "2019-08-15T16:07:00.000Z",
         "cisco.ftd.destination_interface": "outside",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430003",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430003",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -247,6 +247,7 @@
         "event.dataset": "cisco.ftd",
         "event.duration": "0",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 8.8.8.8, SrcPort: 49264, DstPort: 53, Protocol: udp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: DNS client, ApplicationProtocol: DNS, ConnectionDuration: 0, InitiatorPackets: 2, ResponderPackets: 2, InitiatorBytes: 164, ResponderBytes: 314, NAPPolicy: Balanced Security and Connectivity, DNSQuery: siem-inside, DNSRecordType: a host address, DNSResponseType: Non-Existent Domain, DNS_TTL: 86395",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -255,7 +256,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 1821,
-        "log.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 8.8.8.8, SrcPort: 49264, DstPort: 53, Protocol: udp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: DNS client, ApplicationProtocol: DNS, ConnectionDuration: 0, InitiatorPackets: 2, ResponderPackets: 2, InitiatorBytes: 164, ResponderBytes: 314, NAPPolicy: Balanced Security and Connectivity, DNSQuery: siem-inside, DNSRecordType: a host address, DNSResponseType: Non-Existent Domain, DNS_TTL: 86395",
         "network.application": "dns client",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -274,11 +274,11 @@
     {
         "@timestamp": "2019-08-15T16:07:18.000Z",
         "cisco.ftd.destination_interface": "outside",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430002",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430002",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -316,6 +316,7 @@
         "event.code": "430002",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 52.59.244.233, SrcPort: 43228, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 2, ResponderPackets: 1, InitiatorBytes: 140, ResponderBytes: 74, NAPPolicy: Balanced Security and Connectivity",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -324,7 +325,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 2515,
-        "log.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 52.59.244.233, SrcPort: 43228, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 2, ResponderPackets: 1, InitiatorBytes: 140, ResponderBytes: 74, NAPPolicy: Balanced Security and Connectivity",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
@@ -341,11 +341,11 @@
     {
         "@timestamp": "2019-08-15T16:07:19.000Z",
         "cisco.ftd.destination_interface": "outside",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430003",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430003",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -393,6 +393,7 @@
         "event.dataset": "cisco.ftd",
         "event.duration": "1",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 52.59.244.233, SrcPort: 43228, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: Debian APT-HTTP/1.3 (1.6.11), Client: Advanced Packaging Tool, ClientVersion: 1.3, ApplicationProtocol: HTTP, WebApplication: Ubuntu, ConnectionDuration: 1, InitiatorPackets: 1359, ResponderPackets: 29001, InitiatorBytes: 97454, ResponderBytes: 41319018, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: eu-central-1.ec2.archive.ubuntu.com, URL: http://eu-central-1.ec2.archive.ubuntu.com/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -402,7 +403,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 3037,
-        "log.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 52.59.244.233, SrcPort: 43228, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: Debian APT-HTTP/1.3 (1.6.11), Client: Advanced Packaging Tool, ClientVersion: 1.3, ApplicationProtocol: HTTP, WebApplication: Ubuntu, ConnectionDuration: 1, InitiatorPackets: 1359, ResponderPackets: 29001, InitiatorBytes: 97454, ResponderBytes: 41319018, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: eu-central-1.ec2.archive.ubuntu.com, URL: http://eu-central-1.ec2.archive.ubuntu.com/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
         "network.application": [
             "Advanced Packaging Tool",
             "Ubuntu"
@@ -427,11 +427,11 @@
     {
         "@timestamp": "2019-08-16T09:33:15.000Z",
         "cisco.ftd.destination_interface": "outside",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430002",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430002",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -469,6 +469,7 @@
         "event.code": "430002",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 213.211.198.62, SrcPort: 46000, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 2, ResponderPackets: 1, InitiatorBytes: 140, ResponderBytes: 74, NAPPolicy: Balanced Security and Connectivity",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -477,7 +478,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 3919,
-        "log.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 213.211.198.62, SrcPort: 46000, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 2, ResponderPackets: 1, InitiatorBytes: 140, ResponderBytes: 74, NAPPolicy: Balanced Security and Connectivity",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
@@ -494,11 +494,11 @@
     {
         "@timestamp": "2019-08-16T09:33:15.000Z",
         "cisco.ftd.destination_interface": "outside",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430003",
+        "cisco.ftd.rule_name": [
             "default",
             "Rule-1"
         ],
-        "cisco.ftd.message_id": "430003",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Allow",
         "cisco.ftd.security.AccessControlRuleName": "Rule-1",
@@ -545,6 +545,7 @@
         "event.dataset": "cisco.ftd",
         "event.duration": "0",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 213.211.198.62, SrcPort: 46000, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: curl/7.58.0, Client: cURL, ClientVersion: 7.58.0, ApplicationProtocol: HTTP, ConnectionDuration: 0, InitiatorPackets: 6, ResponderPackets: 4, InitiatorBytes: 503, ResponderBytes: 690, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: www.eicar.org, URL: http://www.eicar.org/download/eicar_com.zip",
         "event.outcome": "allow",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -554,7 +555,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 4442,
-        "log.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 213.211.198.62, SrcPort: 46000, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: curl/7.58.0, Client: cURL, ClientVersion: 7.58.0, ApplicationProtocol: HTTP, ConnectionDuration: 0, InitiatorPackets: 6, ResponderPackets: 4, InitiatorBytes: 503, ResponderBytes: 690, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: www.eicar.org, URL: http://www.eicar.org/download/eicar_com.zip",
         "network.application": "curl",
         "network.iana_number": 6,
         "network.protocol": "http",
@@ -576,11 +576,11 @@
     {
         "@timestamp": "2019-08-16T09:35:15.000Z",
         "cisco.ftd.destination_interface": "input",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430002",
+        "cisco.ftd.rule_name": [
             "default",
             "Block-inbound-ICMP"
         ],
-        "cisco.ftd.message_id": "430002",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Block",
         "cisco.ftd.security.AccessControlRuleName": "Block-inbound-ICMP",
@@ -608,6 +608,7 @@
         "event.code": "430002",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430002: AccessControlRuleAction: Block, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Block-inbound-ICMP, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 0, ResponderPackets: 0, InitiatorBytes: 0, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity",
         "event.outcome": "block",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -616,7 +617,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 5177,
-        "log.original": "%FTD-1-430002: AccessControlRuleAction: Block, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Block-inbound-ICMP, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 0, ResponderPackets: 0, InitiatorBytes: 0, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
@@ -632,11 +632,11 @@
     {
         "@timestamp": "2019-08-14T15:09:41.000Z",
         "cisco.ftd.destination_interface": "output",
-        "cisco.ftd.list_id": [
+        "cisco.ftd.message_id": "430003",
+        "cisco.ftd.rule_name": [
             "default",
             "Intrusion-Rule"
         ],
-        "cisco.ftd.message_id": "430003",
         "cisco.ftd.security.ACPolicy": "default",
         "cisco.ftd.security.AccessControlRuleAction": "Block",
         "cisco.ftd.security.AccessControlRuleName": "Intrusion-Rule",
@@ -676,6 +676,7 @@
         "event.dataset": "cisco.ftd",
         "event.duration": "1",
         "event.module": "cisco",
+        "event.original": "%FTD-1-430003: AccessControlRuleAction: Block, AccessControlRuleReason: File Block, SrcIP: 10.0.1.20, DstIP: 10.0.100.30, SrcPort: 41544, DstPort: 8000, Protocol: tcp, IngressInterface: input, EgressInterface: output, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Intrusion-Rule, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: curl/7.58.0, Client: cURL, ClientVersion: 7.58.0, ApplicationProtocol: HTTP, ConnectionDuration: 1, FileCount: 1, InitiatorPackets: 4, ResponderPackets: 7, InitiatorBytes: 365, ResponderBytes: 1927, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: 10.0.100.30:8000, URL: http://10.0.100.30:8000/eicar_com.zip",
         "event.outcome": "block",
         "event.severity": 1,
         "event.timezone": "+00:00",
@@ -685,7 +686,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 5719,
-        "log.original": "%FTD-1-430003: AccessControlRuleAction: Block, AccessControlRuleReason: File Block, SrcIP: 10.0.1.20, DstIP: 10.0.100.30, SrcPort: 41544, DstPort: 8000, Protocol: tcp, IngressInterface: input, EgressInterface: output, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Intrusion-Rule, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: curl/7.58.0, Client: cURL, ClientVersion: 7.58.0, ApplicationProtocol: HTTP, ConnectionDuration: 1, FileCount: 1, InitiatorPackets: 4, ResponderPackets: 7, InitiatorBytes: 365, ResponderBytes: 1927, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: 10.0.100.30:8000, URL: http://10.0.100.30:8000/eicar_com.zip",
         "network.application": "curl",
         "network.iana_number": 6,
         "network.protocol": "http",
