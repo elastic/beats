@@ -46,8 +46,6 @@ type MetricSet struct {
 	topics []string
 }
 
-var errFailQueryOffset = errors.New("operation failed")
-
 var debugf = logp.MakeDebug("kafka")
 
 // New creates a new instance of the partition MetricSet.
@@ -123,7 +121,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 				if !offOK {
 					if err == nil {
-						err = errFailQueryOffset
+						err = errors.Wrap(err, "operation failed")
 					}
 
 					msg := fmt.Errorf("Failed to query kafka partition (%v:%v) offsets: %v",
