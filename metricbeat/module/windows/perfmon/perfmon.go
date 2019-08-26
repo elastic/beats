@@ -20,9 +20,8 @@
 package perfmon
 
 import (
-	"strings"
-
 	"github.com/pkg/errors"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -80,7 +79,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization of reader failed")
 	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		reader:        reader,
@@ -89,13 +87,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
+	var err error
+	// refresh performance counter list
+	if m.reader.executed {
+		err = m.reader.RefreshCounterPaths()
+	}
 	events, err := m.reader.Read()
 	if err != nil {
 		m.log.Debugw("Failed reading counters", "error", err)
 		err = errors.Wrap(err, "failed reading counters")
 		report.Error(err)
 	}
-
 	for _, event := range events {
 		report.Event(event)
 	}

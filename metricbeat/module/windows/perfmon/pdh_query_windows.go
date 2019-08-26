@@ -67,7 +67,7 @@ func (q *Query) Open() error {
 // AddCounter adds the specified counter to the query.
 func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
-		return errors.Errorf("counter %s has been already added", counterPath)
+		return nil
 	}
 	var err error
 	var instanceName string
@@ -129,6 +129,9 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	}
 	if err != nil {
 		return nil, err
+	}
+	if expdPaths == nil {
+		return nil, errors.New("No counter paths found")
 	}
 	return UTF16ToStringArray(expdPaths), nil
 }

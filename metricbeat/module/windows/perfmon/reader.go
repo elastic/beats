@@ -37,12 +37,12 @@ var (
 
 // Reader will contain the config options
 type Reader struct {
-	query             Query             // PDH Query
-	instanceLabel     map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
-	measurement       map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed          bool              // Indicates if the query has been executed.
-	log               *logp.Logger      //
-	groupMeasurements bool              // Indicates if measurements with the same instance label should be sent in the same event
+	query         Query             // PDH Query
+	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
+	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
+	executed      bool              // Indicates if the query has been executed.
+	log           *logp.Logger      //
+	config        Config            // Metricset configuration
 }
 
 // NewReader creates a new instance of Reader.
@@ -53,11 +53,11 @@ func NewReader(config Config) (*Reader, error) {
 	}
 
 	r := &Reader{
-		query:             query,
-		instanceLabel:     map[string]string{},
-		measurement:       map[string]string{},
-		log:               logp.NewLogger("perfmon"),
-		groupMeasurements: config.GroupMeasurements,
+		query:         query,
+		instanceLabel: map[string]string{},
+		measurement:   map[string]string{},
+		log:           logp.NewLogger("perfmon"),
+		config:        config,
 	}
 	for _, counter := range config.CounterConfig {
 		childQueries, err := query.ExpandWildCardPath(counter.Query)
@@ -94,8 +94,38 @@ func NewReader(config Config) (*Reader, error) {
 	return r, nil
 }
 
+// RefreshCounterPaths will recheck for any new instances and add them to the counter list
+func (r *Reader) RefreshCounterPaths() error {
+	for _, counter := range r.config.CounterConfig {
+		if !strings.Contains(counter.Query, "*") {
+			continue
+		}
+		childQueries, err := r.query.ExpandWildCardPath(counter.Query)
+		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
+			for _, v := range childQueries {
+				if err := r.query.AddCounter(v, counter, len(childQueries) > 1); err != nil {
+					r.query.Close()
+					return errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
+				}
+				r.instanceLabel[v] = counter.InstanceLabel
+				r.measurement[v] = counter.MeasurementLabel
+			}
+			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+			if err := r.query.CollectData(); err != nil {
+				return errors.Wrap(err, "failed querying counter values")
+			}
+		}
+	}
+	return nil
+}
+
 // Read executes a query and returns those values in an event.
 func (r *Reader) Read() ([]mb.Event, error) {
+	//if r.config.IgnoreNECounters && len(r.query.counters) == 0 {
+	//	return nil, nil
+	//}
+
 	if err := r.query.CollectData(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
 	}
@@ -119,7 +149,7 @@ func (r *Reader) Read() ([]mb.Event, error) {
 			}
 
 			var eventKey string
-			if r.groupMeasurements && val.Err == nil {
+			if r.config.GroupMeasurements && val.Err == nil {
 				// Send measurements with the same instance label as part of the same event
 				eventKey = val.Instance
 			} else {
