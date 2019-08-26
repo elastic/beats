@@ -21,11 +21,11 @@ import (
 //
 //  int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len) // 4.x
 //
-// We are interested on the sock* and the length.
 //
 // output:
-//  UDP_SENDMSG_LEN:+4(%sp)
-//  UDP_SENDMSG_SOCK:%dx
+//  UDP_SENDMSG_LEN: $stack4
+//  UDP_SENDMSG_SOCK: $stack2
+//  UDP_SENDMSG_MSG: $stack3
 
 func init() {
 	if err := Registry.AddGuess(&guessUDPSendMsg{}); err != nil {
@@ -54,6 +54,7 @@ func (g *guessUDPSendMsg) Provides() []string {
 	return []string{
 		"UDP_SENDMSG_SOCK",
 		"UDP_SENDMSG_LEN",
+		"UDP_SENDMSG_MSG",
 	}
 }
 
@@ -96,12 +97,14 @@ func (g *guessUDPSendMsg) Validate(ev interface{}) (common.MapStr, bool) {
 	if event.Param3 == g.length {
 		return common.MapStr{
 			"UDP_SENDMSG_SOCK": g.ctx.Vars["P1"],
+			"UDP_SENDMSG_MSG":  g.ctx.Vars["P2"],
 			"UDP_SENDMSG_LEN":  g.ctx.Vars["P3"],
 		}, true
 	}
 	if event.Param4 == g.length {
 		return common.MapStr{
 			"UDP_SENDMSG_SOCK": g.ctx.Vars["P2"],
+			"UDP_SENDMSG_MSG":  g.ctx.Vars["P3"],
 			"UDP_SENDMSG_LEN":  g.ctx.Vars["P4"],
 		}, true
 	}

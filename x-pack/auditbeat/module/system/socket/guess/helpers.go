@@ -72,11 +72,16 @@ func createSocket6WithProto(proto int, bindAddr unix.SockaddrInet6) (fd int, add
 	return fd, *addrptr, nil
 }
 
+func alignTo(offset, align int) int {
+	if offset&(align-1) != 0 {
+		offset = (offset + align) & ^(align - 1)
+	}
+	return offset
+}
+
 func indexAligned(buf []byte, needle []byte, start, align int) int {
 	n := len(needle)
-	if start&(align-1) != 0 {
-		start = (start + align) & ^(align - 1)
-	}
+	start = alignTo(start, align)
 	var off, limit int
 	for off, limit = start, len(buf)-n; off <= limit; off += align {
 		if bytes.Equal(buf[off:off+n], needle) {
@@ -261,6 +266,7 @@ func consolidate(partials []common.MapStr) (result common.MapStr, err error) {
 
 type inetClientServer struct {
 	client, server, accepted int
+	cliAddr                  unix.SockaddrInet4
 	srvAddr                  unix.SockaddrInet4
 }
 
@@ -272,7 +278,7 @@ func (cs *inetClientServer) SetupTCP() (err error) {
 	if err = unix.Listen(cs.server, 1); err != nil {
 		return err
 	}
-	if cs.client, _, err = createSocket(unix.SockaddrInet4{}); err != nil {
+	if cs.client, cs.cliAddr, err = createSocket(unix.SockaddrInet4{Addr: randomLocalIP()}); err != nil {
 		return err
 	}
 	if err = unix.Connect(cs.client, &cs.srvAddr); err != nil {
@@ -287,11 +293,11 @@ func (cs *inetClientServer) SetupTCP() (err error) {
 // SetupUDP sets up a UDP client-server connection.
 func (cs *inetClientServer) SetupUDP() (err error) {
 	cs.accepted = -1
-	cs.server, cs.srvAddr, err = createSocketWithProto(unix.SOCK_DGRAM, unix.SockaddrInet4{})
+	cs.server, cs.srvAddr, err = createSocketWithProto(unix.SOCK_DGRAM, unix.SockaddrInet4{Addr: randomLocalIP()})
 	if err != nil {
 		return err
 	}
-	if cs.client, _, err = createSocketWithProto(unix.SOCK_DGRAM, unix.SockaddrInet4{}); err != nil {
+	if cs.client, cs.cliAddr, err = createSocketWithProto(unix.SOCK_DGRAM, unix.SockaddrInet4{Addr: randomLocalIP()}); err != nil {
 		return err
 	}
 	return nil

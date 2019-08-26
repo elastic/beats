@@ -21,6 +21,8 @@ import (
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
 
+const minUdpPacketSize = 28
+
 // event is the interface that all the deserialized events from the ring-buffer
 // have to conform to in order to be processed by state.
 type event interface {
@@ -455,10 +457,8 @@ func (e *udpSendMsgCall) asFlow() flow {
 		proto:    protoUDP,
 		dir:      directionOutbound,
 		lastSeen: kernelTime(e.Meta.Timestamp),
-		// udp_sendmsg doesn't increment local counters because that's
-		// done in ip_local_out.
-		local:  newEndpointIPv4(e.LAddr, e.LPort, 0, 0),
-		remote: newEndpointIPv4(e.RAddr, e.RPort, 0, 0),
+		local:    newEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)+minUdpPacketSize),
+		remote:   newEndpointIPv4(e.RAddr, e.RPort, 0, 0),
 	}
 }
 
@@ -524,16 +524,48 @@ func (e *udpv6SendMsgCall) Update(s *state) error {
 }
 
 type udpQueueRcvSkb struct {
-	Meta  tracing.Metadata `kprobe:"metadata"`
-	Sock  uintptr          `kprobe:"sock"`
-	Size  uint32           `kprobe:"size"`
-	LAddr uint32           `kprobe:"laddr"`
-	RAddr uint32           `kprobe:"raddr"`
-	LPort uint16           `kprobe:"lport"`
-	RPort uint16           `kprobe:"rport"`
+	Meta   tracing.Metadata         `kprobe:"metadata"`
+	Sock   uintptr                  `kprobe:"sock"`
+	Size   uint32                   `kprobe:"size"`
+	LAddr  uint32                   `kprobe:"laddr"`
+	LPort  uint16                   `kprobe:"lport"`
+	IPHdr  uint16                   `kprobe:"iphdr"`
+	UDPHdr uint16                   `kprobe:"udphdr"`
+	Base   uintptr                  `kprobe:"base"`
+	Packet [pktHeaderDumpBytes]byte `kprobe:"packet,greedy"`
+}
+
+func validHeaders(ipHdr uint16, udpHdr uint16, data []byte) bool {
+	return ipHdr != 0 &&
+		int(ipHdr)+20 < len(data) &&
+		data[ipHdr]&0xF0 == 0x40 &&
+		udpHdr != 0 &&
+		int(udpHdr)+12 < len(data)
 }
 
 func (e *udpQueueRcvSkb) asFlow() flow {
+	if valid := validHeaders(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
+		// Check if we're dealing with pointers
+		// TODO: This should check for SK_BUFF_HAS_POINTERS
+		base := uint16(e.Base)
+		if e.IPHdr > base &&
+			e.UDPHdr > base {
+			ipOff := e.IPHdr - base
+			udpOff := e.UDPHdr - base
+			if valid = validHeaders(ipOff, udpOff, e.Packet[:]); valid {
+				e.IPHdr = ipOff
+				e.UDPHdr = udpOff
+			}
+		}
+		if !valid {
+			return flow{}
+		}
+	}
+	var raddr uint32
+	var rport uint16
+	// the remote is this packet's source
+	raddr = tracing.MachineEndian.Uint32(e.Packet[e.IPHdr+12:])
+	rport = tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
 	return flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -542,7 +574,7 @@ func (e *udpQueueRcvSkb) asFlow() flow {
 		dir:      directionInbound,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv4(e.LAddr, e.LPort, 0, 0),
-		remote:   newEndpointIPv4(e.RAddr, e.RPort, 1, uint64(e.Size)),
+		remote:   newEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minUdpPacketSize),
 	}
 }
 

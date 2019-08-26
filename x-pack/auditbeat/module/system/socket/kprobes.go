@@ -19,6 +19,9 @@ import (
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
 
+// Enough for padding + mac_hdr + max ip_hdr + udp_hdr
+const pktHeaderDumpBytes = 8 * 12
+
 // ProbeTransform transforms a probe before its installed.
 type ProbeTransform func(helper.ProbeDef) helper.ProbeDef
 
@@ -45,7 +48,7 @@ func (p *probeInstaller) Install(pdef helper.ProbeDef) (format tracing.ProbeForm
 		return format, decoder, errors.New("nil decoder in probe definition")
 	}
 	if err = p.traceFS.AddKProbe(pdef.Probe); err != nil {
-		return format, decoder, errors.Wrap(err, "failed installing probe")
+		return format, decoder, errors.Wrapf(err, "failed installing probe '%s'", pdef.Probe.String())
 	}
 	p.installed = append(p.installed, pdef.Probe)
 	if format, err = p.traceFS.LoadProbeFormat(pdef.Probe); err != nil {
@@ -318,7 +321,7 @@ var installKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udp_sendmsg_in",
 			Address:   "udp_sendmsg",
-			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.UDP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.UDP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16",
+			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.UDP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddr=+{{.SOCKADDR_IN_ADDR}}(+0({{.UDP_SENDMSG_MSG}})):u32  rport=+{{.SOCKADDR_IN_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpSendMsgCall) }),
 	},
@@ -327,7 +330,7 @@ var installKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udp_queue_rcv_skb",
 			Address:   "udp_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.P1}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.P1}}):u16",
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 head=+{{.SK_BUFF_HEAD}}({{.P2}}) base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, pktHeaderDumpBytes),
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpQueueRcvSkb) }),
 	},

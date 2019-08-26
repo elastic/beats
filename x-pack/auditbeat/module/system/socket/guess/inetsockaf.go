@@ -84,7 +84,7 @@ func (g *guessInetSockFamily) Probes() ([]helper.ProbeDef, error) {
 	return []helper.ProbeDef{
 		{
 			Probe: tracing.Probe{
-				Name:      "inet_sock_ipv6_guess",
+				Name:      "inet_sock_af_guess",
 				Address:   "inet_release",
 				Fetchargs: helper.MakeMemoryDump("+{{.SOCKET_SOCK}}({{.P1}})", 0, inetSockAfDumpSize),
 			},

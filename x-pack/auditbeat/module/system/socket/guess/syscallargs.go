@@ -71,7 +71,6 @@ func (g *guessSyscallArgs) Provides() []string {
 func (g *guessSyscallArgs) Requires() []string {
 	return []string{
 		"SYS_GETTIMEOFDAY",
-		"P2",
 		"SYS_P1",
 		"SYS_P2",
 	}
