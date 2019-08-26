@@ -27,6 +27,9 @@
         "dns.question.name": "dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io",
         "dns.question.registered_domain": "es.io",
         "dns.question.type": "A",
+        "dns.resolved_ip": [
+            "35.199.178.4"
+        ],
         "dns.response_code": "NOERROR",
         "event.dataset": "zeek.dns",
         "event.duration": 76967000,

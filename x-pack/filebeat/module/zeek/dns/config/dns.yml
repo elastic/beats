@@ -17,6 +17,8 @@ processors:
       lang: javascript
       id: zeek_dns_flags
       source: >
+        var net = require("net");
+
         function addDnsHeaderFlags(evt) {
             var flag = evt.Get("zeek.dns.AA");
             if (flag === true) {
@@ -68,14 +70,22 @@ processors:
                 return;
             }
 
+            var resolvedIps = [];
             var answersObjs = [];
             for (var i = 0; i < answers.length; i++) {
+                var answer = answers[i];
                 answersObjs.push({
-                    data: answers[i],
+                    data: answer,
                     ttl: ttls[i],
                 })
+                if (net.isIP(answer)) {
+                    resolvedIps.push(answer);
+                }
             }
             evt.Put("dns.answers", answersObjs);
+            if (resolvedIps.length > 0) {
+                evt.Put("dns.resolved_ip", resolvedIps);
+            }
         }
 
         function addEventDuration(evt) {
