@@ -340,6 +340,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New options to configure roles and VPC. {pull}11779[11779]
 - Export automation templates used to create functions. {pull}11923[11923]
 - Configurable Amazon endpoint. {pull}12369[12369]
+- Configurable tags for Lambda functions. {pull}13352[13352]
 
 *Winlogbeat*
 
