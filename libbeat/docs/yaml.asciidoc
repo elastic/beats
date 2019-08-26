@@ -94,3 +94,24 @@ to an integer. If not, it's converted to a float.
 To prevent unwanted type conversions, avoid using leading zeros in field values,
 or wrap the values in single quotation marks.
 
+[float]
+[[avoid-leading-zeros]]
+=== Avoid using leading zeros in numeric values
+
+If you use a leading zero (for example, `09`) in a numeric field without
+wrapping the value in single quotation marks, the value may be interpreted
+incorrectly by the YAML parser. If the value is a valid octal, it's converted
+to an integer. If not, it's converted to a float.
+
+To prevent unwanted type conversions, avoid using leading zeros in field values,
+or wrap the values in single quotation marks.
+
+[float]
+[[avoid-leading-zeros]]
+=== Get Syntax Highlighting and Validation with JSON Schema Definition Files
+
+Use https://json-schema-everywhere.github.io/yaml to get better tooltips, inline 
+documentation, intellisense, and instant schema validation while you work on 
+your yaml configuration
+
+See an example in +/etc/heartbeat/monitors.schema.json+

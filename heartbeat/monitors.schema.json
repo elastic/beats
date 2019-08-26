@@ -1,0 +1,282 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  
+  "title": "Heartbeat monitor configuration",
+  "description": "Each monitor item is an entry in a yaml list, and so begins with a dash (-). You can define the type of monitor to use, the hosts to check, and other optional settings that control Heartbeat behavior. \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html",
+
+  "definitions": {
+
+    "type": {
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "icmp",
+          "title": "Uses an ICMP (v4 and v6) Echo Request to ping the configured hosts. \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-icmp-options"
+        },
+        {
+          "const": "tcp",
+          "title": "Connects via TCP and optionally verifies the endpoint by sending and/or receiving a custom payload. \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-tcp-options"
+        },
+        {
+          "const": "http",
+          "title": "Connects via HTTP and optionally verifies that the host returns the expected response.  See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-http-options"
+        }
+      ],
+      "description": "The type of monitor to run"
+    },
+
+    "id": {
+      "type": "string",
+      "description": "A unique identifier for this configuration. This should not change with edits to the monitor configuration regardless of changes to any config fields \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-id"
+    },
+
+    "name": {
+      "type": "string",
+      "description": "Optional human readable name for this monitor."
+    },
+
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "A Boolean value that specifies whether the module is enabled."
+    },
+
+
+    "schedule": {
+      "type": "string",
+      "pattern": "(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\\d+(ns|us|µs|ms|s|m|h))+)|((((\\d+,)+\\d+|(\\d+(\\/|-)\\d+)|\\d+|\\*) ?){5,7})",
+      "description": "A cron-like expression that specifies the task schedule. \n The schedule option uses a cron-like syntax based on this cronexpr implementation, but adds the @every keyword. \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-schedule"
+    },
+
+
+    "ipv4": {
+      "type": "boolean",
+      "default": true,
+      "description": "A Boolean value that specifies whether to ping using the ipv4 protocol if hostnames are configured."
+    },
+
+    "ipv6": {
+      "type": "boolean",
+      "default": true,
+      "description": "A Boolean value that specifies whether to ping using the ipv6 protocol if hostnames are configured."
+    },
+
+    "mode": {
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "any",
+          "title": "If mode is any, the monitor pings only one IP address for a hostname"
+        },
+        {
+          "const": "all",
+          "title": "If mode is all, the monitor pings all resolvable IPs for a hostname."
+        }
+      ],
+      "default": "any",
+      "description": "Configure IP protocol types to ping on if hostnames are configured. The mode: all setting is useful if you are using a DNS-load balancer and want to ping every IP address for the specified hostname"
+    },
+
+
+    "timeout": {
+      "type": "string",
+      "pattern": "(\\d+(ns|us|µs|ms|s|m|h))+",
+      "default": "16s",
+      "description": "The total running time for each ping test. This is the total time allowed for testing the connection and exchanging data. \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-timeout"
+    },
+
+
+    "fields": {
+      "type": "object",
+      "description": "Optional fields that you can specify to add additional information to the output. For example, you might add fields that you can use for filtering log data. Fields can be scalar values, arrays, dictionaries, or any nested combination of these. \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-fields"
+    },
+
+    "fields_under_root": {
+      "type": "boolean",
+      "default": false,
+      "description": "If this option is set to true, the custom fields are stored as top-level fields in the output document instead of being grouped under a fields sub-dictionary."
+    },
+
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "A list of tags that will be sent with the monitor event"
+    },
+
+    "processors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "A list of processors to apply to the data generated by the monitor"
+    },
+
+    "hosts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "A list of hosts to ping"
+    },
+
+    "wait": {
+      "type": "string",
+      "pattern": "(\\d+(ns|us|µs|ms|s|m|h))+",
+      "default": "1s",
+      "description": "The duration to wait before emitting another ICMP Echo Request. The default is 1 second (1s)"
+    },
+
+
+    "hosts_tcp": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "A list of hosts to ping. The entries in the list can be: \n *A plain host name, such as localhost, or an IP address. \n *A hostname and port, such as localhost:12345. \n *A full URL using the syntax scheme://<host>:[port] \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-tcp-hosts"
+    },
+
+    "ports": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "description": "A list of ports to ping if the host specified in hosts does not contain a port number."
+    },
+    
+    "check.send": {
+      "type": "string",
+      "description": "An optional payload string to send to the remote host and the expected answer. Send is the payload that will be sent. \n\n  See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-tcp-check"
+    },
+
+    "check.receive": {
+      "type": "string",
+      "description": "An optional payload string to send to the remote host and the expected answer. Receive is the payload that will be expected. \n\n  See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html#monitor-tcp-check"
+    },
+
+    "proxy_url": {
+      "type": "string",
+      "pattern": "^socks5://",
+      "description": "The URL of the SOCKS5 proxy to use when connecting to the server. The value must be a URL with a scheme of socks5://"
+    },
+
+
+    "proxy_use_local_resolver": {
+      "type": "boolean",
+      "default": false,
+      "description": "A Boolean value that determines whether hostnames are resolved locally instead of being resolved on the proxy server."
+    },
+
+    "ssl": {
+      "type": "object",
+      "properties": {
+        "certificate_authorities": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "The list of root certificates for server verifications. If certificate_authorities is empty or not set, the trusted certificate authorities of the host system are used."
+        },
+        "supported_protocols": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "default": ["TLSv1.1", "TLSv1.2"],
+            "enum": ["SSLv3", "TLSv1", "TLSv1.0", "TLSv1.1", "TLSv1.2"]
+          },
+          "description": "List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions not configured, the connection will be dropped during or after the handshake."
+        }
+      },
+      "description": "The TLS/SSL connection settings. If the monitor is configured to use SSL, it will attempt an SSL handshake. \n\n See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-ssl.html"
+    },
+
+
+    "urls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^(https?|wss?|ftp)://"
+      },
+      "description": "Enter the urls you'd like to ping. Use for type=https"
+    },
+
+    "username": {
+      "type": "string",
+      "description": "The username for authenticating with the server. The credentials are passed with the request. This setting is optional."
+    },
+
+    "password": {
+      "type": "string",
+      "description": "The password for authenticating with the server."
+    }
+
+  },
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      
+      "id": {"$ref": "#/definitions/id"},
+      "name": {"$ref": "#/definitions/name"},
+      "enabled": {"$ref": "#/definitions/enabled"},
+      "schedule": {"$ref": "#/definitions/schedule"},
+
+      "ipv4": {"$ref": "#/definitions/ipv4"},
+      "ipv6": {"$ref": "#/definitions/ipv6"},
+      "mode": {"$ref": "#/definitions/mode"},
+
+      "timeout": {"$ref": "#/definitions/timeout"},
+
+      "fields": {"$ref": "#/definitions/fields"},
+      "fields_under_root": {"$ref": "#/definitions/fields_under_root"},
+      
+      "tags": {"$ref": "#/definitions/tags"},
+      "processors": {"$ref": "#/definitions/processors"},
+
+
+
+
+      "hosts": {"$ref": "#/definitions/hosts"},
+      "wait": {"$ref": "#/definitions/wait"},
+
+      "ports": {"$ref": "#/definitions/ports"},
+      "check.send": {"$ref": "#/definitions/check.send"},
+      "check.receive": {"$ref": "#/definitions/check.receive"},
+      "proxy_url": {"$ref": "#/definitions/proxy_url"},
+      "proxy_use_local_resolver": {"$ref": "#/definitions/proxy_use_local_resolver"},
+      "ssl": {"$ref": "#/definitions/ssl"},
+      
+      "urls": {"$ref": "#/definitions/urls"},
+      "username": {"$ref": "#/definitions/username"},
+      "password": {"$ref": "#/definitions/password"}
+    },
+
+    "oneOf": [
+      {
+        "properties": {
+          "type": { "const": "icmp" },
+
+          "hosts": {"$ref": "#/definitions/hosts"},
+          "wait": {"$ref": "#/definitions/wait"}
+        }
+      },
+      {
+        "properties": {
+          "type": { "const": "tcp" },
+
+          "hosts": {"$ref": "#/definitions/hosts_tcp"},
+          "ports": {"$ref": "#/definitions/ports"},
+          "check.send": {"$ref": "#/definitions/check.send"},
+          "check.receive": {"$ref": "#/definitions/check.receive"},
+          "proxy_url": {"$ref": "#/definitions/proxy_url"},
+          "proxy_use_local_resolver": {"$ref": "#/definitions/proxy_use_local_resolver"},
+          "ssl": {"$ref": "#/definitions/ssl"}
+        }
+      },
+      {
+        "properties": {
+          "type": { "const": "http" },
+
+          "urls": {"$ref": "#/definitions/urls"},
+          "username": {"$ref": "#/definitions/username"},
+          "password": {"$ref": "#/definitions/password"}
+        }
+      }
+    ],
+
+    "required": [
+      "type",
+      "id"
+    ]
+  }
+}
