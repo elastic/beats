@@ -1,9 +1,9 @@
 [
     {
         "@timestamp": "2017-10-23T14:20:12.046Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "logstash.log",
         "event.module": "logstash",
+        "event.timezone": "+00:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",
@@ -14,9 +14,9 @@
     },
     {
         "@timestamp": "2017-11-20T03:55:00.318Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "logstash.log",
         "event.module": "logstash",
+        "event.timezone": "+00:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [

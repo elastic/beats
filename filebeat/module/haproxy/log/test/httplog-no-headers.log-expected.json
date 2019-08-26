@@ -1,6 +1,5 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 0,
         "event.module": "haproxy",
@@ -36,7 +35,6 @@
         "source.port": 35982
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 0,
         "event.module": "haproxy",
@@ -72,7 +70,6 @@
         "source.port": 43738
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 0,
         "event.module": "haproxy",

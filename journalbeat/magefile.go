@@ -29,13 +29,18 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
-	mage.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
+	common.RegisterCheckDeps(Update)
 
-	mage.Platforms = mage.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
+	devtools.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
+
+	devtools.Platforms = devtools.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
 }
 
 const (
@@ -44,41 +49,36 @@ const (
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if d, ok := deps[mage.Platform.Name]; ok {
+	if d, ok := deps[devtools.Platform.Name]; ok {
 		mg.Deps(d)
 	}
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild(mage.ImageSelector(selectImage))
+	return devtools.CrossBuild(devtools.ImageSelector(selectImage))
 }
 
 // CrossBuildXPack cross-builds the beat with XPack for all target platforms.
 func CrossBuildXPack() error {
-	return mage.CrossBuildXPack(mage.ImageSelector(selectImage))
+	return devtools.CrossBuildXPack(devtools.ImageSelector(selectImage))
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon(mage.ImageSelector(selectImage))
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return mage.Clean()
+	return devtools.CrossBuildGoDaemon(devtools.ImageSelector(selectImage))
 }
 
 // Package packages the Beat for distribution.
@@ -88,16 +88,16 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseElasticBeatPackaging()
+	devtools.UseElasticBeatPackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return devtools.TestPackages()
 }
 
 // Update updates the generated files (aka make update).
@@ -107,21 +107,21 @@ func Update() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return mage.GenerateFieldsYAML()
+	return devtools.GenerateFieldsYAML()
 }
 
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // GoTestIntegration executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // -----------------------------------------------------------------------------
@@ -219,10 +219,15 @@ func selectImage(platform string) (string, error) {
 		tagSuffix = "main-debian8"
 	}
 
-	goVersion, err := mage.GoVersion()
+	goVersion, err := devtools.GoVersion()
 	if err != nil {
 		return "", err
 	}
 
-	return mage.BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
+	return devtools.BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
+}
+
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
 }

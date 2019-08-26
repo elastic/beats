@@ -16,6 +16,13 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_ml_jobs: yes
 :has_central_config:
 :has_solutions:
+:ignores_max_retries:
+:has_docker_label_ex:
+:has_decode_csv_fields_processor:
+:has_script_processor:
+:has_timestamp_processor:
+:has_modules_command:
+:has_registry:
 :deb_os:
 :rpm_os:
 :mac_os:

@@ -84,6 +84,8 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -180,7 +182,7 @@ configurations for all available {beatname_uc} modules.
 If you are using a Docker image, see <<running-on-docker>>.
 +
 The following examples enable the `apache` and `mysql` configs in the
-`modules.d` directory :
+`modules.d` directory:
 +
 *deb and rpm:*
 +
@@ -270,6 +272,10 @@ or run {beatname_uc} with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
+:requires-sudo:
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+:requires-sudo!:
+
 *win:*
 
 ["source","sh",subs="attributes"]
@@ -311,4 +317,4 @@ The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 [role="screenshot"]
-image:./images/{beatname_lc}_system_dashboard.png[{beatname_uc} Dashboard]
+image::./images/{beatname_lc}_system_dashboard.png[{beatname_uc} Dashboard]

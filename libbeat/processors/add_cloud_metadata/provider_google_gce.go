@@ -70,6 +70,6 @@ func newGceMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 		return out
 	}
 
-	fetcher, err := newMetadataFetcher(config, "gce", gceHeaders, metadataHost, gceSchema, gceMetadataURI)
+	fetcher, err := newMetadataFetcher(config, "gcp", gceHeaders, metadataHost, gceSchema, gceMetadataURI)
 	return fetcher, err
 }

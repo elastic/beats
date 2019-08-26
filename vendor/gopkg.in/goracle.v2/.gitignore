@@ -1,0 +1,6 @@
+.dsn
+*.test
+*/build/*
+*~*
+*.swp
+env.sh

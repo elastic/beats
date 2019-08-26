@@ -26,20 +26,20 @@ views on the *Discover* page. To use these searches, make sure you've
 Type `Packetbeat` in the Search field to filter the list of searches.
 
 [role="screenshot"]
-image:./images/saved-packetbeat-searches.png[Saved Packetbeat Searches]
+image::./images/saved-packetbeat-searches.png[Saved Packetbeat Searches]
 
 You can use the predefined searches to customize the columns in the Discover
 table. For example, select the *Packetbeat Search* to customize the columns in
 the Discover table:
 
 [role="screenshot"]
-image:./images/discovery-packetbeat-transactions.png[Packetbeat Search]
+image::./images/discovery-packetbeat-transactions.png[Packetbeat Search]
 
 Select the *Packetbeat Flows Search* to display the most important information
 for Packetbeat flows:
 
 [role="screenshot"]
-image:./images/discovery-packetbeat-flows.png[Packetbeat Flows Search]
+image::./images/discovery-packetbeat-flows.png[Packetbeat Flows Search]
 
 
 

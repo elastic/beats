@@ -65,6 +65,7 @@ type Client struct {
 type ClientSettings struct {
 	URL                string
 	Proxy              *url.URL
+	ProxyDisable       bool
 	TLS                *transport.TLSConfig
 	Username, Password string
 	EscapeHTML         bool
@@ -140,9 +141,12 @@ func NewClient(
 	s ClientSettings,
 	onConnect *callbacksRegistry,
 ) (*Client, error) {
-	proxy := http.ProxyFromEnvironment
-	if s.Proxy != nil {
-		proxy = http.ProxyURL(s.Proxy)
+	var proxy func(*http.Request) (*url.URL, error)
+	if !s.ProxyDisable {
+		proxy = http.ProxyFromEnvironment
+		if s.Proxy != nil {
+			proxy = http.ProxyURL(s.Proxy)
+		}
 	}
 
 	pipeline := s.Pipeline
@@ -262,10 +266,14 @@ func (client *Client) Clone() *Client {
 
 	c, _ := NewClient(
 		ClientSettings{
-			URL:              client.URL,
-			Index:            client.index,
-			Pipeline:         client.pipeline,
-			Proxy:            client.proxyURL,
+			URL:      client.URL,
+			Index:    client.index,
+			Pipeline: client.pipeline,
+			Proxy:    client.proxyURL,
+			// Without the following nil check on proxyURL, a nil Proxy field will try
+			// reloading proxy settings from the environment instead of leaving them
+			// empty.
+			ProxyDisable:     client.proxyURL == nil,
 			TLS:              client.tlsConfig,
 			Username:         client.Username,
 			Password:         client.Password,

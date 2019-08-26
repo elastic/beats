@@ -1,12 +1,18 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-kubernetes]]
 == Kubernetes module
 
-This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet]
-agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] service.
+This module fetches metrics from Kubernetes several components:
+
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/[kubelet]
+- https://github.com/kubernetes/kube-state-metrics[kube-state-metrics]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/[apiserver]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/[controller-manager]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/[scheduler]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/[proxy]
 
 All metricsets with the `state_` prefix require `hosts` field pointing to kube-state-metrics
 service within the cluster, while the rest should be pointed to kubelet service. Check the
@@ -17,7 +23,30 @@ The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
 [float]
 === Compability
 
-The Kubernetes module is tested with Kubernetes 1.8.0, 1.9.4 and 1.10.0.
+The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
+
+[float]
+=== Dashboard
+
+Kubernetes module is shipped including default dashboards for `apiserver`, `controllermanager`, `scheduler` and `proxy`.
+
+If you are using HA for those components, be aware that when gathering data from all instances the dashboard will usually show and average of the metrics. For those scenarios filtering by hosts or service address is possible.
+
+Dashboards for `controllermanager` `scheduler` and `proxy` are not compatible with kibana versions below `7.2.0`
+
+Kubernetes controller manager example:
+
+image::./images/metricbeat-kubernetes-controllermanager.png[]
+
+
+Kubernetes scheduler example:
+
+image::./images/metricbeat_kubernetes_scheduler.png[]
+
+
+Kubernetes proxy example:
+
+image::./images/metricbeat-kubernetes-proxy.png[]
 
 
 [float]
@@ -48,7 +77,6 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -63,12 +91,12 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_cronjob
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -80,11 +108,39 @@ metricbeat.modules:
     - event
 
 # Kubernetes API server
+# (when running metricbeat as a pod)
 - module: kubernetes
   enabled: true
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+# Kubernetes proxy server
+# (when running metricbeat locally at hosts or as a daemonset + host network)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - proxy
+  hosts: ["localhost:10249"]
+  period: 10s
+
+# Kubernetes controller manager
+# (URL and deployment will need to be modified to match the controller manager deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - controllermanager
+  hosts: ["http://localhost:10252"]
+  period: 10s
+
+# Kubernetes scheduler
+# (URL and deployment method will need to be adapted to match scheduler deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - scheduler
+  hosts: ["localhost:10251"]
+  period: 10s
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
@@ -99,13 +155,21 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-container,container>>
 
+* <<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>
+
 * <<metricbeat-metricset-kubernetes-event,event>>
 
 * <<metricbeat-metricset-kubernetes-node,node>>
 
 * <<metricbeat-metricset-kubernetes-pod,pod>>
 
+* <<metricbeat-metricset-kubernetes-proxy,proxy>>
+
+* <<metricbeat-metricset-kubernetes-scheduler,scheduler>>
+
 * <<metricbeat-metricset-kubernetes-state_container,state_container>>
+
+* <<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>
 
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
 
@@ -125,13 +189,21 @@ include::kubernetes/apiserver.asciidoc[]
 
 include::kubernetes/container.asciidoc[]
 
+include::kubernetes/controllermanager.asciidoc[]
+
 include::kubernetes/event.asciidoc[]
 
 include::kubernetes/node.asciidoc[]
 
 include::kubernetes/pod.asciidoc[]
 
+include::kubernetes/proxy.asciidoc[]
+
+include::kubernetes/scheduler.asciidoc[]
+
 include::kubernetes/state_container.asciidoc[]
+
+include::kubernetes/state_cronjob.asciidoc[]
 
 include::kubernetes/state_deployment.asciidoc[]
 

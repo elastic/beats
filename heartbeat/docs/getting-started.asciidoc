@@ -81,6 +81,8 @@ tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -214,7 +216,7 @@ include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-Dashboards for heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
+Dashboards for Heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 
 [[heartbeat-starting]]
 === Step 5: Start Heartbeat
@@ -246,6 +248,10 @@ configuration file, or run Heartbeat with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
+:requires-sudo:
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+:requires-sudo!:
+
 *win:*
 
 ["source","sh",subs="attributes"]
@@ -262,8 +268,9 @@ events to your defined output.
 === Step 6: View the sample Kibana dashboards
 
 To make it easier for you to visualize the status of your services, we have
-created example {beatname_uc} dashboards. You loaded the dashboards earlier when
-you ran the `setup` command.
+created example {beatname_uc} dashboards in the
+https://github.com/elastic/uptime-contrib[uptime-contrib] github repository. If
+you loaded them earlier, open them now.
 
 include::{libbeat-dir}/docs/opendashboards.asciidoc[]
 
@@ -271,4 +278,4 @@ The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 [role="screenshot"]
-image:./images/heartbeat-statistics.png[Heartbeat statistics]
+image::./images/heartbeat-statistics.png[Heartbeat statistics]

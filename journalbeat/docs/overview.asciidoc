@@ -13,9 +13,3 @@ https://www.elastic.co/products/elasticsearch[Elasticsearch] or
 https://www.elastic.co/products/logstash[Logstash].
 
 include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
-
-[float]
-=== Compatibility
-
-{beatname_uc} requires systemd v233 or later. Versions prior to systemd v233
-have a defect that prevents {beatname_uc} from reading rotated journals.

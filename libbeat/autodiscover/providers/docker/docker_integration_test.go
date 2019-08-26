@@ -33,7 +33,6 @@ import (
 
 // Test docker start emits an autodiscover event
 func TestDockerStart(t *testing.T) {
-	t.Skip("Skipped as flaky: https://github.com/elastic/beats/issues/11627")
 	d, err := dk.NewClient()
 	if err != nil {
 		t.Fatal(err)

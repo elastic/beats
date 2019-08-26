@@ -36,9 +36,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
+	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats")
+	config := mtest.GetConfig("stats", service.Host())
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	if err != nil {
@@ -54,8 +54,8 @@ func TestFetch(t *testing.T) {
 		t.Skip("Kibana stats API is not available until 6.4.0")
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
@@ -67,9 +67,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kibana")
+	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats")
+	config := mtest.GetConfig("stats", service.Host())
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	if err != nil {
@@ -85,8 +85,8 @@ func TestData(t *testing.T) {
 		t.Skip("Kibana stats API is not available until 6.4.0")
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	err = mbtest.WriteEventsReporterV2(f, t, "")
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	err = mbtest.WriteEventsReporterV2Error(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

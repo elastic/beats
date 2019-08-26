@@ -22,6 +22,7 @@ the events to {es}.
 
 ["source","sh",subs="attributes"]
 ----
+{beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 {beatname_lc}.provider.aws.functions:
   - name: cloudwatch
@@ -46,7 +47,6 @@ processors:
   - add_cloud_metadata: ~
 ----
 
-
 [id="{beatname_lc}-options"]
 [float]
 === Configuration options
@@ -55,6 +55,12 @@ to deploy.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
+
+[float]
+[id="{beatname_lc}-endpoint"]
+==== `provider.aws.endpoint`
+
+AWS endpoint to use in the URL template to load functions.
 
 [float]
 [id="{beatname_lc}-deploy-bucket"]
@@ -92,9 +98,13 @@ multiple functions and need more context about how each function is used.
 ==== `triggers`
 
 A list of triggers that will cause the function to execute. The list of valid
-triggers depends on the `type`. If `type` is `cloudwatch_logs` logs, specify a
-list of log groups. If `type` is `sqs`, specify a list of Amazon Resource Names
-(ARNs).
+triggers depends on the `type`:
+
+* For `cloudwatch_logs`, specify a list of log groups. Because the AWS limit is
+one subscription filter per CloudWatch log group, the log groups specified here
+must have no other subscription filters, or deployment will fail.
+For more information, see <<unable-to-deploy-resource-limit>>.
+* For `sqs` or `kinesis`, specify a list of Amazon Resource Names (ARNs).
 
 [float]
 [id="{beatname_lc}-filter_pattern"]

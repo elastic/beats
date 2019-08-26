@@ -27,44 +27,48 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
-	mage.SetBuildVariableSources(mage.DefaultBeatBuildVariableSources)
+	devtools.SetBuildVariableSources(devtools.DefaultBeatBuildVariableSources)
 
-	mage.BeatDescription = "One sentence description of the Beat."
+	devtools.BeatDescription = "One sentence description of the Beat."
+}
+
+//CollectAll generates the docs and the fields.
+func CollectAll() {
+	mg.Deps(CollectDocs, FieldsDocs)
 }
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
+	return devtools.CrossBuild()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return mage.Clean()
+	return devtools.CrossBuildGoDaemon()
 }
 
 // Package packages the Beat for distribution.
@@ -74,16 +78,16 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseCommunityBeatPackaging()
+	devtools.UseCommunityBeatPackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return devtools.TestPackages()
 }
 
 // Update updates the generated files (aka make update).
@@ -93,32 +97,48 @@ func Update() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return mage.GenerateFieldsYAML("module")
+	return devtools.GenerateFieldsYAML("module")
 }
 
 // FieldsDocs generates docs/fields.asciidoc containing all fields
 // (including x-pack).
 func FieldsDocs() error {
 	inputs := []string{
-		mage.OSSBeatDir("module"),
+		devtools.OSSBeatDir("module"),
 	}
-	output := mage.CreateDir("build/fields/fields.all.yml")
-	if err := mage.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+	output := devtools.CreateDir("build/fields/fields.all.yml")
+	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {
 		return err
 	}
-	return mage.Docs.FieldDocs(output)
+	return devtools.Docs.FieldDocs(output)
+}
+
+// CollectDocs creates the documentation under docs/
+func CollectDocs() error {
+	return metricbeat.CollectDocs()
 }
 
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // GoTestIntegration executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+}
+
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	customDeps := devtools.ConfigFileParams{
+		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
+		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
+		DockerParts:    []string{"_meta/docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
+		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
+	}
+	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
 }

@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": 1320435875000,
-        "ecs.version": "1.0.0",
         "event.dataset": "zeek.notice",
         "event.module": "zeek",
         "fileset.name": "notice",
@@ -23,6 +22,8 @@
     {
         "@timestamp": 1551393388000,
         "destination.address": "207.154.238.205",
+        "destination.as.number": 14061,
+        "destination.as.organization.name": "DigitalOcean, LLC",
         "destination.geo.city_name": "New York",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -31,7 +32,6 @@
         "destination.geo.region_iso_code": "US-NY",
         "destination.geo.region_name": "New York",
         "destination.ip": "207.154.238.205",
-        "ecs.version": "1.0.0",
         "event.dataset": "zeek.notice",
         "event.module": "zeek",
         "fileset.name": "notice",
@@ -39,6 +39,8 @@
         "log.offset": 357,
         "service.type": "zeek",
         "source.address": "8.42.77.171",
+        "source.as.number": 393552,
+        "source.as.organization.name": "Longmont Power & Communications",
         "source.geo.city_name": "Longmont",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",

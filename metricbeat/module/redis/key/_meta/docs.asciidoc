@@ -21,7 +21,7 @@ whose name starts with `pipeline-*`, with a limit of 20 keys.
 - module: redis
   metricsets: ['key']
   key.patterns:
-    - name: 'pipeline-*'
+    - pattern: 'pipeline-*'
       limit: 20
 ------------------------------------------------------------------------------
 

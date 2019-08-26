@@ -13,4 +13,4 @@ manager, and for Homebrew on macOS (Darwin).
 The dataset comes with a sample dashboard:
 
 [role="screenshot"]
-image:./images/auditbeat-system-package-dashboard.png[Auditbeat System Package Dashboard]
+image::./images/auditbeat-system-package-dashboard.png[Auditbeat System Package Dashboard]

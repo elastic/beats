@@ -31,7 +31,3 @@ class Test(metricbeat.BaseTest):
         self.assertNotIn("error", event)
 
         self.assert_fields_are_documented(event)
-
-    def get_hosts(self):
-        return [os.getenv('COUCHDB_HOST', 'localhost') + ':' +
-                os.getenv('COUCHDB_PORT', '5984')]

@@ -1,0 +1,82 @@
+- name: performance
+  type: group
+  description: Performance related metrics on a single database instance
+  release: beta
+  fields:
+    - name: machine
+      type: keyword
+      description: Operating system machine name
+    - name: buffer_pool
+      type: keyword
+      description: Name of the buffer pool in the instance
+    - name: username
+      type: keyword
+      description: Oracle username
+    - name: io_reloads
+      type: double
+      description: Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are tumber of times a PIN was requested for objects of this namespace
+    - name: lock_requests
+      type: long
+      description: Average of the ratio between 'gethits' and 'gets' being 'Gethits' the number of times an object's handle was found in memory and 'gets' the number of times a lock was requested for objects of this namespace.
+    - name: pin_requests
+      type: double
+      description: Average of all pinhits/pins ratios being 'PinHits' the number of times all of the metadata pieces of the library object were found in memory and 'pins' the number of times a PIN was requested for objects of this namespace
+    - name: cache
+      type: group
+      description: Statistics about all buffer pools available for the instance
+      fields:
+        - name: buffer.hit.pct
+          type: double
+          description: The cache hit ratio of the specified buffer pool.
+        - name: physical_reads
+          type: long
+          description: Physical reads
+        - name: get
+          type: group
+          description: Buffer pool 'get' statistics
+          fields:
+            - name: consistent
+              type: long
+              description: Consistent gets statistic
+            - name: db_blocks
+              type: long
+              description: Database blocks gotten
+    - name: cursors
+      type: group
+      description: Cursors information
+      fields:
+        - name: avg
+          type: double
+          description: Average cursors opened by username and machine
+        - name: max
+          type: double
+          description: Max cursors opened by username and machine
+        - name: total
+          type: double
+          description: Total opened cursors by username and machine
+        - name: opened
+          type: group
+          description: Opened cursors statistic
+          fields:
+            - name: current
+              type: long
+              description: Total number of current open cursors
+            - name: total
+              type: long
+              description: Total number of cursors opened since the instance started
+        - name: parse
+          type: group
+          description: Parses statistic information that occured in the current session
+          fields:
+            - name: real
+              type: long
+              description: "Real number of parses that occurred: session cursor cache hits - parse count (total)"
+            - name: total
+              type: long
+              description: Total number of parse calls (hard and soft). A soft parse is a check on an object already in the shared pool, to verify that the permissions on the underlying object have not changed.
+        - name: session.cache_hits
+          type: long
+          description: Number of hits in the session cursor cache. A hit means that the SQL statement did not have to be reparsed.
+        - name: cache_hit.pct
+          type: double
+          description: Ratio of session cursor cache hits from total number of cursors

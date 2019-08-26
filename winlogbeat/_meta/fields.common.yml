@@ -1,9 +1,8 @@
 - key: winlog
-  title: "Windows Event Log fields emitted by Winlogbeat"
+  title: "Winlogbeat"
   description: >
     Fields from the Windows Event Log.
   fields:
-    # Candidate to add to ECS
 
     - name: log.file.path
       type: keyword
@@ -170,11 +169,15 @@
             The Windows security identifier (SID) of the account associated with
             this event.
 
-
             If Winlogbeat cannot resolve the SID to a name, then the `user.name`,
             `user.domain`, and `user.type` fields will be omitted from the event.
             If you discover Winlogbeat not resolving SIDs, review the log for
             clues as to what the problem may be.
+
+        - name: user.name
+          type: keyword
+          description: >
+            Name of the user associated with this event.
 
         - name: user.domain
           type: keyword
@@ -195,9 +198,11 @@
 
 # Aliases for the old fields
 - key: eventlog
-  title: Event log record
+  title: Legacy Winlogbeat alias
   description: >
-    Contains data from a Windows event log record.
+    Field aliases based on Winlogbeat 6.x that point to the fields for this
+    version of Winlogbeat. These are added to the index template when
+    `migration.6_to_7.enable: true` is set in the configuration.
   fields:
     - name: type
       type: alias

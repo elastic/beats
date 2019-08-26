@@ -4,7 +4,9 @@ related products:
 
 * {es} for storing and indexing the data.
 * {kib} for the UI.
+ifndef::only-elasticsearch[]
 * {ls} (optional) for parsing and enhancing the data.
+endif::only-elasticsearch[]
 
 See {stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}]
 for more information about installing these products.
@@ -19,4 +21,6 @@ Service for free].
 ==============
 
 After installing the {stack}, read the following topics to learn how to
-install, configure, and run {beatname_uc}:
+install, configure, and run {beatname_uc}. Upgrading to a new version of
+{beatname_uc}? Start by reading the Beats {beats-ref}/upgrading.html[upgrade
+documentation].

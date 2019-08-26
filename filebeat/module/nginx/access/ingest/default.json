@@ -5,7 +5,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\""
+                    "\"?(?:%{IP_LIST:nginx.access.remote_ip_list}|%{DATA:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{DATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\""
                 ],
                 "pattern_definitions": {
                     "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
@@ -31,7 +31,15 @@
         {
             "split": {
                 "field": "nginx.access.remote_ip_list",
-                "separator": "\"?,?\\s+"
+                "separator": "\"?,?\\s+",
+                "ignore_missing": true
+            }
+        },
+        {
+            "split": {
+                "field": "nginx.access.origin",
+                "separator": "\"?,?\\s+",
+                "ignore_missing": true
             }
         },
         {
@@ -43,17 +51,24 @@
         {
             "script": {
                 "lang": "painless",
-                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.nginx.access.remote_ip_list) {     if (!isPrivate(params.dot, item)) {       ctx.source.ip = item;       found = true;       break;     }   }   if (!found) {     ctx.source.ip = ctx.nginx.access.remote_ip_list[0];   }",
+                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   try {    ctx.source.ip = null;    if (ctx.nginx.access.remote_ip_list == null) { return; }    def found = false;    for (def item : ctx.nginx.access.remote_ip_list) {        if (!isPrivate(params.dot, item)) {            ctx.source.ip = item;            found = true;            break;        }    }    if (!found) {     ctx.source.ip = ctx.nginx.access.remote_ip_list[0];   }} catch (Exception e) { ctx.source.ip = null; }",
                 "params": {
                     "dot": "."
                 }
             }
         },
         {
+            "remove": {
+                "field": "source.ip",
+                "if": "ctx.source.ip == null"
+            }
+        },
+        {
             "convert": {
                 "field": "source.ip",
                 "target_field": "source.address",
-                "type": "string"
+                "type": "string",
+                "ignore_missing": true
             }
         },
         {
@@ -74,8 +89,25 @@
                 "formats": [
                     "dd/MMM/yyyy:H:m:s Z"
                 ],
-                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
                 "ignore_failure": true
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.event.timezone != null",
+                "field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                "timezone": "{{ event.timezone }}",
+                "on_failure": [
+                    {
+                        "append": {
+                            "field": "error.message",
+                            "value": "{{ _ingest.on_failure_message }}"
+                        }
+                    }
+                ]
             }
         },
         {
@@ -92,6 +124,32 @@
             "geoip": {
                 "field": "source.ip",
                 "target_field": "source.geo",
+                "ignore_missing": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
                 "ignore_missing": true
             }
         }

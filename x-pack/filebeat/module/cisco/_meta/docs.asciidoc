@@ -5,8 +5,12 @@
 
 == Cisco module
 
-This is a module for Cisco network device's logs. Currently supports the `asa`
-fileset for Cisco ASA firewall logs received over syslog or read from a file.
+beta[]
+
+This is a module for Cisco network device's logs. The `asa` fileset supports
+Cisco ASA firewall logs received over syslog or read from a file. And the `ios`
+fileset supports Cisco IOS router and switch logs received over syslog or read
+from a file.
 
 Cisco ASA devices also support exporting flow records using NetFlow, which is
 supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
@@ -14,26 +18,21 @@ supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
 
 include::../include/what-happens.asciidoc[]
 
-[float]
-=== Compatibility
-
-This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
-Elasticsearch plugin.
-
 include::../include/running-modules.asciidoc[]
 
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard:
+This module comes with a sample dashboard for ASA:
 
 [role="screenshot"]
 image::./images/kibana-cisco-asa.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
-The module is by default configured to run via syslog on port 9001. However
-it can also be configured to read from a file path. See the following example.
+The module is by default configured to run via syslog on port 9001 for ASA and
+port 9002 for IOS. However it can also be configured to read from a file path.
+See the following example.
 
 ["source","yaml",subs="attributes"]
 -----
@@ -55,7 +54,10 @@ Example config:
 
 [source,yaml]
 ----
+- module: cisco
   asa:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
     var.log_level: 5
 ----
 
@@ -82,6 +84,48 @@ A value of 7 (default) will not filter any messages. A lower value will drop
 any messages with a severity level higher than the specified value. For
 example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
 and 3 (Error). All other messages will be dropped.
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9001.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `ios` fileset settings
+
+The Cisco IOS fileset primarily supports parsing IPv4 and IPv6 access list log
+messages.
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  ios:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9002
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9002.
+
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

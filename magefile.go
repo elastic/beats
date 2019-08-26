@@ -29,12 +29,12 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 var (
-	// Beats is a list of Beats to collect dashboards from.
-	Beats = []string{
+	// BeatsWithDashboards is a list of Beats to collect dashboards from.
+	BeatsWithDashboards = []string{
 		"heartbeat",
 		"journalbeat",
 		"packetbeat",
@@ -42,31 +42,30 @@ var (
 		"x-pack/auditbeat",
 		"x-pack/filebeat",
 		"x-pack/metricbeat",
-		"x-pack/functionbeat",
 	}
 )
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.
 func PackageBeatDashboards() error {
-	version, err := mage.BeatQualifiedVersion()
+	version, err := devtools.BeatQualifiedVersion()
 	if err != nil {
 		return err
 	}
 
-	spec := mage.PackageSpec{
+	spec := devtools.PackageSpec{
 		Name:     "beats-dashboards",
 		Version:  version,
-		Snapshot: mage.Snapshot,
-		Files: map[string]mage.PackageFile{
-			".build_hash.txt": mage.PackageFile{
+		Snapshot: devtools.Snapshot,
+		Files: map[string]devtools.PackageFile{
+			".build_hash.txt": devtools.PackageFile{
 				Content: "{{ commit }}\n",
 			},
 		},
 		OutputFile: "build/distributions/dashboards/{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}",
 	}
 
-	for _, beatDir := range Beats {
+	for _, beatDir := range BeatsWithDashboards {
 		// The generated dashboard content is moving in the build dir, but
 		// not all projects have been updated so detect which dir to use.
 		dashboardDir := filepath.Join(beatDir, "build/kibana")
@@ -74,20 +73,20 @@ func PackageBeatDashboards() error {
 		beatName := filepath.Base(beatDir)
 
 		if _, err := os.Stat(dashboardDir); err == nil {
-			spec.Files[beatName] = mage.PackageFile{Source: dashboardDir}
+			spec.Files[beatName] = devtools.PackageFile{Source: dashboardDir}
 		} else if _, err := os.Stat(legacyDir); err == nil {
-			spec.Files[beatName] = mage.PackageFile{Source: legacyDir}
+			spec.Files[beatName] = devtools.PackageFile{Source: legacyDir}
 		} else {
 			return errors.Errorf("no dashboards found for %v", beatDir)
 		}
 	}
 
-	return mage.PackageZip(spec.Evaluate())
+	return devtools.PackageZip(spec.Evaluate())
 }
 
 // Fmt formats code and adds license headers.
 func Fmt() {
-	mg.Deps(mage.GoImports, mage.PythonAutopep8)
+	mg.Deps(devtools.GoImports, devtools.PythonAutopep8)
 	mg.Deps(addLicenseHeaders)
 }
 
@@ -96,7 +95,7 @@ func Fmt() {
 func addLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	if err := sh.Run("go", "get", mage.GoLicenserImportPath); err != nil {
+	if err := sh.Run("go", "get", devtools.GoLicenserImportPath); err != nil {
 		return err
 	}
 
@@ -108,5 +107,5 @@ func addLicenseHeaders() error {
 
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
-	return mage.DumpVariables()
+	return devtools.DumpVariables()
 }

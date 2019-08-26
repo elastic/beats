@@ -35,8 +35,9 @@ We fetch the following data:
 Some specific AWS permissions are required for IAM user to collect AWS EC2 metrics.
 ----
 ec2:DescribeInstances
-cloudwatch:GetMetricData
 ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
 ----
 
 [float]
@@ -45,3 +46,16 @@ ec2:DescribeRegions
 The aws ec2 metricset comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-ec2-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - ec2
+  access_key_id: '<access_key_id>'
+  secret_access_key: '<secret_access_key>'
+  session_token: '<session_token>'
+----

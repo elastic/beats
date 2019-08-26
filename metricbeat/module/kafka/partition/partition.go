@@ -18,10 +18,11 @@
 package partition
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/Shopify/sarama"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -74,18 +75,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch partition stats list from kafka
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	broker, err := m.Connect()
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error in connect")
 	}
 	defer broker.Close()
 
 	topics, err := broker.GetTopicsMetadata(m.topics...)
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error getting topic metadata")
+	}
+	if len(topics) == 0 {
+		debugf("no topic could be read, check ACLs")
+		return nil
 	}
 
 	evtBroker := common.MapStr{
@@ -123,8 +126,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 						err = errFailQueryOffset
 					}
 
-					logp.Err("Failed to query kafka partition (%v:%v) offsets: %v",
+					msg := fmt.Errorf("Failed to query kafka partition (%v:%v) offsets: %v",
 						topic.Name, partition.ID, err)
+					m.Logger().Error(msg)
+					r.Error(msg)
 					continue
 				}
 
@@ -163,16 +168,20 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				}
 
 				// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
-				r.Event(mb.Event{
+				sent := r.Event(mb.Event{
 					ModuleFields: common.MapStr{
 						"broker": evtBroker,
 						"topic":  evtTopic,
 					},
 					MetricSetFields: event,
 				})
+				if !sent {
+					return nil
+				}
 			}
 		}
 	}
+	return nil
 }
 
 // queryOffsetRange queries the broker for the oldest and the newest offsets in

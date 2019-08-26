@@ -7,19 +7,18 @@
 package pkg
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRPMPackages(t *testing.T) {
-	os, err := getOS()
-	if err != nil {
+	_, err := os.Stat(rpmPath)
+	if os.IsNotExist(err) {
+		t.Skipf("RPM test only on systems where %v exists", rpmPath)
+	} else if err != nil {
 		t.Fatal(err)
-	}
-
-	if os.Family != "redhat" {
-		t.Skip("RPM test only on Redhat systems")
 	}
 
 	// Control using the exec command
@@ -34,5 +33,4 @@ func TestRPMPackages(t *testing.T) {
 	}
 
 	assert.EqualValues(t, packagesExpected, packages)
-
 }

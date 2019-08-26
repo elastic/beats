@@ -1,6 +1,7 @@
 = Metricbeat Reference
 
 :libbeat-dir: ../../libbeat
+:libbeat-xpack-dir: ../../../x-pack/libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
 
@@ -16,6 +17,8 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_ml_jobs: yes
 :has_central_config:
 :has_solutions:
+:has_docker_label_ex:
+:has_modules_command:
 :deb_os:
 :rpm_os:
 :mac_os:

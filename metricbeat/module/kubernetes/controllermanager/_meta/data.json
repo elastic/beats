@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.controllermanager",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "controllermanager": {
+            "client": {
+                "request": {
+                    "count": 1113352
+                }
+            },
+            "code": "200",
+            "host": "192.168.205.10:6443",
+            "method": "GET"
+        }
+    },
+    "metricset": {
+        "name": "controllermanager",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
+}

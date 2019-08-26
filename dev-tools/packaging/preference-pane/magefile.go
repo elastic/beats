@@ -28,19 +28,19 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 var builder = preferencePaneBuilder{
 	Project:       "beats-preference-pane.xcodeproj",
-	Configuration: mage.EnvOr("XCODE_CONFIGURATION", "Release"),
+	Configuration: devtools.EnvOr("XCODE_CONFIGURATION", "Release"),
 	PackageName:   "BeatsPrefPane.pkg",
 	InstallDir:    "/Library/PreferencePanes",
 	Identifier:    "co.elastic.beats.preference-pane",
 	Version:       "1.0.0",
 }
 
-// Default specifies the default build target for mage.
+// Default specifies the default build target for devtools.
 var Default = All
 
 // All build, sign, and package the Beats Preference Pane.
@@ -66,8 +66,8 @@ type preferencePaneBuilder struct {
 	Version       string
 }
 
-func (b preferencePaneBuilder) SigningInfo() *mage.AppleSigningInfo {
-	info, err := mage.GetAppleSigningInfo()
+func (b preferencePaneBuilder) SigningInfo() *devtools.AppleSigningInfo {
+	info, err := devtools.GetAppleSigningInfo()
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +76,7 @@ func (b preferencePaneBuilder) SigningInfo() *mage.AppleSigningInfo {
 }
 
 func (b preferencePaneBuilder) Build() error {
-	if mage.IsUpToDate("build/Release/Beats.prefPane/Contents/MacOS/Beats",
+	if devtools.IsUpToDate("build/Release/Beats.prefPane/Contents/MacOS/Beats",
 		"helper", "beats-preference-pane", "beats-preference-pane.xcodeproj") {
 		fmt.Println(">> Building MacOS Preference Pane (UP-TO-DATE)")
 		return nil
@@ -124,7 +124,7 @@ func (b preferencePaneBuilder) Package() error {
 	output := filepath.Join("build", b.PackageName)
 	input := filepath.Join("build", b.Configuration, "Beats.prefPane")
 
-	if mage.IsUpToDate(output, input) {
+	if devtools.IsUpToDate(output, input) {
 		fmt.Println(">> Packaging MacOS Preference Pane (UP-TO-DATE)")
 		return nil
 	}
@@ -136,7 +136,7 @@ func (b preferencePaneBuilder) Package() error {
 		return err
 	}
 
-	if err := mage.Copy(input, installDir); err != nil {
+	if err := devtools.Copy(input, installDir); err != nil {
 		return err
 	}
 

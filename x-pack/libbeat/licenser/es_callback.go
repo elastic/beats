@@ -15,7 +15,7 @@ import (
 
 // Enforce setups the corresponding callbacks in libbeat to verify the license on the
 // remote elasticsearch cluster.
-func Enforce(log *logp.Logger, checks ...CheckFunc) {
+func Enforce(log *logp.Logger, name string, checks ...CheckFunc) {
 	cb := func(client *elasticsearch.Client) error {
 		fetcher := NewElasticFetcher(client)
 		license, err := fetcher.Fetch()
@@ -25,9 +25,9 @@ func Enforce(log *logp.Logger, checks ...CheckFunc) {
 		}
 
 		if license == OSSLicense {
-			return errors.New("This Beat requires the default distribution of Elasticsearch. Please " +
-				"upgrade to the default distribution of Elasticsearch from elastic.co, or downgrade to " +
-				"the oss-only distribution of beats")
+			return errors.Errorf("%s requires the default distribution of Elasticsearch. Please "+
+				"update to the default distribution of Elasticsearch for full access to all "+
+				"free features, or switch to the OSS distribution of %s.", name, name)
 		}
 
 		if !Validate(log, *license, checks...) {

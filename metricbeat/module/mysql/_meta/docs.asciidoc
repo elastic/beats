@@ -30,7 +30,7 @@ precedence over those specified in the `username` and `password` config options.
 
 The mysql MetricSets were tested with MySQL and Percona 5.7 and 8.0 and are expected
 to work with all versions >= 5.7.0.
-It is also tested with MariaDB 10.2 and 10.3.
+It is also tested with MariaDB 10.2, 10.3 and 10.4.
 
 [float]
 === Dashboard

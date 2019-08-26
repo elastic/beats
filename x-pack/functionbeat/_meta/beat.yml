@@ -12,6 +12,8 @@
 # Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #
+# Configure which S3 endpoint should we use.
+functionbeat.provider.aws.endpoint: "s3.amazonaws.com"
 # Configure which S3 bucket we should upload the lambda artifact.
 functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
 
@@ -37,6 +39,14 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -74,6 +84,14 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -117,6 +135,14 @@ functionbeat.provider.aws.functions:
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
 
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
     # combination of these.
@@ -125,6 +151,15 @@ functionbeat.provider.aws.functions:
 
     # Define custom processors for this function.
     #processors:
+    #  This example extracts the raw data from events.
+    #  - decode_base64_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decompress_gzip_field:
+    #      field:
+    #        from: message
+    #        to: message
     #  - decode_json_fields:
     #      fields: ["message"]
     #      process_array: false

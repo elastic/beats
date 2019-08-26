@@ -1,37 +1,36 @@
-########################## Winlogbeat Configuration ###########################
+###################### Winlogbeat Configuration Example ########################
 
-# This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains only
-# the most common options, please see winlogbeat.yml in the same directory.
+# This file is an example configuration file highlighting only the most common
+# options. The winlogbeat.reference.yml file from the same directory contains
+# all the supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/winlogbeat/index.html
 
-#======================= Winlogbeat specific options ==========================
+#======================= Winlogbeat specific options ===========================
 
-# The registry file is where Winlogbeat persists its state so that the beat
-# can resume after shutdown or an outage. The default is .winlogbeat.yml
-# in the directory in which it was started.
+# The registry file is where Winlogbeat persists its state so that the beat can
+# resume after shutdown or an outage. The default is .winlogbeat.yml in the
+# directory in which it was started.
 #winlogbeat.registry_file: .winlogbeat.yml
-
-# The maximum amount of time Winlogbeat should wait for events to finish
-# publishing when shutting down.
-#winlogbeat.shutdown_timeout: 0s
 
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
 #
 # The supported keys are name (required), tags, fields, fields_under_root,
-# forwarded, ignore_older, level, no_more_events, event_id, provider, and
-# include_xml. Please visit the documentation for the complete details of each
-# option.
+# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
+# visit the documentation for the complete details of each option.
 # https://go.es.io/WinlogbeatConfig
 winlogbeat.event_logs:
   - name: Application
     ignore_older: 72h
-  - name: Security
+
   - name: System
+
+  - name: Security
+
+
 
 #================================ General ======================================
 
@@ -74,7 +73,7 @@ winlogbeat.event_logs:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -252,6 +251,13 @@ winlogbeat.event_logs:
 #    target: ""
 #    overwrite_keys: false
 #
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
 # The following example copies the value of message to message_copied
 #
 #processors:
@@ -290,7 +296,7 @@ winlogbeat.event_logs:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using winlogbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Winlogbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -353,6 +359,11 @@ output.elasticsearch:
   # Proxy server URL
   #proxy_url: http://proxy:3128
 
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
+
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
   # dropped. The default is 3.
@@ -410,7 +421,6 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -555,7 +565,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version winlogbeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Winlogbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -579,8 +589,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -595,6 +605,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -808,7 +822,7 @@ output.elasticsearch:
   #filename: winlogbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every winlogbeat restart, the files are rotated. The default value is 10240
+  # every Winlogbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -819,7 +833,6 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
 
 #----------------------------- Console output ---------------------------------
 #output.console:
@@ -836,26 +849,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the winlogbeat installation. This is the default base path
+# The home path for the Winlogbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the winlogbeat installation. This is the default
+# The configuration path for the Winlogbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the winlogbeat installation. This is the default base path
-# for all the files in which winlogbeat needs to store its data. If not set by a
+# The data path for the Winlogbeat installation. This is the default base path
+# for all the files in which Winlogbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a winlogbeat installation. This is the default location for
+# The logs path for a Winlogbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -967,22 +980,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'winlogbeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "winlogbeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'winlogbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 
@@ -1051,13 +1080,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, winlogbeat periodically logs its internal metrics that have changed
+# If enabled, Winlogbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1095,12 +1127,16 @@ logging.files:
   # Unix epoch. Defaults to disabled.
   #interval: 0
 
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
+
 # Set to true to log messages in JSON format.
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
-# winlogbeat can export internal metrics to a central Elasticsearch monitoring
+#============================== X-Pack Monitoring ===============================
+# Winlogbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 

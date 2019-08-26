@@ -67,7 +67,11 @@ ifeval::["{beatname_lc}"=="filebeat"]
 :processor-scope: input
 endif::[]
 
-ifeval::["{beatname_lc}"=="auditbeat" or "{beatname_lc}"=="metricbeat"]
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
 :processor-scope: module
 endif::[]
 
@@ -104,7 +108,7 @@ For example:
 ------
 +
 Similarly, for {beatname_uc} modules, you can define processors under the
-`input` section of the module definition. 
+`input` section of the module definition.
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 [source,yaml]
@@ -115,7 +119,7 @@ ifeval::["{beatname_lc}"=="metricbeat"]
   - <processor_name>:
       when:
         <condition>
-      <parameters> 
+      <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
@@ -129,7 +133,7 @@ auditbeat.modules:
   - <processor_name>:
       when:
         <condition>
-      <parameters> 
+      <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
@@ -138,7 +142,7 @@ For example:
 [source,yaml]
 ----
 packetbeat.protocols:
-- type: <protocol_type>  
+- type: <protocol_type>
   processors:
   - <processor_name>:
       when:
@@ -201,18 +205,30 @@ The supported processors are:
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-labels, `add_labels`>>
  * <<add-locale,`add_locale`>>
+ * <<add-observer-metadata,`add_observer_metadata`>>
  * <<add-process-metadata,`add_process_metadata`>>
  * <<add-tags, `add_tags`>>
  * <<community-id,`community_id`>>
+ * <<convert,`convert`>>
+ * <<decode-base64-field,`decode_base64_field`>>
+ifdef::has_decode_csv_fields_processor[]
+ * <<decode-csv-fields,`decode_csv_fields`>>
+endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
+ * <<decompress-gzip-field,`decompress_gzip_field`>>
  * <<dissect, `dissect`>>
  * <<processor-dns, `dns`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
+ * <<extract-array,`extract_array`>>
  * <<include-fields,`include_fields`>>
+ * <<processor-registered-domain,`registered_domain`>>
  * <<rename-fields,`rename`>>
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
  * <<processor-script,`script`>>
+endif::[]
+ifdef::has_timestamp_processor[]
+ * <<processor-timestamp,`timestamp`>>
 endif::[]
 
 [[conditions]]
@@ -495,7 +511,7 @@ provider and cache the instance metadata.
 
 The following cloud providers are supported:
 
-- Amazon Elastic Compute Cloud (EC2)
+- Amazon Web Services (AWS)
 - Digital Ocean
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
@@ -527,16 +543,18 @@ default).
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.
 
-_EC2_
+_AWS_
 
 [source,json]
 -------------------------------------------------------------------------------
 {
   "cloud": {
+    "account.id": "123456789012",
     "availability_zone": "us-east-1c",
-    "instance_id": "i-4e123456",
-    "machine_type": "t2.medium",
-    "provider": "ec2",
+    "instance.id": "i-4e123456",
+    "machine.type": "t2.medium",
+    "image.id": "ami-abcd1234",
+    "provider": "aws",
     "region": "us-east-1"
   }
 }
@@ -548,24 +566,24 @@ _Digital Ocean_
 -------------------------------------------------------------------------------
 {
   "cloud": {
-    "instance_id": "1234567",
+    "instance.id": "1234567",
     "provider": "digitalocean",
     "region": "nyc2"
   }
 }
 -------------------------------------------------------------------------------
 
-_GCE_
+_GCP_
 
 [source,json]
 -------------------------------------------------------------------------------
 {
   "cloud": {
     "availability_zone": "us-east1-b",
-    "instance_id": "1234556778987654321",
-    "machine_type": "f1-micro",
-    "project_id": "my-dev",
-    "provider": "gce"
+    "instance.id": "1234556778987654321",
+    "machine.type": "f1-micro",
+    "project.id": "my-dev",
+    "provider": "gcp"
   }
 }
 -------------------------------------------------------------------------------
@@ -577,7 +595,7 @@ _Tencent Cloud_
 {
   "cloud": {
     "availability_zone": "gz-azone2",
-    "instance_id": "ins-qcloudv5",
+    "instance.id": "ins-qcloudv5",
     "provider": "qcloud",
     "region": "china-south-gz"
   }
@@ -594,7 +612,7 @@ ECS instance.
 {
   "cloud": {
     "availability_zone": "cn-shenzhen",
-    "instance_id": "i-wz9g2hqiikg0aliyun2b",
+    "instance.id": "i-wz9g2hqiikg0aliyun2b",
     "provider": "ecs",
     "region": "cn-shenzhen-a"
   }
@@ -608,9 +626,9 @@ _Azure Virtual Machine_
 {
   "cloud": {
     "provider": "az",
-    "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-    "instance_name": "test-az-vm",
-    "machine_type": "Standard_D3_v2",
+    "instance.id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+    "instance.name": "test-az-vm",
+    "machine.type": "Standard_D3_v2",
     "region": "eastus2"
   }
 }
@@ -622,11 +640,11 @@ _Openstack Nova_
 -------------------------------------------------------------------------------
 {
   "cloud": {
-    "provider": "openstack",
-    "instance_name": "test-998d932195.mycloud.tld",
+    "instance.name": "test-998d932195.mycloud.tld",
+    "instance.id": "i-00011a84",
     "availability_zone": "xxxx-az-c",
-    "instance_id": "i-00011a84",
-    "machine_type": "m2.large"
+    "provider": "openstack",
+    "machine.type": "m2.large"
   }
 }
 -------------------------------------------------------------------------------
@@ -639,7 +657,7 @@ scalar values, arrays, dictionaries, or any nested combination of these.  By
 default the fields that you specify will be grouped under the `fields`
 sub-dictionary in the event. To group the fields under a different
 sub-dictionary, use the `target` setting. To store the fields as
-top-level fields, set `target: ''`. 
+top-level fields, set `target: ''`.
 
 `target`:: (Optional) Sub-dictionary to put all fields into. Defaults to `fields`.
 `fields`:: Fields to be added.
@@ -722,7 +740,7 @@ The `add_locale` processor enriches each event with the machine's time zone
 offset from UTC or with the name of the time zone. It supports one configuration
 option named `format` that controls whether an offset or time zone abbreviation
 is added to the event. The default format is `offset`. The processor adds the
-a `beat.timezone` value to each event.
+a `event.timezone` value to each event.
 
 The configuration below enables the processor with the default settings.
 
@@ -775,6 +793,50 @@ Adds the environment field to every event:
 }
 -------------------------------------------------------------------------------
 
+ifdef::has_decode_csv_fields_processor[]
+[[decode-csv-fields]]
+=== Decode CSV fields
+
+experimental[]
+
+The `decode_csv_fields` processor decodes fields containing records in
+comma-separated format (CSV). It will output the values as an array of strings.
+This processor is available for Filebeat and Journalbeat.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - decode_csv_fields:
+     fields:
+        message: decoded.csv
+     separator: ,
+     ignore_missing: false
+     overwrite_keys: true
+     trim_leading_whitespace: false
+     fail_on_error: true
+-----------------------------------------------------
+
+The `decode_csv_fields` has the following settings:
+
+`fields`:: This is a mapping from the source field containing the CSV data to
+           the destination field to which the decoded array will be written.
+`separator`:: (Optional) Character to be used as a column separator.
+              The default is the comma character. For using a TAB character you
+              must set it to "\t".
+`ignore_missing`:: (Optional) Whether to ignore events which lack the source
+                   field. The default is `false`, which will fail processing of
+                   an event if a field is missing.
+`overwrite_keys`:: Whether the target field is overwritten if it
+                   already exists. The default is false, which will fail
+                   processing of an event when `target` already exists.
+`trim_leading_space`:: Whether extra space after the separator is trimmed from
+                       values. This works even if the separator is also a space.
+                       The default is `false`.
+`fail_on_error`:: (Optional) If set to true, in case of an error the changes to
+the event are reverted, and the original event is returned. If set to `false`,
+processing continues also if an error happens. Default is `true`.
+
+endif::[]
 
 [[decode-json-fields]]
 === Decode JSON fields
@@ -791,6 +853,7 @@ processors:
      max_depth: 1
      target: ""
      overwrite_keys: false
+     add_error_key: true
 -----------------------------------------------------
 
 The `decode_json_fields` processor has the following configuration settings:
@@ -807,6 +870,81 @@ is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
+`add_error_key`:: (Optional) If it set to true, in case of error while decoding json keys
+`error` field is going to be part of event with error message. If it set to false, there
+will not be any error in event's field. Even error occurs while decoding json keys. The
+default value is false
+
+
+[[decode-base64-field]]
+=== Decode Base64 fields
+
+The `decode_base64_field` processor specifies a field to base64 decode.
+The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
+
+To overwrite fields either first rename the target field or use the `drop_fields`
+processor to drop the field and then rename the field.
+
+[source,yaml]
+-------
+processors:
+- decode_base64_field:
+    field:
+      from: "field1"
+      to: "field2"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+In the example above:
+    - field1 is decoded in field2
+
+The `decode_base64_field` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be base64 decoded is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the base6 4decode
+of fields is stopped and the original event is returned. If set to false, decoding
+continues also if an error happened during decoding. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
+
+[[decompress-gzip-field]]
+=== Decompress gzip fields
+
+The `decompress_gzip_field` processor specifies a field to gzip decompress.
+The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
+
+To overwrite fields either first rename the target field or use the `drop_fields`
+processor to drop the field and then rename the field.
+
+[source,yaml]
+-------
+processors:
+- decompress_gzip_field:
+    field:
+      from: "field1"
+      to: "field2"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+In the example above:
+    - field1 is decoded in field2
+
+The `decompress_gzip_field` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be base64 decoded is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the base6 4decode
+of fields is stopped and the original event is returned. If set to false, decoding
+continues also if an error happened during decoding. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
 
 [[community-id]]
 === Community ID Network Flow Hash
@@ -843,7 +981,8 @@ processors:
         source_port: my_source_port
         destination_ip: my_dest_ip
         destination_port: my_dest_port
-        transport: proto
+        iana_number: my_iana_number
+        transport: my_transport
         icmp_type: my_icmp_type
         icmp_code: my_icmp_code
       target: network.community_id
@@ -854,6 +993,52 @@ silently continue without adding the target field.
 
 The processor also accepts an optional `seed` parameter that must be a 16-bit
 unsigned integer. This value gets incorporated into all generated hashes.
+
+[[convert]]
+=== Convert
+
+The `convert` processor converts a field in the event to a different type, such
+as converting a string to an integer.
+
+The supported types include: `integer`, `long`, `float`, `double`, `string`,
+`boolean`, and `ip`.
+
+The `ip` type is effectively an alias for `string`, but with an added validation
+that the value is an IPv4 or IPv6 address.
+
+[source,yaml]
+----
+processors:
+  - convert:
+      fields:
+        - {from: "src_ip", to: "source.ip", type: "ip"}
+        - {from: "src_port", to: "source.port", type: "integer"}
+      ignore_missing: true
+      fail_on_error: false
+----
+
+The `convert` processor has the following configuration settings:
+
+`fields`:: (Required) This is the list of fields to convert. At least one item
+must be contained in the list. Each item in the list must have a `from` key that
+specifies the source field. The `to` key is optional and specifies where to
+assign the converted value. If `to` is omitted then the `from` field is updated
+in-place. The `type` key specifies the data type to convert the value to. If
+`type` is omitted then the processor copies or renames the field without any
+type conversion.
+
+`ignore_missing`:: (Optional) If `true` the processor continues to the next
+field when the `from` key is not found in the event. If false then the processor
+returns an error and does not process the remaining fields. Default is `false`.
+
+`fail_on_error`:: (Optional) If false type conversion failures are ignored and
+the processor continues to the next field. Default is `true`.
+
+`tag`:: (Optional) An identifier for this processor. Useful for debugging.
+
+`mode`:: (Optional) When both `from` and `to` are defined for a field then
+`mode` controls whether to `copy` or `rename` the field when the type conversion
+is successful. Default is `copy`.
 
 [[drop-event]]
 === Drop events
@@ -887,12 +1072,61 @@ processors:
      when:
         condition
      fields: ["field1", "field2", ...]
+     ignore_missing: false
 -----------------------------------------------------
 
 See <<conditions>> for a list of supported conditions.
 
 NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
+
+The `drop_fields` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If `true` the processor will not return an error
+when a specified field does not exist. Defaults to `false`.
+
+[[extract-array]]
+=== Extract array
+
+experimental[]
+
+The `extract_array` processor populates fields with values read from an array
+field. The following example will populate `source.ip` with the first element of
+the `my_array` field, `destination.ip` with the second element, and
+`network.transport` with the third.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - extract_array:
+     field: my_array
+     mappings:
+        source.ip: 0
+        destination.ip: 1
+        network.transport: 2
+-----------------------------------------------------
+
+The following settings are supported:
+
+`field`:: The array field whose elements are to be extracted.
+`mappings`:: Maps each field name to an array index. Use 0 for the first element in
+             the array. Multiple fields can be mapped to the same array element.
+`ignore_missing`:: (Optional) Whether to ignore events where the array field is
+                   missing. The default is `false`, which will fail processing
+                   of an event if the specified field does not exist. Set it to
+                   `true` to ignore this condition.
+`overwrite_keys`:: Whether the target fields specified in the mapping are
+                   overwritten if they already exist. The default is `false`,
+                   which will fail processing if a target field already exists.
+`fail_on_error`:: (Optional) If set to `true` and an error happens, changes to
+                  the event are reverted, and the original event is returned. If
+                  set to `false`, processing continues despite errors.
+                  Default is `true`.
+`omit_empty`:: (Optional) Whether empty values are extracted from the array. If
+                  set to `true`, instead of the target field being set to an
+                  empty value, it is left unset. The empty string (`""`), an
+                  empty array (`[]`) or an empty object (`{}`) are considered
+                  empty values. Default is `false`.
 
 [[include-fields]]
 === Keep fields from events
@@ -918,6 +1152,40 @@ section.
 
 NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
+
+[[processor-registered-domain]]
+=== Registered Domain
+
+The `registered_domain` processor reads a field containing a hostname and then
+writes the "registered domain" contained in the hostname to the target field.
+For example, given `www.google.co.uk` the processor would output `google.co.uk`.
+In other words the "registered domain" is the effective top-level domain
+(`co.uk`) plus one level (`google`).
+
+This processor uses the Mozilla Public Suffix list to determine the value.
+
+[source,yaml]
+----
+processors:
+- registered_domain:
+    field: dns.question.name
+    target_field: dns.question.registered_domain
+    ignore_missing: true
+    ignore_failure: true
+----
+
+The `registered_domain` processor has the following configuration settings:
+
+.Registered Domain options
+[options="header"]
+|======
+| Name             | Required | Default    | Description                                                      |
+| `field`          | yes      |            | Source field containing a fully qualified domain name (FQDN).    |
+| `target_field`   | yes      |            | Target field for the registered domain value.                    |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                  |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                     |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging. |
+|======
 
 [[rename-fields]]
 === Rename fields from events
@@ -990,7 +1258,7 @@ construct a lookup key with the value of the field `metricset.host`.
 Each Beat can define its own default indexers and matchers which are enabled by
 default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
-the `log.file.path` field, extracts the container ID, and uses it to retrieve 
+the `log.file.path` field, extracts the container ID, and uses it to retrieve
 metadata.
 
 The configuration below enables the processor when {beatname_lc} is run as a pod in
@@ -1000,7 +1268,6 @@ Kubernetes.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: true
 -------------------------------------------------------------------------------
 
 The configuration below enables the processor on a Beat running as a process on
@@ -1010,7 +1277,6 @@ the Kubernetes node.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: false
     host: <hostname>
     kube_config: ${HOME}/.kube/config
 -------------------------------------------------------------------------------
@@ -1022,7 +1288,6 @@ enables ones that the user is interested in.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: false
     host: <hostname>
     kube_config: ~/.kube/config
     default_indexers.enabled: false
@@ -1036,8 +1301,6 @@ processors:
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
 
-`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
-by default.
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
@@ -1073,7 +1336,7 @@ You can do this by mounting the socket inside the container. For example:
 To avoid privilege issues, you may also need to add `--user=root` to the
 `docker run` flags. Because the user must be part of the docker group in order
 to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
-running as non-root inside the container. 
+running as non-root inside the container.
 =====
 
 [source,yaml]
@@ -1131,8 +1394,6 @@ forget metadata for a container, 60s by default.
 [[add-host-metadata]]
 === Add Host metadata
 
-beta[]
-
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
@@ -1155,25 +1416,25 @@ It has the following settings:
 
 `cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
 
-`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+`geo.name`:: (Optional) User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
 
-`geo.location`:: Longitude and latitude in comma separated format.
+`geo.location`:: (Optional) Longitude and latitude in comma separated format.
 
-`geo.continent_name`:: Name of the continent.
+`geo.continent_name`:: (Optional) Name of the continent.
 
-`geo.country_name`:: Name of the country.
+`geo.country_name`:: (Optional) Name of the country.
 
-`geo.region_name`:: Name of the region.
+`geo.region_name`:: (Optional) Name of the region.
 
-`geo.city_name`:: Name of the city.
+`geo.city_name`:: (Optional) Name of the city.
 
-`geo.country_iso_code`:: ISO country code.
+`geo.country_iso_code`:: (Optional) ISO country code.
 
-`geo.region_iso_code`:: ISO region code.
+`geo.region_iso_code`:: (Optional) ISO region code.
 
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
-The fields added to the event are looking as following:
+The fields added to the event look like the following:
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -1202,6 +1463,80 @@ The fields added to the event are looking as following:
           "location": "40.7128, -74.0060"
         }
    }
+}
+-------------------------------------------------------------------------------
+
+[[add-observer-metadata]]
+=== Add Observer metadata
+
+beta[]
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_observer_metadata:
+    netinfo.enabled: false
+    cache.ttl: 5m
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields observer.ip and observer.mac
+
+`cache.ttl`:: (Optional) The processor uses an internal cache for the observer metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
+
+`geo.name`:: (Optional) User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+
+`geo.location`:: (Optional) Longitude and latitude in comma separated format.
+
+`geo.continent_name`:: (Optional) Name of the continent.
+
+`geo.country_name`:: (Optional) Name of the country.
+
+`geo.region_name`:: (Optional) Name of the region.
+
+`geo.city_name`:: (Optional) Name of the city.
+
+`geo.country_iso_code`:: (Optional) ISO country code.
+
+`geo.region_iso_code`:: (Optional) ISO region code.
+
+
+The `add_geo_metadata` processor annotates each event with relevant metadata from the observer machine.
+The fields added to the event look like the following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "observer" : {
+    "hostname" : "avce",
+    "type" : "heartbeat",
+    "vendor" : "elastic",
+    "ip" : [
+      "192.168.1.251",
+      "fe80::64b2:c3ff:fe5b:b974",
+    ],
+    "mac" : [
+      "dc:c1:02:6f:1b:ed",
+    ],
+    "geo": {
+      "continent_name": "North America",
+      "country_iso_code": "US",
+      "region_name": "New York",
+      "region_iso_code": "NY",
+      "city_name": "New York",
+      "name": "nyc-dc1-rack1",
+      "location": "40.7128, -74.0060"
+    }
+  }
 }
 -------------------------------------------------------------------------------
 
@@ -1403,7 +1738,7 @@ set to `true`, this condition will be ignored.
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
 [[processor-script]]
 === Script Processor
 
@@ -1572,4 +1907,72 @@ thrown.
 
 *Example*: `event.AppendTo("error.message", "invalid file hash");`
 |===
+endif::[]
+
+ifdef::has_timestamp_processor[]
+[[processor-timestamp]]
+=== Timestamp
+
+beta[]
+
+The `timestamp` processor parses a timestamp from a field. By default the
+timestamp processor writes the parsed result to the `@timestamp` field. You can
+specify a different field by setting the `target_field` parameter. The timestamp
+value is parsed according to the `layouts` parameter. Multiple layouts can be
+specified and they will be used sequentially to attempt parsing the timestamp
+field.
+
+NOTE: The timestamp layouts used by this processor are different than the
+      formats supported by date processors in Logstash and Elasticsearch Ingest
+      Node.
+
+The `layouts` are described using a reference time that is based on this
+specific time:
+
+    Mon Jan 2 15:04:05 MST 2006
+
+Since MST is GMT-0700, the reference time is:
+
+    01/02 03:04:05PM '06 -0700
+
+To define your own layout, rewrite the reference time in a format that matches
+the timestamps you expect to parse. For more layout examples and details see the
+https://godoc.org/time#pkg-constants[Go time package documentation].
+
+If a layout does not contain a year then the current year in the specified
+`timezone` is added to the time value.
+
+.Timestamp options
+[options="header"]
+|======
+| Name             | Required | Default    | Description                                                                                                           |
+| `field`          | yes      |            | Source field containing the time to be parsed.                                                                        |
+| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.                                    |
+| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |
+| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone.                           |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                                                       |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                                          |
+| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.                                         |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                                                      |
+|======
+
+Here is an example that parses the `start_time` field and writes the result
+to the `@timestamp` field then deletes the `start_time` field. When the
+processor is loaded it will immediately validate that the two `test` timestamps
+parse with this configuration.
+
+[source,yaml]
+----
+processors:
+- timestamp:
+    field: start_time
+    layouts:
+      - '2006-01-02T15:04:05Z'
+      - '2006-01-02T15:04:05.999Z'
+    test:
+      - '2019-06-22T16:33:51Z'
+      - '2019-11-18T04:59:51.123Z'
+- drop_fields:
+    fields: [start_time]
+----
 endif::[]

@@ -67,8 +67,8 @@ index template. This is no longer recommended. Use the `setup` command instead.
 *Metricbeat and Filebeat users:* If you use {beats} central management,
 make sure you migrate the {beats} central management index to 6.7 before you
 upgrade to 7.0. Although central management is not a GA-level feature in 7.0,
-we've provided a migration tool to help you migrate your configurations. For
-more information, see the
+we've provided a migration tool to help you migrate your configurations from
+version 6.6 to 6.7 or later. For more information, see the
 https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
 
 ==== Upgrade {beats} binaries to 7.0
@@ -141,18 +141,39 @@ template to 7.0.
 migration.6_to_7.enabled: true
 ----
 
-The field aliases enable you to use 6.x dashboards and visualizations
-with indices created by {beats} 7.0 or later. The aliases do *not* work
-with saved searches or with API calls that manipulate documents directly.
+The field aliases let you use 6.x dashboards and visualizations with indices
+created by {beats} 7.0 or later. The aliases do *not* work with saved searches
+or with API calls that manipulate documents directly. 
+
+Some fields also have type changes in 7.0 that affect the behavior of older
+dashboards and visualizations. To clarify:
+
+* *Some fields have type changes.* Your {kib} visualizations and aggregations 
+will not work on these fields until the conflicts are resolved.
+
+* *Some fields have name changes, but no type changes.* The field aliases
+created by the compatibility layer ensure that visualizations and aggregations
+on the old field names work on old and new data. 7.0 dashboards work
+only on new field names (and therefore only on new data).
+
+* *Some fields have both name and type changes.* Field aliases are created for
+these fields, but your {kib} visualizations and aggregations will not work on
+these fields until the conflicts are resolved. Some of your  {es} API queries
+may continue to work, if the old and new types are compatible.
 
 We strongly advise that you adjust your custom {kib} dashboards, machine
-learning jobs, and other content to use the new ECS field names. After removing
-all references to old fields, you should set `migration.6_to_7.enabled: false`
-so that field aliases will not be created during your next minor upgrade.
+learning jobs, and other content to use the new ECS field names. To learn more
+about migrating to ECS, see the
+https://www.elastic.co/blog/migrating-to-elastic-common-schema-in-beats-environments[Migrating
+to Elastic Common Schema (ECS) in Beats environments] blog post.
+
+After removing all references to old fields, you should set
+`migration.6_to_7.enabled: false` so that field aliases will not be created
+during your next minor upgrade.
 
 The aliases will be removed in 8.0.
 
-Did you run the Beat or load the index template before reading this section?
+TIP: Did you run the Beat or load the index template before reading this section?
 That's OK. See the clean-up steps described under <<missing-fields>>.
 
 [[upgrade-index-template]]
@@ -386,21 +407,29 @@ manually.
 
 To add the setting manually, first identify the list of fields that you want to
 set as the default search fields, then specify the list of fields in the
-`default_field` setting. For example:
+`default_field` setting.
 
-// REVIEWERS: Can we provide users with a more realistic example here that
-// maybe shows some fields for metricbeat? This one is too generic. 
+For example, here's a snippet that shows how to add default search fields to a
+Metricbeat 6.6 index. This example is truncated. Full examples for Metricbeat
+and Filebeat are available in
+https://github.com/elastic/beats/blob/master/libbeat/docs/troubleshooting/default_field.md[this file]. 
 
 [source,js]
 --------------------------------------------------
-PUT /myIndex/_settings
+PUT /metricbeat-6.6.2-2019.04.09/_settings
 {
   "index": {
     "query": {
       "default_field": [
-        "field1",
-        "nestedfield.field4",
-        "field2",
+        "aerospike.namespace.name",
+        "aerospike.namespace.node.host",
+        "aerospike.namespace.node.name",
+        "apache.status.hostname",
+        "beat.hostname",
+        "beat.name",
+        "beat.timezone",
+        "beat.version",
+        ...
       ]
     }
   }

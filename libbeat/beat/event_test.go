@@ -44,8 +44,8 @@ func TestEventPutGetTimestamp(t *testing.T) {
 	assert.Equal(t, ts, v)
 	assert.Equal(t, ts, evt.Timestamp)
 
-	// The @timestamp is also written into Fields.
-	assert.Equal(t, ts, evt.Fields["@timestamp"])
+	// The @timestamp is not written into Fields.
+	assert.Nil(t, evt.Fields["@timestamp"])
 }
 
 func TestEventMetadata(t *testing.T) {

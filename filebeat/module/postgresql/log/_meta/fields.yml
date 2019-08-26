@@ -4,6 +4,7 @@
     Fields from the PostgreSQL log files.
   fields:
     - name: timestamp
+      deprecated: 7.3.0
       description: >
         The timestamp from the log line.
     - name: core_id
@@ -18,6 +19,10 @@
       example: "SELECT * FROM users;"
       description:
         Query statement.
+
+    - name: error.code
+      type: long
+      description: Error code returned by Postgres (if any)
 
     - name: timezone
       type: alias

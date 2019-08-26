@@ -7,7 +7,15 @@ from nose.plugins.skip import SkipTest
 
 class KafkaTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['kafka']
+    COMPOSE_ADVERTISED_HOST = True
+
     VERSION = "2.0.0"
+
+    PRODUCER_USERNAME = "producer"
+    PRODUCER_PASSWORD = "producer-secret"
+
+    USERNAME = "stats"
+    PASSWORD = "test-secret"
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_partition(self):
@@ -23,6 +31,8 @@ class KafkaTest(metricbeat.BaseTest):
             "hosts": self.get_hosts(),
             "period": "1s",
             "version": self.VERSION,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
@@ -38,13 +48,14 @@ class KafkaTest(metricbeat.BaseTest):
     def create_topic(self):
         from kafka import KafkaProducer
 
-        producer = KafkaProducer(bootstrap_servers=self.get_hosts()[0],
-                                 retries=20, retry_backoff_ms=500)
+        producer = KafkaProducer(
+            bootstrap_servers=self.get_hosts()[0],
+            security_protocol="SASL_PLAINTEXT",
+            sasl_mechanism="PLAIN",
+            sasl_plain_username=self.PRODUCER_USERNAME,
+            sasl_plain_password=self.PRODUCER_PASSWORD,
+            retries=20, retry_backoff_ms=500)
         producer.send('foobar', b'some_message_bytes')
-
-    def get_hosts(self):
-        return [self.compose_hosts()[0] + ':' +
-                os.getenv('KAFKA_PORT', '9092')]
 
 
 class Kafka_1_1_0_Test(KafkaTest):

@@ -12,7 +12,7 @@ heartbeat.autodiscover:
               kubernetes.annotations.prometheus.io.scrape: "true"
           config:
             - type: http
-              hosts: ["${data.host}:${data.port}"]
+              urls: ["${data.host}:${data.port}"]
               schedule: "@every 1s"
               timeout: 1s
 -------------------------------------------------------------------------------------

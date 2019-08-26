@@ -48,6 +48,13 @@ endif::win_only[]
 TIP: In addition to setting logging options in the config file, you can modify
 the logging output configuration from the command line. See
 <<command-line-options>>.
+
+ifndef::win_only[]
+WARNING: When {beatname_uc} is running on a Linux system with systemd, it uses
+by default the `-e` command line option, that makes it write all the logging output
+to stderr so it can be captured by journald. Other outputs are disabled. See
+<<running-with-systemd>> to know more and learn how to change this.
+endif::win_only[]
 endif::serverless[]
 
 ifdef::serverless[]
@@ -77,6 +84,12 @@ You can specify the following options in the `logging` section of the
 +{beatname_lc}.yml+ config file:
 
 ifndef::serverless[]
+[float]
+==== `logging.to_stderr`
+
+When true, writes all logging output to standard error output. This is
+equivalent to using the `-e` command line option.
+
 [float]
 ==== `logging.to_syslog`
 
@@ -205,6 +218,13 @@ are boundary-aligned with minutes, hours, days, weeks, months, and years as
 reported by the local system clock. All other intervals are calculated from the
 unix epoch. Defaults to disabled.
 endif::serverless[]
+
+[float]
+==== `logging.files.rotateonstartup`
+
+If the log file already exists on startup, immediately rotate it and start
+writing to a new file instead of appending to the existing one. Defaults to
+true.
 
 [float]
 ==== `logging.json`

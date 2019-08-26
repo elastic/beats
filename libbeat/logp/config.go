@@ -42,23 +42,25 @@ type Config struct {
 
 // FileConfig contains the configuration options for the file output.
 type FileConfig struct {
-	Path           string        `config:"path"`
-	Name           string        `config:"name"`
-	MaxSize        uint          `config:"rotateeverybytes" validate:"min=1"`
-	MaxBackups     uint          `config:"keepfiles" validate:"max=1024"`
-	Permissions    uint32        `config:"permissions"`
-	Interval       time.Duration `config:"interval"`
-	RedirectStderr bool          `config:"redirect_stderr"`
+	Path            string        `config:"path"`
+	Name            string        `config:"name"`
+	MaxSize         uint          `config:"rotateeverybytes" validate:"min=1"`
+	MaxBackups      uint          `config:"keepfiles" validate:"max=1024"`
+	Permissions     uint32        `config:"permissions"`
+	Interval        time.Duration `config:"interval"`
+	RotateOnStartup bool          `config:"rotateonstartup"`
+	RedirectStderr  bool          `config:"redirect_stderr"`
 }
 
 var defaultConfig = Config{
 	Level:   InfoLevel,
 	ToFiles: true,
 	Files: FileConfig{
-		MaxSize:     10 * 1024 * 1024,
-		MaxBackups:  7,
-		Permissions: 0600,
-		Interval:    0,
+		MaxSize:         10 * 1024 * 1024,
+		MaxBackups:      7,
+		Permissions:     0600,
+		Interval:        0,
+		RotateOnStartup: true,
 	},
 	addCaller: true,
 }

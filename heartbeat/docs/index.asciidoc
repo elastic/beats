@@ -20,6 +20,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :linux_os:
 :docker_platform:
 :win_os:
+:no_dashboards:
 
 include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 

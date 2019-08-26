@@ -44,7 +44,7 @@ const (
 
 var (
 	errMonitoringBothConfigEnabled = errors.New("both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.elasticsearch.hosts to monitoring cluster hosts")
-	warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.elasticsearch.hosts to monitoring cluster hosts"
+	warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.elasticsearch.hosts to monitoring cluster hosts."
 )
 
 // Default is the global default metrics registry provided by the monitoring package.
@@ -92,7 +92,7 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
 		return nil, nil, errMonitoringBothConfigEnabled
 	case beatCfg.XPackMonitoring.Enabled():
-		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
+		cfgwarn.Deprecate("8.0", warnMonitoringDeprecatedConfig)
 		monitoringCfg := beatCfg.XPackMonitoring
 		return monitoringCfg, &report.Settings{Format: report.FormatXPackMonitoringBulk}, nil
 	case beatCfg.Monitoring.Enabled():

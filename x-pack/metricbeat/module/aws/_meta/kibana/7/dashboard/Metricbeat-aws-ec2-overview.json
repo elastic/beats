@@ -12,7 +12,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 DiskIO Write Bytes ECS",
+                "title": "EC2 DiskIO Write Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -44,7 +44,7 @@
                                 "filter": "",
                                 "formatter": "number",
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                                "label": "AWS EC2 DiskIO Write Bytes ECS",
+                                "label": "AWS EC2 DiskIO Write Bytes",
                                 "line_width": 1,
                                 "metrics": [
                                     {
@@ -70,7 +70,7 @@
                         "time_field": "@timestamp",
                         "type": "timeseries"
                     },
-                    "title": "AWS EC2 DiskIO Write Bytes ECS",
+                    "title": "AWS EC2 DiskIO Write Bytes",
                     "type": "metrics"
                 }
             },
@@ -91,7 +91,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Status Check Failed ECS",
+                "title": "EC2 Status Check Failed [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -151,7 +151,7 @@
                         "time_field": "@timestamp",
                         "type": "metric"
                     },
-                    "title": "AWS EC2 Status Check Failed ECS",
+                    "title": "AWS EC2 Status Check Failed",
                     "type": "metrics"
                 }
             },
@@ -172,7 +172,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Network In Bytes ECS",
+                "title": "EC2 Network In Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -204,7 +204,7 @@
                                 "filter": "",
                                 "formatter": "number",
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                                "label": "AWS EC2 Network In Bytes ECS",
+                                "label": "AWS EC2 Network In Bytes",
                                 "line_width": 1,
                                 "metrics": [
                                     {
@@ -230,7 +230,7 @@
                         "time_field": "@timestamp",
                         "type": "timeseries"
                     },
-                    "title": "AWS EC2 Network In Bytes ECS",
+                    "title": "AWS EC2 Network In Bytes",
                     "type": "metrics"
                 }
             },
@@ -251,7 +251,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Network Out Bytes ECS",
+                "title": "EC2 Network Out Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -283,7 +283,7 @@
                                 "filter": "",
                                 "formatter": "number",
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                                "label": "AWS EC2 Network Out Bytes ECS",
+                                "label": "AWS EC2 Network Out Bytes",
                                 "line_width": 1,
                                 "metrics": [
                                     {
@@ -309,7 +309,7 @@
                         "time_field": "@timestamp",
                         "type": "timeseries"
                     },
-                    "title": "AWS EC2 Network Out Bytes ECS",
+                    "title": "AWS EC2 Network Out Bytes",
                     "type": "metrics"
                 }
             },
@@ -330,7 +330,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 DiskIO Read Bytes ECS",
+                "title": "EC2 DiskIO Read Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -362,7 +362,7 @@
                                 "filter": "",
                                 "formatter": "number",
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                                "label": "AWS EC2 DiskIO Read Bytes ECS",
+                                "label": "AWS EC2 DiskIO Read Bytes",
                                 "line_width": 1,
                                 "metrics": [
                                     {
@@ -388,7 +388,7 @@
                         "time_field": "@timestamp",
                         "type": "timeseries"
                     },
-                    "title": "AWS EC2 DiskIO Read Bytes ECS",
+                    "title": "AWS EC2 DiskIO Read Bytes",
                     "type": "metrics"
                 }
             },
@@ -409,7 +409,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 CPU Utilization ECS",
+                "title": "EC2 CPU Utilization [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -441,7 +441,7 @@
                                 "filter": "",
                                 "formatter": "number",
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                                "label": "AWS EC2 CPU Utilization ECS",
+                                "label": "AWS EC2 CPU Utilization",
                                 "line_width": 1,
                                 "metrics": [
                                     {
@@ -467,7 +467,7 @@
                         "time_field": "@timestamp",
                         "type": "timeseries"
                     },
-                    "title": "AWS EC2 CPU Utilization ECS",
+                    "title": "AWS EC2 CPU Utilization",
                     "type": "metrics"
                 }
             },
@@ -488,7 +488,7 @@
                         }
                     }
                 },
-                "title": "AWS Filters ECS",
+                "title": "Filters [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -545,7 +545,7 @@
                         "updateFiltersOnChange": true,
                         "useTimeFilter": false
                     },
-                    "title": "AWS Filters ECS",
+                    "title": "AWS Filters",
                     "type": "input_control_vis"
                 }
             },
@@ -567,7 +567,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Instance State ECS",
+                "title": "EC2 Instance State [Metricbeat AWS]",
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -623,7 +623,7 @@
                         "legendPosition": "right",
                         "type": "pie"
                     },
-                    "title": "AWS EC2 Instance State ECS",
+                    "title": "AWS EC2 Instance State",
                     "type": "pie"
                 }
             },
@@ -765,7 +765,7 @@
                     }
                 ],
                 "timeRestore": false,
-                "title": "[Metricbeat AWS] EC2 Overview ECS",
+                "title": "[Metricbeat AWS] EC2 Overview",
                 "version": 1
             },
             "id": "c5846400-f7fb-11e8-af03-c999c9dea608-ecs",

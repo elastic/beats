@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Provider for autodiscover
@@ -56,7 +55,7 @@ func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
 	}
 
 	r.providers[name] = provider
-	logp.Debug(debugK, "Provider registered: %s", name)
+	r.logger.Debugf("Provider registered: %s", name)
 	return nil
 }
 
@@ -79,7 +78,7 @@ func (r *registry) BuildProvider(bus bus.Bus, c *common.Config) (Provider, error
 
 	builder := r.GetProvider(config.Type)
 	if builder == nil {
-		return nil, fmt.Errorf("Unknown autodiscover provider %s", config.Type)
+		return nil, fmt.Errorf("unknown autodiscover provider %s", config.Type)
 	}
 
 	uuid, err := uuid.NewV4()

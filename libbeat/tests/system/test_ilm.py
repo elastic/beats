@@ -1,266 +1,365 @@
 from base import BaseTest
+from idxmgmt import IdxMgmt
 import os
-from elasticsearch import Elasticsearch, TransportError
 from nose.plugins.attrib import attr
 import unittest
 import shutil
-import logging
 import datetime
+import logging
+import json
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
-testPolicyName = "libbeat-test-default-policy"
-
-
-class Test(BaseTest):
+class TestRunILM(BaseTest):
 
     def setUp(self):
-        super(BaseTest, self).setUp()
+        super(TestRunILM, self).setUp()
 
-        self.elasticsearch_url = self.get_elasticsearch_url()
-        print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = Elasticsearch([self.elasticsearch_url])
-        self.alias_name = "mockbeat-9.9.9"
-        self.policy_name = testPolicyName
-        logging.getLogger("urllib3").setLevel(logging.WARNING)
-        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
+        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.custom_alias = self.beat_name + "_foo"
+        self.custom_policy = self.beat_name + "_bar"
+        self.es = self.es_client()
+        self.idxmgmt = IdxMgmt(self.es, self.index_name)
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+
+    def tearDown(self):
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+
+    def render_config(self, **kwargs):
+        self.render_config_template(
+            elasticsearch={"hosts": self.get_elasticsearch_url()},
+            es_template_name=self.index_name,
+            **kwargs
+        )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_enabled(self):
+    def test_ilm_default(self):
         """
-        Test ilm enabled
+        Test ilm default settings to load ilm policy, write alias and ilm template
         """
-
-        self.render_config_template(
-            ilm={
-                "enabled": True,
-            },
-            elasticsearch={
-                "hosts": self.get_elasticsearch_url(),
-            },
-        )
-
-        self.clean()
-
+        self.render_config()
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("Set setup.template.name"))
+        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        # Check if template is loaded with settings
-        template = self.es.transport.perform_request('GET', '/_template/' + self.alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
 
-        print(self.alias_name)
-        assert template[self.alias_name]["settings"]["index"]["lifecycle"]["name"] == testPolicyName
-        assert template[self.alias_name]["settings"]["index"]["lifecycle"]["rollover_alias"] == self.alias_name
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_ilm_disabled(self):
+        """
+        Test ilm disabled to not load ilm related components
+        """
 
-        # Make sure the correct index + alias was created
-        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
-        d = datetime.datetime.now()
-        now = d.strftime("%Y.%m.%d")
-        index_name = self.alias_name + "-" + now + "-000001"
-        assert index_name in alias
-        assert alias[index_name]["aliases"][self.alias_name]["is_write_index"] == True
+        self.render_config(ilm={"enabled": False})
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        proc.check_kill_and_wait()
 
-        # Asserts that data is actually written to the ILM indices
-        self.wait_until(lambda: self.es.transport.perform_request(
-            'GET', '/' + index_name + '/_search')["hits"]["total"] > 0)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_alias_not_created(self.alias_name)
+        self.idxmgmt.assert_policy_not_created(self.policy_name)
 
-        data = self.es.transport.perform_request('GET', '/' + index_name + '/_search')
-        assert data["hits"]["total"] > 0
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_policy_name(self):
+        """
+        Test setting ilm policy name
+        """
+
+        policy_name = self.beat_name + "_foo"
+        self.render_config(ilm={"enabled": True, "policy_name": policy_name})
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        proc.check_kill_and_wait()
+
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, policy_name, self.alias_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_policy_created(policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_rollover_alias(self):
         """
-        Test ilm rollover alias setting
+        Test settings ilm rollover alias
         """
 
-        alias_name = "foo"
-        self.render_config_template(
-            ilm={
-                "enabled": True,
-                "pattern": "1",
-                "rollover_alias": alias_name
-            },
-            elasticsearch={
-                "hosts": self.get_elasticsearch_url(),
-            },
-        )
-
-        self.clean(alias_name=alias_name)
+        self.render_config(ilm={"enabled": True, "rollover_alias": self.custom_alias})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("Set setup.template.name"))
+        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        # Make sure the correct index + alias was created
-        print '/_alias/' + alias_name
-        logfile = self.beat_name + ".log"
-        with open(os.path.join(self.working_dir, logfile), "r") as f:
-            print f.read()
-
-        alias = self.es.transport.perform_request('GET', '/_alias/' + alias_name)
-        index_name = alias_name + "-1"
-        assert index_name in alias
+        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
+        self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_pattern(self):
         """
-        Test ilm pattern setting
+        Test setting ilm pattern
         """
 
-        self.render_config_template(
-            ilm={
-                "enabled": True,
-                "pattern": "1"
-            },
-            elasticsearch={
-                "hosts": self.get_elasticsearch_url(),
-            },
-        )
-
-        self.clean()
+        pattern = "1"
+        self.render_config(ilm={"enabled": True, "pattern": pattern})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("Set setup.template.name"))
+        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        # Make sure the correct index + alias was created
-        print '/_alias/' + self.alias_name
-        logfile = self.beat_name + ".log"
-        with open(os.path.join(self.working_dir, logfile), "r") as f:
-            print f.read()
-
-        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
-        index_name = self.alias_name + "-1"
-        assert index_name in alias
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name, pattern=pattern)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=pattern)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_pattern_date(self):
         """
-        Test ilm pattern with date inside
+        Test setting ilm pattern with date
         """
 
-        self.render_config_template(
-            ilm={
-                "enabled": True,
-                "pattern": "'{now/d}'"
-            },
-            elasticsearch={
-                "hosts": self.get_elasticsearch_url(),
-            },
-        )
-
-        self.clean()
+        pattern = "'{now/d}'"
+        self.render_config(ilm={"enabled": True, "pattern": pattern})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("Set setup.template.name"))
+        self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        # Make sure the correct index + alias was created
-        print '/_alias/' + self.alias_name
-        logfile = self.beat_name + ".log"
-        with open(os.path.join(self.working_dir, logfile), "r") as f:
-            print f.read()
+        resolved_pattern = datetime.datetime.now().strftime("%Y.%m.%d")
 
-        # Make sure the correct index + alias was created
-        alias = self.es.transport.perform_request('GET', '/_alias/' + self.alias_name)
-        d = datetime.datetime.now()
-        now = d.strftime("%Y.%m.%d")
-        index_name = self.alias_name + "-" + now
-        assert index_name in alias
-        assert alias[index_name]["aliases"][self.alias_name]["is_write_index"] == True
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name, pattern=resolved_pattern)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=resolved_pattern)
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
-    def test_setup_ilm_policy(self):
-        """
-        Test ilm policy setup
-        """
 
-        self.clean()
+class TestCommandSetupILMPolicy(BaseTest):
+    """
+    Test beat command `setup` related to ILM policy
+    """
 
-        shutil.copy(self.beat_path + "/_meta/config.yml",
-                    os.path.join(self.working_dir, "libbeat.yml"))
-        shutil.copy(self.beat_path + "/fields.yml",
-                    os.path.join(self.working_dir, "fields.yml"))
+    def setUp(self):
+        super(TestCommandSetupILMPolicy, self).setUp()
 
-        exit_code = self.run_beat(
-            logging_args=["-v", "-d", "*"],
-            extra_args=["setup",
-                        "--ilm-policy",
-                        "-path.config", self.working_dir,
-                        "-E", "output.elasticsearch.hosts=['" + self.get_elasticsearch_url() + "']"],
-            config="libbeat.yml")
+        self.setupCmd = "--ilm-policy"
 
-        assert exit_code == 0
+        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.custom_alias = self.beat_name + "_foo"
+        self.custom_policy = self.beat_name + "_bar"
+        self.es = self.es_client()
+        self.idxmgmt = IdxMgmt(self.es, self.index_name)
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
 
-        policy = self.es.transport.perform_request('GET', "/_ilm/policy/" + self.policy_name)
-        assert self.policy_name in policy
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
+
+    def tearDown(self):
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+
+    def render_config(self, **kwargs):
+        self.render_config_template(
+            elasticsearch={"hosts": self.get_elasticsearch_url()},
+            es_template_name=self.index_name,
+            **kwargs
+        )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_export_ilm_policy(self):
+    def test_setup_ilm_policy_and_template(self):
         """
-        Test ilm policy export
+        Test combination of ilm policy and template setup
         """
+        self.render_config()
 
-        self.clean()
-
-        shutil.copy(self.beat_path + "/_meta/config.yml",
-                    os.path.join(self.working_dir, "libbeat.yml"))
-        shutil.copy(self.beat_path + "/fields.yml",
-                    os.path.join(self.working_dir, "fields.yml"))
-
-        exit_code = self.run_beat(
-            logging_args=["-v", "-d", "*"],
-            extra_args=["export",
-                        "ilm-policy",
-                        ],
-            config="libbeat.yml")
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd, "--template"])
 
         assert exit_code == 0
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_ilm_default(self):
+        """
+        Test ilm policy setup with default config
+        """
+        self.render_config()
+
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_ilm_disabled(self):
+        """
+        Test ilm policy setup when ilm disabled
+        """
+        self.render_config()
+
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.enabled=false"])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_alias_not_created(self.alias_name)
+        self.idxmgmt.assert_policy_not_created(self.policy_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_policy_name(self):
+        """
+        Test ilm policy setup when policy_name is configured
+        """
+        self.render_config()
+
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.policy_name=" + self.custom_policy])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
+        self.idxmgmt.assert_policy_created(self.custom_policy)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_rollover_alias(self):
+        """
+        Test ilm policy setup when rollover_alias is configured
+        """
+        self.render_config()
+
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
+        self.idxmgmt.assert_alias_created(self.custom_alias)
+
+
+class TestCommandExportILMPolicy(BaseTest):
+    """
+    Test beat command `export ilm-policy`
+    """
+
+    def setUp(self):
+        super(TestCommandExportILMPolicy, self).setUp()
+
+        self.config = "libbeat.yml"
+        self.output = os.path.join(self.working_dir, self.config)
+        shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
+        self.policy_name = self.beat_name + "-9.9.9"
+        self.cmd = "ilm-policy"
+
+    def assert_log_contains_policy(self):
+        assert self.log_contains('ILM policy successfully loaded.')
         assert self.log_contains('"max_age": "30d"')
         assert self.log_contains('"max_size": "50gb"')
 
-    def clean(self, alias_name=""):
+    def assert_log_contains_write_alias(self):
+        assert self.log_contains('Write alias successfully generated.')
 
-        if alias_name == "":
-            alias_name = self.alias_name
+    def test_default(self):
+        """
+        Test ilm-policy export with default config
+        """
 
-        # Delete existing indices and aliases with it policy
-        try:
-            self.es.transport.perform_request('DELETE', "/" + alias_name + "*")
-        except:
-            pass
+        exit_code = self.run_beat(extra_args=["export", self.cmd],
+                                  config=self.config)
 
-        # Delete any existing policy
-        try:
-            self.es.transport.perform_request('DELETE', "/_ilm/policy/" + self.policy_name)
-        except:
-            pass
+        assert exit_code == 0
+        self.assert_log_contains_policy()
+        self.assert_log_contains_write_alias()
 
-        # Delete templates
-        try:
-            self.es.transport.perform_request('DELETE', "/_template/mockbeat*")
-        except:
-            pass
+    def test_load_disabled(self):
+        """
+        Test ilm-policy export when ilm disabled in config
+        """
 
-        # Delete indices
-        try:
-            self.es.transport.perform_request('DELETE', "/foo*,mockbeat*")
-        except:
-            pass
+        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.enabled=false"],
+                                  config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_policy()
+        self.assert_log_contains_write_alias()
+
+    def test_changed_policy_name(self):
+        """
+        Test ilm-policy export when policy name is changed
+        """
+        policy_name = "foo"
+
+        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.policy_name=" + policy_name],
+                                  config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_policy()
+        self.assert_log_contains_write_alias()
+
+    def test_export_to_file_absolute_path(self):
+        """
+        Test export ilm policy to file with absolute file path
+        """
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        exit_code = self.run_beat(
+            extra_args=["export", self.cmd, "--dir=" + base_path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        file = os.path.join(base_path, "policy", self.policy_name + '.json')
+        with open(file) as f:
+            policy = json.load(f)
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
+
+        os.remove(file)
+
+    def test_export_to_file_relative_path(self):
+        """
+        Test export ilm policy to file with relative file path
+        """
+        path = os.path.join(os.path.dirname(__file__), "export")
+        exit_code = self.run_beat(
+            extra_args=["export", self.cmd, "--dir=" + path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        file = os.path.join(base_path, "policy", self.policy_name + '.json')
+        with open(file) as f:
+            policy = json.load(f)
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
+
+        os.remove(file)

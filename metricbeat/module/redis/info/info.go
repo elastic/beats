@@ -22,19 +22,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/redis"
 )
 
-var (
-	debugf = logp.MakeDebug("redis-info")
-)
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()
 
 func init() {
 	mb.Registry.MustAddMetricSet("redis", "info", New,
-		mb.WithHostParser(parse.PassThruHostParser),
+		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
 }
@@ -54,12 +51,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	conn := m.Connection()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+		}
+	}()
+
 	// Fetch default INFO.
-	info, err := redis.FetchRedisInfo("default", m.Connection())
+	info, err := redis.FetchRedisInfo("default", conn)
 	if err != nil {
-		logp.Err("Failed to fetch redis info: %s", err)
-		return
+		return errors.Wrap(err, "failed to fetch redis info")
 	}
 
 	// In 5.0 some fields are renamed, maintain both names, old ones will be deprecated
@@ -77,13 +80,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		}
 	}
 
-	slowLogLength, err := redis.FetchSlowLogLength(m.Connection())
+	slowLogLength, err := redis.FetchSlowLogLength(conn)
 	if err != nil {
-		logp.Err("Failed to fetch slow log length: %s", err)
-		return
+		return errors.Wrap(err, "failed to fetch slow log length")
+
 	}
 	info["slowlog_len"] = strconv.FormatInt(slowLogLength, 10)
 
-	debugf("Redis INFO from %s: %+v", m.Host(), info)
+	m.Logger().Debugf("Redis INFO from %s: %+v", m.Host(), info)
 	eventMapping(r, info)
+	return nil
 }

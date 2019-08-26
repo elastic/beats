@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Info OSSEC rootkit [Osquery Result] ECS", 
+                "title": "Info OSSEC rootkit [Filebeat Osquery] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -15,7 +15,7 @@
                         "fontSize": 12, 
                         "markdown": "This dashboard shows data collected by the ossec-rootkit pack from osquery."
                     }, 
-                    "title": "Info OSSEC rootkit [Osquery Result] ECS", 
+                    "title": "Info OSSEC rootkit [Filebeat Osquery] ECS", 
                     "type": "markdown"
                 }
             }, 
@@ -37,7 +37,7 @@
                     }
                 }, 
                 "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
-                "title": "Number of rootkits found [Osquery Result] ECS", 
+                "title": "Number of rootkits found [Filebeat Osquery] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -81,7 +81,7 @@
                         }, 
                         "type": "metric"
                     }, 
-                    "title": "Number of rootkits found [Osquery Result] ECS", 
+                    "title": "Number of rootkits found [Filebeat Osquery] ECS", 
                     "type": "metric"
                 }
             }, 
@@ -103,7 +103,7 @@
                     }
                 }, 
                 "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
-                "title": "Number of hosts infected [Osquery Result] ECS", 
+                "title": "Number of hosts infected [Filebeat Osquery] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -147,7 +147,7 @@
                         }, 
                         "type": "metric"
                     }, 
-                    "title": "Number of hosts infected [Osquery Result] ECS", 
+                    "title": "Number of hosts infected [Filebeat Osquery] ECS", 
                     "type": "metric"
                 }
             }, 
@@ -162,7 +162,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Navigation [Osquery Result] ECS", 
+                "title": "Navigation [Filebeat Osquery] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -171,7 +171,7 @@
                         "fontSize": 10, 
                         "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs)"
                     }, 
-                    "title": "Navigation [Osquery Result] ECS", 
+                    "title": "Navigation [Filebeat Osquery] ECS", 
                     "type": "markdown"
                 }
             }, 
@@ -277,7 +277,7 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "OSSEC Rootkits [Osquery Result] ECS", 
+                "title": "OSSEC Rootkits [Filebeat Osquery] ECS", 
                 "version": 1
             }, 
             "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
@@ -373,7 +373,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Osquery Result] OSSEC rootkit pack ECS", 
+                "title": "[Filebeat Osquery] OSSEC rootkit pack ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 

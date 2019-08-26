@@ -22,17 +22,13 @@ func TestFetch(t *testing.T) {
 		t.Skip("Skipping TestFetch: " + info)
 	}
 
-	sqsMetricSet := mbtest.NewReportingMetricSetV2(t, config)
-	events, err := mbtest.ReportingFetchV2(sqsMetricSet)
-	if err != nil {
-		t.Skip("Skipping TestFetch: failed to make api calls. Please check $AWS_ACCESS_KEY_ID, " +
-			"$AWS_SECRET_ACCESS_KEY and $AWS_SESSION_TOKEN in config.yml")
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
-	}
-	t.Logf("Module: %s Metricset: %s", sqsMetricSet.Module().Name(), sqsMetricSet.Name())
+	assert.NotEmpty(t, events)
 
 	for _, event := range events {
 		// RootField
@@ -58,9 +54,8 @@ func TestData(t *testing.T) {
 		t.Skip("Skipping TestData: " + info)
 	}
 
-	sqsMetricSet := mbtest.NewReportingMetricSetV2(t, config)
-	errs := mbtest.WriteEventsReporterV2(sqsMetricSet, t, "/")
-	if errs != nil {
-		t.Fatal("write", errs)
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
+		t.Fatal("write", err)
 	}
 }

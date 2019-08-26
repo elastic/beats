@@ -1,18 +1,21 @@
+# Module: aws
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-aws.html
+
 - module: aws
   period: 300s
   metricsets:
-    - "ec2"
-    - "sqs"
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
+    - ec2
+  regions:
+    - us-east-1
 - module: aws
-  period: 86400s
+  period: 300s
   metricsets:
-    - "s3_request"
-    - "s3_daily_storage"
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
+    - cloudwatch
+  metrics:
+    - namespace: AWS/EC2
+      name: ["CPUUtilization", "DiskWriteOps"]
+      tags.resource_type_filter: ec2:intance
+      #dimensions:
+      #  - name: InstanceId
+      #    value: i-0686946e22cf9494a
+      statistic: ["Average", "Maximum"]

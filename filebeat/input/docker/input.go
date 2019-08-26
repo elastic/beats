@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/log"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/pkg/errors"
@@ -45,25 +46,18 @@ func NewInput(
 ) (input.Input, error) {
 	logger := logp.NewLogger("docker")
 
+	cfgwarn.Deprecate("8.0.0", "'docker' input deprecated. Use 'container' input instead.")
+
 	// Wrap log input with custom docker settings
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading docker input config")
 	}
 
-	// Docker input should make sure that no callers should ever pass empty strings as container IDs or paths
+	// Docker input should make sure that no callers should ever pass empty strings as container IDs
 	// Hence we explicitly make sure that we catch such things and print stack traces in the event of
 	// an invocation so that it can be fixed.
-	var ids, paths []string
-	for _, p := range config.Containers.Paths {
-		if p != "" {
-			paths = append(paths, p)
-		} else {
-			logger.Error("Docker paths can't be empty for Docker input config")
-			logger.Debugw("Empty path for Docker logfile was received", logp.Stack("stacktrace"))
-		}
-	}
-
+	var ids []string
 	for _, containerID := range config.Containers.IDs {
 		if containerID != "" {
 			ids = append(ids, containerID)
@@ -73,23 +67,12 @@ func NewInput(
 		}
 	}
 
-	if len(ids) == 0 && len(paths) == 0 {
+	if len(ids) == 0 {
 		return nil, errors.New("Docker input requires at least one entry under 'containers.ids' or 'containers.paths'")
 	}
 
-	// IDs + Path and Paths are mutually exclusive. Ensure that only one of them are set in a given configuration
-	if len(ids) != 0 && len(paths) != 0 {
-		return nil, errors.New("can not provide both 'containers.ids' and 'containers.paths' in the same input config")
-	}
-
-	if len(ids) != 0 {
-		for idx, containerID := range ids {
-			cfg.SetString("paths", idx, path.Join(config.Containers.Path, containerID, "*.log"))
-		}
-	} else {
-		for idx, p := range paths {
-			cfg.SetString("paths", idx, p)
-		}
+	for idx, containerID := range ids {
+		cfg.SetString("paths", idx, path.Join(config.Containers.Path, containerID, "*.log"))
 	}
 
 	if err := checkStream(config.Containers.Stream); err != nil {
@@ -108,13 +91,8 @@ func NewInput(
 		return nil, errors.Wrap(err, "update input config")
 	}
 
-	if err := cfg.SetBool("docker-json.force_cri_logs", -1, config.CRIForce); err != nil {
-		return nil, errors.Wrap(err, "update input config")
-	}
-
-	if len(paths) != 0 {
-		// Set symlinks to true as CRI-O paths could point to symlinks instead of the actual path.
-		if err := cfg.SetBool("symlinks", -1, true); err != nil {
+	if config.CRIForce {
+		if err := cfg.SetString("docker-json.format", -1, "cri"); err != nil {
 			return nil, errors.Wrap(err, "update input config")
 		}
 	}

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"strconv"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -97,9 +98,11 @@ func (b packageBuilder) Build() error {
 }
 
 type testPackagesParams struct {
-	HasModules   bool
-	HasMonitorsD bool
-	HasModulesD  bool
+	HasModules           bool
+	HasMonitorsD         bool
+	HasModulesD          bool
+	HasRootUserContainer bool
+	MinModules           *int
 }
 
 // TestPackagesOption defines a option to the TestPackages target.
@@ -109,6 +112,14 @@ type TestPackagesOption func(params *testPackagesParams)
 func WithModules() func(params *testPackagesParams) {
 	return func(params *testPackagesParams) {
 		params.HasModules = true
+	}
+}
+
+// MinModules sets the minimum number of modules to require
+func MinModules(n int) func(params *testPackagesParams) {
+	return func(params *testPackagesParams) {
+		minModules := n
+		params.MinModules = &minModules
 	}
 }
 
@@ -123,6 +134,13 @@ func WithMonitorsD() func(params *testPackagesParams) {
 func WithModulesD() func(params *testPackagesParams) {
 	return func(params *testPackagesParams) {
 		params.HasModulesD = true
+	}
+}
+
+// WithRootUserContainer allows root when checking user in container
+func WithRootUserContainer() func(params *testPackagesParams) {
+	return func(params *testPackagesParams) {
+		params.HasRootUserContainer = true
 	}
 }
 
@@ -148,6 +166,10 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "--modules")
 	}
 
+	if params.MinModules != nil {
+		args = append(args, "--min-modules", strconv.Itoa(*params.MinModules))
+	}
+
 	if params.HasMonitorsD {
 		args = append(args, "--monitors.d")
 	}
@@ -156,9 +178,14 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "--modules.d")
 	}
 
+	if params.HasRootUserContainer {
+		args = append(args, "--root-user-container")
+	}
+
 	if BeatUser == "root" {
 		args = append(args, "-root-owner")
 	}
+
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
 	if out, err := goTest(args...); err != nil {

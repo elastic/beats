@@ -1,0 +1,1735 @@
+[
+  {
+    "@timestamp": "2019-03-18T16:57:37.933Z",
+    "event": {
+      "code": 16,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "Configuration": "C:\\Users\\vagrant\\Downloads\\\"C:\\Users\\vagrant\\Downloads\\Sysmon.exe\"  -i -n"
+      },
+      "event_id": 16,
+      "process": {
+        "pid": 4616,
+        "thread": {
+          "id": 4724
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 1,
+      "user": {
+        "identifier": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "version": 3
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:38.011Z",
+    "event": {
+      "code": 4,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SchemaVersion": "4.20",
+        "State": "Started",
+        "Version": "9.01"
+      },
+      "event_id": 4,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 2,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 3
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:37.949Z",
+    "event": {
+      "category": "process",
+      "code": 1,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_start"
+    },
+    "hash": {
+      "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "args": [
+        "C:\\Windows\\Sysmon.exe"
+      ],
+      "entity_id": "{42f11c3b-ce01-5c8f-0000-0010c73e2a00}",
+      "executable": "C:\\Windows\\Sysmon.exe",
+      "name": "Sysmon.exe",
+      "parent": {
+        "args": [
+          "C:\\Windows\\system32\\services.exe"
+        ],
+        "entity_id": "{42f11c3b-6e1a-5c8c-0000-0010f14d0000}",
+        "executable": "C:\\Windows\\System32\\services.exe",
+        "name": "services.exe",
+        "pid": 488
+      },
+      "pid": 4860,
+      "working_directory": "C:\\Windows\\system32\\"
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "Company": "Sysinternals - www.sysinternals.com",
+        "Description": "System activity monitor",
+        "FileVersion": "9.01",
+        "IntegrityLevel": "System",
+        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonId": "0x3e7",
+        "Product": "Sysinternals Sysmon",
+        "TerminalSessionId": "0"
+      },
+      "event_id": 1,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 3,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:37.964Z",
+    "event": {
+      "category": "process",
+      "code": 1,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_start"
+    },
+    "hash": {
+      "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "args": [
+        "C:\\Windows\\system32\\wbem\\unsecapp.exe",
+        "-Embedding"
+      ],
+      "entity_id": "{42f11c3b-ce01-5c8f-0000-00102c412a00}",
+      "executable": "C:\\Windows\\System32\\wbem\\unsecapp.exe",
+      "name": "unsecapp.exe",
+      "parent": {
+        "args": [
+          "C:\\Windows\\system32\\svchost.exe",
+          "-k",
+          "DcomLaunch"
+        ],
+        "entity_id": "{42f11c3b-6e1b-5c8c-0000-00102f610000}",
+        "executable": "C:\\Windows\\System32\\svchost.exe",
+        "name": "svchost.exe",
+        "pid": 560
+      },
+      "pid": 5028,
+      "working_directory": "C:\\Windows\\system32\\"
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "Company": "Microsoft Corporation",
+        "Description": "Sink to receive asynchronous callbacks for WMI client application",
+        "FileVersion": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "IntegrityLevel": "System",
+        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonId": "0x3e7",
+        "Product": "Microsoft® Windows® Operating System",
+        "TerminalSessionId": "0"
+      },
+      "event_id": 1,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 4,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:38.981Z",
+    "event": {
+      "category": "process",
+      "code": 5,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-cdf4-5c8f-0000-0010e61e2a00}",
+      "executable": "C:\\Users\\vagrant\\AppData\\Local\\Temp\\Sysmon.exe",
+      "name": "Sysmon.exe",
+      "pid": 4616
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 5,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 5,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 3
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:38.981Z",
+    "event": {
+      "category": "process",
+      "code": 5,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-cdf4-5c8f-0000-0010071e2a00}",
+      "executable": "C:\\Users\\vagrant\\Downloads\\Sysmon.exe",
+      "name": "Sysmon.exe",
+      "pid": 4648
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 5,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 6,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 3
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:39.012Z",
+    "event": {
+      "category": "process",
+      "code": 1,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_start"
+    },
+    "hash": {
+      "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "args": [
+        "C:\\Windows\\system32\\wbem\\wmiprvse.exe",
+        "-Embedding"
+      ],
+      "entity_id": "{42f11c3b-ce03-5c8f-0000-0010e9462a00}",
+      "executable": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+      "name": "WmiPrvSE.exe",
+      "parent": {
+        "args": [
+          "C:\\Windows\\system32\\svchost.exe",
+          "-k",
+          "DcomLaunch"
+        ],
+        "entity_id": "{42f11c3b-6e1b-5c8c-0000-00102f610000}",
+        "executable": "C:\\Windows\\System32\\svchost.exe",
+        "name": "svchost.exe",
+        "pid": 560
+      },
+      "pid": 4508,
+      "working_directory": "C:\\Windows\\system32\\"
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "Company": "Microsoft Corporation",
+        "Description": "WMI Provider Host",
+        "FileVersion": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "IntegrityLevel": "System",
+        "LogonGuid": "{42f11c3b-6e1a-5c8c-0000-0020e7030000}",
+        "LogonId": "0x3e7",
+        "Product": "Microsoft® Windows® Operating System",
+        "TerminalSessionId": "0"
+      },
+      "event_id": 1,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 7,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:47.847Z",
+    "destination": {
+      "ip": "a00:203:3000:3000:3000:3000:3000:3300",
+      "port": 53
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:EQDBfI6vAylArTBQHY8kNmaweOA=",
+      "direction": "outbound",
+      "protocol": "domain",
+      "transport": "udp",
+      "type": "ipv6"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 924
+    },
+    "source": {
+      "ip": "a00:20f:0:0:18a2:6e00:e0:ffff",
+      "port": 62141
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 8,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.07Z",
+    "destination": {
+      "ip": "10.0.2.3",
+      "port": 53
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:TXczQujzvcGYSvZ/CKEBu1p2riE=",
+      "direction": "inbound",
+      "protocol": "domain",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 924
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 62141
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 9,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.148Z",
+    "destination": {
+      "ip": "40.77.226.250",
+      "port": 443
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:W2ZbP8nXMY+YAGYw2h/3Sa8Gu/w=",
+      "direction": "outbound",
+      "protocol": "https",
+      "transport": "tcp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 1138
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 10,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.214Z",
+    "destination": {
+      "ip": "40.77.226.250",
+      "port": 443
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:5MsyqYltV9KkhIFGPWiByzQqHDo=",
+      "direction": "outbound",
+      "protocol": "https",
+      "transport": "tcp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 1139
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 11,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.25Z",
+    "destination": {
+      "ip": "10.0.2.255",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
+      "direction": "outbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 12,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.25Z",
+    "destination": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
+      "direction": "inbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "ip": "10.0.2.255",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 13,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.25Z",
+    "destination": {
+      "ip": "ff02:0:0:0:0:0:1:3",
+      "port": 5355
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:4DSgubObvMEI9IKNWPDqltrux+k=",
+      "direction": "outbound",
+      "protocol": "llmnr",
+      "transport": "udp",
+      "type": "ipv6"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 924
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "fe80:0:0:0:e488:b85c:5262:ff86",
+      "port": 55542
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 14,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.25Z",
+    "destination": {
+      "ip": "e000:fc:4300:6800:7200:6f00:6d00:6500",
+      "port": 5355
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:sejGGvgk92xTvKdzlFitndKqdWw=",
+      "direction": "outbound",
+      "protocol": "llmnr",
+      "transport": "udp",
+      "type": "ipv6"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 924
+    },
+    "source": {
+      "ip": "a00:20f:0:0:18a2:6e00:e0:ffff",
+      "port": 55542
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 15,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.25Z",
+    "destination": {
+      "ip": "169.254.255.255",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
+      "direction": "outbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "ip": "169.254.180.25",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 16,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.251Z",
+    "destination": {
+      "ip": "169.254.180.25",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
+      "direction": "inbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "ip": "169.254.255.255",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 17,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.251Z",
+    "destination": {
+      "ip": "ff02:0:0:0:0:0:1:3",
+      "port": 5355
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:Zt/ImHlMNf4MciHXlRDkivgw2jY=",
+      "direction": "outbound",
+      "protocol": "llmnr",
+      "transport": "udp",
+      "type": "ipv6"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 924
+    },
+    "source": {
+      "ip": "fe80:0:0:0:616f:32fa:b04f:b419",
+      "port": 55717
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 18,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.251Z",
+    "destination": {
+      "ip": "e000:fc:0:0:0:0:0:0",
+      "port": 5355
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:SHkoHfPFDYWai8qQBwIiRxvCPZw=",
+      "direction": "outbound",
+      "protocol": "llmnr",
+      "transport": "udp",
+      "type": "ipv6"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-0bad-5c8c-0000-0010dfbc0000}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 924
+    },
+    "source": {
+      "ip": "a9fe:b419:0:0:f880:2301:e0:ffff",
+      "port": 55717
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 19,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.264Z",
+    "destination": {
+      "ip": "40.77.226.250",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:DI+g4BImhWaUwPmLEjdMMQVYPLs=",
+      "direction": "outbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 20,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:48.276Z",
+    "destination": {
+      "ip": "10.0.2.3",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:okFVyky/zOY2Q0BATy37YsbiveA=",
+      "direction": "outbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 21,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:49.213Z",
+    "destination": {
+      "ip": "169.254.255.255",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:ZHyFuF2PjubLSbAh4zRQIZHOZK8=",
+      "direction": "outbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 22,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:49.218Z",
+    "destination": {
+      "ip": "169.254.180.25",
+      "port": 137
+    },
+    "event": {
+      "code": 3,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "community_id": "1:r3C/WjbATNIislTQ0M+ySzwnuiw=",
+      "direction": "outbound",
+      "protocol": "netbios-ns",
+      "transport": "udp",
+      "type": "ipv4"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-6e19-5c8c-0000-0010eb030000}",
+      "executable": "System",
+      "name": "System",
+      "pid": 4
+    },
+    "source": {
+      "domain": "vagrant-2012-r2.local.crowbird.com",
+      "ip": "10.0.2.15",
+      "port": 137
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "SourcePortName": "netbios-ns"
+      },
+      "event_id": 3,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4492
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 23,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.35Z",
+    "event": {
+      "category": "process",
+      "code": 5,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccc6-5c8f-0000-001005082900}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 4832
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 5,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 24,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 3
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.364Z",
+    "event": {
+      "category": "process",
+      "code": 5,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-cccc-5c8f-0000-0010e8272900}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 3208
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 5,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 25,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 3
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.387Z",
+    "event": {
+      "code": 2,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "file": {
+      "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "CreationUtcTime": "2019-03-18 16:52:04.980",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.387"
+      },
+      "event_id": 2,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 26,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 4
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.417Z",
+    "event": {
+      "code": 2,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "file": {
+      "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "CreationUtcTime": "2019-03-18 16:52:04.980",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.402"
+      },
+      "event_id": 2,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 27,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 4
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.417Z",
+    "event": {
+      "code": 2,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "file": {
+      "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "CreationUtcTime": "2019-03-18 16:52:05.028",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.402"
+      },
+      "event_id": 2,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 28,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 4
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.417Z",
+    "event": {
+      "code": 2,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "file": {
+      "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "CreationUtcTime": "2019-03-18 16:51:54.980",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
+      },
+      "event_id": 2,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 29,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 4
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.433Z",
+    "event": {
+      "category": "process",
+      "code": 5,
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccab-5c8f-0000-001064eb2700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 2680
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 5,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 30,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 3
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.433Z",
+    "event": {
+      "code": 2,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "file": {
+      "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "CreationUtcTime": "2019-03-18 16:52:08.496",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
+      },
+      "event_id": 2,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 31,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 4
+    }
+  },
+  {
+    "@timestamp": "2019-03-18T16:57:52.433Z",
+    "event": {
+      "code": 2,
+      "kind": "event",
+      "module": "sysmon"
+    },
+    "file": {
+      "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-ccaa-5c8f-0000-0010b4e22700}",
+      "executable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "name": "chrome.exe",
+      "pid": 1600
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "CreationUtcTime": "2019-03-18 16:52:05.339",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
+      },
+      "event_id": 2,
+      "process": {
+        "pid": 4860,
+        "thread": {
+          "id": 4516
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 32,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 4
+    }
+  }
+]
