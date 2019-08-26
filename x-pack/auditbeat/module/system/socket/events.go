@@ -546,7 +546,15 @@ func validHeaders(ipHdr uint16, udpHdr uint16, data []byte) bool {
 func (e *udpQueueRcvSkb) asFlow() flow {
 	if valid := validHeaders(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
 		// Check if we're dealing with pointers
-		// TODO: This should check for SK_BUFF_HAS_POINTERS
+		// TODO: This should check for SK_BUFF_HAS_POINTERS. Instead is just
+		//		 treating IPHdr/UDPHdr as the lower 16bits of a pointer which
+		//       is enough as the headers are never more than 64k bytes into the
+		//		 packet.
+		//       This hacky solution will only work on little-endian archs
+		//		 which is fine for now as only 386/amd64 is supported.
+		//		 In the future a different set of kprobes must be used
+		//		 when SK_BUFF_HAS_POINTERS so that IPHdr and UDPHdr are
+		//		 the size of a pointer, not uint16.
 		base := uint16(e.Base)
 		if e.IPHdr > base &&
 			e.UDPHdr > base {
