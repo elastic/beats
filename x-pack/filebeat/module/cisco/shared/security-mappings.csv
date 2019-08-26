@@ -36,10 +36,10 @@ flow_start,430002,ApplicationProtocol,network.protocol
 flow_start,430002,Client,
 flow_start,430002,ClientVersion,
 flow_start,430002,DNS_Sinkhole,
-flow_start,430002,DNS_TTL,dns.answers.ttl
+flow_start,430002,DNS_TTL,
 flow_start,430002,DNSQuery,dns.question.name
 flow_start,430002,DNSRecordType,dns.question.type
-flow_start,430002,DNSResponseType,dns.answers.type
+flow_start,430002,DNSResponseType,dns.response_code
 flow_start,430002,DNSSICategory,
 flow_start,430002,DstIP,destination.ip
 flow_start,430002,DstPort,destination.port
@@ -97,10 +97,10 @@ flow_end,430003,Client,
 flow_end,430003,ClientVersion,
 flow_end,430003,ConnectionDuration,event.duration
 flow_end,430003,DNS_Sinkhole,
-flow_end,430003,DNS_TTL,dns.answers.ttl
+flow_end,430003,DNS_TTL,
 flow_end,430003,DNSQuery,dns.question.name
 flow_end,430003,DNSRecordType,dns.question.type
-flow_end,430003,DNSResponseType,dns.answers.type
+flow_end,430003,DNSResponseType,dns.response_code
 flow_end,430003,DNSSICategory,
 flow_end,430003,DstIP,destination.ip
 flow_end,430003,DstPort,destination.port
