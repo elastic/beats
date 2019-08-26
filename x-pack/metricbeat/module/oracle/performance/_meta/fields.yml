@@ -67,7 +67,7 @@
         - name: parse
           type: group
           description: Parses statistic information that occured in the current session
-          field:
+          fields:
             - name: real
               type: long
               description: "Real number of parses that occurred: session cursor cache hits - parse count (total)"
