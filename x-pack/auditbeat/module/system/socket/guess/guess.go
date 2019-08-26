@@ -7,8 +7,8 @@
 package guess
 
 import (
+	"fmt"
 	"runtime"
-	"sync"
 	"syscall"
 	"time"
 
@@ -48,18 +48,30 @@ type Guesser interface {
 	// to this guess.
 	Trigger() error
 	// Validate receives the events generated during trigger.
-	Validate(event interface{}) (common.MapStr, bool)
+	// Done is false when it needs to be called with more events. True when
+	// the guess has completed and results is a map with the discovered values.
+	Validate(event interface{}) (result common.MapStr, done bool)
 	// Terminate performs cleanup after the guess is complete.
 	Terminate() error
 }
 
-// MultiGuesser is a guess that needs to be repeated multiple times.
-type MultiGuesser interface {
+// RepeatGuesser is a guess that needs to be repeated multiple times and the
+// results consolidated into a single result.
+type RepeatGuesser interface {
 	Guesser
 	// NumRepeats returns how many times the guess is repeated.
 	NumRepeats() int
 	// Reduce takes the output of every repetition and returns the final result.
 	Reduce([]common.MapStr) (common.MapStr, error)
+}
+
+// EventualGuesser is a guess that repeats an undetermined amount of times
+// until it succeeds. It is re-executed as long as its Validate method returns
+// a nil result.
+type EventualGuesser interface {
+	Guesser
+	// MaxRepeats is the maximum number of times to repeat.
+	MaxRepeats() int
 }
 
 // Guess is a helper function to easily determine memory layouts of kernel
@@ -68,9 +80,12 @@ type MultiGuesser interface {
 // channel is passed to the Validate function. Terminates once Validate succeeds
 // or the timeout expires.
 func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
-	if multi, ok := guesser.(MultiGuesser); ok {
-		result, err = guessMultiple(multi, installer, ctx)
-	} else {
+	switch v := guesser.(type) {
+	case RepeatGuesser:
+		result, err = guessMultiple(v, installer, ctx)
+	case EventualGuesser:
+		result, err = guessEventually(v, installer, ctx)
+	default:
 		result, err = guessOnce(guesser, installer, ctx)
 	}
 	if err != nil {
@@ -79,7 +94,7 @@ func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (resul
 	return result, nil
 }
 
-func guessMultiple(guess MultiGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
 	var results []common.MapStr
 	for idx := 1; idx <= guess.NumRepeats(); idx++ {
 		r, err := guessOnce(guess, installer, ctx)
@@ -92,15 +107,37 @@ func guessMultiple(guess MultiGuesser, installer helper.ProbeInstaller, ctx Cont
 	return guess.Reduce(results)
 }
 
+func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+	limit := guess.MaxRepeats()
+	for i := 0; i < limit; i++ {
+		ctx.Log.Debugf(" --- %s run #%d", guess.Name(), i)
+		if result, err = guessOnce(guess, installer, ctx); err != nil {
+			return nil, err
+		}
+		if len(result) != 0 {
+			return result, nil
+		}
+	}
+	return nil, fmt.Errorf("guess %s didn't succeed after %d tries", guess.Name(), limit)
+}
+
 func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+	if err := guesser.Prepare(ctx); err != nil {
+		return nil, errors.Wrap(err, "prepare failed")
+	}
+	defer func() {
+		if err := guesser.Terminate(); err != nil {
+			ctx.Log.Errorf("Terminate failed: %v", err)
+		}
+	}()
 	probes, err := guesser.Probes()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed generating probes")
 	}
+
 	decoders := make([]tracing.Decoder, 0, len(probes))
 	formats := make([]tracing.ProbeFormat, 0, len(probes))
 	defer installer.UninstallInstalled()
-
 	for _, pdesc := range probes {
 		format, decoder, err := installer.Install(pdesc)
 		if err != nil {
@@ -110,18 +147,8 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		decoders = append(decoders, decoder)
 	}
 
-	type shared struct {
-		tid int
-		err error
-	}
-	// channel to receive the TID and context from the trigger goroutine.
-	tidChan := make(chan shared, 1)
-
-	// this waitgroup will prevent execution of the trigger until the perf
-	// channel is up and running.
-	var wg sync.WaitGroup
-	var once sync.Once
-	wg.Add(1)
+	// channel to receive the TID and sync with the trigger goroutine.
+	tidChan := make(chan int, 0)
 
 	// Trigger goroutine.
 	go func() {
@@ -130,43 +157,26 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		defer runtime.UnlockOSThread()
 		defer close(tidChan)
 
-		sh := shared{
-			tid: syscall.Gettid(),
-		}
-		sh.err = guesser.Prepare(ctx)
-		tidChan <- sh
-		if sh.err != nil {
-			return
-		}
+		// Send the thread ID
+		tidChan <- syscall.Gettid()
 
-		wg.Wait()
+		// This blocks until the main goroutine installs the perf channel
+		tidChan <- 0
 
-		// Execute custom trigger
 		if err := guesser.Trigger(); err != nil {
 			ctx.Log.Errorf("Trigger failed (%s): %v", guesser.Name(), err)
 		}
 	}()
 
-	// Receive the tid, or an error, from the trigger goroutine.
-	state := <-tidChan
-	if state.err != nil {
-		return nil, errors.Wrap(state.err, "prepare failed")
-	}
-
-	defer func() {
-		once.Do(wg.Done)
-		<-tidChan
-		if err := guesser.Terminate(); err != nil {
-			ctx.Log.Errorf("Terminate failed: %v", err)
-		}
-	}()
+	// Receive the thread ID from the trigger goroutine.
+	tid := <-tidChan
 
 	perfchan, err := tracing.NewPerfChannel(
 		tracing.WithBufferSize(8),
 		tracing.WithErrBufferSize(1),
 		tracing.WithLostBufferSize(8),
 		tracing.WithRingSizeExponent(2),
-		tracing.WithTID(state.tid),
+		tracing.WithTID(tid),
 		tracing.WithPollTimeout(time.Millisecond*10))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create perfchannel")
@@ -194,9 +204,9 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		}
 	}()
 
-	// Allow the trigger to be fired
-	once.Do(wg.Done)
-	// Wait for trigger to finish firing
+	// Read the tidchan again to release the trigger.
+	<-tidChan
+	// This blocks until trigger terminates (channel closed).
 	<-tidChan
 
 	for {
