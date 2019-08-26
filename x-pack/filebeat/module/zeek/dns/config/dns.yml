@@ -9,9 +9,9 @@ tags: {{.tags}}
 processors:
   - rename:
       fields:
-        - {from: message, to: log.original}
+        - {from: message, to: event.original}
   - decode_json_fields:
-      fields: [log.original]
+      fields: [event.original]
       target: zeek.dns
   - script:
       lang: javascript
@@ -33,10 +33,6 @@ processors:
             flag = evt.Get("zeek.dns.RA");
             if (flag === true) {
                 evt.AppendTo("dns.header_flags", "RA");
-            }
-            flag = evt.Get("zeek.dns.Z");
-            if (flag === true) {
-                evt.AppendTo("dns.header_flags", "Z");
             }
         }
 
@@ -104,7 +100,7 @@ processors:
         - {from: zeek.dns.id.orig_h, to: source.address}
         - {from: zeek.dns.id.orig_p, to: source.port, type: long}
         - {from: zeek.dns.id.resp_h, to: destination.address}
-        - {from: zeek.dns.id.resp_p, to: destination.port}
+        - {from: zeek.dns.id.resp_p, to: destination.port, type: long}
         - {from: zeek.dns.uid, to: zeek.session_id}
         - {from: zeek.dns.proto, to: network.transport}
   - convert:
@@ -120,6 +116,11 @@ processors:
         - {from: zeek.dns.query, to: dns.question.name}
         - {from: zeek.dns.qtype_name, to: dns.question.type}
         - {from: zeek.dns.rcode_name, to: dns.response_code}
+  - registered_domain:
+      ignore_missing: true
+      ignore_failure: true
+      field: dns.question.name
+      target_field: dns.question.registered_domain
 {{ if .community_id }}
   - community_id: ~
 {{ end }}
