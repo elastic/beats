@@ -27,7 +27,7 @@ const packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 func rawYaml() ([]byte, error) {
 	// Load the configuration file from disk with all the settings,
 	// the function takes care of using -c.
-	rawConfig, err := cfgfile.Load("", config.ConfigOverrides)
+	rawConfig, err := cfgfile.Load("", config.ConfigOverrides, config.ConditionalOverrides)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func MakeZip(provider string) ([]byte, error) {
 }
 
 func keystoreRaw() ([]byte, error) {
-	cfg, err := cfgfile.Load("", common.NewConfig())
+	cfg, err := cfgfile.Load("", common.NewConfig(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("error loading config file: %v", err)
 	}

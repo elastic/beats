@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -20,12 +18,15 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/libbeat/licenser"
 )
 
 var (
-	graceDelay   = 45 * time.Minute
-	refreshDelay = 15 * time.Minute
+	graceDelay       = 45 * time.Minute
+	refreshDelay     = 15 * time.Minute
+	supportedOutputs = []string{
+		"elasticsearch",
+		"logstash",
+	}
 )
 
 // Functionbeat is a beat designed to run under a serverless environment and listen to external triggers,
@@ -87,22 +88,16 @@ func getProvider(cfg *common.Config) (provider.Provider, error) {
 // Run starts functionbeat.
 func (bt *Functionbeat) Run(b *beat.Beat) error {
 	defer bt.cancel()
+
+	outputName := b.Config.Output.Name()
+	if !isOutputSupported(outputName) {
+		return fmt.Errorf("unsupported output type: %s; supported ones: %+v", outputName, supportedOutputs)
+	}
+
 	bt.log.Info("Functionbeat is running")
 	defer bt.log.Info("Functionbeat stopped running")
 
-	manager, err := licenser.Create(&b.Config.Output, refreshDelay, graceDelay)
-	if err != nil {
-		return errors.Wrap(err, "could not create the license manager")
-	}
-	manager.Start()
-	defer manager.Stop()
-
-	// Wait until we receive the initial license.
-	if err := licenser.WaitForLicense(bt.ctx, bt.log, manager, licenser.BasicAndAboveOrTrial); err != nil {
-		return err
-	}
-
-	clientFactory := makeClientFactory(bt.log, manager, b.Publisher)
+	clientFactory := makeClientFactory(bt.log, b.Publisher)
 
 	enabledFunctions := bt.enabledFunctions()
 	bt.log.Infof("Functionbeat is configuring enabled functions: %s", strings.Join(enabledFunctions, ", "))
@@ -140,7 +135,16 @@ func (bt *Functionbeat) Stop() {
 	bt.cancel()
 }
 
-func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
+func isOutputSupported(name string) bool {
+	for _, output := range supportedOutputs {
+		if name == output {
+			return true
+		}
+	}
+	return false
+}
+
+func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
@@ -167,17 +171,6 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 			},
 		})
 
-		if err != nil {
-			return nil, err
-		}
-
-		// Make the client aware of the current license, the client will accept sending events to the
-		// pipeline until the client is closed or if the license change and is not valid.
-		licenseAware := core.NewLicenseAwareClient(client, licenser.BasicAndAboveOrTrial)
-		if err := manager.AddWatcher(licenseAware); err != nil {
-			return nil, err
-		}
-
-		return licenseAware, nil
+		return client, err
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -25,12 +26,33 @@ var (
 		"logging.to_files":       false,
 		"setup.template.enabled": true,
 		"queue.mem": map[string]interface{}{
-			"events":           "${output.elasticsearch.bulk_max_size}",
 			"flush.min_events": 10,
 			"flush.timeout":    "0.01s",
 		},
+	})
+	esOverrides = common.MustNewConfigFrom(map[string]interface{}{
+		"queue.mem.events":                   "${output.elasticsearch.bulk_max_size}",
 		"output.elasticsearch.bulk_max_size": 50,
 	})
+	logstashOverrides = common.MustNewConfigFrom(map[string]interface{}{
+		"queue.mem.events": "${output.logstash.bulk_max_size}",
+		"output.logstash": map[string]interface{}{
+			"bulk_max_size": 50,
+			"pipelining":    0,
+		},
+	})
+
+	// ConditionalOverrides contans the overrides based on the output.
+	ConditionalOverrides = []cfgfile.ConditionalOverride{
+		cfgfile.ConditionalOverride{
+			Check:  isLogstash,
+			Config: logstashOverrides,
+		},
+		cfgfile.ConditionalOverride{
+			Check:  isElasticsearch,
+			Config: esOverrides,
+		},
+	}
 )
 
 // Config default configuration for Functionbeat.
@@ -56,6 +78,22 @@ var DefaultConfig = Config{}
 // DefaultFunctionConfig is the default configuration for new function.
 var DefaultFunctionConfig = FunctionConfig{
 	Enabled: true,
+}
+
+var isLogstash = func(cfg *common.Config) bool {
+	return isOutput(cfg, "logstash")
+}
+
+var isElasticsearch = func(cfg *common.Config) bool {
+	return isOutput(cfg, "elasticsearch")
+}
+
+func isOutput(cfg *common.Config, name string) bool {
+	outputCfg, err := cfg.Child("output", -1)
+	if err != nil {
+		return false
+	}
+	return outputCfg.HasField(name)
 }
 
 type functionName string

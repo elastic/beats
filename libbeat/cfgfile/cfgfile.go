@@ -61,6 +61,16 @@ func init() {
 	makePathFlag("path.logs", "Logs path")
 }
 
+// ConditionalOverrideChecker checks if a config should be overwritten.
+type OverrideChecker func(*common.Config) bool
+
+// ConditionalOverride stores a config which needs to overwrite the existing config based on the
+// result of the Check.
+type ConditionalOverride struct {
+	Check  OverrideChecker
+	Config *common.Config
+}
+
 // ChangeDefaultCfgfileFlag replaces the value and default value for the `-c`
 // flag so that it reflects the beat name.
 func ChangeDefaultCfgfileFlag(beatName string) error {
@@ -111,7 +121,7 @@ func HandleFlags() error {
 // structure. If path is empty this method reads from the configuration
 // file specified by the '-c' command line flag.
 func Read(out interface{}, path string) error {
-	config, err := Load(path, nil)
+	config, err := Load(path, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -122,7 +132,7 @@ func Read(out interface{}, path string) error {
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
-func Load(path string, beatOverrides *common.Config) (*common.Config, error) {
+func Load(path string, beatOverrides *common.Config, conditionalOverrides []ConditionalOverride) (*common.Config, error) {
 	var config *common.Config
 	var err error
 
@@ -164,6 +174,17 @@ func Load(path string, beatOverrides *common.Config) (*common.Config, error) {
 			config,
 			overwrites,
 		)
+	}
+
+	if conditionalOverrides != nil {
+		for _, o := range conditionalOverrides {
+			if o.Check(config) {
+				config, err = common.MergeConfigs(config, o.Config)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 	}
 
 	config.PrintDebugf("Complete configuration loaded:")

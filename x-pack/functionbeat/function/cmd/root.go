@@ -26,9 +26,10 @@ type FunctionCmd struct {
 // NewFunctionCmd return a new initialized function command.
 func NewFunctionCmd(name string, beatCreator beat.Creator) *FunctionCmd {
 	settings := instance.Settings{
-		Name:            name,
-		IndexPrefix:     name,
-		ConfigOverrides: config.ConfigOverrides,
+		Name:                       name,
+		IndexPrefix:                name,
+		ConfigOverrides:            config.ConfigOverrides,
+		ConditionalConfigOverrides: config.ConditionalOverrides,
 	}
 
 	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
