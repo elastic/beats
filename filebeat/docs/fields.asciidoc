@@ -1583,7 +1583,7 @@ type: keyword
 *`cisco.ftd.mapped_source_ip`*::
 +
 --
-The translated source IP address.
+The translated source IP address. Use ECS source.ip.
 
 
 type: ip
@@ -1593,7 +1593,7 @@ type: ip
 *`cisco.ftd.mapped_source_port`*::
 +
 --
-The translated source port.
+The translated source port. Use ECS source.port.
 
 
 type: long
@@ -1603,7 +1603,7 @@ type: long
 *`cisco.ftd.mapped_destination_ip`*::
 +
 --
-The translated destination IP address.
+The translated destination IP address. Use ECS destination.ip.
 
 
 type: ip
@@ -1613,7 +1613,7 @@ type: ip
 *`cisco.ftd.mapped_destination_port`*::
 +
 --
-The translated destination port.
+The translated destination port. Use ECS destination.port.
 
 
 type: long
@@ -1676,34 +1676,6 @@ type: short
 Raw fields for Security Events.
 
 type: object
-
---
-
-*`cisco.ftd.dns.question.name`*::
-+
---
-type: keyword
-
---
-
-*`cisco.ftd.dns.question.type`*::
-+
---
-type: keyword
-
---
-
-*`cisco.ftd.dns.answers.ttl`*::
-+
---
-type: long
-
---
-
-*`cisco.ftd.dns.answers.type`*::
-+
---
-type: keyword
 
 --
 
