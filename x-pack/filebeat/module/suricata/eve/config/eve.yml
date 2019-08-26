@@ -9,9 +9,9 @@ tags: {{.tags}}
 processors:
   - rename:
       fields:
-        - {from: message, to: log.original}
+        - {from: message, to: event.original}
   - decode_json_fields:
-      fields: [log.original]
+      fields: [event.original]
       target: suricata.eve
   - convert:
       ignore_missing: true
@@ -21,7 +21,7 @@ processors:
         - {from: suricata.eve.src_ip, to: source.address}
         - {from: suricata.eve.src_port, to: source.port, type: long}
         - {from: suricata.eve.dest_ip, to: destination.address}
-        - {from: suricata.eve.dest_port, to: destination.port}
+        - {from: suricata.eve.dest_port, to: destination.port, type: long}
         - {from: suricata.eve.proto, to: network.transport}
   - convert:
       ignore_missing: true
