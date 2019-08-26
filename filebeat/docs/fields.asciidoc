@@ -1381,10 +1381,10 @@ type: keyword
 
 --
 
-*`cisco.asa.list_id`*::
+*`cisco.asa.rule_name`*::
 +
 --
-Name of the Access Control List that matched this event.
+Name of the Access Control List rule that matched this event.
 
 
 type: keyword
@@ -1550,10 +1550,10 @@ type: keyword
 
 --
 
-*`cisco.ftd.list_id`*::
+*`cisco.ftd.rule_name`*::
 +
 --
-Name of the Access Control List that matched this event.
+Name of the Access Control List rule that matched this event.
 
 
 type: keyword
