@@ -6,6 +6,7 @@
         "destination.port": 53,
         "dns.id": "51803",
         "dns.question.name": "google.com",
+        "dns.question.registered_domain": "google.com",
         "dns.question.type": "A",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -41,6 +42,7 @@
         "destination.port": 53,
         "dns.id": "39523",
         "dns.question.name": "google.com",
+        "dns.question.registered_domain": "google.com",
         "dns.question.type": "AAAA",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -88,6 +90,7 @@
         ],
         "dns.id": "39523",
         "dns.question.name": "google.com",
+        "dns.question.registered_domain": "google.com",
         "dns.question.type": "AAAA",
         "dns.resolved_ip": [
             "2607:f8b0:4006:0805:0000:0000:0000:200e"
@@ -139,6 +142,7 @@
         ],
         "dns.id": "51803",
         "dns.question.name": "google.com",
+        "dns.question.registered_domain": "google.com",
         "dns.question.type": "A",
         "dns.resolved_ip": [
             "172.217.11.46"
@@ -178,6 +182,7 @@
         "destination.port": 53,
         "dns.id": "60273",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "A",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -213,6 +218,7 @@
         "destination.port": 53,
         "dns.id": "4210",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "AAAA",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -284,6 +290,7 @@
         ],
         "dns.id": "60273",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "A",
         "dns.resolved_ip": [
             "151.101.130.217",
@@ -362,6 +369,7 @@
         ],
         "dns.id": "4210",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "AAAA",
         "dns.resolved_ip": [
             "2a04:4e42:0600:0000:0000:0000:0000:0729",
@@ -404,6 +412,7 @@
         "destination.port": 53,
         "dns.id": "28329",
         "dns.question.name": "www.yahoo.com",
+        "dns.question.registered_domain": "yahoo.com",
         "dns.question.type": "A",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -439,6 +448,7 @@
         "destination.port": 53,
         "dns.id": "7050",
         "dns.question.name": "www.yahoo.com",
+        "dns.question.registered_domain": "yahoo.com",
         "dns.question.type": "AAAA",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -914,6 +924,7 @@
         "destination.port": 53,
         "dns.id": "9104",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "A",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -949,6 +960,7 @@
         "destination.port": 53,
         "dns.id": "12859",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "AAAA",
         "dns.type": "query",
         "event.category": "network_traffic",
@@ -1020,6 +1032,7 @@
         ],
         "dns.id": "9104",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "A",
         "dns.resolved_ip": [
             "151.101.194.217",
@@ -1098,6 +1111,7 @@
         ],
         "dns.id": "12859",
         "dns.question.name": "www.elastic.co",
+        "dns.question.registered_domain": "elastic.co",
         "dns.question.type": "AAAA",
         "dns.resolved_ip": [
             "2a04:4e42:0000:0000:0000:0000:0000:0729",

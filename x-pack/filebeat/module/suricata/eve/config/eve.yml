@@ -171,9 +171,13 @@ processors:
                     transformDetailedAnswers(evt);
                     addDnsHeaderFlags(evt);
                 }
+      - registered_domain:
+          ignore_missing: true
+          ignore_failure: true
+          field: dns.question.name
+          target_field: dns.question.registered_domain
       - drop_fields:
-          # TODO (andrewkroh 2019-08-22): Uncomment after ignore_missing is added to drop_fields.
-          #ignore_missing: true
+          ignore_missing: true
           fields:
             - suricata.eve.dns.aa
             - suricata.eve.dns.tc
