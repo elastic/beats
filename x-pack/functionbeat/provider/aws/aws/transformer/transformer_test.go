@@ -34,10 +34,7 @@ func TestCloudwatch(t *testing.T) {
 	events := CloudwatchLogs(logsData)
 	assert.Equal(t, 1, len(events))
 
-	currentLoc, err := time.LoadLocation("Local")
-	assert.Nil(t, err)
-
-	expectedTime, err := time.ParseInLocation(time.RFC3339, "2019-08-27T14:24:51.193+02:00", currentLoc)
+	expectedTime, err := time.ParseInLocation(time.RFC3339, "2019-08-27T12:24:51.193+00:00", time.UTC)
 	assert.Nil(t, err)
 
 	expectedEvent := beat.Event{
@@ -54,7 +51,7 @@ func TestCloudwatch(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedEvent.Fields, events[0].Fields)
-	assert.Equal(t, expectedEvent.Timestamp, events[0].Timestamp)
+	assert.Equal(t, expectedEvent.Timestamp, events[0].Timestamp.UTC())
 }
 
 func TestKinesis(t *testing.T) {
