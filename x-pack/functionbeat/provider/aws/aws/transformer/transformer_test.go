@@ -6,12 +6,53 @@ package transformer
 
 import (
 	"testing"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 )
+
+func TestCloudwatch(t *testing.T) {
+	logsData := events.CloudwatchLogsData{
+		Owner:               "me",
+		LogGroup:            "my-group",
+		LogStream:           "stream",
+		SubscriptionFilters: []string{"MyFilter"},
+		MessageType:         "DATA_MESSAGE",
+		LogEvents: []events.CloudwatchLogsLogEvent{
+			events.CloudwatchLogsLogEvent{
+				ID:        "1234567890123456789",
+				Timestamp: 1566908691193,
+				Message:   "my interesting message",
+			},
+		},
+	}
+
+	events := CloudwatchLogs(logsData)
+	assert.Equal(t, 1, len(events))
+
+	expectedTime, err := time.Parse(time.RFC3339, "2019-08-27T14:24:51.193+02:00")
+	assert.Nil(t, err)
+
+	expectedEvent := beat.Event{
+		Timestamp: expectedTime,
+		Fields: common.MapStr{
+			"message":              "my interesting message",
+			"id":                   "1234567890123456789",
+			"owner":                "me",
+			"log_stream":           "stream",
+			"log_group":            "my-group",
+			"message_type":         "DATA_MESSAGE",
+			"subscription_filters": []string{"MyFilter"},
+		},
+	}
+
+	assert.Equal(t, expectedEvent.Fields, events[0].Fields)
+	assert.Equal(t, expectedEvent.Timestamp, events[0].Timestamp)
+}
 
 func TestKinesis(t *testing.T) {
 	request := events.KinesisEvent{
