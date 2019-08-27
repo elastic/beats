@@ -298,10 +298,10 @@ func (c *PerfChannel) Close() error {
 	var errs multierror.Errors
 	for _, ev := range c.events {
 		if err := ev.Disable(); err != nil {
-			errs = append(errs, err)
+			errs = append(errs, errors.Wrap(err, "failed to disable event channel"))
 		}
 		if err := ev.Close(); err != nil {
-			errs = append(errs, err)
+			errs = append(errs, errors.Wrap(err, "failed to close event channel"))
 		}
 	}
 	return errs.Err()
