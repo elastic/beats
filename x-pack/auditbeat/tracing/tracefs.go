@@ -24,26 +24,13 @@ const (
 )
 
 var (
-	kprobeRegexp *regexp.Regexp
-	formatRegexp *regexp.Regexp
+	kprobeRegexp *regexp.Regexp = regexp.MustCompile("^([pr]):(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)")
+	formatRegexp *regexp.Regexp = regexp.MustCompile("\\s+([^:]+):([^;]*);")
 )
 
 // TraceFS is an accessor to manage event tracing via tracefs or debugfs.
 type TraceFS struct {
 	basePath string
-}
-
-func init() {
-	var err error
-	kprobeRegexp, err = regexp.Compile("^([pr]):(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)")
-	if err != nil {
-		panic(err)
-	}
-
-	formatRegexp, err = regexp.Compile("\\s+([^:]+):([^;]*);")
-	if err != nil {
-		panic(err)
-	}
 }
 
 // NewTraceFS creates a new accessor for the event tracing feature.

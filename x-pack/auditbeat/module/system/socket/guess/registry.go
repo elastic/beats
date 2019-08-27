@@ -9,17 +9,17 @@ package guess
 import "fmt"
 
 // Registry serves as a registration point for guesses.
-var Registry = GuessRegistry{
+var Registry = Register{
 	guesses: make(map[string]Guesser),
 }
 
-// GuessRegistry stores the registered guesses.
-type GuessRegistry struct {
+// Register stores the registered guesses.
+type Register struct {
 	guesses map[string]Guesser
 }
 
 // AddGuess registers a new guess.
-func (r *GuessRegistry) AddGuess(guess Guesser) error {
+func (r *Register) AddGuess(guess Guesser) error {
 	if _, found := r.guesses[guess.Name()]; found {
 		return fmt.Errorf("guess %s is duplicated", guess.Name())
 	}
@@ -28,7 +28,7 @@ func (r *GuessRegistry) AddGuess(guess Guesser) error {
 }
 
 // GetList returns a list of registered guesses.
-func (r *GuessRegistry) GetList() (list []Guesser) {
+func (r *Register) GetList() (list []Guesser) {
 	for _, guess := range r.guesses {
 		list = append(list, guess)
 	}

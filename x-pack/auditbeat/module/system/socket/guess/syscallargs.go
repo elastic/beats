@@ -108,8 +108,8 @@ func (g *guessSyscallArgs) Trigger() error {
 	return nil
 }
 
-// Validate check which set of kprobe arguments received the magic values.
-func (g *guessSyscallArgs) Validate(ev interface{}) (common.MapStr, bool) {
+// Extract check which set of kprobe arguments received the magic values.
+func (g *guessSyscallArgs) Extract(ev interface{}) (common.MapStr, bool) {
 	args, ok := ev.(*syscallGuess)
 	if !ok {
 		return nil, false

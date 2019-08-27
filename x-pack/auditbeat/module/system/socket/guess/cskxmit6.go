@@ -124,9 +124,9 @@ func (g *guessInet6CskXmit) Trigger() error {
 	return err
 }
 
-// Validate receives first the sock* from inet_csk_accept, then the arguments
+// Extract receives first the sock* from inet_csk_accept, then the arguments
 // from inet6_csk_xmit.
-func (g *guessInet6CskXmit) Validate(event interface{}) (common.MapStr, bool) {
+func (g *guessInet6CskXmit) Extract(event interface{}) (common.MapStr, bool) {
 	switch msg := event.(type) {
 	case *sockArgumentGuess:
 		g.sock = msg.Sock

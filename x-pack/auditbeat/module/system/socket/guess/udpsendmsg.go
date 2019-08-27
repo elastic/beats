@@ -89,7 +89,7 @@ func (g *guessUDPSendMsg) Terminate() error {
 	return g.cs.Cleanup()
 }
 
-func (g *guessUDPSendMsg) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessUDPSendMsg) Extract(ev interface{}) (common.MapStr, bool) {
 	if g.length == 0 {
 		return nil, false
 	}

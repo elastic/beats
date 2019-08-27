@@ -103,8 +103,8 @@ func (g *guessSockaddrIn) Trigger() error {
 	return nil
 }
 
-// Validate takes the dumped sockaddr_in and scans it for the expected values.
-func (g *guessSockaddrIn) Validate(ev interface{}) (common.MapStr, bool) {
+// Extract takes the dumped sockaddr_in and scans it for the expected values.
+func (g *guessSockaddrIn) Extract(ev interface{}) (common.MapStr, bool) {
 	arr := ev.([]byte)
 	if len(arr) < 8 {
 		return nil, false

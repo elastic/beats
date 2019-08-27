@@ -123,9 +123,9 @@ func (g *guessSkBuffLen) Trigger() error {
 	return nil
 }
 
-// Validate scans the sk_buff memory for any values between the expected
+// Extract scans the sk_buff memory for any values between the expected
 // payload + [0 ... 128).
-func (g *guessSkBuffLen) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessSkBuffLen) Extract(ev interface{}) (common.MapStr, bool) {
 	skbuff := ev.([]byte)
 	if len(skbuff) != skbuffDumpSize || g.written <= 0 {
 		return nil, false
@@ -344,9 +344,9 @@ func (g *guessSkBuffProto) Trigger() error {
 	return nil
 }
 
-// Validate will scan the sk_buff memory to look for all the uint16-sized memory
+// Extract will scan the sk_buff memory to look for all the uint16-sized memory
 // locations that contain the expected protocol value.
-func (g *guessSkBuffProto) Validate(event interface{}) (common.MapStr, bool) {
+func (g *guessSkBuffProto) Extract(event interface{}) (common.MapStr, bool) {
 	raw := event.([]byte)
 	needle := []byte{0x08, 0x00} // ETH_P_IP
 	if g.doIPv6 {
@@ -426,7 +426,7 @@ const (
 	by it (if any) and the pointer value itself. Another probe set to the same
 	function dumps the sk_buff.
 
-	Validate receives the candidate dump and the sk_buff.
+	Extract receives the candidate dump and the sk_buff.
 
 	First it will check if the dumped data is the packet. For this it takes
     advantage of knowing the src/dst ip and ports. This helps discover the offset
@@ -608,14 +608,14 @@ func u32At(buf []byte) uintptr {
 	return uintptr(tracing.MachineEndian.Uint32(buf[:4]))
 }
 
-// Validate stores the result of each kretprobe and when it received both
+// Extract stores the result of each kretprobe and when it received both
 // it makes validations.
 //
-// As this is a EventualGuess, the return values of validate are as follows:
+// As this is an EventualGuess, the return values of Extract are as follows:
 // (any), false : Signals that it needs another event in the current iteration.
 // nil, true : Finish the current iteration and perform a new one.
 // (non-nil), true : The guess completed.
-func (g *guessSkBuffDataPtr) Validate(event interface{}) (common.MapStr, bool) {
+func (g *guessSkBuffDataPtr) Extract(event interface{}) (common.MapStr, bool) {
 	g.ctx.Log.Debugf("%s off=0x%x received %T", g.Name(), g.dumpOffset, event)
 	switch v := event.(type) {
 	case *dataDump:
@@ -730,7 +730,7 @@ func (g *guessSkBuffDataPtr) Validate(event interface{}) (common.MapStr, bool) {
 
 // MaxRepeats sets a size enough so that all the possible pointers in a sk_buff
 // are scanned. It will never never repeat this many times due to an additional
-// check in Validate().
+// check in Extract().
 func (g *guessSkBuffDataPtr) MaxRepeats() int {
 	return 128
 }

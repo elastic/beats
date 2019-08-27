@@ -136,10 +136,10 @@ func (g *guessIPLocalOut) Trigger() error {
 	return nil
 }
 
-// Validate first receives and saves the sock* from tcp_sendmsg.
+// Extract first receives and saves the sock* from tcp_sendmsg.
 // Once ip_local_out is called, it analyses the captured arguments to determine
 // their layout.
-func (g *guessIPLocalOut) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessIPLocalOut) Extract(ev interface{}) (common.MapStr, bool) {
 	switch v := ev.(type) {
 	case *sockArgumentGuess:
 		g.sock = v.Sock

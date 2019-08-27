@@ -21,6 +21,8 @@ import (
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
 
+// This is just to compensate the size argument of udp_sendmsg which is only
+// UDP payload. 28 being the size of an IP header (no options) + size of UDP header.
 const minUdpPacketSize = 28
 
 // event is the interface that all the deserialized events from the ring-buffer
@@ -30,7 +32,7 @@ type event interface {
 	Update(*state) error
 }
 
-type tcpV4ConnectCall struct {
+type tcpIPv4ConnectCall struct {
 	Meta  tracing.Metadata `kprobe:"metadata"`
 	Sock  uintptr          `kprobe:"sock"`
 	LAddr uint32           `kprobe:"laddr"`
@@ -40,7 +42,7 @@ type tcpV4ConnectCall struct {
 }
 
 // String returns a representation of the event.
-func (e *tcpV4ConnectCall) String() string {
+func (e *tcpIPv4ConnectCall) String() string {
 	var buf [4]byte
 	tracing.MachineEndian.PutUint32(buf[:], e.LAddr)
 	laddr := net.IPv4(buf[0], buf[1], buf[2], buf[3])
@@ -61,11 +63,11 @@ func (e *tcpV4ConnectCall) String() string {
 }
 
 // Update the state with the contents of this event.
-func (e *tcpV4ConnectCall) Update(s *state) error {
+func (e *tcpIPv4ConnectCall) Update(s *state) error {
 	return s.ThreadEnter(e.Meta.TID, e)
 }
 
-type tcpV6ConnectCall struct {
+type tcpIPv6ConnectCall struct {
 	Meta   tracing.Metadata `kprobe:"metadata"`
 	Sock   uintptr          `kprobe:"sock"`
 	LAddrA uint64           `kprobe:"laddra"`
@@ -77,7 +79,7 @@ type tcpV6ConnectCall struct {
 }
 
 // String returns a representation of the event.
-func (e *tcpV6ConnectCall) String() string {
+func (e *tcpIPv6ConnectCall) String() string {
 	var buf [16]byte
 	tracing.MachineEndian.PutUint64(buf[:], e.LAddrA)
 	tracing.MachineEndian.PutUint64(buf[8:], e.LAddrB)
@@ -100,7 +102,7 @@ func (e *tcpV6ConnectCall) String() string {
 }
 
 // Update the state with the contents of this event.
-func (e *tcpV6ConnectCall) Update(s *state) error {
+func (e *tcpIPv6ConnectCall) Update(s *state) error {
 	return s.ThreadEnter(e.Meta.TID, e)
 }
 
@@ -116,47 +118,38 @@ func (e *tcpConnectResult) String() string {
 
 // Update the state with the contents of this event.
 func (e *tcpConnectResult) Update(s *state) error {
-	if ev, found := s.ThreadLeave(e.Meta.TID); found {
-		if e.Retval != 0 {
-			return nil
-		}
-		switch call := ev.(type) {
-		case *tcpV4ConnectCall:
-			return s.UpdateFlow(flow{
-				sock:     call.Sock,
-				pid:      e.Meta.PID,
-				inetType: inetTypeIPv4,
-				proto:    protoTCP,
-				dir:      directionOutbound,
-				complete: true,
-				lastSeen: kernelTime(call.Meta.Timestamp),
-				local:    newEndpointIPv4(call.LAddr, call.LPort, 0, 0),
-				remote:   newEndpointIPv4(call.RAddr, call.RPort, 0, 0),
-			})
-		case *tcpV6ConnectCall:
-			return s.UpdateFlow(flow{
-				sock:     call.Sock,
-				pid:      e.Meta.PID,
-				inetType: inetTypeIPv6,
-				proto:    protoTCP,
-				dir:      directionOutbound,
-				complete: true,
-				lastSeen: kernelTime(call.Meta.Timestamp),
-				local:    newEndpointIPv6(call.LAddrA, call.LAddrB, call.LPort, 0, 0),
-				remote:   newEndpointIPv6(call.RAddrA, call.RAddrB, call.RPort, 0, 0),
-			})
-		default:
-			return fmt.Errorf("stored thread event has unexpected type %T", ev)
-		}
+	ev, found := s.ThreadLeave(e.Meta.TID)
+	if !found || e.Retval != 0 {
+		return nil
 	}
-	return nil
+	switch call := ev.(type) {
+	case *tcpIPv4ConnectCall:
+		return s.UpdateFlow(flow{
+			sock:     call.Sock,
+			pid:      e.Meta.PID,
+			inetType: inetTypeIPv4,
+			proto:    protoTCP,
+			dir:      directionOutbound,
+			complete: true,
+			lastSeen: kernelTime(call.Meta.Timestamp),
+			local:    newEndpointIPv4(call.LAddr, call.LPort, 0, 0),
+			remote:   newEndpointIPv4(call.RAddr, call.RPort, 0, 0),
+		})
+	case *tcpIPv6ConnectCall:
+		return s.UpdateFlow(flow{
+			sock:     call.Sock,
+			pid:      e.Meta.PID,
+			inetType: inetTypeIPv6,
+			proto:    protoTCP,
+			dir:      directionOutbound,
+			complete: true,
+			lastSeen: kernelTime(call.Meta.Timestamp),
+			local:    newEndpointIPv6(call.LAddrA, call.LAddrB, call.LPort, 0, 0),
+			remote:   newEndpointIPv6(call.RAddrA, call.RAddrB, call.RPort, 0, 0),
+		})
+	}
+	return fmt.Errorf("stored thread event has unexpected type %T", ev)
 }
-
-const (
-	// Two states that means closed and no further packets to be received.
-	tcpTimeWait = 6
-	tcpClose    = 7
-)
 
 var tcpStates = []string{
 	"(zero)",
@@ -172,13 +165,6 @@ var tcpStates = []string{
 	"TCP_LISTEN",
 	"TCP_CLOSING",
 	"TCP_NEW_SYN_RECV",
-}
-
-// tcpSetStateCall is currently unused.
-type tcpSetStateCall struct {
-	Meta  tracing.Metadata `kprobe:"metadata"`
-	Sock  uintptr          `kprobe:"sock"`
-	State int32            `kprobe:"state"`
 }
 
 type tcpAcceptResult struct {

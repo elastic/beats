@@ -27,6 +27,13 @@ import (
 	"github.com/elastic/go-libaudit/aucoalesce"
 )
 
+const (
+	// how often to collect and report expired and terminated flows.
+	reapInterval = time.Second
+	// how often the state log generated (only in debug mode).
+	logInterval = time.Second * 30
+)
+
 var (
 	userCache  = aucoalesce.NewUserCache(5 * time.Minute)
 	groupCache = aucoalesce.NewGroupCache(5 * time.Minute)
@@ -364,9 +371,9 @@ func (s *state) logState() {
 }
 
 func (s *state) reapLoop() {
-	reportTicker := time.NewTicker(time.Second)
+	reportTicker := time.NewTicker(reapInterval)
 	defer reportTicker.Stop()
-	logTicker := time.NewTicker(time.Second * 30)
+	logTicker := time.NewTicker(logInterval)
 	defer logTicker.Stop()
 	for {
 		select {

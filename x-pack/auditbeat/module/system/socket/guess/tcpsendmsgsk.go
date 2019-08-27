@@ -100,9 +100,9 @@ func (g *guessTcpSendmsgSock) Trigger() (err error) {
 	return err
 }
 
-// Validate checks which of the arguments to tcp_sendmsg contains the expected
+// Extract checks which of the arguments to tcp_sendmsg contains the expected
 // value (address of destination).
-func (g *guessTcpSendmsgSock) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessTcpSendmsgSock) Extract(ev interface{}) (common.MapStr, bool) {
 	event := ev.(*tcpSendMsgSockGuess)
 	if g.written <= 0 {
 		g.ctx.Log.Errorf("write failed for guess")

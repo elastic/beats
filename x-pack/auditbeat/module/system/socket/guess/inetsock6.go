@@ -133,9 +133,9 @@ func (g *guessInetSockIPv6) Trigger() error {
 	return nil
 }
 
-// Validate scans the returned memory dump for the remote address followed
+// Extract scans the returned memory dump for the remote address followed
 // by the local address.
-func (g *guessInetSockIPv6) Validate(event interface{}) (common.MapStr, bool) {
+func (g *guessInetSockIPv6) Extract(event interface{}) (common.MapStr, bool) {
 	raw := event.([]byte)
 	var expected []byte
 	expected = append(expected, g.clientAddr.Addr[:]...) // sck_v6_daddr

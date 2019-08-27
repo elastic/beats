@@ -44,7 +44,7 @@ import (
 		"STRUCT_CRED_EGID": 24
 */
 
-// This should be  a multiple of 8 enough to fit up to egid on a struct cred
+// This should be multiple of 8 enough to fit up to egid on a struct cred.
 const (
 	credDumpBytes  = 8 * 16
 	credDebugMagic = 0x43736564
@@ -108,8 +108,8 @@ func (g *guessStructCreds) Terminate() error {
 	return nil
 }
 
-// Validate receives the struct cred dump and discovers the offsets.
-func (g *guessStructCreds) Validate(ev interface{}) (common.MapStr, bool) {
+// Extract receives the struct cred dump and discovers the offsets.
+func (g *guessStructCreds) Extract(ev interface{}) (common.MapStr, bool) {
 	raw := ev.([]byte)
 	if len(raw) != credDumpBytes {
 		return nil, false

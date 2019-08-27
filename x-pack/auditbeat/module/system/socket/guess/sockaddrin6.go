@@ -105,9 +105,9 @@ func (g *guessSockaddrIn6) Trigger() error {
 	return nil
 }
 
-// Validate receives the dumped struct sockaddr_in6 and scans it for the
+// Extract receives the dumped struct sockaddr_in6 and scans it for the
 // expected values.
-func (g *guessSockaddrIn6) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessSockaddrIn6) Extract(ev interface{}) (common.MapStr, bool) {
 	arr := ev.([]byte)
 	if len(arr) < 8 {
 		return nil, false

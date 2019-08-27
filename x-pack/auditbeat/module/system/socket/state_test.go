@@ -76,7 +76,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
 		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
 		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
-		&tcpV4ConnectCall{Meta: meta(1234, 1235, 8), Sock: sock, RAddr: rAddr, RPort: rPort},
+		&tcpIPv4ConnectCall{Meta: meta(1234, 1235, 8), Sock: sock, RAddr: rAddr, RPort: rPort},
 		&ipLocalOutCall{
 			Meta:  meta(1234, 1235, 8),
 			Sock:  sock,

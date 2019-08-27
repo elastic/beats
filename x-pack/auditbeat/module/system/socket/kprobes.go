@@ -234,7 +234,7 @@ var installKProbes = []helper.ProbeDef{
 			Fetchargs: "sock={{.P1}} laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN_AF}}({{.P2}}):u16 addr=+{{.SOCKADDR_IN_ADDR}}({{.P2}}):u32 port=+{{.SOCKADDR_IN_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpV4ConnectCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpIPv4ConnectCall) }),
 	},
 
 	// Result of IPv4/TCP connect:
@@ -399,7 +399,7 @@ var installKProbes = []helper.ProbeDef{
 			Fetchargs: "sock={{.P1}} laddra=+{{.INET_SOCK_V6_LADDR_A}}({{.P1}}):u64 laddrb=+{{.INET_SOCK_V6_LADDR_B}}({{.P1}}):u64 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN6_AF}}({{.P2}}):u16 addra=+{{.SOCKADDR_IN6_ADDRA}}({{.P2}}):u64 addrb=+{{.SOCKADDR_IN6_ADDRB}}({{.P2}}):u64 port=+{{.SOCKADDR_IN6_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET6}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpV6ConnectCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpIPv6ConnectCall) }),
 	},
 
 	// Result of IPv6/TCP connect:

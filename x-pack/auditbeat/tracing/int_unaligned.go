@@ -5,6 +5,8 @@
 // +build linux
 // +build 386 amd64 amd64p32
 
+// Integer reading and writing functions for platforms where alignment is not a problem.
+
 package tracing
 
 import (

@@ -109,9 +109,9 @@ func (g *guessSocketSock) Trigger() error {
 	return nil
 }
 
-// Validate first receives the sock* from sock_init_data, then uses it to
+// Extract first receives the sock* from sock_init_data, then uses it to
 // scan the dump from inet_release.
-func (g *guessSocketSock) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessSocketSock) Extract(ev interface{}) (common.MapStr, bool) {
 	if v, ok := ev.(*sockEvent); ok {
 		if g.initData != nil {
 			return nil, false

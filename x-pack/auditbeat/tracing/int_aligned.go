@@ -5,6 +5,8 @@
 // +build linux
 // +build !386,!amd64,!amd64p32
 
+// Alignment-safe integer reading and writing functions.
+
 package tracing
 
 import (

@@ -124,8 +124,8 @@ func (g *guessInetSockFamily) Trigger() error {
 	return nil
 }
 
-// Validate scans the struct inet_sock* memory for the current address family value.
-func (g *guessInetSockFamily) Validate(event interface{}) (common.MapStr, bool) {
+// Extract scans the struct inet_sock* memory for the current address family value.
+func (g *guessInetSockFamily) Extract(event interface{}) (common.MapStr, bool) {
 	raw := event.([]byte)
 	var expected [2]byte
 	var hits []int

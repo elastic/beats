@@ -91,9 +91,9 @@ func (g *guessTCPSendMsg) Trigger() (err error) {
 	return err
 }
 
-// Validate receives the arguments from the tcp_sendmsg call and checks
+// Extract receives the arguments from the tcp_sendmsg call and checks
 // which one contains the number of bytes written by trigger.
-func (g *guessTCPSendMsg) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessTCPSendMsg) Extract(ev interface{}) (common.MapStr, bool) {
 	event := ev.(*tcpSendMsgArgCountGuess)
 	if g.written <= 0 {
 		g.ctx.Log.Errorf("write failed for guess")

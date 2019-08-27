@@ -164,6 +164,7 @@ func newIPv6Loopback() (lo ipv6loopback, err error) {
 	return lo, errors.New("no loopback interface detected")
 }
 
+// adds a randomly-generated address from the fd00::/8 prefix (Unique Local Address)
 func (lo *ipv6loopback) addRandomAddress() (addr net.IP, err error) {
 	addr = make(net.IP, 16)
 	addr[0] = 0xFD

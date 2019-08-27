@@ -47,10 +47,10 @@ type Guesser interface {
 	// Trigger performs the actions necessary to generate events of interest
 	// to this guess.
 	Trigger() error
-	// Validate receives the events generated during trigger.
+	// Extract receives the events generated during trigger.
 	// Done is false when it needs to be called with more events. True when
 	// the guess has completed and results is a map with the discovered values.
-	Validate(event interface{}) (result common.MapStr, done bool)
+	Extract(event interface{}) (result common.MapStr, done bool)
 	// Terminate performs cleanup after the guess is complete.
 	Terminate() error
 }
@@ -66,7 +66,7 @@ type RepeatGuesser interface {
 }
 
 // EventualGuesser is a guess that repeats an undetermined amount of times
-// until it succeeds. It is re-executed as long as its Validate method returns
+// until it succeeds. It is re-executed as long as its Extract method returns
 // a nil result.
 type EventualGuesser interface {
 	Guesser
@@ -77,7 +77,7 @@ type EventualGuesser interface {
 // Guess is a helper function to easily determine memory layouts of kernel
 // structs and similar tasks. It installs the guesser's Probe, starts a perf
 // channel and executes the Trigger function. Each record received through the
-// channel is passed to the Validate function. Terminates once Validate succeeds
+// channel is passed to the Extract function. Terminates once Extract succeeds
 // or the timeout expires.
 func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
 	switch v := guesser.(type) {
@@ -148,6 +148,8 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	}
 
 	// channel to receive the TID and sync with the trigger goroutine.
+	// Length is zero so that it blocks sender and receiver, making it useful
+	// for synchronization.
 	tidChan := make(chan int, 0)
 
 	// Trigger goroutine.
@@ -218,7 +220,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 			if !ok {
 				return nil, errors.New("perf channel closed unexpectedly")
 			}
-			if result, ok = guesser.Validate(ev); !ok {
+			if result, ok = guesser.Extract(ev); !ok {
 				continue
 			}
 			return result, nil

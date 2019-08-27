@@ -129,10 +129,10 @@ func (g *guessInetSockIPv4) Trigger() error {
 	return nil
 }
 
-// Validate receives the dump of a struct inet_sock* and scans it for the
+// Extract receives the dump of a struct inet_sock* and scans it for the
 // random local and remote IPs and ports. Will return lists of all the
 // offsets were each value was found.
-func (g *guessInetSockIPv4) Validate(ev interface{}) (common.MapStr, bool) {
+func (g *guessInetSockIPv4) Extract(ev interface{}) (common.MapStr, bool) {
 	data := ev.([]byte)
 
 	laddr := g.local.Addr[:]
