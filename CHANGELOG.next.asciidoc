@@ -65,6 +65,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
 - Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
+- Fix `decode_base64_field` processor. {pull}13092[13092] {pull}13144[13144]
 
 *Auditbeat*
 
@@ -76,7 +77,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve detection of file deletion on Windows. {pull}10747[10747]
 - Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
 - Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
-- Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 
 *Heartbeat*
 
@@ -91,7 +91,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
-
+- Fix `logstash/node_stats` metricset to also collect `logstash_stats.events.duration_in_millis` field when `xpack.enabled: true` is set. {pull}13082[13082]
+- Fix `logstash/node` metricset to also collect `logstash_state.pipeline.representation.{type,version,hash}` fields when `xpack.enabled: true` is set. {pull}13133[13133]
+- Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
 
 *Packetbeat*
 
@@ -168,6 +170,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add check on object name in the counter path if the instance name is missing {issue}6528[6528] {pull}11878[11878]
 - Add AWS cloudwatch metricset. {pull}11798[11798] {issue}11734[11734]
 - Add `regions` in aws module config to specify target regions for querying cloudwatch metrics. {issue}11932[11932] {pull}11956[11956]
+- Make the `beat` module defensive about determine ES cluster UUID when `xpack.enabled: true` is set. {pull}13020[13020]
 
 *Packetbeat*
 
