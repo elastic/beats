@@ -128,7 +128,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 					msg := fmt.Errorf("Failed to query kafka partition (%v:%v) offsets: %v",
 						topic.Name, partition.ID, err)
-					m.Logger().Error(msg)
+					m.Logger().Warn(msg)
 					r.Error(msg)
 					continue
 				}
