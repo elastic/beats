@@ -93,8 +93,8 @@ func validateTags(tags map[string]string) error {
 			return fmt.Errorf("too long key; expected 127 chars, but got %d", keyLen)
 		}
 		valLen := utf8.RuneCountInString(val)
-		if valLen > 127 {
-			return fmt.Errorf("too long value; expected 127 chars, but got %d", valLen)
+		if valLen > 255 {
+			return fmt.Errorf("too long value; expected 255 chars, but got %d", valLen)
 		}
 	}
 
