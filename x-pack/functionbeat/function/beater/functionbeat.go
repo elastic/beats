@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/libbeat/licenser"
 )
 
 var (
@@ -92,6 +93,10 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	outputName := b.Config.Output.Name()
 	if !isOutputSupported(outputName) {
 		return fmt.Errorf("unsupported output type: %s; supported ones: %+v", outputName, supportedOutputs)
+	}
+
+	if outputName == "elasticsearch" {
+		licenser.Enforce(logp.NewLogger("license"), licenser.BasicAndAboveOrTrial)
 	}
 
 	bt.log.Info("Functionbeat is running")
