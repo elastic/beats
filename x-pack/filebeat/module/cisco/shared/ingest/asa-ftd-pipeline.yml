@@ -452,13 +452,13 @@ processors:
      params:
        ACPolicy:
          id: ["430001", "430002", "430003"]
-         ecs: [_temp_.cisco.list_id]
+         ecs: [_temp_.cisco.rule_name]
        AccessControlRuleAction:
          id: ["430002", "430003"]
          ecs: [event.outcome]
        AccessControlRuleName:
          id: ["430002", "430003"]
-         ecs: [_temp_.cisco.list_id]
+         ecs: [_temp_.cisco.rule_name]
        AccessControlRuleReason:
          id: ["430002", "430003"]
        ApplicationProtocol:
@@ -519,7 +519,7 @@ processors:
          ecs: [file.path]
        FilePolicy:
          id: ["430004", "430005"]
-         ecs: [_temp_.cisco.list_id]
+         ecs: [_temp_.cisco.rule_name]
        FileSHA256:
          id: ["430004", "430005"]
          ecs: [file.hash.sha256]
@@ -569,7 +569,7 @@ processors:
          ecs: [event.outcome]
        IntrusionPolicy:
          id: ["430001"]
-         ecs: [_temp_.cisco.list_id]
+         ecs: [_temp_.cisco.rule_name]
        MPLS_Label:
          id: ["430001"]
        Message:

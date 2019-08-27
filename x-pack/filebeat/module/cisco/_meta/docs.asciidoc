@@ -126,7 +126,7 @@ Mappings for Intrusion events fields:
 | HTTPResponse | http.response.status_code
 | IngressInterface | cisco.ftd.source_interface
 | InlineResult | event.outcome
-| IntrusionPolicy | cisco.ftd.list_id
+| IntrusionPolicy | cisco.ftd.rule_name
 | Message | message
 | Protocol | network.transport
 | SrcIP | source.ip
@@ -139,15 +139,14 @@ Mappings for Connection and Security Intelligence events fields:
 [options="header"]
 |====================================
 | FTD Field | Mapped fields
-| ACPolicy | cisco.ftd.list_id
+| ACPolicy | cisco.ftd.rule_name
 | AccessControlRuleAction | event.outcome
-| AccessControlRuleName | cisco.ftd.list_id
+| AccessControlRuleName | cisco.ftd.rule_name
 | ApplicationProtocol | network.protocol
 | ConnectionDuration | event.duration
 | DNSQuery | dns.question.name
 | DNSRecordType | dns.question.type
-| DNSResponseType | dns.answers.type
-| DNS_TTL | dns.answers.ttl
+| DNSResponseType | dns.response_code
 | DstIP | destination.ip
 | DstPort | destination.port
 | EgressInterface | cisco.ftd.destination_interface
@@ -183,7 +182,7 @@ Mappings for File and Malware events fields:
 | DstIP | destination.ip
 | DstPort | destination.port
 | FileName | file.path
-| FilePolicy | cisco.ftd.list_id
+| FilePolicy | cisco.ftd.rule_name
 | FileSHA256 | file.hash.sha256
 | FileSize | file.size
 | FileType | file.type

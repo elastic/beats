@@ -13,7 +13,7 @@ intrusion,430001,ICMPType,
 intrusion,430001,IngressInterface,cisco.ftd.source_interface
 intrusion,430001,IngressZone,
 intrusion,430001,InlineResult,event.outcome
-intrusion,430001,IntrusionPolicy,cisco.ftd.list_id
+intrusion,430001,IntrusionPolicy,cisco.ftd.rule_name
 intrusion,430001,MPLS_Label,
 intrusion,430001,Message,message
 intrusion,430001,NAPPolicy,
@@ -29,9 +29,9 @@ intrusion,430001,User,user.id,user.name
 intrusion,430001,VLAN_ID,
 intrusion,430001,WebApplication,network.application
 flow_start,430002,AccessControlRuleAction,event.outcome
-flow_start,430002,AccessControlRuleName,cisco.ftd.list_id
+flow_start,430002,AccessControlRuleName,cisco.ftd.rule_name
 flow_start,430002,AccessControlRuleReason,
-flow_start,430002,ACPolicy,cisco.ftd.list_id
+flow_start,430002,ACPolicy,cisco.ftd.rule_name
 flow_start,430002,ApplicationProtocol,network.protocol
 flow_start,430002,Client,
 flow_start,430002,ClientVersion,
@@ -89,9 +89,9 @@ flow_start,430002,UserAgent,user_agent.original
 flow_start,430002,VLAN_ID,
 flow_start,430002,WebApplication,network.application
 flow_end,430003,AccessControlRuleAction,event.outcome
-flow_end,430003,AccessControlRuleName,cisco.ftd.list_id
+flow_end,430003,AccessControlRuleName,cisco.ftd.rule_name
 flow_end,430003,AccessControlRuleReason,
-flow_end,430003,ACPolicy,cisco.ftd.list_id
+flow_end,430003,ACPolicy,cisco.ftd.rule_name
 flow_end,430003,ApplicationProtocol,network.protocol
 flow_end,430003,Client,
 flow_end,430003,ClientVersion,
@@ -164,7 +164,7 @@ file,430004,DstPort,destination.port
 file,430004,FileAction,
 file,430004,FileDirection,
 file,430004,FileName,file.path
-file,430004,FilePolicy,cisco.ftd.list_id
+file,430004,FilePolicy,cisco.ftd.rule_name
 file,430004,FileSandboxStatus,
 file,430004,FileSHA256,file.hash.sha256
 file,430004,FileSize,file.size
@@ -193,7 +193,7 @@ malware,430005,DstPort,destination.port
 malware,430005,FileAction,
 malware,430005,FileDirection,
 malware,430005,FileName,file.path
-malware,430005,FilePolicy,cisco.ftd.list_id
+malware,430005,FilePolicy,cisco.ftd.rule_name
 malware,430005,FileSandboxStatus,
 malware,430005,FileSHA256,file.hash.sha256
 malware,430005,FileSize,file.size
