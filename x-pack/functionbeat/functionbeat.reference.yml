@@ -36,6 +36,9 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
     # Execution role of the function.
     #role: arn:aws:iam::123456789012:role/MyFunction
 
@@ -80,6 +83,9 @@ functionbeat.provider.aws.functions:
     # The maximum memory allocated for this function, the configured size must be a factor of 64.
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
 
     # Execution role of the function.
     #role: arn:aws:iam::123456789012:role/MyFunction
@@ -130,6 +136,9 @@ functionbeat.provider.aws.functions:
     # The maximum memory allocated for this function, the configured size must be a factor of 64.
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
 
     # Execution role of the function.
     #role: arn:aws:iam::123456789012:role/MyFunction
@@ -220,7 +229,7 @@ functionbeat.provider.aws.functions:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -857,7 +866,7 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # Functionbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
