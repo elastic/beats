@@ -1102,10 +1102,6 @@ processors:
      ignore_missing: true
 
 on_failure:
- - set:
+ - append:
      field: "error.message"
      value: "{{ _ingest.on_failure_message }}"
- - remove:
-     field:
-     - _temp_
-     ignore_missing: true
