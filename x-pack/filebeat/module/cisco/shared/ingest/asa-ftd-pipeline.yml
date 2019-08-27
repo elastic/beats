@@ -467,7 +467,7 @@ processors:
          id: ["430004", "430005"]
        ArchiveFileName:
          id: ["430004", "430005"]
-         ecs: [file.path]
+         ecs: [file.name]
        ArchiveFileStatus:
          id: ["430004", "430005"]
        ArchiveSHA256:
@@ -516,7 +516,7 @@ processors:
          id: ["430004", "430005"]
        FileName:
          id: ["430004", "430005"]
-         ecs: [file.path]
+         ecs: [file.name]
        FilePolicy:
          id: ["430004", "430005"]
          ecs: [_temp_.cisco.rule_name]
@@ -532,7 +532,6 @@ processors:
          id: ["430004", "430005"]
        FileType:
          id: ["430004", "430005"]
-         ecs: [file.type]
        FirstPacketSecond:
          id: ["430004", "430005"]
          ecs: [event.start]

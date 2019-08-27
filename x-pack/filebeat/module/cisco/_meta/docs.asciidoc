@@ -176,16 +176,15 @@ Mappings for File and Malware events fields:
 |====================================
 | FTD Field | Mapped fields
 | ApplicationProtocol | network.protocol
-| ArchiveFileName | file.path
+| ArchiveFileName | file.name
 | ArchiveSHA256 | file.hash.sha256
 | Client | network.application
 | DstIP | destination.ip
 | DstPort | destination.port
-| FileName | file.path
+| FileName | file.name
 | FilePolicy | cisco.ftd.rule_name
 | FileSHA256 | file.hash.sha256
 | FileSize | file.size
-| FileType | file.type
 | FirstPacketSecond | event.start
 | Protocol | network.transport
 | SrcIP | source.ip
