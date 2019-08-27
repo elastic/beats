@@ -74,20 +74,6 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "process", COMMON_FIELDS + fields, {"process.hash.max_file_size": 1},
                              errors_allowed=True, warnings_allowed=True)
 
-    @unittest.skip("Needs a new test")
-    def test_metricset_socket(self):
-        """
-        socket metricset collects information about open sockets on a system.
-        """
-
-        fields = ["socket.entity_id", "destination.port", "network.direction", "network.transport"]
-
-        # errors_allowed=True - The socket metricset fills the `error` field if the process enrichment fails
-        # (e.g. process has exited). This should not fail the test.
-        # warnings_allowed=True - Metricset is beta and that generates a warning, TODO: remove later
-        self.check_metricset("system", "socket", COMMON_FIELDS + fields, extras={"socket.include_localhost": "true"},
-                             errors_allowed=True, warnings_allowed=True)
-
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
     def test_metricset_user(self):
         """
