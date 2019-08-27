@@ -133,6 +133,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
+- Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
 - Change iis url.path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225]
 - Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 
@@ -192,6 +193,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Fix function name reference for Kinesis streams in CloudFormation templates {pull}11646[11646]
+- Fix Cloudwatch logs timestamp to use timestamp of the log record instead of when the record was processed {pull}13291[13291]
 
 ==== Added
 
@@ -340,6 +342,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New options to configure roles and VPC. {pull}11779[11779]
 - Export automation templates used to create functions. {pull}11923[11923]
 - Configurable Amazon endpoint. {pull}12369[12369]
+- Add timeout option to reference configuration. {pull}13351[13351]
 
 *Winlogbeat*
 

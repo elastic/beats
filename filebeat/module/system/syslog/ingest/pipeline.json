@@ -34,6 +34,7 @@
                 "formats": [
                     "MMM  d HH:mm:ss",
                     "MMM dd HH:mm:ss",
+                    "MMM d HH:mm:ss",
                     "ISO8601"
                 ],
                 "ignore_failure": true
@@ -42,8 +43,14 @@
         {
             "date": {
                 "if": "ctx.event.timezone != null",
-                "field": "@timestamp",
-                "formats": ["ISO8601"],
+                "field": "system.syslog.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "MMM  d HH:mm:ss",
+                    "MMM dd HH:mm:ss",
+                    "MMM d HH:mm:ss",
+                    "ISO8601"
+                ],
                 "timezone": "{{ event.timezone }}",
                 "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
