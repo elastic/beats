@@ -84,7 +84,7 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 			if err == io.EOF {
 				break
 			}
-			return nil, errors.Wrap(err, "Decode MetricFamily failed")
+			return nil, errors.Wrap(err, "decoding of metric family failed")
 		} else {
 			families = append(families, mf)
 		}

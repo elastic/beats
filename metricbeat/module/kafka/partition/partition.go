@@ -46,6 +46,8 @@ type MetricSet struct {
 	topics []string
 }
 
+var errFailQueryOffset = errors.New("operation failed")
+
 var debugf = logp.MakeDebug("kafka")
 
 // New creates a new instance of the partition MetricSet.
@@ -121,7 +123,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 				if !offOK {
 					if err == nil {
-						err = errors.Wrap(err, "operation failed")
+						err = errFailQueryOffset
 					}
 
 					msg := fmt.Errorf("Failed to query kafka partition (%v:%v) offsets: %v",
@@ -192,12 +194,12 @@ func queryOffsetRange(
 ) (int64, int64, bool, error) {
 	oldest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetOldest)
 	if err != nil {
-		return -1, -1, false, err
+		return -1, -1, false, errors.Wrap(err, "failed to get oldest offset")
 	}
 
 	newest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetNewest)
 	if err != nil {
-		return -1, -1, false, err
+		return -1, -1, false, errors.Wrap(err, "failed to get newest offset")
 	}
 
 	okOld := oldest != -1
