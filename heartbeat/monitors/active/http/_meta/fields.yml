@@ -22,7 +22,7 @@
                 - name: hash
                   type: keyword
                   description: >
-                    Hash of the full response body. Can be used to group responses with identical hashes
+                    Hash of the full response body. Can be used to group responses with identical hashes.
         - name: rtt
           type: group
           description: >
