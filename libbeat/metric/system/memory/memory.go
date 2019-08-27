@@ -162,7 +162,7 @@ func GetVMStat() (*sysinfotypes.VMStatInfo, error) {
 	if vmstatHandle, ok := h.(sysinfotypes.VMStat); ok {
 		info, err := vmstatHandle.VMStat()
 		if err != nil {
-			return nil, errors.Wrap(err, "Error getting VMStat info")
+			return nil, errors.Wrap(err, "error getting VMStat info")
 		}
 		return info, nil
 	}
