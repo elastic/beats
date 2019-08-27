@@ -20,7 +20,10 @@ import (
 var output string
 
 func initProviders() ([]provider.Provider, error) {
-	b, err := instance.NewInitializedBeat(instance.Settings{Name: Name})
+	b, err := instance.NewInitializedBeat(instance.Settings{
+		Name:            Name,
+		ConfigOverrides: config.Overrides,
+	})
 	if err != nil {
 		return nil, err
 	}
