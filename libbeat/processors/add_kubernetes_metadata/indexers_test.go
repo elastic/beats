@@ -210,13 +210,13 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, indices[1], "fghij")
 
 	expected["container"] = common.MapStr{
-		"name": container,
+		"name":  container,
 		"image": containerImage,
 	}
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
 	expected["container"] = common.MapStr{
-		"name": initContainer,
+		"name":  initContainer,
 		"image": initContainerImage,
 	}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
@@ -405,7 +405,7 @@ func TestIpPortIndexer(t *testing.T) {
 
 	pod.Spec.Containers = []v1.Container{
 		{
-			Name: container,
+			Name:  container,
 			Image: containerImage,
 			Ports: []v1.ContainerPort{
 				{
