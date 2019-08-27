@@ -333,6 +333,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Update DNS protocol plugin to produce events with ECS fields for DNS. {issue}13320[13320] {pull}13354[13354]
+
 *Functionbeat*
 
 - New options to configure roles and VPC. {pull}11779[11779]
