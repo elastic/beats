@@ -177,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
 - Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
 - Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
+- Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
 
 *Packetbeat*
 
