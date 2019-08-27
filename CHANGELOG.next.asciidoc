@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Change iis url.path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225]
+- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 
 *Heartbeat*
 
@@ -228,6 +229,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
 - add_host_metadata is no GA. {pull}13148[13148]
 - Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
+- Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
 
 *Auditbeat*
 
@@ -275,6 +277,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add S3 input to retrieve logs from AWS S3 buckets. {pull}12640[12640] {issue}12582[12582]
 - Add aws module s3access metricset. {pull}13170[13170] {issue}12880[12880]
 - Update Suricata module to populate ECS DNS fields and handle EVE DNS version 2. {issue}13320[13320] {pull}13329[13329]
+- Update PAN-OS fileset to use the ECS NAT fields. {issue}13320[13320] {pull}13330[13330]
 
 *Heartbeat*
 

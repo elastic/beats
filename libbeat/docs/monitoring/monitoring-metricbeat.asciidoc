@@ -81,7 +81,7 @@ For more information, see
 --
 
 ifndef::serverless[]
-. <<{beatname_lc}-starting,Start {beatname_uc}>>.
+. Start {beatname_uc}.
 endif::[]
 
 [float]
