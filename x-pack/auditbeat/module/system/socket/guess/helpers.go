@@ -143,12 +143,12 @@ func newIPv6Loopback() (lo ipv6loopback, err error) {
 			continue
 		}
 		for _, addr := range addrs {
-			if ipnet, ok := addr.(*net.IPNet); ok && ipnet.IP.To4() == nil && ipnet.IP.IsLoopback() {
+			if ipnet, ok := addr.(*net.IPNet); ok && ipnet.IP.IsLoopback() {
 				lo.deviceName = dev.Name
 				lo.fd, err = unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, unix.IPPROTO_IP)
 				if err != nil {
 					lo.fd = -1
-					return lo, err
+					return lo, errors.Wrap(err, "ipv6 socket failed")
 				}
 				copy(lo.ifreq.name[:], dev.Name)
 				lo.ifreq.name[len(dev.Name)] = 0
@@ -175,7 +175,7 @@ func (lo *ipv6loopback) addRandomAddress() (addr net.IP, err error) {
 	req.prefix = 128
 	_, _, e := unix.Syscall(unix.SYS_IOCTL, uintptr(lo.fd), unix.SIOCSIFADDR, uintptr(unsafe.Pointer(&req)))
 	if e != 0 {
-		return nil, e
+		return nil, errors.Wrap(e, "ioctl SIOCSIFADDR failed")
 	}
 	lo.addresses = append(lo.addresses, addr)
 
@@ -184,7 +184,7 @@ func (lo *ipv6loopback) addRandomAddress() (addr net.IP, err error) {
 	// available to bind.
 	fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, 0)
 	if err != nil {
-		return addr, err
+		return addr, errors.Wrap(err, "socket ipv6 dgram failed")
 	}
 	defer unix.Close(fd)
 	var bindAddr unix.SockaddrInet6
@@ -198,7 +198,7 @@ func (lo *ipv6loopback) addRandomAddress() (addr net.IP, err error) {
 		}
 		time.Sleep(time.Millisecond * time.Duration(i))
 	}
-	return addr, err
+	return addr, errors.Wrap(err, "bind failed")
 }
 
 func (lo *ipv6loopback) Cleanup() error {

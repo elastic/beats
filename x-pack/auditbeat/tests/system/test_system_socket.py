@@ -32,6 +32,12 @@ def is_platform_supported():
     return {'i386', 'i686', 'x86_64', 'amd64'}.intersection(p)
 
 
+def enable_ipv6_loopback():
+    f = open('/proc/sys/net/ipv6/conf/lo/disable_ipv6', 'wb')
+    f.write('0\n')
+    f.close()
+
+
 @unittest.skipUnless(is_platform_supported(), "Requires Linux 2.6.32+ and 386/amd64 arch")
 @unittest.skipUnless(is_root(), "Requires root")
 class Test(AuditbeatXPackTest):
@@ -55,6 +61,7 @@ class Test(AuditbeatXPackTest):
         self.with_runner(ConnectedUDP4TestCase())
 
     def with_runner(self, test):
+        enable_ipv6_loopback()
         self.render_config_template(modules=[{
             "name": "system",
             "datasets": ["socket"],
