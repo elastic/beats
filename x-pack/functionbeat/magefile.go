@@ -27,8 +27,6 @@ import (
 	functionbeat "github.com/elastic/beats/x-pack/functionbeat/scripts/mage"
 )
 
-var ()
-
 func init() {
 	devtools.BeatDescription = "Functionbeat is a beat implementation for a serverless architecture."
 	devtools.BeatLicense = "Elastic License"
