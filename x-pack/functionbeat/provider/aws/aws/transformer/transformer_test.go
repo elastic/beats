@@ -34,7 +34,10 @@ func TestCloudwatch(t *testing.T) {
 	events := CloudwatchLogs(logsData)
 	assert.Equal(t, 1, len(events))
 
-	expectedTime, err := time.Parse(time.RFC3339, "2019-08-27T14:24:51.193+02:00")
+	currentLoc, err := time.LoadLocation("Local")
+	assert.Nil(t, err)
+
+	expectedTime, err := time.ParseInLocation(time.RFC3339, "2019-08-27T14:24:51.193+02:00", currentLoc)
 	assert.Nil(t, err)
 
 	expectedEvent := beat.Event{
