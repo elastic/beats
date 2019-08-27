@@ -13,6 +13,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode"
 
 	"gopkg.in/yaml.v2"
 
@@ -50,21 +51,21 @@ def appendOrCreate(Map dest, String[] path, def value) {
     existing.add(value)
     : dest.put(key, new ArrayList([existing, value]));
 }
-def msg = ctx._temp_.cisco.security;
+def msg = ctx._temp_.orig_security;
 def counters = new HashMap();
-def delete = new HashSet();
+def dest = new HashMap();
+ctx._temp_.cisco['security'] = dest;
 for (entry in msg.entrySet()) {
  def param = params.get(entry.getKey());
  if (param == null) {
-   delete.add(entry.getKey());
    continue;
  }
  param.getOrDefault('id', []).forEach( id -> counters[id] = 1 + counters.getOrDefault(id, 0) );
  if (!isEmpty(entry.getValue())) {
   param.getOrDefault('ecs', []).forEach( field -> appendOrCreate(ctx, field.splitOnToken('.'), entry.getValue()) );
+  dest[param.target] = entry.getValue();
  }
 }
-msg.entrySet().removeIf(item -> delete.contains(item.getKey()) || isEmpty(item.getValue()));
 if (ctx._temp_.cisco.message_id != "") return;
 def best;
 for (entry in counters.entrySet()) {
@@ -81,9 +82,10 @@ type mappings struct {
 }
 
 type fieldMapping struct {
-	name string
-	ID   stringSet `yaml:",flow,omitempty"`
-	ECS  stringSet `yaml:",flow,omitempty"`
+	name   string
+	Target string
+	ID     stringSet `yaml:",flow,omitempty"`
+	ECS    stringSet `yaml:",flow,omitempty"`
 }
 
 func main() {
@@ -122,7 +124,7 @@ func generate() error {
 	if err != nil {
 		return fmt.Errorf("failed to load mappings from '%s': %v", csvFile, err)
 	}
-	mappings.If = "ctx._temp_?.cisco?.security != null"
+	mappings.If = "ctx._temp_?.orig_security != null"
 	mappings.Lang = "painless"
 	mappings.Source = painless
 	processors := []map[string]interface{}{
@@ -165,9 +167,10 @@ func loadMappings(reader io.Reader) (m mappings, err error) {
 		}
 		ids := newStringSet(record[1:2])
 		m.merge(&fieldMapping{
-			name: record[2],
-			ID:   ids,
-			ECS:  newStringSet(makeTempFields(record[3:])),
+			name:   record[2],
+			ID:     ids,
+			ECS:    newStringSet(makeTempFields(record[3:])),
+			Target: snakeCase(record[2]),
 		})
 		allIDs.merge(ids)
 	}
@@ -200,4 +203,47 @@ func makeTempFields(fields []string) []string {
 		}
 	}
 	return fields
+}
+
+func snakeCase(in string) string {
+	// This is copied from the netflow input with two changes:
+	//  - handle spaces
+	//  - treat digits as uppercase
+	if strings.ContainsRune(in, ' ') {
+		in = strings.ReplaceAll(in, " ", "_")
+	}
+	if strings.ContainsRune(in, '_') {
+		return strings.ToLower(in)
+	}
+
+	out := make([]rune, 0, len(in)+4)
+	runes := []rune(in)
+	upperCount := 1
+	for _, r := range runes {
+		lr := unicode.ToLower(r)
+		isUpper := lr != r || (r >= '0' && r <= '9')
+		if isUpper {
+			if upperCount == 0 {
+				out = append(out, '_')
+			}
+			upperCount++
+		} else {
+			if upperCount > 2 {
+				// Some magic here:
+				// NetFlow usually lowercases all but the first letter of an
+				// acronym (Icmp) Except when it is 2 characters long: (IP).
+				// In other cases, it keeps all caps, but if we have a run of
+				// more than 2 uppercase chars, then the last char belongs to
+				// the next word:
+				// postNATSourceIPv4Address     : post_nat_source_ipv4_address
+				// selectorIDTotalFlowsObserved : selector_id_total_flows_...
+				out = append(out, '_')
+				n := len(out) - 1
+				out[n], out[n-1] = out[n-1], out[n]
+			}
+			upperCount = 0
+		}
+		out = append(out, lr)
+	}
+	return string(out)
 }
