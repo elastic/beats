@@ -154,7 +154,9 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 
 	// Trigger goroutine.
 	go func() {
-		// Make sure it doesn't switch OS threads during it's lifetime.
+		// Lock this goroutine to the current CPU thread. This way we can setup
+		// the perf channel to receive events from this thread only, avoiding
+		// the guess being contaminated with an externally-generated event.
 		runtime.LockOSThread()
 		defer runtime.UnlockOSThread()
 		defer close(tidChan)
