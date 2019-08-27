@@ -25,10 +25,9 @@ type metric struct {
 }
 
 type registry struct {
-	metrics       map[string]map[string]*metric
-	reservoirSize int
-	ttl           time.Duration
-	lastReport    time.Time
+	metrics    map[string]map[string]*metric
+	ttl        time.Duration
+	lastReport time.Time
 }
 
 type setMetric struct {
@@ -69,6 +68,118 @@ func (d *deltaGaugeMetric) Value() float64 {
 	return d.value
 }
 
+// SamplingTimer is a timer that supports sampling
+type samplingTimer struct {
+	metrics.Timer
+	meter     metrics.Meter
+	histogram metrics.Histogram
+}
+
+// NewSamplingTimer returns a new SamplingTimer
+func newSamplingTimer() *samplingTimer {
+	m := metrics.NewMeter()
+	h := metrics.NewHistogram(metrics.NewExpDecaySample(1048, 0.0015))
+
+	return &samplingTimer{
+		Timer:     metrics.NewCustomTimer(h, m),
+		meter:     m,
+		histogram: h,
+	}
+}
+
+// SampledUpdate will update the timer a sampled measurement
+func (s *samplingTimer) SampledUpdate(d time.Duration, sampleRate float64) {
+	s.histogram.Update(int64(d))
+	s.meter.Mark(int64(1 / sampleRate))
+}
+
+// Snapshot gets a snapshot of the SamplingTimer
+func (s *samplingTimer) Snapshot() samplingTimerSnapshot {
+	return samplingTimerSnapshot{
+		histogram: s.histogram.Snapshot(),
+		meter:     s.meter.Snapshot(),
+	}
+}
+
+type samplingTimerSnapshot struct {
+	histogram metrics.Histogram
+	meter     metrics.Meter
+}
+
+// Count returns the number of events recorded at the time the snapshot was
+// taken.
+func (t *samplingTimerSnapshot) Count() int64 { return t.meter.Count() }
+
+// Max returns the maximum value at the time the snapshot was taken.
+func (t *samplingTimerSnapshot) Max() int64 { return t.histogram.Max() }
+
+// Mean returns the mean value at the time the snapshot was taken.
+func (t *samplingTimerSnapshot) Mean() float64 { return t.histogram.Mean() }
+
+// Min returns the minimum value at the time the snapshot was taken.
+func (t *samplingTimerSnapshot) Min() int64 { return t.histogram.Min() }
+
+// Percentile returns an arbitrary percentile of sampled values at the time the
+// snapshot was taken.
+func (t *samplingTimerSnapshot) Percentile(p float64) float64 {
+	return t.histogram.Percentile(p)
+}
+
+// Percentiles returns a slice of arbitrary percentiles of sampled values at
+// the time the snapshot was taken.
+func (t *samplingTimerSnapshot) Percentiles(ps []float64) []float64 {
+	return t.histogram.Percentiles(ps)
+}
+
+// Rate1 returns the one-minute moving average rate of events per second at the
+// time the snapshot was taken.
+func (t *samplingTimerSnapshot) Rate1() float64 { return t.meter.Rate1() }
+
+// Rate5 returns the five-minute moving average rate of events per second at
+// the time the snapshot was taken.
+func (t *samplingTimerSnapshot) Rate5() float64 { return t.meter.Rate5() }
+
+// Rate15 returns the fifteen-minute moving average rate of events per second
+// at the time the snapshot was taken.
+func (t *samplingTimerSnapshot) Rate15() float64 { return t.meter.Rate15() }
+
+// RateMean returns the meter's mean rate of events per second at the time the
+// snapshot was taken.
+func (t *samplingTimerSnapshot) RateMean() float64 { return t.meter.RateMean() }
+
+// Snapshot returns the snapshot.
+func (t *samplingTimerSnapshot) Snapshot() metrics.Timer { return t }
+
+// StdDev returns the standard deviation of the values at the time the snapshot
+// was taken.
+func (t *samplingTimerSnapshot) StdDev() float64 { return t.histogram.StdDev() }
+
+// Stop is a no-op.
+func (t *samplingTimerSnapshot) Stop() {}
+
+// Sum returns the sum at the time the snapshot was taken.
+func (t *samplingTimerSnapshot) Sum() int64 { return t.histogram.Sum() }
+
+// Time panics.
+func (*samplingTimerSnapshot) Time(func()) {
+	panic("Time called on a samplingTimerSnapshot")
+}
+
+// Update panics.
+func (*samplingTimerSnapshot) Update(time.Duration) {
+	panic("Update called on a samplingTimerSnapshot")
+}
+
+// Record the duration of an event that started at a time and ends now.
+func (t *samplingTimerSnapshot) UpdateSince(ts time.Time) {
+	panic("Update called on a samplingTimerSnapshot")
+}
+
+// Variance returns the variance of the values in the sample.
+func (t *samplingTimerSnapshot) Variance() float64 {
+	return t.histogram.Variance()
+}
+
 type metricsGroup struct {
 	tags    map[string]string
 	metrics common.MapStr
@@ -95,7 +206,7 @@ func (r *registry) getMetric(metric interface{}) map[string]interface{} {
 		values["p95"] = ps[2]
 		values["p99"] = ps[3]
 		values["p99_9"] = ps[4]
-	case metrics.Timer:
+	case *samplingTimer:
 		t := m.Snapshot()
 		ps := t.Percentiles([]float64{0.5, 0.75, 0.95, 0.99, 0.999})
 		values["count"] = t.Count()
@@ -136,6 +247,11 @@ func (r *registry) GetAll() []metricsGroup {
 
 			// cleanups according to ttl
 			if r.ttl > 0 && m.lastSeen.Before(cutOff) {
+				m, _ := metricsMap[key]
+
+				if stoppable, ok := m.metric.(interface{ Stop() }); ok {
+					stoppable.Stop()
+				}
 				delete(metricsMap, key)
 				continue
 			}
@@ -199,6 +315,14 @@ func (r *registry) getOrNew(name string, tags map[string]string, new func() inte
 	return c.metric
 }
 
+func (r *registry) clearTypeChanged(name string, tags map[string]string) {
+	// type was changed
+	// we can try to support the situation where a new version of the app has changed a type in
+	// a metric by deleting the old one and creating a new one
+	logger.With("name", name).Warn("metric changed type")
+	r.Delete(name, tags)
+}
+
 func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.Counter {
 	maybeCounter := r.getOrNew(name, tags, func() interface{} { return metrics.NewCounter() })
 	counter, ok := maybeCounter.(metrics.Counter)
@@ -206,25 +330,18 @@ func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.
 		return counter
 	}
 
-	// type was changed
-	// we can try to support the situation where a new version of the app has changed a type in
-	// a metric by deleting the old one and creating a new one
-	logger.With("name", name).Warn("metric changed type")
-	r.Delete(name, tags)
+	r.clearTypeChanged(name, tags)
 	return r.GetOrNewCounter(name, tags)
 
 }
 
-func (r *registry) GetOrNewTimer(name string, tags map[string]string) metrics.Timer {
-	timer, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewTimer() }).(metrics.Timer)
+func (r *registry) GetOrNewTimer(name string, tags map[string]string) *samplingTimer {
+	timer, ok := r.getOrNew(name, tags, func() interface{} { return newSamplingTimer() }).(*samplingTimer)
 	if ok {
 		return timer
 	}
-	// type was changed
-	// we can try to support the situation where a new version of the app has changed a type in
-	// a metric by deleting the old one and creating a new one
-	logger.With("name", name).Warn("metric changed type")
-	r.Delete(name, tags)
+
+	r.clearTypeChanged(name, tags)
 	return r.GetOrNewTimer(name, tags)
 }
 
@@ -233,24 +350,18 @@ func (r *registry) GetOrNewGauge64(name string, tags map[string]string) *deltaGa
 	if ok {
 		return gauge
 	}
-	// type was changed
-	// we can try to support the situation where a new version of the app has changed a type in
-	// a metric by deleting the old one and creating a new one
-	logger.With("name", name).Warn("metric changed type")
-	r.Delete(name, tags)
+
+	r.clearTypeChanged(name, tags)
 	return r.GetOrNewGauge64(name, tags)
 }
 
 func (r *registry) GetOrNewHistogram(name string, tags map[string]string) metrics.Histogram {
-	histogram, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewHistogram(metrics.NewUniformSample(r.reservoirSize)) }).(metrics.Histogram)
+	histogram, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewHistogram(metrics.NewExpDecaySample(1028, 0.015)) }).(metrics.Histogram)
 	if ok {
 		return histogram
 	}
-	// type was changed
-	// we can try to support the situation where a new version of the app has changed a type in
-	// a metric by deleting the old one and creating a new one
-	logger.With("name", name).Warn("metric changed type")
-	r.Delete(name, tags)
+
+	r.clearTypeChanged(name, tags)
 	return r.GetOrNewHistogram(name, tags)
 }
 
@@ -259,11 +370,8 @@ func (r *registry) GetOrNewSet(name string, tags map[string]string) *setMetric {
 	if ok {
 		return setmetric
 	}
-	// type was changed
-	// we can try to support the situation where a new version of the app has changed a type in
-	// a metric by deleting the old one and creating a new one
-	logger.With("name", name).Warn("metric changed type")
-	r.Delete(name, tags)
+
+	r.clearTypeChanged(name, tags)
 	return r.GetOrNewSet(name, tags)
 }
 

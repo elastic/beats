@@ -251,7 +251,7 @@ func TestTagsCleanup(t *testing.T) {
 	testData := []string{
 		"metric1:1|g|#k1:v1,k2:v2",
 
-		"metric2:3|g|@0.1|#k1:v2,k2:v3",
+		"metric2:3|ms|#k1:v2,k2:v3",
 	}
 	process(t, testData, ms)
 	time.Sleep(1000 * time.Millisecond)
@@ -357,4 +357,66 @@ func TestCounter(t *testing.T) {
 	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
 		"metric01": map[string]interface{}{"count": int64(0)},
 	})
+}
+
+func TestCounterSampled(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|c|@0.1",
+		"metric01:2|c|@0.2",
+	}
+	process(t, testData, ms)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(20)},
+	})
+}
+
+func TestTimerSampled(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:2|ms|@0.01",
+		"metric01:1|ms|@0.1",
+		"metric01:2|ms|@0.2",
+		"metric01:2|ms",
+	}
+
+	// total of 100 + 10 + 5 + 1 = 116 measurements
+	process(t, testData, ms)
+
+	// rate gorutine runs every 5 sec
+	time.Sleep(time.Second * 6)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	actualMetric01 := events[0].MetricSetFields["metric01"].(map[string]interface{})
+
+	// returns the extrapolated count
+	assert.Equal(t, int64(116), actualMetric01["count"])
+
+	// rate numbers are updated by a gorutine periodically, so we cant tell exactly what they should be here
+	// we just need to check that the sample rate was applied
+	assert.True(t, actualMetric01["1m_rate"].(float64) > 10)
+	assert.True(t, actualMetric01["5m_rate"].(float64) > 10)
+	assert.True(t, actualMetric01["15m_rate"].(float64) > 10)
+}
+
+func TestChangeType(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|ms",
+		"metric01:2|c",
+	}
+	process(t, testData, ms)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(2)},
+	}, events[0].MetricSetFields)
 }

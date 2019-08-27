@@ -111,6 +111,18 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		return nil
 	}
 
+	// parse sample rate. Only applicable for timers and counters
+	var sampleRate float64
+	if m.sampleRate == "" {
+		sampleRate = 1.0
+	} else {
+		var err error
+		sampleRate, err = strconv.ParseFloat(m.sampleRate, 64)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process counter `%s` sample rate `%s`", m.name, m.sampleRate)
+		}
+	}
+
 	switch m.metricType {
 	case "c":
 		c := p.registry.GetOrNewCounter(m.name, m.tags)
@@ -118,6 +130,8 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to process counter `%s` with value `%s`", m.name, m.value)
 		}
+		// apply sample rate
+		v = int64(float64(v) * (1.0 / sampleRate))
 		c.Inc(v)
 	case "g":
 		c := p.registry.GetOrNewGauge64(m.name, m.tags)
@@ -138,7 +152,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to process timer `%s` with value `%s`", m.name, m.value)
 		}
-		c.Update(time.Duration(v))
+		c.SampledUpdate(time.Duration(v), sampleRate)
 	case "h": // TODO: can these be floats?
 		c := p.registry.GetOrNewHistogram(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
