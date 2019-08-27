@@ -21,13 +21,15 @@ var (
 	configOverrides = common.MustNewConfigFrom(map[string]interface{}{
 		"path.data":              "/tmp",
 		"path.logs":              "/tmp/logs",
-		"logging.to_stderr":      true,
-		"logging.to_files":       false,
 		"setup.template.enabled": true,
 		"queue.mem": map[string]interface{}{
 			"flush.min_events": 10,
 			"flush.timeout":    "0.01s",
 		},
+	})
+	functionLoggingOverrides = common.MustNewConfigFrom(map[string]interface{}{
+		"logging.to_stderr": true,
+		"logging.to_files":  false,
 	})
 	esOverrides = common.MustNewConfigFrom(map[string]interface{}{
 		"queue.mem.events":                   "${output.elasticsearch.bulk_max_size}",
@@ -56,6 +58,13 @@ var (
 			Config: esOverrides,
 		},
 	}
+
+	functionOverride = cfgfile.ConditionalOverride{
+		Check:  always,
+		Config: functionLoggingOverrides,
+	}
+	// FunctionOverrides contain logging settings
+	FunctionOverrides = append(Overrides, functionOverride)
 )
 
 // Config default configuration for Functionbeat.

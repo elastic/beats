@@ -28,7 +28,7 @@ func NewFunctionCmd(name string, beatCreator beat.Creator) *FunctionCmd {
 	settings := instance.Settings{
 		Name:            name,
 		IndexPrefix:     name,
-		ConfigOverrides: config.Overrides,
+		ConfigOverrides: config.FunctionOverrides,
 	}
 
 	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
