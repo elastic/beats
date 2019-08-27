@@ -1583,7 +1583,7 @@ type: keyword
 *`cisco.ftd.mapped_source_ip`*::
 +
 --
-The translated source IP address. Use ECS source.ip.
+The translated source IP address. Use ECS source.nat.ip.
 
 
 type: ip
@@ -1593,7 +1593,7 @@ type: ip
 *`cisco.ftd.mapped_source_port`*::
 +
 --
-The translated source port. Use ECS source.port.
+The translated source port. Use ECS source.nat.port.
 
 
 type: long
@@ -1603,7 +1603,7 @@ type: long
 *`cisco.ftd.mapped_destination_ip`*::
 +
 --
-The translated destination IP address. Use ECS destination.ip.
+The translated destination IP address. Use ECS destination.nat.ip.
 
 
 type: ip
@@ -1613,7 +1613,7 @@ type: ip
 *`cisco.ftd.mapped_destination_port`*::
 +
 --
-The translated destination port. Use ECS destination.port.
+The translated destination port. Use ECS destination.nat.port.
 
 
 type: long
