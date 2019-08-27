@@ -50,7 +50,7 @@ type PerfChannel struct {
 	lostC   chan uint64
 
 	// one perf.Event per CPU
-	evs     []*perf.Event
+	events  []*perf.Event
 	streams map[uint64]stream
 
 	running uintptr
@@ -209,12 +209,12 @@ func WithPollTimeout(timeout time.Duration) PerfChannelConf {
 // will determine the types and contents of the returned events.
 func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 	c.attr.Config = uint64(format.ID)
-	doGroup := len(c.evs) > 0
+	doGroup := len(c.events) > 0
 	for idx := 0; idx < c.numCPUs; idx++ {
 		var group *perf.Event
 		var flags int
 		if doGroup {
-			group = c.evs[idx]
+			group = c.events[idx]
 			flags = unix.PERF_FLAG_FD_NO_GROUP | unix.PERF_FLAG_FD_OUTPUT
 		}
 		ev, err := perf.OpenWithFlags(&c.attr, c.pid, idx, group, flags)
@@ -237,7 +237,7 @@ func (c *PerfChannel) MonitorProbe(format ProbeFormat, decoder Decoder) error {
 			}
 		}
 		c.streams[cid] = stream{probeID: format.ID, decoder: decoder}
-		c.evs = append(c.evs, ev)
+		c.events = append(c.events, ev)
 
 		if !doGroup {
 			if err := ev.MapRingNumPages(c.mappedPages); err != nil {
@@ -276,7 +276,7 @@ func (c *PerfChannel) Run() error {
 	c.errC = make(chan error, c.sizeErrC)
 	c.lostC = make(chan uint64, c.sizeLostC)
 
-	for _, ev := range c.evs {
+	for _, ev := range c.events {
 		if err := ev.Enable(); err != nil {
 			return errors.Wrap(err, "perf channel enable failed")
 		}
@@ -296,7 +296,7 @@ func (c *PerfChannel) Close() error {
 		defer close(c.lostC)
 	}
 	var errs multierror.Errors
-	for _, ev := range c.evs {
+	for _, ev := range c.events {
 		if err := ev.Disable(); err != nil {
 			errs = append(errs, err)
 		}
@@ -352,7 +352,7 @@ func makeMetadata(eventID int, record *perf.SampleRecord) Metadata {
 func (c *PerfChannel) channelLoop() {
 	defer c.wg.Done()
 	ctx := doneWrapperContext(c.done)
-	merger := newRecordMerger(c.evs[:c.numCPUs], c, c.pollTimeout)
+	merger := newRecordMerger(c.events[:c.numCPUs], c, c.pollTimeout)
 	for {
 		// Read the available event from all the monitored ring-buffers that
 		// has the smallest timestamp.
