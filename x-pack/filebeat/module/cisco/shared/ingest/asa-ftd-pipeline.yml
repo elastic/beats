@@ -804,6 +804,17 @@ processors:
      value: malware-detected
 
 #
+# Handle event.duration
+#
+# It can be set from ConnectionDuration FTD field above. This field holds
+# seconds as a string. Copy it to _temp_.duration_hms so that the following
+# processor converts it to the right value and populates start and end.
+ - set:
+     field: '_temp_.duration_hms'
+     value: '{{event.duration}}'
+     if: 'ctx.event?.duration != null'
+
+#
 # Process the flow duration "hh:mm:ss" present in some messages
 # This will fill event.start, event.end and event.duration
 #
