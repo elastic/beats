@@ -172,7 +172,15 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 
 	// Receive the thread ID from the trigger goroutine.
 	tid := <-tidChan
-
+	defer func() {
+		// reads the tidChan just in case we return due to an error below and
+		// the trigger goroutine is blocking for the fire signal.
+		// Otherwise this will be a read from a closed channel.
+		select {
+		case <-tidChan:
+		default:
+		}
+	}()
 	perfchan, err := tracing.NewPerfChannel(
 		tracing.WithBufferSize(8),
 		tracing.WithErrBufferSize(1),
@@ -208,8 +216,13 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 
 	// Read the tidchan again to release the trigger.
 	<-tidChan
-	// This blocks until trigger terminates (channel closed).
-	<-tidChan
+
+	// This blocks until trigger terminates (channel closed) or a timeout
+	select {
+	case <-tidChan:
+	case <-timer.C:
+		return nil, errors.New("timeout while waiting for guess trigger to complete")
+	}
 
 	for {
 		select {

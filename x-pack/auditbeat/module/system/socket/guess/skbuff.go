@@ -616,7 +616,6 @@ func u32At(buf []byte) uintptr {
 // nil, true : Finish the current iteration and perform a new one.
 // (non-nil), true : The guess completed.
 func (g *guessSkBuffDataPtr) Extract(event interface{}) (common.MapStr, bool) {
-	g.ctx.Log.Debugf("%s off=0x%x received %T", g.Name(), g.dumpOffset, event)
 	switch v := event.(type) {
 	case *dataDump:
 		g.data = v
@@ -647,15 +646,11 @@ func (g *guessSkBuffDataPtr) Extract(event interface{}) (common.MapStr, bool) {
 	var ports [4]byte
 	binary.BigEndian.PutUint16(ports[:2], uint16(g.cs.cliAddr.Port))
 	binary.BigEndian.PutUint16(ports[2:], uint16(g.cs.srvAddr.Port))
-	g.ctx.Log.Debugf("looking for %s and %s", hex.EncodeToString(ipAddresses[:]), hex.EncodeToString(ports[:]))
-	//g.ctx.Log.Debugf("received %d bytes at offset 0x%x looking for %s:\n%s\n",
-	//	len(g.data.Data), g.dumpOffset, hex.EncodeToString(ipAddresses[:]), hex.Dump(g.data.Data[:]))
 	// Checking with align=1 although it always seems aligned at 4 because
 	// sk_buff->data is always padded with 2 bytes at the start.
 	ipHdrOff := indexAligned(g.data.Data[:], ipAddresses[:], 12 /*offset in iphdr*/ +14 /*eth header*/, 1)
 	if ipHdrOff == -1 {
 		// This is not out packet. dumpOffset is not the right one.
-		g.ctx.Log.Debugf("no ip header")
 		return nil, true
 	}
 	ipHdrOff -= 12
