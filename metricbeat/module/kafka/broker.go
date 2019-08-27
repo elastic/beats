@@ -26,6 +26,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -174,12 +176,12 @@ func (b *Broker) PartitionOffset(
 	req.AddBlock(topic, partition, time, 1)
 	resp, err := b.broker.GetAvailableOffsets(req)
 	if err != nil {
-		return -1, err
+		return -1, errors.Wrap(err, "get available offsets failed")
 	}
 
 	block := resp.GetBlock(topic, partition)
 	if len(block.Offsets) == 0 {
-		return -1, nil
+		return -1, errors.Wrap(block.Err, "block offsets is empty")
 	}
 
 	return block.Offsets[0], nil

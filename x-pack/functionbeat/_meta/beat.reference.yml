@@ -50,6 +50,10 @@ functionbeat.provider.aws.functions:
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
 
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
     # combination of these.
@@ -97,6 +101,10 @@ functionbeat.provider.aws.functions:
 
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -151,6 +159,10 @@ functionbeat.provider.aws.functions:
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
 
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
     # combination of these.
@@ -168,6 +180,72 @@ functionbeat.provider.aws.functions:
     #      field:
     #        from: message
     #        to: message
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
+
+  # Create a function that accepts Cloudwatch logs from Kinesis streams.
+  - name: cloudwatch-logs-kinesis
+    enabled: false
+    type: cloudwatch_logs_kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Cloudwatch logs in Kinesis events"
+
+    # Set base64_encoded if your data is base64 encoded.
+    #base64_encoded: false
+
+    # Set compressed if your data is compressed with gzip.
+    #compressed: true
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
     #  - decode_json_fields:
     #      fields: ["message"]
     #      process_array: false
