@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
@@ -27,7 +26,7 @@ const packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 func rawYaml() ([]byte, error) {
 	// Load the configuration file from disk with all the settings,
 	// the function takes care of using -c.
-	rawConfig, err := cfgfile.Load("", config.ConfigOverrides)
+	rawConfig, err := cfgfile.Load("", config.Overrides)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func MakeZip(provider string) ([]byte, error) {
 }
 
 func keystoreRaw() ([]byte, error) {
-	cfg, err := cfgfile.Load("", common.NewConfig())
+	cfg, err := cfgfile.Load("", config.Overrides)
 	if err != nil {
 		return nil, fmt.Errorf("error loading config file: %v", err)
 	}

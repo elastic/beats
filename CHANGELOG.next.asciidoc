@@ -177,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
 - Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
 - Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
+- Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
 
 *Packetbeat*
 
@@ -278,11 +279,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ingesting IBM MQ logs. {pull}8782[8782]
 - Add S3 input to retrieve logs from AWS S3 buckets. {pull}12640[12640] {issue}12582[12582]
 - Add aws module s3access metricset. {pull}13170[13170] {issue}12880[12880]
+- Update Suricata module to populate ECS DNS fields and handle EVE DNS version 2. {issue}13320[13320] {pull}13329[13329]
 - Update PAN-OS fileset to use the ECS NAT fields. {issue}13320[13320] {pull}13330[13330]
+- Add fields to the Zeek DNS fileset for ECS DNS. {issue}13320[13320] {pull}13324[13324]
 
 *Heartbeat*
 
 - Enable `add_observer_metadata` processor in default config. {pull}11394[11394]
+- Record HTTP body metadata and optionally contents in `http.response.body.*` fields. {pull}13022[13022]
 
 *Journalbeat*
 
@@ -337,12 +341,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Update DNS protocol plugin to produce events with ECS fields for DNS. {issue}13320[13320] {pull}13354[13354]
+
 *Functionbeat*
 
 - New options to configure roles and VPC. {pull}11779[11779]
 - Export automation templates used to create functions. {pull}11923[11923]
 - Configurable Amazon endpoint. {pull}12369[12369]
 - Add timeout option to reference configuration. {pull}13351[13351]
+- Configurable tags for Lambda functions. {pull}13352[13352]
 
 *Winlogbeat*
 
