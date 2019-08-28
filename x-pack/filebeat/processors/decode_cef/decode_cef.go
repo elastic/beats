@@ -141,7 +141,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 func toCEFObject(cefEvent *cef.Event) common.MapStr {
 	// Add CEF header fields.
-	cefObject := common.MapStr{"version": cefEvent.Version}
+	cefObject := common.MapStr{"version": strconv.Itoa(cefEvent.Version)}
 	if cefEvent.DeviceVendor != "" {
 		cefObject.Put("device.vendor", cefEvent.DeviceVendor)
 	}

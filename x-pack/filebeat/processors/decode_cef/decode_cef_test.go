@@ -37,7 +37,7 @@ func TestProcessorRun(t *testing.T) {
 			},
 			message: "CEF:1|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5",
 			fields: common.MapStr{
-				"version":                   1,
+				"version":                   "1",
 				"device.event_class_id":     "600",
 				"device.product":            "Deep Security Manager",
 				"device.vendor":             "Trend Micro",
@@ -62,7 +62,7 @@ func TestProcessorRun(t *testing.T) {
 		"parse_errors": {
 			message: "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|Low|msg=User signed in with =xyz",
 			fields: common.MapStr{
-				"cef.version":               0,
+				"cef.version":               "0",
 				"cef.device.event_class_id": "600",
 				"cef.device.product":        "Deep Security Manager",
 				"cef.device.vendor":         "Trend Micro",
@@ -90,7 +90,7 @@ func TestProcessorRun(t *testing.T) {
 			},
 			message: "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5",
 			fields: common.MapStr{
-				"cef.version":                   0,
+				"cef.version":                   "0",
 				"cef.device.event_class_id":     "600",
 				"cef.device.product":            "Deep Security Manager",
 				"cef.device.vendor":             "Trend Micro",
@@ -164,7 +164,7 @@ func TestProcessorRun(t *testing.T) {
 		}
 
 		version, _ := evt.GetValue("cef.version")
-		assert.EqualValues(t, 1, version)
+		assert.EqualValues(t, "1", version)
 	})
 }
 

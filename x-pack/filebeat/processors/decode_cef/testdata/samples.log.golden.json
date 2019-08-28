@@ -24,7 +24,7 @@
       },
       "name": "trojan successfully stopped",
       "severity": "10",
-      "version": 0
+      "version": "0"
     },
     "destination": {
       "ip": "12.121.122.82"
@@ -60,7 +60,7 @@
       },
       "name": "User Signed In",
       "severity": "3",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "code": "600",
@@ -109,7 +109,7 @@
       },
       "name": "Eicar_test_file",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "Delete",
@@ -159,7 +159,7 @@
       },
       "name": "AppControl detectOnly",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "detectOnly",
@@ -216,7 +216,7 @@
       },
       "name": "Log for TCP Port 80",
       "severity": "0",
-      "version": 0
+      "version": "0"
     },
     "destination": {
       "bytes": 1019,
@@ -267,7 +267,7 @@
       },
       "name": "New Integrity Monitoring Rule",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "updated",
@@ -328,7 +328,7 @@
       },
       "name": "Test Intrusion Prevention Rule",
       "severity": "3",
-      "version": 0
+      "version": "0"
     },
     "destination": {
       "bytes": 1093,
@@ -380,7 +380,7 @@
       },
       "name": "Microsoft Windows Events",
       "severity": "8",
-      "version": 0
+      "version": "0"
     },
     "destination": {
       "user": {
@@ -424,7 +424,7 @@
       },
       "name": "WebReputation",
       "severity": "5",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "code": "5000000",
@@ -467,7 +467,7 @@
       },
       "name": "APPFW_STARTURL",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "blocked",
@@ -514,7 +514,7 @@
       },
       "name": "APPFW_STARTURL",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "not blocked",
@@ -561,7 +561,7 @@
       },
       "name": "APPFW_SAFECOMMERCE_XFORM",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "transformed",
@@ -608,7 +608,7 @@
       },
       "name": "APPFW_SAFECOMMERCE",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "transformed",
@@ -655,7 +655,7 @@
       },
       "name": "APPFW_SIGNATURE_MATCH",
       "severity": "6",
-      "version": 0
+      "version": "0"
     },
     "event": {
       "action": "not blocked",
@@ -698,7 +698,7 @@
       },
       "name": "Something awesome happened",
       "severity": "very-high",
-      "version": 0
+      "version": "0"
     },
     "destination": {
       "geo": {
