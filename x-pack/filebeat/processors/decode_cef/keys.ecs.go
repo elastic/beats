@@ -252,6 +252,10 @@ var ecsExtensionMapping = map[string]mappedField{
 		Target: "file.type",
 		Type:   String,
 	},
+	"message": {
+		Target: "message",
+		Type:   String,
+	},
 	"requestClientApplication": {
 		Target: "user_agent.original",
 		Type:   String,

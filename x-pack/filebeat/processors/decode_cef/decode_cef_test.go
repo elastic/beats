@@ -51,7 +51,7 @@ func TestProcessorRun(t *testing.T) {
 				"extensions.target":         "admin",
 				// ECS
 				"event.code":       "600",
-				"message":          "User Signed In",
+				"message":          "User signed in from 2001:db8::5",
 				"observer.product": "Deep Security Manager",
 				"observer.vendor":  "Trend Micro",
 				"observer.version": "1.2.3",
