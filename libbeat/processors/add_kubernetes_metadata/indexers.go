@@ -195,7 +195,7 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 		}
 		metadata = append(metadata, MetadataIndex{
 			Index: cID,
-			Data:  c.metaGen.ContainerMetadata(pod, status.GetName()),
+			Data:  c.metaGen.ContainerMetadata(pod, status.GetName(), status.GetImage()),
 		})
 	}
 
@@ -245,7 +245,7 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 
 				metadata = append(metadata, MetadataIndex{
 					Index: fmt.Sprintf("%s:%d", pod.Status.GetPodIP(), port.GetContainerPort()),
-					Data:  h.metaGen.ContainerMetadata(pod, container.GetName()),
+					Data:  h.metaGen.ContainerMetadata(pod, container.GetName(), container.GetImage()),
 				})
 			}
 		}
