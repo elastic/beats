@@ -70,12 +70,12 @@ func TestProcessorRun(t *testing.T) {
 				"cef.name":                  "User Signed In",
 				"cef.severity":              "Low",
 				// ECS
-				"event.code": "600",
-				"event.severity":            0,
-				"observer.product":        "Deep Security Manager",
-				"observer.vendor":         "Trend Micro",
-				"observer.version":        "1.2.3",
-				"message":                   "User Signed In",
+				"event.code":       "600",
+				"event.severity":   0,
+				"observer.product": "Deep Security Manager",
+				"observer.vendor":  "Trend Micro",
+				"observer.version": "1.2.3",
+				"message":          "User Signed In",
 				"error.message": []string{
 					"malformed value for msg at pos 94",
 					"unexpected end of CEF event",
