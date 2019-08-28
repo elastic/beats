@@ -112,7 +112,7 @@ The Cisco FTD fileset primarily supports parsing IPv4 and IPv6 access list log
 messages similar to that of ASA devices as well as Security Event Syslog
 Messages for Intrusion, Connection, File and Malware events.
 
-*ECS Field mapping*
+*Field mappings*
 
 The `ftd` fileset maps Security Event Syslog Messages to the Elastic Common
 Schema (ECS) format. The following table illustrates the mapping from

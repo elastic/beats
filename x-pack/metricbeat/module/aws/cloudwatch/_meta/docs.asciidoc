@@ -29,7 +29,7 @@ By default, statistic includes Average, Sum, Count, Maximum and Minimum.
 === Configuration example
 To be more focused on `cloudwatch` metricset use cases, the examples below do
 not include configurations on AWS credentials.
-Please see <<aws-credentials-config>> for more details on setting AWS credentials
+Please see <<aws-credentials-config,AWS credentials options>> for more details on setting AWS credentials
 in configurations in order for this metricset to make proper AWS API calls.
 
 [source,yaml]
