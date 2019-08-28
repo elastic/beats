@@ -18,7 +18,7 @@ import (
 var generateCorpus = flag.Bool("corpus", false, "generate fuzz corpus from test cases")
 
 const (
-	standardMessage = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|src=10.0.0.192 dst=12.121.122.82 spt=1232`
+	standardMessage = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|src=10.0.0.192 dst=12.121.122.82 spt=1232 eventId=1`
 
 	headerOnly = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|`
 
@@ -76,7 +76,7 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 }
 
 func TestEventUnpack(t *testing.T) {
-	t.Run("regularMessage", func(t *testing.T) {
+	t.Run("standardMessage", func(t *testing.T) {
 		var e Event
 		err := e.Unpack([]byte(standardMessage))
 		assert.NoError(t, err)
@@ -88,9 +88,10 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
 		assert.Equal(t, map[string]string{
-			"src": "10.0.0.192",
-			"dst": "12.121.122.82",
-			"spt": "1232",
+			"src":     "10.0.0.192",
+			"dst":     "12.121.122.82",
+			"spt":     "1232",
+			"eventId": "1",
 		}, e.Extensions)
 	})
 
@@ -331,6 +332,7 @@ func TestEventUnpackWithFullExtensionNames(t *testing.T) {
 		"sourceAddress":      "10.0.0.192",
 		"destinationAddress": "12.121.122.82",
 		"sourcePort":         "1232",
+		"eventId":            "1",
 	}, e.Extensions)
 }
 

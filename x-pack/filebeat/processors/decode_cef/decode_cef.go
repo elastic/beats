@@ -99,12 +99,10 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	// Map CEF extension fields to ECS fields.
 	if p.ECS {
-		if sev, ok := cefSeverityToNumber(ce.Severity); ok {
-			event.PutValue("event.severity", sev)
-		}
+		writeCEFHeaderToECS(&ce, event)
 
 		for key, v := range ce.Extensions {
-			mapping, found := ecsKeyMapping[key]
+			mapping, found := ecsExtensionMapping[key]
 			if !found {
 				continue
 			}
@@ -113,14 +111,14 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 			if mapping.Translate != nil {
 				translatedValue, err := mapping.Translate(v)
 				if err != nil {
-					cefErrors = append(cefErrors, err)
+					cefErrors = append(cefErrors, errors.Wrap(err, key))
 					continue
 				}
 				event.PutValue(mapping.Target, translatedValue)
 			} else if mapping.Type != unset {
 				translatedValue, err := toType(v, mapping.Type)
 				if err != nil {
-					cefErrors = append(cefErrors, err)
+					cefErrors = append(cefErrors, errors.Wrap(err, key))
 					continue
 				}
 				event.PutValue(mapping.Target, translatedValue)
@@ -171,6 +169,30 @@ func toCEFObject(cefEvent *cef.Event) common.MapStr {
 	}
 
 	return cefObject
+}
+
+func writeCEFHeaderToECS(cefEvent *cef.Event, event *beat.Event) {
+	if cefEvent.DeviceVendor != "" {
+		event.PutValue("observer.vendor", cefEvent.DeviceVendor)
+	}
+	if cefEvent.DeviceProduct != "" {
+		// TODO: observer.product is not officially part of ECS.
+		event.PutValue("observer.product", cefEvent.DeviceProduct)
+	}
+	if cefEvent.DeviceVersion != "" {
+		event.PutValue("observer.version", cefEvent.DeviceVersion)
+	}
+	if cefEvent.DeviceEventClassID != "" {
+		event.PutValue("event.code", cefEvent.DeviceEventClassID)
+	}
+	if cefEvent.Name != "" {
+		event.PutValue("message", cefEvent.Name)
+	}
+	if cefEvent.Severity != "" {
+		if sev, ok := cefSeverityToNumber(cefEvent.Severity); ok {
+			event.PutValue("event.severity", sev)
+		}
+	}
 }
 
 func appendErrorMessage(m common.MapStr, msg string) error {

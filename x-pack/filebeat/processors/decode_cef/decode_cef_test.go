@@ -49,9 +49,14 @@ func TestProcessorRun(t *testing.T) {
 				"extensions.sourceAddress":  "10.52.116.160",
 				"extensions.sourceUserName": "admin",
 				"extensions.target":         "admin",
-				"message":                   "User signed in from 2001:db8::5",
-				"source.ip":                 "10.52.116.160",
-				"source.user.name":          "admin",
+				// ECS
+				"event.code":       "600",
+				"message":          "User Signed In",
+				"observer.product": "Deep Security Manager",
+				"observer.vendor":  "Trend Micro",
+				"observer.version": "1.2.3",
+				"source.ip":        "10.52.116.160",
+				"source.user.name": "admin",
 			},
 		},
 		"parse_errors": {
@@ -64,8 +69,13 @@ func TestProcessorRun(t *testing.T) {
 				"cef.device.version":        "1.2.3",
 				"cef.name":                  "User Signed In",
 				"cef.severity":              "Low",
+				// ECS
+				"event.code": "600",
 				"event.severity":            0,
-				"message":                   "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|Low|msg=User signed in with =xyz",
+				"observer.product":        "Deep Security Manager",
+				"observer.vendor":         "Trend Micro",
+				"observer.version":        "1.2.3",
+				"message":                   "User Signed In",
 				"error.message": []string{
 					"malformed value for msg at pos 94",
 					"unexpected end of CEF event",
@@ -185,7 +195,7 @@ func readCEFSamples(t testing.TB, source string) []common.MapStr {
 	defer f.Close()
 
 	conf := defaultConfig()
-	conf.Field = "log.original"
+	conf.Field = "event.original"
 	dec, err := newDecodeCEF(conf)
 	if err != nil {
 		t.Fatal(err)
@@ -201,7 +211,7 @@ func readCEFSamples(t testing.TB, source string) []common.MapStr {
 
 		evt := &beat.Event{
 			Fields: common.MapStr{
-				"log": common.MapStr{"original": string(data)},
+				"event": common.MapStr{"original": string(data)},
 			},
 		}
 

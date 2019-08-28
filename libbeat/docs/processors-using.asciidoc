@@ -805,7 +805,7 @@ beta[]
 The `decode_cef` processor decodes Common Event Format (CEF) messages. This
 processor is available in Filebeat.
 
-Below an example configuration that decodes the `message` field as CEF after
+Below is an example configuration that decodes the `message` field as CEF after
 renaming it to `log.original`. It is best to rename `message` to `log.original`
 because the decoded CEF data may contain its own `message` field.
 

@@ -98,7 +98,7 @@ func (e *Event) Unpack(data []byte, opts ...Option) error {
 	if settings.fullExtensionNames {
 		for key, v := range e.Extensions {
 			fullName, found := fullNameMapping[key]
-			if !found {
+			if !found || key == fullName {
 				continue
 			}
 

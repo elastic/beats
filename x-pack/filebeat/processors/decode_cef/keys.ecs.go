@@ -7,6 +7,7 @@ package decode_cef
 import (
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -41,25 +42,25 @@ type mappedField struct {
 	Translate func(in string) (interface{}, error)
 }
 
-var ecsKeyMapping = map[string]mappedField{
+var ecsExtensionMapping = map[string]mappedField{
 	"agentAddress": {
-		Target: "observer.ip",
+		Target: "agent.ip",
 		Type:   IP,
 	},
 	"agentDnsDomain": {
-		Target: "observer.hostname",
+		Target: "agent.name",
 		Type:   String,
 	},
 	"agentHostName": {
-		Target: "observer.hostname",
+		Target: "agent.name",
 		Type:   String,
 	},
 	"agentId": {
-		Target: "observer.serial_number",
+		Target: "agent.id",
 		Type:   String,
 	},
 	"agentMacAddress": {
-		Target: "observer.mac",
+		Target: "agent.mac",
 		Type:   String,
 	},
 	"agentReceiptTime": {
@@ -67,11 +68,11 @@ var ecsKeyMapping = map[string]mappedField{
 		Type:   Timestamp,
 	},
 	"agentType": {
-		Target: "observer.type",
+		Target: "agent.type",
 		Type:   String,
 	},
 	"agentVersion": {
-		Target: "observer.version",
+		Target: "agent.version",
 		Type:   String,
 	},
 	"applicationProtocol": {
@@ -103,11 +104,11 @@ var ecsKeyMapping = map[string]mappedField{
 		Type:   String,
 	},
 	"destinationGeoLatitude": {
-		Target: "destination.geo.location",
+		Target: "destination.geo.location.lat",
 		Type:   Double,
 	},
 	"destinationGeoLongitude": {
-		Target: "destination.geo.location",
+		Target: "destination.geo.location.lon",
 		Type:   Double,
 	},
 	"destinationHostName": {
@@ -131,7 +132,7 @@ var ecsKeyMapping = map[string]mappedField{
 		Type:   String,
 	},
 	"destinationServiceName": {
-		Target: "service.name",
+		Target: "destination.service.name",
 		Type:   String,
 	},
 	"destinationTranslatedAddress": {
@@ -159,7 +160,7 @@ var ecsKeyMapping = map[string]mappedField{
 		Type:   String,
 	},
 	"deviceAddress": {
-		Target: "host.ip",
+		Target: "observer.ip",
 		Type:   IP,
 	},
 	"deviceDirection": {
@@ -175,16 +176,16 @@ var ecsKeyMapping = map[string]mappedField{
 			}
 		},
 	},
-	"deviceExternalId": {
-		Target: "host.id",
+	"deviceDnsDomain": {
+		Target: "observer.hostname",
 		Type:   String,
 	},
 	"deviceHostName": {
-		Target: "host.hostname",
+		Target: "observer.hostname",
 		Type:   String,
 	},
 	"deviceMacAddress": {
-		Target: "host.mac",
+		Target: "observer.mac",
 		Type:   String,
 	},
 	"devicePayloadId": {
@@ -251,14 +252,6 @@ var ecsKeyMapping = map[string]mappedField{
 		Target: "file.type",
 		Type:   String,
 	},
-	"message": {
-		Target: "message",
-		Type:   String,
-	},
-	"rawEvent": {
-		Target: "event.original",
-		Type:   String,
-	},
 	"requestClientApplication": {
 		Target: "user_agent.original",
 		Type:   String,
@@ -284,11 +277,11 @@ var ecsKeyMapping = map[string]mappedField{
 		Type:   String,
 	},
 	"sourceGeoLatitude": {
-		Target: "source.geo.location",
+		Target: "source.geo.location.lat",
 		Type:   Double,
 	},
 	"sourceGeoLongitude": {
-		Target: "source.geo.location",
+		Target: "source.geo.location.lon",
 		Type:   Double,
 	},
 	"sourceHostName": {
@@ -337,7 +330,9 @@ var ecsKeyMapping = map[string]mappedField{
 	},
 	"transportProtocol": {
 		Target: "network.transport",
-		Type:   String,
+		Translate: func(in string) (interface{}, error) {
+			return strings.ToLower(in), nil
+		},
 	},
 	"type": {
 		Target: "event.kind",
