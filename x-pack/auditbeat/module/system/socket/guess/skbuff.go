@@ -254,7 +254,7 @@ func (g *guessSkBuffProto) Probes() ([]helper.ProbeDef, error) {
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_recv_datagram",
-				Address:   "__skb_recv_datagram",
+				Address:   "{{.RECV_UDP_DATAGRAM}}",
 				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, 1024),
 			},
 			Decoder: tracing.NewDumpDecoder,
@@ -523,7 +523,7 @@ func (g *guessSkBuffDataPtr) Probes() ([]helper.ProbeDef, error) {
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_recv_dgrm_data",
-				Address:   "__skb_recv_datagram",
+				Address:   "{{.RECV_UDP_DATAGRAM}}",
 				Fetchargs: fmt.Sprintf("ptr=%s data=%s", address, helper.MakeMemoryDump(address, 0, dataDumpBytes)),
 			},
 			Decoder: helper.NewStructDecoder(func() interface{} { return new(dataDump) }),
@@ -532,7 +532,7 @@ func (g *guessSkBuffDataPtr) Probes() ([]helper.ProbeDef, error) {
 			Probe: tracing.Probe{
 				Type:      tracing.TypeKRetProbe,
 				Name:      "guess_recv_dgrm_skbuff",
-				Address:   "__skb_recv_datagram",
+				Address:   "{{.RECV_UDP_DATAGRAM}}",
 				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, skbuffDumpSize),
 			},
 			Decoder: tracing.NewDumpDecoder,
