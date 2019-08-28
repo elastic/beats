@@ -816,7 +816,7 @@ processors:
     fields:
       - {from: "message", to: "event.original"}
 - decode_cef:
-    field: log.original
+    field: event.original
 ----
 
 The `decode_cef` processor has the following configuration settings.
