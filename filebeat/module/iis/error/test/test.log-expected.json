@@ -104,6 +104,7 @@
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
-        "source.port": 64388
+        "source.port": 64388,
+        "url.original": "-"
     }
 ]
