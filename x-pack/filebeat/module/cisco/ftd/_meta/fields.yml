@@ -1,18 +1,18 @@
-- name: asa
+- name: ftd
   type: group
   description: >
-    Fields for Cisco ASA Firewall.
+    Fields for Cisco Firepower Threat Defense Firewall.
   fields:
   - name: message_id
     type: keyword
     description: >
-      The Cisco ASA message identifier.
+      The Cisco FTD message identifier.
 
   - name: suffix
     type: keyword
     example: session
     description: >
-      Optional suffix after %ASA identifier.
+      Optional suffix after %FTD identifier.
 
   - name: source_interface
     type: keyword
@@ -42,22 +42,22 @@
   - name: mapped_source_ip
     type: ip
     description: >
-      The translated source IP address.
+      The translated source IP address. Use ECS source.nat.ip.
 
   - name: mapped_source_port
     type: long
     description: >
-      The translated source port.
+      The translated source port. Use ECS source.nat.port.
 
   - name: mapped_destination_ip
     type: ip
     description: >
-      The translated destination IP address.
+      The translated destination IP address. Use ECS destination.nat.ip.
 
   - name: mapped_destination_port
     type: long
     description: >
-      The translated destination port.
+      The translated destination port. Use ECS destination.nat.port.
 
   - name: threat_level
     type: keyword
@@ -85,3 +85,8 @@
     type: short
     description: >
       ICMP code.
+
+  - name: security
+    type: object
+    description:
+      Raw fields for Security Events.
