@@ -63,7 +63,7 @@ metricbeat.modules:
   period: 10s
 ----
 
-You should store sensitive values like passwords in the <<keystore,secrets keystore>>.
+Store sensitive values like passwords in the <<keystore,secrets keystore>>.
 
 [float]
 === Metricsets
