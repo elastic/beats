@@ -5,10 +5,11 @@
 package monitor
 
 import (
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 )
 
 // filterMetrics will filter out any unsupported metrics based on the namespace selected
@@ -150,10 +151,10 @@ func mapResourceGroupFormID(path string) string {
 func mapTags(azureTags map[string]*string) map[string]string {
 	if len(azureTags) == 0 {
 		return nil
-}
-	 var tags = map[string]string{}
-	for key, value:= range azureTags {
-		tags[key]= *value
+	}
+	var tags = map[string]string{}
+	for key, value := range azureTags {
+		tags[key] = *value
 	}
 	return tags
 }

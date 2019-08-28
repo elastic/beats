@@ -6,15 +6,18 @@ package monitor
 
 import (
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
 
@@ -38,12 +41,13 @@ type ResourceConfiguration struct {
 
 // Resource will contain the main azure resource details
 type Resource struct {
-	ID       string
-	Name     string
-	Location string
-	Type     string
-	Group string
-	Tags map[string]string
+	ID           string
+	Name         string
+	Location     string
+	Type         string
+	Group        string
+	Tags         map[string]string
+	Subscription string
 }
 
 // Metric will contain the main azure metric details
@@ -221,7 +225,8 @@ func (client *Client) mapMetric(metric azure.MetricConfig, resource resources.Ge
 		}
 	}
 
-	met = Metric{resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type, Group:mapResourceGroupFormID(*resource.ID), Tags: mapTags(resource.Tags)},
+	met = Metric{resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type, Group: mapResourceGroupFormID(*resource.ID),
+		Tags: mapTags(resource.Tags), Subscription: client.config.SubscriptionID},
 		namespace: metric.Namespace, names: supportedMetricNames, aggregations: strings.Join(supportedAggregations, ","), dimensions: dim, timeGrain: metric.Timegrain}
 
 	//map previous metric values if existing
@@ -275,7 +280,7 @@ func (client *Client) mapMetricValues(index int, metrics []insights.Metric) erro
 }
 
 // logError is used to reduce the number of lines written when logging errors
-func (client *Client) logError(report mb.ReporterV2, err error)  {
+func (client *Client) logError(report mb.ReporterV2, err error) {
 	client.log.Error(err)
 	report.Error(err)
 }

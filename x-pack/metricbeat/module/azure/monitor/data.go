@@ -6,10 +6,11 @@ package monitor
 
 import (
 	"fmt"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 // eventsMapping will map metric values to beats events
@@ -47,14 +48,14 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 				Timestamp: timestamp,
 				MetricSetFields: common.MapStr{
 					"resource": common.MapStr{
-						"name":  metric.resource.Name,
-						"type":  metric.resource.Type,
-						"tags":  metric.resource.Tags,
+						"name": metric.resource.Name,
+						"type": metric.resource.Type,
+						"tags": metric.resource.Tags,
 					},
-					"resource_group": metric.resource.Group,
-					"namespace":      metric.namespace,
-					"subscriptionID": "unique identifier",
-					"metrics":        metricList,
+					"resource_group":  metric.resource.Group,
+					"namespace":       metric.namespace,
+					"subscription_id": metric.resource.Subscription,
+					"metrics":         metricList,
 				},
 			}
 			if len(metric.dimensions) > 0 {

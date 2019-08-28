@@ -31,7 +31,7 @@
       type: keyword
       description: >
         The resource group
-    - name: subscriptionID
+    - name: subscription_id
       type: keyword
       description: >
         The subscription ID

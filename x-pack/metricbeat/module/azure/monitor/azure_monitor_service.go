@@ -7,10 +7,11 @@ package monitor
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
-	"strings"
 )
 
 type AzureMonitorService struct {
@@ -82,9 +83,9 @@ func (service *AzureMonitorService) GetMetricValues(resourceID string, namespace
 			aggregations, nil, "", filter, insights.Data, namespace)
 		if err != nil {
 			return metrics, err
-		} else {
-			metrics = append(metrics, *resp.Value...)
 		}
+		metrics = append(metrics, *resp.Value...)
+
 	}
 	return metrics, nil
 }

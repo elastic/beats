@@ -5,10 +5,11 @@
 package monitor
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
-	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

@@ -6,14 +6,16 @@ package monitor
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 // AzureMockService mock for the azure monitor services
@@ -117,7 +119,7 @@ func MockMetricDefinitions() *[]insights.MetricDefinition {
 	metric1 := "TotalRequests"
 	metric2 := "Capacity"
 	metric3 := "BytesRead"
-	defs:= []insights.MetricDefinition{
+	defs := []insights.MetricDefinition{
 		{
 			Name:                      &insights.LocalizableString{Value: &metric1},
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Maximum, insights.Count, insights.Total, insights.Average},
@@ -158,7 +160,7 @@ func TestInitResources(t *testing.T) {
 func TestMapMetric(t *testing.T) {
 	resource := MockResource()
 	metricDefinitions := insights.MetricDefinitionCollection{
-		Value:    MockMetricDefinitions(),
+		Value: MockMetricDefinitions(),
 	}
 	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
 	client := MockClient()
@@ -226,7 +228,7 @@ func TestGetMetricValues(t *testing.T) {
 		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
 		client.azureMonitorService = m
-		mr:= MockReporterV2{}
+		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		err := client.GetMetricValues(mr)
 		assert.Nil(t, err)

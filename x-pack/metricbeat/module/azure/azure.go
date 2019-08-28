@@ -5,9 +5,11 @@
 package azure
 
 import (
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 // Config options

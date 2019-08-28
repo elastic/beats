@@ -2194,7 +2194,7 @@ type: keyword
 
 --
 
-*`azure.monitor.subscriptionID`*::
+*`azure.monitor.subscription_id`*::
 +
 --
 The subscription ID
