@@ -1,9 +1,5 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "system.memory",
         "duration": 115000,
@@ -18,36 +14,25 @@
     "system": {
         "memory": {
             "actual": {
-                "free": 4974256128,
+                "free": 3280441344,
                 "used": {
-                    "bytes": 11597463552,
-                    "pct": 0.6998
+                    "bytes": 13899427840,
+                    "pct": 0.8091
                 }
             },
-            "free": 1320112128,
-            "hugepages": {
-                "default_size": 2097152,
-                "free": 0,
-                "reserved": 0,
-                "surplus": 0,
-                "total": 0,
-                "used": {
-                    "bytes": 0,
-                    "pct": 0
-                }
-            },
+            "free": 300634112,
             "swap": {
-                "free": 3482378240,
-                "total": 8589930496,
+                "free": 771751936,
+                "total": 6442450944,
                 "used": {
-                    "bytes": 5107552256,
-                    "pct": 0.5946
+                    "bytes": 5670699008,
+                    "pct": 0.8802
                 }
             },
-            "total": 16571719680,
+            "total": 17179869184,
             "used": {
-                "bytes": 15251607552,
-                "pct": 0.9203
+                "bytes": 16879235072,
+                "pct": 0.9825
             }
         }
     }
