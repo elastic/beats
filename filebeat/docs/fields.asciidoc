@@ -1415,6 +1415,33 @@ type: object
 
 --
 
+*`observer.product`*::
++
+--
+Product name.
+
+type: keyword
+
+--
+
+*`source.service.name`*::
++
+--
+Service that is the source of the event.
+
+type: keyword
+
+--
+
+*`destination.service.name`*::
++
+--
+Service that is the target of the event.
+
+type: keyword
+
+--
+
 [[exported-fields-cisco]]
 == Cisco fields
 
