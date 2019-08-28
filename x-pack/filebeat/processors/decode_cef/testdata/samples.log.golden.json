@@ -691,6 +691,7 @@
         "destinationServiceName": "chrome",
         "eventId": "3457",
         "rawEvent": "{\"x\": \"y\"}",
+        "requestContext": "application/json",
         "requestMethod": "POST",
         "sourceServiceName": "httpd",
         "transportProtocol": "TCP"
@@ -713,7 +714,7 @@
     "event": {
       "code": "18",
       "id": 3457,
-      "original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Something awesome happened|very-high|eventId=3457 requestMethod=POST dlat=38.915 dlong=-77.511 proto=TCP rawEvent={\"x\": \"y\"} sourceServiceName=httpd destinationServiceName=chrome",
+      "original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Something awesome happened|very-high|eventId=3457 requestMethod=POST dlat=38.915 dlong=-77.511 proto=TCP rawEvent={\"x\": \"y\"} sourceServiceName=httpd destinationServiceName=chrome requestContext=application/json",
       "severity": 9
     },
     "http": {

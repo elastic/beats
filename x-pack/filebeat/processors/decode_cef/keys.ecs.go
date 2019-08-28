@@ -258,7 +258,13 @@ var ecsExtensionMapping = map[string]mappedField{
 	},
 	"requestContext": {
 		Target: "http.request.referrer",
-		Type:   String,
+		Translate: func(in string) (interface{}, error) {
+			// Does the string look like URL?
+			if strings.HasPrefix(in, "http") {
+				return in, nil
+			}
+			return nil, nil
+		},
 	},
 	"requestMethod": {
 		Target: "http.request.method",

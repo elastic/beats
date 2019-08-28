@@ -114,7 +114,9 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 					cefErrors = append(cefErrors, errors.Wrap(err, key))
 					continue
 				}
-				event.PutValue(mapping.Target, translatedValue)
+				if translatedValue != nil {
+					event.PutValue(mapping.Target, translatedValue)
+				}
 			} else if mapping.Type != unset {
 				translatedValue, err := toType(v, mapping.Type)
 				if err != nil {
