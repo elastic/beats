@@ -172,7 +172,7 @@ func TestParseMetrics(t *testing.T) {
 		assert.Equal(t, test.err, err, test.input)
 		assert.Equal(t, test.expected, actual, test.input)
 
-		processor := newMetricProcessor(1000, time.Second)
+		processor := newMetricProcessor(time.Second)
 		for _, e := range actual {
 			err := processor.processSingle(e)
 

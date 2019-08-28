@@ -78,7 +78,7 @@ type samplingTimer struct {
 // NewSamplingTimer returns a new SamplingTimer
 func newSamplingTimer() *samplingTimer {
 	m := metrics.NewMeter()
-	h := metrics.NewHistogram(metrics.NewExpDecaySample(1048, 0.0015))
+	h := metrics.NewHistogram(metrics.NewExpDecaySample(1028, 0.015))
 
 	return &samplingTimer{
 		Timer:     metrics.NewCustomTimer(h, m),

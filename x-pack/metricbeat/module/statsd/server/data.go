@@ -99,10 +99,9 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func newMetricProcessor(reservoirSize int, ttl time.Duration) *metricProcessor {
+func newMetricProcessor(ttl time.Duration) *metricProcessor {
 	return &metricProcessor{
-		registry:      &registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
-		reservoirSize: reservoirSize,
+		registry: &registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
 	}
 }
 
