@@ -48,6 +48,21 @@ metricbeat.modules:
 
 ----
 
+To use credentials requiring an Active Directory domain, separate out the username and password as:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
+  period: 10s
+----
+
 [float]
 === Metricsets
 
