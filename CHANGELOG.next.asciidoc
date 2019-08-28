@@ -282,6 +282,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Suricata module to populate ECS DNS fields and handle EVE DNS version 2. {issue}13320[13320] {pull}13329[13329]
 - Update PAN-OS fileset to use the ECS NAT fields. {issue}13320[13320] {pull}13330[13330]
 - Add fields to the Zeek DNS fileset for ECS DNS. {issue}13320[13320] {pull}13324[13324]
+- Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
 
 *Heartbeat*
 
