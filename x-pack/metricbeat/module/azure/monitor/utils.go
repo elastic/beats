@@ -109,7 +109,7 @@ func metricExists(name string, metric insights.MetricValue, metrics []MetricValu
 
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
-	if prevMet.namespace == met.namespace && reflect.DeepEqual(prevMet.names, met.names) && prevMet.resource == met.resource && prevMet.aggregations == met.aggregations && prevMet.timeGrain == met.timeGrain {
+	if prevMet.namespace == met.namespace && reflect.DeepEqual(prevMet.names, met.names) && prevMet.resource.ID == met.resource.ID && prevMet.aggregations == met.aggregations && prevMet.timeGrain == met.timeGrain {
 		return true
 	}
 	return false
@@ -135,4 +135,25 @@ func (p *ResourceConfiguration) expired() bool {
 	}
 	p.lastUpdate.Time = time.Now()
 	return true
+}
+
+func mapResourceGroupFormID(path string) string {
+	params := strings.Split(path, "/")
+	for i, param := range params {
+		if param == "resourceGroups" {
+			return params[i+1]
+		}
+	}
+	return ""
+}
+
+func mapTags(azureTags map[string]*string) map[string]string {
+	if len(azureTags) == 0 {
+		return nil
+}
+	 var tags = map[string]string{}
+	for key, value:= range azureTags {
+		tags[key]= *value
+	}
+	return tags
 }

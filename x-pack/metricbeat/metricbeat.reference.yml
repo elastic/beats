@@ -215,10 +215,10 @@ metricbeat.modules:
   metricsets: ["monitor"]
   enabled: true
   period: 30s
-  client_id: ''
-  client_secret: ''
-  tenant_id: ''
-  subscription_id: ''
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
 #--------------------------------- Beat Module ---------------------------------
 - module: beat

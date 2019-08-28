@@ -38,17 +38,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 	if len(config.Resources) == 0 {
-		return nil, errors.New("no metrics defined")
+		return nil, errors.New("no resource options defined: module azure - monitor metricset")
 	}
 	monitorClient, err := NewClient(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error initializing the monitor client")
+		return nil, errors.Wrap(err, "error initializing the monitor client: module azure - monitor metricset")
 	}
-	err = monitorClient.InitResources()
-	if err != nil {
-		return nil, errors.Wrap(err, "error initializing the monitor client")
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		client:        monitorClient,
@@ -59,15 +54,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := m.client.InitResources()
+	err := m.client.InitResources(report)
 	if err != nil {
 		return nil
 	}
-	err = m.client.GetMetricValues()
-	if err != nil {
-		return nil
+	err = m.client.GetMetricValues(report)
+	if err == nil && len(m.client.resources.metrics) > 0 {
+		eventsMapping(report, m.client.resources.metrics)
 	}
-	eventsMapping(report, m.client.resources.metrics)
-
 	return nil
 }

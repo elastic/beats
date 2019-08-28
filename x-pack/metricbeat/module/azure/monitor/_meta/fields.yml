@@ -1,5 +1,6 @@
 - name: monitor
   type: group
+  release: beta
   description: >
     monitor
   fields:
@@ -16,10 +17,20 @@
          type: keyword
          description: >
            The type of the resource
+       - name: tags.*
+         type: object
+         object_type: keyword
+         object_type_mapping_type: "*"
+         description: >
+           Azure resource tags.
     - name: namespace
       type: keyword
       description: >
         The namespace selected
+    - name: resource_group
+      type: keyword
+      description: >
+        The resource group
     - name: subscriptionID
       type: keyword
       description: >

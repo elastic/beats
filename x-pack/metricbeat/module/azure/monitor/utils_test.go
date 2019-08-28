@@ -11,14 +11,14 @@ import (
 
 func TestFilterMetrics(t *testing.T) {
 	selectedRange := []string{"TotalRequests", "Capacity", "CPUUsage"}
-	intersection, difference := filterMetrics(selectedRange, MockMetricDefinitions())
+	intersection, difference := filterMetrics(selectedRange, *MockMetricDefinitions())
 	assert.Equal(t, intersection, []string{"TotalRequests", "Capacity"})
 	assert.Equal(t, difference, []string{"CPUUsage"})
 }
 
 func TestFilterAggregations(t *testing.T) {
 	selectedRange := []string{"Average", "Minimum"}
-	intersection, difference := filterAggregations(selectedRange, MockMetricDefinitions())
+	intersection, difference := filterAggregations(selectedRange, *MockMetricDefinitions())
 	assert.Equal(t, intersection, []string{"Average"})
 	assert.Equal(t, difference, []string{"Minimum"})
 }
@@ -49,14 +49,14 @@ func TestIntersections(t *testing.T) {
 	firstStr = []string{"test1", "test2", "test2", "test3"}
 	sercondStr = []string{"test4", "test5", "test5"}
 	intersection, difference = intersections(firstStr, sercondStr)
-	assert.Equal(t, intersection, []string{"test2", "test3"})
+	assert.Equal(t, len(intersection), 0)
 	assert.Equal(t, difference, []string{"test4", "test5"})
 
 }
 
 func TestGetMetricDefinitionsByNames(t *testing.T) {
 	metrics := []string{"TotalRequests", "CPUUsage"}
-	result := getMetricDefinitionsByNames(MockMetricDefinitions(), metrics)
+	result := getMetricDefinitionsByNames(*MockMetricDefinitions(), metrics)
 	assert.Equal(t, len(result), 1)
 	assert.Equal(t, *result[0].Name.Value, "TotalRequests")
 }

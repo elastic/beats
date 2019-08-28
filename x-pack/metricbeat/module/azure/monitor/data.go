@@ -47,9 +47,11 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 				Timestamp: timestamp,
 				MetricSetFields: common.MapStr{
 					"resource": common.MapStr{
-						"name": metric.resource.Name,
-						"type": metric.resource.Type,
+						"name":  metric.resource.Name,
+						"type":  metric.resource.Type,
+						"tags":  metric.resource.Tags,
 					},
+					"resource_group": metric.resource.Group,
 					"namespace":      metric.namespace,
 					"subscriptionID": "unique identifier",
 					"metrics":        metricList,

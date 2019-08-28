@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -2113,6 +2114,113 @@ SQS queue name
 
 
 type: keyword
+
+--
+
+[[exported-fields-azure]]
+== azure fields
+
+azure module
+
+
+
+[float]
+=== azure
+
+
+
+
+[float]
+=== monitor
+
+monitor
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.monitor.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.monitor.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource_group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.monitor.subscriptionID`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.monitor.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.monitor.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
 
 --
 
