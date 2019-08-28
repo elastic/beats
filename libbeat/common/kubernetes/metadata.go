@@ -35,7 +35,7 @@ type MetaGenerator interface {
 	PodMetadata(pod *Pod) common.MapStr
 
 	// Containermetadata generates metadata for the given container of a pod
-	ContainerMetadata(pod *Pod, container string) common.MapStr
+	ContainerMetadata(pod *Pod, container string, image string) common.MapStr
 }
 
 // MetaGeneratorConfig settings
@@ -140,12 +140,13 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 }
 
 // Containermetadata generates metadata for the given container of a pod
-func (g *metaGenerator) ContainerMetadata(pod *Pod, container string) common.MapStr {
+func (g *metaGenerator) ContainerMetadata(pod *Pod, container string, image string) common.MapStr {
 	podMeta := g.PodMetadata(pod)
 
 	// Add container details
 	podMeta["container"] = common.MapStr{
-		"name": container,
+		"name":  container,
+		"image": image,
 	}
 
 	return podMeta

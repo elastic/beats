@@ -1,15 +1,15 @@
 [
     {
         "@timestamp": "2019-01-01T01:00:27.000Z",
-        "cisco.asa.message_id": "999999",
+        "cisco.ftd.message_id": "999999",
         "event.action": "firewall-rule",
         "event.code": 999999,
-        "event.dataset": "cisco.asa",
+        "event.dataset": "cisco.ftd",
         "event.module": "cisco",
-        "event.original": "%ASA-7-999999: This message is not filtered.",
+        "event.original": "%FTD-7-999999: This message is not filtered.",
         "event.severity": 7,
         "event.timezone": "+00:00",
-        "fileset.name": "asa",
+        "fileset.name": "ftd",
         "host.hostname": "beats",
         "input.type": "log",
         "log.level": "debug",
@@ -18,7 +18,7 @@
         "process.pid": 1234,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-ftd"
         ]
     }
 ]
