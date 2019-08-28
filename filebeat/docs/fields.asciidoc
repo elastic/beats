@@ -1381,10 +1381,10 @@ type: keyword
 
 --
 
-*`cisco.asa.list_id`*::
+*`cisco.asa.rule_name`*::
 +
 --
-Name of the Access Control List that matched this event.
+Name of the Access Control List rule that matched this event.
 
 
 type: keyword
@@ -1498,6 +1498,184 @@ ICMP code.
 
 
 type: short
+
+--
+
+[float]
+=== ftd
+
+Fields for Cisco Firepower Threat Defense Firewall.
+
+
+
+*`cisco.ftd.message_id`*::
++
+--
+The Cisco FTD message identifier.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.suffix`*::
++
+--
+Optional suffix after %FTD identifier.
+
+
+type: keyword
+
+example: session
+
+--
+
+*`cisco.ftd.source_interface`*::
++
+--
+Source interface for the flow or event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.destination_interface`*::
++
+--
+Destination interface for the flow or event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.rule_name`*::
++
+--
+Name of the Access Control List rule that matched this event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.source_username`*::
++
+--
+Name of the user that is the source for this event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.destination_username`*::
++
+--
+Name of the user that is the destination for this event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.mapped_source_ip`*::
++
+--
+The translated source IP address. Use ECS source.nat.ip.
+
+
+type: ip
+
+--
+
+*`cisco.ftd.mapped_source_port`*::
++
+--
+The translated source port. Use ECS source.nat.port.
+
+
+type: long
+
+--
+
+*`cisco.ftd.mapped_destination_ip`*::
++
+--
+The translated destination IP address. Use ECS destination.nat.ip.
+
+
+type: ip
+
+--
+
+*`cisco.ftd.mapped_destination_port`*::
++
+--
+The translated destination port. Use ECS destination.nat.port.
+
+
+type: long
+
+--
+
+*`cisco.ftd.threat_level`*::
++
+--
+Threat level for malware / botnet traffic. One of very-low, low, moderate, high or very-high.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.threat_category`*::
++
+--
+Category for the malware / botnet traffic. For example: virus, botnet, trojan, etc.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.connection_id`*::
++
+--
+Unique identifier for a flow.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.icmp_type`*::
++
+--
+ICMP type.
+
+
+type: short
+
+--
+
+*`cisco.ftd.icmp_code`*::
++
+--
+ICMP code.
+
+
+type: short
+
+--
+
+*`cisco.ftd.security`*::
++
+--
+Raw fields for Security Events.
+
+type: object
 
 --
 

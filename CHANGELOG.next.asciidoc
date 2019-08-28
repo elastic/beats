@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add read_buffer configuration option. {pull}11739[11739]
 - `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
+- cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 
 *Heartbeat*
 
@@ -284,6 +285,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update PAN-OS fileset to use the ECS NAT fields. {issue}13320[13320] {pull}13330[13330]
 - Add fields to the Zeek DNS fileset for ECS DNS. {issue}13320[13320] {pull}13324[13324]
 - Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
+- Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
 
 *Heartbeat*
 
