@@ -163,7 +163,10 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 			client.logError(report, err)
 		} else {
 			err = client.mapMetricValues(i, resp)
-			client.logError(report, err)
+			if err != nil {
+				client.logError(report, err)
+			}
+
 		}
 	}
 	return nil

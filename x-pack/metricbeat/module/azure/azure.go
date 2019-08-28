@@ -18,7 +18,7 @@ type Config struct {
 	ClientSecret        string           `config:"client_secret" validate:"required"`
 	TenantID            string           `config:"tenant_id" validate:"required"`
 	SubscriptionID      string           `config:"subscription_id" validate:"required"`
-	Period              time.Duration    `config:"period"`
+	Period              time.Duration    `config:"period" validate:"nonzero,required"`
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
 }

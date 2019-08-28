@@ -24,19 +24,19 @@ type AzureMockService struct {
 }
 
 // GetResourceDefinitions is a mock function for the azure service
-func (client AzureMockService) GetResourceDefinitions(ID string, group string, rType string, query string) (resources.ListResultPage, error) {
+func (client *AzureMockService) GetResourceDefinitions(ID string, group string, rType string, query string) (resources.ListResultPage, error) {
 	args := client.Called(ID, group, rType, query)
 	return args.Get(0).(resources.ListResultPage), args.Error(1)
 }
 
 // GetMetricDefinitions is a mock function for the azure service
-func (client AzureMockService) GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error) {
+func (client *AzureMockService) GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error) {
 	args := client.Called(resourceID, namespace)
 	return args.Get(0).(insights.MetricDefinitionCollection), args.Error(1)
 }
 
 // GetMetricValues is a mock function for the azure service
-func (client AzureMockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
+func (client *AzureMockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
 	args := client.Called(resourceID, namespace)
 	return args.Get(0).([]insights.Metric), args.Error(1)
 }
@@ -47,13 +47,13 @@ type MockReporterV2 struct {
 }
 
 // Event function is mock implementation for testing purposes
-func (reporter MockReporterV2) Event(event mb.Event) bool {
+func (reporter *MockReporterV2) Event(event mb.Event) bool {
 	args := reporter.Called(event)
 	return args.Get(0).(bool)
 }
 
 // Error is mock implementation for testing purposes
-func (reporter MockReporterV2) Error(err error) bool {
+func (reporter *MockReporterV2) Error(err error) bool {
 	args := reporter.Called(err)
 	return args.Get(0).(bool)
 }
@@ -121,15 +121,15 @@ func MockMetricDefinitions() *[]insights.MetricDefinition {
 	metric3 := "BytesRead"
 	defs := []insights.MetricDefinition{
 		{
-			Name:                      &insights.LocalizableString{Value: &metric1},
+			Name: &insights.LocalizableString{Value: &metric1},
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Maximum, insights.Count, insights.Total, insights.Average},
 		},
 		{
-			Name:                      &insights.LocalizableString{Value: &metric2},
+			Name: &insights.LocalizableString{Value: &metric2},
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
 		},
 		{
-			Name:                      &insights.LocalizableString{Value: &metric3},
+			Name: &insights.LocalizableString{Value: &metric3},
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
 		},
 	}
@@ -140,7 +140,7 @@ func TestInitResources(t *testing.T) {
 	t.Run("return error when no resource options were configured", func(t *testing.T) {
 		client := MockClient()
 		mr := MockReporterV2{}
-		err := client.InitResources(mr)
+		err := client.InitResources(&mr)
 		assert.Error(t, err, "no resource options were configured")
 	})
 	t.Run("return error no resources were found", func(t *testing.T) {
@@ -151,7 +151,7 @@ func TestInitResources(t *testing.T) {
 		client.azureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		err := client.InitResources(mr)
+		err := client.InitResources(&mr)
 		assert.Error(t, err, "no resources were found based on all the configurations options entered")
 		assert.Equal(t, len(client.resources.metrics), 0)
 		m.AssertExpectations(t)
@@ -230,7 +230,7 @@ func TestGetMetricValues(t *testing.T) {
 		client.azureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		err := client.GetMetricValues(mr)
+		err := client.GetMetricValues(&mr)
 		assert.Nil(t, err)
 		assert.Equal(t, len(client.resources.metrics[0].values), 0)
 		m.AssertExpectations(t)

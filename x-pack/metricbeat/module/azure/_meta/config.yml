@@ -1,7 +1,7 @@
 - module: azure
   metricsets: ["monitor"]
   enabled: true
-  period: 30s
+  period: 60s
   client_id: '${AZURE_CLIENT_ID:""}'
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
