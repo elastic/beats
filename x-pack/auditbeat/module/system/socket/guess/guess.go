@@ -8,8 +8,6 @@ package guess
 
 import (
 	"fmt"
-	"runtime"
-	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -147,48 +145,25 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		decoders = append(decoders, decoder)
 	}
 
-	// channel to receive the TID and sync with the trigger goroutine.
-	// Length is zero so that it blocks sender and receiver, making it useful
-	// for synchronization.
-	tidChan := make(chan int, 0)
+	// Separate OS thread to run the guesses.Trigger() function.
+	// - This thread is locked to a single CPU thread, so that perf channel
+	//   can monitor only that thread ID.
+	// - Running the trigger in a separate goroutine allows to timeout
+	//   if trigger blocks.
+	//
+	// executorQueueSize>0 allows the executor to terminate and release the OS
+	// thread even if the result of an execution is not consumed because be
+	// timeout.
+	const executorQueueSize = 1
+	thread := helper.NewFixedThreadExecutor(executorQueueSize)
+	defer thread.Close()
 
-	// Trigger goroutine.
-	go func() {
-		// Lock this goroutine to the current CPU thread. This way we can setup
-		// the perf channel to receive events from this thread only, avoiding
-		// the guess being contaminated with an externally-generated event.
-		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
-		defer close(tidChan)
-
-		// Send the thread ID
-		tidChan <- syscall.Gettid()
-
-		// This blocks until the main goroutine installs the perf channel
-		tidChan <- 0
-
-		if err := guesser.Trigger(); err != nil {
-			ctx.Log.Errorf("Trigger failed (%s): %v", guesser.Name(), err)
-		}
-	}()
-
-	// Receive the thread ID from the trigger goroutine.
-	tid := <-tidChan
-	defer func() {
-		// reads the tidChan just in case we return due to an error below and
-		// the trigger goroutine is blocking for the fire signal.
-		// Otherwise this will be a read from a closed channel.
-		select {
-		case <-tidChan:
-		default:
-		}
-	}()
 	perfchan, err := tracing.NewPerfChannel(
 		tracing.WithBufferSize(8),
 		tracing.WithErrBufferSize(1),
 		tracing.WithLostBufferSize(8),
 		tracing.WithRingSizeExponent(2),
-		tracing.WithTID(tid),
+		tracing.WithTID(thread.TID),
 		tracing.WithPollTimeout(time.Millisecond*10))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create perfchannel")
@@ -206,7 +181,6 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	}
 
 	timer := time.NewTimer(ctx.Timeout)
-
 	defer func() {
 		if !timer.Stop() {
 			select {
@@ -216,14 +190,20 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		}
 	}()
 
-	// Read the tidchan again to release the trigger.
-	<-tidChan
+	thread.Run(func() (interface{}, error) {
+		return nil, guesser.Trigger()
+	})
 
-	// This blocks until trigger terminates (channel closed) or a timeout
+	// Blocks until trigger terminates or a timeout.
+	// Need to make sure that the trigger has finished before extracting
+	// results because there could be data-races between Trigger and Extract.
 	select {
-	case <-tidChan:
+	case result := <-thread.C():
+		if result.Err != nil {
+			return nil, errors.Wrap(err, "trigger execution failed")
+		}
 	case <-timer.C:
-		return nil, errors.New("timeout while waiting for guess trigger to complete")
+		return nil, errors.New("timeout while waiting for trigger to complete")
 	}
 
 	for {
