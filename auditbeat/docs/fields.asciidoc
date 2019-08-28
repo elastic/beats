@@ -7376,37 +7376,10 @@ type: keyword
 
 --
 
-*`process.hash.md5`*::
-+
---
-MD5 hash of the executable.
-
-type: keyword
-
---
-
-*`process.hash.sha1`*::
-+
---
-SHA1 hash of the executable.
-
-type: keyword
-
---
-
 *`process.hash.sha224`*::
 +
 --
 SHA224 hash of the executable.
-
-type: keyword
-
---
-
-*`process.hash.sha256`*::
-+
---
-SHA256 hash of the executable.
 
 type: keyword
 
@@ -7452,15 +7425,6 @@ type: keyword
 +
 --
 SHA3_512 hash of the executable.
-
-type: keyword
-
---
-
-*`process.hash.sha512`*::
-+
---
-SHA512 hash of the executable.
 
 type: keyword
 
