@@ -21,6 +21,7 @@ var (
 	configOverrides = common.MustNewConfigFrom(map[string]interface{}{
 		"path.data":              "/tmp",
 		"path.logs":              "/tmp/logs",
+		"keystore.path":          "/tmp/beats.keystore",
 		"setup.template.enabled": true,
 		"queue.mem": map[string]interface{}{
 			"flush.min_events": 10,
@@ -63,6 +64,7 @@ var (
 		Check:  always,
 		Config: functionLoggingOverrides,
 	}
+
 	// FunctionOverrides contain logging settings
 	FunctionOverrides = append(Overrides, functionOverride)
 )
