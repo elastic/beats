@@ -79,6 +79,9 @@ func New(config PluginConfig) (*Processors, error) {
 
 		gen, exists := registry.reg[actionName]
 		if !exists {
+			if actionName == "add_docker_metadata" {
+				continue
+			}
 			var validActions []string
 			for k := range registry.reg {
 				validActions = append(validActions, k)
