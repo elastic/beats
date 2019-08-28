@@ -304,6 +304,10 @@ var ecsExtensionMapping = map[string]mappedField{
 		Target: "source.process.name",
 		Type:   String,
 	},
+	"sourceServiceName": {
+		Target: "source.service.name",
+		Type:   String,
+	},
 	"sourceTranslatedAddress": {
 		Target: "source.nat.ip",
 		Type:   IP,

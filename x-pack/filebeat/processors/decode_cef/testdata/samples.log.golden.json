@@ -688,9 +688,11 @@
       "extensions": {
         "destinationGeoLatitude": "38.915",
         "destinationGeoLongitude": "-77.511",
+        "destinationServiceName": "chrome",
         "eventId": "3457",
         "rawEvent": "{\"x\": \"y\"}",
         "requestMethod": "POST",
+        "sourceServiceName": "httpd",
         "transportProtocol": "TCP"
       },
       "name": "Something awesome happened",
@@ -703,12 +705,15 @@
           "lat": 38.915,
           "lon": -77.511
         }
+      },
+      "service": {
+        "name": "chrome"
       }
     },
     "event": {
       "code": "18",
       "id": 3457,
-      "original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Something awesome happened|very-high|eventId=3457 requestMethod=POST dlat=38.915 dlong=-77.511 proto=TCP rawEvent={\"x\": \"y\"}",
+      "original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Something awesome happened|very-high|eventId=3457 requestMethod=POST dlat=38.915 dlong=-77.511 proto=TCP rawEvent={\"x\": \"y\"} sourceServiceName=httpd destinationServiceName=chrome",
       "severity": 9
     },
     "http": {
@@ -724,6 +729,11 @@
       "product": "Vaporware",
       "vendor": "Elastic",
       "version": "1.0.0-alpha"
+    },
+    "source": {
+      "service": {
+        "name": "httpd"
+      }
     }
   }
 ]
