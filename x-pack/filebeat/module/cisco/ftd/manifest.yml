@@ -3,13 +3,13 @@ module_version: "1.0"
 var:
   - name: paths
     default:
-      - /var/log/cisco-asa.log
+      - /var/log/cisco-ftd.log
   - name: tags
-    default: [cisco-asa]
+    default: [cisco-ftd]
   - name: syslog_host
     default: localhost
   - name: syslog_port
-    default: 9001
+    default: 9003
   - name: input
     default: syslog
   - name: log_level
@@ -21,10 +21,9 @@ var:
       value: false
     # These flags are used internally by the shared pipeline
   - name: internal_prefix
-    default: asa
+    default: ftd
   - name: internal_PREFIX
-    default: ASA
-
+    default: FTD
 ingest_pipeline: ../shared/ingest/asa-ftd-pipeline.yml
 input: config/input.yml
 
