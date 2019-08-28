@@ -806,15 +806,15 @@ The `decode_cef` processor decodes Common Event Format (CEF) messages. This
 processor is available in Filebeat.
 
 Below is an example configuration that decodes the `message` field as CEF after
-renaming it to `log.original`. It is best to rename `message` to `log.original`
-because the decoded CEF data may contain its own `message` field.
+renaming it to `event.original`. It is best to rename `message` to
+`event.original` because the decoded CEF data contains its own `message` field.
 
 [source,yaml]
 ----
 processors:
 - rename:
     fields:
-      - {from: "message", to: "log.original"}
+      - {from: "message", to: "event.original"}
 - decode_cef:
     field: log.original
 ----
