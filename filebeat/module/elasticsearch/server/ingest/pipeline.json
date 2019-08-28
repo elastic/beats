@@ -67,8 +67,12 @@
         {
             "date": {
                 "if": "ctx.event.timezone != null",
-                "field": "@timestamp",
-                "formats": ["ISO8601"],
+                "field": "elasticsearch.server.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "yyyy-MM-dd'T'HH:mm:ss,SSS",
+                    "ISO8601"
+                ],
                 "timezone": "{{ event.timezone }}",
                 "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
