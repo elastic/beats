@@ -158,6 +158,13 @@ var (
 		namespace: "AWS/Lambda",
 		statistic: defaultStatistics,
 	}
+
+	namespaceMSK = "AWS/Kafka"
+	metricName6  = "MemoryUsed"
+	listMetric8  = cloudwatch.Metric{
+		MetricName: &metricName6,
+		Namespace:  &namespaceMSK,
+	}
 )
 
 func TestGetIdentifiers(t *testing.T) {
@@ -196,6 +203,11 @@ func TestConstructLabel(t *testing.T) {
 			listMetric5,
 			"SampleCount",
 			"CPUUtilization AWS/EC2 SampleCount",
+		},
+		{
+			listMetric8,
+			"SampleCount",
+			"MemoryUsed AWS/Kafka",
 		},
 	}
 
@@ -355,6 +367,23 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					resourceTypeFilter: resourceTypeEC2,
 					metricNames:        []string{"CPUUtilization", "StatusCheckFailed"},
 					statistic:          []string{"Average", "Maximum"},
+				},
+			},
+		},
+		{
+			"test AWS/Kafka MemoryUsed",
+			[]Config{
+				{
+					Namespace:  "AWS/Kafka",
+					MetricName: []string{"MemoryUsed"},
+				},
+			},
+			listMetricWithDetail{},
+			[]namespaceWithDetail{
+				{
+					namespace:          "AWS/Kafka",
+					resourceTypeFilter: "kafka",
+					statistic:          defaultStatistics,
 				},
 			},
 		},
