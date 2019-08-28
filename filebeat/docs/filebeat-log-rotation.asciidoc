@@ -1,45 +1,53 @@
-[[input-file-log-rotation]]
-== Configure logrotation for the input files of {beatname_uc}
+[[file-log-rotation]]
+=== Log rotation results in lost or duplicate events
 
-Incorrectly configured logrotation can result in either lost log messages or duplicated events when using {beatname_uc} to
-forward messages. When you see missing or duplicate events when running the Beat, be sure to check how input files are rotated.
+{beatname_uc} supports reading from rotating log files. However, some log
+rotation strategies can result in lost or duplicate events when using
+{beatname_uc} to forward messages. To resolve this issue:
 
-[float]
-[[log-rotation-strategies]]
-=== Logrotation strategies
+* *Avoid log rotation strategies that copy and truncate log files* 
++
+Log rotation strategies that copy and truncate the input log file can result in
+{beatname_uc} sending duplicate events. This happens because {beatname_uc}
+identifies files by inode and device name. During log rotation, lines that
+{beatname_uc} has already processed are moved to a new file. When
+{beatname_uc} encounters the new file, it reads from the beginning because the
+previous state information (the offset and read timestamp) is associated with the
+inode and device name of the old file.
++
+Furthermore, strategies that copy and truncate the input log file can result in
+lost events if lines are written to the log file after it's copied, but before
+it's truncated.
 
-[float]
-[[log-rotation-truncate]]
-===== Truncating the input file
+* *Make sure {beatname_uc} is configured to read from all rotated logs*
++
+When an input log file is moved or renamed during log rotation, {beatname_uc} is
+able to recognize that the file has already been read. After the file is
+rotated, a new log file is created, and the application continues logging.
+{beatname_uc} picks up the new file during the next scan. Because the file
+has a new inode and device name, {beatname_uc} starts reading it from the
+beginning.
++
+To avoid missing events from a rotated file, configure the input to read from
+the log file and all the rotated files. For examples, see
+<<log-rotate-example>>.
 
-In case of strategies which include copying and truncating the input file is going to result in sending duplicated events.
-It happens because {beatname_uc} identifies files by inode and device name. During rotation the already processed lines are
-moved to a new file. When {beatname_uc} encounters this new file, it is going to read it from the beginning, as previous state
-information (offset, read timestamp) are not found for this inode and device name combination in its state registry.
-Furthermore, when the input file is truncated it is possible that the application writing it might added new lines
-between the time of the copy and truncation. Those lines get lost. We suggest you avoid using this method for rotating logs.
-
-[float]
-[[log-rotation-move]]
-===== Moving the input file
-
-When the input file is moved or renamed, {beatname_uc} is able to recognize that the file was already read. After the input is
-rotated, a new log file is created, so the application can continue logging. The Beat picks up the new file during the
-next scan. As it finds a new file, with new inode and device name, it starts reading it from the beginning.
-To avoid missing events from a rotated file, add the rotated files to the input.
+If you're using Windows, also see <<log-rotation-windows>>.
 
 [float]
 [[log-rotate-example]]
 ==== Example configurations
 
-In this section we choose to share a sample configuration of logrotate, as it is a popular tool to do log rotation on Linux.
-
-In this example {beatname_uc} reads the logs of a web server. The logs are rotated every day, and the new file is created
-with the specified permissions.
+This section shows a typical configuration for logrotate, a popular tool for
+doing log rotation on Linux, followed by a {beatname_uc} configuration that
+reads all the rotated logs.
 
 [float]
 [[log-rotate-example-logrotate]]
 ===== logrotate.conf
+
+In this example, {beatname_uc} reads web server log. The logs are rotated every
+day, and the new file is created with the specified permissions.
 
 [source,yaml]
 -----------------------------------------------------
@@ -52,11 +60,12 @@ with the specified permissions.
 }
 -----------------------------------------------------
 
-{beatname_uc} is configured to read all of the files to make sure it does not miss any event.
-
 [float]
 [[log-rotate-example-filebeat]]
 ===== filebeat.yml
+
+In this example, {beatname_uc} is configured to read all log files to make
+sure it does not miss any events.
 
 [source,yaml]
 -----------------------------------------------------
@@ -69,21 +78,21 @@ filebeat.inputs:
 
 [float]
 [[log-rotation-windows]]
-=== Additional notes on logrotation on Windows
+==== More about log rotation on Windows
 
-Log rotation schemes deleting old files and renaming newer files to the old files might get blocked if old
-files are still processed by {beatname_uc}. This is due to Windows not deleting files and file meta-data,
-until the last process has closed the file. Unlike most *nix filesystems,
-one can not reuse a file name, until all processes accessing the file have closed the deleted file.
+On Windows, log rotation schemes that delete old files and rename newer
+files to old filenames might get blocked if the old files are being processed by
+{beatname_uc}. This happens because Windows does not delete files and file
+metadata until the last process has closed the file. Unlike most *nix
+filesystems, a Windows filename cannot be reused until all processes accessing
+the file have closed the deleted file.
 
-For Windows users a better strategy is to use dates in the rotated file names.
-Thus, a file is never renamed to an older file, and the log writer cannot fail to open files
-(same for log rotator, if it's an external process).
+To avoid this problem, use dates in rotated filenames. The file will never
+be renamed to an older filename, and the log writer and log rotator will always
+be able to open the file. This approach also highly reduces the chance of
+log writing, rotation, and collection interfering with each other.
 
-This highly reduces the chance of log writing, rotation, and collecting interfering with each other.
+Because log rotation is typically handled by the logging application, we are
+not providing an example configuration for Windows.
 
-As it's usually the logging application doing the rotation, we are not providing an example configuration for Windows.
-
-To learn more the topic check out Frequently Asked Question about logrotation on Windows:
-
-* <<windows-file-rotation>>
+Also read <<windows-file-rotation>>.

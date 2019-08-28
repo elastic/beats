@@ -35,14 +35,12 @@ The following topics describe how to configure Filebeat:
 * <<configuring-ingest-node>>
 * <<{beatname_lc}-geoip>>
 * <<configuration-path>>
-* <<input-file-log-rotation>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<configuration-autodiscover>>
-//* <<configuration-central-management>>
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<http-endpoint>>
@@ -77,8 +75,6 @@ include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
 include::{libbeat-dir}/docs/shared-geoip.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
-
-include::./filebeat-log-rotation.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
 
