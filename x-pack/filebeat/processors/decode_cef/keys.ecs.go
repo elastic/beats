@@ -233,7 +233,7 @@ var ecsExtensionMapping = map[string]mappedField{
 		Type:   Timestamp,
 	},
 	"filename": {
-		Target: "file.uid",
+		Target: "file.name",
 		Type:   String,
 	},
 	"filePath": {

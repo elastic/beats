@@ -393,7 +393,7 @@
       "severity": 8
     },
     "file": {
-      "uid": "Security"
+      "name": "Security"
     },
     "message": "WinEvtLog Security: AUDIT_FAILURE(4625): Microsoft-Windows-Security-Auditing: (no user): no domain: WIN-RM6HM42G65V: An account failed to log on. Subject: ..",
     "observer": {
