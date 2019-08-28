@@ -53,3 +53,18 @@
           object_type: keyword
           description: >
             Collection of key-value pairs carried in the CEF extension field.
+
+    - name: observer.product
+      type: keyword
+      description:
+        Product name.
+
+    - name: source.service.name
+      type: keyword
+      description:
+        Service that is the source of the event.
+
+    - name: destination.service.name
+      type: keyword
+      description:
+        Service that is the target of the event.
