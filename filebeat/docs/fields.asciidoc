@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
+* <<exported-fields-cef>>
 * <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
 * <<exported-fields-coredns>>
@@ -1313,6 +1314,129 @@ alias to: agent.hostname
 +
 --
 Time series instance id
+
+type: keyword
+
+--
+
+[[exported-fields-cef]]
+== Decode CEF processor fields fields
+
+Common Event Format (CEF) data.
+
+
+
+[float]
+=== cef
+
+By default the `decode_cef` processor writes all data from the CEF message to this `cef` object. It contains the CEF header fields and the extension data.
+
+
+
+*`cef.version`*::
++
+--
+Version of the CEF specification used by the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.vendor`*::
++
+--
+Vendor of the device that produced the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.product`*::
++
+--
+Product of the device that produced the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.version`*::
++
+--
+Version of the product that produced the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.event_class_id`*::
++
+--
+Unique identifier of the event type.
+
+
+type: keyword
+
+--
+
+*`cef.severity`*::
++
+--
+Importance of the event. The valid string values are Unknown, Low, Medium, High, and Very-High. The valid integer values are 0-3=Low, 4-6=Medium, 7- 8=High, and 9-10=Very-High.
+
+
+type: keyword
+
+example: Very-High
+
+--
+
+*`cef.name`*::
++
+--
+Short description of the event.
+
+
+type: keyword
+
+--
+
+*`cef.extensions`*::
++
+--
+Collection of key-value pairs carried in the CEF extension field.
+
+
+type: object
+
+--
+
+*`observer.product`*::
++
+--
+Product name.
+
+type: keyword
+
+--
+
+*`source.service.name`*::
++
+--
+Service that is the source of the event.
+
+type: keyword
+
+--
+
+*`destination.service.name`*::
++
+--
+Service that is the target of the event.
 
 type: keyword
 
