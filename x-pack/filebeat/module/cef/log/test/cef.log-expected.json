@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-08-28T17:26:50.873Z",
+        "@timestamp": "2019-08-28T21:30:56.143Z",
         "cef.device.event_class_id": "18",
         "cef.device.product": "Vaporware",
         "cef.device.vendor": "Elastic",
@@ -19,7 +19,7 @@
         "cef.extensions.transportProtocol": "TCP",
         "cef.name": "Web request",
         "cef.severity": "low",
-        "cef.version": 0,
+        "cef.version": "0",
         "destination.ip": "192.168.10.1",
         "destination.port": 443,
         "event.code": "18",
