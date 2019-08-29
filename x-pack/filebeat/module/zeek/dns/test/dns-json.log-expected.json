@@ -31,6 +31,7 @@
             "35.199.178.4"
         ],
         "dns.response_code": "NOERROR",
+        "dns.type": "answer",
         "event.dataset": "zeek.dns",
         "event.duration": 76967000,
         "event.id": "CAcJw21BbVedgFnYH3",
@@ -84,6 +85,7 @@
         "dns.question.name": "_googlecast._tcp.local",
         "dns.question.registered_domain": "_tcp.local",
         "dns.question.type": "PTR",
+        "dns.type": "query",
         "event.dataset": "zeek.dns",
         "event.id": "C19a1k4lTv46YMbeOk",
         "event.module": "zeek",
@@ -129,6 +131,7 @@
         "dns.question.name": "_googlecast._tcp.local",
         "dns.question.registered_domain": "_tcp.local",
         "dns.response_code": "NOERROR",
+        "dns.type": "answer",
         "event.dataset": "zeek.dns",
         "event.id": "CdiVAw7jJw6gsX5H",
         "event.module": "zeek",
