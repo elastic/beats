@@ -1,5 +1,5 @@
 # Module: statsd
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-statsd.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.4/metricbeat-module-statsd.html
 
 - module: statsd
   host: "localhost"
