@@ -79,6 +79,22 @@
           description: >
             Available swap memory.
 
+        - name: out.pages
+          type: long
+          description: count of pages swapped out
+
+        - name: in.pages
+          type: long
+          description: count of pages swapped in
+
+        - name: readahead.pages
+          type: long
+          description: swap readahead pages
+
+        - name: readahead.cached
+          type: long
+          description: swap readahead cache hits
+
         - name: used.pct
           type: scaled_float
           format: percent
@@ -131,3 +147,14 @@
           format: bytes
           description: >
             Default size for huge pages.
+
+        - name: swap.out
+          type: group
+          description: huge pages swapped out
+          fields:
+            - name: pages
+              type: long
+              description: pages swapped out
+            - name: fallback
+              type: long
+              description: Count of huge pages that must be split before swapout
