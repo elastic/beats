@@ -3,6 +3,16 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.3]]
+=== Beats version 6.8.3
+https://github.com/elastic/beats/compare/v6.8.2...v6.8.3[View commits
+
+==== Bugfixes
+
+*Journalbeat*
+
+- Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716
+
 [[release-notes-6.8.2]]
 === Beats version 6.8.2
 https://github.com/elastic/beats/compare/v6.8.1...v6.8.2[View commits]
