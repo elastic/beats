@@ -138,6 +138,7 @@ func (p *ResourceConfiguration) expired() bool {
 	return true
 }
 
+// map resource group from resource ID
 func mapResourceGroupFormID(path string) string {
 	params := strings.Split(path, "/")
 	for i, param := range params {
@@ -148,6 +149,7 @@ func mapResourceGroupFormID(path string) string {
 	return ""
 }
 
+// map resource tags
 func mapTags(azureTags map[string]*string) map[string]string {
 	if len(azureTags) == 0 {
 		return nil
