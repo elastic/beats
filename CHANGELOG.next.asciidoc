@@ -342,6 +342,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `metricset.period` field with the configured fetching period. {pull}13242[13242] {issue}12616[12616]
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
 - Add Performance metricset to Oracle module {pull}12547[12547]
+- Add proc/vmstat data to the system/memory metricset on linux {pull}13322[13322]
 
 *Packetbeat*
 
