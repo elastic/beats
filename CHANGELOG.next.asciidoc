@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
 - Fix typo in TLS renegotiation configuration and setting the option correctly {issue}10871[10871], {pull}12354[12354]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
 - Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
