@@ -52,18 +52,6 @@ const (
 var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
-	// check if Docker is available in running environment
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		logp.Info("%v: docker environment not detected.", processorName)
-		return
-	}
-	info, err := cli.Info(context.Background())
-	if err != nil {
-		logp.Info("%v: docker environment not detected.", processorName)
-		return
-	}
-	logp.Info("docker environment detected: %v", info)
 	processors.RegisterPlugin(processorName, New)
 }
 
@@ -81,6 +69,18 @@ type addDockerMetadata struct {
 
 // New constructs a new add_docker_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
+	// check if Docker is available in running environment
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		logp.Info("%v: docker environment not detected.", processorName)
+		return nil, nil
+	}
+	info, err := cli.Info(context.Background())
+	if err != nil {
+		logp.Info("%v: docker environment not detected.", processorName)
+		return nil, nil
+	}
+	logp.Info("docker environment detected: %v", info)
 	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
 }
 
