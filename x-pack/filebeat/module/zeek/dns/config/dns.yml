@@ -88,6 +88,15 @@ processors:
             }
         }
 
+        function setDnsType(evt) {
+            var response_code = evt.Get("zeek.dns.rcode_name");
+            if (response_code) {
+              evt.Put("dns.type", "answer");
+            } else {
+              evt.Put("dns.type", "query");
+            }
+        }
+
         function addEventDuration(evt) {
             var rttSec = evt.Get("zeek.dns.rtt");
             if (!rttSec) {
@@ -100,6 +109,7 @@ processors:
             addDnsHeaderFlags(evt);
             addDnsQuestionClass(evt);
             addDnsAnswers(evt);
+            setDnsType(evt);
             addEventDuration(evt);
         }
   - convert:
