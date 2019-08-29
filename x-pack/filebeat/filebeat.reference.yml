@@ -87,6 +87,14 @@ filebeat.modules:
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
 
+#--------------------------------- CEF Module ---------------------------------
+- module: cef
+  log:
+    enabled: true
+    var:
+      syslog_host: localhost
+      syslog_port: 9003
+
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
