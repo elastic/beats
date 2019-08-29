@@ -19,10 +19,10 @@ produces:
 consumes:
   - "application/json"
   - "text/plain"
-basePath: "/v1.31"
+basePath: "/v1.32"
 info:
   title: "Docker Engine API"
-  version: "1.31"
+  version: "1.32"
   x-logo:
     url: "https://docs.docker.com/images/logo-docker-main.png"
   description: |
@@ -44,7 +44,7 @@ info:
 
     The API is usually changed in each release of Docker, so API calls are versioned to ensure that clients don't break.
 
-    For Docker Engine 17.06, the API version is 1.30. To lock to this version, you prefix the URL with `/v1.30`. For example, calling `/info` is the same as calling `/v1.30/info`.
+    For Docker Engine 17.07, the API version is 1.31. To lock to this version, you prefix the URL with `/v1.31`. For example, calling `/info` is the same as calling `/v1.31/info`.
 
     Engine releases in the near future should support this version of the API, so your client will continue to work even if it is talking to a newer Engine.
 
@@ -52,10 +52,11 @@ info:
 
     The API uses an open schema model, which means server may add extra properties to responses. Likewise, the server will ignore any extra query parameters and request body properties. When you write clients, you need to ignore additional properties in responses to ensure they do not break when talking to newer Docker daemons.
 
-    This documentation is for version 1.31 of the API. Use this table to find documentation for previous versions of the API:
+    This documentation is for version 1.32 of the API. Use this table to find documentation for previous versions of the API:
 
     Docker version  | API version | Changes
     ----------------|-------------|---------
+    17.07.x | [1.31](https://docs.docker.com/engine/api/v1.31/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-31-api-changes)
     17.06.x | [1.30](https://docs.docker.com/engine/api/v1.30/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-30-api-changes)
     17.05.x | [1.29](https://docs.docker.com/engine/api/v1.29/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-29-api-changes)
     17.04.x | [1.28](https://docs.docker.com/engine/api/v1.28/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-28-api-changes)
@@ -2827,6 +2828,27 @@ definitions:
           type: "array"
           items:
             $ref: "#/definitions/Mount"
+
+  Driver:
+    description: "Driver represents a driver (network, logging, secrets)."
+    type: "object"
+    required: [Name]
+    properties:
+      Name:
+        description: "Name of the driver."
+        type: "string"
+        x-nullable: false
+        example: "some-driver"
+      Options:
+        description: "Key/value map of driver-specific options."
+        type: "object"
+        x-nullable: false
+        additionalProperties:
+          type: "string"
+        example:
+          OptionA: "value for driver-specific option A"
+          OptionB: "value for driver-specific option B"
+
   SecretSpec:
     type: "object"
     properties:
@@ -2838,24 +2860,38 @@ definitions:
         type: "object"
         additionalProperties:
           type: "string"
+        example:
+          com.example.some-label: "some-value"
+          com.example.some-other-label: "some-other-value"
       Data:
-        description: "Base64-url-safe-encoded secret data"
-        type: "array"
-        items:
-          type: "string"
+        description: |
+          Base64-url-safe-encoded ([RFC 4648](https://tools.ietf.org/html/rfc4648#section-3.2))
+          data to store as secret.
+
+          This field is only used to _create_ a secret, and is not returned by
+          other endpoints.
+        type: "string"
+        example: ""
+      Driver:
+        description: "Name of the secrets driver used to fetch the secret's value from an external secret store"
+        $ref: "#/definitions/Driver"
+
   Secret:
     type: "object"
     properties:
       ID:
         type: "string"
+        example: "blt1owaxmitz71s9v5zh81zun"
       Version:
         $ref: "#/definitions/ObjectVersion"
       CreatedAt:
         type: "string"
         format: "dateTime"
+        example: "2017-07-20T13:55:28.678958722Z"
       UpdatedAt:
         type: "string"
         format: "dateTime"
+        example: "2017-07-20T13:55:28.678958722Z"
       Spec:
         $ref: "#/definitions/SecretSpec"
   ConfigSpec:
@@ -2870,10 +2906,10 @@ definitions:
         additionalProperties:
           type: "string"
       Data:
-        description: "Base64-url-safe-encoded config data"
-        type: "array"
-        items:
-          type: "string"
+        description: |
+          Base64-url-safe-encoded ([RFC 4648](https://tools.ietf.org/html/rfc4648#section-3.2))
+          config data.
+        type: "string"
   Config:
     type: "object"
     properties:
@@ -8425,6 +8461,20 @@ paths:
             items:
               $ref: "#/definitions/Secret"
             example:
+              - ID: "blt1owaxmitz71s9v5zh81zun"
+                Version:
+                  Index: 85
+                CreatedAt: "2017-07-20T13:55:28.678958722Z"
+                UpdatedAt: "2017-07-20T13:55:28.678958722Z"
+                Spec:
+                  Name: "mysql-passwd"
+                  Labels:
+                    some.label: "some.value"
+                  Driver:
+                    Name: "secret-bucket"
+                    Options:
+                      OptionA: "value for driver option A"
+                      OptionB: "value for driver option B"
               - ID: "ktnbjxoalbkvbvedmg1urrz8h"
                 Version:
                   Index: 11
@@ -8432,6 +8482,8 @@ paths:
                 UpdatedAt: "2016-11-05T01:20:17.327670065Z"
                 Spec:
                   Name: "app-dev.crt"
+                  Labels:
+                    foo: "bar"
         500:
           description: "server error"
           schema:
@@ -8495,6 +8547,11 @@ paths:
                   Labels:
                     foo: "bar"
                   Data: "VEhJUyBJUyBOT1QgQSBSRUFMIENFUlRJRklDQVRFCg=="
+                  Driver:
+                    Name: "secret-bucket"
+                    Options:
+                      OptionA: "value for driver option A"
+                      OptionB: "value for driver option B"
       tags: ["Secret"]
   /secrets/{id}:
     get:
@@ -8516,6 +8573,14 @@ paths:
               UpdatedAt: "2016-11-05T01:20:17.327670065Z"
               Spec:
                 Name: "app-dev.crt"
+                Labels:
+                  foo: "bar"
+                Driver:
+                  Name: "secret-bucket"
+                  Options:
+                    OptionA: "value for driver option A"
+                    OptionB: "value for driver option B"
+
         404:
           description: "secret not found"
           schema:

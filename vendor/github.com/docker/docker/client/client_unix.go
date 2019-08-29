@@ -1,4 +1,4 @@
-// +build linux freebsd solaris openbsd darwin netbsd
+// +build linux freebsd solaris openbsd darwin
 
 package client
 
