@@ -135,6 +135,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Change iis url.path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225]
 - Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
+- Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
 
 *Heartbeat*
 
