@@ -1876,26 +1876,6 @@ DNS-specific event fields.
 
 
 
-*`dns.id`*::
-+
---
-The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
-
-
-type: long
-
---
-
-*`dns.op_code`*::
-+
---
-The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
-
-
-example: QUERY
-
---
-
 *`dns.flags.authoritative`*::
 +
 --
@@ -1956,59 +1936,12 @@ type: boolean
 
 --
 
-*`dns.response_code`*::
-+
---
-The DNS status code.
-
-example: NOERROR
-
---
-
-*`dns.question.name`*::
-+
---
-The domain name being queried. If the name field contains non-printable characters (below 32 or above 126), then those characters are represented as escaped base 10 integers (\DDD). Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds are converted to \t, \r, and \n respectively.
-
-
-example: www.google.com.
-
---
-
-*`dns.question.type`*::
-+
---
-The type of records being queried.
-
-example: AAAA
-
---
-
-*`dns.question.class`*::
-+
---
-The class of of records being queried.
-
-example: IN
-
---
-
 *`dns.question.etld_plus_one`*::
 +
 --
 The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
 
 example: amazon.co.uk.
-
---
-
-*`dns.answers`*::
-+
---
-An array containing a dictionary about each answer section returned by the server.
-
-
-type: object
 
 --
 
@@ -2019,51 +1952,6 @@ The number of resource records contained in the `dns.answers` field.
 
 
 type: long
-
---
-
-*`dns.answers.name`*::
-+
---
-The domain name to which this resource record pertains.
-
-example: example.com.
-
---
-
-*`dns.answers.type`*::
-+
---
-The type of data contained in this resource record.
-
-example: MX
-
---
-
-*`dns.answers.class`*::
-+
---
-The class of DNS data contained in this resource record.
-
-example: IN
-
---
-
-*`dns.answers.ttl`*::
-+
---
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
-
-
-type: long
-
---
-
-*`dns.answers.data`*::
-+
---
-The data describing the resource. The meaning of this data depends on the type and class of the resource record.
-
 
 --
 
