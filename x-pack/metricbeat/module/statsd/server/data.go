@@ -118,7 +118,10 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		var err error
 		sampleRate, err = strconv.ParseFloat(m.sampleRate, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process counter `%s` sample rate `%s`", m.name, m.sampleRate)
+			return errors.Wrapf(err, "failed to process metric `%s` sample rate `%s`", m.name, m.sampleRate)
+		}
+		if sampleRate <= 0.0 {
+			return errors.Errorf("sample rate of 0.0 is invalid for metric `%s`", m.name)
 		}
 	}
 

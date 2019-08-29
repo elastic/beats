@@ -247,7 +247,7 @@ func (r *registry) GetAll() []metricsGroup {
 
 			// cleanups according to ttl
 			if r.ttl > 0 && m.lastSeen.Before(cutOff) {
-				if stoppable, ok := m.metric.(interface{ Stop() }); ok {
+				if stoppable, ok := m.metric.(metrics.Stoppable); ok {
 					stoppable.Stop()
 				}
 				delete(metricsMap, key)

@@ -194,7 +194,7 @@ func (u *testUDPEvent) GetMeta() server.Meta {
 	return u.meta
 }
 
-func process(t testing.TB, packets []string, ms *MetricSet) {
+func process(t *testing.T, packets []string, ms *MetricSet) error {
 	for _, d := range packets {
 		udpEvent := &testUDPEvent{
 			event: common.MapStr{
@@ -204,9 +204,11 @@ func process(t testing.TB, packets []string, ms *MetricSet) {
 				"client_ip": "127.0.0.1",
 			},
 		}
-		err := ms.processor.Process(udpEvent)
-		require.NoError(t, err)
+		if err := ms.processor.Process(udpEvent); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func TestTagsGrouping(t *testing.T) {
@@ -219,7 +221,9 @@ func TestTagsGrouping(t *testing.T) {
 		"metric4:4|ms|#k1:v2,k2:v3",
 	}
 
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
+
 	events := ms.getEvents()
 	assert.Len(t, events, 2)
 
@@ -253,7 +257,9 @@ func TestTagsCleanup(t *testing.T) {
 
 		"metric2:3|ms|#k1:v2,k2:v3",
 	}
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
+
 	time.Sleep(1000 * time.Millisecond)
 
 	// they will be reported at least once
@@ -263,7 +269,9 @@ func TestTagsCleanup(t *testing.T) {
 		"metric1:+2|g|#k1:v1,k2:v2",
 	}
 	// refresh metrics1
-	process(t, testData, ms)
+	err = process(t, testData, ms)
+	require.NoError(t, err)
+
 	time.Sleep(500 * time.Millisecond)
 
 	// metrics2 should be out now
@@ -279,7 +287,9 @@ func TestSetReset(t *testing.T) {
 		"metric1:hello|s|#k1:v1,k2:v2",
 		"metric1:again|s|#k1:v1,k2:v2",
 	}
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
+
 	events := ms.getEvents()
 	require.Len(t, events, 1)
 
@@ -303,7 +313,8 @@ func TestData(t *testing.T) {
 		"metric09,k1=v1,k2=v2:8|h",
 		"metric10.with.dots,k1=v1,k2=v2:9|h",
 	}
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
 
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
@@ -318,7 +329,8 @@ func TestGaugeDeltas(t *testing.T) {
 		"metric01:1.0|g|#k1:v1,k2:v2",
 		"metric01:-2.0|g|#k1:v1,k2:v2",
 	}
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
 
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
@@ -341,7 +353,8 @@ func TestCounter(t *testing.T) {
 		"metric01:1|c|#k1:v1,k2:v2",
 		"metric01:2|c|#k1:v1,k2:v2",
 	}
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
 
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
@@ -365,7 +378,8 @@ func TestCounterSampled(t *testing.T) {
 		"metric01:1|c|@0.1",
 		"metric01:2|c|@0.2",
 	}
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
 
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
@@ -373,6 +387,18 @@ func TestCounterSampled(t *testing.T) {
 	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
 		"metric01": map[string]interface{}{"count": int64(20)},
 	})
+}
+
+func TestCounterSampledZero(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|c|@0.0",
+	}
+	err := process(t, testData, ms)
+	assert.Error(t, err)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 0)
 }
 
 func TestTimerSampled(t *testing.T) {
@@ -385,7 +411,8 @@ func TestTimerSampled(t *testing.T) {
 	}
 
 	// total of 100 + 10 + 5 + 1 = 116 measurements
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
 
 	// rate gorutine runs every 5 sec
 	time.Sleep(time.Second * 6)
@@ -411,7 +438,8 @@ func TestChangeType(t *testing.T) {
 		"metric01:1|ms",
 		"metric01:2|c",
 	}
-	process(t, testData, ms)
+	err := process(t, testData, ms)
+	require.NoError(t, err)
 
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
