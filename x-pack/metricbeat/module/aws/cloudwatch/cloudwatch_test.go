@@ -182,37 +182,32 @@ func TestConstructLabel(t *testing.T) {
 		{
 			listMetric1,
 			"Average",
-			"CPUUtilization AWS/EC2 Average InstanceId i-1",
+			"CPUUtilization|AWS/EC2|Average|InstanceId|i-1",
 		},
 		{
 			listMetric2,
 			"Maximum",
-			"StatusCheckFailed AWS/EC2 Maximum InstanceId i-1",
+			"StatusCheckFailed|AWS/EC2|Maximum|InstanceId|i-1",
 		},
 		{
 			listMetric3,
 			"Minimum",
-			"StatusCheckFailed_System AWS/EC2 Minimum InstanceId i-2",
+			"StatusCheckFailed_System|AWS/EC2|Minimum|InstanceId|i-2",
 		},
 		{
 			listMetric4,
 			"Sum",
-			"StatusCheckFailed_Instance AWS/EC2 Sum InstanceId i-2",
+			"StatusCheckFailed_Instance|AWS/EC2|Sum|InstanceId|i-2",
 		},
 		{
 			listMetric5,
 			"SampleCount",
-			"CPUUtilization AWS/EC2 SampleCount",
+			"CPUUtilization|AWS/EC2|SampleCount",
 		},
 		{
 			listMetric8,
 			"SampleCount",
-			"MemoryUsed AWS/Kafka",
-		},
-		{
-			listMetric8,
-			"SampleCount",
-			"MemoryUsed|AWS/Kafka",
+			"MemoryUsed|AWS/Kafka|SampleCount",
 		},
 	}
 
@@ -387,7 +382,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]namespaceWithDetail{
 				{
 					namespace:          "AWS/Kafka",
-					resourceTypeFilter: "kafka",
+					resourceTypeFilter: "",
+					metricNames:        []string{"MemoryUsed"},
 					statistic:          defaultStatistics,
 				},
 			},
