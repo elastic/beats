@@ -216,7 +216,7 @@ func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
 		filename:                    monitoring.NewString(r, "name"),
 		started:                     monitoring.NewString(r, "start_time"),
 		lastPublished:               monitoring.NewString(r, "last_event_published_time"),
-		lastPublishedEventTimestamp: monitoring.NewString(r, "last_event_@timestamp"),
+		lastPublishedEventTimestamp: monitoring.NewString(r, "last_event_timestamp"),
 		currentSize:                 monitoring.NewInt(r, "size"),
 		readOffset:                  monitoring.NewInt(r, "read_offset"),
 	}
