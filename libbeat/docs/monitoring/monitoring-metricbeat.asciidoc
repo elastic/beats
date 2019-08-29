@@ -81,8 +81,8 @@ For more information, see
 --
 
 ifndef::serverless[]
-. <<{beatname_lc}-starting,Start {beatname_uc}>>.
-endif::serverless[]
+. Start {beatname_uc}.
+endif::[]
 
 [float]
 [[configure-metricbeat]]
@@ -108,7 +108,6 @@ locations.
 endif::[]
 
 . Enable the `beat-xpack` module in {metricbeat}. +
-endif::[]
 +
 --
 // tag::enable-beat-module[]
@@ -153,7 +152,15 @@ By default, the module collects {beatname_uc} monitoring data from
 `localhost:5066`. If you exposed the metrics on a different host or port when
 you enabled the HTTP endpoint, update the `hosts` setting.
 
-To monitor multiple {beats} agents, specify a list of hosts, for example:
+To monitor multiple 
+ifndef::apm-server[]
+{beats} agents,
+endif::[]
+ifdef::apm-server[]
+APM Server instances,
+endif::[]
+specify a list of hosts, for example:
+
 [source,yaml]
 ----------------------------------
 hosts: ["http://localhost:5066","http://localhost:5067","http://localhost:5068"]

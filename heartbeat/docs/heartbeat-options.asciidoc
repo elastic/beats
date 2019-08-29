@@ -429,10 +429,24 @@ Example configuration:
 Also see <<configuration-ssl>> for a full description of the `ssl` options.
 
 [float]
+[[monitor-http-response]]
+=== `response`
+
+Controls the indexing of the HTTP response body contents to the `http.response.body.contents` field.
+
+Set `response.include_body` to one of the options listed below.
+
+*`on_error`*:: Include the body if an error is encountered during the check. This is the default.
+*`never`*:: Never include the body.
+*`always`*:: Always include the body with checks.
+
+Set `response.include_body_max_bytes` to control the maximum size of the stored body contents. Defaults to 1024 bytes.
+
+[float]
 [[monitor-http-check]]
 ==== `check`
 
-An optional `request` to send to the remote host and the expected `response`.
+An optional `request` to send to the remote host and the expected `response`. 
 
 Example configuration:
 

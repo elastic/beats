@@ -700,8 +700,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/ecs
-Version: v1.0.1
-Revision: ab5e966864a6e2d4bc9fd6e2343e8d7f05f648fb
+Version: v1.1.0
+Revision: cc1d96bf3f70a8e6af1e436a0283ef22b6af3dd2
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/ecs/LICENSE.txt:
 --------------------------------------------------------------------
@@ -822,7 +822,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-windows
-Revision: bb1581babc04d5cb29a2bfa7a9ac6781c730c8dd
+Version: v1.0.1
+Revision: 8c929792e70203792e3baf128c380e28754ae8b5
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-windows/LICENSE.txt:
 --------------------------------------------------------------------
@@ -830,15 +831,15 @@ Apache License 2.0
 
 -------NOTICE.txt-----
 Elastic go-windows
-Copyright 2017-2018 Elasticsearch B.V.
+Copyright 2017-2019 Elasticsearch B.V.
 
 This product includes software developed at
 Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: HEAD
-Revision: f48d9dc84bc636d361c33fab2d7d753b705fd373
+Version: v0.10.5
+Revision: 7aef3366157f2bfdf3e068f73ce7193573e88e0c
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------

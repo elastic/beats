@@ -6,7 +6,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -28,7 +29,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -50,7 +52,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -72,31 +75,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
-        },
-        "prometheus": {
-            "labels": {
-                "dialer_name": "default"
-            },
-            "metrics": {
-                "net_conntrack_dialer_conn_attempted_total": 0,
-                "net_conntrack_dialer_conn_closed_total": 0,
-                "net_conntrack_dialer_conn_established_total": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -120,7 +100,56 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "dialer_name": "default"
+            },
+            "metrics": {
+                "net_conntrack_dialer_conn_attempted_total": 0,
+                "net_conntrack_dialer_conn_closed_total": 0,
+                "net_conntrack_dialer_conn_established_total": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "quantile": "0.75"
+            },
+            "metrics": {
+                "go_gc_duration_seconds": 0.004392391
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -144,7 +173,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -166,29 +196,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
-        },
-        "prometheus": {
-            "labels": {
-                "quantile": "0.75"
-            },
-            "metrics": {
-                "go_gc_duration_seconds": 0.004392391
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -211,7 +220,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "labels": {
@@ -233,7 +243,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000
         },
         "prometheus": {
             "metrics": {
