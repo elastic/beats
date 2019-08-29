@@ -21,7 +21,7 @@ var (
 	configOverrides = common.MustNewConfigFrom(map[string]interface{}{
 		"path.data":              "/tmp",
 		"path.logs":              "/tmp/logs",
-		"keystore.path":          "/tmp/beats.keystore",
+		"keystore.path":          "/tmp/functionbeat.keystore",
 		"setup.template.enabled": true,
 		"queue.mem": map[string]interface{}{
 			"flush.min_events": 10,

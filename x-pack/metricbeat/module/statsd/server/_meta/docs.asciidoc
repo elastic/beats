@@ -12,7 +12,6 @@ A ttl of zero means metrics will never expire.
   metricsets: ["server"]
   host: "localhost"
   port: "8125"
-  #reservoir_size: 1000
   #ttl: "30s"
 ------------------------------------------------------------------------------
 
