@@ -209,6 +209,11 @@ func TestConstructLabel(t *testing.T) {
 			"SampleCount",
 			"MemoryUsed AWS/Kafka",
 		},
+		{
+			listMetric8,
+			"SampleCount",
+			"MemoryUsed|AWS/Kafka",
+		},
 	}
 
 	for _, c := range cases {
