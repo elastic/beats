@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
@@ -160,6 +162,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 		metricSetFieldResults[instanceID] = map[string]interface{}{}
 	}
 
+	// monitoring state for each instance
+	monitoringStates := map[string]string{}
+
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(getMetricDataResults)
 	if !timestamp.IsZero() {
@@ -192,6 +197,8 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				if err != nil {
 					return events, errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
 				}
+
+				monitoringStates[instanceID] = monitoringState
 
 				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
 				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
@@ -227,6 +234,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				return events, errors.Wrap(err, "EventMapping failed")
 			}
 
+			// add rate metrics
+			calculateRate(resultMetricsetFields, monitoringStates[instanceID])
+
 			events[instanceID].MetricSetFields.Update(resultMetricsetFields)
 			if len(events[instanceID].MetricSetFields) < 5 {
 				m.Logger().Info("Missing Cloudwatch data, this is expected for non-running instances" +
@@ -237,6 +247,31 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 	}
 
 	return events, nil
+}
+
+func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) {
+	var period = 300.0
+	if monitoringState != "disabled" {
+		period = 60.0
+	}
+
+	metricList := []string{
+		"network.in.bytes",
+		"network.out.bytes",
+		"network.in.packets",
+		"network.out.packets",
+		"diskio.read.bytes",
+		"diskio.write.bytes",
+		"diskio.read.count",
+		"diskio.write.count"}
+
+	for _, metricName := range metricList {
+		metricValue, err := resultMetricsetFields.GetValue(metricName)
+		if err == nil && metricValue != nil {
+			rateValue := metricValue.(float64) / period
+			resultMetricsetFields.Put(metricName+"_per_sec", rateValue)
+		}
+	}
 }
 
 func getInstancesPerRegion(svc ec2iface.ClientAPI) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {

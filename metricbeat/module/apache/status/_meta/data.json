@@ -57,7 +57,8 @@
         "module": "apache"
     },
     "metricset": {
-        "name": "status"
+        "name": "status",
+        "period": 10000
     },
     "service": {
         "address": "127.0.0.1:55555",

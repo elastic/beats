@@ -58,4 +58,14 @@ type Server struct {
 
 	// Packets sent from the server to the client.
 	Packets int64 `ecs:"packets"`
+
+	// Translated ip of destination based NAT sessions (e.g. internet to
+	// private DMZ)
+	// Typically used with load balancers, firewalls, or routers.
+	NatIP string `ecs:"nat.ip"`
+
+	// Translated port of destination based NAT sessions (e.g. internet to
+	// private DMZ)
+	// Typically used with load balancers, firewalls, or routers.
+	NatPort int64 `ecs:"nat.port"`
 }

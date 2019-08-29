@@ -7,6 +7,7 @@ package cmd
 import (
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/beater"
 )
 
@@ -18,7 +19,8 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
-		Name: Name,
+		Name:            Name,
+		ConfigOverrides: config.Overrides,
 	})
 
 	RootCmd.AddCommand(genDeployCmd())

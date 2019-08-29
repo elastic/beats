@@ -17,17 +17,17 @@
 Use the following settings to configure internal collection when you are not
 using {metricbeat} to collect monitoring data.
 
-You specify these settings in the `monitoring` section of the
+You specify these settings in the X-Pack monitoring section of the
 +{beatname_lc}.yml+ config file:
 
-==== `enabled`
+==== `monitoring.enabled`
 
-The `enabled` config is a boolean setting to enable or disable {monitoring}.
+The `monitoring.enabled` config is a boolean setting to enable or disable {monitoring}.
 If set to `true`, monitoring is enabled.
 
 The default value is `false`.
 
-==== `elasticsearch`
+==== `monitoring.elasticsearch`
 
 The {es} instances that you want to ship your {beatname_uc} metrics to. This
 configuration option contains the following fields:

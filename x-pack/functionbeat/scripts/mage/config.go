@@ -23,7 +23,6 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 			"ExcludeConsole":    true,
 			"ExcludeFileOutput": true,
 			"ExcludeKafka":      true,
-			"ExcludeLogstash":   true,
 			"ExcludeRedis":      true,
 		},
 	}

@@ -11,6 +11,8 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/input/googlepubsub"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/s3"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/aws"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/cef"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/cisco"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/coredns"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/envoyproxy"
@@ -23,4 +25,5 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/rabbitmq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/zeek"
+	_ "github.com/elastic/beats/x-pack/filebeat/processors/decode_cef"
 )

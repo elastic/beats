@@ -72,7 +72,7 @@ func newFromConfig(c config) (*processor, error) {
 
 	// Execute user provided built-in tests.
 	for _, test := range c.TestTimestamps {
-		ts, err := p.parseString(test)
+		ts, err := p.parseValue(test)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse test timestamp")
 		}
@@ -120,29 +120,21 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 func (p *processor) tryToTime(value interface{}) (time.Time, error) {
 	switch v := value.(type) {
-	case string:
-		return p.parseString(v)
 	case time.Time:
 		return v, nil
 	case common.Time:
 		return time.Time(v), nil
 	default:
-		return time.Time{}, errors.Errorf("unexpected type %T for time field", value)
+		return p.parseValue(v)
 	}
 }
 
-func (p *processor) parseString(v string) (time.Time, error) {
+func (p *processor) parseValue(v interface{}) (time.Time, error) {
 	detailedErr := &parseError{}
 
 	for _, layout := range p.Layouts {
-		ts, err := time.ParseInLocation(layout, v, p.tz)
+		ts, err := p.parseValueByLayout(v, layout)
 		if err == nil {
-			// Use current year if no year is zero.
-			if ts.Year() == 0 {
-				currentYear := time.Now().In(ts.Location()).Year()
-				ts = ts.AddDate(currentYear, 0, 0)
-			}
-
 			return ts, nil
 		}
 
@@ -165,4 +157,38 @@ func (p *processor) parseString(v string) (time.Time, error) {
 		}
 	}
 	return time.Time{}, detailedErr
+}
+
+func (p *processor) parseValueByLayout(v interface{}, layout string) (time.Time, error) {
+	switch layout {
+	case "UNIX":
+		if sec, ok := common.TryToInt(v); ok {
+			return time.Unix(int64(sec), 0), nil
+		} else if sec, ok := common.TryToFloat64(v); ok {
+			return time.Unix(0, int64(sec*float64(time.Second))), nil
+		}
+		return time.Time{}, errors.New("could not parse time field as int or float")
+	case "UNIX_MS":
+		if ms, ok := common.TryToInt(v); ok {
+			return time.Unix(0, int64(ms)*int64(time.Millisecond)), nil
+		} else if ms, ok := common.TryToFloat64(v); ok {
+			return time.Unix(0, int64(ms*float64(time.Millisecond))), nil
+		}
+		return time.Time{}, errors.New("could not parse time field as int or float")
+	default:
+		str, ok := v.(string)
+		if !ok {
+			return time.Time{}, errors.Errorf("unexpected type %T for time field", v)
+		}
+
+		ts, err := time.ParseInLocation(layout, str, p.tz)
+		if err == nil {
+			// Use current year if no year is zero.
+			if ts.Year() == 0 {
+				currentYear := time.Now().In(ts.Location()).Year()
+				ts = ts.AddDate(currentYear, 0, 0)
+			}
+		}
+		return ts, err
+	}
 }
