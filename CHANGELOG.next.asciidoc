@@ -93,7 +93,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix unexpected stops on docker autodiscover when a container is restarted before `cleanup_timeout`. {issue}12962[12962] {pull}13127[13127]
 - Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
 - Fix some incorrect types and formats in field.yml files. {pull}13188[13188]
-- Load DLLs only from Windows system directory. {pull}13234[13234]
+- Load DLLs only from Windows system directory. {pull}13234[13234] {pull}13384[13384]
 - Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
 - Fix case insensitive regular expressions not working correctly. {pull}13250[13250]
 
@@ -135,8 +135,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
-- Change iis url.path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225]
+- Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
 - Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
+- Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
 
 *Heartbeat*
 
@@ -342,6 +343,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `metricset.period` field with the configured fetching period. {pull}13242[13242] {issue}12616[12616]
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
 - Add Performance metricset to Oracle module {pull}12547[12547]
+- Add proc/vmstat data to the system/memory metricset on linux {pull}13322[13322]
 
 *Packetbeat*
 
