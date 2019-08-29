@@ -121,15 +121,15 @@ func MockMetricDefinitions() *[]insights.MetricDefinition {
 	metric3 := "BytesRead"
 	defs := []insights.MetricDefinition{
 		{
-			Name: &insights.LocalizableString{Value: &metric1},
+			Name:                      &insights.LocalizableString{Value: &metric1},
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Maximum, insights.Count, insights.Total, insights.Average},
 		},
 		{
-			Name: &insights.LocalizableString{Value: &metric2},
+			Name:                      &insights.LocalizableString{Value: &metric2},
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
 		},
 		{
-			Name: &insights.LocalizableString{Value: &metric3},
+			Name:                      &insights.LocalizableString{Value: &metric3},
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
 		},
 	}
