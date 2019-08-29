@@ -4727,18 +4727,6 @@ required: False
 
 --
 
-*`event.code`*::
-+
---
-The code for this log message (Windows event ID).
-
-
-type: keyword
-
-required: False
-
---
-
 *`event.original`*::
 +
 --
