@@ -30,6 +30,7 @@ var (
 	identifierNameIdx  = 3
 	identifierValueIdx = 4
 	defaultStatistics  = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
+	labelSeperator     = "|"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -303,7 +304,7 @@ func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, period ti
 
 func constructLabel(metric cloudwatch.Metric, statistic string) string {
 	// label = metricName + namespace + statistic + dimKeys + dimValues
-	label := *metric.MetricName + " " + *metric.Namespace + " " + statistic
+	label := *metric.MetricName + labelSeperator + *metric.Namespace + labelSeperator + statistic
 	dimNames := ""
 	dimValues := ""
 	for i, dim := range metric.Dimensions {
@@ -316,8 +317,8 @@ func constructLabel(metric cloudwatch.Metric, statistic string) string {
 	}
 
 	if dimNames != "" && dimValues != "" {
-		label += " " + dimNames
-		label += " " + dimValues
+		label += labelSeperator + dimNames
+		label += labelSeperator + dimValues
 	}
 	return label
 }
@@ -437,7 +438,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
-				labels := strings.Split(*output.Label, " ")
+				labels := strings.Split(*output.Label, labelSeperator)
 				if len(labels) == 5 {
 					identifierValue := labels[identifierValueIdx]
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
