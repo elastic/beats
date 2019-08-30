@@ -1,16 +1,12 @@
 ---
-description: Pipeline for dissecting text in plaintext logs
+description: Pipeline for dissecting CoreDNS plaintext logs.
 processors:
   - dissect:
       field: message
-      pattern: '%{timestamp} [%{log.level}] %{temp.source} - %{coredns.id} "%{coredns.query.type}
-      %{coredns.query.class} %{coredns.query.name} %{network.transport} %{coredns.query.size}
-      %{coredns.dnssec_ok} %{bufsize}" %{coredns.response.code} %{coredns.response.flags}
+      pattern: '%{timestamp} [%{log.level}] %{temp.source} - %{dns.id} "%{dns.question.type}
+      %{dns.question.class} %{dns.question.name} %{network.transport} %{coredns.query.size}
+      %{coredns.dnssec_ok} %{?bufsize}" %{dns.response_code} %{dns.header_flags}
       %{coredns.response.size} %{coredns.duration}s'
-  - remove:
-      field:
-        - bufsize
-      ignore_failure: true
 on_failure:
   - set:
       field: error.message

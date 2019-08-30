@@ -299,6 +299,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
 - Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 - Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
+- Update CoreDNS module to populate ECS DNS fields. {issue}13320[13320] {pull}13505[13505]
 
 *Heartbeat*
 

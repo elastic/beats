@@ -1,5 +1,5 @@
 ---
-description: Pipeline for normalizing Kubernetes coredns logs
+description: Pipeline for normalizing Kubernetes CoreDNS logs.
 processors:
   - pipeline:
       if: ctx.message.charAt(0) == (char)("{")
@@ -9,18 +9,28 @@ processors:
       name: '{< IngestPipeline "pipeline-plaintext" >}'
   - script:
       lang: painless
-      source: ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['timestamp'];
+      source: >
+        ctx.event.created = ctx['@timestamp'];
+        ctx['@timestamp'] = ctx['timestamp'];
         ctx.remove('timestamp');
       ignore_failure: true
   - script:
       lang: painless
-      source: ctx['source'] = new HashMap(); if (ctx.temp.source.charAt(0) == (char)("["))
-        { def p = ctx.temp.source.indexOf (']'); def l = ctx.temp.source.length(); ctx.source.address
-        = ctx.temp.source.substring(1, p); ctx.source.port = ctx.temp.source.substring(p+2,
-        l);} else { def p = ctx.temp.source.indexOf (':'); def l = ctx.temp.source.length();
-        ctx.source.address = ctx.temp.source.substring(0, p); ctx.source.port = ctx.temp.source.substring(p+1,
-        l);} ctx.remove('temp');
       if: ctx.temp?.source != null
+      source: >
+        ctx['source'] = new HashMap();
+        if (ctx.temp.source.charAt(0) == (char)("[")) {
+            def p = ctx.temp.source.indexOf (']');
+            def l = ctx.temp.source.length();
+            ctx.source.address = ctx.temp.source.substring(1, p);
+            ctx.source.port = ctx.temp.source.substring(p+2, l);
+        } else {
+            def p = ctx.temp.source.indexOf(':');
+            def l = ctx.temp.source.length();
+            ctx.source.address = ctx.temp.source.substring(0, p);
+            ctx.source.port = ctx.temp.source.substring(p+1, l);
+        }
+        ctx.remove('temp');
   - set:
       field: source.ip
       value: "{{source.address}}"
@@ -41,19 +51,52 @@ processors:
       field: coredns.dnssec_ok
       type: boolean
   - uppercase:
-      field: coredns.response.flags
+      field: dns.header_flags
   - split:
-      field: coredns.response.flags
+      field: dns.header_flags
       separator: ","
+  - append:
+      if: ctx.coredns?.dnssec_ok
+      field: dns.header_flags
+      value: DO
   - script:
       lang: painless
-      source: ctx.event.duration = Math.round(ctx.coredns.duration * params.scale)
+      source: ctx.event.duration = Math.round(ctx.coredns.duration * params.scale);
       params:
         scale: 1000000000
       if: ctx.coredns?.duration != null
   - remove:
-      field: coredns.duration
+      field:
+        - coredns.duration
       ignore_missing: true
+  # The following copies values from dns namespace (ECS) to the coredns
+  # namespace to avoid introducing breaking change. This should be removed
+  # for 8.0.0. Additionally coredns.dnssec_ok can be removed.
+  - set:
+      if: ctx.dns?.id != null
+      field: coredns.id
+      value: '{{dns.id}}'
+  - set:
+      if: ctx.dns?.question?.class != null
+      field: coredns.query.class
+      value: '{{dns.question.class}}'
+  - set:
+      if: ctx.dns?.question?.name != null
+      field: coredns.query.name
+      value: '{{dns.question.name}}'
+  - set:
+      if: ctx.dns?.question?.type != null
+      field: coredns.query.type
+      value: '{{dns.question.type}}'
+  - set:
+      if: ctx.dns?.response_code != null
+      field: coredns.response.code
+      value: '{{dns.response_code}}'
+  - script:
+      if: ctx.dns?.header_flags != null
+      lang: painless
+      source: >
+        ctx.coredns.response.flags = ctx.dns.header_flags;
 on_failure:
   - set:
       field: error.message

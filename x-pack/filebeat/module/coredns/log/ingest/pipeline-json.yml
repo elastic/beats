@@ -1,19 +1,19 @@
 ---
-description: Pipeline for dissecting message field in JSON logs
+description: Pipeline for dissecting CoreDNS JSON logs.
 processors:
-  - json:
+  - rename:
       field: message
+      target_field: event.original
+      ignore_failure: true
+  - json:
+      field: event.original
       target_field: json
   - dissect:
       field: json.message
-      pattern: '%{timestamp} [%{log.level}] %{temp.source} - %{coredns.id} "%{coredns.query.type}
-      %{coredns.query.class} %{coredns.query.name} %{network.transport} %{coredns.query.size}
-      %{coredns.dnssec_ok} %{bufsize}" %{coredns.response.code} %{coredns.response.flags}
+      pattern: '%{timestamp} [%{log.level}] %{temp.source} - %{dns.id} "%{dns.question.type}
+      %{dns.question.class} %{dns.question.name} %{network.transport} %{coredns.query.size}
+      %{coredns.dnssec_ok} %{?bufsize}" %{dns.response_code} %{dns.header_flags}
       %{coredns.response.size} %{coredns.duration}s'
-  - remove:
-      field:
-        - message
-      ignore_failure: true
   - rename:
       field: json.message
       target_field: message
@@ -25,7 +25,6 @@ processors:
   - remove:
       field:
         - json
-        - bufsize
       ignore_failure: true
 on_failure:
   - set:
