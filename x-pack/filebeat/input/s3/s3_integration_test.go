@@ -32,80 +32,60 @@ import (
 
 const (
 	fileName          = "sample1.txt"
-	fileDir           = "./ftest/" + fileName
 	visibilityTimeout = 300 * time.Second
 )
+
+var filePath = filepath.Join("ftest", fileName)
 
 // GetConfigForTest function gets aws credentials for integration tests.
 func getConfigForTest() (config, string) {
 	awsConfig := awscommon.ConfigAWS{}
-	info := ""
 	queueURL := os.Getenv("QUEUE_URL")
-	if queueURL == "" {
-		info = "Skipping: $QUEUE_URL is not set in environment."
-	}
-
 	profileName := os.Getenv("AWS_PROFILE_NAME")
-	if profileName != "" {
-		awsConfig.ProfileName = profileName
-		config := config{
-			QueueURL:          queueURL,
-			AwsConfig:         awsConfig,
-			VisibilityTimeout: visibilityTimeout,
-		}
-		return config, info
-	}
-
 	accessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
 	sessionToken := os.Getenv("AWS_SESSION_TOKEN")
-	defaultRegion := os.Getenv("AWS_REGION")
-	if defaultRegion == "" {
-		defaultRegion = "us-west-1"
+
+	config := config{
+		VisibilityTimeout: visibilityTimeout,
 	}
-
-	if accessKeyID == "" {
-		info = "Skipping: $AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty"
-	} else if secretAccessKey == "" {
-		info = "Skipping: $AWS_SECRET_ACCESS_KEY not set or set to empty"
-	} else {
-		awsConfig = awscommon.ConfigAWS{
-			AccessKeyID:     accessKeyID,
-			SecretAccessKey: secretAccessKey,
-		}
-
+	switch {
+	case queueURL == "":
+		return config, "Skipping: $QUEUE_URL is not set in environment"
+	case profileName == "" && accessKeyID == "":
+		return config, "Skipping: $AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty"
+	case profileName != "":
+		awsConfig.ProfileName = profileName
+		config.QueueURL = queueURL
+		config.AwsConfig = awsConfig
+		return config, ""
+	case secretAccessKey == "":
+		return config, "Skipping: $AWS_SECRET_ACCESS_KEY not set or set to empty"
+	default:
+		awsConfig.AccessKeyID = accessKeyID
+		awsConfig.SecretAccessKey = secretAccessKey
 		if sessionToken != "" {
 			awsConfig.SessionToken = sessionToken
 		}
+		config.AwsConfig = awsConfig
+		return config, ""
 	}
-	config := config{
-		QueueURL:          queueURL,
-		AwsConfig:         awsConfig,
-		VisibilityTimeout: visibilityTimeout,
-	}
-	return config, info
-}
-
-func testSetup(t *testing.T) context.CancelFunc {
-	t.Helper()
-	_, cancel := context.WithCancel(context.Background())
-	return cancel
 }
 
 func uploadSampleLogFile(t *testing.T, bucketName string, svcS3 s3iface.ClientAPI) {
+	t.Helper()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	file, err := os.Open(fileDir)
+	file, err := os.Open(filePath)
 	if err != nil {
-		t.Fatalf("Failed to open file %v", fileDir)
-		os.Exit(1)
+		t.Fatalf("Failed to open file %v", filePath)
 	}
 	defer file.Close()
 
 	s3PutObjectInput := s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
-		Key:    aws.String(filepath.Base(fileDir)),
+		Key:    aws.String(filepath.Base(filePath)),
 		Body:   file,
 	}
 	req := svcS3.PutObjectRequest(&s3PutObjectInput)
@@ -116,6 +96,7 @@ func uploadSampleLogFile(t *testing.T, bucketName string, svcS3 s3iface.ClientAP
 }
 
 func collectOldMessages(t *testing.T, queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI) []string {
+	t.Helper()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -158,16 +139,13 @@ func (input *s3Input) deleteAllMessages(t *testing.T, awsConfig awssdk.Config, q
 	return nil
 }
 
-func defaultTestConfig() *common.Config {
+func inputConfig() *common.Config {
 	return common.MustNewConfigFrom(map[string]interface{}{
 		"queue_url": os.Getenv("QUEUE_URL"),
 	})
 }
 
-func runTest(t *testing.T, cfg *common.Config, run func(input *s3Input, out *stubOutleter, t *testing.T)) {
-	clientCancel := testSetup(t)
-	defer clientCancel()
-
+func runTest(t *testing.T, cfg *common.Config, run func(t *testing.T, input *s3Input, out *stubOutleter)) {
 	// Simulate input.Context from Filebeat input runner.
 	inputCtx := newInputContext()
 	defer close(inputCtx.Done)
@@ -187,7 +165,7 @@ func runTest(t *testing.T, cfg *common.Config, run func(input *s3Input, out *stu
 	s3Input := in.(*s3Input)
 	defer s3Input.Stop()
 
-	run(s3Input, eventOutlet, t)
+	run(t, s3Input, eventOutlet)
 }
 
 func newInputContext() input.Context {
@@ -245,9 +223,9 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 }
 
 func TestS3Input(t *testing.T) {
-	cfg := defaultTestConfig()
+	cfg := inputConfig()
 
-	runTest(t, cfg, func(input *s3Input, out *stubOutleter, t *testing.T) {
+	runTest(t, cfg, func(t *testing.T, input *s3Input, out *stubOutleter) {
 		config, info := getConfigForTest()
 		if info != "" {
 			t.Skipf("failed to get config for test: %v", info)
@@ -376,7 +354,7 @@ func TestMockS3Input(t *testing.T) {
 		"queue_url": "https://sqs.ap-southeast-1.amazonaws.com/123456/test",
 	})
 
-	runTest(t, cfg, func(input *s3Input, out *stubOutleter, t *testing.T) {
+	runTest(t, cfg, func(t *testing.T, input *s3Input, out *stubOutleter) {
 		svcS3 := &MockS3Client{}
 		svcSQS := &MockSQSClient{}
 
