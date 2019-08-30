@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
+
 *Packetbeat*
 
 *Winlogbeat*
