@@ -81,10 +81,10 @@ func TestPackages() error {
 	return devtools.TestPackages()
 }
 
-// Fields generates the fields.yml file and a fields.go for each module and
-// input.
+// Fields generates the fields.yml file and a fields.go for each module, input,
+// and processor.
 func Fields() {
-	mg.Deps(fieldsYML, moduleFieldsGo, inputFieldsGo)
+	mg.Deps(fieldsYML, moduleFieldsGo, inputFieldsGo, processorsFieldsGo)
 }
 
 func inputFieldsGo() error {
@@ -95,9 +95,13 @@ func moduleFieldsGo() error {
 	return devtools.GenerateModuleFieldsGo("module")
 }
 
+func processorsFieldsGo() error {
+	return devtools.GenerateModuleFieldsGo("processors")
+}
+
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
 func fieldsYML() error {
-	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module", "input")
+	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module", "input", "processors")
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
@@ -130,7 +134,7 @@ func Update() {
 }
 
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
+	return devtools.GenerateIncludeListGo([]string{"input/*", "processors/*"}, []string{"module"})
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

@@ -113,6 +113,13 @@ func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 	)
 }
 
+func respondingHTTPBodyChecks(body string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"http.response.body.content": body,
+		"http.response.body.bytes":   int64(len(body)),
+	})
+}
+
 var upStatuses = []int{
 	// 1xx
 	http.StatusContinue,
@@ -224,6 +231,7 @@ func TestDownStatuses(t *testing.T) {
 					hbtest.SummaryChecks(0, 1),
 					respondingHTTPChecks(server.URL, status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
+					respondingHTTPBodyChecks("hello, world!"),
 				)),
 				event.Fields,
 			)

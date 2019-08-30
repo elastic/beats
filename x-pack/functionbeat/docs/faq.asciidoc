@@ -17,4 +17,7 @@ example, if you want to monitor CloudWatch logs for a service running in the
 `us-east-1` region, you must deploy the Lambda function to the same region, or
 deployment fails.
 
+include::faq-resource-limit.asciidoc[]
+
 include::{libbeat-dir}/docs/shared-faq.asciidoc[]
+

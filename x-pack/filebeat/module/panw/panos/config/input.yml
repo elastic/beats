@@ -49,8 +49,8 @@ processors:
         server.ip: 8
         destination.ip: 8
         destination.address: 8
-        panw.panos.source.nat.ip: 9
-        panw.panos.destination.nat.ip: 10
+        source.nat.ip: 9
+        destination.nat.ip: 10
         panw.panos.ruleset: 11
         client.user.name: 12
         source.user.name: 12
@@ -66,8 +66,8 @@ processors:
         source.port: 24
         destination.port: 25
         server.port: 25
-        panw.panos.source.nat.port: 26
-        panw.panos.destination.nat.port: 27
+        source.nat.port: 26
+        destination.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
         event.outcome: 30
@@ -102,8 +102,8 @@ processors:
         server.ip: 8
         destination.ip: 8
         destination.address: 8
-        panw.panos.source.nat.ip: 9
-        panw.panos.destination.nat.ip: 10
+        source.nat.ip: 9
+        destination.nat.ip: 10
         panw.panos.ruleset: 11
         client.user.name: 12
         source.user.name: 12
@@ -119,8 +119,8 @@ processors:
         source.port: 24
         destination.port: 25
         server.port: 25
-        panw.panos.source.nat.port: 26
-        panw.panos.destination.nat.port: 27
+        source.nat.port: 26
+        destination.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
         event.outcome: 30
@@ -152,7 +152,17 @@ processors:
   - community_id:
       target: panw.panos.network.nat.community_id
       fields:
-        source_ip: panw.panos.source.nat.ip
-        source_port: panw.panos.source.nat.port
-        destination_ip: panw.panos.destination.nat.ip
-        destination_port: panw.panos.destination.nat.port
+        source_ip: source.nat.ip
+        source_port: source.nat.port
+        destination_ip: destination.nat.ip
+        destination_port: destination.nat.port
+
+  # Copy NAT data from ECS fields to the original non-ECS fields to retain
+  # backward compatibility. This should be removed for 8.0.
+  - convert:
+      ignore_missing: true
+      fields:
+        - {from: source.nat.ip, to: panw.panos.source.nat.ip, type: ip}
+        - {from: destination.nat.ip, to: panw.panos.destination.nat.ip, type: ip}
+        - {from: source.nat.port, to: panw.panos.source.nat.port, type: long}
+        - {from: destination.nat.port, to: panw.panos.destination.nat.port, type: long}
