@@ -58,6 +58,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- Separate management and functions in Functionbeat. {pull}12939[12939]
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -355,6 +357,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Configurable Amazon endpoint. {pull}12369[12369]
 - Add timeout option to reference configuration. {pull}13351[13351]
 - Configurable tags for Lambda functions. {pull}13352[13352]
+- Add input for Cloudwatch logs through Kinesis. {pull}13317[13317]
+- Enable Logstash output. {pull}13345[13345]
 
 *Winlogbeat*
 
