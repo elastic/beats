@@ -22,6 +22,7 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/filebeat/fileset"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -140,7 +141,12 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		filesets := l.getFilesets(hints, module)
 		for fileset, conf := range filesets {
 			filesetConf, _ := common.NewConfigFrom(config)
-			filesetConf.SetString("containers.stream", -1, conf.Stream)
+
+			if inputType, _ := filesetConf.String("type", -1); inputType == harvester.ContainerType {
+				filesetConf.SetString("stream", -1, conf.Stream)
+			} else {
+				filesetConf.SetString("containers.stream", -1, conf.Stream)
+			}
 
 			moduleConf[fileset+".enabled"] = conf.Enabled
 			moduleConf[fileset+".input"] = filesetConf
