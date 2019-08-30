@@ -226,6 +226,7 @@ func TestS3Input(t *testing.T) {
 	cfg := inputConfig()
 
 	runTest(t, cfg, func(t *testing.T, input *s3Input, out *stubOutleter) {
+		defer out.Close()
 		config, info := getConfigForTest()
 		if info != "" {
 			t.Skipf("failed to get config for test: %v", info)
@@ -267,7 +268,6 @@ func TestS3Input(t *testing.T) {
 			input.run(svcSQS, svcS3, 300)
 		}()
 
-		time.AfterFunc(10*time.Second, func() { out.Close() })
 		events, ok := out.waitForEvents(2)
 		if !ok {
 			t.Fatalf("Expected 2 events, but got %d.", len(events))
@@ -355,6 +355,7 @@ func TestMockS3Input(t *testing.T) {
 	})
 
 	runTest(t, cfg, func(t *testing.T, input *s3Input, out *stubOutleter) {
+		defer out.Close()
 		svcS3 := &MockS3Client{}
 		svcSQS := &MockSQSClient{}
 
@@ -365,7 +366,6 @@ func TestMockS3Input(t *testing.T) {
 			input.run(svcSQS, svcS3, 300)
 		}()
 
-		time.AfterFunc(10*time.Second, func() { out.Close() })
 		events, ok := out.waitForEvents(2)
 		if !ok {
 			t.Fatalf("Expected 2 events, but got %d.", len(events))
