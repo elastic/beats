@@ -28371,6 +28371,42 @@ format: bytes
 
 --
 
+*`system.memory.swap.out.pages`*::
++
+--
+count of pages swapped out
+
+type: long
+
+--
+
+*`system.memory.swap.in.pages`*::
++
+--
+count of pages swapped in
+
+type: long
+
+--
+
+*`system.memory.swap.readahead.pages`*::
++
+--
+swap readahead pages
+
+type: long
+
+--
+
+*`system.memory.swap.readahead.cached`*::
++
+--
+swap readahead cache hits
+
+type: long
+
+--
+
 *`system.memory.swap.used.pct`*::
 +
 --
@@ -28470,6 +28506,30 @@ Default size for huge pages.
 type: long
 
 format: bytes
+
+--
+
+[float]
+=== swap.out
+
+huge pages swapped out
+
+
+*`system.memory.hugepages.swap.out.pages`*::
++
+--
+pages swapped out
+
+type: long
+
+--
+
+*`system.memory.hugepages.swap.out.fallback`*::
++
+--
+Count of huge pages that must be split before swapout
+
+type: long
 
 --
 
