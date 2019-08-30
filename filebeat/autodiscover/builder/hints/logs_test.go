@@ -473,6 +473,147 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
+		{
+			msg:    "Hint with module should attach input to its filesets",
+			config: defaultCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module": "apache2",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module": "apache2",
+				"error": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type":   "container",
+						"stream": "all",
+						"paths": []interface{}{
+							"/var/lib/docker/containers/abc/*-json.log",
+						},
+					},
+				},
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type":   "container",
+						"stream": "all",
+						"paths": []interface{}{
+							"/var/lib/docker/containers/abc/*-json.log",
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Hint with module should honor defined filesets",
+			config: defaultCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module":  "apache2",
+						"fileset": "access",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module": "apache2",
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type":   "container",
+						"stream": "all",
+						"paths": []interface{}{
+							"/var/lib/docker/containers/abc/*-json.log",
+						},
+					},
+				},
+				"error": map[string]interface{}{
+					"enabled": false,
+					"input": map[string]interface{}{
+						"type":   "container",
+						"stream": "all",
+						"paths": []interface{}{
+							"/var/lib/docker/containers/abc/*-json.log",
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Hint with module should honor defined filesets with streams",
+			config: defaultCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module":         "apache2",
+						"fileset.stdout": "access",
+						"fileset.stderr": "error",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module": "apache2",
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type":   "container",
+						"stream": "stdout",
+						"paths": []interface{}{
+							"/var/lib/docker/containers/abc/*-json.log",
+						},
+					},
+				},
+				"error": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type":   "container",
+						"stream": "stderr",
+						"paths": []interface{}{
+							"/var/lib/docker/containers/abc/*-json.log",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
