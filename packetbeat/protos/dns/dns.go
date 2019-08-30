@@ -385,6 +385,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		pbf.Event.Start = t.request.ts
 		pbf.Event.End = t.response.ts
 
+		dnsEvent["type"] = "answer"
 		fields["method"] = dnsOpCodeToString(t.request.data.Opcode)
 		if len(t.request.data.Question) > 0 {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
@@ -407,6 +408,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		pbf.Source.Bytes = int64(t.request.length)
 		pbf.Event.Start = t.request.ts
 
+		dnsEvent["type"] = "query"
 		fields["method"] = dnsOpCodeToString(t.request.data.Opcode)
 		if len(t.request.data.Question) > 0 {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
@@ -422,6 +424,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		pbf.Destination.Bytes = int64(t.response.length)
 		pbf.Event.End = t.response.ts
 
+		dnsEvent["type"] = "answer"
 		fields["method"] = dnsOpCodeToString(t.response.data.Opcode)
 		if len(t.response.data.Question) > 0 {
 			fields["query"] = dnsQuestionToString(t.response.data.Question[0])
