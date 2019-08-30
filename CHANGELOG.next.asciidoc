@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 *Metricbeat*
 
 - Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
 
 *Packetbeat*
 
