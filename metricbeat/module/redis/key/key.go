@@ -95,6 +95,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				logp.Err("Failed to fetch key info for key %s in keyspace %d", key, p.Keyspace)
 				continue
 			}
+			if keyInfo == nil {
+				debugf("Ignoring removed key %s from keyspace %d", key, p.Keyspace)
+				continue
+			}
 			event := eventMapping(p.Keyspace, keyInfo)
 			if !r.Event(event) {
 				debugf("Failed to report event, interrupting Fetch")
