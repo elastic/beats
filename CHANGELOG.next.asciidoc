@@ -135,6 +135,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
+- Fix filebeat autodiscover fileset hint for container input. {pull}13296[13296]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
 - Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
@@ -182,7 +183,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
 - Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
 - Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
+- Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
 - Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433]
 
 *Packetbeat*
 
@@ -347,6 +350,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
 - Add Performance metricset to Oracle module {pull}12547[12547]
 - Add proc/vmstat data to the system/memory metricset on linux {pull}13322[13322]
+- Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414 [13414]
 
 *Packetbeat*
 

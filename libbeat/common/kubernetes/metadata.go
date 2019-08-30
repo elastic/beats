@@ -44,22 +44,27 @@ type MetaGeneratorConfig struct {
 	ExcludeLabels      []string `config:"exclude_labels"`
 	IncludeAnnotations []string `config:"include_annotations"`
 
+	LabelsDedot      bool `config:"labels.dedot"`
+	AnnotationsDedot bool `config:"annotations.dedot"`
+
 	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
 	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
-	LabelsDedot            bool `config:"labels.dedot"`
-	AnnotationsDedot       bool `config:"annotations.dedot"`
 }
 
 type metaGenerator = MetaGeneratorConfig
 
-// NewMetaGenerator initializes and returns a new kubernetes metadata generator
-func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
-	// default settings:
-	generator := metaGenerator{
+// DefaultMetaGeneratorConfig initializes and returns a new MetaGeneratorConfig with default values
+func DefaultMetaGeneratorConfig() MetaGeneratorConfig {
+	return MetaGeneratorConfig{
 		IncludeCreatorMetadata: true,
 		LabelsDedot:            true,
 		AnnotationsDedot:       true,
 	}
+}
+
+// NewMetaGenerator initializes and returns a new kubernetes metadata generator
+func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
+	generator := DefaultMetaGeneratorConfig()
 
 	err := cfg.Unpack(&generator)
 	return &generator, err
