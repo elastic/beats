@@ -456,8 +456,23 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	}
 
 	for _, event := range events {
-		if reported := report.Event(event); !reported {
-			return nil
+		metrics, err := event.RootFields.GetValue("aws.metrics")
+		if err != nil {
+			m.Logger().Warn(errors.Wrap(err, "failed to get root field aws.metrics"))
+			continue
+		}
+
+		dims, err := event.RootFields.GetValue("aws.cloudwatch.dimensions")
+		if err != nil {
+			m.Logger().Warn(errors.Wrap(err, "failed to get root field aws.cloudwatch.dimensions"))
+			continue
+		}
+
+		// if metrics and dims are both nil, means this event is empty. Only report non-empty events.
+		if metrics != nil || dims != nil {
+			if reported := report.Event(event); !reported {
+				return nil
+			}
 		}
 	}
 
