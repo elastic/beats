@@ -27,6 +27,29 @@ Example configuration:
 
 ----
 
+[id="{beatname_lc}-input-{type}-azure"]
+==== Configuring for Azure Event Hubs
+
+The `kafka` input can be used to ingest data from Microsoft Azure Event Hubs
+that have Kafka compatibility enabled, by configuring as follows:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: kafka
+  hosts: ["<your event hub namespace>.servicebus.windows.net:9093"]
+  topics: ["<your event hub instance>"]
+  group_id: "<your consumer group>"
+
+  username: "$ConnectionString"
+  password: "<your connection string>"
+  ssl.enabled: true
+
+----
+
+For more details on the mapping between Kafka and Event Hubs configuration
+parameters, see the
+link:https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-for-kafka-ecosystem-overview[Azure documentation].
 
 [id="{beatname_lc}-input-{type}-options"]
 ==== Configuration options
