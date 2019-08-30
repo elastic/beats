@@ -202,6 +202,7 @@ output.elasticsearch:
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
+  - add_docker_metadata: ~
 
 #================================ Logging =====================================
 

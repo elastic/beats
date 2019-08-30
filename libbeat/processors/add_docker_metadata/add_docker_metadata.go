@@ -67,20 +67,30 @@ type addDockerMetadata struct {
 	dedot     bool          // If set to true, replace dots in labels with `_`.
 }
 
-// New constructs a new add_docker_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
-	// check if Docker is available in running environment
+// checkForDockerEnvironment checks if Docker is available in running environment
+// and returns an error in case Docker is not detected
+func checkForDockerEnvironment() error {
 	cli, err := client.NewEnvClient()
+	errorMsg := fmt.Sprintf("%v: docker environment not detected.", processorName)
 	if err != nil {
-		logp.Info("%v: docker environment not detected.", processorName)
-		return nil, nil
+		logp.Info(errorMsg)
+		return fmt.Errorf(errorMsg)
 	}
 	info, err := cli.Info(context.Background())
 	if err != nil {
-		logp.Info("%v: docker environment not detected.", processorName)
-		return nil, nil
+		logp.Info(errorMsg)
+		return fmt.Errorf(errorMsg)
 	}
 	logp.Info("docker environment detected: %v", info)
+	return nil
+}
+
+// New constructs a new add_docker_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
+	err := checkForDockerEnvironment()
+	if err != nil {
+		return nil, nil
+	}
 	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
 }
 

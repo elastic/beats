@@ -93,11 +93,12 @@ output.elasticsearch:
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
+  - add_docker_metadata: ~
 {{else}}
 processors:
-  - add_observer_metadata: 
+  - add_observer_metadata:
   # Optional, but recommended geo settings for the location {{ .BeatName | title }} is running in
-  #geo: 
+  #geo:
     # Token describing this location
     #name: us-east-1a
 
