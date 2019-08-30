@@ -182,6 +182,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
 - Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
 - Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
+- Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
+- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433]
 
 *Packetbeat*
 
