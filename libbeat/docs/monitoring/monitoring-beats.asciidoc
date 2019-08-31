@@ -57,7 +57,7 @@ xpack.monitoring:
     username: {beat_monitoring_user}
     password: somepassword
 --------------------
-
++
 NOTE: Currently you must send monitoring data to the same cluster as all other events.
 If you configured {es} output, do not specify additional hosts in the monitoring
 configuration.
