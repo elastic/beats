@@ -139,6 +139,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
+- Fix integer comparison on JSON responses. {pull}13348[13348]
 
 *Journalbeat*
 
