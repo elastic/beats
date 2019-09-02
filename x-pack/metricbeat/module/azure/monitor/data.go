@@ -48,15 +48,17 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 				Timestamp: timestamp,
 				MetricSetFields: common.MapStr{
 					"resource": common.MapStr{
-						"name": metric.resource.Name,
-						"type": metric.resource.Type,
-						"tags": metric.resource.Tags,
+						"name":  metric.resource.Name,
+						"type":  metric.resource.Type,
+						"group": metric.resource.Group,
 					},
-					"resource_group":  metric.resource.Group,
 					"namespace":       metric.namespace,
 					"subscription_id": metric.resource.Subscription,
 					"metrics":         metricList,
 				},
+			}
+			if len(metric.resource.Tags) > 0 {
+				event.MetricSetFields.Put("resource.tags", metric.resource.Tags)
 			}
 			if len(metric.dimensions) > 0 {
 				for _, dimension := range metric.dimensions {

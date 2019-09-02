@@ -26,7 +26,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	client *Client
+	client ClientInterface
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -57,11 +57,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	err := m.client.InitResources(report)
 	if err != nil {
-		return nil
+		return err
 	}
 	err = m.client.GetMetricValues(report)
-	if err == nil && len(m.client.resources.metrics) > 0 {
-		eventsMapping(report, m.client.resources.metrics)
+
+	if err == nil && len(m.client.GetResources().metrics) > 0 {
+		eventsMapping(report, m.client.GetResources().metrics)
 	}
 	return nil
 }

@@ -17,6 +17,10 @@
          type: keyword
          description: >
            The type of the resource
+       - name: group
+         type: keyword
+         description: >
+           The resource group
        - name: tags.*
          type: object
          object_type: keyword
@@ -27,10 +31,6 @@
       type: keyword
       description: >
         The namespace selected
-    - name: resource_group
-      type: keyword
-      description: >
-        The resource group
     - name: subscription_id
       type: keyword
       description: >

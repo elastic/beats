@@ -2164,6 +2164,16 @@ type: keyword
 
 --
 
+*`azure.monitor.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
 *`azure.monitor.resource.tags.*`*::
 +
 --
@@ -2178,16 +2188,6 @@ type: object
 +
 --
 The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.monitor.resource_group`*::
-+
---
-The resource group
 
 
 type: keyword

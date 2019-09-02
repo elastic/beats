@@ -172,6 +172,11 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 	return nil
 }
 
+// GetResources retrieves resources - used for testing
+func (client *Client) GetResources() ResourceConfiguration {
+	return client.resources
+}
+
 // mapMetric should validate and map the metric related configuration to relevant azure monitor api parameters
 func (client *Client) mapMetric(metric azure.MetricConfig, resource resources.GenericResource) (Metric, error) {
 	var met = Metric{}

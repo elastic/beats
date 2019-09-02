@@ -92,7 +92,7 @@ var (
 	}
 )
 
-func MockClient() *Client {
+func NewTestClient() *Client {
 	azureMockService := new(AzureMockService)
 	client := &Client{
 		azureMonitorService: azureMockService,
@@ -138,13 +138,13 @@ func MockMetricDefinitions() *[]insights.MetricDefinition {
 
 func TestInitResources(t *testing.T) {
 	t.Run("return error when no resource options were configured", func(t *testing.T) {
-		client := MockClient()
+		client := NewTestClient()
 		mr := MockReporterV2{}
 		err := client.InitResources(&mr)
 		assert.Error(t, err, "no resource options were configured")
 	})
 	t.Run("return error no resources were found", func(t *testing.T) {
-		client := MockClient()
+		client := NewTestClient()
 		client.config = resourceQueryConfig
 		m := &AzureMockService{}
 		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(resources.ListResultPage{}, errors.New("invalid resource query"))
@@ -163,7 +163,7 @@ func TestMapMetric(t *testing.T) {
 		Value: MockMetricDefinitions(),
 	}
 	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
-	client := MockClient()
+	client := NewTestClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &AzureMockService{}
 		m.On("GetMetricDefinitions", "123", metricConfig.Namespace).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
@@ -211,7 +211,7 @@ func TestMapMetric(t *testing.T) {
 }
 
 func TestGetMetricValues(t *testing.T) {
-	client := MockClient()
+	client := NewTestClient()
 	client.config = resourceIDConfig
 	t.Run("return no error when no metric values are returned but log and send event", func(t *testing.T) {
 		client.resources = ResourceConfiguration{
