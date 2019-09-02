@@ -59,6 +59,7 @@ class Test(BaseTest):
         Basic test with icmp root non privilege ICMP test.
 
         """
+        print("STARTING ICMP TEST")
 
         config = {
             "monitors": [
@@ -75,13 +76,16 @@ class Test(BaseTest):
             **config
         )
 
+        print("DETECTED PLATFORM %s" % platform.system)
         if platform.system() in ["Linux", "Darwin"]:
             adminRights = self.has_admin()
             groupRights = self.has_group_permission()
             if groupRights == True or adminRights == True:
                 proc = self.start_beat()
+                print("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB %s")
                 self.wait_until(lambda: self.log_contains(
                     "heartbeat is running"))
+                print("CHECK WAIT %s")
                 proc.check_kill_and_wait()
             else:
                 exit_code = self.run_beat()
@@ -89,8 +93,10 @@ class Test(BaseTest):
                 assert self.log_contains(
                     "You dont have root permission to run ping") is True
         else:
+            print("ON WINDOWS %s")
             # windows seems to allow all users to run sockets
             proc = self.start_beat()
             self.wait_until(lambda: self.log_contains(
                 "heartbeat is running"))
             proc.check_kill_and_wait()
+        print("FINISHED ICMP TEST")
