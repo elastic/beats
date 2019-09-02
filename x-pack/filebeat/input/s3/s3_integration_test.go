@@ -139,7 +139,7 @@ func (input *s3Input) deleteAllMessages(t *testing.T, awsConfig awssdk.Config, q
 	return nil
 }
 
-func inputConfig() *common.Config {
+func defaultTestConfig() *common.Config {
 	return common.MustNewConfigFrom(map[string]interface{}{
 		"queue_url": os.Getenv("QUEUE_URL"),
 	})
@@ -223,10 +223,9 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 }
 
 func TestS3Input(t *testing.T) {
-	cfg := inputConfig()
+	inputConfig := defaultTestConfig()
 
-	runTest(t, cfg, func(t *testing.T, input *s3Input, out *stubOutleter) {
-		defer out.Close()
+	runTest(t, inputConfig, func(t *testing.T, input *s3Input, out *stubOutleter) {
 		config, info := getConfigForTest()
 		if info != "" {
 			t.Skipf("failed to get config for test: %v", info)
@@ -355,7 +354,6 @@ func TestMockS3Input(t *testing.T) {
 	})
 
 	runTest(t, cfg, func(t *testing.T, input *s3Input, out *stubOutleter) {
-		defer out.Close()
 		svcS3 := &MockS3Client{}
 		svcSQS := &MockSQSClient{}
 
