@@ -18,10 +18,7 @@
 package add_docker_metadata
 
 import (
-	"context"
 	"fmt"
-
-	"github.com/docker/docker/client"
 
 	"os"
 	"path/filepath"
@@ -68,23 +65,6 @@ type addDockerMetadata struct {
 	dockerAvailable bool          // If Docker exists in env, then it is set to true
 }
 
-// isDockerAvailable checks if Docker is available in running environment
-func isDockerAvailable() bool {
-	cli, err := client.NewEnvClient()
-	errorMsg := fmt.Sprintf("%v: docker environment not detected.", processorName)
-	if err != nil {
-		logp.Info(errorMsg)
-		return false
-	}
-	info, err := cli.Info(context.Background())
-	if err != nil {
-		logp.Info(errorMsg)
-		return false
-	}
-	logp.Info("%v: docker environment detected: %v", processorName, info)
-	return true
-}
-
 // New constructs a new add_docker_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
@@ -96,16 +76,16 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	dockerAvailable := isDockerAvailable()
+	var dockerAvailable bool
 
-	var watcher docker.Watcher
-	var err error
-	if dockerAvailable {
-		watcher, err = watcherConstructor(config.Host, config.TLS, config.MatchShortID)
-		if err != nil {
-			return nil, err
-		}
-
+	watcher, err := watcherConstructor(config.Host, config.TLS, config.MatchShortID)
+	if err != nil {
+		dockerAvailable = false
+		errorMsg := fmt.Sprintf("%v: docker environment not detected: %v", processorName, err)
+		logp.Debug("add_docker_metadata", errorMsg)
+	} else {
+		dockerAvailable = true
+		logp.Debug("add_docker_metadata", "%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
 			return nil, err
 		}
