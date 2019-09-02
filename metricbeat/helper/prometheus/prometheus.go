@@ -22,6 +22,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 
@@ -83,6 +84,7 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 			if err == io.EOF {
 				break
 			}
+			return nil, errors.Wrap(err, "decoding of metric family failed")
 		} else {
 			families = append(families, mf)
 		}

@@ -38,6 +38,7 @@ https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks
 https://github.com/hellmouthengine/discobeat[discobeat]:: Reads messages from Discord and indexes them in Elasticsearch
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
+https://github.com/radoondas/earthquakebeat[earthquakebeat]:: Pulls data from https://earthquake.usgs.gov/fdsnws/event/1/[USGS] earthquake API.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
 https://github.com/berfinsari/envoyproxybeat[envoyproxybeat]:: Reads stats from the Envoy Proxy and indexes them into Elasticsearch.
 https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API and indexes them into Elasticsearch.
@@ -49,6 +50,7 @@ https://github.com/cloudronics/fileoccurancebeat[fileoccurencebeat]:: Checks for
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/GeneralElectric/GABeat[gabeat]:: Collects data from Google Analytics Realtime API.
 https://github.com/GoogleCloudPlatform/gcsbeat[gcsbeat]:: Reads data from https://cloud.google.com/storage/[Google Cloud Storage] buckets.
+https://github.com/threatstack/gelfbeat[gelfbeat]:: Collects and parses GELF-encoded UDP messages.
 https://github.com/josephlewis42/githubbeat[githubbeat]:: Easily monitors GitHub repository activity.
 https://github.com/hpcugent/gpfsbeat[gpfsbeat]:: Collects GPFS metric and quota information.
 https://github.com/ullaakut/hackerbeat[hackerbeat]:: Indexes the top stories of HackerNews into an ElasticSearch instance.

@@ -71,6 +71,8 @@ include::../include/var-paths.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+include::../include/timezone-support.asciidoc[]
+
 [float]
 === Virtual Host
 
