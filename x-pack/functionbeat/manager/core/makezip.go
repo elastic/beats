@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
@@ -27,7 +26,7 @@ const packageUncompressedLimit = 250 * 1000 * 1000 // 250MB
 func rawYaml() ([]byte, error) {
 	// Load the configuration file from disk with all the settings,
 	// the function takes care of using -c.
-	rawConfig, err := cfgfile.Load("", config.ConfigOverrides)
+	rawConfig, err := cfgfile.Load("", config.Overrides)
 	if err != nil {
 		return nil, err
 	}
@@ -56,17 +55,9 @@ func MakeZip(provider string) ([]byte, error) {
 		&bundle.LocalFile{Path: "pkg/functionbeat-" + provider, FileMode: 0755},
 	}
 
-	rawKeystore, err := keystoreRaw()
+	resources, err = addKeystoreIfConfigured(resources)
 	if err != nil {
 		return nil, err
-	}
-
-	if len(rawKeystore) > 0 {
-		resources = append(resources, &bundle.MemoryFile{
-			Path:     "data/functionbeat.keystore",
-			Raw:      rawKeystore,
-			FileMode: 0600,
-		})
 	}
 
 	bundle := bundle.NewZipWithLimits(
@@ -81,8 +72,30 @@ func MakeZip(provider string) ([]byte, error) {
 	return content, nil
 }
 
-func keystoreRaw() ([]byte, error) {
-	cfg, err := cfgfile.Load("", common.NewConfig())
+func addKeystoreIfConfigured(resources []bundle.Resource) ([]bundle.Resource, error) {
+	ksPackager, err := keystorePackager()
+	if err != nil {
+		return nil, err
+	}
+
+	rawKeystore, err := ksPackager.Package()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(rawKeystore) > 0 {
+		resources = append(resources, &bundle.MemoryFile{
+			Path:     ksPackager.ConfiguredPath(),
+			Raw:      rawKeystore,
+			FileMode: 0600,
+		})
+	}
+
+	return resources, nil
+}
+
+func keystorePackager() (keystore.Packager, error) {
+	cfg, err := cfgfile.Load("", config.Overrides)
 	if err != nil {
 		return nil, fmt.Errorf("error loading config file: %v", err)
 	}
@@ -97,5 +110,5 @@ func keystoreRaw() ([]byte, error) {
 		return nil, fmt.Errorf("the configured keystore cannot be packaged")
 	}
 
-	return packager.Package()
+	return packager, nil
 }

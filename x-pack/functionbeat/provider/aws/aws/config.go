@@ -7,8 +7,10 @@ package aws
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 	"unicode"
+	"unicode/utf8"
 
 	humanize "github.com/dustin/go-humanize"
 
@@ -49,6 +51,7 @@ type LambdaConfig struct {
 	Timeout          time.Duration     `config:"timeout" validate:"nonzero,positive"`
 	Role             string            `config:"role"`
 	VPCConfig        *vpcConfig        `config:"virtual_private_cloud"`
+	Tags             map[string]string `config:"tags"`
 }
 
 // Validate checks a LambdaConfig
@@ -65,7 +68,7 @@ func (c *LambdaConfig) Validate() error {
 		return fmt.Errorf("invalid role: '%s', name must match pattern %s", c.Role, arnRolePattern)
 	}
 
-	return nil
+	return validateTags(c.Tags)
 }
 
 type deadLetterConfig struct {
@@ -75,6 +78,27 @@ type deadLetterConfig struct {
 type vpcConfig struct {
 	SecurityGroupIDs []string `config:"security_group_ids" validate:"required"`
 	SubnetIDs        []string `config:"subnet_ids" validate:"required"`
+}
+
+func validateTags(tags map[string]string) error {
+	for key, val := range tags {
+		if strings.HasPrefix(key, "aws:") {
+			return fmt.Errorf("key '%s' cannot be prefixed with 'aws:'", key)
+		}
+		if strings.HasPrefix(val, "aws:") {
+			return fmt.Errorf("value '%s' cannot be prefixed with 'aws:'", val)
+		}
+		keyLen := utf8.RuneCountInString(key)
+		if keyLen > 127 {
+			return fmt.Errorf("too long key; expected 127 chars, but got %d", keyLen)
+		}
+		valLen := utf8.RuneCountInString(val)
+		if valLen > 255 {
+			return fmt.Errorf("too long value; expected 255 chars, but got %d", valLen)
+		}
+	}
+
+	return nil
 }
 
 // MemSizeFactor64 implements a human understandable format for bytes but also make sure that all
