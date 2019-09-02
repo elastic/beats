@@ -89,7 +89,8 @@
                 "formats": [
                     "dd/MMM/yyyy:H:m:s Z"
                 ],
-                "ignore_failure": true
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_mes
+sage }}"}}]
             }
         },
         {
