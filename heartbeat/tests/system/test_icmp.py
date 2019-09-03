@@ -83,10 +83,10 @@ class Test(BaseTest):
             if groupRights == True or adminRights == True:
                 proc = self.start_beat()
                 print("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB %s")
-                #self.wait_until(lambda: self.log_contains(
+                # self.wait_until(lambda: self.log_contains(
                 #    "heartbeat is running"))
                 print("CHECK WAIT %s")
-                #proc.check_kill_and_wait()
+                # proc.check_kill_and_wait()
             else:
                 exit_code = self.run_beat()
                 assert exit_code == 1
