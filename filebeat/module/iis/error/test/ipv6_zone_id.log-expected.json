@@ -7,7 +7,6 @@
         "event.dataset": "iis.error",
         "event.module": "iis",
         "fileset.name": "error",
-        "iis.error.queue_name": "-",
         "iis.error.reason_phrase": "Timer_ConnectionIdle",
         "input.type": "log",
         "log.offset": 195,

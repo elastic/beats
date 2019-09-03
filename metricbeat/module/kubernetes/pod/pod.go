@@ -98,7 +98,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Enrich(events)
 
 	for _, e := range events {
-		reporter.Event(mb.Event{MetricSetFields: e})
+		reporter.Event(mb.TransformMapStrToEvent("kubernetes", e, nil))
 	}
 	return
 }

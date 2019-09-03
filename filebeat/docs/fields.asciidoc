@@ -16,6 +16,8 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
+* <<exported-fields-cef>>
+* <<exported-fields-cef-module>>
 * <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
 * <<exported-fields-coredns>>
@@ -1318,6 +1320,135 @@ type: keyword
 
 --
 
+[[exported-fields-cef]]
+== Decode CEF processor fields fields
+
+Common Event Format (CEF) data.
+
+
+
+[float]
+=== cef
+
+By default the `decode_cef` processor writes all data from the CEF message to this `cef` object. It contains the CEF header fields and the extension data.
+
+
+
+*`cef.version`*::
++
+--
+Version of the CEF specification used by the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.vendor`*::
++
+--
+Vendor of the device that produced the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.product`*::
++
+--
+Product of the device that produced the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.version`*::
++
+--
+Version of the product that produced the message.
+
+
+type: keyword
+
+--
+
+*`cef.device.event_class_id`*::
++
+--
+Unique identifier of the event type.
+
+
+type: keyword
+
+--
+
+*`cef.severity`*::
++
+--
+Importance of the event. The valid string values are Unknown, Low, Medium, High, and Very-High. The valid integer values are 0-3=Low, 4-6=Medium, 7- 8=High, and 9-10=Very-High.
+
+
+type: keyword
+
+example: Very-High
+
+--
+
+*`cef.name`*::
++
+--
+Short description of the event.
+
+
+type: keyword
+
+--
+
+*`cef.extensions`*::
++
+--
+Collection of key-value pairs carried in the CEF extension field.
+
+
+type: object
+
+--
+
+*`observer.product`*::
++
+--
+Product name.
+
+type: keyword
+
+--
+
+*`source.service.name`*::
++
+--
+Service that is the source of the event.
+
+type: keyword
+
+--
+
+*`destination.service.name`*::
++
+--
+Service that is the target of the event.
+
+type: keyword
+
+--
+
+[[exported-fields-cef-module]]
+== CEF fields
+
+Module for receiving CEF logs over Syslog. The module does not add fields beyond what the decode_cef processor provides.
+
+
 [[exported-fields-cisco]]
 == Cisco fields
 
@@ -1381,10 +1512,10 @@ type: keyword
 
 --
 
-*`cisco.asa.list_id`*::
+*`cisco.asa.rule_name`*::
 +
 --
-Name of the Access Control List that matched this event.
+Name of the Access Control List rule that matched this event.
 
 
 type: keyword
@@ -1498,6 +1629,184 @@ ICMP code.
 
 
 type: short
+
+--
+
+[float]
+=== ftd
+
+Fields for Cisco Firepower Threat Defense Firewall.
+
+
+
+*`cisco.ftd.message_id`*::
++
+--
+The Cisco FTD message identifier.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.suffix`*::
++
+--
+Optional suffix after %FTD identifier.
+
+
+type: keyword
+
+example: session
+
+--
+
+*`cisco.ftd.source_interface`*::
++
+--
+Source interface for the flow or event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.destination_interface`*::
++
+--
+Destination interface for the flow or event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.rule_name`*::
++
+--
+Name of the Access Control List rule that matched this event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.source_username`*::
++
+--
+Name of the user that is the source for this event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.destination_username`*::
++
+--
+Name of the user that is the destination for this event.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.mapped_source_ip`*::
++
+--
+The translated source IP address. Use ECS source.nat.ip.
+
+
+type: ip
+
+--
+
+*`cisco.ftd.mapped_source_port`*::
++
+--
+The translated source port. Use ECS source.nat.port.
+
+
+type: long
+
+--
+
+*`cisco.ftd.mapped_destination_ip`*::
++
+--
+The translated destination IP address. Use ECS destination.nat.ip.
+
+
+type: ip
+
+--
+
+*`cisco.ftd.mapped_destination_port`*::
++
+--
+The translated destination port. Use ECS destination.nat.port.
+
+
+type: long
+
+--
+
+*`cisco.ftd.threat_level`*::
++
+--
+Threat level for malware / botnet traffic. One of very-low, low, moderate, high or very-high.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.threat_category`*::
++
+--
+Category for the malware / botnet traffic. For example: virus, botnet, trojan, etc.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.connection_id`*::
++
+--
+Unique identifier for a flow.
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.icmp_type`*::
++
+--
+ICMP type.
+
+
+type: short
+
+--
+
+*`cisco.ftd.icmp_code`*::
++
+--
+ICMP code.
+
+
+type: short
+
+--
+
+*`cisco.ftd.security`*::
++
+--
+Raw fields for Security Events.
+
+type: object
 
 --
 

@@ -24,10 +24,10 @@
     description: >
       Destination interface for the flow or event.
 
-  - name: list_id
+  - name: rule_name
     type: keyword
     description: >
-      Name of the Access Control List that matched this event.
+      Name of the Access Control List rule that matched this event.
 
   - name: source_username
     type: keyword
