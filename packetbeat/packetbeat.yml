@@ -214,7 +214,7 @@ processors:
 # "publish", "service".
 #logging.selectors: ["*"]
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # packetbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
