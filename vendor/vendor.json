@@ -850,7 +850,6 @@
 		},
 		{
 			"checksumSHA1": "RYc8X/VhRR7JKKE7EAwVhqbbjAs=",
-			"origin": "github.com/exekias/moby/client",
 			"path": "github.com/docker/docker/client",
 			"revision": "8af4db6f002ac907b6ef8610b237879dfcaa5b7a",
 			"revisionTime": "2017-08-02T01:53:33Z"
@@ -923,7 +922,6 @@
 		},
 		{
 			"checksumSHA1": "Aa2l7tUYFCEvHd+C//15fQnAfqQ=",
-			"origin": "github.com/exekias/moby/pkg/system",
 			"path": "github.com/docker/docker/pkg/system",
 			"revision": "8af4db6f002ac907b6ef8610b237879dfcaa5b7a",
 			"revisionTime": "2017-08-02T01:53:33Z"
