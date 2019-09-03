@@ -12,7 +12,7 @@ it. Hints tell {beatname_uc} how to get metrics for the given container. This is
 ===== `co.elastic.metrics/hosts`
 
 Hosts setting to use with the given module. Hosts can include `${data.host}` and `${data.port}`
-values from the autodiscover event, ie: `${data.host}:80`.
+values from the autodiscover event, ie: `${data.host}:9090`.
 
 [float]
 ===== `co.elastic.metrics/metricsets`
@@ -107,7 +107,7 @@ hint. For example, these hints configure a common behavior for all containers in
 -------------------------------------------------------------------------------------
 annotations:
   co.elastic.metrics/module: apache
-  co.elastic.metrics/hosts: '${data.host}:80'
+  co.elastic.metrics/hosts: '${data.host}:9090'
   co.elastic.metrics.sidecar/hosts: '${data.host}:8080'
 -------------------------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ You can label Docker containers with useful info to spin up {beatname_uc} module
 -------------------------------------------------------------------------------------
   co.elastic.metrics/module: nginx
   co.elastic.metrics/metricsets: stubstatus
-  co.elastic.metrics/hosts: '${data.host}:80'
+  co.elastic.metrics/hosts: '${data.host}:9090'
   co.elastic.metrics/period: 10s
 -------------------------------------------------------------------------------------
 
