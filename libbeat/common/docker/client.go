@@ -22,7 +22,6 @@ import (
 	"os"
 
 	"github.com/docker/docker/api"
-	"github.com/docker/docker/api/types/versions"
 	"github.com/docker/docker/client"
 	"golang.org/x/net/context"
 
@@ -44,20 +43,8 @@ func NewClient(host string, httpClient *http.Client, httpHeaders map[string]stri
 
 	if os.Getenv("DOCKER_API_VERSION") == "" {
 		logp.Debug("docker", "Negotiating client version")
-		ping, err := c.Ping(context.Background())
-		if err != nil {
-			logp.Debug("docker", "Failed to perform ping: %s", err)
-		}
 
-		// try a really old version, before versioning headers existed
-		if ping.APIVersion == "" {
-			ping.APIVersion = "1.22"
-		}
-
-		// if server version is lower than the client version, downgrade
-		if versions.LessThan(ping.APIVersion, version) {
-			c.UpdateClientVersion(ping.APIVersion)
-		}
+		c.NegotiateAPIVersion(context.Background())
 	}
 
 	logp.Debug("docker", "Client version set to %s", c.ClientVersion())
