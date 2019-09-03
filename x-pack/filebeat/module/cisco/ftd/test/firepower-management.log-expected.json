@@ -1,0 +1,615 @@
+[
+    {
+        "@timestamp": "2019-08-14T13:56:30.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=AuditLog, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "platformSettingEdit.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 0,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:57:19.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=Banner, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "platformSettingEdit.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 194,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:57:26.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/ChangeReconciliation.cgi, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "ChangeReconciliation.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 386,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:57:34.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=IntrusionPolicyPrefs, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "platformSettingEdit.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 568,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:57:43.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /admin/lights_out_mgmt.cgi, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 774,
+        "process.name": "lights_out_mgmt.cgi",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:58:02.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Cloud Services, View url filtering settings\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 943,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:58:02.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Cloud Services, View amp settings\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1072,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:58:20.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Monitoring > Syslog, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1191,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:58:41.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1316,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:58:47.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management > NGFW Interfaces, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1440,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:58:52.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management > NGFW Device Summary, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1575,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:58:54.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management > NGFW Device Summary, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1721,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:59:10.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1867,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T13:59:15.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1984,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:00:37.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Save Policy ftd-policy\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2128,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:00:37.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Modified: Syslog\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2285,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:00:37.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2436,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:12.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Save Policy ftd-policy\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2580,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:12.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Modified: Syslog\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2737,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:13.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2888,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:20.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3032,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:31.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "ActionQueueScrape.pl",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3143,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:31.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@localhost, Task Queue, Successful task completion : Pre-deploy Global Configuration Generation\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "ActionQueueScrape.pl",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3267,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:35.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "ActionQueueScrape.pl",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3440,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:36.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@localhost, Task Queue, Successful task completion : Pre-deploy Device Configuration for siem-ftd\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "ActionQueueScrape.pl",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3564,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:55.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3739,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:56.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@localhost, Task Queue, Policy Deployment to siem-ftd - SUCCESS\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3874,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:01:57.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "sfdccsm",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4002,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:02:03.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Monitoring > Syslog, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4113,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:02:11.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Monitoring > Audit, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "index.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4238,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:02:19.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4357,
+        "process.name": "mojo_server.pl",
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:02:31.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=AuditLog, Page View\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "platformSettingEdit.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4492,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:02:38.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Local System Configuration, Save Local System Configuration\u0000x0a\u0000x00",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "platformSettingEdit.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4686,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2019-08-14T14:02:38.000Z",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Audit Log Settings >  Modified: Send Audit Log to Syslog enabled > Disabled",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "platformSettingEdit.cgi",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4870,
+        "service.type": "cisco",
+        "syslog.facility": 14,
+        "syslog.priority": 2,
+        "tags": [
+            "cisco-ftd"
+        ]
+    }
+]
