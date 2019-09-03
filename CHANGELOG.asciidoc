@@ -11,7 +11,18 @@ https://github.com/elastic/beats/compare/v6.8.2...v6.8.3[View commits
 
 *Journalbeat*
 
-- Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716
+- Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716]
+
+*Metricbeat*
+
+- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
+
+==== Added
+
+*Metricbeat*
+
+- Remove _nodes field from under cluster_stats as it's not being used. {pull}13010[13010]
+- Collect license expiry date fields as well. {pull}11652[11652]
 
 [[release-notes-6.8.2]]
 === Beats version 6.8.2
