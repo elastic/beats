@@ -18,6 +18,7 @@
 package add_kubernetes_metadata
 
 import (
+	"os"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -45,6 +46,7 @@ type PluginConfig []map[string]common.Config
 
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
+		KubeConfig:      os.Getenv("HOME") + "/.kube/config",
 		SyncPeriod:      10 * time.Minute,
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},

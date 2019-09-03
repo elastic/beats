@@ -26,6 +26,9 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8s "k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -33,10 +36,11 @@ const (
 )
 
 type kubernetesAnnotator struct {
-	watcher  kubernetes.Watcher
-	indexers *Indexers
-	matchers *Matchers
-	cache    *cache
+	watcher             kubernetes.Watcher
+	indexers            *Indexers
+	matchers            *Matchers
+	cache               *cache
+	kubernetesAvailable bool
 }
 
 func init() {
@@ -49,6 +53,16 @@ func init() {
 	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
+}
+
+func isKubernetesAvailable(client k8s.Interface) bool {
+	info, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
+	if err != nil {
+		logp.Debug("kubernetes", "%v: could not detect kubernetes env", "add_kubernetes_metadata")
+		return false
+	}
+	logp.Debug("kubernetes", "%v: kubernetes env detected: %v", "add_kubernetes_metadata", info)
+	return true
 }
 
 // New constructs a new add_kubernetes_metadata processor.
@@ -96,6 +110,15 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
+	if !isKubernetesAvailable(client) {
+		return &kubernetesAnnotator{
+			indexers:            indexers,
+			matchers:            matchers,
+			cache:               newCache(config.CleanupTimeout),
+			kubernetesAvailable: false,
+		}, nil
+	}
+
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
 	logp.Debug("kubernetes", "Using host: %s", config.Host)
@@ -112,10 +135,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	processor := &kubernetesAnnotator{
-		watcher:  watcher,
-		indexers: indexers,
-		matchers: matchers,
-		cache:    newCache(config.CleanupTimeout),
+		watcher:             watcher,
+		indexers:            indexers,
+		matchers:            matchers,
+		cache:               newCache(config.CleanupTimeout),
+		kubernetesAvailable: true,
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
@@ -139,6 +163,9 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
+	if !k.kubernetesAvailable {
+		return event, nil
+	}
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		return event, nil
