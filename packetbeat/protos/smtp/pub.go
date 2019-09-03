@@ -199,14 +199,14 @@ func (pub *transPub) getEndpoints(m *message) (
 	*common.Endpoint,
 ) {
 	src := &common.Endpoint{
-		IP:   m.Tuple.SrcIP.String(),
-		Port: m.Tuple.SrcPort,
-		Proc: string(m.CmdlineTuple.Src),
+		IP:      m.Tuple.SrcIP.String(),
+		Port:    m.Tuple.SrcPort,
+		Process: m.CmdlineTuple.Src,
 	}
 	dst := &common.Endpoint{
-		IP:   m.Tuple.DstIP.String(),
-		Port: m.Tuple.DstPort,
-		Proc: string(m.CmdlineTuple.Dst),
+		IP:      m.Tuple.DstIP.String(),
+		Port:    m.Tuple.DstPort,
+		Process: m.CmdlineTuple.Dst,
 	}
 	if m.Direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src

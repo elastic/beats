@@ -124,7 +124,7 @@ func (e *eventStore) publish(event beat.Event) {
 
 func TestParser(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"smtp"})
+		logp.TestingSetup(logp.WithSelectors("smtp"))
 	}
 
 	t.Run("basic", func(t *testing.T) {
@@ -165,7 +165,7 @@ func TestParser(t *testing.T) {
 
 func TestSyncer(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"smtp"})
+		logp.TestingSetup(logp.WithSelectors("smtp"))
 	}
 
 	t.Run("single-line prompt", func(t *testing.T) {
@@ -213,7 +213,7 @@ func TestSyncer(t *testing.T) {
 
 func TestIntegration(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"smtp"})
+		logp.TestingSetup(logp.WithSelectors("smtp"))
 	}
 
 	t.Run("basic", func(t *testing.T) {
@@ -591,10 +591,12 @@ func modForTests(store *eventStore) *smtpPlugin {
 func testCreateTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
-		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-		SrcPort: 6512, DstPort: 25,
+		BaseTuple: common.BaseTuple{
+			SrcIP: net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+			SrcPort: 6512, DstPort: 25,
+		},
 	}
-	t.ComputeHashebles()
+	t.ComputeHashables()
 
 	return t
 }
