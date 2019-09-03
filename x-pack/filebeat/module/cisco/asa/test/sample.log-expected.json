@@ -329,9 +329,10 @@
     },
     {
         "@timestamp": "2011-06-04T21:59:52.000Z",
+        "cisco.asa.icmp_code": 17233,
+        "cisco.asa.mapped_source_ip": "192.168.132.46",
         "cisco.asa.message_id": "302021",
-        "destination.ip": "192.168.132.46",
-        "destination.port": 17233,
+        "destination.ip": "172.24.177.29",
         "event.action": "flow-expiration",
         "event.code": 302021,
         "event.dataset": "cisco.asa",
@@ -347,8 +348,7 @@
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
-        "source.ip": "172.24.177.29",
-        "source.port": 0,
+        "source.ip": "192.168.132.46",
         "tags": [
             "cisco-asa"
         ]
