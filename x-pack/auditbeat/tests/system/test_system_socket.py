@@ -95,7 +95,7 @@ class Test(AuditbeatXPackTest):
         try:
             try:
                 self.wait_until(lambda: self.log_contains('system/socket dataset is running.'),
-                            max_timeout=60)
+                                max_timeout=60)
             except Exception, e:
                 raise Exception('Auditbeat failed to start start'), None, sys.exc_info()[2]
             self.execute(test)
