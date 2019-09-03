@@ -1,4 +1,3 @@
-import ipaddress
 import operator
 import platform
 import random
@@ -473,7 +472,7 @@ def release_ipv6_address(addr):
 
 
 def random_address_ipv6():
-    return str(ipaddress.IPv6Address('\xfd' + os.urandom(15)))
+    return 'fdee:' + ':'.join(['{:x}'.format(random.randint(1, 65535)) for _ in range(7)])
 
 
 class HasEvent:
