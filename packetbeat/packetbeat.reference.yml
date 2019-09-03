@@ -333,15 +333,6 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
-  # Max size for per-session message queue. This places a limit on the memory
-  # that can be used to buffer requests and responses for correlation.
-  #queue_max_bytes: 1048576
-
-  # Max number of messages for per-session message queue. This limits the number
-  # of requests or responses that can be buffered for correlation. Set a value
-  # large enough to allow for pipelining.
-  #queue_max_messages: 20000
-
 - type: smtp
   # SMTP port for traffic monitoring.
   ports: [25]
@@ -361,6 +352,15 @@ packetbeat.protocols:
   # If this option is enabled, the raw message of the response (`response`
   # field) is sent to Elasticsearch. The default is false.
   #send_response: false
+
+  # Max size for per-session message queue. This places a limit on the memory
+  # that can be used to buffer requests and responses for correlation.
+  #queue_max_bytes: 1048576
+
+  # Max number of messages for per-session message queue. This limits the number
+  # of requests or responses that can be buffered for correlation. Set a value
+  # large enough to allow for pipelining.
+  #queue_max_messages: 20000
 
 - type: thrift
   # Enable thrift monitoring. Default: true
@@ -1467,7 +1467,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'packetbeat-%{[agent.version]}'.
+# name is 'packetbeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "packetbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".

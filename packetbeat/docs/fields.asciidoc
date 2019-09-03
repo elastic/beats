@@ -7428,6 +7428,7 @@ The return value of the Redis command in a human readable format.
 --
 If the Redis command has resulted in an error, this field contains the error message returned by the Redis server.
 
+
 --
 
 [[exported-fields-smtp]]
@@ -7437,64 +7438,115 @@ SMTP event fields.
 
 
 [float]
-== smtp fields
+=== smtp
 
-Information about the SMTP request and response.
-
-
-[float]
-== request fields
-
-SMTP request
+Information about the SMTP transaction.
 
 
-[float]
-=== `smtp.request.command`
-
-example: EHLO
-
-The SMTP command.
-
-[float]
-=== `smtp.request.param`
-
-The SMTP command argument. It follows the SMTP command issued by the client (e.g. `localhost` in `HELO localhost`).
-
-
-[float]
-=== `smtp.request.headers`
-
-type: object
-
-A map containing the captured message header fields from the client DATA request.
-
-
-[float]
-=== `smtp.request.body`
+*`smtp.type`*::
++
+--
+The SMTP transaction type (`PROMPT`, `COMMAND` or `MAIL`).
 
 type: text
 
-The body (message) of the client DATA request.
+--
+
+*`smtp.session_id`*::
++
+--
+SMTP session UUID.
+
+type: text
+
+--
 
 [float]
-== response fields
+=== request
 
-SMTP response
+SMTP request (only `COMMAND` transactions).
 
+
+*`smtp.request.command`*::
++
+--
+SMTP command
+
+type: text
+
+example: EHLO
+
+--
+
+*`smtp.request.param`*::
++
+--
+The SMTP command argument. Follows the SMTP command (e.g. `localhost` in `HELO localhost`).
+
+
+--
 
 [float]
-=== `smtp.response.code`
+=== response
+
+SMTP response (only `COMMAND` and `PROMPT` transactions)
+
+
+*`smtp.response.code`*::
++
+--
+The SMTP status code.
 
 example: 250
 
-The SMTP status code.
+--
 
-[float]
-=== `smtp.response.phrases`
+*`smtp.response.phrases`*::
++
+--
+The SMTP status phrases (one per each line of the response)
 
 type: object
 
-The SMTP status phrases.
+--
+
+*`smtp.envelope_sender`*::
++
+--
+Sender ("reverse path") provided during the mail transaction using the `MAIL` command (only `MAIL` transactions).
+
+
+type: text
+
+--
+
+*`smtp.envelope_recipients`*::
++
+--
+Recipients ("forward paths") provided during the mail transaction using `RCPT` commands (only `MAIL` transactions).
+
+
+type: object
+
+--
+
+*`smtp.headers`*::
++
+--
+A map containing the captured message header fields from the client `DATA` request (only `MAIL` transactions).
+
+
+type: object
+
+--
+
+*`smtp.body`*::
++
+--
+The body (message) of the client DATA request (only `MAIL` transactions).
+
+
+type: text
 
 --
 
