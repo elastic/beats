@@ -73,7 +73,7 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// CollectModules collects module configs to modules.d
+// ModulesCollector collects module configs to modules.d
 func ModulesCollector() error {
 	return metricbeat.CollectModules()
 }
