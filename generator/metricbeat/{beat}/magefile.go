@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	//"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 
@@ -50,6 +49,7 @@ func init() {
 	devtools.SetBuildVariableSources(devtools.DefaultBeatBuildVariableSources)
 
 	devtools.BeatDescription = "One sentence description of the Beat."
+	devtools.BeatVendor = "{full_name}"
 }
 
 // CollectAll generates the docs and the fields.
@@ -86,9 +86,8 @@ func FieldsDocs() error {
 
 //Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return mage.GenerateFieldsYAML("module")
+	return devtools.GenerateFieldsYAML("module")
 }
-
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
