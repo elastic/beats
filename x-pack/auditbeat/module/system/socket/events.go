@@ -21,9 +21,15 @@ import (
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
 
-// This is just to compensate the size argument of udp_sendmsg which is only
-// UDP payload. 28 being the size of an IP header (no options) + size of UDP header.
-const minUdpPacketSize = 28
+const (
+	// This compensates the size argument of udp_sendmsg which is only
+	// UDP payload. 28 is the size of an IPv4 header (no options) + UDP header.
+	minIPv4UdpPacketSize = 28
+
+	// Same for udpv6_sendmsg.
+	// 40 is the size of an IPv6 header (no extensions) + UDP header.
+	minIPv6UdpPacketSize = 48
+)
 
 // event is the interface that all the deserialized events from the ring-buffer
 // have to conform to in order to be processed by state.
@@ -299,9 +305,21 @@ func (e *ipLocalOutCall) String() string {
 		f.remote.String())
 }
 
+func isNotUDP(f *flow) bool {
+	return f.proto != protoUDP
+}
+
 // Update the state with the contents of this event.
 func (e *ipLocalOutCall) Update(s *state) error {
-	return s.UpdateFlow(e.asFlow())
+	flow := e.asFlow()
+	if flow.remote.addr.IP == nil {
+		// Unconnected-UDP flows have nil destination in here.
+		return nil
+	}
+	// Only count non-UDP packets.
+	// Those are already counted by udp_sendmsg, but there is no way
+	// to discriminate UDP in ip_local_out at kprobe level.
+	return s.UpdateFlowWithCondition(flow, isNotUDP)
 }
 
 type inet6CskXmitCall struct {
@@ -426,16 +444,25 @@ func (e *tcpV6DoRcv) Update(s *state) error {
 }
 
 type udpSendMsgCall struct {
-	Meta  tracing.Metadata `kprobe:"metadata"`
-	Sock  uintptr          `kprobe:"sock"`
-	Size  uintptr          `kprobe:"size"`
-	LAddr uint32           `kprobe:"laddr"`
-	RAddr uint32           `kprobe:"raddr"`
-	LPort uint16           `kprobe:"lport"`
-	RPort uint16           `kprobe:"rport"`
+	Meta     tracing.Metadata `kprobe:"metadata"`
+	Sock     uintptr          `kprobe:"sock"`
+	Size     uintptr          `kprobe:"size"`
+	LAddr    uint32           `kprobe:"laddr"`
+	RAddr    uint32           `kprobe:"raddr"`
+	AltRAddr uint32           `kprobe:"altraddr"`
+	LPort    uint16           `kprobe:"lport"`
+	RPort    uint16           `kprobe:"rport"`
+	AltRPort uint16           `kprobe:"altrport"`
 }
 
 func (e *udpSendMsgCall) asFlow() flow {
+	raddr, rport := e.RAddr, e.RPort
+	if raddr == 0 {
+		raddr = e.AltRAddr
+	}
+	if rport == 0 {
+		rport = e.AltRPort
+	}
 	return flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -443,8 +470,8 @@ func (e *udpSendMsgCall) asFlow() flow {
 		proto:    protoUDP,
 		dir:      directionOutbound,
 		lastSeen: kernelTime(e.Meta.Timestamp),
-		local:    newEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)+minUdpPacketSize),
-		remote:   newEndpointIPv4(e.RAddr, e.RPort, 0, 0),
+		local:    newEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)+minIPv4UdpPacketSize),
+		remote:   newEndpointIPv4(raddr, rport, 0, 0),
 	}
 }
 
@@ -466,18 +493,28 @@ func (e *udpSendMsgCall) Update(s *state) error {
 }
 
 type udpv6SendMsgCall struct {
-	Meta   tracing.Metadata `kprobe:"metadata"`
-	Sock   uintptr          `kprobe:"sock"`
-	Size   uintptr          `kprobe:"size"`
-	LAddrA uint64           `kprobe:"laddra"`
-	LAddrB uint64           `kprobe:"laddrb"`
-	RAddrA uint64           `kprobe:"raddra"`
-	RAddrB uint64           `kprobe:"raddrb"`
-	LPort  uint16           `kprobe:"lport"`
-	RPort  uint16           `kprobe:"rport"`
+	Meta      tracing.Metadata `kprobe:"metadata"`
+	Sock      uintptr          `kprobe:"sock"`
+	Size      uintptr          `kprobe:"size"`
+	LAddrA    uint64           `kprobe:"laddra"`
+	LAddrB    uint64           `kprobe:"laddrb"`
+	RAddrA    uint64           `kprobe:"raddra"`
+	RAddrB    uint64           `kprobe:"raddrb"`
+	AltRAddrA uint64           `kprobe:"altraddra"`
+	AltRAddrB uint64           `kprobe:"altraddrb"`
+	LPort     uint16           `kprobe:"lport"`
+	RPort     uint16           `kprobe:"rport"`
+	AltRPort  uint16           `kprobe:"altrport"`
 }
 
 func (e *udpv6SendMsgCall) asFlow() flow {
+	raddra, raddrb, rport := e.RAddrA, e.RAddrB, e.RPort
+	if raddra == 0 && raddrb == 0 {
+		raddra, raddrb = e.AltRAddrA, e.AltRAddrB
+	}
+	if rport == 0 {
+		rport = e.AltRPort
+	}
 	return flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -487,8 +524,8 @@ func (e *udpv6SendMsgCall) asFlow() flow {
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		// In IPv6, udpv6_sendmsg increments local counters as there is no
 		// corresponding ip6_local_out call.
-		local:  newEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 1, uint64(e.Size)),
-		remote: newEndpointIPv6(e.RAddrA, e.RAddrB, e.RPort, 0, 0),
+		local:  newEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 1, uint64(e.Size)+minIPv6UdpPacketSize),
+		remote: newEndpointIPv6(raddra, raddrb, rport, 0, 0),
 	}
 }
 
@@ -521,7 +558,7 @@ type udpQueueRcvSkb struct {
 	Packet [pktHeaderDumpBytes]byte `kprobe:"packet,greedy"`
 }
 
-func validHeaders(ipHdr uint16, udpHdr uint16, data []byte) bool {
+func validIPv4Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {
 	return ipHdr != 0 &&
 		int(ipHdr)+20 < len(data) &&
 		data[ipHdr]&0xF0 == 0x40 &&
@@ -529,8 +566,16 @@ func validHeaders(ipHdr uint16, udpHdr uint16, data []byte) bool {
 		int(udpHdr)+12 < len(data)
 }
 
+func validIPv6Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {
+	return ipHdr != 0 &&
+		int(ipHdr)+40 < len(data) &&
+		data[ipHdr]&0xF0 == 0x60 &&
+		udpHdr != 0 &&
+		int(udpHdr)+12 < len(data)
+}
+
 func (e *udpQueueRcvSkb) asFlow() flow {
-	if valid := validHeaders(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
+	if valid := validIPv4Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
 		// Check if we're dealing with pointers
 		// TODO: This should check for SK_BUFF_HAS_POINTERS. Instead is just
 		//		 treating IPHdr/UDPHdr as the lower 16bits of a pointer which
@@ -546,7 +591,7 @@ func (e *udpQueueRcvSkb) asFlow() flow {
 			e.UDPHdr > base {
 			ipOff := e.IPHdr - base
 			udpOff := e.UDPHdr - base
-			if valid = validHeaders(ipOff, udpOff, e.Packet[:]); valid {
+			if valid = validIPv4Headers(ipOff, udpOff, e.Packet[:]); valid {
 				e.IPHdr = ipOff
 				e.UDPHdr = udpOff
 			}
@@ -568,7 +613,7 @@ func (e *udpQueueRcvSkb) asFlow() flow {
 		dir:      directionInbound,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv4(e.LAddr, e.LPort, 0, 0),
-		remote:   newEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minUdpPacketSize),
+		remote:   newEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minIPv4UdpPacketSize),
 	}
 }
 
@@ -590,18 +635,42 @@ func (e *udpQueueRcvSkb) Update(s *state) error {
 }
 
 type udpv6QueueRcvSkb struct {
-	Meta   tracing.Metadata `kprobe:"metadata"`
-	Sock   uintptr          `kprobe:"sock"`
-	Size   uint32           `kprobe:"size"`
-	LAddrA uint64           `kprobe:"laddra"`
-	LAddrB uint64           `kprobe:"laddrb"`
-	RAddrA uint64           `kprobe:"raddra"`
-	RAddrB uint64           `kprobe:"raddrb"`
-	LPort  uint16           `kprobe:"lport"`
-	RPort  uint16           `kprobe:"rport"`
+	Meta   tracing.Metadata         `kprobe:"metadata"`
+	Sock   uintptr                  `kprobe:"sock"`
+	Size   uint32                   `kprobe:"size"`
+	LAddrA uint64                   `kprobe:"laddra"`
+	LAddrB uint64                   `kprobe:"laddrb"`
+	LPort  uint16                   `kprobe:"lport"`
+	IPHdr  uint16                   `kprobe:"iphdr"`
+	UDPHdr uint16                   `kprobe:"udphdr"`
+	Base   uintptr                  `kprobe:"base"`
+	Packet [pktHeaderDumpBytes]byte `kprobe:"packet,greedy"`
 }
 
 func (e *udpv6QueueRcvSkb) asFlow() flow {
+	if valid := validIPv6Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
+		// Check if we're dealing with pointers
+		// TODO: This only works in little-endian, same as in udpQueueRcvSkb
+		base := uint16(e.Base)
+		if e.IPHdr > base &&
+			e.UDPHdr > base {
+			ipOff := e.IPHdr - base
+			udpOff := e.UDPHdr - base
+			if valid = validIPv6Headers(ipOff, udpOff, e.Packet[:]); valid {
+				e.IPHdr = ipOff
+				e.UDPHdr = udpOff
+			}
+		}
+		if !valid {
+			return flow{}
+		}
+	}
+	var raddrA, raddrB uint64
+	var rport uint16
+	// the remote is this packet's source
+	raddrA = tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+8:])
+	raddrB = tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+16:])
+	rport = tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
 	return flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -610,7 +679,7 @@ func (e *udpv6QueueRcvSkb) asFlow() flow {
 		dir:      directionInbound,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
-		remote:   newEndpointIPv6(e.RAddrA, e.RAddrB, e.RPort, 1, uint64(e.Size)),
+		remote:   newEndpointIPv6(raddrA, raddrB, rport, 1, uint64(e.Size)+minIPv6UdpPacketSize),
 	}
 }
 
