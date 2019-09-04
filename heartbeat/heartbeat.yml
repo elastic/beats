@@ -117,9 +117,9 @@ output.elasticsearch:
 #================================ Processors =====================================
 
 processors:
-  - add_observer_metadata: 
+  - add_observer_metadata:
   # Optional, but recommended geo settings for the location Heartbeat is running in
-  #geo: 
+  #geo:
     # Token describing this location
     #name: us-east-1a
 
@@ -146,7 +146,7 @@ processors:
 #monitoring.enabled: false
 
 # Sets the UUID of the Elasticsearch cluster under which monitoring data for this
-# Auditbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# Heartbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
 # is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
 #monitoring.override_cluster_uuid:
 
