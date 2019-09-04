@@ -468,21 +468,17 @@ endif::[]
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
-
+ifdef::ignores_max_retries[]
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
-
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
-
+ifndef::ignores_max_retries[]
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
-
 endif::[]
 
 
@@ -735,21 +731,17 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
-
+ifdef::ignores_max_retries[]
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
-
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
-
+ifndef::ignores_max_retries[]
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
-
 endif::[]
 
 ===== `bulk_max_size`
@@ -991,21 +983,17 @@ metadata for the configured topics. The default is true.
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
-
+ifdef::ignores_max_retries[]
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
-
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
-
+ifndef::ignores_max_retries[]
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
-
 endif::[]
 
 ===== `bulk_max_size`
@@ -1251,21 +1239,17 @@ Redis after a network error. The default is 60s.
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
-
+ifdef::ignores_max_retries[]
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
-
 endif::[]
 
-ifeval::["{beatname_lc}"!="filebeat" and "{beatname_lc}"!="winlogbeat"]
-
+ifndef::ignores_max_retries[]
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
 
 Set `max_retries` to a value less than 0 to retry until all events are published.
 
 The default is 3.
-
 endif::[]
 
 

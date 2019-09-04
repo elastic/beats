@@ -47,14 +47,14 @@ or under `paths`. For a description of this option, see
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
-<<{beatname_lc}-seek,`seek`>>. 
+<<seek,`seek`>>. 
 
 [float]
 ==== `include_matches` deprecated[5.6.1,Use the option under `paths` instead.]
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
-<<{beatname_lc}-include-matches,`include_matches`>>. 
+<<include-matches,`include_matches`>>. 
 
 include::{libbeat-dir}/docs/generalconfig.asciidoc[]
 

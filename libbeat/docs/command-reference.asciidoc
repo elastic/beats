@@ -82,23 +82,23 @@ endif::[]
 [options="header"]
 |=======================
 |Commands |
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 |<<deploy-command,`deploy`>> | {deploy-command-short-desc}.
 endif::[]
 |<<export-command,`export`>> |{export-command-short-desc}.
 |<<help-command,`help`>> |{help-command-short-desc}.
 |<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 |<<package-command,`package`>> |{package-command-short-desc}.
 |<<remove-command,`remove`>> |{remove-command-short-desc}.
 endif::[]
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
+ifdef::has_modules_command[]
 |<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
 |<<run-command,`run`>> |{run-command-short-desc}.
 |<<setup-command,`setup`>> |{setup-command-short-desc}.
 |<<test-command,`test`>> |{test-command-short-desc}.
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 |<<update-command,`update`>> |{update-command-short-desc}.
 endif::[]
 |<<version-command,`version`>> |{version-command-short-desc}.
@@ -106,7 +106,7 @@ endif::[]
 
 Also see <<global-flags,Global flags>>.
 
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 [[deploy-command]]
 ==== `deploy` command
 
@@ -325,7 +325,7 @@ Shows help for the `keystore` command.
 
 See <<keystore>> for more examples.
 
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 [[package-command]]
 ==== `package` command
 
@@ -387,7 +387,7 @@ Shows help for the `remove` command.
 -----
 endif::[]
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
+ifdef::has_modules_command[]
 [[modules-command]]
 ==== `modules` command
 
@@ -730,7 +730,7 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 -----
 endif::[]
 
-ifeval::[("{beatname_lc}"=="functionbeat")]
+ifeval::["{beatname_lc}"=="functionbeat"]
 [[update-command]]
 ==== `update` command
 
