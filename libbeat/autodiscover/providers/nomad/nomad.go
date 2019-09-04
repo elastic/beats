@@ -18,6 +18,8 @@
 package nomad
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -84,9 +86,14 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
+	host, err := os.Hostname()
+	if err != nil || len(host) == 0 {
+		return nil, fmt.Errorf("Error getting the hostname: %v", err)
+	}
+
 	options := nomad.WatchOptions{
 		SyncTimeout: 1 * time.Second,
-		Node:        "perf-storage24",
+		Node:        host,
 	}
 
 	watcher, err := nomad.NewWatcher(client, options)
