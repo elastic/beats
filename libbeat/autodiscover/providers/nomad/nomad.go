@@ -155,14 +155,13 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	objMeta := p.metagen.ResourceMetadata(*obj)
 
 	for _, group := range obj.Job.TaskGroups {
-		for _, task := range group.Tasks {
+		for range group.Tasks {
 			event := bus.Event{
 				"provider": p.uuid,
 				"id":       obj.ID,
-				"flag":     true, // ???
-				"job":      obj.Job.Name,
-				"task":     task.Name,
-				"meta":     objMeta,
+				flag:       true, // event type
+				// "task":     task.Name,
+				"meta": objMeta,
 			}
 
 			p.publish(event)
