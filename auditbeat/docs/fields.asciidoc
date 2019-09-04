@@ -2886,7 +2886,16 @@ The name of the module's dataset that generated the event.
 
 --
 
+<<<<<<< HEAD
 *`event.action`*::
+=======
+An array of strings describing a possible external origin for this file. For example, the URL it was downloaded from. Only supported in macOS, via the kMDItemWhereFroms attribute. Omitted if origin information is not available.
+
+
+--
+
+*`file.origin.raw`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 type: keyword
@@ -2897,9 +2906,19 @@ Action describes the change that triggered the event.
 For the file integrity module the possible values are: attributes_modified, created, deleted, updated, moved, and config_change.
 
 
+<<<<<<< HEAD
 --
 
 *`event.id`*::
+=======
+[float]
+== selinux fields
+
+The SELinux identity of the file.
+
+
+*`file.selinux.user`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 type: keyword

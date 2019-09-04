@@ -7,7 +7,7 @@ For example, the following configuration includes a subset of the Packetbeat DNS
 requests and their response codes are reported:
 
 [source, yaml]
------------------------------------------------------
+----
 processors:
   - include_fields:
       fields:
@@ -18,12 +18,12 @@ processors:
         - dns.question.name
         - dns.question.etld_plus_one
         - dns.response_code
------------------------------------------------------
+----
 
 The filtered event would look something like this:
 
 [source,shell]
------------------------------------------------------
+----
 {
   "@timestamp": "2016-03-28T14:48:21.732Z",
   "bytes_in": 32,
@@ -39,12 +39,12 @@ The filtered event would look something like this:
   "ip": "8.8.8.8",
   "type": "dns"
 }
------------------------------------------------------
+----
 
 If you would like to drop all the successful transactions, you can use the following configuration:
 
 [source,yaml]
-------------
+----
 processors:
  - drop_event:
      when:
@@ -56,13 +56,13 @@ processors:
 If you don't want to export raw data for the successful transactions:
 
 [source,yaml]
-------------
+----
 processors:
  - drop_fields:
      when:
         equals:
            http.response.code: 200
      fields: ["request", "response"]
-------------
+----
 
 include::{libbeat-dir}/docs/processors-using.asciidoc[]
