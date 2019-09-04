@@ -22,13 +22,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/mail"
-	"time"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
@@ -60,19 +60,20 @@ func (pub *transPub) createEvent(
 	trans transaction,
 	sessionID uuid.UUID,
 ) beat.Event {
-	fields := common.MapStr{
-		"type":   "smtp",
-		"status": common.OK_STATUS,
-	}
 	d := common.MapStr{"session_id": sessionID}
 	drequ := common.MapStr{}
 	dresp := common.MapStr{}
 
-	var ts time.Time
+	var fields common.MapStr
+	var evt beat.Event
+	var pbf *pb.Fields
+	var src, dst *common.Endpoint
 
 	switch t := trans.(type) {
-
 	case *transPrompt:
+		evt, pbf = pb.NewBeatEvent(t.resp.Ts)
+		fields = evt.Fields
+
 		d["type"] = "PROMPT"
 		if pub.sendResponse {
 			fields["response"] =
@@ -86,10 +87,13 @@ func (pub *transPub) createEvent(
 		if len(t.resp.statusPhrases) > 0 {
 			dresp["phrases"] = t.resp.statusPhrases
 		}
-		fields["src"], fields["dst"] = pub.getEndpoints(t.resp)
-		ts = t.resp.Ts
+		src, dst = pub.getEndpoints(t.resp)
+		pbf.Network.Transport = t.resp.Transport.String()
 
 	case *transCommand:
+		evt, pbf = pb.NewBeatEvent(t.resp.Ts)
+		fields = evt.Fields
+
 		d["type"] = "COMMAND"
 		if pub.sendRequest {
 			fields["request"] =
@@ -105,16 +109,19 @@ func (pub *transPub) createEvent(
 			fields["status"] = common.SERVER_ERROR_STATUS
 		}
 		// Response time in milliseconds
-		fields["responsetime"] =
-			int32(t.resp.Ts.Sub(t.requ.Ts).Nanoseconds() / 1e6)
+		pbf.Event.Duration = t.resp.Ts.Sub(t.requ.Ts)
+
 		drequ["command"] = t.requ.command
 		drequ["param"] = t.requ.param
 		dresp["code"] = t.resp.statusCode
 		dresp["phrases"] = t.resp.statusPhrases
-		fields["src"], fields["dst"] = pub.getEndpoints(t.requ)
-		ts = t.resp.Ts
+		src, dst = pub.getEndpoints(t.requ)
+		pbf.Network.Transport = t.resp.Transport.String()
 
 	case *transMail:
+		evt, pbf = pb.NewBeatEvent(t.resp.Ts)
+		fields = evt.Fields
+
 		d["type"] = "MAIL"
 		if t.reversePath != nil {
 			d["envelope_sender"] = t.reversePath
@@ -143,9 +150,20 @@ func (pub *transPub) createEvent(
 		if len(t.Notes) > 0 {
 			fields["notes"] = t.Notes
 		}
-		fields["src"], fields["dst"] = pub.getEndpoints(t.requ)
-		ts = t.resp.Ts
+		src, dst = pub.getEndpoints(t.requ)
+		pbf.Network.Transport = t.resp.Transport.String()
+	}
 
+	pbf.SetSource(src)
+	pbf.SetDestination(dst)
+
+	pbf.Event.Start = evt.Timestamp
+	pbf.Event.Dataset = "smtp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+
+	fields["type"] = "smtp"
+	if fields["status"] == nil {
+		fields["status"] = common.OK_STATUS
 	}
 
 	if len(drequ) > 0 {
@@ -157,10 +175,7 @@ func (pub *transPub) createEvent(
 
 	fields["smtp"] = d
 
-	return beat.Event{
-		Timestamp: ts,
-		Fields:    fields,
-	}
+	return evt
 }
 
 func (pub *transPub) parsePayload(t *transMail) (
@@ -191,7 +206,7 @@ func (pub *transPub) parsePayload(t *transMail) (
 		return nil, nil, err
 	}
 
-	return headers, common.NetString(body), nil
+	return headers, body, nil
 }
 
 func (pub *transPub) getEndpoints(m *message) (
