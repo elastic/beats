@@ -260,7 +260,7 @@ var installKProbes = []helper.ProbeDef{
 			Name:    "inet_csk_accept_ret",
 			Address: "inet_csk_accept",
 			Fetchargs: "sock={{.RET}} laddr=+{{.INET_SOCK_LADDR}}({{.RET}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.RET}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.RET}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.RET}}):u16 " +
-				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16 laddr6a=+{{.INET_SOCK_V6_LADDR_A}}({{.RET}}):u64 laddr6b=+{{.INET_SOCK_V6_LADDR_B}}({{.RET}}):u64 raddr6a=+{{.INET_SOCK_V6_RADDR_A}}({{.RET}}):u64 raddr6b=+{{.INET_SOCK_V6_RADDR_B}}({{.RET}}):u64",
+				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}}",
 			Filter: "family=={{.AF_INET}} || family=={{.AF_INET6}}",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpAcceptResult) }),
@@ -276,7 +276,7 @@ var installKProbes = []helper.ProbeDef{
 			Name:    "tcp_sendmsg_in",
 			Address: "tcp_sendmsg",
 			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
-				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16 laddr6a=+{{.INET_SOCK_V6_LADDR_A}}({{.TCP_SENDMSG_SOCK}}):u64 laddr6b=+{{.INET_SOCK_V6_LADDR_B}}({{.TCP_SENDMSG_SOCK}}):u64 raddr6a=+{{.INET_SOCK_V6_RADDR_A}}({{.TCP_SENDMSG_SOCK}}):u64 raddr6b=+{{.INET_SOCK_V6_RADDR_B}}({{.TCP_SENDMSG_SOCK}}):u64",
+				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}}",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall) }),
 	},
@@ -372,7 +372,7 @@ var installKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "inet6_csk_xmit_call",
 			Address:   "inet6_csk_xmit",
-			Fetchargs: "sock={{.INET6_CSK_XMIT_SOCK}} size=+{{.SK_BUFF_LEN}}({{.INET6_CSK_XMIT_SKBUFF}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 laddr6a=+{{.INET_SOCK_V6_LADDR_A}}({{.INET6_CSK_XMIT_SOCK}}):u64 laddr6b=+{{.INET_SOCK_V6_LADDR_B}}({{.INET6_CSK_XMIT_SOCK}}):u64 raddr6a=+{{.INET_SOCK_V6_RADDR_A}}({{.INET6_CSK_XMIT_SOCK}}):u64 raddr6b=+{{.INET_SOCK_V6_RADDR_B}}({{.INET6_CSK_XMIT_SOCK}}):u64",
+			Fetchargs: "sock={{.INET6_CSK_XMIT_SOCK}} size=+{{.SK_BUFF_LEN}}({{.INET6_CSK_XMIT_SKBUFF}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.INET6_CSK_XMIT_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.INET6_CSK_XMIT_SOCK}}){{.INET_SOCK_V6_TERM}}",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(inet6CskXmitCall) }),
 	},
@@ -384,7 +384,7 @@ var installKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "tcp_v6_do_rcv_call",
 			Address:   "tcp_v6_do_rcv",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.P1}}):u16 laddr6a=+{{.INET_SOCK_V6_LADDR_A}}({{.P1}}):u64 laddr6b=+{{.INET_SOCK_V6_LADDR_B}}({{.P1}}):u64 raddr6a=+{{.INET_SOCK_V6_RADDR_A}}({{.P1}}):u64 raddr6b=+{{.INET_SOCK_V6_RADDR_B}}({{.P1}}):u64",
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 rport=+{{.INET_SOCK_RPORT}}({{.P1}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}}",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpV6DoRcv) }),
 	},
@@ -396,7 +396,7 @@ var installKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "tcp6_connect_in",
 			Address:   "tcp_v6_connect",
-			Fetchargs: "sock={{.P1}} laddra=+{{.INET_SOCK_V6_LADDR_A}}({{.P1}}):u64 laddrb=+{{.INET_SOCK_V6_LADDR_B}}({{.P1}}):u64 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN6_AF}}({{.P2}}):u16 addra=+{{.SOCKADDR_IN6_ADDRA}}({{.P2}}):u64 addrb=+{{.SOCKADDR_IN6_ADDRB}}({{.P2}}):u64 port=+{{.SOCKADDR_IN6_PORT}}({{.P2}}):u16",
+			Fetchargs: "sock={{.P1}} laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 af=+{{.SOCKADDR_IN6_AF}}({{.P2}}):u16 addra=+{{.SOCKADDR_IN6_ADDRA}}({{.P2}}):u64 addrb=+{{.SOCKADDR_IN6_ADDRB}}({{.P2}}):u64 port=+{{.SOCKADDR_IN6_PORT}}({{.P2}}):u16",
 			Filter:    "af=={{.AF_INET6}}",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpIPv6ConnectCall) }),
@@ -430,7 +430,7 @@ var installKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udpv6_sendmsg_in",
 			Address:   "udpv6_sendmsg",
-			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddra=+{{.INET_SOCK_V6_LADDR_A}}({{.UDP_SENDMSG_SOCK}}):u64 laddrb=+{{.INET_SOCK_V6_LADDR_B}}({{.UDP_SENDMSG_SOCK}}):u64 lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddra=+{{.SOCKADDR_IN6_ADDRA}}(+0({{.UDP_SENDMSG_MSG}})):u64 raddrb=+{{.SOCKADDR_IN6_ADDRB}}(+0({{.UDP_SENDMSG_MSG}})):u64 rport=+{{.SOCKADDR_IN6_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddra=+{{.INET_SOCK_V6_RADDR_A}}({{.UDP_SENDMSG_SOCK}}):u64 altraddrb=+{{.INET_SOCK_V6_RADDR_B}}({{.UDP_SENDMSG_SOCK}}):u64 altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16",
+			Fetchargs: "sock={{.UDP_SENDMSG_SOCK}} size={{.UDP_SENDMSG_LEN}} laddra={{.INET_SOCK_V6_LADDR_A}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.UDP_SENDMSG_SOCK}}):u16 raddra=+{{.SOCKADDR_IN6_ADDRA}}(+0({{.UDP_SENDMSG_MSG}})):u64 raddrb=+{{.SOCKADDR_IN6_ADDRB}}(+0({{.UDP_SENDMSG_MSG}})):u64 rport=+{{.SOCKADDR_IN6_PORT}}(+0({{.UDP_SENDMSG_MSG}})):u16 altraddra={{.INET_SOCK_V6_RADDR_A}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} altraddrb={{.INET_SOCK_V6_RADDR_B}}({{.UDP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} altrport=+{{.INET_SOCK_RPORT}}({{.UDP_SENDMSG_SOCK}}):u16",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpv6SendMsgCall) }),
 	},
@@ -440,7 +440,7 @@ var installKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udpv6_queue_rcv_skb",
 			Address:   "udpv6_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra=+{{.INET_SOCK_V6_LADDR_A}}({{.P1}}):u64 laddrb=+{{.INET_SOCK_V6_LADDR_B}}({{.P1}}):u64 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, pktHeaderDumpBytes),
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, pktHeaderDumpBytes),
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpv6QueueRcvSkb) }),
 	},
