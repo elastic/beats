@@ -167,12 +167,6 @@ var (
 	}
 )
 
-func TestGetIdentifiers(t *testing.T) {
-	listMetricDetailTotal := []metricsWithStatistics{metricsWithStat1, metricsWithStat2, metricsWithStat3, metricsWithStat4}
-	identifiers := getIdentifiers(listMetricDetailTotal)
-	assert.Equal(t, []string{instanceID1, instanceID2}, identifiers["InstanceId"])
-}
-
 func TestConstructLabel(t *testing.T) {
 	cases := []struct {
 		listMetricDetail cloudwatch.Metric
