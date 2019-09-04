@@ -354,7 +354,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414 [13414]
 - Add module for statsd. {pull}13109[13109]
 
-
 *Packetbeat*
 
 - Update DNS protocol plugin to produce events with ECS fields for DNS. {issue}13320[13320] {pull}13354[13354]
