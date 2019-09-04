@@ -2660,8 +2660,6 @@ This is a non-analyzed field that is useful for aggregations on the origin data.
 
 type: keyword
 
---
-
 [float]
 === selinux
 

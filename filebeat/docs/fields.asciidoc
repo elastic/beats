@@ -7610,13 +7610,26 @@ example: COMMAND
 Context of message
 
 
+<<<<<<< HEAD
 type: keyword
+=======
+--
+
+*`logstash.log.thread.text`*::
++
+--
+type: text
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 
 example: initandlisten
 
+<<<<<<< HEAD
 --
 
 *`mongodb.log.severity`*::
+=======
+*`logstash.log.log_event`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 type: alias
@@ -7664,17 +7677,27 @@ type: long
 Contains fields from the MySQL error logs.
 
 
+<<<<<<< HEAD
 
 *`mysql.error.thread_id`*::
+=======
+--
+
+*`logstash.slowlog.thread.text`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 type: alias
 
 alias to: mysql.thread_id
 
+<<<<<<< HEAD
 --
 
 *`mysql.error.level`*::
+=======
+*`logstash.slowlog.event`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 type: alias
@@ -7683,13 +7706,20 @@ alias to: log.level
 
 --
 
+<<<<<<< HEAD
 *`mysql.error.message`*::
+=======
+--
+
+*`logstash.slowlog.event.text`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 type: alias
 
 alias to: message
 
+<<<<<<< HEAD
 --
 
 [float]
@@ -7700,6 +7730,9 @@ Contains fields from the MySQL slow logs.
 
 
 *`mysql.slowlog.lock_time.sec`*::
+=======
+*`logstash.slowlog.plugin_name`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
@@ -7737,6 +7770,13 @@ The number of rows modified by the query.
 
 type: long
 
+<<<<<<< HEAD
+=======
+--
+
+*`logstash.slowlog.plugin_params.text`*::
++
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 --
 
 *`mysql.slowlog.bytes_sent`*::
@@ -7749,9 +7789,13 @@ type: long
 
 format: bytes
 
+<<<<<<< HEAD
 --
 
 *`mysql.slowlog.bytes_received`*::
+=======
+*`logstash.slowlog.plugin_params_object`*::
+>>>>>>> 99e4fbe40... [7.1][DOCS] Backport: Fix asciidoctor build (#13460)
 +
 --
 The number of bytes received from client.
