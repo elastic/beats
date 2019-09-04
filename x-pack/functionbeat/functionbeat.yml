@@ -365,7 +365,7 @@ processors:
 #monitoring.enabled: false
 
 # Sets the UUID of the Elasticsearch cluster under which monitoring data for this
-# Auditbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# Functionbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
 # is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
 #monitoring.override_cluster_uuid:
 
