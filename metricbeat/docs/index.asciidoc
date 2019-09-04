@@ -15,6 +15,9 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beat_default_index_prefix: {beatname_lc}
 :has_ml_jobs: yes
 :has_central_config:
+:has_solutions:
+:has_docker_label_ex:
+:has_modules_command:
 :deb_os:
 :rpm_os:
 :mac_os:
