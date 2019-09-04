@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	//"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 
@@ -33,28 +32,20 @@ import (
 	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/build"
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/dev-tools/mage/target/update"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/test"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/collectors"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/update"
+	"github.com/elastic/beats/dev-tools/mage/target/pkg"
 )
 
 func init() {
 	devtools.SetBuildVariableSources(devtools.DefaultBeatBuildVariableSources)
 
 	devtools.BeatDescription = "One sentence description of the Beat."
-}
-
-// CollectAll generates the docs and the fields.
-func CollectAll() {
-	mg.Deps(collectors.CollectDocs, FieldsDocs)
+	devtools.BeatVendor = "{full_name}"
 }
 
 // Package packages the Beat for distribution.
@@ -71,32 +62,12 @@ func Package() {
 	mg.SerialDeps(devtools.Package, pkg.PackageTest)
 }
 
-// FieldsDocs generates docs/fields.asciidoc containing all fields
-// (including x-pack).
-func FieldsDocs() error {
-	inputs := []string{
-		devtools.OSSBeatDir("module"),
-	}
-	output := devtools.CreateDir("build/fields/fields.all.yml")
-	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {
-		return err
-	}
-	return devtools.Docs.FieldDocs(output)
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
 }
 
 //Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return mage.GenerateFieldsYAML("module")
-}
-
-
-// Config generates both the short/reference/docker configs.
-func Config() error {
-	customDeps := devtools.ConfigFileParams{
-		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
-		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
-		DockerParts:    []string{"_meta/docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
-		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
-	}
-	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
+	return devtools.GenerateFieldsYAML()
 }
