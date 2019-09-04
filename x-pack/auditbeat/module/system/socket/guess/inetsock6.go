@@ -164,10 +164,6 @@ func (d *decoderWrapper) Decode(raw []byte, meta tracing.Metadata) (event interf
 // to by the return value (an inet_sock*) and a kretprobe that dumps various
 // candidates for the ipv6_pinfo struct.
 func (g *guessInetSockIPv6) Probes() (probes []helper.ProbeDef, err error) {
-	raddrOffsets, err := getListField(g.ctx.Vars, "INET_SOCK_RADDR_LIST")
-	if err != nil {
-		return nil, err
-	}
 	probes = append(probes, helper.ProbeDef{
 		Probe: tracing.Probe{
 			Type:      tracing.TypeKRetProbe,
@@ -177,7 +173,8 @@ func (g *guessInetSockIPv6) Probes() (probes []helper.ProbeDef, err error) {
 		},
 		Decoder: tracing.NewDumpDecoder,
 	})
-
+	raddrOffsets := g.offsets
+	g.offsets = nil
 	const sizePtr = int(sizeOfPtr)
 	var fetch []string
 	for _, off := range raddrOffsets {
@@ -215,6 +212,10 @@ func (g *guessInetSockIPv6) Probes() (probes []helper.ProbeDef, err error) {
 // random addresses in the fd00::/8 reserved network to the loopback device.
 func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 	g.ctx = ctx
+	g.offsets, err = getListField(g.ctx.Vars, "INET_SOCK_RADDR_LIST")
+	if err != nil {
+		return err
+	}
 	g.loopback, err = newIPv6Loopback()
 	if err != nil {
 		return errors.Wrap(err, "detect IPv6 loopback failed")
