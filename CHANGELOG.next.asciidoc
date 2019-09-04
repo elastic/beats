@@ -139,8 +139,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix filebeat autodiscover fileset hint for container input. {pull}13296[13296]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
+- Fix timezone parsing of elasticsearch module ingest pipelines. {pull}13367[13367]
 - Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
-- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 - Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
 - Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
 
@@ -297,6 +297,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update PAN-OS fileset to use the ECS NAT fields. {issue}13320[13320] {pull}13330[13330]
 - Add fields to the Zeek DNS fileset for ECS DNS. {issue}13320[13320] {pull}13324[13324]
 - Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
+- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 - Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
 
 *Heartbeat*
