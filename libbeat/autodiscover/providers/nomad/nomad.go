@@ -23,6 +23,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
+	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -143,7 +144,7 @@ func (p *Provider) String() string {
 }
 
 func (p *Provider) emit(obj *nomad.Resource, flag string) {
-	// emit one event per task with the proper metadata
+	// emit one event per allocation with the embedded tasks' metadata
 	objMeta := p.metagen.ResourceMetadata(*obj)
 
 	for _, group := range obj.Job.TaskGroups {
@@ -168,12 +169,59 @@ func (p *Provider) publish(event bus.Event) {
 		event["config"] = config
 	} else {
 		// If there isn't a default template then attempt to use builders
-		// if config := p.builders.GetConfig(p.generateHints(event)); config != nil {
-		// 	event["config"] = config
-		// }
+		if config := p.builders.GetConfig(p.generateHints(event)); config != nil {
+			event["config"] = config
+		}
 	}
 
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
 	p.bus.Publish(event)
+}
+
+func (p *Provider) generateHints(event bus.Event) bus.Event {
+	// Try to build a config with enabled builders. Send a provider agnostic payload.
+	// Builders are Beat specific.
+	e := bus.Event{}
+
+	var tags common.MapStr
+	var meta, container common.MapStr
+
+	rawMeta, ok := event["meta"]
+	if ok {
+		meta = rawMeta.(common.MapStr)
+		// The builder base config can configure any of the field values of kubernetes if need be.
+		e["meta"] = meta
+		if rawAnn, ok := meta["tags"]; ok {
+			tags = rawAnn.(common.MapStr)
+
+			e["tags"] = tags
+		}
+	}
+
+	if host, ok := event["host"]; ok {
+		e["host"] = host
+	}
+
+	// We keep this in case that we decide to add information about the container.
+	// Nomad supports different runtimes, so it will not always be _container_ info, but we could
+	// generalize it by calling it runtime
+	if rawCont, ok := meta["container"]; ok {
+		container = rawCont.(common.MapStr)
+		// This would end up adding a runtime entry into the event. This would make sure
+		// that there is not an attempt to spin up a docker input for a rkt container and when a
+		// rkt input exists it would be natively supported.
+		e["container"] = container
+	}
+
+	cname := builder.GetContainerName(container)
+	hints := builder.GenerateHints(meta, cname, p.config.Prefix)
+
+	logp.Debug("nomad", "Generated hints %+v", hints)
+	if len(hints) != 0 {
+		e["hints"] = hints
+	}
+	logp.Debug("nomad", "Generated builder event %+v", e)
+
+	return e
 }
