@@ -55,7 +55,7 @@ The `kafka` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
-[[hosts]]
+[[kafka-hosts]]
 ===== `hosts`
 
 A list of Kafka bootstrapping hosts (brokers) for this cluster.
