@@ -29,14 +29,33 @@ import (
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 )
 
-type transaction interface{}
+type transaction interface {
+	ResponseMessage() *message
+	Endpoints() (*common.Endpoint, *common.Endpoint)
+}
 
 type transPrompt struct {
 	resp *message
 }
 
+func (t *transPrompt) ResponseMessage() *message {
+	return t.resp
+}
+
+func (t *transPrompt) Endpoints() (*common.Endpoint, *common.Endpoint) {
+	return getEndpoints(t.resp)
+}
+
 type transCommand struct {
 	requ, resp *message
+}
+
+func (t *transCommand) ResponseMessage() *message {
+	return t.resp
+}
+
+func (t *transCommand) Endpoints() (*common.Endpoint, *common.Endpoint) {
+	return getEndpoints(t.requ)
 }
 
 type transMail struct {
@@ -49,6 +68,14 @@ type transMail struct {
 
 	// DATA payload request in requ
 	requ, resp *message
+}
+
+func (t *transMail) ResponseMessage() *message {
+	return t.resp
+}
+
+func (t *transMail) Endpoints() (*common.Endpoint, *common.Endpoint) {
+	return getEndpoints(t.requ)
 }
 
 type transactions struct {

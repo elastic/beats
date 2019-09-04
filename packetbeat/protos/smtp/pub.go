@@ -60,20 +60,29 @@ func (pub *transPub) createEvent(
 	trans transaction,
 	sessionID uuid.UUID,
 ) beat.Event {
+	resp := trans.ResponseMessage()
+	src, dst := trans.Endpoints()
+
+	evt, pbf := pb.NewBeatEvent(resp.Ts)
+
+	pbf.SetSource(src)
+	pbf.SetDestination(dst)
+
+	pbf.Event.Start = evt.Timestamp
+	pbf.Event.Dataset = "smtp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Network.Transport = resp.Transport.String()
+
+	fields := evt.Fields
+	fields["type"] = "smtp"
+	fields["status"] = common.OK_STATUS
+
 	d := common.MapStr{"session_id": sessionID}
 	drequ := common.MapStr{}
 	dresp := common.MapStr{}
 
-	var fields common.MapStr
-	var evt beat.Event
-	var pbf *pb.Fields
-	var src, dst *common.Endpoint
-
 	switch t := trans.(type) {
 	case *transPrompt:
-		evt, pbf = pb.NewBeatEvent(t.resp.Ts)
-		fields = evt.Fields
-
 		d["type"] = "PROMPT"
 		if pub.sendResponse {
 			fields["response"] =
@@ -82,18 +91,15 @@ func (pub *transPub) createEvent(
 		if t.resp.statusCode >= 400 {
 			fields["status"] = common.SERVER_ERROR_STATUS
 		}
-		fields["bytes_out"] = t.resp.Size
+
+		pbf.Destination.Bytes = int64(t.resp.Size)
+
 		dresp["code"] = t.resp.statusCode
 		if len(t.resp.statusPhrases) > 0 {
 			dresp["phrases"] = t.resp.statusPhrases
 		}
-		src, dst = pub.getEndpoints(t.resp)
-		pbf.Network.Transport = t.resp.Transport.String()
 
 	case *transCommand:
-		evt, pbf = pb.NewBeatEvent(t.resp.Ts)
-		fields = evt.Fields
-
 		d["type"] = "COMMAND"
 		if pub.sendRequest {
 			fields["request"] =
@@ -103,8 +109,10 @@ func (pub *transPub) createEvent(
 			fields["response"] =
 				common.NetString(t.resp.raw.BufferedBytes())
 		}
-		fields["bytes_in"] = t.requ.Size
-		fields["bytes_out"] = t.resp.Size
+
+		pbf.Source.Bytes = int64(t.requ.Size)
+		pbf.Destination.Bytes = int64(t.resp.Size)
+
 		if t.resp.statusCode >= 400 {
 			fields["status"] = common.SERVER_ERROR_STATUS
 		}
@@ -115,13 +123,8 @@ func (pub *transPub) createEvent(
 		drequ["param"] = t.requ.param
 		dresp["code"] = t.resp.statusCode
 		dresp["phrases"] = t.resp.statusPhrases
-		src, dst = pub.getEndpoints(t.requ)
-		pbf.Network.Transport = t.resp.Transport.String()
 
 	case *transMail:
-		evt, pbf = pb.NewBeatEvent(t.resp.Ts)
-		fields = evt.Fields
-
 		d["type"] = "MAIL"
 		if t.reversePath != nil {
 			d["envelope_sender"] = t.reversePath
@@ -144,26 +147,14 @@ func (pub *transPub) createEvent(
 				}
 			}
 		}
-		fields["bytes_in"] = t.BytesIn
-		fields["bytes_out"] = t.BytesOut
+
+		pbf.Source.Bytes = int64(t.BytesIn)
+		pbf.Destination.Bytes = int64(t.BytesOut)
+
 		fields["status"] = t.Status
 		if len(t.Notes) > 0 {
 			fields["notes"] = t.Notes
 		}
-		src, dst = pub.getEndpoints(t.requ)
-		pbf.Network.Transport = t.resp.Transport.String()
-	}
-
-	pbf.SetSource(src)
-	pbf.SetDestination(dst)
-
-	pbf.Event.Start = evt.Timestamp
-	pbf.Event.Dataset = "smtp"
-	pbf.Network.Protocol = pbf.Event.Dataset
-
-	fields["type"] = "smtp"
-	if fields["status"] == nil {
-		fields["status"] = common.OK_STATUS
 	}
 
 	if len(drequ) > 0 {
@@ -209,7 +200,7 @@ func (pub *transPub) parsePayload(t *transMail) (
 	return headers, body, nil
 }
 
-func (pub *transPub) getEndpoints(m *message) (
+func getEndpoints(m *message) (
 	*common.Endpoint,
 	*common.Endpoint,
 ) {
