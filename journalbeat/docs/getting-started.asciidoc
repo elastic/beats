@@ -123,15 +123,15 @@ path. For example:
 +
 If no paths are specified, {beatname_uc} reads from the default journal.
 
-. Set the <<{beatname_lc}-seek,`seek`>> option to control the position where
+. Set the <<seek,`seek`>> option to control the position where
 {beatname_uc} starts reading the journal. The available options are `head`,
 `tail`, and `cursor`. The default is `cursor`, which means that on first read,
 {beatname_uc} starts reading at the beginning of the file, but continues reading
 at the last known position after a reload or restart. For more detail about
 the settings, see the reference docs for the
-<<{beatname_lc}-seek,`seek` option>>. 
+<<seek,`seek` option>>. 
 
-. (Optional) Set the <<{beatname_lc}-include-matches,`include_matches`>> option
+. (Optional) Set the <<include-matches,`include_matches`>> option
 to filter entries in journald before collecting any log events. This reduces the
 number of events that {beatname_uc} needs to process. For example, to fetch only
 Redis events from a Docker container tagged as `redis`, use: 
