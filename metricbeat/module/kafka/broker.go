@@ -110,7 +110,7 @@ func (b *Broker) Close() error {
 // Connect connects the broker to the configured host
 func (b *Broker) Connect() error {
 	if err := b.broker.Open(b.cfg); err != nil {
-		return err
+		return errors.Wrap(err, "broker.Open failed")
 	}
 
 	if b.id != noID || !b.matchID {
@@ -121,7 +121,7 @@ func (b *Broker) Connect() error {
 	meta, err := queryMetadataWithRetry(b.broker, b.cfg, nil)
 	if err != nil {
 		closeBroker(b.broker)
-		return err
+		return errors.Wrap(err, "failed to query metadata")
 	}
 
 	finder := brokerFinder{Net: &defaultNet{}}
