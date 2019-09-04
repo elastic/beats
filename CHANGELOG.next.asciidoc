@@ -353,6 +353,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
 - Add Performance metricset to Oracle module {pull}12547[12547]
 - Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414 [13414]
+- Add module for statsd. {pull}13109[13109]
 
 *Packetbeat*
 
