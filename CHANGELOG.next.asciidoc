@@ -372,6 +372,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Configurable tags for Lambda functions. {pull}13352[13352]
 - Add input for Cloudwatch logs through Kinesis. {pull}13317[13317]
 - Enable Logstash output. {pull}13345[13345]
+- Make `bulk_max_size` configurable in outputs. {pull}13493[13493]
 
 *Winlogbeat*
 
