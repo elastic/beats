@@ -27,11 +27,10 @@ Example configuration:
 
 ----
 
-[id="{beatname_lc}-input-{type}-azure"]
-==== Configuring for Azure Event Hubs
+==== Configuration for Azure Event Hubs
 
-The `kafka` input can be used to ingest data from Microsoft Azure Event Hubs
-that have Kafka compatibility enabled, by configuring as follows:
+The following example shows how to use the `kafka` input to ingest data from
+Microsoft Azure Event Hubs that have Kafka compatibility enabled:
 
 ["source","yaml",subs="attributes"]
 ----
