@@ -244,7 +244,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - add_host_metadata is no GA. {pull}13148[13148]
 - Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
 - Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
-- Add autodetection mode for add_docker_metadata {pull}13374[13374]
+- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
 
 *Auditbeat*
 

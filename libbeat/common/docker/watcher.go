@@ -132,7 +132,7 @@ func NewWatcher(host string, tls *TLSConfig, storeShortID bool) (Watcher, error)
 		return nil, err
 	}
 
-	// extra check to confirm that Docker is available
+	// Extra check to confirm that Docker is available
 	_, err = client.Info(context.Background())
 	if err != nil {
 		return nil, err

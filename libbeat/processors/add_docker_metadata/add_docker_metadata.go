@@ -19,7 +19,6 @@ package add_docker_metadata
 
 import (
 	"fmt"
-
 	"os"
 	"path/filepath"
 	"strings"
@@ -87,7 +86,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		dockerAvailable = true
 		logp.Debug("add_docker_metadata", "%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to start watcher")
 		}
 	}
 
@@ -130,11 +129,12 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 }
 
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	var cid string
-	var err error
 	if !d.dockerAvailable {
 		return event, nil
 	}
+	var cid string
+	var err error
+
 	// Extract CID from the filepath contained in the "log.file.path" field.
 	if d.sourceProcessor != nil {
 		lfp, _ := event.Fields.GetValue("log.file.path")
