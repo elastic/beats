@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd module: Normalized value of `event.category` field from `user-login` to `authentication`. {pull}11432[11432]
 - Auditd module: Unset `auditd.session` and `user.audit.id` fields are removed from audit events. {issue}11431[11431] {pull}11815[11815]
 - Socket dataset: Exclude localhost by default {pull}11993[11993]
+- Socket dataset: New implementation using Kprobes for finer-grained monitoring and UDP support. {pull}13058[13058]
 
 *Filebeat*
 
@@ -138,14 +139,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix filebeat autodiscover fileset hint for container input. {pull}13296[13296]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
+- Fix timezone parsing of elasticsearch module ingest pipelines. {pull}13367[13367]
 - Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
-- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
+- Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
 - Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
 
 *Heartbeat*
 
 - Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
+- Fix integer comparison on JSON responses. {pull}13348[13348]
 
 *Journalbeat*
 
@@ -186,6 +189,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
 - Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
 - Fix module-level fields in Kubernetes metricsets. {pull}13433[13433]
+- Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
 
 *Packetbeat*
 
@@ -242,6 +246,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - add_host_metadata is no GA. {pull}13148[13148]
 - Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
 - Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
+- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
 
 *Auditbeat*
 
@@ -292,6 +297,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update PAN-OS fileset to use the ECS NAT fields. {issue}13320[13320] {pull}13330[13330]
 - Add fields to the Zeek DNS fileset for ECS DNS. {issue}13320[13320] {pull}13324[13324]
 - Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
+- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 - Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
 
 *Heartbeat*
@@ -351,6 +357,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Performance metricset to Oracle module {pull}12547[12547]
 - Add proc/vmstat data to the system/memory metricset on linux {pull}13322[13322]
 - Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414 [13414]
+- Add module for statsd. {pull}13109[13109]
+
 
 *Packetbeat*
 
