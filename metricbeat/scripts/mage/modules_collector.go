@@ -24,6 +24,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 // CollectModules collects module configs to modules.d
@@ -37,13 +39,13 @@ func CollectModules() error {
 		return err
 	}
 
-	beatName := os.Getenv("BEAT_NAME")
-	docsBranch := os.Getenv("DOCS_BRANCH")
-
-	path, err := filepath.Abs("module")
+	beatName := devtools.BeatName
+	docsBranch, err := devtools.BeatDocBranch()
 	if err != nil {
 		return err
 	}
+
+	path := devtools.OSSBeatDir("module")
 
 	modules, err := ioutil.ReadDir("module")
 	if err != nil {
@@ -54,11 +56,7 @@ func CollectModules() error {
 		return err
 	}
 
-	modulesDDir, err := filepath.Abs("modules.d")
-	if err != nil {
-		return err
-	}
-
+	modulesDDir := devtools.OSSBeatDir("modules.d")
 	for _, module := range modules {
 		moduleConfsGlob := filepath.Join(path, module.Name(), "_meta/config*.yml")
 		moduleConfs, err := filepath.Glob(moduleConfsGlob)
@@ -71,11 +69,10 @@ func CollectModules() error {
 				continue
 			}
 
-			info, err := os.Stat(moduleConf)
-			if err != nil {
+			// skip directories
+			if info, err := os.Stat(moduleConf); err != nil {
 				return err
-			}
-			if info.IsDir() {
+			} else if info.IsDir() {
 				continue
 			}
 

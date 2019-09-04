@@ -1,5 +1,5 @@
 # Name can be overwritten, as Metricbeat is also a library
-export BEAT_NAME?=metricbeat
+BEAT_NAME?=metricbeat
 BEAT_TITLE?=Metricbeat
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
@@ -9,7 +9,7 @@ ES_BEATS?=..
 GOX_OS=netbsd linux windows
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
-export DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14-)
+DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14-)
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
