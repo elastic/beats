@@ -117,5 +117,41 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "-"
+    },
+    {
+        "@timestamp": "2019-02-02T04:38:45.000Z",
+        "event.dataset": "apache.access",
+        "event.module": "apache",
+        "fileset.name": "access",
+        "http.request.referrer": "-",
+        "http.response.body.bytes": 152,
+        "http.response.status_code": 408,
+        "input.type": "log",
+        "log.offset": 666,
+        "service.type": "apache",
+        "source.address": "hostname_example.com",
+        "source.domain": "hostname_example.com",
+        "user.name": "-",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "-"
+    },
+    {
+        "@timestamp": "2019-02-02T04:38:45.000Z",
+        "event.dataset": "apache.access",
+        "event.module": "apache",
+        "fileset.name": "access",
+        "http.request.referrer": "-",
+        "http.response.body.bytes": 152,
+        "http.response.status_code": 408,
+        "input.type": "log",
+        "log.offset": 740,
+        "service.type": "apache",
+        "source.address": "hostname-example.com",
+        "source.domain": "hostname-example.com",
+        "user.name": "-",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "-"
     }
 ]

@@ -9,6 +9,10 @@
                     "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"-\" %{NUMBER:http.response.status_code:long} -",
                     "\\[%{HTTPDATE:apache.access.time}\\] %{IPORHOST:source.address} %{DATA:apache.access.ssl.protocol} %{DATA:apache.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.body.bytes:long}"
                 ],
+                "pattern_definitions": {
+                    "HOSTNAME": "\\b(?:[0-9A-Za-z][_0-9A-Za-z-]{0,62})(?:\\.(?:[0-9A-Za-z][_0-9A-Za-z-]{0,62}))*(\\.?|\\b)",
+                    "IPORHOST": "(?:%{IP}|%{HOSTNAME})"
+                },
                 "ignore_missing": true
             }
         },
@@ -23,7 +27,10 @@
                 "ignore_missing": true,
                 "patterns": [
                     "^(%{IP:source.ip}|%{HOSTNAME:source.domain})$"
-                ]
+                ],
+                "pattern_definitions": {
+                    "HOSTNAME": "\\b(?:[0-9A-Za-z][_0-9A-Za-z-]{0,62})(?:\\.(?:[0-9A-Za-z][_0-9A-Za-z-]{0,62}))*(\\.?|\\b)"
+                }
             }
         },
         {
