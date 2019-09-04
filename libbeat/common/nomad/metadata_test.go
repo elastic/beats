@@ -18,6 +18,7 @@
 package nomad
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/nomad/api"
@@ -35,7 +36,7 @@ func newJob(jobID string) *Job {
 		Region:      helper.StringToPtr("global"),
 		Name:        helper.StringToPtr("my-job"),
 		Type:        helper.StringToPtr(structs.JobTypeService),
-		Datacenters: []string{"dus"},
+		Datacenters: []string{"europe-west4"},
 		Meta: map[string]string{
 			"key1":    "job-value",
 			"job-key": "job.value",
@@ -53,7 +54,6 @@ func newJob(jobID string) *Job {
 						Meta: map[string]string{
 							"key1":     "task-value",
 							"task-key": "task.value",
-							"pepe.key": "pepe.value",
 						},
 						Services: []*api.Service{
 							{
@@ -99,10 +99,12 @@ func TestAllocationMetadata(t *testing.T) {
 	tasks, _ := meta["meta"].([]common.MapStr)
 	flat := tasks[0].Flatten()
 
+	fmt.Printf("%+v\n", meta)
+
 	assert.Equal(t, "my-job", meta["job"])
 	assert.Equal(t, "task-value", flat["task1.key1"])
 	assert.Equal(t, 1, len(tasks))
-	assert.Equal(t, []string{"dus"}, meta["datacenters"])
+	assert.Equal(t, []string{"europe-west4"}, meta["datacenters"])
 }
 
 func TestExcludeMetadata(t *testing.T) {
@@ -129,6 +131,7 @@ func TestExcludeMetadata(t *testing.T) {
 	flat := tasks[0].Flatten()
 
 	exists, err := flat.HasKey("task1.key1")
+
 	assert.NotNil(t, err)
 	assert.False(t, exists)
 }
