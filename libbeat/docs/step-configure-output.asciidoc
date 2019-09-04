@@ -7,12 +7,10 @@ to {es}, or to {ls} for additional processing.
 To send output directly to {es} (without using {ls}), set the location of the
 {es} installation:
 +
---
 endif::only-elasticsearch[]
 ifdef::only-elasticsearch[]
 . Configure the  {es} output by setting the location of the {es} installation:
 +
---
 endif::only-elasticsearch[]
 endif::has_module_steps[]
 * If you're running our
@@ -33,18 +31,11 @@ output.elasticsearch:
   hosts: ["myEShost:9200"]
 ----------------------------------------------------------------------
 ifndef::has_module_steps[]
---
 +
 ifndef::only-elasticsearch[]
-ifeval::["{beatname_lc}"!="filebeat" and "{beatname_lc}"!="winlogbeat"]
 To send output to {ls}, 
 <<logstash-output,Configure the {ls} output>> instead. For all other
 outputs, see <<configuring-output>>.
-endif::[]
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
-To send output to {ls}, make sure you configure the Logstash output in
-<<config-{beatname_lc}-logstash>>. For all other outputs, see <<configuring-output>>.
-endif::[]
 endif::only-elasticsearch[]
 ifdef::only-elasticsearch[]
 {es} is currently the only output supported by {beatname_uc}.
