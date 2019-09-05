@@ -14,6 +14,7 @@ modules_by_platform = [
     },
 ]
 
+
 def get_importable_lines(go_beat_path, import_line):
     path = abspath("module")
 
@@ -32,7 +33,8 @@ def get_importable_lines(go_beat_path, import_line):
             if module in not_common_modules:
                 lines = _collect_imports_from_module(path, module, module_import, go_beat_path, import_line, lines)
             else:
-                common_lines = _collect_imports_from_module(path, module, module_import, go_beat_path, import_line, common_lines)
+                common_lines = _collect_imports_from_module(
+                    path, module, module_import, go_beat_path, import_line, common_lines)
 
         if lines is not None:
             imports_by_module.append({
@@ -48,6 +50,7 @@ def get_importable_lines(go_beat_path, import_line):
     })
 
     return imports_by_module
+
 
 def _collect_imports_from_module(path, module, module_import, go_beat_path, import_line, imported_lines):
     imported_lines.append(module_import)
