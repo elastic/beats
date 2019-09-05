@@ -88,6 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// Fetch fetches events and reports them upstream
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	events, err := m.reader.Read()
 	if err != nil {
