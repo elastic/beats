@@ -152,6 +152,23 @@ func (p *Provider) String() string {
 
 func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	// emit one event per allocation with the embedded tasks' metadata
+	nodeName := obj.NodeName
+
+	if len(nodeName) == 0 {
+		// On older versions of Nomad the NodeName property is not set, as a workaround we can use the NodeID
+		host, err := p.metagen.AllocationNodeName(obj.NodeID)
+		if err != nil {
+			logp.Err("Error fetching node information: %s", err)
+		}
+
+		// If we cannot get a host, we assume that the allocation was stopped
+		if len(host) == 0 {
+			return
+		}
+
+		nodeName = host
+	}
+
 	objMeta := p.metagen.ResourceMetadata(*obj)
 
 	for _, group := range obj.Job.TaskGroups {
@@ -159,9 +176,11 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 			event := bus.Event{
 				"provider": p.uuid,
 				"id":       obj.ID,
-				flag:       true, // event type
-				// "task":     task.Name,
-				"meta": objMeta,
+				flag:       true,
+				"host":     nodeName,
+				"meta": common.MapStr{
+					"nomad": objMeta,
+				},
 			}
 
 			p.publish(event)

@@ -26,6 +26,6 @@ var defaultConfig = api.DefaultConfig()
 
 // GetNomadClient returns a new Nomad config, using the default configuration or
 // the one passed as a parameter.
-func GetNomadClient() (*api.Client, error) {
+func GetNomadClient() (*Client, error) {
 	return api.NewClient(defaultConfig)
 }

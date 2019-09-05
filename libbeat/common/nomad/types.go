@@ -30,3 +30,6 @@ type Job = api.Job
 
 // TaskGroup contains a group of tasks that will be allocated in the same node
 type TaskGroup = api.TaskGroup
+
+// Client is the interface for executing queries against a Nomad agent
+type Client = api.Client
