@@ -95,3 +95,63 @@ tar: metricbeat/kibana/7/dashboard/Metricbeat-consul-overview.json: Cannot open:
 ```
 
 I haven't looked much into this, there seems to be something going on when kubernetes untars the bundled directory. As a workaround, delete the metricbeat directory at the Pod before copying a new set of assets.
+
+# Testing kubernetes loads
+
+## Kube-state-metrics
+
+Kube-state-metrics needs to be deployed for all the `state_` prefix metricsets at kubernetes. Yamls are to be found at the [upstream project](https://github.com/kubernetes/kube-state-metrics/tree/master/kubernetes)
+
+For the sake of laziness they are copied under [02_kubestatemetrics](./02_kubestatemetrics)
+
+```
+kubectl apply -f $GOPATH/src/github.com/elastic/beats/metricbeat/module/kubernetes/_meta/test/docs/02_kubestatemetrics/1.7.0
+```
+
+## Core components test
+
+Testing core components (kubelet, apiserver, controller manager, scheduler) requires a diverse range of objects to be created. Using [Sonobuoy](https://github.com/heptio/sonobuoy) is the fastest path for testing,getting metrics and filling dashboards.
+
+Refer to the documentation at Sonobuoy, at the time of this writing installing and running can be achieved with a couple commands
+
+```
+go get -u -v github.com/heptio/sonobuoy
+sonobuoy run --wait
+```
+
+## Regular kubernetes components
+
+For now only a CronJob example is added.
+When adding new examples, we should consider whether they should be created under a subfolder here, or at the metricset where the example makes sense.
+
+```
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mycronjob
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mycron-container
+            image: alpine
+            imagePullPolicy: IfNotPresent
+            
+            command: ['sh', '-c', 'echo elastic world ; sleep 5']
+    
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 0
+  concurrencyPolicy: Allow
+```
+
+# Going further
+
+- All improvements are welcome
+- Different ways to test are welcome and can live here side by side.
+- Using kind seems to be a lot more lightweight
+- Probably some steps above can be tackled using [telepresence](https://www.telepresence.io/)
+
+
