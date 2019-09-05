@@ -14,6 +14,8 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
 :has_ml_jobs: yes
+:has_registry:
+:ignores_max_retries:
 :win_os:
 :win_only:
 
