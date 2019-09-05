@@ -64,6 +64,8 @@ By default states are never removed from the registry file. To resolve the inode
 
 You can use <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> for files that are removed from disk. Be aware that `clean_removed` cleans the file state from the registry whenever a file cannot be found during a scan. If the file shows up again later, it will be sent again from scratch.
 
+include::filebeat-log-rotation.asciidoc[]
+
 [[windows-file-rotation]]
 === Open file handlers cause issues with Windows file rotation
 
@@ -121,4 +123,5 @@ deleted before {beatname_uc} reaches the end of the file.
 
 
 include::{libbeat-dir}/docs/faq-limit-bandwidth.asciidoc[]
+
 include::{libbeat-dir}/docs/shared-faq.asciidoc[]

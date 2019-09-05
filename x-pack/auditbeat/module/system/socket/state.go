@@ -585,6 +585,13 @@ func (s *state) OnSockDestroyed(ptr uintptr, pid uint32) error {
 
 // UpdateFlow receives a partial flow and creates or updates an existing flow.
 func (s *state) UpdateFlow(ref flow) error {
+	return s.UpdateFlowWithCondition(ref, nil)
+}
+
+// UpdateFlowWithCondition receives a partial flow and creates or updates an
+// existing flow. The optional condition must be met before an existing flow is
+// updated. Otherwise the update is ignored.
+func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	s.Lock()
 	defer s.Unlock()
 	ref.createdTime = s.kernTimestampToTime(ref.created)
@@ -596,6 +603,9 @@ func (s *state) UpdateFlow(ref flow) error {
 	prev, found := sock.flows[ref.remote.addr.String()]
 	if !found {
 		return s.createFlow(ref)
+	}
+	if cond != nil && !cond(prev) {
+		return nil
 	}
 	s.mutualEnrich(sock, &ref)
 	prev.updateWith(ref, s)
