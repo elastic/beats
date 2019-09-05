@@ -19,9 +19,16 @@ package nomad
 
 import (
 	"testing"
+	"time"
 
+	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/nomad"
+	"github.com/gofrs/uuid"
+	"github.com/hashicorp/nomad/api"
+	"github.com/hashicorp/nomad/helper"
+	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -99,6 +106,192 @@ func TestGenerateHints(t *testing.T) {
 	}
 	for _, test := range tests {
 		assert.Equal(t, p.generateHints(test.event), test.result)
+	}
+}
+
+func TestEmitEvent(t *testing.T) {
+	host := "nomad1"
+	namespace := "default"
+
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		Message    string
+		Flag       string
+		Allocation nomad.Resource
+		Expected   bus.Event
+	}{
+		{
+			Message: "Test common allocation start",
+			Flag:    "start",
+			Allocation: nomad.Resource{
+				ID:        UUID.String(),
+				Name:      "job.task",
+				Namespace: namespace,
+				NodeName:  host,
+				Job: &nomad.Job{
+					ID:          helper.StringToPtr(UUID.String()),
+					Region:      helper.StringToPtr("global"),
+					Name:        helper.StringToPtr("my-job"),
+					Type:        helper.StringToPtr(structs.JobTypeService),
+					Datacenters: []string{"europe-west4"},
+					Meta: map[string]string{
+						"key1":    "job-value",
+						"job-key": "job.value",
+					},
+					TaskGroups: []*nomad.TaskGroup{
+						{
+							Name: helper.StringToPtr("web"),
+							Meta: map[string]string{
+								"key1":      "group-value",
+								"group-key": "group.value",
+							},
+							Tasks: []*api.Task{
+								{
+									Name: "task1",
+									Meta: map[string]string{
+										"key1":     "task-value",
+										"task-key": "task.value",
+									},
+									Services: []*api.Service{
+										{
+											Id:   "service-a",
+											Name: "web",
+											Tags: []string{"tag-a", "tag-b"},
+										},
+										{
+											Id:   "service-b",
+											Name: "nginx",
+											Tags: []string{"tag-c", "tag-d"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"provider": UUID,
+				"id":       UUID.String(),
+				"config":   []*common.Config{},
+				"start":    true,
+				"host":     host,
+				"meta": common.MapStr{
+					"nomad": common.MapStr{
+						"datacenters": []string{"europe-west4"},
+						"job":         "my-job",
+						"meta": []common.MapStr{
+							common.MapStr{
+								"task1": common.MapStr{
+									"canary_tags": []string{"web", "nginx"},
+									"group-key":   "group.value",
+									"job-key":     "job.value",
+									"key1":        "task-value",
+									"name":        []string{"web", "nginx"},
+									"tags":        []string{"web", "nginx", "tag-c", "tag-d"},
+									"task-key":    "task.value"},
+							},
+						},
+						"name":      "job.task",
+						"namespace": "default",
+						"region":    "global",
+						"type":      "service",
+						"uuid":      UUID.String(),
+					},
+				},
+			},
+		},
+		{
+			Message: "Allocation without a host/node name",
+			Flag:    "start",
+			Allocation: nomad.Resource{
+				ID:        UUID.String(),
+				Name:      "job.task",
+				Namespace: "default",
+				NodeName:  "",
+				Job: &nomad.Job{
+					ID:          helper.StringToPtr(UUID.String()),
+					Region:      helper.StringToPtr("global"),
+					Name:        helper.StringToPtr("my-job"),
+					Type:        helper.StringToPtr(structs.JobTypeService),
+					Datacenters: []string{"europe-west4"},
+					Meta: map[string]string{
+						"key1":    "job-value",
+						"job-key": "job.value",
+					},
+					TaskGroups: []*nomad.TaskGroup{
+						{
+							Name: helper.StringToPtr("web"),
+							Meta: map[string]string{
+								"key1":      "group-value",
+								"group-key": "group.value",
+							},
+							Tasks: []*api.Task{
+								{
+									Name: "task1",
+									Meta: map[string]string{
+										"key1":     "task-value",
+										"task-key": "task.value",
+									},
+									Services: []*api.Service{
+										{
+											Id:   "service-a",
+											Name: "web",
+											Tags: []string{"tag-a", "tag-b"},
+										},
+										{
+											Id:   "service-b",
+											Name: "nginx",
+											Tags: []string{"tag-c", "tag-d"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Expected: nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Message, func(t *testing.T) {
+			mapper, err := template.NewConfigMapper(nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			metaGen, err := nomad.NewMetaGenerator(common.NewConfig())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			p := &Provider{
+				config:    defaultConfig(),
+				bus:       bus.New("test"),
+				metagen:   metaGen,
+				templates: mapper,
+				uuid:      UUID,
+			}
+
+			listener := p.bus.Subscribe()
+
+			p.emit(&test.Allocation, test.Flag)
+
+			select {
+			case event := <-listener.Events():
+				assert.Equal(t, test.Expected, event, test.Message)
+			case <-time.After(2 * time.Second):
+				if test.Expected != nil {
+					t.Fatal("Timeout while waiting for event")
+				}
+			}
+		})
 	}
 }
 
