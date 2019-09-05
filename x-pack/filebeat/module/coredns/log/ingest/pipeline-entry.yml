@@ -97,6 +97,16 @@ processors:
       lang: painless
       source: >
         ctx.coredns.response.flags = ctx.dns.header_flags;
+  # Right trim the trailing dot from domain names.
+  - script:
+      if: ctx.dns?.question?.name != null
+      lang: painless
+      source: >
+        def q = ctx.dns.question.name;
+        def end = q.length() - 1;
+        if (q.charAt(end) == (char) '.') {
+            ctx.dns.question.name = q.substring(0, end);
+        }
 on_failure:
   - set:
       field: error.message
