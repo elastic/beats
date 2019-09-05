@@ -73,11 +73,6 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// ModulesCollector collects module configs to modules.d
-func ModulesCollector() error {
-	return metricbeat.CollectModules()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
