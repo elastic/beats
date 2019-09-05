@@ -121,7 +121,7 @@ func TestRangeOnArrayConditionPositiveMatch(t *testing.T) {
 	httpResponseTestEventWithArray := &beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
-			"tags":  []string{"auditbeat", "prod", "security"},
+			"tags": []string{"auditbeat", "prod", "security"},
 		},
 	}
 
@@ -133,12 +133,11 @@ func TestRangeOnArrayConditionPositiveMatch(t *testing.T) {
 	})
 }
 
-
 func TestRangeOnArrayConditionNegativeMatch(t *testing.T) {
 	httpResponseTestEventWithArray := &beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
-			"tags":  []string{"auditbeat", "prod", "security"},
+			"tags": []string{"auditbeat", "prod", "security"},
 		},
 	}
 
