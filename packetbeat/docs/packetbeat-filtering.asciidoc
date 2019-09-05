@@ -50,7 +50,7 @@ processors:
      when:
         equals:
            http.response.code: 200
------------
+----
 
 
 If you don't want to export raw data for the successful transactions:
