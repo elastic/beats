@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/checks"
+	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type truncateFieldsConfig struct {
@@ -54,6 +55,7 @@ func init() {
 			checks.MutuallyExclusiveRequiredFields("max_bytes", "max_characters"),
 		),
 	)
+	jsProcessor.RegisterPlugin("TruncateFields", NewTruncateFields)
 }
 
 // NewTruncateFields returns a new truncate_fields processor.

@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -53,6 +54,7 @@ var debugf = logp.MakeDebug("filters")
 // init registers the add_cloud_metadata processor.
 func init() {
 	processors.RegisterPlugin("add_cloud_metadata", New)
+	jsProcessor.RegisterPlugin("AddCloudMetadata", New)
 }
 
 type schemaConv func(m map[string]interface{}) common.MapStr

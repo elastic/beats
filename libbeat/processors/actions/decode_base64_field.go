@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/checks"
+	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -50,6 +51,7 @@ func init() {
 		checks.ConfigChecked(NewDecodeBase64Field,
 			checks.RequireFields("field"),
 			checks.AllowedFields("field", "when", "ignore_missing", "fail_on_error")))
+	jsProcessor.RegisterPlugin("DecodeBase64Field", NewDecodeBase64Field)
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.

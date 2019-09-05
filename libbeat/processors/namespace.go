@@ -121,4 +121,12 @@ func (ns *Namespace) Plugin() Constructor {
 	})
 }
 
+func (ns *Namespace) Constructors() map[string]Constructor {
+	c := make(map[string]Constructor, len(ns.reg))
+	for name, p := range ns.reg {
+		c[name] = p.Plugin()
+	}
+	return c
+}
+
 func (p plugin) Plugin() Constructor { return p.c }

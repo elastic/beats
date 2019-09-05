@@ -31,12 +31,14 @@ import (
 	"github.com/elastic/beats/libbeat/common/flowhash"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.community_id"
 
 func init() {
 	processors.RegisterPlugin("community_id", New)
+	jsProcessor.RegisterPlugin("CommunityID", New)
 }
 
 type processor struct {

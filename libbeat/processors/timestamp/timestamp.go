@@ -28,12 +28,14 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.timestamp"
 
 func init() {
 	processors.RegisterPlugin("timestamp", New)
+	jsProcessor.RegisterPlugin("Timestamp", New)
 }
 
 type processor struct {
