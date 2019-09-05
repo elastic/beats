@@ -57,10 +57,11 @@ type addDockerMetadata struct {
 	fields          []string
 	sourceProcessor processors.Processor
 
-	pidFields []string      // Field names that contain PIDs.
-	cgroups   *common.Cache // Cache of PID (int) to cgropus (map[string]string).
-	hostFS    string        // Directory where /proc is found
-	dedot     bool          // If set to true, replace dots in labels with `_`.
+	pidFields       []string      // Field names that contain PIDs.
+	cgroups         *common.Cache // Cache of PID (int) to cgropus (map[string]string).
+	hostFS          string        // Directory where /proc is found
+	dedot           bool          // If set to true, replace dots in labels with `_`.
+	dockerAvailable bool          // If Docker exists in env, then it is set to true
 }
 
 // New constructs a new add_docker_metadata processor.
@@ -74,13 +75,19 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
+	var dockerAvailable bool
+
 	watcher, err := watcherConstructor(config.Host, config.TLS, config.MatchShortID)
 	if err != nil {
-		return nil, err
-	}
-
-	if err = watcher.Start(); err != nil {
-		return nil, err
+		dockerAvailable = false
+		errorMsg := fmt.Sprintf("%v: docker environment not detected: %v", processorName, err)
+		logp.Debug("add_docker_metadata", errorMsg)
+	} else {
+		dockerAvailable = true
+		logp.Debug("add_docker_metadata", "%v: docker environment detected", processorName)
+		if err = watcher.Start(); err != nil {
+			return nil, errors.Wrap(err, "failed to start watcher")
+		}
 	}
 
 	// Use extract_field processor to get container ID from source file path.
@@ -106,6 +113,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		pidFields:       config.MatchPIDs,
 		hostFS:          config.HostFS,
 		dedot:           config.DeDot,
+		dockerAvailable: dockerAvailable,
 	}, nil
 }
 
@@ -121,8 +129,12 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 }
 
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
+	if !d.dockerAvailable {
+		return event, nil
+	}
 	var cid string
 	var err error
+
 	// Extract CID from the filepath contained in the "log.file.path" field.
 	if d.sourceProcessor != nil {
 		lfp, _ := event.Fields.GetValue("log.file.path")

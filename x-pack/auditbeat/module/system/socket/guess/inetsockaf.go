@@ -72,7 +72,7 @@ func (g *guessInetSockFamily) Provides() []string {
 func (g *guessInetSockFamily) Requires() []string {
 	return []string{
 		"SOCKET_SOCK",
-		"INET_SOCK_V6_RADDR_A",
+		"INET_SOCK_V6_LIMIT",
 		"P1",
 	}
 }
@@ -97,8 +97,11 @@ func (g *guessInetSockFamily) Probes() ([]helper.ProbeDef, error) {
 func (g *guessInetSockFamily) Prepare(ctx Context) error {
 	g.ctx = ctx
 	var ok bool
-	if g.limit, ok = g.ctx.Vars["INET_SOCK_V6_RADDR_A"].(int); !ok {
-		return errors.New("required variable INET_SOCK_V6_RADDR_A not found")
+	// limit is used as a reference point within struct sock_common to know where
+	// to stop looking for the skc_family field, as limit is part of the fields
+	// in inet_sock that are past struct sock.
+	if g.limit, ok = g.ctx.Vars["INET_SOCK_V6_LIMIT"].(int); !ok {
+		return errors.New("required variable INET_SOCK_V6_LIMIT not found")
 	}
 	return nil
 }
