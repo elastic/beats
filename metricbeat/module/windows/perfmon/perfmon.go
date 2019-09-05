@@ -88,16 +88,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	events, err := m.reader.Read()
 	if err != nil {
-		m.log.Debugw("Failed reading counters", "error", err)
-		err = errors.Wrap(err, "failed reading counters")
-		report.Error(err)
+		return errors.Wrap(err, "failed reading counters")
 	}
 
 	for _, event := range events {
-		report.Event(event)
+		isOpen := report.Event(event)
+		if !isOpen {
+			break
+		}
 	}
 }
 
