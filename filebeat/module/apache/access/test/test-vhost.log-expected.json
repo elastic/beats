@@ -12,7 +12,7 @@
         "input.type": "log",
         "log.offset": 0,
         "service.type": "apache",
-        "source.domain": "vhost1.domaine.fr",
+        "destination.domain": "vhost1.domaine.fr",
         "source.ip": "192.168.33.2",
         "url.original": "/hello",
         "user.name": "-",
