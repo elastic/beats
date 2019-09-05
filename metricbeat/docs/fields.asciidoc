@@ -14490,6 +14490,32 @@ Kubernetes metrics
 
 
 [float]
+=== container
+
+
+
+
+*`container.id`*::
++
+--
+Unique container id.
+
+
+type: keyword
+
+--
+
+*`container.runtime`*::
++
+--
+Runtime managing this container.
+
+
+type: keyword
+
+--
+
+[float]
 === kubernetes
 
 Information and statistics of pods managed by kubernetes.

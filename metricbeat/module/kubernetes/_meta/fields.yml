@@ -6,6 +6,18 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: container
+      type: group
+      description: >
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            Unique container id.
+        - name: runtime
+          type: keyword
+          description: >
+            Runtime managing this container.
     - name: kubernetes
       type: group
       description: >

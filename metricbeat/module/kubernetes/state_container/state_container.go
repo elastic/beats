@@ -18,6 +18,8 @@
 package state_container
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -141,11 +143,26 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 		delete(event, mb.ModuleDataKey)
 
-		if reported := reporter.Event(mb.Event{
+		eventToReport := mb.Event{
 			MetricSetFields: event,
 			ModuleFields:    moduleFieldsMapStr,
 			Namespace:       "kubernetes.container",
-		}); !reported {
+		}
+
+		// Add ECS container fields
+		if id, ok := event["id"]; ok {
+			idSplit := strings.Split(id.(string), "://")
+			if len(idSplit) == 2 {
+				eventToReport.RootFields = common.MapStr{
+					"container": map[string]interface{}{
+						"runtime": idSplit[0],
+						"id":      idSplit[1],
+					},
+				}
+			}
+		}
+
+		if reported := reporter.Event(eventToReport); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}
