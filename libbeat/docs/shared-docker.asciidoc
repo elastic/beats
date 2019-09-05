@@ -232,19 +232,6 @@ docker run -d \
 --------------------------------------------
 endif::[]
 
-ifeval::["{beatname_lc}"=="apm-server"]
-["source", "sh", subs="attributes"]
---------------------------------------------
-docker run -d \
-  --name={beatname_lc} \
-  --user={beatname_lc} \
-  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
-  {dockerimage} \
-  --strict.perms=false -e \
-  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
---------------------------------------------
-endif::[]
-
 <1> Substitute your Elasticsearch hosts and ports.
 <2> If you are using the hosted Elasticsearch Service in Elastic Cloud, replace
 the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password
