@@ -142,9 +142,8 @@ func (c Range) Check(event ValuesMap) bool {
 				count := reflect.ValueOf(value).Len()
 				if !checkValue(float64(count), rangeValue) {
 					return false
-				} else {
-					return true
 				}
+				return true
 			}
 
 			logp.L().Named(logName).Warnf("unexpected type %T in range condition.", value)
