@@ -101,6 +101,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
+
+	return nil
 }
 
 // Close will be called when metricbeat is stopped, should close the query.
