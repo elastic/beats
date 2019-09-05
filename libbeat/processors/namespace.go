@@ -121,6 +121,7 @@ func (ns *Namespace) Plugin() Constructor {
 	})
 }
 
+// Constructors returns all registered processor constructors and its names.
 func (ns *Namespace) Constructors() map[string]Constructor {
 	c := make(map[string]Constructor, len(ns.reg))
 	for name, p := range ns.reg {

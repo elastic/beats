@@ -31,6 +31,7 @@ import (
 // Note that script is omitted to avoid nesting.
 var registry = processors.NewNamespace()
 
+// RegisterPlugin registeres processor plugins for the javascript processor.
 func RegisterPlugin(name string, c processors.Constructor) {
 	logp.L().Named("javascript").Debugf("Register script processor %s", name)
 
