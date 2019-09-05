@@ -137,6 +137,16 @@ func (c Range) Check(event ValuesMap) bool {
 			}
 
 		default:
+			// If it's an Slice, apply range on number of elements
+			if reflect.TypeOf(value).Kind() == reflect.Slice {
+				count := reflect.ValueOf(value).Len()
+				if !checkValue(float64(count), rangeValue) {
+					return false
+				} else {
+					return true
+				}
+			}
+
 			logp.L().Named(logName).Warnf("unexpected type %T in range condition.", value)
 			return false
 		}

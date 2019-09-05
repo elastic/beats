@@ -116,3 +116,35 @@ func TestOpenGteRangeConditionPositiveMatch(t *testing.T) {
 func TestOpenGteRangeConditionNegativeMatch(t *testing.T) {
 	testConfig(t, false, httpResponseTestEvent, procCPURangeConfig)
 }
+
+func TestRangeOnArrayConditionPositiveMatch(t *testing.T) {
+	httpResponseTestEventWithArray := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"tags":  []string{"auditbeat", "prod", "security"},
+		},
+	}
+
+	testConfig(t, true, httpResponseTestEventWithArray, &Config{
+		Range: &Fields{fields: map[string]interface{}{
+			"tags.gt": 0,
+			"tags.lt": 4,
+		}},
+	})
+}
+
+
+func TestRangeOnArrayConditionNegativeMatch(t *testing.T) {
+	httpResponseTestEventWithArray := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"tags":  []string{"auditbeat", "prod", "security"},
+		},
+	}
+
+	testConfig(t, false, httpResponseTestEventWithArray, &Config{
+		Range: &Fields{fields: map[string]interface{}{
+			"tags.lt": 2,
+		}},
+	})
+}
