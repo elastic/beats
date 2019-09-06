@@ -18,11 +18,8 @@
 package kafka
 
 import (
-	"crypto/sha256"
-	"crypto/sha512"
 	"errors"
 	"fmt"
-	"hash"
 	"strings"
 	"time"
 
@@ -37,35 +34,7 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/xdg/scram"
 )
-
-var SHA256 scram.HashGeneratorFcn = func() hash.Hash { return sha256.New() }
-var SHA512 scram.HashGeneratorFcn = func() hash.Hash { return sha512.New() }
-
-type XDGSCRAMClient struct {
-	*scram.Client
-	*scram.ClientConversation
-	scram.HashGeneratorFcn
-}
-
-func (x *XDGSCRAMClient) Begin(userName, password, authzID string) (err error) {
-	x.Client, err = x.HashGeneratorFcn.NewClient(userName, password, authzID)
-	if err != nil {
-		return err
-	}
-	x.ClientConversation = x.Client.NewConversation()
-	return nil
-}
-
-func (x *XDGSCRAMClient) Step(challenge string) (response string, err error) {
-	response, err = x.ClientConversation.Step(challenge)
-	return
-}
-
-func (x *XDGSCRAMClient) Done() bool {
-	return x.ClientConversation.Done()
-}
 
 type kafkaConfig struct {
 	Hosts              []string                  `config:"hosts"               validate:"required"`
@@ -89,7 +58,13 @@ type kafkaConfig struct {
 	Username           string                    `config:"username"`
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
-	Mechanism          string                    `config:"mechanism"`
+	Sasl               saslConfig                `config:"sasl"`
+}
+
+type saslConfig struct {
+	SaslMechanism string `config:"mechanism"`
+	//SaslUsername  string `config:"username"` //maybe use ssl.username ssl.password instead in future?
+	//SaslPassword  string `config:"password"`
 }
 
 type metaConfig struct {
@@ -112,11 +87,11 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"snappy": sarama.CompressionSnappy,
 }
 
-var mechanismModes = map[string]sarama.SASLMechanism{
-	"PLAIN":         sarama.SASLTypePlaintext,
-	"SCRAM-SHA-512": sarama.SASLTypeSCRAMSHA512,
-	"SCRAM-SHA-256": sarama.SASLTypeSCRAMSHA256,
-}
+const (
+	saslTypePlaintext   = sarama.SASLTypePlaintext
+	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
+	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
+)
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
@@ -145,8 +120,31 @@ func defaultConfig() kafkaConfig {
 		ChanBufferSize:   256,
 		Username:         "",
 		Password:         "",
-		Mechanism:        "PLAIN",
 	}
+}
+
+func (c *saslConfig) configureSarama(config *sarama.Config) error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "":
+		// SASL is not enabled
+		return nil
+	case saslTypePlaintext:
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
+	case saslTypeSCRAMSHA256:
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
+		}
+	case saslTypeSCRAMSHA512:
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
+		}
+	default:
+		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+	}
+
+	return nil
 }
 
 func readConfig(cfg *common.Config) (*kafkaConfig, error) {
@@ -174,17 +172,12 @@ func (c *kafkaConfig) Validate() error {
 		return fmt.Errorf("password must be set when username is configured")
 	}
 
-	if _, ok := mechanismModes[c.Mechanism]; !ok {
-		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.Mechanism)
-	}
-
 	if c.Compression == "gzip" {
 		lvl := c.CompressionLevel
 		if lvl != sarama.CompressionLevelDefault && !(0 <= lvl && lvl <= 9) {
 			return fmt.Errorf("compression_level must be between 0 and 9")
 		}
 	}
-
 	return nil
 }
 
@@ -219,22 +212,10 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
-	}
-
-	mechanism := config.Mechanism
-
-	// SCRAM-SHA-512 mechanism
-	if mechanism == "SCRAM-SHA-512" {
-		k.Net.SASL.Handshake = true
-		k.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: SHA512} }
-		k.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
-	}
-
-	// SCRAM-SHA-256 mechanism
-	if mechanism == "SCRAM-SHA-256" {
-		k.Net.SASL.Handshake = true
-		k.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: SHA256} }
-		k.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
+		err = config.Sasl.configureSarama(k)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// configure metadata update properties
@@ -285,8 +266,6 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		return nil, fmt.Errorf("Unknown/unsupported kafka version: %v", config.Version)
 	}
 	k.Version = version
-
-	k.MetricRegistry = kafkaMetricsRegistry()
 
 	k.Producer.Partitioner = partitioner
 	k.MetricRegistry = adapter.GetGoMetrics(
