@@ -36,30 +36,27 @@ information, see
 . Add the `xpack.monitoring` settings in the {beatname_uc} configuration file. If you
 configured {es} output, specify the following minimal configuration:
 +
---
 [source, yml]
---------------------
+----
 xpack.monitoring.enabled: true
---------------------
-
+----
++
 If you configured a different output, such as {ls}, you must specify additional
 configuration options. For example:
-
++
 [source, yml]
---------------------
+----
 xpack.monitoring:
   enabled: true
   elasticsearch:
     hosts: ["https://example.com:9200", "https://example2.com:9200"]
     username: elastic
     password: changeme
---------------------
-
+----
++
 NOTE: Currently you must send monitoring data to the same cluster as all other events.
 If you configured {es} output, do not specify additional hosts in the monitoring
 configuration.
-
---
 
 . {kibana-ref}/monitoring-xpack-kibana.html[Configure monitoring in {kib}].
 

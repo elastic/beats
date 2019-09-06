@@ -12,6 +12,7 @@ include::{asciidoc-dir}/../../shared/attributes62.asciidoc[]
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
 :has_ml_jobs: yes
+:has_modules_command:
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
