@@ -3034,6 +3034,8 @@ type: text
 
 The path to the file.
 
+--
+
 *`file.path.raw`*::
 +
 --
@@ -3041,8 +3043,6 @@ type: keyword
 
 The path to the file. This is a non-analyzed field that is useful for aggregations.
 
-
---
 
 --
 
@@ -3187,6 +3187,8 @@ type: text
 An array of strings describing a possible external origin for this file. For example, the URL it was downloaded from. Only supported in macOS, via the kMDItemWhereFroms attribute. Omitted if origin information is not available.
 
 
+--
+
 *`file.origin.raw`*::
 +
 --
@@ -3194,8 +3196,6 @@ type: keyword
 
 This is a non-analyzed field that is useful for aggregations on the origin data.
 
-
---
 
 --
 
