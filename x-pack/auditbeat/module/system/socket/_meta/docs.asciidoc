@@ -2,7 +2,24 @@
 
 beta[]
 
-This is the `socket` dataset of the system module.
+This is the `socket` dataset of the system module. It allows to monitor network
+traffic to and from running processes. It's main features are:
+
+- Supports TCP and UDP sockets over IPv4 and IPv6.
+- Outputs per-flow bytes and packets counters.
+- Enriches the flows with https://www.elastic.co/guide/en/ecs/current/ecs-process.html[process]
+and https://www.elastic.co/guide/en/ecs/current/ecs-user.html[user] information.
+- Provides information similar to Packetbeat's flow monitoring with reduced CPU
+and memory usage.
+- Works on stock kernels without the need of custom modules, external libraries
+or development headers.
+
+This dataset does not:
+
+- Analyze application-layer protocols nor any other advanced features present
+in Packetbeat.
+- Monitor network traffic whose destination is not a local process, as is the
+case with traffic forwarding.
 
 [float]
 === Implementation
@@ -14,7 +31,8 @@ The dataset uses
 https://www.kernel.org/doc/Documentation/trace/kprobetrace.txt[KProbe-based event tracing]
 to monitor TCP and UDP sockets over IPv4 and IPv6, providing flow monitoring
 that includes byte and packet counters, as well as the local process and user
-involved in the flow.
+involved in the flow. It does so by plugin into the TCP/IP stack to generate
+custom tracing events avoiding the need to copy network traffic to user space.
 
 By not relying on periodic polling, this approach enables the dataset to perform
 near real-time monitoring of the system without the risk of missing short lived
@@ -101,7 +119,7 @@ closed. If set too low, additional flows will be generated for those packets.
 
 - `socket.perf_queue_size` (default: 4096)
 
-The number of tracing samples that can be queued for processing. A larger  value
+The number of tracing samples that can be queued for processing. A larger value
 uses more memory but reduces the chances of samples being lost when the system
 is under heavy load.
 
