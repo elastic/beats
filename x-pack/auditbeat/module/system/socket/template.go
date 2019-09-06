@@ -7,6 +7,7 @@
 package socket
 
 import (
+	"strings"
 	"unsafe"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -58,7 +59,12 @@ func LoadTracingFunctions(tfs *tracing.TraceFS) (common.StringSet, error) {
 	// doesn't allow to create empty sets.
 	functions := common.StringSet(make(map[string]struct{}, len(fnList)))
 	for _, fn := range fnList {
-		functions.Add(fn)
+		// Strip the module name (if any)
+		end := strings.IndexByte(fn, ' ')
+		if end == -1 {
+			end = len(fn)
+		}
+		functions.Add(fn[:end])
 	}
 	return functions, nil
 }
