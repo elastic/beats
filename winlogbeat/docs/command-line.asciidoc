@@ -9,7 +9,7 @@ The following command line options from libbeat are also available for
 Winlogbeat.
 
 [source,shell]
---------------------------------------------------------------------------------
+----
 $ winlogbeat -h
 Usage of ./winlogbeat:
   -N	Disable actual publishing for testing
@@ -29,6 +29,6 @@ Usage of ./winlogbeat:
   -v	Log at INFO level
   -version
     	Print version and exit
---------------------------------------------------------------------------------
+----
 
 include::../../libbeat/docs/shared-command-line.asciidoc[]
