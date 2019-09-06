@@ -5,7 +5,7 @@ The following command line options from libbeat are also available for Topbeat.
 To use these options, you need to start Topbeat in the foreground.
 
 [source,shell]
----------------------------------------------------------
+----
 
 $ ./topbeat -h
 Usage of ./topbeat:
@@ -24,7 +24,7 @@ Usage of ./topbeat:
   -v  Log at INFO level
   -version
       Print version and exit
----------------------------------------------------------
+----
 
 include::../../libbeat/docs/shared-command-line.asciidoc[]
 
