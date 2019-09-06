@@ -1367,13 +1367,18 @@
 			"versionExact": "v0.4.0"
 		},
 		{
-			"checksumSHA1": "c54eehjtxPjBUbM4aQuDPgc7G9Q=",
+			"checksumSHA1": "+nIsRlnG94bUQI6IQd4Mcj4diTY=",
 			"path": "github.com/elastic/go-lookslike",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z",
+			"revision": "747dc7db1c961662d8e225a42af6c3859a1a0f1d",
+			"revisionTime": "2019-09-04T15:56:46Z",
 			"tree": true,
-			"version": "v0.2.0",
-			"versionExact": "v0.2.0"
+			"version": "=v0.3.0",
+			"versionExact": "v0.3.0"
+		},
+		{
+			"path": "github.com/elastic/go-lookslike^",
+			"revision": "=v0.3.0",
+			"version": "=v0.3.0"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
