@@ -19,6 +19,22 @@ var security = (function () {
         "11": "CachedInteractive",
     };
 
+    var eventActionTypes = {
+        "4624": "Logon Success",
+        "4625": "Logon Failed",
+        "4634": "Logoff",
+        "4672": "Special Logon",
+        "4720": "Account Created",
+        "4722": "Account Enabled",
+        "4723": "Password Change",
+        "4724": "Password Reset",
+        "4725": "Account Disabled",
+        "4726": "Account Deleted",
+        "4738": "Account Changed",
+        "4740": "Account Locked Out",
+        "4767": "Account Unlocked",
+        "4781": "Account Renamed"
+    }
     // Descriptions of failure status codes.
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625
     var logonFailureStatus = {
@@ -1030,6 +1046,15 @@ var security = (function () {
         return msobjsMessageTable[code];
     };
 
+    var addActionDesc = function(evt){
+        var code = evt.Get("event.code");
+        if (!code) {
+            return;
+        }
+        var eventActionDescription=eventActionTypes[code];
+        evt.Put("event.action",eventActionDescription)
+    }
+
     var addLogonType = function(evt) {
         var code = evt.Get("winlog.event_data.LogonType");
         if (!code) {
@@ -1076,17 +1101,7 @@ var security = (function () {
 
     // Add logon IDs to winlog.logon.id to make it easy to find all activity
     // related to a logon ID.
-    var addLogonIds = function(evt) {
-        var id = evt.Get("winlog.event_data.SubjectLogonId");
-        if (id) {
-            evt.AppendTo("winlog.logon.id", id);
-        }
-        id = evt.Get("winlog.event_data.TargetLogonId");
-        if (id) {
-            evt.AppendTo("winlog.logon.id", id);
-        }
-    };
-
+  
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
@@ -1096,8 +1111,18 @@ var security = (function () {
             ],
             ignore_missing: true,
         })
-        .Add(addLogonIds)
         .Build();
+    
+    var copyTargetUserLogonId  = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetLogonId", to: "winlog.logon.id"},
+            ],
+            ignore_missing: true,
+            mode: "rename"
+        })
+        .Build();
+
 
     var copySubjectUser  = new processor.Chain()
         .Convert({
@@ -1108,8 +1133,27 @@ var security = (function () {
             ],
             ignore_missing: true,
         })
-        .Add(addLogonIds)
         .Build();
+    
+    var copyOldTargetUser  = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.OldTargetUserName", to: "user.name"},
+            ],
+            ignore_missing: true,
+        })
+        .Build();
+
+    var copySubjectUserLogonId  = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.SubjectLogonId", to: "winlog.logon.id"},
+            ],
+            ignore_missing: true,
+            mode: "rename"
+        })
+        .Build();
+
 
     var renameCommonAuthFields = new processor.Chain()
         .Convert({
@@ -1155,29 +1199,36 @@ var security = (function () {
     // Handles 4634 and 4647.
     var logoff = new processor.Chain()
         .Add(copyTargetUser)
+        .Add(copyTargetUserLogonId)
         .Add(addLogonType)
+        .Add(addActionDesc)
         .Build();
 
     // Handles both 4624 and 4648.
     var logonSuccess = new processor.Chain()
         .Add(addAuthSuccess)
         .Add(copyTargetUser)
+        .Add(copyTargetUserLogonId)
         .Add(addLogonType)
         .Add(renameCommonAuthFields)
+        .Add(addActionDesc)
         .Build();
 
     var event4625 = new processor.Chain()
         .Add(addAuthFailed)
         .Add(copyTargetUser)
+        .Add(copyTargetUserLogonId)
         .Add(addLogonType)
         .Add(addFailureCode)
         .Add(addFailureStatus)
         .Add(addFailureSubStatus)
         .Add(renameCommonAuthFields)
+        .Add(addActionDesc)
         .Build();
 
     var event4672 = new processor.Chain()
         .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
         .Add(function(evt) {
             var privs = evt.Get("winlog.event_data.PrivilegeList");
             if (!privs) {
@@ -1185,7 +1236,21 @@ var security = (function () {
             }
             evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
         })
+        .Add(addActionDesc)
         .Build();
+    
+    var userMgmtEvts = new processor.Chain()
+        .Add(copyTargetUser)
+        .Add(copySubjectUserLogonId)
+        .Add(renameCommonAuthFields)
+        .Add(addActionDesc)
+        .Build();
+
+    var userRenamed = new processor.Chain()
+        .Add(copyOldTargetUser)
+        .Add(copySubjectUserLogonId)
+        .Add(addActionDesc)
+        .Build();    
 
     return {
         // 4624 - An account was successfully logged on.
@@ -1205,6 +1270,36 @@ var security = (function () {
 
         // 4672 - Special privileges assigned to new logon.
         4672: event4672.Run,
+
+        // 4720 - A user account was created
+		4720: userMgmtEvts.Run,
+				
+		// 4722 - A user account was enabled
+		4722: userMgmtEvts.Run,
+				
+		// 4723 - An attempt was made to change an account's password
+		4723: userMgmtEvts.Run,
+				
+		// 4724 - An attempt was made to reset an account's password
+		4724: userMgmtEvts.Run,
+				
+		// 4725 - A user account was disabled.
+		4725: userMgmtEvts.Run,
+				
+		// 4726 - An user account was deleted.
+		4726: userMgmtEvts.Run,
+				
+		// 4738 - An user account was changed.
+		4738: userMgmtEvts.Run,
+				
+		// 4767 - A user account was unlocked.
+		4767: userMgmtEvts.Run,
+        
+        // 4740 - An account was locked out
+		4740: userMgmtEvts.Run,
+        
+        // 4781 - The name of an account was changed.
+		4781: userRenamed.Run,	
 
         process: function(evt) {
             var event_id = evt.Get("winlog.event_id");
