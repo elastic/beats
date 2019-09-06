@@ -1,0 +1,1806 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "lucene",
+              "query": "*"
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "1",
+              "w": 8,
+              "x": 40,
+              "y": 4
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "defaultColors": {
+                  "0 - 100": "rgb(0,104,55)"
+                }
+              }
+            },
+            "gridData": {
+              "h": 8,
+              "i": "3",
+              "w": 40,
+              "x": 0,
+              "y": 4
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_1",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "defaultColors": {
+                  "0 - 18k": "rgb(247,251,255)",
+                  "108k - 126k": "rgb(74,152,201)",
+                  "126k - 144k": "rgb(46,126,188)",
+                  "144k - 162k": "rgb(23,100,171)",
+                  "162k - 180k": "rgb(8,74,145)",
+                  "18k - 36k": "rgb(227,238,249)",
+                  "36k - 54k": "rgb(208,225,242)",
+                  "54k - 72k": "rgb(182,212,233)",
+                  "72k - 90k": "rgb(148,196,223)",
+                  "90k - 108k": "rgb(107,174,214)"
+                },
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 16,
+              "i": "5",
+              "w": 24,
+              "x": 0,
+              "y": 32
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_2",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "6",
+              "w": 48,
+              "x": 0,
+              "y": 48
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_3",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 16,
+              "i": "7",
+              "w": 24,
+              "x": 24,
+              "y": 32
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_4",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "9",
+              "w": 48,
+              "x": 0,
+              "y": 12
+            },
+            "panelIndex": "9",
+            "panelRefName": "panel_5",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "params": {
+                  "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                  }
+                }
+              }
+            },
+            "gridData": {
+              "h": 16,
+              "i": "11",
+              "w": 24,
+              "x": 24,
+              "y": 56
+            },
+            "panelIndex": "11",
+            "panelRefName": "panel_6",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 4,
+              "i": "12",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "12",
+            "panelRefName": "panel_7",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "params": {
+                  "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                  }
+                }
+              }
+            },
+            "gridData": {
+              "h": 16,
+              "i": "13",
+              "w": 24,
+              "x": 0,
+              "y": 56
+            },
+            "panelIndex": "13",
+            "panelRefName": "panel_8",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "14",
+              "w": 24,
+              "x": 0,
+              "y": 20
+            },
+            "panelIndex": "14",
+            "panelRefName": "panel_9",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "15",
+              "w": 24,
+              "x": 24,
+              "y": 20
+            },
+            "panelIndex": "15",
+            "panelRefName": "panel_10",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "mapCenter": [
+                12.211180191503997,
+                0
+              ],
+              "mapZoom": 1
+            },
+            "gridData": {
+              "h": 12,
+              "i": "16",
+              "w": 24,
+              "x": 24,
+              "y": 72
+            },
+            "panelIndex": "16",
+            "panelRefName": "panel_11",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "mapCenter": [
+                -0.17578097424708533,
+                0
+              ],
+              "mapZoom": 1
+            },
+            "gridData": {
+              "h": 12,
+              "i": "17",
+              "w": 24,
+              "x": 0,
+              "y": 72
+            },
+            "panelIndex": "17",
+            "panelRefName": "panel_12",
+            "version": "7.3.0"
+          }
+        ],
+        "refreshInterval": {
+          "display": "Off",
+          "pause": false,
+          "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[ArcSight] Microsoft DNS Overview",
+        "version": 1
+      },
+      "id": "153e0bf0-752f-11e7-ae68-d756b92f3a9c",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "4ee62420-7523-11e7-871d-5f0fb978413c",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "1de45d60-7523-11e7-9445-91c40765092f",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "d72d7940-7529-11e7-9445-91c40765092f",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "1c54cda0-752c-11e7-9445-91c40765092f",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "8cda1c30-752a-11e7-9445-91c40765092f",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "aa57b050-7526-11e7-b440-f1d91dc5774d",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "4303de60-752b-11e7-9445-91c40765092f",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "31b85570-454a-11e7-86b6-95298e9da6dc",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "8f0161a0-752d-11e7-b440-f1d91dc5774d",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "ebfd45a0-75a4-11e7-b440-f1d91dc5774d",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "bd1c82c0-75a7-11e7-871d-5f0fb978413c",
+          "name": "panel_10",
+          "type": "visualization"
+        },
+        {
+          "id": "c658b300-7745-11e7-8fb2-417804dc0ec8",
+          "name": "panel_11",
+          "type": "visualization"
+        },
+        {
+          "id": "b1f98ce0-7745-11e7-8fb2-417804dc0ec8",
+          "name": "panel_12",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzYsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "DNS - Event Throughput [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "background_color_rules": [
+              {
+                "id": "798c5e10-3d5b-11e7-8b9d-ddc45b5f6d00"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "77dd4e80-3d5b-11e7-8b9d-ddc45b5f6d00"
+              }
+            ],
+            "filter": {
+              "language": "lucene",
+              "query": "deviceProduct:\"DNS Trace Log\""
+            },
+            "gauge_color_rules": [
+              {
+                "gauge": null,
+                "id": "988f35d0-3d5b-11e7-8b9d-ddc45b5f6d00",
+                "value": 0
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_max": "",
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "429af7e0-3d5b-11e7-8b9d-ddc45b5f6d00",
+            "index_pattern": "arcsight-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(0,156,224,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "429af7e1-3d5b-11e7-8b9d-ddc45b5f6d00",
+                "label": "Event Throughput",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "429af7e2-3d5b-11e7-8b9d-ddc45b5f6d00",
+                    "type": "count"
+                  },
+                  {
+                    "field": "429af7e2-3d5b-11e7-8b9d-ddc45b5f6d00",
+                    "id": "6497aaa0-7dc5-11e7-95f6-690ab80d4e85",
+                    "type": "cumulative_sum"
+                  },
+                  {
+                    "field": "6497aaa0-7dc5-11e7-95f6-690ab80d4e85",
+                    "id": "6800ed50-7dc5-11e7-95f6-690ab80d4e85",
+                    "type": "derivative",
+                    "unit": "1s"
+                  },
+                  {
+                    "alpha": 0.3,
+                    "beta": 0.1,
+                    "field": "6800ed50-7dc5-11e7-95f6-690ab80d4e85",
+                    "gamma": 0.3,
+                    "id": "6cf98290-7dc5-11e7-95f6-690ab80d4e85",
+                    "model_type": "simple",
+                    "multiplicative": false,
+                    "period": 1,
+                    "type": "moving_average",
+                    "window": ""
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}  / s"
+              }
+            ],
+            "show_legend": 1,
+            "time_field": "deviceReceiptTime",
+            "type": "gauge"
+          },
+          "title": "DNS - Event Throughput [ArcSight]",
+          "type": "metrics"
+        }
+      },
+      "id": "4ee62420-7523-11e7-871d-5f0fb978413c",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzcsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "DNS Metrics Overview [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 100": "rgb(0,104,55)"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Event Count"
+              },
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Threads",
+                "field": "deviceCustomString1"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "OpCodes",
+                "field": "deviceCustomString2"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Activity Types",
+                "field": "deviceEventClassId"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "gauge": {
+              "autoExtend": false,
+              "backStyle": "Full",
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 100
+                }
+              ],
+              "gaugeColorMode": "None",
+              "gaugeStyle": "Full",
+              "gaugeType": "Metric",
+              "invertColors": false,
+              "labels": {
+                "color": "black",
+                "show": true
+              },
+              "orientation": "vertical",
+              "percentageMode": false,
+              "scale": {
+                "color": "#333",
+                "labels": false,
+                "show": false,
+                "width": 2
+              },
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": "32",
+                "labelColor": false,
+                "subText": ""
+              },
+              "type": "simple",
+              "useRange": false,
+              "verticalSplit": false
+            },
+            "type": "gauge"
+          },
+          "title": "DNS Metrics Overview [ArcSight]",
+          "type": "metric"
+        }
+      },
+      "id": "1de45d60-7523-11e7-9445-91c40765092f",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzgsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top Destinations by Traffic Size [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 18k": "rgb(247,251,255)",
+              "108k - 126k": "rgb(74,152,201)",
+              "126k - 144k": "rgb(46,126,188)",
+              "144k - 162k": "rgb(23,100,171)",
+              "162k - 180k": "rgb(8,74,145)",
+              "18k - 36k": "rgb(227,238,249)",
+              "36k - 54k": "rgb(208,225,242)",
+              "54k - 72k": "rgb(182,212,233)",
+              "72k - 90k": "rgb(148,196,223)",
+              "90k - 108k": "rgb(107,174,214)"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Bytes",
+                "field": "bytesIn"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "filters": [
+                  {
+                    "input": {
+                      "language": "lucene",
+                      "query": {
+                        "query_string": {
+                          "analyze_wildcard": true,
+                          "query": "deviceDirection:\"0\""
+                        }
+                      }
+                    },
+                    "label": "Inbound"
+                  },
+                  {
+                    "input": {
+                      "language": "lucene",
+                      "query": {
+                        "query_string": {
+                          "analyze_wildcard": true,
+                          "query": "deviceDirection:\"1\""
+                        }
+                      }
+                    },
+                    "label": "Outbound"
+                  }
+                ]
+              },
+              "schema": "segment",
+              "type": "filters"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "destinationHostName",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 10
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "colorSchema": "Blues",
+            "colorsNumber": 10,
+            "colorsRange": [
+              {
+                "from": 0,
+                "to": null
+              }
+            ],
+            "enableHover": true,
+            "invertColors": false,
+            "legendPosition": "top",
+            "percentageMode": false,
+            "setColorRange": false,
+            "times": [],
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "color": "#555",
+                  "rotate": 0,
+                  "show": false
+                },
+                "scale": {
+                  "defaultYExtents": false,
+                  "type": "linear"
+                },
+                "show": false,
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Top Destinations by Traffic Size [ArcSight]",
+          "type": "heatmap"
+        }
+      },
+      "id": "d72d7940-7529-11e7-9445-91c40765092f",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzksMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Event Types [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "deviceEventClassId",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "square root"
+          },
+          "title": "Top 10 Event Types [ArcSight]",
+          "type": "tagcloud"
+        }
+      },
+      "id": "1c54cda0-752c-11e7-9445-91c40765092f",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzEwLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Event Types by Size [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "Count": "#64B0C8",
+              "Total (Bytes)": "#E24D42"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Event Type",
+                "field": "deviceEventClassId",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 20
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Total (Bytes)",
+                "field": "bytesIn"
+              },
+              "schema": "metric",
+              "type": "sum"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "rotate": 75,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Event Type"
+                },
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              },
+              "valueAxis": null
+            },
+            "legendPosition": "right",
+            "orderBucketsBySum": false,
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "3",
+                  "label": "Total (Bytes)"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "lineWidth": 3,
+                "mode": "normal",
+                "show": true,
+                "showCircles": false,
+                "type": "line",
+                "valueAxis": "ValueAxis-2"
+              }
+            ],
+            "times": [],
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "square root"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              },
+              {
+                "id": "ValueAxis-2",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "RightAxis-1",
+                "position": "right",
+                "scale": {
+                  "mode": "normal",
+                  "type": "square root"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Total (Bytes)"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Event Types by Size [ArcSight]",
+          "type": "histogram"
+        }
+      },
+      "id": "8cda1c30-752a-11e7-9445-91c40765092f",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzExLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "Events Types by Severity [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "filter": {
+              "language": "lucene",
+              "query": "deviceProduct:\"DNS Trace Log\""
+            },
+            "id": "5f4e1f70-7523-11e7-b440-f1d91dc5774d",
+            "index_pattern": "arcsight-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "f7c4afd0-752d-11e7-ae68-d756b92f3a9c",
+                "label": "Cumulative Bytes",
+                "line_width": "3",
+                "metrics": [
+                  {
+                    "field": "bytesIn",
+                    "id": "f7c4afd1-752d-11e7-ae68-d756b92f3a9c",
+                    "type": "count"
+                  }
+                ],
+                "point_size": "0",
+                "seperate_axis": 1,
+                "split_filters": [
+                  {
+                    "color": "rgba(244,78,59,1)",
+                    "filter": "(deviceSeverity:\"2\" OR deviceSeverity:\"3\" OR deviceSeverity:\"5\" OR deviceSeverity:\"16\" OR deviceCustomString4:\"SERVFAIL\" OR deviceCustomString4:\"NXDOMAIN\" OR deviceCustomString4:\"REFUSED\" OR deviceCustomString4:\"BADVERS\" OR deviceCustomString4:\"BADSIG\")",
+                    "id": "53f76f80-7539-11e7-ae68-d756b92f3a9c",
+                    "label": "HIGH"
+                  },
+                  {
+                    "color": "rgba(254,146,0,1)",
+                    "filter": "(deviceSeverity:\"1\" OR  deviceSeverity:\"4\" OR  deviceSeverity:\"6\" OR  deviceSeverity:\"7\" OR  deviceSeverity:\"8\" OR  deviceSeverity:\"9\" OR  deviceSeverity:\"10\" OR deviceSeverity:\"17\" OR  deviceSeverity:\"18\" OR  deviceSeverity:\"19\" OR  deviceSeverity:\"20\" OR  deviceSeverity:\"21\" OR  deviceSeverity:\"22\" OR   deviceCustomString4:\"Error\" OR  deviceCustomString4:\"ERROR\" OR  deviceCustomString4:\"Warning\" OR  deviceCustomString4:\"WARNING\" OR  deviceCustomString4:\"FORMERR\" OR  deviceCustomString4:\"NOTIMP\" OR  deviceCustomString4:\"YXDOMAIN\" OR  deviceCustomString4:\"YXRRSET\" OR  deviceCustomString4:\"NXRRSET\" OR  deviceCustomString4:\"NOTAUTH\" OR  deviceCustomString4:\"NOTZONE\" OR  deviceCustomString4:\"BADKEY\" OR  deviceCustomString4:\"BADTIME\" OR  deviceCustomString4:\"BADMODE\" OR  deviceCustomString4:\"BADNAME\" OR  deviceCustomString4:\"BADALG\" OR  deviceCustomString4:\"BADTRUNC\")",
+                    "id": "6033e990-7539-11e7-ae68-d756b92f3a9c",
+                    "label": "MEDIUM"
+                  },
+                  {
+                    "color": "rgba(252,220,0,1)",
+                    "filter": "(NOT (deviceSeverity:\"2\" OR deviceSeverity:\"3\" OR deviceSeverity:\"5\" OR deviceSeverity:\"16\" OR deviceCustomString4:\"SERVFAIL\" OR deviceCustomString4:\"NXDOMAIN\" OR deviceCustomString4:\"REFUSED\" OR deviceCustomString4:\"BADVERS\" OR deviceCustomString4:\"BADSIG\" OR deviceSeverity:\"1\" OR  deviceSeverity:\"4\" OR  deviceSeverity:\"6\" OR  deviceSeverity:\"7\" OR  deviceSeverity:\"8\" OR  deviceSeverity:\"9\" OR  deviceSeverity:\"10\" OR deviceSeverity:\"17\" OR  deviceSeverity:\"18\" OR  deviceSeverity:\"19\" OR  deviceSeverity:\"20\" OR  deviceSeverity:\"21\" OR  deviceSeverity:\"22\" OR deviceCustomString4:\"Error\" OR  deviceCustomString4:\"ERROR\" OR  deviceCustomString4:\"Warning\" OR  deviceCustomString4:\"WARNING\" OR  deviceCustomString4:\"FORMERR\" OR  deviceCustomString4:\"NOTIMP\" OR  deviceCustomString4:\"YXDOMAIN\" OR  deviceCustomString4:\"YXRRSET\" OR  deviceCustomString4:\"NXRRSET\" OR  deviceCustomString4:\"NOTAUTH\" OR  deviceCustomString4:\"NOTZONE\" OR  deviceCustomString4:\"BADKEY\" OR  deviceCustomString4:\"BADTIME\" OR  deviceCustomString4:\"BADMODE\" OR  deviceCustomString4:\"BADNAME\" OR  deviceCustomString4:\"BADALG\" OR  deviceCustomString4:\"BADTRUNC\"))",
+                    "id": "6b4be0d0-7539-11e7-ae68-d756b92f3a9c",
+                    "label": "LOW"
+                  }
+                ],
+                "split_mode": "filters",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "bar",
+                "color": "rgba(0,156,224,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "e1a5d1f0-7525-11e7-b440-f1d91dc5774d",
+                "label": "Count by Event Type",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "e1a5d1f1-7525-11e7-b440-f1d91dc5774d",
+                    "type": "count"
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "deviceEventClassId",
+                "terms_size": "20"
+              }
+            ],
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Events Types by Severity [ArcSight]",
+          "type": "metrics"
+        }
+      },
+      "id": "aa57b050-7526-11e7-b440-f1d91dc5774d",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzEyLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Destinations by Size [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Destinations",
+                "field": "destinationHostName",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Bytes",
+                "field": "bytesIn"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Sources",
+                "field": "sourceAddress"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Count"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "perPage": 10,
+            "showMeticsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Top 10 Destinations by Size [ArcSight]",
+          "type": "table"
+        }
+      },
+      "id": "4303de60-752b-11e7-9445-91c40765092f",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzEzLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "ArcSight: Dashboard Navigation",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "markdown": "[Network Overview](#/dashboard/37af0b40-398d-11e7-ae19-21fb91585845) | [Network Suspicious Activity](#/dashboard/82051450-3e56-11e7-96c4-0d3a291ec93a) | [Endpoint Overview](#dashboard/d2fa5030-3e5d-11e7-b212-897f1496dc0e) | [Endpoint OS Activity](#/dashboard/64c92510-4555-11e7-83ea-67cb6920446d) | [Microsoft DNS Overview](#/dashboard/153e0bf0-752f-11e7-ae68-d756b92f3a9c)"
+          },
+          "title": "ArcSight: Dashboard Navigation",
+          "type": "markdown"
+        }
+      },
+      "id": "31b85570-454a-11e7-86b6-95298e9da6dc",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzE0LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Sources by Size [ArcSight]",
+        "uiStateJSON": {
+          "P-11": {
+            "vis": {
+              "params": {
+                "sort": {
+                  "columnIndex": null,
+                  "direction": null
+                }
+              }
+            }
+          },
+          "P-13": {
+            "vis": {
+              "params": {
+                "sort": {
+                  "columnIndex": null,
+                  "direction": null
+                }
+              }
+            }
+          },
+          "P-2": {
+            "mapCenter": [
+              -0.17578097424708533,
+              0
+            ],
+            "mapZoom": 0
+          },
+          "P-3": {
+            "vis": {
+              "defaultColors": {
+                "0 - 100": "rgb(0,104,55)"
+              }
+            }
+          },
+          "P-4": {
+            "mapCenter": [
+              -0.17578097424708533,
+              0
+            ],
+            "mapZoom": 0
+          },
+          "P-5": {
+            "vis": {
+              "defaultColors": {
+                "0 - 18,000": "rgb(247,251,255)",
+                "108,000 - 126,000": "rgb(74,152,201)",
+                "126,000 - 144,000": "rgb(46,126,188)",
+                "144,000 - 162,000": "rgb(23,100,171)",
+                "162,000 - 180,000": "rgb(8,74,145)",
+                "18,000 - 36,000": "rgb(227,238,249)",
+                "36,000 - 54,000": "rgb(208,225,242)",
+                "54,000 - 72,000": "rgb(182,212,233)",
+                "72,000 - 90,000": "rgb(148,196,223)",
+                "90,000 - 108,000": "rgb(107,174,214)"
+              },
+              "legendOpen": false
+            }
+          },
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Sources",
+                "field": "sourceHostName",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Bytes",
+                "field": "bytesIn"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Destinations",
+                "field": "destinationHostName"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Count"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "perPage": 10,
+            "showMeticsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Top 10 Sources by Size [ArcSight]",
+          "type": "table"
+        }
+      },
+      "id": "8f0161a0-752d-11e7-b440-f1d91dc5774d",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzE1LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "Events by Direction [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "filter": {
+              "language": "lucene",
+              "query": "deviceProduct:\"DNS Trace Log\""
+            },
+            "id": "12cdd300-75a2-11e7-b440-f1d91dc5774d",
+            "index_pattern": "arcsight-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "bar",
+                "color": "#68BC00",
+                "fill": "0.2",
+                "filter": {
+                  "language": "lucene",
+                  "query": "device"
+                },
+                "formatter": "number",
+                "id": "12cdd301-75a2-11e7-b440-f1d91dc5774d",
+                "label": "Inbound Requests",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "12cdd302-75a2-11e7-b440-f1d91dc5774d",
+                    "type": "count"
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 0,
+                "split_filters": [
+                  {
+                    "color": "rgba(0,156,224,1)",
+                    "filter": {
+                      "language": "lucene",
+                      "query": "deviceDirection:\"0\""
+                    },
+                    "id": "2bb9d440-75a2-11e7-b440-f1d91dc5774d",
+                    "label": "Inbound Requests"
+                  }
+                ],
+                "split_mode": "filters",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "bar",
+                "color": "#68BC00",
+                "fill": "0.2",
+                "formatter": "number",
+                "id": "bbe68d10-75a2-11e7-b440-f1d91dc5774d",
+                "label": "Outbound Requests",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "bbe68d11-75a2-11e7-b440-f1d91dc5774d",
+                    "type": "count"
+                  },
+                  {
+                    "id": "d50e5ed0-75a2-11e7-b440-f1d91dc5774d",
+                    "script": "params.outbound \u003e 0 ? params.outbound * -1 : 0",
+                    "type": "calculation",
+                    "variables": [
+                      {
+                        "field": "bbe68d11-75a2-11e7-b440-f1d91dc5774d",
+                        "id": "d785ee80-75a2-11e7-b440-f1d91dc5774d",
+                        "name": "outbound"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 0,
+                "split_filters": [
+                  {
+                    "color": "rgba(211,49,21,1)",
+                    "filter": "deviceDirection:\"1\"",
+                    "id": "bfad3200-75a2-11e7-b440-f1d91dc5774d",
+                    "label": "Outbound Requests"
+                  }
+                ],
+                "split_mode": "filters",
+                "stacked": "none"
+              }
+            ],
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Events by Direction [ArcSight]",
+          "type": "metrics"
+        }
+      },
+      "id": "ebfd45a0-75a4-11e7-b440-f1d91dc5774d",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzE2LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "Events by Size [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "filter": {
+              "language": "lucene",
+              "query": "deviceProduct:\"DNS Trace Log\""
+            },
+            "id": "8d6c10a0-75a6-11e7-871d-5f0fb978413c",
+            "index_pattern": "arcsight-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(0,156,224,1)",
+                "fill": 0.5,
+                "filter": {
+                  "language": "lucene",
+                  "query": "deviceDirection:\"0\""
+                },
+                "formatter": "bytes",
+                "id": "8d6c10a1-75a6-11e7-871d-5f0fb978413c",
+                "label": "Inbound Bytes",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "bytesIn",
+                    "id": "8d6c10a2-75a6-11e7-871d-5f0fb978413c",
+                    "type": "sum"
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 0,
+                "split_mode": "filter",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(244,78,59,1)",
+                "fill": 0.5,
+                "filter": {
+                  "language": "lucene",
+                  "query": "deviceDirection:\"1\""
+                },
+                "formatter": "bytes",
+                "id": "b15b6fb0-75a6-11e7-871d-5f0fb978413c",
+                "label": "Outbound Bytes",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "bytesIn",
+                    "id": "b15b6fb1-75a6-11e7-871d-5f0fb978413c",
+                    "type": "sum"
+                  },
+                  {
+                    "id": "b6e2b060-75a6-11e7-871d-5f0fb978413c",
+                    "script": "params.outbound_bytes \u003e= 0 ? params.outbound_bytes * -1 : 0",
+                    "type": "calculation",
+                    "variables": [
+                      {
+                        "field": "b15b6fb1-75a6-11e7-871d-5f0fb978413c",
+                        "id": "b9031f60-75a6-11e7-871d-5f0fb978413c",
+                        "name": "outbound_bytes"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 0,
+                "split_mode": "filter",
+                "stacked": "none"
+              }
+            ],
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Events by Size [ArcSight]",
+          "type": "metrics"
+        }
+      },
+      "id": "bd1c82c0-75a7-11e7-871d-5f0fb978413c",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzE3LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top Destinations by Events [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "autoPrecision": true,
+                "field": "destination.location",
+                "precision": 2,
+                "useGeocentroid": true
+              },
+              "schema": "segment",
+              "type": "geohash_grid"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addTooltip": true,
+            "heatBlur": 15,
+            "heatMaxZoom": 0,
+            "heatMinOpacity": 0.1,
+            "heatRadius": 25,
+            "isDesaturated": true,
+            "legendPosition": "bottomright",
+            "mapCenter": [
+              0,
+              0
+            ],
+            "mapType": "Shaded Circle Markers",
+            "mapZoom": 2,
+            "wms": {
+              "enabled": false,
+              "options": {
+                "attribution": "Maps provided by USGS",
+                "format": "image/png",
+                "layers": "0",
+                "styles": "",
+                "transparent": true,
+                "version": "1.3.0"
+              },
+              "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
+            }
+          },
+          "title": "Top Destinations by Events [ArcSight]",
+          "type": "tile_map"
+        }
+      },
+      "id": "c658b300-7745-11e7-8fb2-417804dc0ec8",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzE4LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top Sources by Events [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "autoPrecision": true,
+                "field": "source.location",
+                "precision": 2,
+                "useGeocentroid": true
+              },
+              "schema": "segment",
+              "type": "geohash_grid"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addTooltip": true,
+            "heatBlur": 15,
+            "heatMaxZoom": 0,
+            "heatMinOpacity": 0.1,
+            "heatRadius": 25,
+            "isDesaturated": true,
+            "legendPosition": "bottomright",
+            "mapCenter": [
+              0,
+              0
+            ],
+            "mapType": "Shaded Circle Markers",
+            "mapZoom": 2,
+            "wms": {
+              "enabled": false,
+              "options": {
+                "attribution": "Maps provided by USGS",
+                "format": "image/png",
+                "layers": "0",
+                "styles": "",
+                "transparent": true,
+                "version": "1.3.0"
+              },
+              "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
+            }
+          },
+          "title": "Top Sources by Events [ArcSight]",
+          "type": "tile_map"
+        }
+      },
+      "id": "b1f98ce0-7745-11e7-8fb2-417804dc0ec8",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzE5LDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "deviceVendor",
+          "deviceProduct",
+          "categoryBehavior",
+          "categoryOutcome",
+          "destinationAddress",
+          "destinationPort",
+          "destinationHostName",
+          "deviceEventClassId",
+          "deviceCustomString1Label",
+          "deviceCustomString1",
+          "deviceCustomString2Label",
+          "deviceCustomString2",
+          "deviceCustomString3Label",
+          "deviceCustomString3",
+          "deviceCustomString4Label",
+          "deviceCustomString4",
+          "deviceEventCategory",
+          "deviceSeverity",
+          "sourceAddress",
+          "sourcePort",
+          "transportProtocol",
+          "bytesIn",
+          "requestUrl"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "query_string": {
+                "analyze_wildcard": true,
+                "query": "deviceProduct:\"DNS Trace Log\""
+              }
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "deviceReceiptTime",
+            "desc"
+          ]
+        ],
+        "title": "Microsoft DNS Events [ArcSight]",
+        "version": 1
+      },
+      "id": "bb1f4bc0-73fd-11e7-b4d0-0fc7dfb45744",
+      "migrationVersion": {
+        "search": "7.4.0"
+      },
+      "references": [
+        {
+          "id": "arcsight-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "Wzc2LDFd"
+    }
+  ],
+  "version": "8.0.0-SNAPSHOT"
+}

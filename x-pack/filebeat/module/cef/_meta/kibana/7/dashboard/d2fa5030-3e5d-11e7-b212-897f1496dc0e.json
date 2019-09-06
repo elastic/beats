@@ -1,0 +1,1765 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "lucene",
+              "query": "*"
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "1",
+              "w": 8,
+              "x": 40,
+              "y": 4
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "colors": {
+                  "/Attempt": "#0A50A1",
+                  "/Failure": "#BF1B00",
+                  "/Success": "#629E51"
+                }
+              }
+            },
+            "gridData": {
+              "h": 12,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 32
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "colors": {
+                  "/Attempt": "#0A50A1",
+                  "/Failure": "#BF1B00",
+                  "/Success": "#629E51"
+                }
+              }
+            },
+            "gridData": {
+              "h": 12,
+              "i": "3",
+              "w": 24,
+              "x": 0,
+              "y": 32
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "5",
+              "w": 48,
+              "x": 0,
+              "y": 12
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_3",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "6",
+              "w": 24,
+              "x": 24,
+              "y": 44
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_4",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "defaultColors": {
+                  "0 - 100": "rgb(0,104,55)"
+                }
+              }
+            },
+            "gridData": {
+              "h": 8,
+              "i": "7",
+              "w": 40,
+              "x": 0,
+              "y": 4
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_5",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "colors": {
+                  "/Attempt": "#0A50A1",
+                  "/Failure": "#BF1B00",
+                  "/Success": "#629E51"
+                }
+              }
+            },
+            "gridData": {
+              "h": 12,
+              "i": "8",
+              "w": 24,
+              "x": 0,
+              "y": 44
+            },
+            "panelIndex": "8",
+            "panelRefName": "panel_6",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "columns": [
+                "categoryDeviceGroup",
+                "categoryTechnique",
+                "categoryOutcome",
+                "categorySignificance",
+                "categoryObject",
+                "categoryBehavior",
+                "categoryDeviceType"
+              ],
+              "sort": [
+                "deviceReceiptTime",
+                "desc"
+              ]
+            },
+            "gridData": {
+              "h": 20,
+              "i": "9",
+              "w": 48,
+              "x": 0,
+              "y": 76
+            },
+            "panelIndex": "9",
+            "panelRefName": "panel_7",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "10",
+              "w": 24,
+              "x": 24,
+              "y": 56
+            },
+            "panelIndex": "10",
+            "panelRefName": "panel_8",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "colors": {
+                  "Anti-Virus": "#EAB839",
+                  "Database": "#629E51",
+                  "Host-based IDS/IPS": "#E0752D",
+                  "Operating System": "#BF1B00",
+                  "Security Mangement": "#64B0C8"
+                }
+              }
+            },
+            "gridData": {
+              "h": 12,
+              "i": "11",
+              "w": 24,
+              "x": 0,
+              "y": 20
+            },
+            "panelIndex": "11",
+            "panelRefName": "panel_9",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "params": {
+                  "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                  }
+                }
+              }
+            },
+            "gridData": {
+              "h": 20,
+              "i": "12",
+              "w": 24,
+              "x": 0,
+              "y": 56
+            },
+            "panelIndex": "12",
+            "panelRefName": "panel_10",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "colors": {
+                  "/Attempt": "#0A50A1",
+                  "/Failure": "#BF1B00",
+                  "/Informational": "#7EB26D",
+                  "/Informational/Warning": "#EF843C",
+                  "/Success": "#629E51",
+                  "Anti-Virus": "#EAB839",
+                  "Database": "#629E51",
+                  "Host-based IDS/IPS": "#E0752D",
+                  "Log Consolidator": "#E0F9D7",
+                  "Operating System": "#BF1B00",
+                  "Recon": "#BF1B00",
+                  "Security Mangement": "#64B0C8"
+                }
+              }
+            },
+            "gridData": {
+              "h": 12,
+              "i": "14",
+              "w": 24,
+              "x": 24,
+              "y": 20
+            },
+            "panelIndex": "14",
+            "panelRefName": "panel_11",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 4,
+              "i": "15",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "15",
+            "panelRefName": "panel_12",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {
+              "mapCenter": [
+                12.897489183755892,
+                0
+              ],
+              "mapZoom": 1
+            },
+            "gridData": {
+              "h": 12,
+              "i": "17",
+              "w": 24,
+              "x": 24,
+              "y": 64
+            },
+            "panelIndex": "17",
+            "panelRefName": "panel_13",
+            "version": "7.3.0"
+          }
+        ],
+        "refreshInterval": {
+          "display": "Off",
+          "pause": false,
+          "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[ArcSight] Endpoint Overview Dashboard",
+        "version": 1
+      },
+      "id": "d2fa5030-3e5d-11e7-b212-897f1496dc0e",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "c53825b0-3e4b-11e7-af78-9fc514b4e118",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "e301a830-3e4d-11e7-af78-9fc514b4e118",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "9de87d40-3e4e-11e7-af78-9fc514b4e118",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "96af5bf0-3e50-11e7-af78-9fc514b4e118",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "ff476320-3e4a-11e7-af78-9fc514b4e118",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "b74e59b0-3e5f-11e7-899c-f940f646009b",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "7c6875e0-3e61-11e7-899c-f940f646009b",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "panel_7",
+          "type": "search"
+        },
+        {
+          "id": "cc8affd0-3e65-11e7-899c-f940f646009b",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "1bde8be0-3e68-11e7-899c-f940f646009b",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "7c414c90-3e66-11e7-899c-f940f646009b",
+          "name": "panel_10",
+          "type": "visualization"
+        },
+        {
+          "id": "6fb90a30-3e6b-11e7-9d4a-89ea81333ea4",
+          "name": "panel_11",
+          "type": "visualization"
+        },
+        {
+          "id": "31b85570-454a-11e7-86b6-95298e9da6dc",
+          "name": "panel_12",
+          "type": "visualization"
+        },
+        {
+          "id": "2a33c810-3e4d-11e7-af78-9fc514b4e118",
+          "name": "panel_13",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzYyLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "Endpoint Average EPS [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "bar_color_rules": [
+              {
+                "id": "527ca820-3e4b-11e7-af78-9fc514b4e118"
+              }
+            ],
+            "filter": {
+              "language": "lucene",
+              "query": "categoryDeviceGroup:\"/Operating System\" OR categoryDeviceGroup:\"/IDS/Host\" OR categoryDeviceGroup:\"/Application\""
+            },
+            "gauge_color_rules": [
+              {
+                "id": "52cee6d0-3e4b-11e7-af78-9fc514b4e118"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "3f2cf630-3e4b-11e7-af78-9fc514b4e118",
+            "index_pattern": "arcsight-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(0,156,224,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "3f2cf631-3e4b-11e7-af78-9fc514b4e118",
+                "label": "Event Throughput",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "3f2cf632-3e4b-11e7-af78-9fc514b4e118",
+                    "type": "count"
+                  },
+                  {
+                    "field": "3f2cf632-3e4b-11e7-af78-9fc514b4e118",
+                    "id": "fbe01c40-7dc4-11e7-95f6-690ab80d4e85",
+                    "type": "cumulative_sum"
+                  },
+                  {
+                    "field": "fbe01c40-7dc4-11e7-95f6-690ab80d4e85",
+                    "id": "01089b20-7dc5-11e7-95f6-690ab80d4e85",
+                    "type": "derivative",
+                    "unit": "1s"
+                  },
+                  {
+                    "alpha": 0.3,
+                    "beta": 0.1,
+                    "field": "01089b20-7dc5-11e7-95f6-690ab80d4e85",
+                    "gamma": 0.3,
+                    "id": "070d9750-7dc5-11e7-95f6-690ab80d4e85",
+                    "model_type": "simple",
+                    "multiplicative": false,
+                    "period": 1,
+                    "type": "moving_average",
+                    "window": ""
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}} / s"
+              }
+            ],
+            "show_legend": 1,
+            "time_field": "deviceReceiptTime",
+            "type": "gauge"
+          },
+          "title": "Endpoint Average EPS [ArcSight]",
+          "type": "metrics"
+        }
+      },
+      "id": "c53825b0-3e4b-11e7-af78-9fc514b4e118",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzYzLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Destination Ports by Outcomes [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "destinationPort",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 20
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "categoryOutcome",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "destinationPort: Descending"
+                },
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "showCircles": true,
+            "times": [],
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": true,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "square root"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Destination Ports by Outcomes [ArcSight]",
+          "type": "histogram"
+        }
+      },
+      "id": "e301a830-3e4d-11e7-af78-9fc514b4e118",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzY0LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Outcomes Breakdown [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "/Attempt": "#3F2B5B",
+              "/Failure": "#BF1B00"
+            },
+            "legendOpen": true
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Time",
+                "extended_bounds": {},
+                "field": "deviceReceiptTime",
+                "interval": "auto",
+                "min_doc_count": 1
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "categoryOutcome",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Time"
+                },
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "showCircles": true,
+            "times": [],
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Outcomes Breakdown [ArcSight]",
+          "type": "area"
+        }
+      },
+      "id": "9de87d40-3e4e-11e7-af78-9fc514b4e118",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzY1LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "Events by Device [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "filter": {
+              "language": "lucene",
+              "query": "categoryDeviceGroup:\"/Operating System\" OR categoryDeviceGroup:\"/IDS/Host\" OR categoryDeviceGroup:\"/Application\""
+            },
+            "id": "f80221f0-3e4e-11e7-af78-9fc514b4e118",
+            "index_pattern": "arcsight-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(254,37,37,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "f80221f1-3e4e-11e7-af78-9fc514b4e118",
+                "label": "Events",
+                "line_width": "3",
+                "metrics": [
+                  {
+                    "id": "f8024900-3e4e-11e7-af78-9fc514b4e118",
+                    "type": "count"
+                  },
+                  {
+                    "alpha": 0.3,
+                    "beta": 0.1,
+                    "field": "f8024900-3e4e-11e7-af78-9fc514b4e118",
+                    "gamma": 0.3,
+                    "id": "1d93e660-3e4f-11e7-af78-9fc514b4e118",
+                    "model_type": "simple",
+                    "multiplicative": false,
+                    "period": 1,
+                    "type": "moving_average",
+                    "window": ""
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 1,
+                "split_filters": [
+                  {
+                    "color": "rgba(244,78,59,1)",
+                    "filter": "categoryDeviceGroup:\"/Operating System\" ",
+                    "id": "725ac7e0-3e4f-11e7-af78-9fc514b4e118",
+                    "label": "Operating System"
+                  },
+                  {
+                    "color": "rgba(254,146,0,1)",
+                    "filter": " categoryDeviceGroup:\"/IDS/Host\"",
+                    "id": "bd6104c0-3e4f-11e7-af78-9fc514b4e118",
+                    "label": "Host IDS"
+                  },
+                  {
+                    "color": "rgba(252,220,0,1)",
+                    "filter": "categoryDeviceGroup:\"/Application\"",
+                    "id": "cf5dd0e0-3e4f-11e7-af78-9fc514b4e118",
+                    "label": "Application"
+                  }
+                ],
+                "split_mode": "filters",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "left",
+                "chart_type": "bar",
+                "color": "rgba(0,156,224,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "1633f8a0-3e50-11e7-af78-9fc514b4e118",
+                "label": "Moving Average by Device HostNames",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "1633f8a1-3e50-11e7-af78-9fc514b4e118",
+                    "type": "count"
+                  },
+                  {
+                    "alpha": 0.3,
+                    "beta": 0.1,
+                    "field": "1633f8a1-3e50-11e7-af78-9fc514b4e118",
+                    "gamma": 0.3,
+                    "id": "2b8a9e20-3e50-11e7-af78-9fc514b4e118",
+                    "model_type": "simple",
+                    "multiplicative": false,
+                    "period": 1,
+                    "type": "moving_average",
+                    "window": ""
+                  }
+                ],
+                "point_size": 1,
+                "seperate_axis": 1,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "deviceHostName"
+              }
+            ],
+            "show_legend": 1,
+            "time_field": "deviceReceiptTime",
+            "type": "timeseries"
+          },
+          "title": "Events by Device [ArcSight]",
+          "type": "metrics"
+        }
+      },
+      "id": "96af5bf0-3e50-11e7-af78-9fc514b4e118",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzY2LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Destination Port [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "destinationPort",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 20
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear"
+          },
+          "title": "Top 10 Destination Port [ArcSight]",
+          "type": "tagcloud"
+        }
+      },
+      "id": "ff476320-3e4a-11e7-af78-9fc514b4e118",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzY3LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Endpoint Metrics Overview [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 100": "rgb(0,104,55)"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Event Count"
+              },
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Devices",
+                "field": "deviceHostName"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Source",
+                "field": "sourceAddress"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Destination",
+                "field": "destinationAddress"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Port",
+                "field": "destinationPort"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "fontSize": "30",
+            "gauge": {
+              "autoExtend": false,
+              "backStyle": "Full",
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 100
+                }
+              ],
+              "gaugeColorMode": "None",
+              "gaugeStyle": "Full",
+              "gaugeType": "Metric",
+              "invertColors": false,
+              "labels": {
+                "color": "black",
+                "show": true
+              },
+              "orientation": "vertical",
+              "percentageMode": false,
+              "scale": {
+                "color": "#333",
+                "labels": false,
+                "show": false,
+                "width": 2
+              },
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": "12",
+                "labelColor": false,
+                "subText": ""
+              },
+              "type": "simple",
+              "useRange": false,
+              "verticalSplit": false
+            },
+            "handleNoResults": true,
+            "type": "gauge"
+          },
+          "title": "Endpoint Metrics Overview [ArcSight]",
+          "type": "metric"
+        }
+      },
+      "id": "b74e59b0-3e5f-11e7-899c-f940f646009b",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzY4LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Outcomes by Device Type [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "/Failure": "#BF1B00"
+            },
+            "legendOpen": true
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "categoryDeviceType",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "categoryOutcome",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 200
+                },
+                "position": "left",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "categoryDeviceType: Descending"
+                },
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "showCircles": true,
+            "times": [],
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": true,
+                  "rotate": 75,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "bottom",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Outcomes by Device Type [ArcSight]",
+          "type": "histogram"
+        }
+      },
+      "id": "7c6875e0-3e61-11e7-899c-f940f646009b",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzY5LDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "categoryDeviceGroup",
+          "categoryTechnique",
+          "categoryOutcome",
+          "categorySignificance",
+          "categoryObject",
+          "categoryBehavior",
+          "categoryDeviceType"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "query_string": {
+                "analyze_wildcard": true,
+                "query": "categoryDeviceGroup:\"/Operating System\" OR categoryDeviceGroup:\"/IDS/Host\" OR categoryDeviceGroup:\"/Application\""
+              }
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "deviceReceiptTime",
+            "desc"
+          ]
+        ],
+        "title": "Endpoint Event Explorer [ArcSight]",
+        "version": 1
+      },
+      "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+      "migrationVersion": {
+        "search": "7.4.0"
+      },
+      "references": [
+        {
+          "id": "arcsight-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzcwLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 5 Source Countries [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "source.country_name",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 20
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "maxFontSize": 72,
+            "minFontSize": 18,
+            "orientation": "single",
+            "scale": "linear"
+          },
+          "title": "Top 5 Source Countries [ArcSight]",
+          "type": "tagcloud"
+        }
+      },
+      "id": "cc8affd0-3e65-11e7-899c-f940f646009b",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzcxLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Device Types by Vendor [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "exclude": "Network-based IDS/IPS",
+                "field": "categoryDeviceType",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "exclude": "",
+                "field": "deviceVendor",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": false,
+            "legendPosition": "right"
+          },
+          "title": "Device Types by Vendor [ArcSight]",
+          "type": "pie"
+        }
+      },
+      "id": "1bde8be0-3e68-11e7-899c-f940f646009b",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzcyLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Source Countries by Event [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Events"
+              },
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "source.country_name",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 35
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Source Addresses",
+                "field": "sourceAddress"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Destination Addresses",
+                "field": "destinationAddress"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Destination Ports",
+                "field": "destinationPort"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "perPage": 10,
+            "showMeticsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Top 10 Source Countries by Event [ArcSight]",
+          "type": "table"
+        }
+      },
+      "id": "7c414c90-3e66-11e7-899c-f940f646009b",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzczLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Outcomes by User Names [ArcSight]",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "/Informational": "#7EB26D",
+              "/Informational/Warning": "#EF843C",
+              "/Success": "#64B0C8",
+              "Anti-Virus": "#B7DBAB",
+              "Host-based IDS/IPS": "#629E51",
+              "Log Consolidator": "#E0F9D7",
+              "Operating System": "#3F6833",
+              "Recon": "#BF1B00",
+              "Security Mangement": "#CFFAFF"
+            },
+            "legendOpen": true
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "exclude": "Network-based IDS/IPS",
+                "field": "categoryDeviceType",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "categoryOutcome",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "6",
+              "params": {
+                "field": "destinationUserName",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": false,
+            "legendPosition": "right"
+          },
+          "title": "Outcomes by User Names [ArcSight]",
+          "type": "pie"
+        }
+      },
+      "id": "6fb90a30-3e6b-11e7-9d4a-89ea81333ea4",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "Wzc0LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "query_string": {
+                "query": "*"
+              }
+            }
+          }
+        },
+        "title": "ArcSight: Dashboard Navigation",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "listeners": {},
+          "params": {
+            "markdown": "[Network Overview](#/dashboard/37af0b40-398d-11e7-ae19-21fb91585845) | [Network Suspicious Activity](#/dashboard/82051450-3e56-11e7-96c4-0d3a291ec93a) | [Endpoint Overview](#dashboard/d2fa5030-3e5d-11e7-b212-897f1496dc0e) | [Endpoint OS Activity](#/dashboard/64c92510-4555-11e7-83ea-67cb6920446d) | [Microsoft DNS Overview](#/dashboard/153e0bf0-752f-11e7-ae68-d756b92f3a9c)"
+          },
+          "title": "ArcSight: Dashboard Navigation",
+          "type": "markdown"
+        }
+      },
+      "id": "31b85570-454a-11e7-86b6-95298e9da6dc",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "WzE0LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top Destination Locations by Event [ArcSight]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "autoPrecision": true,
+                "field": "destination.location",
+                "precision": 2,
+                "useGeocentroid": true
+              },
+              "schema": "segment",
+              "type": "geohash_grid"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addTooltip": true,
+            "heatBlur": 15,
+            "heatMaxZoom": 0,
+            "heatMinOpacity": 0.1,
+            "heatNormalizeData": true,
+            "heatRadius": 25,
+            "isDesaturated": true,
+            "legendPosition": "bottomright",
+            "mapCenter": [
+              0,
+              0
+            ],
+            "mapType": "Shaded Circle Markers",
+            "mapZoom": 2,
+            "wms": {
+              "enabled": false,
+              "options": {
+                "attribution": "Maps provided by USGS",
+                "format": "image/png",
+                "layers": "0",
+                "styles": "",
+                "transparent": true,
+                "version": "1.3.0"
+              },
+              "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
+            }
+          },
+          "title": "Top Destination Locations by Event [ArcSight]",
+          "type": "tile_map"
+        }
+      },
+      "id": "2a33c810-3e4d-11e7-af78-9fc514b4e118",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "1d9ba830-3e47-11e7-af78-9fc514b4e118",
+          "name": "search_0",
+          "type": "search"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-09-06T00:51:22.848Z",
+      "version": "Wzc1LDFd"
+    }
+  ],
+  "version": "8.0.0-SNAPSHOT"
+}
