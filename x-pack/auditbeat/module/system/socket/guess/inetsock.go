@@ -30,6 +30,9 @@ import (
 // INET_SOCK_LPORT : 582
 // INET_SOCK_RADDR : 576
 // INET_SOCK_RPORT : 580
+// INET_SOCK_RADDR_LIST : [...array of offsets...]
+// INET_SOCK_RADDR_LIST is a list of all the offsets within the structure that
+// matched the remote address. This is used by guess_inet_sock6.
 
 func init() {
 	if err := Registry.AddGuess(&guessInetSockIPv4{}); err != nil {
@@ -55,6 +58,10 @@ func (g *guessInetSockIPv4) Provides() []string {
 		"INET_SOCK_LPORT",
 		"INET_SOCK_RADDR",
 		"INET_SOCK_RPORT",
+		"INET_SOCK_LADDR_LIST",
+		"INET_SOCK_LPORT_LIST",
+		"INET_SOCK_RADDR_LIST",
+		"INET_SOCK_RPORT_LIST",
 	}
 }
 
@@ -201,6 +208,7 @@ func (g *guessInetSockIPv4) Reduce(results []common.MapStr) (result common.MapSt
 		if err != nil {
 			return nil, err
 		}
+		result[key+"_LIST"] = list
 		result[key] = list[0]
 	}
 	return result, nil
