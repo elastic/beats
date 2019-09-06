@@ -1,0 +1,6 @@
+- name: application_elb
+  type: group
+  description: >
+    `application_elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Application ELB.
+  release: beta
+  fields:

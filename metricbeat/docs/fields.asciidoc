@@ -856,6 +856,12 @@ type: keyword
 --
 
 [float]
+=== application_elb
+
+`application_elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Application ELB.
+
+
+[float]
 === cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.

@@ -1,0 +1,32 @@
+Application Load Balancing publishes data points to Amazon CloudWatch for your load
+balancers and your targets. This aws `application_elb` metricset collects these
+Cloudwatch metrics for monitoring purposes. Application Load Balancing reports
+metrics to CloudWatch only when requests are flowing through the load balancer.
+If there are requests flowing through the load balancer, Application Load
+Balancing measures and sends its metrics in 60-second intervals. If there are
+no requests flowing through the load balancer or no data for a metric, the
+metric is not reported. Please see more details for each metric in
+https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html[application-elb-cloudwatch-metric].
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS Application Load Balancing metrics.
+----
+ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+tag:getResources
+----
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - application_elb
+  credential_profile_name: test-mb
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+----

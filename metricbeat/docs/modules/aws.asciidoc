@@ -162,6 +162,8 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-aws-application_elb,application_elb>>
+
 * <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
 
 * <<metricbeat-metricset-aws-ebs,ebs>>
@@ -177,6 +179,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-aws-s3_request,s3_request>>
 
 * <<metricbeat-metricset-aws-sqs,sqs>>
+
+include::aws/application_elb.asciidoc[]
 
 include::aws/cloudwatch.asciidoc[]
 

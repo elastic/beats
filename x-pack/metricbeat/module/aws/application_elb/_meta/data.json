@@ -1,0 +1,44 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "LoadBalancer": "app/andrewvc-elbv2-test/8e858b04373118d3"
+            },
+            "namespace": "AWS/ApplicationELB"
+        },
+        "metrics": {
+            "ActiveConnectionCount": {
+                "sum": 1
+            },
+            "HTTPCode_ELB_503_Count": {
+                "sum": 1
+            },
+            "HTTPCode_ELB_5XX_Count": {
+                "sum": 1
+            },
+            "NewConnectionCount": {
+                "sum": 1
+            },
+            "ProcessedBytes": {
+                "sum": 515
+            }
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.application_elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "application_elb",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

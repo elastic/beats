@@ -34,7 +34,7 @@ import (
 
 var (
 	// Use `go test -data` to update files.
-	dataFlag = flag.Bool("data", false, "Write updated data.json files")
+	dataFlag = flag.Bool("data", true, "Write updated data.json files")
 )
 
 // WriteEvent fetches a single event writes the output to a ./_meta/data.json

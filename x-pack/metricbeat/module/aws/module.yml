@@ -2,3 +2,4 @@ name: aws
 metricsets:
   - elb
   - ebs
+  - application_elb
