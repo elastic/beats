@@ -33,3 +33,10 @@ type TaskGroup = api.TaskGroup
 
 // Client is the interface for executing queries against a Nomad agent
 type Client = api.Client
+
+// Desired status for a given allocation
+const (
+	AllocDesiredStatusRun   = api.AllocDesiredStatusRun   // Allocation should run
+	AllocDesiredStatusStop  = api.AllocDesiredStatusStop  // Allocation should stop
+	AllocDesiredStatusEvict = api.AllocDesiredStatusEvict // Allocation should stop, and was evicted
+)

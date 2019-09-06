@@ -47,6 +47,7 @@ type watcher struct {
 	nodeID      string
 	allocations []*api.Allocation
 	lastFetch   time.Time
+	handler     ResourceEventHandlerFuncs
 }
 
 // WatchOptions controls watch behaviors
@@ -89,7 +90,9 @@ func (w *watcher) Start() error {
 
 func (w *watcher) Stop() {}
 
-func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {}
+func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {
+	w.handler = h
+}
 
 // Sync the allocations on the given node and update the local metadata
 func (w *watcher) sync() error {
@@ -135,6 +138,22 @@ func (w *watcher) sync() error {
 		return nil
 	}
 
+	for _, alloc := range allocations {
+		switch alloc.DesiredStatus {
+		case AllocDesiredStatusRun:
+			w.handler.OnAdd(*alloc)
+		case AllocDesiredStatusStop:
+			w.handler.OnDelete(*alloc)
+		case AllocDesiredStatusEvict:
+			w.handler.OnDelete(*alloc)
+		}
+
+		// allocation was updated after our last fetch
+		if alloc.ModifyTime > w.lastFetch.Unix() {
+			w.handler.OnUpdate(*alloc)
+		}
+	}
+
 	logp.Debug("Allocations index has changed (%d != %d)", fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 	w.allocations = allocations
 	queryOpts.WaitIndex = meta.LastIndex
@@ -167,5 +186,6 @@ func backoff(failures uint) {
 	if wait > maxBackoff {
 		wait = maxBackoff
 	}
+
 	time.Sleep(wait)
 }
