@@ -43,13 +43,13 @@ minikube start --kubernetes-version v1.15.0
 
 ## Playground Pod
 
-A playground Pod hosts the ubuntu container metricbeat will be run. A working playground is provided under [./01_playground](./01_playground) subfolder.
+A playground Pod hosts the ubuntu container metricbeat will be running. A working playground is provided under [./01_playground](./01_playground) subfolder.
 
 This file contains:
 
 - a service account.
 - a cluster role, if you are consuming kubernetes API resources, make sure that the APIGroup/Version, Resource and verb are listed here.
-- a cluster role binging that links the service account to the service role
+- a cluster role binding that links the service account to the service role
 - an Ubuntu Pod:
   - uses `hostNetwork`, so it can reach ports at the host instance (for instance, the kubelet)
   - executes `sleep infinity`, so that it never exists, but does nothing
@@ -66,12 +66,12 @@ kubectl apply -f https://raw.githubusercontent.com/elastic/beats/master/metricbe
 ## Test
 
 
-Binary and assets needed for the test that we prepared above need to be copied to the playground pod. We us `kubectl` to copy the directory, further iterations might only need to copy the changing assets.
+Binary and assets needed for the test that we prepared above need to be copied to the playground pod. Use `kubectl` to copy the directory, further iterations might only need to copy the changing assets.
 
 Replace source folder and Pod namespace/name
 
 ```
-kubectl cp /home/myuser/playground/metricbeat playground:/root/metricbeat
+kubectl cp --no-preserve  /home/myuser/playground/metricbeat playground:/metricbeat
 ```
 
 Now you can exec into the container and launch metricbeat
