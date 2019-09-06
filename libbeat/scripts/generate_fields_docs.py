@@ -74,7 +74,7 @@ def document_field(output, field, path):
 
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
-            document_field(output, subfield, field_path + "." +
+            document_field(output, subfield, path + "." +
                            subfield["name"])
 
 
