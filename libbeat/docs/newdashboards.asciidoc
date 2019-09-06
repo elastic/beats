@@ -48,47 +48,47 @@ Elasticsearch running on localhost for a single Beat (eg. Metricbeat):
 - from a local directory:
 +
 [source,shell]
-----------------------------------------------------------------------
+----
 ./scripts/import_dashboards -dir kibana/metricbeat
-----------------------------------------------------------------------
+----
 
 - from a local zip archive:
 +
 [source,shell]
-----------------------------------------------------------------------
+----
 ./scripts/import_dashboards -file metricbeat-dashboards-1.1.zip
-----------------------------------------------------------------------
+----
 
 - from the official zip archive available at {dashboards}:
 +
 [source,shell]
-----------------------------------------------------------------------
+----
 ./scripts/import_dashboards
-----------------------------------------------------------------------
+----
 +
 See <<dashboards-archive-structure>> for more details about the structure of dashboard archives.
 
 - from a zip archive available online:
 +
 [source,shell]
------------------------
+----
 ./scripts/import_dashboards -url https://github.com/monicasarbu/metricbeat-dashboards/archive/v1.1.zip
------------------------
+----
 
 If you don't specify the location of the archive, then by default it's set to the official zip archive containing the index pattern and the dashboards of the official Beats.
 
 To import only the index-pattern for a single Beat (eg. Metricbeat) use:
 [source,shell]
------------------------
+----
 ./scripts/import_dashboards -only-index
------------------------
+----
 
 To import only the dashboards together with visualizations and searches for a single Beat (eg. Metricbeat) use:
 
 [source,shell]
------------------------
+----
 ./scripts/import_dashboards -only-dashboards
------------------------
+----
 
 
 NOTE: When running the `import_dashboards` script from within the Beat package, the `-beat` option is set automatically to the Beat
@@ -102,10 +102,10 @@ See <<import-dashboard-options>> for a description of other import options.
 For development or community Beats, it's easier to run the `import_dashboards` script from the https://github.com/elastic/beats/tree/master/libbeat/dashboards[beats/libbeat/dashboards] directory. In this case, you need to first compile the script:
 
 [source,shell]
------------------------
+----
 cd beats/libbeat/dashboards
 make
------------------------
+----
 
 And then you can import the index pattern and the dashboards together with visualizations and searches for a single
 Beat, by passing the `-beat` option.
@@ -114,9 +114,9 @@ For example, to import the Metricbeat dashboards together with visualizations,
 searches, and the Metricbeat index pattern:
 
 [source,shell]
------------------
+----
 beats/libbeat/dashboards/import_dashboards -beat metricbeat
------------------
+----
 
 For this example, you must specify `-beat metricbeat`. If the `-beat` option is not
 specified, the script imports the dashboards of all Beats.
@@ -125,16 +125,16 @@ NOTE: You can make use of the Makefile from the Beat GitHub repository to import
 dashboards. If Elasticsearch is running on localhost, then you can run the following command from the Beat repository:
 
 [source,shell]
---------------------------------
+----
 make import-dashboards
---------------------------------
+----
 
 If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
 
 [source,shell]
--------------------------------
+----
 ES_URL="http://192.168.3.206:9200" make import-dashboards
--------------------------------
+----
 
 [[import-dashboard-options]]
 ==== Command Line Options
@@ -142,9 +142,9 @@ ES_URL="http://192.168.3.206:9200" make import-dashboards
 The `import_dashboards` script accepts the following command-line options. To see all the available options, read the descriptions below or run:
 
 ["source","sh",subs="attributes"]
-----------------------------------------------------------------------
+----
 ./import_dashboards -h
-----------------------------------------------------------------------
+----
 
 *`-beat <beatname>`*::
 The Beat name. The Beat name is required when importing from a zip archive. When using `import_dashboards` from the Beat package, this option is set automatically with the name of
@@ -210,7 +210,7 @@ The zip archive contains dashboards for at least one Beat. The index pattern, da
 are available in a separate directory for each Beat, having the name of the Beat. For example the official zip archive (beats-dashboards-{stack-version}) has the following structure:
 
 [source,shell]
--------------------------
+----
   metricbeat/
     dashboard/
     search/
@@ -228,7 +228,7 @@ are available in a separate directory for each Beat, having the name of the Beat
     search/
     visualization/
     index-pattern/
-------------------------
+----
 
 
 [[build-dashboards]]
@@ -248,9 +248,9 @@ check the <<generate-index-pattern,generate index pattern>> section.
 If you would like to build dashboards from scratch for any Elastic Beats, you can start by importing the same version of the index pattern as your Beat:
 
 [source,shell]
----------------
+----
 $ scripts/import_dashboards -only-index
----------------
+----
 
 After creating your own dashboards in Kibana, you can <<export-dashboards,export the Kibana dashboards>> to a local
 directory, and then <<archive-dashboards,archive the dashboards>> in order to be able to share the dashboards with the community.
@@ -269,9 +269,9 @@ to display fields as `50%` or `5MB`.
 To generate the index pattern from the `etc/fields.yml`, you need to run the following command in the Beat repository:
 
 [source,shell]
----------------
+----
 make update
----------------
+----
 
 [[export-dashboards]]
 === Exporting New and Modified Beat Dashboards
@@ -286,16 +286,16 @@ NOTE: You can make use of the Makefile from the Beat GitHub repository to export
 from your Elasticsearch. If Elasticsearch is running on localhost, then you just need to run the following command from the Beat repository:
 
 [source,shell]
------------------------------
+----
 make export-dashboards
------------------------------
+----
 
 If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
 
 [source,shell]
-----------------------------
+----
 ES_URL="http://192.168.3.206:9200" make export-dashboards
-----------------------------
+----
 
 
 To export only some Kibana dashboards for an Elastic Beat or community Beat, you can simply pass a regular expression to
@@ -305,23 +305,23 @@ Before running the `export_dashboards.py` script for the first time, you
 need to create an environment that contains all the required Python packages.
 
 [source,shell]
--------------------------
+----
 make python-env
--------------------------
+----
 
 For example, to export all Kibana dashboards that start with the **Packetbeat** name:
 
 [source,shell]
-----------------------------------------------------------------------
+----
 python ../dev-tools/export_dashboards.py --regex Packetbeat*
-----------------------------------------------------------------------
+----
 
 To see all the available options, read the descriptions below or run:
 
 [source,shell]
-----------------------------------------------------------------------
+----
 python ../dev-tools/export_dashboards.py -h
-----------------------------------------------------------------------
+----
 
 *`--url <elasticsearch_url>`*::
 The Elasticsearch URL. The default value is http://localhost:9200.
@@ -338,13 +338,13 @@ The output directory where the dashboards and all dependencies will be saved. Th
 The output directory has the following structure:
 
 [source,shell]
---------------
+----
 output/
     index-pattern/
     dashboard/
     visualization/
     search/
---------------
+----
 
 [[archive-dashboards]]
 === Archiving Your Beat Dashboards
@@ -354,9 +354,9 @@ dashboards, including visualizations and searches and the index pattern, you can
 repository:
 
 [source,shell]
---------------
+----
 make package-dashboards
---------------
+----
 
 The Makefile is part of libbeat, which means that community Beats contributors can use the commands shown here to
 archive dashboards. The dashboards must be available under the `etc/kibana` directory.

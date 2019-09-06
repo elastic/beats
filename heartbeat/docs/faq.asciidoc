@@ -6,4 +6,5 @@ out the
 https://discuss.elastic.co/c/beats/heartbeat[Heartbeat discussion forum].
 
 include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
+
 include::../../libbeat/docs/shared-faq.asciidoc[]
