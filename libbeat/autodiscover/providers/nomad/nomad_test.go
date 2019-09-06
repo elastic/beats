@@ -18,6 +18,9 @@
 package nomad
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -266,7 +269,12 @@ func TestEmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen, err := nomad.NewMetaGenerator(common.NewConfig())
+			client, err := makeClient()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			metaGen, err := nomad.NewMetaGenerator(common.NewConfig(), client)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -302,4 +310,17 @@ func getNestedAnnotations(in common.MapStr) common.MapStr {
 		out.Put(k, v)
 	}
 	return out
+}
+
+func makeClient() (*nomad.Client, error) {
+	config := api.DefaultConfig()
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	config.Address = ts.URL
+
+	return api.NewClient(config)
 }

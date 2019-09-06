@@ -23,10 +23,13 @@ import (
 	"github.com/imdario/mergo"
 )
 
-// MetaGenerator builds metadata objects for pods and containers
+// MetaGenerator builds metadata objects for allocations
 type MetaGenerator interface {
-	// ResourceMetadata generates metadata for the given allocation object taking to account certain filters
+	// ResourceMetadata generates metadata for the given allocation
 	ResourceMetadata(obj Resource) common.MapStr
+
+	// AllocationNodeName returns the name of the node where the Task is allocated
+	AllocationNodeName(id string) (string, error)
 }
 
 // MetaGeneratorConfig settings
@@ -39,17 +42,19 @@ type MetaGeneratorConfig struct {
 	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 	LabelsDedot            bool `config:"labels.dedot"`
 	AnnotationsDedot       bool `config:"annotations.dedot"`
+	client                 *Client
 }
 
 type metaGenerator = MetaGeneratorConfig
 
 // NewMetaGenerator initializes and returns a new kubernetes metadata generator
-func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
+func NewMetaGenerator(cfg *common.Config, c *Client) (MetaGenerator, error) {
 	// default settings:
 	generator := metaGenerator{
 		IncludeCreatorMetadata: true,
 		LabelsDedot:            true,
 		AnnotationsDedot:       true,
+		client:                 c,
 	}
 
 	err := cfg.Unpack(&generator)
@@ -63,12 +68,7 @@ func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 
 // ResourceMetadata generates metadata for the *given Nomad allocation*
 func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
-	// and allocations will always have one job with
-	// at least 1 task group
-	// at least 1 task
 	tasksMeta := g.GroupMeta(obj.Job)
-	// ❓ denormalize the allocation TaskGroup into separated events?
-	// each Task has its own .stdout/.stderr file that filebeat monitors
 
 	for _, task := range tasksMeta {
 		labelMap := common.MapStr{}
@@ -185,4 +185,16 @@ func generateMapSubset(input common.MapStr, keys []string, dedot bool) common.Ma
 	}
 
 	return output
+}
+
+// AllocationNodeName returns Name of the node where the task is allocated. It
+// does one additional API call to circunvent the empty NodeName property of
+// older Nomad versions
+func (g *metaGenerator) AllocationNodeName(id string) (string, error) {
+	node, _, err := g.client.Nodes().Info(id, nil)
+	if err != nil {
+		return "", err
+	}
+
+	return node.Name, nil
 }

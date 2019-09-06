@@ -81,7 +81,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
-	metagen, err := nomad.NewMetaGenerator(c)
+	metagen, err := nomad.NewMetaGenerator(c, client)
 	if err != nil {
 		return nil, err
 	}
