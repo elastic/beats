@@ -35,18 +35,18 @@ the `fields.yml` file, and places it under the `5.x/index-pattern` and `default/
 it collects the dashboards from all the modules to the `_meta/kibana` directory.
 
 [source,shell]
------------------
+----
 make update
------------------
+----
 
 Then load all the Beat's dashboards. For example, to load the Metricbeat rabbitmq dashboards together with the Metricbeat index-pattern into Kibana 5.6,
 using the Kibana API:
 
 [source,shell]
------------------
+----
 make update
 ./metricbeat setup -E setup.dashboards.directory=_meta/kibana
------------------
+----
 
 * Export the dashboards using Beats 6.0 version.
 
@@ -57,11 +57,11 @@ application.
 For example, to export the Metricbeat rabbitmq dashboard:
 
 [source,shell]
------------------
+----
 cd beats/metricbeat
 go run ../dev-tools/cmd/dashboards/export_dashboards.go -dashboards Metricbeat-Rabbitmq -output
 module/rabbitmq/_meta/kibana/default/Metricbeat-Rabbitmq.json <1>
------------------
+----
 <1> `Metricbeat-Rabbitmq` is the ID of the dashboard that you want to export.
 
 Note: You can get the dashboard ID from the URL of the dashboard in Kibana. Depending on the Kibana version the
@@ -74,7 +74,7 @@ Starting with Beats 6.0.0, you can create an `yml` file for each module or for t
 Below is an example of the `module.yml` file for the system module in Metricbeat.
 
 [source,yaml]
-----------------
+----
 dashboards:
     - id: Metricbeat-system-overview <1>
       file: Metricbeat-system-overview.json <2>
@@ -84,15 +84,15 @@ dashboards:
 
     - id: CPU-slash-Memory-per-container
       file: Metricbeat-docker-overview.json
-----------------
+----
 <1> Dashboard ID.
 <2> The JSON file where the dashboard is saved on disk.
 
 Using the yml file, you can export all the dashboards for a single module or for the entire Beat using a single command:
 
 [source,shell]
-------------------
+----
 cd metricbeat/module/system
 go run ../../../dev-tools/cmd/dashboards/export_dashboards.go -yml module.yml
--------------------
+----
 
