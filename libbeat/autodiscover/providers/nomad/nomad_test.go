@@ -120,13 +120,13 @@ func TestEmitEvent(t *testing.T) {
 
 	tests := []struct {
 		Message    string
-		Flag       string
+		Status     string
 		Allocation nomad.Resource
 		Expected   bus.Event
 	}{
 		{
 			Message: "Test common allocation start",
-			Flag:    "start",
+			Status:  "start",
 			Allocation: nomad.Resource{
 				ID:        UUID.String(),
 				Name:      "job.task",
@@ -207,7 +207,7 @@ func TestEmitEvent(t *testing.T) {
 		},
 		{
 			Message: "Allocation without a host/node name",
-			Flag:    "start",
+			Status:  "start",
 			Allocation: nomad.Resource{
 				ID:        UUID.String(),
 				Name:      "job.task",
@@ -281,7 +281,7 @@ func TestEmitEvent(t *testing.T) {
 
 			listener := p.bus.Subscribe()
 
-			p.emit(&test.Allocation, test.Flag)
+			p.emit(&test.Allocation, test.Status)
 
 			select {
 			case event := <-listener.Events():
