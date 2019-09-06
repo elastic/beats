@@ -518,7 +518,7 @@
               "query": "categoryDeviceGroup:\"/Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\" "
             },
             "id": "e1a58ab0-3957-11e7-ae19-21fb91585845",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -540,7 +540,7 @@
                 "override_index_pattern": 1,
                 "point_size": 1,
                 "seperate_axis": 0,
-                "series_index_pattern": "arcsight-*",
+                "series_index_pattern": "filebeat-*",
                 "series_time_field": "deviceReceiptTime",
                 "split_mode": "everything",
                 "stacked": "none",
@@ -578,7 +578,7 @@
                 "override_index_pattern": 1,
                 "point_size": 1,
                 "seperate_axis": 0,
-                "series_index_pattern": "arcsight-*",
+                "series_index_pattern": "filebeat-*",
                 "series_time_field": "deviceReceiptTime",
                 "split_mode": "everything",
                 "stacked": "none",
@@ -648,7 +648,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "e1a58ab0-3957-11e7-ae19-21fb91585845",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -822,7 +822,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "e1a58ab0-3957-11e7-ae19-21fb91585845",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -1704,7 +1704,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "e1a58ab0-3957-11e7-ae19-21fb91585845",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -2020,7 +2020,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "429af7e0-3d5b-11e7-8b9d-ddc45b5f6d00",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -2340,7 +2340,7 @@
       },
       "references": [
         {
-          "id": "arcsight-*",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }

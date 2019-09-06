@@ -375,7 +375,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "429af7e0-3d5b-11e7-8b9d-ddc45b5f6d00",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -968,7 +968,7 @@
               "query": "deviceProduct:\"DNS Trace Log\""
             },
             "id": "5f4e1f70-7523-11e7-b440-f1d91dc5774d",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -1366,7 +1366,7 @@
               "query": "deviceProduct:\"DNS Trace Log\""
             },
             "id": "12cdd300-75a2-11e7-b440-f1d91dc5774d",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -1489,7 +1489,7 @@
               "query": "deviceProduct:\"DNS Trace Log\""
             },
             "id": "8d6c10a0-75a6-11e7-871d-5f0fb978413c",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -1792,7 +1792,7 @@
       },
       "references": [
         {
-          "id": "arcsight-*",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }

@@ -855,7 +855,7 @@
               "query": "categoryDeviceGroup:\"/Operating System\""
             },
             "id": "e10aefa0-4550-11e7-86b6-95298e9da6dc",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -1277,7 +1277,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "3f2cf630-3e4b-11e7-af78-9fc514b4e118",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -1984,7 +1984,7 @@
       },
       "references": [
         {
-          "id": "arcsight-*",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }

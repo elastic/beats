@@ -419,7 +419,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "3f2cf630-3e4b-11e7-af78-9fc514b4e118",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -803,7 +803,7 @@
               "query": "categoryDeviceGroup:\"/Operating System\" OR categoryDeviceGroup:\"/IDS/Host\" OR categoryDeviceGroup:\"/Application\""
             },
             "id": "f80221f0-3e4e-11e7-af78-9fc514b4e118",
-            "index_pattern": "arcsight-*",
+            "index_pattern": "filebeat-*",
             "interval": "auto",
             "series": [
               {
@@ -1294,7 +1294,7 @@
       },
       "references": [
         {
-          "id": "arcsight-*",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
