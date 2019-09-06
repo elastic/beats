@@ -10,7 +10,7 @@ To start Filebeat, you must use the `-c config/path` option to specify the path 
 configuration file.
 
 [source,shell]
-----------------------------------------------------------------------------
+----
 $ ./filebeat -h
 Usage of ./filebeat:
   -N  Disable actual publishing for testing
@@ -28,7 +28,7 @@ Usage of ./filebeat:
   -v  Log at INFO level
   -version
       Print version and exit
------------------------------------------------------------------------------
+----
 
 include::../../libbeat/docs/shared-command-line.asciidoc[]
 

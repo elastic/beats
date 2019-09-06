@@ -3,7 +3,7 @@
 The following command line options are available for Packetbeat.
 
 [source,shell]
-------------------------------------------------------------------------
+----
 $ ./packetbeat -h
 Usage of ./packetbeat:
   -I string
@@ -33,7 +33,7 @@ Usage of ./packetbeat:
       Print version and exit
   -waitstop int
       Additional seconds to wait before shutting down
-----------------------------------------------------------------------------
+----
 
 [float]
 === Packet-Beat Specific Options
