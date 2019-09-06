@@ -299,7 +299,7 @@
         "timeFrom": "now-24h",
         "timeRestore": true,
         "timeTo": "now",
-        "title": "[ArcSight] Endpoint OS Activity Dashboard",
+        "title": "[Filebeat CEF] Endpoint OS Activity Dashboard",
         "version": 1
       },
       "id": "9e352900-89c3-4c1b-863e-249e24d0dac9",
@@ -401,7 +401,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Source Users by Event Type and Destination Users [ArcSight]",
+        "title": "Source Users by Event Type and Destination Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -573,7 +573,7 @@
               }
             ]
           },
-          "title": "Source Users by Event Type and Destination Users [ArcSight]",
+          "title": "Source Users by Event Type and Destination Users [Filebeat CEF]",
           "type": "histogram"
         }
       },
@@ -601,7 +601,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Endpoint OS Metrics Overview [ArcSight]",
+        "title": "Endpoint OS Metrics Overview [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -697,7 +697,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Endpoint OS Metrics Overview [ArcSight]",
+          "title": "Endpoint OS Metrics Overview [Filebeat CEF]",
           "type": "metric"
         }
       },
@@ -725,7 +725,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Behaviors by Outcome [ArcSight]",
+        "title": "Top 10 Behaviors by Outcome [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -809,7 +809,7 @@
               }
             ]
           },
-          "title": "Top 10 Behaviors by Outcome [ArcSight]",
+          "title": "Top 10 Behaviors by Outcome [Filebeat CEF]",
           "type": "heatmap"
         }
       },
@@ -841,7 +841,7 @@
             }
           }
         },
-        "title": "Events by Outcomes [ArcSight]",
+        "title": "Events by Outcomes [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -926,7 +926,7 @@
             "time_field": "deviceReceiptTime",
             "type": "timeseries"
           },
-          "title": "Events by Outcomes [ArcSight]",
+          "title": "Events by Outcomes [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -948,7 +948,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 20 Behaviors by Outcome [ArcSight]",
+        "title": "Top 20 Behaviors by Outcome [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -994,7 +994,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Top 20 Behaviors by Outcome [ArcSight]",
+          "title": "Top 20 Behaviors by Outcome [Filebeat CEF]",
           "type": "pie"
         }
       },
@@ -1022,7 +1022,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 15 Event Types by Events [ArcSight]",
+        "title": "Top 15 Event Types by Events [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -1109,7 +1109,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top 15 Event Types by Events [ArcSight]",
+          "title": "Top 15 Event Types by Events [Filebeat CEF]",
           "type": "table"
         }
       },
@@ -1137,7 +1137,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 5 Vendors by Product [ArcSight]",
+        "title": "Top 5 Vendors by Product [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1183,7 +1183,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Top 5 Vendors by Product [ArcSight]",
+          "title": "Top 5 Vendors by Product [Filebeat CEF]",
           "type": "pie"
         }
       },
@@ -1215,7 +1215,7 @@
             }
           }
         },
-        "title": "ArcSight: Dashboard Navigation",
+        "title": " Dashboard Navigation [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1224,7 +1224,7 @@
           "params": {
             "markdown": "[Network Overview](#/dashboard/dd0bc9af-2e89-4150-9b42-62517ea56b71) | [Network Suspicious Activity](#/dashboard/db1e1aca-279e-4ecc-b84e-fe58644f7619) | [Endpoint Overview](#dashboard/c10ce1cf-f6b8-4de4-8715-2cb5f6770b3b) | [Endpoint OS Activity](#/dashboard/9e352900-89c3-4c1b-863e-249e24d0dac9) | [Microsoft DNS Overview](#/dashboard/12741bcf-557d-4d9d-89f3-6acc8c22c102)"
           },
-          "title": "ArcSight: Dashboard Navigation",
+          "title": " Dashboard Navigation [Filebeat CEF]",
           "type": "markdown"
         }
       },
@@ -1250,7 +1250,7 @@
             }
           }
         },
-        "title": "Endpoint - OS Average EPS [ArcSight]",
+        "title": "Endpoint - OS Average EPS [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1330,7 +1330,7 @@
             "time_field": "deviceReceiptTime",
             "type": "gauge"
           },
-          "title": "Endpoint - OS Average EPS [ArcSight]",
+          "title": "Endpoint - OS Average EPS [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -1352,7 +1352,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Events by Source and Destination Users [ArcSight]",
+        "title": "Events by Source and Destination Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1526,7 +1526,7 @@
               }
             ]
           },
-          "title": "Events by Source and Destination Users [ArcSight]",
+          "title": "Events by Source and Destination Users [Filebeat CEF]",
           "type": "histogram"
         }
       },
@@ -1554,7 +1554,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Sources by Destinations [ArcSight]",
+        "title": "Top 10 Sources by Destinations [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1600,7 +1600,7 @@
             "isDonut": true,
             "legendPosition": "bottom"
           },
-          "title": "Top 10 Sources by Destinations [ArcSight]",
+          "title": "Top 10 Sources by Destinations [Filebeat CEF]",
           "type": "pie"
         }
       },
@@ -1628,7 +1628,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Source Users by Destination Users [ArcSight]",
+        "title": "Top 10 Source Users by Destination Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1674,7 +1674,7 @@
             "isDonut": true,
             "legendPosition": "bottom"
           },
-          "title": "Top 10 Source Users by Destination Users [ArcSight]",
+          "title": "Top 10 Source Users by Destination Users [Filebeat CEF]",
           "type": "pie"
         }
       },
@@ -1702,7 +1702,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Destinations [ArcSight]",
+        "title": "Top 10 Destinations [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1735,7 +1735,7 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "Top 10 Destinations [ArcSight]",
+          "title": "Top 10 Destinations [Filebeat CEF]",
           "type": "tagcloud"
         }
       },
@@ -1763,7 +1763,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Destination Users [ArcSight]",
+        "title": "Top 10 Destination Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1796,7 +1796,7 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "Top 10 Destination Users [ArcSight]",
+          "title": "Top 10 Destination Users [Filebeat CEF]",
           "type": "tagcloud"
         }
       },
@@ -1824,7 +1824,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Sources [ArcSight]",
+        "title": "Top 10 Sources [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1857,7 +1857,7 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "Top 10 Sources [ArcSight]",
+          "title": "Top 10 Sources [Filebeat CEF]",
           "type": "tagcloud"
         }
       },
@@ -1885,7 +1885,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Source Users [ArcSight]",
+        "title": "Top 10 Source Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1918,7 +1918,7 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "Top 10 Source Users [ArcSight]",
+          "title": "Top 10 Source Users [Filebeat CEF]",
           "type": "tagcloud"
         }
       },
@@ -1975,7 +1975,7 @@
             "desc"
           ]
         ],
-        "title": "Endpoint - OS Events [ArcSight]",
+        "title": "Endpoint - OS Events [Filebeat CEF]",
         "version": 1
       },
       "id": "e6cf2383-71f4-4db1-a791-1a7d4f110194",

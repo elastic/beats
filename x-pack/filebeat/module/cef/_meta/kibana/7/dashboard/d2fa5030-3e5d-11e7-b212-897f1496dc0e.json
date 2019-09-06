@@ -296,7 +296,7 @@
         "timeFrom": "now-24h",
         "timeRestore": true,
         "timeTo": "now",
-        "title": "[ArcSight] Endpoint Overview Dashboard",
+        "title": "[Filebeat CEF] Endpoint Overview Dashboard",
         "version": 1
       },
       "id": "c10ce1cf-f6b8-4de4-8715-2cb5f6770b3b",
@@ -392,7 +392,7 @@
             }
           }
         },
-        "title": "Endpoint Average EPS [ArcSight]",
+        "title": "Endpoint Average EPS [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -471,7 +471,7 @@
             "time_field": "deviceReceiptTime",
             "type": "gauge"
           },
-          "title": "Endpoint Average EPS [ArcSight]",
+          "title": "Endpoint Average EPS [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -493,7 +493,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Destination Ports by Outcomes [ArcSight]",
+        "title": "Destination Ports by Outcomes [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -607,7 +607,7 @@
               }
             ]
           },
-          "title": "Destination Ports by Outcomes [ArcSight]",
+          "title": "Destination Ports by Outcomes [Filebeat CEF]",
           "type": "histogram"
         }
       },
@@ -635,7 +635,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Outcomes Breakdown [ArcSight]",
+        "title": "Outcomes Breakdown [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -757,7 +757,7 @@
               }
             ]
           },
-          "title": "Outcomes Breakdown [ArcSight]",
+          "title": "Outcomes Breakdown [Filebeat CEF]",
           "type": "area"
         }
       },
@@ -789,7 +789,7 @@
             }
           }
         },
-        "title": "Events by Device [ArcSight]",
+        "title": "Events by Device [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -896,7 +896,7 @@
             "time_field": "deviceReceiptTime",
             "type": "timeseries"
           },
-          "title": "Events by Device [ArcSight]",
+          "title": "Events by Device [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -918,7 +918,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Destination Port [ArcSight]",
+        "title": "Top 10 Destination Port [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -950,7 +950,7 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "Top 10 Destination Port [ArcSight]",
+          "title": "Top 10 Destination Port [Filebeat CEF]",
           "type": "tagcloud"
         }
       },
@@ -978,7 +978,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Endpoint Metrics Overview [ArcSight]",
+        "title": "Endpoint Metrics Overview [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -1084,7 +1084,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Endpoint Metrics Overview [ArcSight]",
+          "title": "Endpoint Metrics Overview [Filebeat CEF]",
           "type": "metric"
         }
       },
@@ -1112,7 +1112,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Outcomes by Device Type [ArcSight]",
+        "title": "Outcomes by Device Type [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -1233,7 +1233,7 @@
               }
             ]
           },
-          "title": "Outcomes by Device Type [ArcSight]",
+          "title": "Outcomes by Device Type [Filebeat CEF]",
           "type": "histogram"
         }
       },
@@ -1285,7 +1285,7 @@
             "desc"
           ]
         ],
-        "title": "Endpoint Event Explorer [ArcSight]",
+        "title": "Endpoint Event Explorer [Filebeat CEF]",
         "version": 1
       },
       "id": "5cede2d3-20fe-4140-add4-4c4f841b71a2",
@@ -1312,7 +1312,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 5 Source Countries [ArcSight]",
+        "title": "Top 5 Source Countries [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1344,7 +1344,7 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "Top 5 Source Countries [ArcSight]",
+          "title": "Top 5 Source Countries [Filebeat CEF]",
           "type": "tagcloud"
         }
       },
@@ -1372,7 +1372,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Device Types by Vendor [ArcSight]",
+        "title": "Device Types by Vendor [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1418,7 +1418,7 @@
             "isDonut": false,
             "legendPosition": "right"
           },
-          "title": "Device Types by Vendor [ArcSight]",
+          "title": "Device Types by Vendor [Filebeat CEF]",
           "type": "pie"
         }
       },
@@ -1446,7 +1446,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Source Countries by Event [ArcSight]",
+        "title": "Top 10 Source Countries by Event [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -1524,7 +1524,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top 10 Source Countries by Event [ArcSight]",
+          "title": "Top 10 Source Countries by Event [Filebeat CEF]",
           "type": "table"
         }
       },
@@ -1552,7 +1552,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Outcomes by User Names [ArcSight]",
+        "title": "Outcomes by User Names [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -1624,7 +1624,7 @@
             "isDonut": false,
             "legendPosition": "right"
           },
-          "title": "Outcomes by User Names [ArcSight]",
+          "title": "Outcomes by User Names [Filebeat CEF]",
           "type": "pie"
         }
       },
@@ -1656,7 +1656,7 @@
             }
           }
         },
-        "title": "ArcSight: Dashboard Navigation",
+        "title": " Dashboard Navigation [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1665,7 +1665,7 @@
           "params": {
             "markdown": "[Network Overview](#/dashboard/dd0bc9af-2e89-4150-9b42-62517ea56b71) | [Network Suspicious Activity](#/dashboard/db1e1aca-279e-4ecc-b84e-fe58644f7619) | [Endpoint Overview](#dashboard/c10ce1cf-f6b8-4de4-8715-2cb5f6770b3b) | [Endpoint OS Activity](#/dashboard/f22c88af-6018-409f-9ce3-0430bf69d78b) | [Microsoft DNS Overview](#/dashboard/c26428a9-a5ba-45cc-bef1-966f53623d69)"
           },
-          "title": "ArcSight: Dashboard Navigation",
+          "title": " Dashboard Navigation [Filebeat CEF]",
           "type": "markdown"
         }
       },
@@ -1687,7 +1687,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top Destination Locations by Event [ArcSight]",
+        "title": "Top Destination Locations by Event [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1741,7 +1741,7 @@
               "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
-          "title": "Top Destination Locations by Event [ArcSight]",
+          "title": "Top Destination Locations by Event [Filebeat CEF]",
           "type": "tile_map"
         }
       },

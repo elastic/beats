@@ -249,7 +249,7 @@
         "timeFrom": "now-24h",
         "timeRestore": true,
         "timeTo": "now",
-        "title": "[ArcSight] Microsoft DNS Overview",
+        "title": "[Filebeat CEF] Microsoft DNS Overview",
         "version": 1
       },
       "id": "56428e01-0c47-4770-8ba4-9345a029ea41",
@@ -340,7 +340,7 @@
             }
           }
         },
-        "title": "DNS - Event Throughput [ArcSight]",
+        "title": "DNS - Event Throughput [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -427,7 +427,7 @@
             "time_field": "deviceReceiptTime",
             "type": "gauge"
           },
-          "title": "DNS - Event Throughput [ArcSight]",
+          "title": "DNS - Event Throughput [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -449,7 +449,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "DNS Metrics Overview [ArcSight]",
+        "title": "DNS Metrics Overview [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -543,7 +543,7 @@
             },
             "type": "gauge"
           },
-          "title": "DNS Metrics Overview [ArcSight]",
+          "title": "DNS Metrics Overview [Filebeat CEF]",
           "type": "metric"
         }
       },
@@ -571,7 +571,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top Destinations by Traffic Size [ArcSight]",
+        "title": "Top Destinations by Traffic Size [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -683,7 +683,7 @@
               }
             ]
           },
-          "title": "Top Destinations by Traffic Size [ArcSight]",
+          "title": "Top Destinations by Traffic Size [Filebeat CEF]",
           "type": "heatmap"
         }
       },
@@ -711,7 +711,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Event Types [ArcSight]",
+        "title": "Top 10 Event Types [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -743,7 +743,7 @@
             "orientation": "single",
             "scale": "square root"
           },
-          "title": "Top 10 Event Types [ArcSight]",
+          "title": "Top 10 Event Types [Filebeat CEF]",
           "type": "tagcloud"
         }
       },
@@ -771,7 +771,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Event Types by Size [ArcSight]",
+        "title": "Event Types by Size [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -922,7 +922,7 @@
               }
             ]
           },
-          "title": "Event Types by Size [ArcSight]",
+          "title": "Event Types by Size [Filebeat CEF]",
           "type": "histogram"
         }
       },
@@ -954,7 +954,7 @@
             }
           }
         },
-        "title": "Events Types by Severity [ArcSight]",
+        "title": "Events Types by Severity [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1039,7 +1039,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Events Types by Severity [ArcSight]",
+          "title": "Events Types by Severity [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -1061,7 +1061,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Destinations by Size [ArcSight]",
+        "title": "Top 10 Destinations by Size [Filebeat CEF]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -1130,7 +1130,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top 10 Destinations by Size [ArcSight]",
+          "title": "Top 10 Destinations by Size [Filebeat CEF]",
           "type": "table"
         }
       },
@@ -1162,7 +1162,7 @@
             }
           }
         },
-        "title": "ArcSight: Dashboard Navigation",
+        "title": " Dashboard Navigation [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1171,7 +1171,7 @@
           "params": {
             "markdown": "[Network Overview](#/dashboard/2e10a0ea-02e3-456a-86ec-866661f7ab09) | [Network Suspicious Activity](#/dashboard/a40d3f72-7daa-44ae-bfef-e2f4e5c034b0) | [Endpoint Overview](#dashboard/c8e1d65f-fc57-4f71-97f4-0b9c91a529ea) | [Endpoint OS Activity](#/dashboard/f22c88af-6018-409f-9ce3-0430bf69d78b) | [Microsoft DNS Overview](#/dashboard/56428e01-0c47-4770-8ba4-9345a029ea41)"
           },
-          "title": "ArcSight: Dashboard Navigation",
+          "title": " Dashboard Navigation [Filebeat CEF]",
           "type": "markdown"
         }
       },
@@ -1193,7 +1193,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Sources by Size [ArcSight]",
+        "title": "Top 10 Sources by Size [Filebeat CEF]",
         "uiStateJSON": {
           "P-11": {
             "vis": {
@@ -1320,7 +1320,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top 10 Sources by Size [ArcSight]",
+          "title": "Top 10 Sources by Size [Filebeat CEF]",
           "type": "table"
         }
       },
@@ -1352,7 +1352,7 @@
             }
           }
         },
-        "title": "Events by Direction [ArcSight]",
+        "title": "Events by Direction [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1449,7 +1449,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Events by Direction [ArcSight]",
+          "title": "Events by Direction [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -1475,7 +1475,7 @@
             }
           }
         },
-        "title": "Events by Size [ArcSight]",
+        "title": "Events by Size [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1559,7 +1559,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Events by Size [ArcSight]",
+          "title": "Events by Size [Filebeat CEF]",
           "type": "metrics"
         }
       },
@@ -1581,7 +1581,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top Destinations by Events [ArcSight]",
+        "title": "Top Destinations by Events [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1634,7 +1634,7 @@
               "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
-          "title": "Top Destinations by Events [ArcSight]",
+          "title": "Top Destinations by Events [Filebeat CEF]",
           "type": "tile_map"
         }
       },
@@ -1662,7 +1662,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top Sources by Events [ArcSight]",
+        "title": "Top Sources by Events [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1715,7 +1715,7 @@
               "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
-          "title": "Top Sources by Events [ArcSight]",
+          "title": "Top Sources by Events [Filebeat CEF]",
           "type": "tile_map"
         }
       },
@@ -1783,7 +1783,7 @@
             "desc"
           ]
         ],
-        "title": "Microsoft DNS Events [ArcSight]",
+        "title": "Microsoft DNS Events [Filebeat CEF]",
         "version": 1
       },
       "id": "f85a3444-8a43-4e46-b872-4e44bc25d0f3",
