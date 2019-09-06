@@ -63,7 +63,7 @@ TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration t
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
 STRESS_TEST_OPTIONS?=-timeout=20m -race -v
-GOX_OS?=linux darwin windows freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
+GOX_OS?=linux darwin windows openbsd ## @Building List of all OS to be supported by "make crosscompile".
 GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
 # XXX: Should be switched back to `snapshot` once the Elasticsearch
