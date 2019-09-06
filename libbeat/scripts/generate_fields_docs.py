@@ -11,7 +11,8 @@ def document_fields(output, section, sections, path):
         output.write("{}\n".format(section["prefix"]))
 
     # Intermediate level titles
-    if "description" in section and "prefix" not in section and "anchor" not in section:
+    if ("description" in section and "prefix" not in section and
+            "anchor" not in section):
         output.write("[float]\n")
 
     if "description" in section:
@@ -68,7 +69,8 @@ def document_field(output, field, path):
 
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
-            document_field(output, subfield, path + "." + subfield["name"])
+            document_field(output, subfield, path + "." +
+                           subfield["name"])
 
 
 def fields_to_asciidoc(input, output, beat):
@@ -124,7 +126,8 @@ if __name__ == "__main__":
         description="Generates the documentation for a Beat.")
     parser.add_argument("path", help="Path to the beat folder")
     parser.add_argument("beattitle", help="The beat title")
-    parser.add_argument("es_beats", help="The path to the general beats folder")
+    parser.add_argument("es_beats",
+                        help="The path to the general beats folder")
 
     args = parser.parse_args()
 

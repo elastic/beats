@@ -8,6 +8,7 @@ include::{asciidoc-dir}/../../shared/attributes62.asciidoc[]
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
 :beatname_pkg: {beatname_lc}
+:has_modules_command:
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
