@@ -81,7 +81,7 @@ endif::[]
 |<<export-command,`export`>> |{export-command-short-desc}.
 |<<help-command,`help`>> |{help-command-short-desc}.
 |<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
+ifdef::has_modules_command[]
 |<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
 |<<run-command,`run`>> |{run-command-short-desc}.
@@ -253,7 +253,7 @@ Shows help for the `keystore` command.
 see <<keystore>> for more examples.
 
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
+ifdef::has_modules_command[]
 
 [[modules-command]]
 ==== `modules` command
@@ -642,7 +642,7 @@ endif::[]
 *EXAMPLE*
 
 ["source","sh",subs="attributes"]
------
+----
 {beatname_lc} version
 ----
 
@@ -658,9 +658,9 @@ Overrides a specific configuration setting. You can specify multiple overrides.
 For example:
 +
 ["source","sh",subs="attributes"]
-----------------------------------------------------------------------
+----
 {beatname_lc} -E "name=mybeat" -E "output.elasticsearch.hosts=['http://myhost:9200']"
-----------------------------------------------------------------------
+----
 +
 This setting is applied to the currently running {beatname_uc} process.
 The {beatname_uc} configuration file is not changed.
@@ -671,9 +671,9 @@ ifeval::["{beatname_lc}"=="filebeat"]
 {beatname_uc} module. You can specify multiple variable overrides. For example:
 +
 ["source","sh",subs="attributes"]
-----------------------------------------------------------------------
+----
 {beatname_lc} -modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
-----------------------------------------------------------------------
+----
 
 endif::[]
 
