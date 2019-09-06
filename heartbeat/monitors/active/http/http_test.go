@@ -21,8 +21,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/go-lookslike/llpath"
-	"github.com/elastic/go-lookslike/llresult"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -33,8 +31,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/beat"
@@ -43,8 +39,11 @@ import (
 	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
+	"github.com/stretchr/testify/require"
 )
 
 func testRequest(t *testing.T, testURL string) *beat.Event {
@@ -104,8 +103,8 @@ func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 		httpBaseChecks(url),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
-				"response.status_code":   statusCode,
-				"response.body.hash": isdef.IsString,
+				"response.status_code": statusCode,
+				"response.body.hash":   isdef.IsString,
 				// TODO add this isdef to lookslike in a robust way
 				"response.body.bytes": isdef.Is("an int64 greater than 0", func(path llpath.Path, v interface{}) *llresult.Results {
 					raw, ok := v.(int64)
