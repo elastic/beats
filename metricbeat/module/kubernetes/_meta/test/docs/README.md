@@ -60,7 +60,7 @@ At the time of writing this the Pod has been only used for 2 tests from the same
 To deploy the pod _as is_ you need to:
 
 ```
-kubectl apply -f kubectl apply -f https://raw.githubusercontent.com/elastic/beats/master/metricbeat/module/kubernetes/_meta/test/docs/01_playground/playground-ubuntu.yaml
+kubectl apply -f https://raw.githubusercontent.com/elastic/beats/master/metricbeat/module/kubernetes/_meta/test/docs/01_playground/playground-ubuntu.yaml
 ```
 
 ## Test
