@@ -21,7 +21,7 @@ func init() {
 		}
 
 		// The system/socket dataset uses additional syscalls
-		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "perf_event_open", "eventfd2", "ppoll"); err != nil {
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "perf_event_open", "eventfd2", "ppoll", "mount", "umount2"); err != nil {
 			panic(err)
 		}
 	}
