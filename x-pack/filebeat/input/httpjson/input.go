@@ -212,7 +212,7 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 		}
 	}
 	if in.PaginationEnable {
-		v, err = common.MapStr(m.(map[string]interface{})).GetValue(in.PaginationIdField)
+		v, err = common.MapStr(m.(map[string]interface{})).GetValue(in.PaginationIDField)
 		if err != nil {
 			in.log.Info("Successfully processed HTTP request. Pagination finished.")
 			return nil

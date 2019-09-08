@@ -20,7 +20,7 @@ type config struct {
 	JSONObjects                string      `config:"json_objects_array"`
 	PaginationEnable           bool        `config:"pagination_enable"`
 	PaginationExtraBodyContent interface{} `config:"pagination_extra_body_content"`
-	PaginationIdField          string      `config:"pagination_id_field"`
+	PaginationIDField          string      `config:"pagination_id_field"`
 	PaginationRequestField     string      `config:"pagination_req_field"`
 	PaginationURL              string      `config:"pagination_url"`
 	ServerName                 string      `config:"server_name"`
