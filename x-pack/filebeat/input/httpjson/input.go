@@ -125,7 +125,7 @@ func (in *httpjsonInput) Run() {
 }
 
 // Create HTTP request for the input
-func (in *httpjsonInput) createHttpRequest(ctx context.Context, ri *requestInfo) (*http.Request, error) {
+func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo) (*http.Request, error) {
 	b, _ := json.Marshal(ri.ContentMap)
 	body := strings.NewReader(string(b))
 	req, err := http.NewRequest(in.HTTPMethod, ri.URL, body)
@@ -143,7 +143,7 @@ func (in *httpjsonInput) createHttpRequest(ctx context.Context, ri *requestInfo)
 }
 
 // Process HTTP request, recursively handle pagination if enable
-func (in *httpjsonInput) processHttpRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
+func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
 	msg, err := client.Do(req)
 	if err != nil {
 		in.log.Error(err)
@@ -239,12 +239,12 @@ func (in *httpjsonInput) processHttpRequest(ctx context.Context, client *http.Cl
 			default:
 			}
 		}
-		req, err = in.createHttpRequest(ctx, ri)
+		req, err = in.createHTTPRequest(ctx, ri)
 		if err != nil {
 			in.log.Error(err)
 			return err
 		}
-		in.processHttpRequest(ctx, client, req, ri)
+		in.processHTTPRequest(ctx, client, req, ri)
 	}
 	return nil
 }
@@ -286,12 +286,12 @@ func (in *httpjsonInput) run() error {
 			in.log.Error("HTTPRequestBody configuration is wrong, hence ignored!")
 		}
 	}
-	req, err := in.createHttpRequest(ctx, ri)
+	req, err := in.createHTTPRequest(ctx, ri)
 	if err != nil {
 		in.log.Error(err)
 		return err
 	}
-	err = in.processHttpRequest(ctx, client, req, ri)
+	err = in.processHTTPRequest(ctx, client, req, ri)
 	if err == nil && in.Interval > 0 {
 		ticker := time.NewTicker(time.Duration(in.Interval) * time.Second)
 		for {
@@ -300,7 +300,7 @@ func (in *httpjsonInput) run() error {
 				in.log.Info("Context done.")
 				return nil
 			case <-ticker.C:
-				err = in.processHttpRequest(ctx, client, req, ri)
+				err = in.processHTTPRequest(ctx, client, req, ri)
 			}
 		}
 	}
