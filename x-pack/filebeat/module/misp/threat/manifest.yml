@@ -2,11 +2,32 @@ module_version: "1.0"
 
 var:
   - name: input
-    default: misp
+    default: httpjson
+  - name: api_key
+    default: ""
+  - name: http_client_timeout
+    default: 30
+  - name: http_method
+    default: GET
+  - name: http_request_body
+    default: ""
+  - name: interval_in_seconds
+    default: 0
+  - name: json_objects_array
+    default: ""
+  - name: pagination_enable
+    default: false
+  - name: pagination_extra_body_content
+    default: ""
+  - name: pagination_id_field
+    default: ""
+  - name: pagination_req_field
+    default: ""
+  - name: pagination_url
+    default: ""
+  - name: server_name
+    default: ""
+  - name: url
+    default: ""
 
-# ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
-
-# requires.processors:
-# - name: geoip
-#   plugin: ingest-geoip

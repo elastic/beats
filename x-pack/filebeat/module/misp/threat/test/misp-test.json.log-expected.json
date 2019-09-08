@@ -1,0 +1,47 @@
+[
+    {
+        "@timestamp": "2017-03-30T12:54:26.000Z",
+        "event.category": "threat-intel",
+        "event.dataset": "misp.threat",
+        "event.module": "misp",
+        "event.type": "indicator",
+        "fileset.name": "threat",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "misp",
+        "threat.threat_indicator.attack_pattern": "[destination.ip = \"98.235.162.24\"]",
+        "threat.threat_indicator.description": "Tor exit nodes feed",
+        "threat.threat_indicator.feed": "misp",
+        "threat.threat_indicator.id": "58dcfe62-ed84-4e5e-b293-4991950d210f"
+    },
+    {
+        "@timestamp": "2017-03-30T12:54:26.000Z",
+        "event.category": "threat-intel",
+        "event.dataset": "misp.threat",
+        "event.module": "misp",
+        "event.type": "indicator",
+        "fileset.name": "threat",
+        "input.type": "log",
+        "log.offset": 460,
+        "service.type": "misp",
+        "threat.threat_indicator.attack_pattern": "[file.md5 = \"89357a1b2e32f2b9bddff94b8136810b\"]",
+        "threat.threat_indicator.description": "OSINT - OSX/Linker: New Mac malware attempts zero-day Gatekeeper bypass",
+        "threat.threat_indicator.feed": "misp",
+        "threat.threat_indicator.id": "5d159be2-d4b4-4d97-9e14-406a02de0b81"
+    },
+    {
+        "@timestamp": "2017-03-30T12:54:26.000Z",
+        "event.category": "threat-intel",
+        "event.dataset": "misp.threat",
+        "event.module": "misp",
+        "event.type": "indicator",
+        "fileset.name": "threat",
+        "input.type": "log",
+        "log.offset": 987,
+        "service.type": "misp",
+        "threat.threat_indicator.attack_pattern": "[file.path = \"f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de\"]",
+        "threat.threat_indicator.description": "OSINT - OSX/Linker: New Mac malware attempts zero-day Gatekeeper bypass",
+        "threat.threat_indicator.feed": "misp",
+        "threat.threat_indicator.id": "5d159be2-d4b4-4d97-9e14-406a02de0b81"
+    }
+]

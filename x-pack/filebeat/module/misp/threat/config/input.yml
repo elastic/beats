@@ -1,6 +1,17 @@
-{{ if eq .input "misp" }}
+{{ if eq .input "httpjson" }}
 
-type: misp
+type: httpjson
+api_key: {{ .api_key }}
+http_client_timeout: {{ .http_client_timeout }}
+http_method: {{ .http_method }}
+http_request_body: {{ .http_request_body }}
+interval_in_seconds: {{ .interval_in_seconds }}
+json_objects_array: {{ .json_objects_array }}
+pagination_enable: {{ .pagination_enable }}
+pagination_extra_body_content: {{ .pagination_extra_body_content }}
+pagination_id_field: {{ .pagination_id_field }}
+pagination_req_field: {{ .pagination_req_field }}
+pagination_url: {{ .pagination_url }}
 server_name: {{ .server_name }}
 url: {{ .url }}
 
@@ -14,9 +25,8 @@ paths:
 exclude_files: [".gz$"]
 
 {{ end }}
-
-# processors:
-#   - script:
-#       lang: javascript
-#       id: misp_script
-#       file: ${path.home}/module/misp/threat/config/pipeline.js
+processors:
+  - script:
+      lang: javascript
+      id: misp_script
+      file: ${path.home}/module/misp/threat/config/pipeline.js
