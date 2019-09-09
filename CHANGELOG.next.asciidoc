@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
+- cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
 
 *Heartbeat*
 
@@ -188,7 +189,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
 - Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
 - Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
-- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433]
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
 - Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
 
 *Packetbeat*
