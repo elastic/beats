@@ -1169,7 +1169,7 @@
           "aggs": [],
           "listeners": {},
           "params": {
-            "markdown": "[Network Overview](#/dashboard/2e10a0ea-02e3-456a-86ec-866661f7ab09) | [Network Suspicious Activity](#/dashboard/a40d3f72-7daa-44ae-bfef-e2f4e5c034b0) | [Endpoint Overview](#dashboard/c8e1d65f-fc57-4f71-97f4-0b9c91a529ea) | [Endpoint OS Activity](#/dashboard/f22c88af-6018-409f-9ce3-0430bf69d78b) | [Microsoft DNS Overview](#/dashboard/56428e01-0c47-4770-8ba4-9345a029ea41)"
+            "markdown": "[Network Overview](#/dashboard/2e10a0ea-02e3-456a-86ec-866661f7ab09) | [Network Suspicious Activity](#/dashboard/a40d3f72-7daa-44ae-bfef-e2f4e5c034b0) | [Endpoint Overview](#dashboard/c8e1d65f-fc57-4f71-97f4-0b9c91a529ea) | [Endpoint OS Activity](#/dashboard/9e352900-89c3-4c1b-863e-249e24d0dac9) | [Microsoft DNS Overview](#/dashboard/56428e01-0c47-4770-8ba4-9345a029ea41)"
           },
           "title": " Dashboard Navigation [Filebeat CEF]",
           "type": "markdown"
