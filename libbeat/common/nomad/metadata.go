@@ -43,6 +43,7 @@ type MetaGeneratorConfig struct {
 	LabelsDedot            bool `config:"labels.dedot"`
 	AnnotationsDedot       bool `config:"annotations.dedot"`
 	client                 *Client
+	nodesCache             map[string]string
 }
 
 type metaGenerator = MetaGeneratorConfig
@@ -191,10 +192,16 @@ func generateMapSubset(input common.MapStr, keys []string, dedot bool) common.Ma
 // does one additional API call to circunvent the empty NodeName property of
 // older Nomad versions
 func (g *metaGenerator) AllocationNodeName(id string) (string, error) {
+	if name, ok := g.nodesCache[id]; ok {
+		return name, nil
+	}
+
 	node, _, err := g.client.Nodes().Info(id, nil)
 	if err != nil {
 		return "", err
 	}
+
+	g.nodesCache[id] = node.Name
 
 	return node.Name, nil
 }
