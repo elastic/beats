@@ -180,7 +180,7 @@ Contains common fields available in all event types.
 required: True
 
 The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
-The Event Logging API was designed for Windows Server 2003 or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
+The Event Logging API was designed for Windows Server 2003, Windows XP, or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
 
 
 [[exported-fields-docker-processor]]
@@ -225,7 +225,7 @@ Image labels.
 
 
 [[exported-fields-eventlog]]
-== Event log record Fields
+== Event Log Record Fields
 
 Contains data from a Windows event log record.
 
