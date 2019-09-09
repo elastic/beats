@@ -108,10 +108,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-			Namespace:       "kubernetes.node",
-		})
+		event[mb.NamespaceKey] = "node"
+		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
+		if !reported {
+			m.Logger().Debug("error trying to emit event")
+			return
+		}
 	}
 }
 

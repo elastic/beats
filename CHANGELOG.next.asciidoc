@@ -188,7 +188,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
 - Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
 - Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
-- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433]
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
 - Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
 - Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
 
