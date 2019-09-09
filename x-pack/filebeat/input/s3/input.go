@@ -151,7 +151,12 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 
 	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "getAWSCredentials failed")
+		return nil, errors.Wrap(err, "failed to get aws credentials, please check AWS credential in config")
+	}
+
+	_, err = awsConfig.Credentials.Retrieve()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve aws credentials, please check AWS credential in config")
 	}
 
 	closeChannel := make(chan struct{})
