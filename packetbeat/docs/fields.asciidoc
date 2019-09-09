@@ -1893,8 +1893,6 @@ A map containing the captured header fields from the response. Which headers to 
 [float]
 === `http.response.body`
 
-type: text
-
 The body of the HTTP response.
 
 [[exported-fields-icmp]]
