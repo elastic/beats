@@ -68,7 +68,7 @@ func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 	w := &watcher{
 		client:  client,
 		options: options,
-		logger:  logp.NewLogger("kubernetes"),
+		logger:  logp.NewLogger("nomad"),
 	}
 
 	return w, nil
@@ -96,7 +96,7 @@ func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {
 
 // Sync the allocations on the given node and update the local metadata
 func (w *watcher) sync() error {
-	logp.Info("Nomad: Syncing allocations and metadata")
+	w.logger.Info("Nomad: Syncing allocations and metadata")
 
 	queryOpts := &api.QueryOptions{
 		WaitTime:   w.options.SyncTimeout,
@@ -110,7 +110,7 @@ func (w *watcher) sync() error {
 		// its restarted. This needs to be refreshed at intervals as well
 		nodes, _, err := w.client.Nodes().List(queryOpts)
 		if err != nil {
-			logp.Err("Nomad: Fetching node list err %s", err.Error())
+			w.logger.Errorf("Nomad: Fetching node list err %s", err.Error())
 			return err
 		}
 
@@ -125,7 +125,7 @@ func (w *watcher) sync() error {
 	// Do we need to keep direct access to the metadata as well?
 	allocations, meta, err := w.client.Nodes().Allocations(w.nodeID, queryOpts)
 	if err != nil {
-		logp.Err("Nomad: Fetching allocations err %s for %s,%s", err.Error(), w.options.Node, w.nodeID)
+		w.logger.Errorf("Nomad: Fetching allocations err %s for %s,%s", err.Error(), w.options.Node, w.nodeID)
 		return err
 	}
 
@@ -134,7 +134,8 @@ func (w *watcher) sync() error {
 
 	// Only work if the WaitIndex have changed
 	if remoteWaitIndex == localWaitIndex {
-		logp.Debug("Allocations index is unchanged (%d == %d)", fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
+		w.logger.Debug("Allocations index is unchanged (%d == %d)",
+			fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 		return nil
 	}
 
@@ -154,7 +155,8 @@ func (w *watcher) sync() error {
 		}
 	}
 
-	logp.Debug("Allocations index has changed (%d != %d)", fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
+	w.logger.Debug("Allocations index has changed (%d != %d)",
+		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 	w.allocations = allocations
 	queryOpts.WaitIndex = meta.LastIndex
 	w.lastFetch = time.Now()
