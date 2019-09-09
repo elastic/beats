@@ -52,7 +52,7 @@ var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
-	jsProcessor.RegisterPlugin("AddCloudMetadata", New)
+	jsProcessor.RegisterPlugin("AddDockerMetadata", New)
 }
 
 type addDockerMetadata struct {
