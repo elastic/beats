@@ -60,6 +60,24 @@ func NewTraceFSWithPath(path string) (*TraceFS, error) {
 	return &TraceFS{basePath: path}, nil
 }
 
+// IsTraceFSAvailableAt returns nil if the path passed is a mounted tracefs
+// or debugfs that supports KProbes. Otherwise returns an error.
+func IsTraceFSAvailableAt(path string) error {
+	_, err := os.Stat(filepath.Join(path, kprobeCfgFile))
+	return err
+}
+
+// IsTraceFSAvailable returns nil if a tracefs or debugfs supporting KProbes
+// is available at the well-known paths. Otherwise returns an error.
+func IsTraceFSAvailable() (err error) {
+	for _, path := range []string{traceFSPath, debugFSTracingPath} {
+		if err = IsTraceFSAvailableAt(path); err == nil {
+			break
+		}
+	}
+	return
+}
+
 // ListKProbes lists the currently installed kprobes / kretprobes
 func (dfs *TraceFS) ListKProbes() (kprobes []Probe, err error) {
 	return dfs.listProbes(kprobeCfgFile)
