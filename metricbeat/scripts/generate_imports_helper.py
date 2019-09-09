@@ -8,7 +8,7 @@ modules."""
 
 modules_by_platform = [
     {
-        "file_suffix": "_linux_darwin_windows",
+        "file_suffix": "_docker",
         "build_tags": "// +build linux darwin windows\n\n",
         "modules": ["docker", "kubernetes"],
     },
