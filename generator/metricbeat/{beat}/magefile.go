@@ -84,7 +84,7 @@ func FieldsDocs() error {
 	return devtools.Docs.FieldDocs(output)
 }
 
-//Fields generates a fields.yml for the Beat.
+// Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML("module")
 }
