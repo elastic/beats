@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -319,7 +319,7 @@ func (in *httpjsonInput) Wait() {
 }
 
 func makeEvent(body string) beat.Event {
-	id := uuid.New().String()
+	id := uuid.Must(uuid.NewV4())
 
 	fields := common.MapStr{
 		"event": common.MapStr{
