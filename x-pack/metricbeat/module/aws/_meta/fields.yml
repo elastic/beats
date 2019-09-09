@@ -18,3 +18,8 @@
           type: keyword
           description: >
             Name of a S3 bucket.
+    - name: cloud.account.id
+      type: keyword
+      description: >
+        The cloud account or organization id used to identify different
+        entities in a multi-tenant environment.

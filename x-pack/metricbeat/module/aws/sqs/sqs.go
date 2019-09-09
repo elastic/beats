@@ -115,7 +115,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Create Cloudwatch Events for SQS
-		err = createSQSEvents(queueURLs, metricDataResults, regionName, report)
+		err = createSQSEvents(queueURLs, metricDataResults, regionName, report, m.AccountName)
 		if err != nil {
 			m.Logger().Debug("Error trying to emit event")
 			return nil
@@ -172,8 +172,8 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 	return
 }
 
-func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
-	event = aws.InitEvent(regionName)
+func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema, accountID string) (event mb.Event, err error) {
+	event = aws.InitEvent(regionName, accountID)
 
 	// AWS sqs metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
@@ -206,11 +206,11 @@ func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, que
 	return
 }
 
-func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) error {
+func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2, accountID string) error {
 	for _, queueURL := range queueURLs {
 		queueURLParsed := strings.Split(queueURL, "/")
 		queueName := queueURLParsed[len(queueURLParsed)-1]
-		event, err := createEventPerQueue(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields)
+		event, err := createEventPerQueue(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields, accountID)
 		if err != nil {
 			event.Error = err
 			report.Event(event)

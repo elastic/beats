@@ -129,7 +129,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Create Cloudwatch Events for RDS
-		events, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap)
+		events, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap, m.AccountName)
 		if err != nil {
 			m.Logger().Error(err.Error())
 			report.Error(err)
@@ -223,13 +223,13 @@ func constructLabel(metricDimensions []cloudwatch.Dimension, dbInstanceARN strin
 	return label
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap map[string]DBDetails) (map[string]mb.Event, error) {
+func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap map[string]DBDetails, accountID string) (map[string]mb.Event, error) {
 	// Initialize events and metricSetFieldResults per dbInstance
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
 
 	for dbInstanceArn := range dbInstanceMap {
-		events[dbInstanceArn] = aws.InitEvent(regionName)
+		events[dbInstanceArn] = aws.InitEvent(regionName, accountID)
 		metricSetFieldResults[dbInstanceArn] = map[string]interface{}{}
 	}
 
