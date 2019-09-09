@@ -31,6 +31,7 @@ grouped in the following categories:
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
 * <<exported-fields-thrift>>
+* <<exported-fields-tls>>
 * <<exported-fields-trans_event>>
 * <<exported-fields-trans_measurements>>
 
@@ -2736,6 +2737,502 @@ The value returned by the Thrift-RPC call. This is encoded in a human readable f
 === thrift.exceptions
 
 If the call resulted in exceptions, this field contains the exceptions in a human readable format.
+
+
+[[exported-fields-tls]]
+== TLS Fields
+
+TLS-specific event fields.
+
+
+
+
+[float]
+=== tls.handshake_completed
+
+type: boolean
+
+Whether the TLS negotiation has been successful and the session has transitioned to encrypted mode.
+
+
+[float]
+=== tls.resumed
+
+type: boolean
+
+If the TLS session has been resumed from a previous session.
+
+
+[float]
+=== tls.resumption_method
+
+type: keyword
+
+If the session has been resumed, the underlying method used. One of "id" for TLS session ID or "ticket" for TLS ticket extension.
+
+
+[float]
+=== tls.client_certificate_requested
+
+type: boolean
+
+Whether the server has requested the client to authenticate itself using a client certificate.
+
+
+
+[float]
+=== tls.client_hello.version
+
+type: keyword
+
+The version of the TLS protocol by which the client wishes to communicate during this session.
+
+
+[float]
+=== tls.client_hello.supported_ciphers
+
+type: array
+
+List of ciphers the client is willing to use for this session. See https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
+
+
+[float]
+=== tls.client_hello.supported_compression_methods
+
+type: array
+
+The list of compression methods the client supports. See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
+
+
+[float]
+== extensions Fields
+
+The hello extensions provided by the client.
+
+
+[float]
+=== tls.client_hello.extensions.server_name_indication
+
+type: keyword
+
+List of hostnames
+
+[float]
+=== tls.client_hello.extensions.application_layer_protocol_negotiation
+
+type: keyword
+
+List of application-layer protocols the client is willing to use.
+
+
+[float]
+=== tls.client_hello.extensions.session_ticket
+
+type: keyword
+
+Length of the session ticket, if provided, or an empty string to advertise support for tickets.
+
+
+
+[float]
+=== tls.server_hello.version
+
+type: keyword
+
+The version of the TLS protocol that is used for this session. It is the highest version supported by the server not exceeding the version requested in the client hello.
+
+
+[float]
+=== tls.server_hello.selected_cipher
+
+type: keyword
+
+The cipher suite selected by the server from the list provided by in the client hello.
+
+
+[float]
+=== tls.server_hello.selected_compression_method
+
+type: keyword
+
+The compression method selected by the server from the list provided in the client hello.
+
+
+[float]
+== extensions Fields
+
+The hello extensions provided by the server.
+
+
+[float]
+=== tls.server_hello.extensions.application_layer_protocol_negotiation
+
+type: array
+
+Negotiated application layer protocol
+
+[float]
+=== tls.server_hello.extensions.session_ticket
+
+type: keyword
+
+Used to announce that a session ticket will be provided by the server. Always an empty string.
+
+
+[float]
+== client_certificate Fields
+
+Certificate provided by the client for authentication.
+
+
+[float]
+=== tls.client_certificate.version
+
+type: long
+
+X509 format version.
+
+[float]
+=== tls.client_certificate.serial_number
+
+type: keyword
+
+The certificate's serial number.
+
+[float]
+=== tls.client_certificate.not_before
+
+type: date
+
+Date before which the certificate is not valid.
+
+[float]
+=== tls.client_certificate.not_after
+
+type: date
+
+Date after which the certificate expires.
+
+[float]
+=== tls.client_certificate.public_key_algorithm
+
+type: keyword
+
+The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
+
+
+[float]
+=== tls.client_certificate.public_key_size
+
+type: long
+
+Size of the public key.
+
+[float]
+=== tls.client_certificate.signature_algorithm
+
+type: keyword
+
+The algorithm used for the certificate's signature.
+
+
+[float]
+=== tls.client_certificate.alternative_names
+
+type: array
+
+Subject Alternative Names for this certificate.
+
+[float]
+=== tls.client_certificate.raw
+
+type: keyword
+
+The raw certificate in PEM format.
+
+[float]
+== subject Fields
+
+Subject represented by this certificate.
+
+
+[float]
+=== tls.client_certificate.subject.country
+
+type: keyword
+
+Country code.
+
+[float]
+=== tls.client_certificate.subject.organization
+
+type: keyword
+
+Organization name.
+
+[float]
+=== tls.client_certificate.subject.organizational_unit
+
+type: keyword
+
+Unit within organization.
+
+[float]
+=== tls.client_certificate.subject.province
+
+type: keyword
+
+Province or region within country.
+
+[float]
+=== tls.client_certificate.subject.common_name
+
+type: keyword
+
+Name or host name identified by the certificate.
+
+[float]
+== issuer Fields
+
+Entity that issued and signed this certificate.
+
+
+[float]
+=== tls.client_certificate.issuer.country
+
+type: keyword
+
+Country code.
+
+[float]
+=== tls.client_certificate.issuer.organization
+
+type: keyword
+
+Organization name.
+
+[float]
+=== tls.client_certificate.issuer.organizational_unit
+
+type: keyword
+
+Unit within organization.
+
+[float]
+=== tls.client_certificate.issuer.province
+
+type: keyword
+
+Province or region within country.
+
+[float]
+=== tls.client_certificate.issuer.common_name
+
+type: keyword
+
+Name or host name identified by the certificate.
+
+[float]
+== server_certificate Fields
+
+Certificate provided by the server for authentication.
+
+
+[float]
+=== tls.server_certificate.version
+
+type: long
+
+X509 format version.
+
+[float]
+=== tls.server_certificate.serial_number
+
+type: keyword
+
+The certificate's serial number.
+
+[float]
+=== tls.server_certificate.not_before
+
+type: date
+
+Date before which the certificate is not valid.
+
+[float]
+=== tls.server_certificate.not_after
+
+type: date
+
+Date after which the certificate expires.
+
+[float]
+=== tls.server_certificate.public_key_algorithm
+
+type: keyword
+
+The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
+
+
+[float]
+=== tls.server_certificate.public_key_size
+
+type: long
+
+Size of the public key.
+
+[float]
+=== tls.server_certificate.signature_algorithm
+
+type: keyword
+
+The algorithm used for the certificate's signature.
+
+
+[float]
+=== tls.server_certificate.alternative_names
+
+type: array
+
+Subject Alternative Names for this certificate.
+
+[float]
+=== tls.server_certificate.raw
+
+type: keyword
+
+The raw certificate in PEM format.
+
+[float]
+== subject Fields
+
+Subject represented by this certificate.
+
+
+[float]
+=== tls.server_certificate.subject.country
+
+type: keyword
+
+Country code.
+
+[float]
+=== tls.server_certificate.subject.organization
+
+type: keyword
+
+Organization name.
+
+[float]
+=== tls.server_certificate.subject.organizational_unit
+
+type: keyword
+
+Unit within organization.
+
+[float]
+=== tls.server_certificate.subject.province
+
+type: keyword
+
+Province or region within country.
+
+[float]
+=== tls.server_certificate.subject.common_name
+
+type: keyword
+
+Name or host name identified by the certificate.
+
+[float]
+== issuer Fields
+
+Entity that issued and signed this certificate.
+
+
+[float]
+=== tls.server_certificate.issuer.country
+
+type: keyword
+
+Country code.
+
+[float]
+=== tls.server_certificate.issuer.organization
+
+type: keyword
+
+Organization name.
+
+[float]
+=== tls.server_certificate.issuer.organizational_unit
+
+type: keyword
+
+Unit within organization.
+
+[float]
+=== tls.server_certificate.issuer.province
+
+type: keyword
+
+Province or region within country.
+
+[float]
+=== tls.server_certificate.issuer.common_name
+
+type: keyword
+
+Name or host name identified by the certificate.
+
+[float]
+=== tls.server_certificate_chain
+
+type: array
+
+Chain of trust for the server certificate.
+
+[float]
+=== tls.client_certificate_chain
+
+type: array
+
+Chain of trust for the client certificate.
+
+[float]
+=== tls.alert_types
+
+type: keyword
+
+An array containing the TLS alert type for every alert received.
+
+
+[float]
+== fingerprints Fields
+
+Fingerprints for this TLS session.
+
+
+[float]
+== ja3 Fields
+
+JA3 TLS client fingerprint
+
+
+[float]
+=== tls.fingerprints.ja3.hash
+
+type: keyword
+
+The JA3 fingerprint hash for the client side.
+
+
+[float]
+=== tls.fingerprints.ja3.str
+
+type: keyword
+
+The JA3 string used to calculate the hash.
 
 
 [[exported-fields-trans_event]]
