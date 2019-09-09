@@ -24,7 +24,6 @@ def get_importable_lines(go_beat_path, import_line):
     not_common_modules = []
     for m in modules_by_platform:
         not_common_modules.extend(m["modules"])
-    print(not_common_modules)
 
     for platform_info in modules_by_platform:
         lines = []
