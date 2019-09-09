@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const flagParsingError = "dissect_parsing_error"
@@ -36,7 +36,7 @@ type processor struct {
 
 func init() {
 	processors.RegisterPlugin("dissect", NewProcessor)
-	jsProcessor.RegisterPlugin("Dissect", NewProcessor)
+	jsprocessor.RegisterPlugin("Dissect", NewProcessor)
 }
 
 // NewProcessor constructs a new dissect processor.

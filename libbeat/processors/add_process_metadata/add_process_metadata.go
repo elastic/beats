@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -73,7 +73,7 @@ type processMetadataProvider interface {
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
-	jsProcessor.RegisterPlugin("AddProcessMetadata", New)
+	jsprocessor.RegisterPlugin("AddProcessMetadata", New)
 }
 
 // New constructs a new add_process_metadata processor.

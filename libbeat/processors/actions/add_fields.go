@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/checks"
-	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type addFields struct {
@@ -42,7 +42,7 @@ func init() {
 			checks.RequireFields(FieldsKey),
 			checks.AllowedFields(FieldsKey, "target", "when")))
 
-	jsProcessor.RegisterPlugin("AddFields", CreateAddFields)
+	jsprocessor.RegisterPlugin("AddFields", CreateAddFields)
 }
 
 // CreateAddFields constructs an add_fields processor from config.

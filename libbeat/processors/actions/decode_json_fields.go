@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/checks"
-	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type decodeJSONFields struct {
@@ -68,7 +68,7 @@ func init() {
 			checks.RequireFields("fields"),
 			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when")))
 
-	jsProcessor.RegisterPlugin("DecodeJSONFields", NewDecodeJSONFields)
+	jsprocessor.RegisterPlugin("DecodeJSONFields", NewDecodeJSONFields)
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.

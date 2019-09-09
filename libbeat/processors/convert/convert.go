@@ -30,14 +30,14 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	jsProcessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.convert"
 
 func init() {
 	processors.RegisterPlugin("convert", New)
-	jsProcessor.RegisterPlugin("Convert", New)
+	jsprocessor.RegisterPlugin("Convert", New)
 }
 
 type processor struct {
