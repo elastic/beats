@@ -90,7 +90,7 @@ func TestAllocationMetadata(t *testing.T) {
 		"include_annotations": []string{"b", "b.key"},
 	})
 
-	metaGen, err := NewMetaGenerator(config)
+	metaGen, err := NewMetaGenerator(config, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +121,7 @@ func TestExcludeMetadata(t *testing.T) {
 		"exclude_labels": []string{"key1", "canary_tags"},
 	})
 
-	metaGen, err := NewMetaGenerator(config)
+	metaGen, err := NewMetaGenerator(config, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

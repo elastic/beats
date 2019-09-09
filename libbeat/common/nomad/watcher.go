@@ -41,13 +41,12 @@ type Watcher interface {
 }
 
 type watcher struct {
-	client      *api.Client
-	options     WatchOptions
-	logger      *logp.Logger
-	nodeID      string
-	allocations []*api.Allocation
-	lastFetch   time.Time
-	handler     ResourceEventHandlerFuncs
+	client    *api.Client
+	options   WatchOptions
+	logger    *logp.Logger
+	nodeID    string
+	lastFetch time.Time
+	handler   ResourceEventHandlerFuncs
 }
 
 // WatchOptions controls watch behaviors
@@ -105,9 +104,8 @@ func (w *watcher) sync() error {
 	}
 
 	if w.nodeID == "" {
-		// Fetch the nodeId from the node name
-		// TODO this is not enough because it could be that ID of the node changes if
-		// its restarted. This needs to be refreshed at intervals as well
+		// Fetch the nodeId from the node name, used to filter the allocations
+		// If for some reason the NodeID changes filebeat will have to be restarted as well
 		nodes, _, err := w.client.Nodes().List(queryOpts)
 		if err != nil {
 			w.logger.Errorf("Nomad: Fetching node list err %s", err.Error())
@@ -157,7 +155,7 @@ func (w *watcher) sync() error {
 
 	w.logger.Debug("Allocations index has changed (%d != %d)",
 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
-	w.allocations = allocations
+
 	queryOpts.WaitIndex = meta.LastIndex
 	w.lastFetch = time.Now()
 

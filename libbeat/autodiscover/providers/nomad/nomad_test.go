@@ -18,9 +18,7 @@
 package nomad
 
 import (
-	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -33,6 +31,7 @@ import (
 	"github.com/hashicorp/nomad/helper"
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/jarcoal/httpmock.v1"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -135,6 +134,7 @@ func TestEmitEvent(t *testing.T) {
 				Name:      "job.task",
 				Namespace: namespace,
 				NodeName:  host,
+				NodeID:    "nomad1",
 				Job: &nomad.Job{
 					ID:          helper.StringToPtr(UUID.String()),
 					Region:      helper.StringToPtr("global"),
@@ -216,6 +216,7 @@ func TestEmitEvent(t *testing.T) {
 				Name:      "job.task",
 				Namespace: "default",
 				NodeName:  "",
+				NodeID:    "5456bd7a",
 				Job: &nomad.Job{
 					ID:          helper.StringToPtr(UUID.String()),
 					Region:      helper.StringToPtr("global"),
@@ -262,14 +263,30 @@ func TestEmitEvent(t *testing.T) {
 		},
 	}
 
+	config := api.DefaultConfig()
+	config.Address = "http://127.0.0.1"
+	config.SecretID = ""
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	// use the httpmock patched client
+	config.HttpClient = http.DefaultClient
+
+	httpmock.RegisterResponder(http.MethodGet, "http://127.0.0.1/v1/node/5456bd7a",
+		func(req *http.Request) (*http.Response, error) {
+			return httpmock.NewStringResponse(http.StatusNotFound, ""), nil
+		},
+	)
+
+	client, err := api.NewClient(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			client, err := makeClient()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -301,6 +318,8 @@ func TestEmitEvent(t *testing.T) {
 			}
 		})
 	}
+
+	assert.Equal(t, httpmock.GetCallCountInfo()["GET http://127.0.0.1/v1/node/5456bd7a"], 1)
 }
 
 func getNestedAnnotations(in common.MapStr) common.MapStr {
@@ -310,17 +329,4 @@ func getNestedAnnotations(in common.MapStr) common.MapStr {
 		out.Put(k, v)
 	}
 	return out
-}
-
-func makeClient() (*nomad.Client, error) {
-	config := api.DefaultConfig()
-
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hello, client")
-	}))
-	defer ts.Close()
-
-	config.Address = ts.URL
-
-	return api.NewClient(config)
 }
