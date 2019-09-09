@@ -418,7 +418,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Source Users",
-                "field": "sourceUserName",
+                "field": "source.user.name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -431,7 +431,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Event Types",
-                "field": "categoryBehavior"
+                "field": "cef.extensions.categoryBehavior"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -441,7 +441,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Destination User Names",
-                "field": "destinationUserName"
+                "field": "destination.user.name"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -626,7 +626,7 @@
               "id": "6",
               "params": {
                 "customLabel": "Devices",
-                "field": "deviceHostName"
+                "field": "observer.hostname"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -636,7 +636,7 @@
               "id": "7",
               "params": {
                 "customLabel": "Event Types",
-                "field": "categoryBehavior"
+                "field": "cef.extensions.categoryBehavior"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -646,7 +646,7 @@
               "id": "8",
               "params": {
                 "customLabel": "Event Outcomes",
-                "field": "categoryOutcome"
+                "field": "cef.extensions.categoryOutcome"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -757,7 +757,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Event Type",
-                "field": "categoryBehavior",
+                "field": "cef.extensions.categoryBehavior",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -770,7 +770,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Event Outcome",
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -852,7 +852,7 @@
             "axis_position": "left",
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceGroup:\"/Operating System\""
+              "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\""
             },
             "id": "74716d29-91c6-4095-bc7d-7f6700f12b1f",
             "index_pattern": "filebeat-*",
@@ -879,26 +879,26 @@
                 "split_filters": [
                   {
                     "color": "rgba(244,78,59,1)",
-                    "filter": "categoryOutcome:\"/Failure\"",
+                    "filter": "cef.extensions.categoryOutcome:\"/Failure\"",
                     "id": "94371b84-a7aa-4824-b4d1-217ecbe725a5",
                     "label": "Failure"
                   },
                   {
                     "color": "rgba(104,188,0,1)",
-                    "filter": "categoryOutcome:\"/Success\"",
+                    "filter": "cef.extensions.categoryOutcome:\"/Success\"",
                     "id": "31564794-9278-4f2e-bb20-557f5cfbea79",
                     "label": "Success"
                   },
                   {
                     "color": "rgba(251,158,0,1)",
-                    "filter": "categoryOutcome:\"/Attempt\"",
+                    "filter": "cef.extensions.categoryOutcome:\"/Attempt\"",
                     "id": "10c0f919-0853-41b5-94b4-2e39932e7aa0",
                     "label": "Attempt"
                   }
                 ],
                 "split_mode": "filters",
                 "stacked": "none",
-                "terms_field": "categoryOutcome",
+                "terms_field": "cef.extensions.categoryOutcome",
                 "terms_size": "3"
               },
               {
@@ -923,7 +923,7 @@
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "timeseries"
           },
           "title": "Events by Outcomes [Filebeat CEF]",
@@ -965,7 +965,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Event Behavior",
-                "field": "categoryBehavior",
+                "field": "cef.extensions.categoryBehavior",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -978,7 +978,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Event Outcome",
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 3
@@ -1041,7 +1041,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Event Types",
-                "field": "categoryBehavior",
+                "field": "cef.extensions.categoryBehavior",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 15
@@ -1054,7 +1054,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Source Users",
-                "field": "sourceUserName"
+                "field": "source.user.name"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1064,7 +1064,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Destination Users",
-                "field": "destinationUserName"
+                "field": "destination.user.name"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1074,7 +1074,7 @@
               "id": "5",
               "params": {
                 "customLabel": "Source Hosts",
-                "field": "sourceHostName"
+                "field": "source.domain"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1084,7 +1084,7 @@
               "id": "6",
               "params": {
                 "customLabel": "Destination Hosts",
-                "field": "destinationHostName"
+                "field": "destination.domain"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1154,7 +1154,7 @@
               "id": "2",
               "params": {
                 "customLabel": "OS Vendor",
-                "field": "deviceVendor",
+                "field": "cef.device.vendor",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1167,7 +1167,7 @@
               "id": "3",
               "params": {
                 "customLabel": "OS Product",
-                "field": "deviceProduct",
+                "field": "cef.device.product",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1266,7 +1266,7 @@
             ],
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceGroup:\"/Operating System\""
+              "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\""
             },
             "gauge_color_rules": [
               {
@@ -1315,7 +1315,7 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "offset_time": "1m",
@@ -1327,7 +1327,7 @@
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "gauge"
           },
           "title": "Endpoint - OS Average EPS [Filebeat CEF]",
@@ -1372,7 +1372,7 @@
               "params": {
                 "customLabel": "Timestamp",
                 "extended_bounds": {},
-                "field": "deviceReceiptTime",
+                "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1
               },
@@ -1384,7 +1384,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Source Users",
-                "field": "sourceUserName"
+                "field": "source.user.name"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1394,7 +1394,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Destination Users",
-                "field": "destinationUserName"
+                "field": "destination.user.name"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1571,7 +1571,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Source Host",
-                "field": "sourceHostName",
+                "field": "source.domain",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1584,7 +1584,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Destination Host",
-                "field": "destinationHostName",
+                "field": "destination.domain",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1645,7 +1645,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Source Users",
-                "field": "sourceUserName",
+                "field": "source.user.name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1658,7 +1658,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Destination Users",
-                "field": "destinationUserName",
+                "field": "destination.user.name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1719,7 +1719,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Destination Hosts",
-                "field": "destinationHostName",
+                "field": "destination.domain",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1780,7 +1780,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Destination Users",
-                "field": "destinationUserName",
+                "field": "destination.user.name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1841,7 +1841,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Source Hosts",
-                "field": "sourceHostName",
+                "field": "source.domain",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1902,7 +1902,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Source Users",
-                "field": "sourceUserName",
+                "field": "source.user.name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1940,18 +1940,18 @@
     {
       "attributes": {
         "columns": [
-          "deviceVendor",
-          "deviceProduct",
-          "name",
-          "deviceEventClassId",
-          "deviceEventCategory",
-          "sourceUserName",
-          "destinationUserName",
-          "destinationHostName",
-          "categoryBehavior",
-          "categoryOutcome",
-          "sourceNtDomain",
-          "destinationNTDomain"
+          "cef.device.vendor",
+          "cef.device.product",
+          "message",
+          "cef.device.event_class_id",
+          "cef.extensions.deviceEventCategory",
+          "source.user.name",
+          "destination.user.name",
+          "destination.domain",
+          "cef.extensions.categoryBehavior",
+          "cef.extensions.categoryOutcome",
+          "cef.extensions.sourceNtDomain",
+          "cef.extensions.destinationNtDomain"
         ],
         "description": "",
         "hits": 0,
@@ -1963,7 +1963,7 @@
             "query": {
               "query_string": {
                 "analyze_wildcard": true,
-                "query": "categoryDeviceGroup:\"/Operating System\""
+                "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\""
               }
             },
             "version": true
@@ -1971,7 +1971,7 @@
         },
         "sort": [
           [
-            "deviceReceiptTime",
+            "@timestamp",
             "desc"
           ]
         ],

@@ -143,16 +143,16 @@
           {
             "embeddableConfig": {
               "columns": [
-                "categoryDeviceGroup",
-                "categoryTechnique",
-                "categoryOutcome",
-                "categorySignificance",
-                "categoryObject",
-                "categoryBehavior",
-                "categoryDeviceType"
+                "cef.extensions.categoryDeviceGroup",
+                "cef.extensions.categoryTechnique",
+                "cef.extensions.categoryOutcome",
+                "cef.extensions.categorySignificance",
+                "cef.extensions.categoryObject",
+                "cef.extensions.categoryBehavior",
+                "cef.extensions.categoryDeviceType"
               ],
               "sort": [
-                "deviceReceiptTime",
+                "@timestamp",
                 "desc"
               ]
             },
@@ -408,7 +408,7 @@
             ],
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceGroup:\"/Operating System\" OR categoryDeviceGroup:\"/IDS/Host\" OR categoryDeviceGroup:\"/Application\""
+              "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Host\" OR cef.extensions.categoryDeviceGroup:\"/Application\""
             },
             "gauge_color_rules": [
               {
@@ -457,7 +457,7 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": 1,
@@ -468,7 +468,7 @@
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "gauge"
           },
           "title": "Endpoint Average EPS [Filebeat CEF]",
@@ -509,7 +509,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "destinationPort",
+                "field": "destination.port",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -521,7 +521,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -549,7 +549,7 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "destinationPort: Descending"
+                  "text": "destination.port: Descending"
                 },
                 "type": "category"
               }
@@ -661,7 +661,7 @@
               "params": {
                 "customLabel": "Time",
                 "extended_bounds": {},
-                "field": "deviceReceiptTime",
+                "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1
               },
@@ -672,7 +672,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -800,7 +800,7 @@
             "axis_position": "left",
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceGroup:\"/Operating System\" OR categoryDeviceGroup:\"/IDS/Host\" OR categoryDeviceGroup:\"/Application\""
+              "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Host\" OR cef.extensions.categoryDeviceGroup:\"/Application\""
             },
             "id": "fd1ffeb6-678e-4163-9421-6a164fd59048",
             "index_pattern": "filebeat-*",
@@ -830,7 +830,7 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": 1,
@@ -838,19 +838,19 @@
                 "split_filters": [
                   {
                     "color": "rgba(244,78,59,1)",
-                    "filter": "categoryDeviceGroup:\"/Operating System\" ",
+                    "filter": "cef.extensions.categoryDeviceGroup:\"/Operating System\" ",
                     "id": "d9a580c3-eb83-4d20-a391-0934d7df8837",
                     "label": "Operating System"
                   },
                   {
                     "color": "rgba(254,146,0,1)",
-                    "filter": " categoryDeviceGroup:\"/IDS/Host\"",
+                    "filter": " cef.extensions.categoryDeviceGroup:\"/IDS/Host\"",
                     "id": "9ce8be14-6191-4c9a-a679-e3992fdab8d2",
                     "label": "Host IDS"
                   },
                   {
                     "color": "rgba(252,220,0,1)",
-                    "filter": "categoryDeviceGroup:\"/Application\"",
+                    "filter": "cef.extensions.categoryDeviceGroup:\"/Application\"",
                     "id": "262ecd54-a042-4bfb-b489-d7db8431c36e",
                     "label": "Application"
                   }
@@ -882,18 +882,18 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": 1,
                 "seperate_axis": 1,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "deviceHostName"
+                "terms_field": "observer.hostname"
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "timeseries"
           },
           "title": "Events by Device [Filebeat CEF]",
@@ -934,7 +934,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "destinationPort",
+                "field": "destination.port",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -1003,7 +1003,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Devices",
-                "field": "deviceHostName"
+                "field": "observer.hostname"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1013,7 +1013,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Source",
-                "field": "sourceAddress"
+                "field": "source.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1023,7 +1023,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Destination",
-                "field": "destinationAddress"
+                "field": "destination.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1033,7 +1033,7 @@
               "id": "5",
               "params": {
                 "customLabel": "Port",
-                "field": "destinationPort"
+                "field": "destination.port"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1135,7 +1135,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "categoryDeviceType",
+                "field": "cef.extensions.categoryDeviceType",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1147,7 +1147,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1177,7 +1177,7 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "categoryDeviceType: Descending"
+                  "text": "cef.extensions.categoryDeviceType: Descending"
                 },
                 "type": "category"
               }
@@ -1255,13 +1255,13 @@
     {
       "attributes": {
         "columns": [
-          "categoryDeviceGroup",
-          "categoryTechnique",
-          "categoryOutcome",
-          "categorySignificance",
-          "categoryObject",
-          "categoryBehavior",
-          "categoryDeviceType"
+          "cef.extensions.categoryDeviceGroup",
+          "cef.extensions.categoryTechnique",
+          "cef.extensions.categoryOutcome",
+          "cef.extensions.categorySignificance",
+          "cef.extensions.categoryObject",
+          "cef.extensions.categoryBehavior",
+          "cef.extensions.categoryDeviceType"
         ],
         "description": "",
         "hits": 0,
@@ -1273,7 +1273,7 @@
             "query": {
               "query_string": {
                 "analyze_wildcard": true,
-                "query": "categoryDeviceGroup:\"/Operating System\" OR categoryDeviceGroup:\"/IDS/Host\" OR categoryDeviceGroup:\"/Application\""
+                "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Host\" OR cef.extensions.categoryDeviceGroup:\"/Application\""
               }
             },
             "version": true
@@ -1281,7 +1281,7 @@
         },
         "sort": [
           [
-            "deviceReceiptTime",
+            "@timestamp",
             "desc"
           ]
         ],
@@ -1328,7 +1328,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "source.country_name",
+                "field": "source.geo.country_iso_code",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -1389,7 +1389,7 @@
               "id": "2",
               "params": {
                 "exclude": "Network-based IDS/IPS",
-                "field": "categoryDeviceType",
+                "field": "cef.extensions.categoryDeviceType",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1402,7 +1402,7 @@
               "id": "3",
               "params": {
                 "exclude": "",
-                "field": "deviceVendor",
+                "field": "cef.device.vendor",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1473,7 +1473,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "source.country_name",
+                "field": "source.geo.country_iso_code",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 35
@@ -1486,7 +1486,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Source Addresses",
-                "field": "sourceAddress"
+                "field": "source.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1496,7 +1496,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Destination Addresses",
-                "field": "destinationAddress"
+                "field": "destination.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1506,7 +1506,7 @@
               "id": "5",
               "params": {
                 "customLabel": "Destination Ports",
-                "field": "destinationPort"
+                "field": "destination.port"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1584,7 +1584,7 @@
               "id": "2",
               "params": {
                 "exclude": "Network-based IDS/IPS",
-                "field": "categoryDeviceType",
+                "field": "cef.extensions.categoryDeviceType",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1596,7 +1596,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1608,7 +1608,7 @@
               "enabled": true,
               "id": "6",
               "params": {
-                "field": "destinationUserName",
+                "field": "destination.user.name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1704,7 +1704,7 @@
               "id": "2",
               "params": {
                 "autoPrecision": true,
-                "field": "destination.location",
+                "field": "destination.geo.location",
                 "precision": 2,
                 "useGeocentroid": true
               },

@@ -361,7 +361,7 @@
             ],
             "filter": {
               "language": "lucene",
-              "query": "deviceProduct:\"DNS Trace Log\""
+              "query": "cef.device.product:\"DNS Trace Log\""
             },
             "gauge_color_rules": [
               {
@@ -413,7 +413,7 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": 1,
@@ -424,7 +424,7 @@
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "gauge"
           },
           "title": "DNS - Event Throughput [Filebeat CEF]",
@@ -474,7 +474,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Threads",
-                "field": "deviceCustomString1"
+                "field": "cef.extensions.deviceCustomString1"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -484,7 +484,7 @@
               "id": "3",
               "params": {
                 "customLabel": "OpCodes",
-                "field": "deviceCustomString2"
+                "field": "cef.extensions.deviceCustomString2"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -494,7 +494,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Activity Types",
-                "field": "deviceEventClassId"
+                "field": "cef.device.event_class_id"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -596,7 +596,7 @@
               "id": "1",
               "params": {
                 "customLabel": "Bytes",
-                "field": "bytesIn"
+                "field": "source.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -639,7 +639,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "destinationHostName",
+                "field": "destination.domain",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -727,7 +727,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "deviceEventClassId",
+                "field": "cef.device.event_class_id",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -738,8 +738,8 @@
           ],
           "listeners": {},
           "params": {
-            "maxFontSize": 72,
-            "minFontSize": 18,
+            "maxFontSize": 50,
+            "minFontSize": 12,
             "orientation": "single",
             "scale": "square root"
           },
@@ -795,7 +795,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Event Type",
-                "field": "deviceEventClassId",
+                "field": "cef.device.event_class_id",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -808,7 +808,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Total (Bytes)",
-                "field": "bytesIn"
+                "field": "source.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -965,7 +965,7 @@
             "axis_position": "left",
             "filter": {
               "language": "lucene",
-              "query": "deviceProduct:\"DNS Trace Log\""
+              "query": "cef.device.product:\"DNS Trace Log\""
             },
             "id": "db54ebce-9dd2-4a1e-b476-b3ddb9a9024e",
             "index_pattern": "filebeat-*",
@@ -982,7 +982,7 @@
                 "line_width": "3",
                 "metrics": [
                   {
-                    "field": "bytesIn",
+                    "field": "source.bytes",
                     "id": "521d560c-321a-4410-9eb3-2b2bf3f4efee",
                     "type": "count"
                   }
@@ -992,19 +992,19 @@
                 "split_filters": [
                   {
                     "color": "rgba(244,78,59,1)",
-                    "filter": "(deviceSeverity:\"2\" OR deviceSeverity:\"3\" OR deviceSeverity:\"5\" OR deviceSeverity:\"16\" OR deviceCustomString4:\"SERVFAIL\" OR deviceCustomString4:\"NXDOMAIN\" OR deviceCustomString4:\"REFUSED\" OR deviceCustomString4:\"BADVERS\" OR deviceCustomString4:\"BADSIG\")",
+                    "filter": "(event.severity:\"2\" OR event.severity:\"3\" OR event.severity:\"5\" OR event.severity:\"16\" OR cef.extension.deviceCustomString4:\"SERVFAIL\" OR cef.extension.deviceCustomString4:\"NXDOMAIN\" OR cef.extension.deviceCustomString4:\"REFUSED\" OR cef.extension.deviceCustomString4:\"BADVERS\" OR cef.extension.deviceCustomString4:\"BADSIG\")",
                     "id": "3f31a7e4-acf3-4f2d-8b7d-e30522325b2a",
                     "label": "HIGH"
                   },
                   {
                     "color": "rgba(254,146,0,1)",
-                    "filter": "(deviceSeverity:\"1\" OR  deviceSeverity:\"4\" OR  deviceSeverity:\"6\" OR  deviceSeverity:\"7\" OR  deviceSeverity:\"8\" OR  deviceSeverity:\"9\" OR  deviceSeverity:\"10\" OR deviceSeverity:\"17\" OR  deviceSeverity:\"18\" OR  deviceSeverity:\"19\" OR  deviceSeverity:\"20\" OR  deviceSeverity:\"21\" OR  deviceSeverity:\"22\" OR   deviceCustomString4:\"Error\" OR  deviceCustomString4:\"ERROR\" OR  deviceCustomString4:\"Warning\" OR  deviceCustomString4:\"WARNING\" OR  deviceCustomString4:\"FORMERR\" OR  deviceCustomString4:\"NOTIMP\" OR  deviceCustomString4:\"YXDOMAIN\" OR  deviceCustomString4:\"YXRRSET\" OR  deviceCustomString4:\"NXRRSET\" OR  deviceCustomString4:\"NOTAUTH\" OR  deviceCustomString4:\"NOTZONE\" OR  deviceCustomString4:\"BADKEY\" OR  deviceCustomString4:\"BADTIME\" OR  deviceCustomString4:\"BADMODE\" OR  deviceCustomString4:\"BADNAME\" OR  deviceCustomString4:\"BADALG\" OR  deviceCustomString4:\"BADTRUNC\")",
+                    "filter": "(event.severity:\"1\" OR  event.severity:\"4\" OR  event.severity:\"6\" OR  event.severity:\"7\" OR  event.severity:\"8\" OR  event.severity:\"9\" OR  event.severity:\"10\" OR event.severity:\"17\" OR  event.severity:\"18\" OR  event.severity:\"19\" OR  event.severity:\"20\" OR  event.severity:\"21\" OR  event.severity:\"22\" OR   cef.extension.deviceCustomString4:\"Error\" OR  cef.extension.deviceCustomString4:\"ERROR\" OR  cef.extension.deviceCustomString4:\"Warning\" OR  cef.extension.deviceCustomString4:\"WARNING\" OR  cef.extension.deviceCustomString4:\"FORMERR\" OR  cef.extension.deviceCustomString4:\"NOTIMP\" OR  cef.extension.deviceCustomString4:\"YXDOMAIN\" OR  cef.extension.deviceCustomString4:\"YXRRSET\" OR  cef.extension.deviceCustomString4:\"NXRRSET\" OR  cef.extension.deviceCustomString4:\"NOTAUTH\" OR  cef.extension.deviceCustomString4:\"NOTZONE\" OR  cef.extension.deviceCustomString4:\"BADKEY\" OR  cef.extension.deviceCustomString4:\"BADTIME\" OR  cef.extension.deviceCustomString4:\"BADMODE\" OR  cef.extension.deviceCustomString4:\"BADNAME\" OR  cef.extension.deviceCustomString4:\"BADALG\" OR  cef.extension.deviceCustomString4:\"BADTRUNC\")",
                     "id": "7949d31b-8aae-433a-b7cf-6939a8728cc9",
                     "label": "MEDIUM"
                   },
                   {
                     "color": "rgba(252,220,0,1)",
-                    "filter": "(NOT (deviceSeverity:\"2\" OR deviceSeverity:\"3\" OR deviceSeverity:\"5\" OR deviceSeverity:\"16\" OR deviceCustomString4:\"SERVFAIL\" OR deviceCustomString4:\"NXDOMAIN\" OR deviceCustomString4:\"REFUSED\" OR deviceCustomString4:\"BADVERS\" OR deviceCustomString4:\"BADSIG\" OR deviceSeverity:\"1\" OR  deviceSeverity:\"4\" OR  deviceSeverity:\"6\" OR  deviceSeverity:\"7\" OR  deviceSeverity:\"8\" OR  deviceSeverity:\"9\" OR  deviceSeverity:\"10\" OR deviceSeverity:\"17\" OR  deviceSeverity:\"18\" OR  deviceSeverity:\"19\" OR  deviceSeverity:\"20\" OR  deviceSeverity:\"21\" OR  deviceSeverity:\"22\" OR deviceCustomString4:\"Error\" OR  deviceCustomString4:\"ERROR\" OR  deviceCustomString4:\"Warning\" OR  deviceCustomString4:\"WARNING\" OR  deviceCustomString4:\"FORMERR\" OR  deviceCustomString4:\"NOTIMP\" OR  deviceCustomString4:\"YXDOMAIN\" OR  deviceCustomString4:\"YXRRSET\" OR  deviceCustomString4:\"NXRRSET\" OR  deviceCustomString4:\"NOTAUTH\" OR  deviceCustomString4:\"NOTZONE\" OR  deviceCustomString4:\"BADKEY\" OR  deviceCustomString4:\"BADTIME\" OR  deviceCustomString4:\"BADMODE\" OR  deviceCustomString4:\"BADNAME\" OR  deviceCustomString4:\"BADALG\" OR  deviceCustomString4:\"BADTRUNC\"))",
+                    "filter": "(NOT (event.severity:\"2\" OR event.severity:\"3\" OR event.severity:\"5\" OR event.severity:\"16\" OR cef.extension.deviceCustomString4:\"SERVFAIL\" OR cef.extension.deviceCustomString4:\"NXDOMAIN\" OR cef.extension.deviceCustomString4:\"REFUSED\" OR cef.extension.deviceCustomString4:\"BADVERS\" OR cef.extension.deviceCustomString4:\"BADSIG\" OR event.severity:\"1\" OR  event.severity:\"4\" OR  event.severity:\"6\" OR  event.severity:\"7\" OR  event.severity:\"8\" OR  event.severity:\"9\" OR  event.severity:\"10\" OR event.severity:\"17\" OR  event.severity:\"18\" OR  event.severity:\"19\" OR  event.severity:\"20\" OR  event.severity:\"21\" OR  event.severity:\"22\" OR cef.extension.deviceCustomString4:\"Error\" OR  cef.extension.deviceCustomString4:\"ERROR\" OR  cef.extension.deviceCustomString4:\"Warning\" OR  cef.extension.deviceCustomString4:\"WARNING\" OR  cef.extension.deviceCustomString4:\"FORMERR\" OR  cef.extension.deviceCustomString4:\"NOTIMP\" OR  cef.extension.deviceCustomString4:\"YXDOMAIN\" OR  cef.extension.deviceCustomString4:\"YXRRSET\" OR  cef.extension.deviceCustomString4:\"NXRRSET\" OR  cef.extension.deviceCustomString4:\"NOTAUTH\" OR  cef.extension.deviceCustomString4:\"NOTZONE\" OR  cef.extension.deviceCustomString4:\"BADKEY\" OR  cef.extension.deviceCustomString4:\"BADTIME\" OR  cef.extension.deviceCustomString4:\"BADMODE\" OR  cef.extension.deviceCustomString4:\"BADNAME\" OR  cef.extension.deviceCustomString4:\"BADALG\" OR  cef.extension.deviceCustomString4:\"BADTRUNC\"))",
                     "id": "d2627211-5f9e-4c65-8a47-1cd6f085939d",
                     "label": "LOW"
                   }
@@ -1031,7 +1031,7 @@
                 "seperate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "deviceEventClassId",
+                "terms_field": "cef.device.event_class_id",
                 "terms_size": "20"
               }
             ],
@@ -1080,7 +1080,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Destinations",
-                "field": "destinationHostName",
+                "field": "destination.domain",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1093,7 +1093,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Bytes",
-                "field": "bytesIn"
+                "field": "source.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -1103,7 +1103,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Sources",
-                "field": "sourceAddress"
+                "field": "source.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1270,7 +1270,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Sources",
-                "field": "sourceHostName",
+                "field": "source.domain",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1283,7 +1283,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Bytes",
-                "field": "bytesIn"
+                "field": "source.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -1293,7 +1293,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Destinations",
-                "field": "destinationHostName"
+                "field": "destination.domain"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1363,7 +1363,7 @@
             "axis_position": "left",
             "filter": {
               "language": "lucene",
-              "query": "deviceProduct:\"DNS Trace Log\""
+              "query": "cef.device.product:\"DNS Trace Log\""
             },
             "id": "be556a57-cd1c-496c-8714-0bd210947c85",
             "index_pattern": "filebeat-*",
@@ -1486,7 +1486,7 @@
             "axis_position": "left",
             "filter": {
               "language": "lucene",
-              "query": "deviceProduct:\"DNS Trace Log\""
+              "query": "cef.device.product:\"DNS Trace Log\""
             },
             "id": "6e634117-6b30-411c-b74c-75510befe42f",
             "index_pattern": "filebeat-*",
@@ -1507,7 +1507,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "bytesIn",
+                    "field": "source.bytes",
                     "id": "f613f33f-6459-4e46-a3a0-c36c48c46b2e",
                     "type": "sum"
                   }
@@ -1532,7 +1532,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "bytesIn",
+                    "field": "source.bytes",
                     "id": "b69501e7-56d5-4c38-81d1-34d778c81e11",
                     "type": "sum"
                   },
@@ -1598,7 +1598,7 @@
               "id": "2",
               "params": {
                 "autoPrecision": true,
-                "field": "destination.location",
+                "field": "destination.geo.location",
                 "precision": 2,
                 "useGeocentroid": true
               },
@@ -1679,7 +1679,7 @@
               "id": "2",
               "params": {
                 "autoPrecision": true,
-                "field": "source.location",
+                "field": "source.geo.location",
                 "precision": 2,
                 "useGeocentroid": true
               },
@@ -1737,29 +1737,29 @@
     {
       "attributes": {
         "columns": [
-          "deviceVendor",
-          "deviceProduct",
-          "categoryBehavior",
-          "categoryOutcome",
-          "destinationAddress",
-          "destinationPort",
-          "destinationHostName",
-          "deviceEventClassId",
-          "deviceCustomString1Label",
-          "deviceCustomString1",
-          "deviceCustomString2Label",
-          "deviceCustomString2",
-          "deviceCustomString3Label",
-          "deviceCustomString3",
-          "deviceCustomString4Label",
-          "deviceCustomString4",
-          "deviceEventCategory",
-          "deviceSeverity",
-          "sourceAddress",
-          "sourcePort",
-          "transportProtocol",
-          "bytesIn",
-          "requestUrl"
+          "cef.device.vendor",
+          "cef.device.product",
+          "cef.extensions.categoryBehavior",
+          "cef.extensions.categoryOutcome",
+          "destination.ip",
+          "destination.port",
+          "destination.domain",
+          "cef.device.event_class_id",
+          "cef.extensions.deviceCustomString1Label",
+          "cef.extensions.deviceCustomString1",
+          "cef.extensions.deviceCustomString2Label",
+          "cef.extensions.deviceCustomString2",
+          "cef.extension.cef.extension.deviceCustomString3Label",
+          "cef.extension.deviceCustomString3",
+          "cef.extension.cef.extension.deviceCustomString4Label",
+          "cef.extension.deviceCustomString4",
+          "cef.extensions.deviceEventCategory",
+          "event.severity",
+          "source.ip",
+          "source.port",
+          "network.transport",
+          "source.bytes",
+          "url.original"
         ],
         "description": "",
         "hits": 0,
@@ -1771,7 +1771,7 @@
             "query": {
               "query_string": {
                 "analyze_wildcard": true,
-                "query": "deviceProduct:\"DNS Trace Log\""
+                "query": "cef.device.product:\"DNS Trace Log\""
               }
             },
             "version": true
@@ -1779,7 +1779,7 @@
         },
         "sort": [
           [
-            "deviceReceiptTime",
+            "@timestamp",
             "desc"
           ]
         ],

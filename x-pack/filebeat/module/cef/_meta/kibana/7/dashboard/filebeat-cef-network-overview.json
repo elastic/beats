@@ -449,7 +449,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "applicationProtocol",
+                "field": "network.application",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -515,7 +515,7 @@
             ],
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceGroup:\"/Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\" "
+              "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\" "
             },
             "id": "ec53a1d3-213c-4b0f-a074-5005a84cdb83",
             "index_pattern": "filebeat-*",
@@ -532,7 +532,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "bytesIn",
+                    "field": "source.bytes",
                     "id": "9ce9ec3a-2f11-4935-91b2-531494d2a619",
                     "type": "sum"
                   }
@@ -541,10 +541,10 @@
                 "point_size": 1,
                 "seperate_axis": 0,
                 "series_index_pattern": "filebeat-*",
-                "series_time_field": "deviceReceiptTime",
+                "series_time_field": "@timestamp",
                 "split_mode": "everything",
                 "stacked": "none",
-                "terms_field": "deviceHostName",
+                "terms_field": "observer.hostname",
                 "terms_order_by": "_count"
               },
               {
@@ -558,7 +558,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "bytesOut",
+                    "field": "destination.bytes",
                     "id": "11b1852f-9b62-4e96-8128-522e6c5bf16d",
                     "type": "sum"
                   },
@@ -579,14 +579,14 @@
                 "point_size": 1,
                 "seperate_axis": 0,
                 "series_index_pattern": "filebeat-*",
-                "series_time_field": "deviceReceiptTime",
+                "series_time_field": "@timestamp",
                 "split_mode": "everything",
                 "stacked": "none",
                 "steps": 0
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "timeseries"
           },
           "title": "Bandwidth Utilization [Filebeat CEF]",
@@ -637,7 +637,7 @@
             ],
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceType:\"Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\""
+              "query": "cef.extensions.categoryDeviceType:\"Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\""
             },
             "gauge_color_rules": [
               {
@@ -658,7 +658,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "lucene",
-                  "query": "categoryDeviceGroup:\"/Firewall\""
+                  "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\""
                 },
                 "formatter": "number",
                 "id": "04c44192-1112-4515-a8d9-e9e13215aecf",
@@ -680,7 +680,7 @@
                     "period": 1,
                     "sigma": "",
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": "0",
@@ -690,7 +690,7 @@
                     "color": "rgba(244,78,59,1)",
                     "filter": {
                       "language": "lucene",
-                      "query": "categoryDeviceGroup:\"/Firewall\""
+                      "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\""
                     },
                     "id": "0c929603-fc92-4ebc-a963-fe2795417d89",
                     "label": "Firewall Events"
@@ -699,7 +699,7 @@
                     "color": "rgba(254,146,0,1)",
                     "filter": {
                       "language": "lucene",
-                      "query": "categoryDeviceGroup:\"/IDS/Network\""
+                      "query": "cef.extensions.categoryDeviceGroup:\"/IDS/Network\""
                     },
                     "id": "7798827b-87ab-436b-9e62-9fe36143eb9b",
                     "label": "Intrusion Detection Events"
@@ -708,7 +708,7 @@
                     "color": "rgba(252,220,0,1)",
                     "filter": {
                       "language": "lucene",
-                      "query": "categoryDeviceGroup:\"/VPN\""
+                      "query": "cef.extensions.categoryDeviceGroup:\"/VPN\""
                     },
                     "id": "490f7ad7-8218-45f9-85a9-a4dd9ed7da13",
                     "label": "VPN"
@@ -717,7 +717,7 @@
                 "split_mode": "filters",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "deviceHostName",
+                "terms_field": "observer.hostname",
                 "terms_order_by": null
               },
               {
@@ -744,7 +744,7 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": 1,
@@ -752,12 +752,12 @@
                 "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "deviceHostName",
+                "terms_field": "observer.hostname",
                 "terms_size": "10"
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "timeseries"
           },
           "title": "Events by Source [Filebeat CEF]",
@@ -811,7 +811,7 @@
             "drilldown_url": "",
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceType:\"Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\""
+              "query": "cef.extensions.categoryDeviceType:\"Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\""
             },
             "gauge_color_rules": [
               {
@@ -832,7 +832,7 @@
                 "fill": "0",
                 "filter": {
                   "language": "lucene",
-                  "query": "(categoryDeviceGroup:\"/Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\") AND _exists_:categoryOutcome"
+                  "query": "(cef.extensions.categoryDeviceGroup:\"/Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\") AND _exists_:cef.extensions.categoryOutcome"
                 },
                 "formatter": "number",
                 "id": "04c44192-1112-4515-a8d9-e9e13215aecf",
@@ -853,7 +853,7 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": "0",
@@ -863,7 +863,7 @@
                     "color": "rgba(254,146,0,1)",
                     "filter": {
                       "language": "lucene",
-                      "query": "categoryDeviceGroup:\"/Firewall\""
+                      "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\""
                     },
                     "id": "4c7aac7d-2749-41b6-8136-40dc8636a7e7",
                     "label": "Firewall"
@@ -872,7 +872,7 @@
                 "split_mode": "filter",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "deviceHostName",
+                "terms_field": "observer.hostname",
                 "terms_order_by": null
               },
               {
@@ -895,31 +895,31 @@
                 "split_filters": [
                   {
                     "color": "rgba(104,188,0,0.35)",
-                    "filter": "categoryOutcome:\"/Success\"",
+                    "filter": "cef.extensions.categoryOutcome:\"/Success\"",
                     "id": "cb1ae397-13a0-4b6f-a848-bcdc96870f05",
                     "label": "Success"
                   },
                   {
                     "color": "rgba(244,78,59,1)",
-                    "filter": "categoryOutcome:\"/Failure\"",
+                    "filter": "cef.extensions.categoryOutcome:\"/Failure\"",
                     "id": "ef021c15-1b95-4334-bc3c-e2950e9b0f6f",
                     "label": "Failure"
                   },
                   {
                     "color": "rgba(0,156,224,1)",
-                    "filter": "categoryOutcome:\"/Attempt\"",
+                    "filter": "cef.extensions.categoryOutcome:\"/Attempt\"",
                     "id": "2ff1e859-b178-4824-a0f2-69a115932b98",
                     "label": "Attempt"
                   }
                 ],
                 "split_mode": "filters",
                 "stacked": "stacked",
-                "terms_field": "categoryOutcome",
+                "terms_field": "cef.extensions.categoryOutcome",
                 "terms_size": "3"
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "timeseries"
           },
           "title": "Events by Outcome [Filebeat CEF]",
@@ -969,7 +969,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Devices",
-                "field": "deviceHostName"
+                "field": "observer.hostname"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -979,7 +979,7 @@
               "id": "5",
               "params": {
                 "customLabel": "Sources",
-                "field": "sourceAddress"
+                "field": "source.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -989,7 +989,7 @@
               "id": "6",
               "params": {
                 "customLabel": "Destinations",
-                "field": "destinationAddress"
+                "field": "destination.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -999,7 +999,7 @@
               "id": "7",
               "params": {
                 "customLabel": "Ports",
-                "field": "destinationPort"
+                "field": "destination.port"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1102,7 +1102,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Firewall Types",
-                "field": "categoryDeviceType",
+                "field": "cef.extensions.categoryDeviceType",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1115,7 +1115,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Event Outcome",
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 3
@@ -1253,7 +1253,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Protocols",
-                "field": "destinationPort",
+                "field": "destination.port",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1265,7 +1265,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1399,7 +1399,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Device",
-                "field": "deviceHostName",
+                "field": "observer.hostname",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1412,7 +1412,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Source(s)",
-                "field": "sourceAddress"
+                "field": "source.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1422,7 +1422,7 @@
               "id": "5",
               "params": {
                 "customLabel": "Destination(s)",
-                "field": "destinationAddress"
+                "field": "destination.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1432,7 +1432,7 @@
               "id": "6",
               "params": {
                 "customLabel": "Destination Ports",
-                "field": "destinationPort"
+                "field": "destination.port"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1442,7 +1442,7 @@
               "id": "1",
               "params": {
                 "customLabel": "Bandwidth (Incoming)",
-                "field": "bytesIn"
+                "field": "source.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -1452,7 +1452,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Bandwidth (Outgoing)",
-                "field": "bytesOut"
+                "field": "destination.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -1526,7 +1526,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Device Host Names",
-                "field": "deviceHostName",
+                "field": "observer.hostname",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1539,7 +1539,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Event Outcome",
-                "field": "categoryOutcome",
+                "field": "cef.extensions.categoryOutcome",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1623,7 +1623,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Firewall Types",
-                "field": "categoryDeviceType",
+                "field": "cef.extensions.categoryDeviceType",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -1693,7 +1693,7 @@
             ],
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceType:\"Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\""
+              "query": "cef.extensions.categoryDeviceType:\"Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\""
             },
             "gauge_color_rules": [
               {
@@ -1733,7 +1733,7 @@
                     "period": 1,
                     "sigma": "",
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": "0",
@@ -1741,7 +1741,7 @@
                 "split_filters": [
                   {
                     "color": "rgba(244,78,59,1)",
-                    "filter": "categoryDeviceGroup:\"/Firewall\"",
+                    "filter": "cef.extensions.categoryDeviceGroup:\"/Firewall\"",
                     "id": "78bfdf07-ec02-4dd8-8ff4-b7e250c561c2",
                     "label": "Firewall"
                   }
@@ -1749,7 +1749,7 @@
                 "split_mode": "everything",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "deviceHostName",
+                "terms_field": "observer.hostname",
                 "terms_order_by": null
               },
               {
@@ -1776,19 +1776,19 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": 1,
                 "seperate_axis": 1,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "categoryDeviceType",
+                "terms_field": "cef.extensions.categoryDeviceType",
                 "terms_size": "10"
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "timeseries"
           },
           "title": "Events by Device Types [Filebeat CEF]",
@@ -1841,7 +1841,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Source Country",
-                "field": "source.country_name",
+                "field": "source.geo.country_iso_code",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -1854,7 +1854,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Source Addresses",
-                "field": "sourceAddress"
+                "field": "source.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1864,7 +1864,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Destination Addresses",
-                "field": "destinationAddress"
+                "field": "destination.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1874,7 +1874,7 @@
               "id": "5",
               "params": {
                 "customLabel": "Destination Ports",
-                "field": "destinationPort"
+                "field": "destination.port"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -1936,7 +1936,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "source.country_name",
+                "field": "source.geo.country_iso_code",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 20
@@ -2006,7 +2006,7 @@
             ],
             "filter": {
               "language": "lucene",
-              "query": "categoryDeviceType:\"Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\" "
+              "query": "cef.extensions.categoryDeviceType:\"Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\" "
             },
             "gauge_color_rules": [
               {
@@ -2058,7 +2058,7 @@
                     "multiplicative": false,
                     "period": 1,
                     "type": "moving_average",
-                    "window": ""
+                    "window": "10"
                   }
                 ],
                 "point_size": 1,
@@ -2069,7 +2069,7 @@
               }
             ],
             "show_legend": 1,
-            "time_field": "deviceReceiptTime",
+            "time_field": "@timestamp",
             "type": "gauge"
           },
           "title": "Network - Event Throughput [Filebeat CEF]",
@@ -2149,7 +2149,7 @@
               "params": {
                 "autoPrecision": true,
                 "customLabel": "Destination Location",
-                "field": "destination.location",
+                "field": "destination.geo.location",
                 "precision": 2,
                 "useGeocentroid": true
               },
@@ -2234,7 +2234,7 @@
               "params": {
                 "autoPrecision": true,
                 "customLabel": "Source Location",
-                "field": "source.location",
+                "field": "source.geo.location",
                 "precision": 2,
                 "useGeocentroid": true
               },
@@ -2294,20 +2294,20 @@
       "attributes": {
         "columns": [
           "priority",
-          "name",
-          "sourceAddress",
-          "sourcePort",
-          "destinationAddress",
-          "destinationPort",
-          "applicationProtocol",
           "message",
-          "categoryBehavior",
-          "categoryOutcome",
+          "source.ip",
+          "source.port",
+          "destination.ip",
+          "destination.port",
+          "network.application",
+          "message",
+          "cef.extensions.categoryBehavior",
+          "cef.extensions.categoryOutcome",
           "deviceAddress",
-          "deviceProduct",
-          "deviceVendor",
-          "categoryDeviceGroup",
-          "categoryDeviceType"
+          "cef.device.product",
+          "cef.device.vendor",
+          "cef.extensions.categoryDeviceGroup",
+          "cef.extensions.categoryDeviceType"
         ],
         "description": "",
         "hits": 0,
@@ -2319,7 +2319,7 @@
             "query": {
               "query_string": {
                 "analyze_wildcard": true,
-                "query": "categoryDeviceGroup:\"/Firewall\" OR categoryDeviceGroup:\"/IDS/Network\" OR categoryDeviceGroup:\"/VPN\""
+                "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\""
               }
             },
             "version": true
@@ -2327,7 +2327,7 @@
         },
         "sort": [
           [
-            "deviceReceiptTime",
+            "@timestamp",
             "desc"
           ]
         ],
