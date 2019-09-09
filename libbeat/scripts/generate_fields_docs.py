@@ -11,8 +11,7 @@ def document_fields(output, section, sections, path):
         output.write("{}\n".format(section["prefix"]))
 
     # Intermediate level titles
-    if ("description" in section and "prefix" not in section and
-            "anchor" not in section):
+    if "description" in section and "prefix" not in section and "anchor" not in section:
         output.write("[float]\n")
 
     if "description" in section:
@@ -109,8 +108,7 @@ if __name__ == "__main__":
         description="Generates the documentation for a Beat.")
     parser.add_argument("path", help="Path to the beat folder")
     parser.add_argument("beatname", help="The beat name")
-    parser.add_argument("es_beats",
-                        help="The path to the general beats folder")
+    parser.add_argument("es_beats", help="The path to the general beats folder")
 
     args = parser.parse_args()
 
