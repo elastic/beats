@@ -70,7 +70,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.prometheus.GetFamilies()
 
 	if err != nil {
-		return fmt.Errorf("Unable to decode response from prometheus endpoint")
+		return fmt.Errorf("unable to decode response from prometheus endpoint")
 	}
 
 	eventList := map[string]common.MapStr{}
