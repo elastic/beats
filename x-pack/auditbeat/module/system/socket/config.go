@@ -21,7 +21,7 @@ type Config struct {
 	LostQueueSize int `config:"socket.lost_queue_size,min=1"`
 
 	// ErrQueueSize defines the size of the error queue. A single error is fatal.
-	ErrQueueSize int `config:"socket.err_buffer_size,min=1"`
+	ErrQueueSize int `config:"socket.err_queue_size,min=1"`
 
 	// RingSizeExp configures the exponent size for the per-cpu ring buffer used
 	// by the kernel to pass tracing events.
