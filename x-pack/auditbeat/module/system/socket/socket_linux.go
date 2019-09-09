@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -45,6 +46,11 @@ var (
 	eventCount    uint64
 )
 
+var defaultMounts = []*mountPoint{
+	{fsType: "tracefs", path: "/sys/kernel/tracing"},
+	{fsType: "debugfs", path: "/sys/kernel/debug"},
+}
+
 // MetricSet for system/socket.
 type MetricSet struct {
 	system.SystemMetricSet
@@ -54,6 +60,7 @@ type MetricSet struct {
 	detailLog    *logp.Logger
 	installer    helper.ProbeInstaller
 	perfChannel  *tracing.PerfChannel
+	mountedFS    *mountPoint
 	isDebug      bool
 	isDetailed   bool
 }
@@ -194,6 +201,24 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	var traceFS *tracing.TraceFS
 	if m.config.TraceFSPath == nil {
+
+		if err := tracing.IsTraceFSAvailable(); err != nil {
+			m.log.Debugf("tracefs/debugfs not found. Attempting to mount")
+			for _, mount := range defaultMounts {
+				if err = mount.mount(); err != nil {
+					m.log.Debugf("Mount %s returned %v", mount, err)
+					continue
+				}
+				if tracing.IsTraceFSAvailable() != nil {
+					m.log.Warnf("Mounted %s but no kprobes available", mount, err)
+					mount.unmount()
+					continue
+				}
+				m.log.Debugf("Mounted %s", mount)
+				m.mountedFS = mount
+				break
+			}
+		}
 		traceFS, err = tracing.NewTraceFS()
 	} else {
 		traceFS, err = tracing.NewTraceFSWithPath(*m.config.TraceFSPath)
@@ -339,6 +364,13 @@ func (m *MetricSet) Cleanup() {
 			m.log.Warnf("Failed to remove KProbes on exit: %v", err)
 		}
 	}
+	if m.mountedFS != nil {
+		if err := m.mountedFS.unmount(); err != nil {
+			m.log.Errorf("Failed to umount %s: %v", m.mountedFS, err)
+		} else {
+			m.log.Debugf("Unmounted %s", m.mountedFS)
+		}
+	}
 }
 
 func (m *MetricSet) clockSyncLoop(interval time.Duration, done <-chan struct{}) {
@@ -389,4 +421,21 @@ func triggerClockSync() {
 
 func isOwnProbe(probe tracing.Probe) bool {
 	return probe.Group == auditbeatGroup
+}
+
+type mountPoint struct {
+	fsType string
+	path   string
+}
+
+func (m mountPoint) mount() error {
+	return unix.Mount(m.fsType, m.path, m.fsType, 0, "")
+}
+
+func (m mountPoint) unmount() error {
+	return syscall.Unmount(m.path, 0)
+}
+
+func (m *mountPoint) String() string {
+	return m.fsType + " at " + m.path
 }
