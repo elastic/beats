@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 )
 
@@ -56,12 +55,12 @@ func init() {
 }
 
 func isKubernetesAvailable(client k8s.Interface) bool {
-	info, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
+	server, err := client.Discovery().ServerVersion()
 	if err != nil {
 		logp.Debug("kubernetes", "%v: could not detect kubernetes env", "add_kubernetes_metadata")
 		return false
 	}
-	logp.Debug("kubernetes", "%v: kubernetes env detected: %v", "add_kubernetes_metadata", info)
+	logp.Debug("kubernetes", "%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
 	return true
 }
 
@@ -105,19 +104,25 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
 	}
 
+	processor := &kubernetesAnnotator{
+		indexers: indexers,
+		matchers: matchers,
+		cache:    newCache(config.CleanupTimeout),
+	}
+
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
-		return nil, err
+		logp.Debug("kubernetes", "%v: could not create kubernetes client with config: %v", "add_kubernetes_metadata", config.KubeConfig)
+		processor.kubernetesAvailable = false
+		return processor, nil
 	}
 
 	if !isKubernetesAvailable(client) {
-		return &kubernetesAnnotator{
-			indexers:            indexers,
-			matchers:            matchers,
-			cache:               newCache(config.CleanupTimeout),
-			kubernetesAvailable: false,
-		}, nil
+		processor.kubernetesAvailable = false
+		return processor, nil
 	}
+
+	processor.kubernetesAvailable = true
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
@@ -134,13 +139,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	processor := &kubernetesAnnotator{
-		watcher:             watcher,
-		indexers:            indexers,
-		matchers:            matchers,
-		cache:               newCache(config.CleanupTimeout),
-		kubernetesAvailable: true,
-	}
+	processor.watcher = watcher
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
