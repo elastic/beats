@@ -18,10 +18,11 @@
 package state_cronjob
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 )
 
 func init() {

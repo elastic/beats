@@ -18,9 +18,10 @@
 package apiserver
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 )
 
 // Metricset for apiserver is a prometheus based metricset
