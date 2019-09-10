@@ -7,7 +7,7 @@ metadata). {beatname_uc} provides a couple of options for filtering and
 enhancing exported data.
 
 You can configure {beatname_uc} to include events that match specific filtering
-criteria. To do this, use the <<{beatname_lc}-include-matches,`include_matches`>>
+criteria. To do this, use the <<include-matches,`include_matches`>>
 option. The advantage of this approach is that you can reduce the number of
 fields that {beatname_uc} needs to process.
 

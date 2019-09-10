@@ -45,7 +45,27 @@ endif::[]
 Running {beatname_uc} with the setup command will create the index pattern and
 load visualizations, dashboards, and machine learning jobs.  Run this command:
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat")]
+ifeval::["{beatname_lc}"=="filebeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run \
@@ -192,8 +212,7 @@ using the syntax shown earlier.
 
 ===== Customize your configuration
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-
+ifdef::has_docker_label_ex[]
 The +{beatname_lc}.docker.yml+ file you downloaded earlier is configured to deploy Beats modules based on the Docker labels applied to your containers.  See <<configuration-autodiscover-hints>> for more details. Add labels to your application Docker containers, and they will be picked up by the Beats autodiscover feature when they are deployed.  Here is an example command for an Apache HTTP Server container with labels to configure the Filebeat and Metricbeat modules for the Apache HTTP Server:
 
 ["source", "sh", subs="attributes"]
@@ -210,11 +229,9 @@ docker run \
   -p 8080:80 \
   httpd:2.4
 --------------------------------------------
-
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="metricbeat")]
-
+ifndef::has_docker_label_ex[]
 The +{beatname_lc}.docker.yml+ downloaded earlier should be customized for your environment. See <<configuring-howto-{beatname_lc}>> for more details. Edit the configuration file and customize it to match your environment then re-deploy your {beatname_uc} container.
 endif::[]
 
