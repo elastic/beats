@@ -54,14 +54,16 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info b.Info, content []byt
 		"timestamp": now,
 	}
 
-	var clusterUUID string
-	if isOutputES(state) {
-		clusterUUID = getClusterUUID(state)
-		if clusterUUID == "" {
-			// Output is ES but cluster UUID could not be determined. No point sending monitoring
-			// data with empty cluster UUID since it will not be associated with the correct ES
-			// production cluster. Log error instead.
-			return errors.Wrap(b.ErrClusterUUID, "could not determine cluster UUID")
+	clusterUUID := getMonitoringClusterUUID(state)
+	if clusterUUID == "" {
+		if isOutputES(state) {
+			clusterUUID = getClusterUUID(state)
+			if clusterUUID == "" {
+				// Output is ES but cluster UUID could not be determined. No point sending monitoring
+				// data with empty cluster UUID since it will not be associated with the correct ES
+				// production cluster. Log error instead.
+				return errors.Wrap(b.ErrClusterUUID, "could not determine cluster UUID")
+			}
 		}
 	}
 
@@ -140,4 +142,28 @@ func isOutputES(state map[string]interface{}) bool {
 	}
 
 	return name == "elasticsearch"
+}
+
+func getMonitoringClusterUUID(state map[string]interface{}) string {
+	m, exists := state["monitoring"]
+	if !exists {
+		return ""
+	}
+
+	monitoring, ok := m.(map[string]interface{})
+	if !ok {
+		return ""
+	}
+
+	c, exists := monitoring["cluster_uuid"]
+	if !exists {
+		return ""
+	}
+
+	clusterUUID, ok := c.(string)
+	if !ok {
+		return ""
+	}
+
+	return clusterUUID
 }
