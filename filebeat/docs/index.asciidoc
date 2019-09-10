@@ -21,6 +21,7 @@ include::{asciidoc-dir}/../../shared/attributes62.asciidoc[]
 :beatname_pkg: {beatname_lc}
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+:has_modules_command:
 
 include::./overview.asciidoc[]
 
