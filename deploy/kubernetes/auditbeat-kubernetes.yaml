@@ -73,7 +73,7 @@ spec:
       - name: auditbeat
         image: docker.elastic.co/beats/auditbeat:8.0.0
         args: [
-          "-c", "/etc/auditbeat.yml"
+          "-c", "/etc/auditbeat.yml", "-e"
         ]
         env:
         - name: ELASTICSEARCH_HOST
