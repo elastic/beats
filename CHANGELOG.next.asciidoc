@@ -19,7 +19,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd module: Normalized value of `event.category` field from `user-login` to `authentication`. {pull}11432[11432]
 - Auditd module: Unset `auditd.session` and `user.audit.id` fields are removed from audit events. {issue}11431[11431] {pull}11815[11815]
 - Socket dataset: Exclude localhost by default {pull}11993[11993]
-- Configure container logs to be sent to stdout {pull}12751[12751]
 
 *Filebeat*
 
@@ -89,6 +88,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - System module: Start system module without host ID. {pull}12373[12373]
 - Host dataset: Fix reboot detection logic. {pull}12591[12591]
 - Add syscalls used by librpm for the system/package dataset to the default Auditbeat seccomp policy. {issue}12578[12578] {pull}12617[12617]
+- Configure container logs to be sent to stdout {pull}12751[12751]
 
 *Filebeat*
 
