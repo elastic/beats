@@ -18,7 +18,6 @@
 package nomad
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/nomad/api"
@@ -98,8 +97,6 @@ func TestAllocationMetadata(t *testing.T) {
 	meta := metaGen.ResourceMetadata(alloc)
 	tasks, _ := meta["meta"].([]common.MapStr)
 	flat := tasks[0].Flatten()
-
-	fmt.Printf("%+v\n", meta)
 
 	assert.Equal(t, "my-job", meta["job"])
 	assert.Equal(t, "task-value", flat["task1.key1"])

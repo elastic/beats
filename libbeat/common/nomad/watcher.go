@@ -138,6 +138,16 @@ func (w *watcher) sync() error {
 	}
 
 	for _, alloc := range allocations {
+		// "Patch" the local hostname/node name into the allocations. filebeat
+		// runs locally on each client filters the allocations based on the
+		// hostname/client node name. Due this particular setup all allocations
+		// fetched from the API are coming from the same client.
+		// We patch the NodeName property if empty (Nomad < 0.9) to avoid
+		// fetching it through the API
+		if len(alloc.NodeName) == 0 {
+			alloc.NodeName = w.options.Node
+		}
+
 		switch alloc.DesiredStatus {
 		case AllocDesiredStatusRun:
 			w.handler.OnAdd(*alloc)
