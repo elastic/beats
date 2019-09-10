@@ -370,8 +370,10 @@ func toType(value string, typ dataType) (interface{}, error) {
 		return toBoolean(value)
 	case IP:
 		return toIP(value)
+	case Timestamp:
+		return toTimestamp(value)
 	default:
-		panic("invalid data type")
+		panic(errors.Errorf("invalid data type: %v", typ))
 	}
 }
 
