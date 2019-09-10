@@ -216,5 +216,6 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 
 	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
+	event.RootFields.Put("aws.s3.bucket.name", bucketName)
 	return
 }

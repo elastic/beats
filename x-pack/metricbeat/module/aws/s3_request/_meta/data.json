@@ -1,31 +1,33 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
+        "s3": {
+            "bucket": {
+                "name": "test-s3-ks-2"
+            }
+        },
         "s3_request": {
             "bucket": {
                 "name": "test-s3-ks-2"
             },
             "downloaded": {
-                "bytes": 123653
+                "bytes": 267
             },
             "errors": {
                 "4xx": 0,
                 "5xx": 0
             },
             "latency": {
-                "first_byte.ms": 7975,
-                "total_request.ms": 9005
+                "first_byte.ms": 196,
+                "total_request.ms": 458
             },
             "requests": {
-                "delete": 2,
-                "get": 80,
-                "head": 3,
-                "list": 37,
-                "put": 34,
-                "total": 156
+                "list": 1,
+                "put": 9,
+                "total": 10
             },
             "uploaded": {
-                "bytes": 2644
+                "bytes": 14704
             }
         }
     },
@@ -39,7 +41,8 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "s3_request"
+        "name": "s3_request",
+        "period": 10000
     },
     "service": {
         "type": "aws"
