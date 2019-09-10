@@ -23,6 +23,8 @@ import (
 	"os"
 	"strings"
 
+	"k8s.io/client-go/rest"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -32,16 +34,28 @@ import (
 
 const defaultNode = "localhost"
 
-// GetKubernetesClient returns a kubernetes client. If inCluster is true, it returns an
-// in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
-// it parses the config file to get the config required to build a client.
+// GetKubernetesClient returns a kubernetes client. If InClusterConfig is detected, it returns a
+// a client from cluster configuration based on the secrets mounted in the Pod. Otherwise,
+// it parses kubeConfig file to get the config required to build a client.
 func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
+	var client *kubernetes.Clientset
+	var err error
+
+	clusterConfig, err := rest.InClusterConfig()
+	if err == nil {
+		client, err = kubernetes.NewForConfig(clusterConfig)
+		if err != nil {
+			return nil, fmt.Errorf("unable to build kubernetes clientset: %+v", err)
+		}
+
+		return client, nil
+	}
 	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
 	}
 
-	client, err := kubernetes.NewForConfig(cfg)
+	client, err = kubernetes.NewForConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kubernetes clientset: %+v", err)
 	}

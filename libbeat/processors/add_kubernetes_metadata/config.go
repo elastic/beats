@@ -19,8 +19,6 @@ package add_kubernetes_metadata
 
 import (
 	"os"
-	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -46,45 +44,14 @@ type Enabled struct {
 
 type PluginConfig []map[string]common.Config
 
-func trimAfter(value string, a string) string {
-	// Get substring after a string.
-	pos := strings.LastIndex(value, a)
-	if pos == -1 {
-		return ""
-	}
-	adjustedPos := pos + len(a)
-	if adjustedPos >= len(value) {
-		return ""
-	}
-	return value[adjustedPos:len(value)]
-}
-
-func findDaemonsConfigFlag() string {
-	// Search in processes and search for config in flags
-	psRes, _ := exec.Command("bash", "-c", "ps aux | grep -- -kubeconfig=").Output()
-	psResStr := string(psRes)
-	trimmedPsResStr := trimAfter(psResStr, "--kubeconfig=")
-	arr := strings.Split(trimmedPsResStr, " ")
-	kubeConfigPath := arr[0]
-	return kubeConfigPath
-}
-
 func getSystemKubeConfig() string {
-	homeKubeConfig := os.Getenv("HOME") + "/.kube/config"
-	if _, err := os.Stat(homeKubeConfig); !os.IsNotExist(err) {
-		return homeKubeConfig
-	}
 	envKubeConfig := os.Getenv("KUBECONFIG")
 	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
 		return envKubeConfig
 	}
-	kubeConfigPath := findDaemonsConfigFlag()
-	if _, err := os.Stat(kubeConfigPath); !os.IsNotExist(err) {
-		return kubeConfigPath
-	}
-	kubeletConfig := "/etc/kubernetes/kubelet.conf"
-	if _, err := os.Stat(kubeletConfig); !os.IsNotExist(err) {
-		return kubeletConfig
+	homeKubeConfig := os.Getenv("HOME") + "/.kube/config"
+	if _, err := os.Stat(homeKubeConfig); !os.IsNotExist(err) {
+		return homeKubeConfig
 	}
 	return homeKubeConfig
 }
