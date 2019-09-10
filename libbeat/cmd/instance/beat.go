@@ -401,6 +401,14 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 			return err
 		}
 		defer reporter.Stop()
+
+		// Expose monitoring.cluster_uuid in state API
+		if reporterSettings.ClusterUUID != "" {
+			stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+			monitoringRegistry := stateRegistry.NewRegistry("monitoring")
+			clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
+			clusterUUIDRegVar.Set(reporterSettings.ClusterUUID)
+		}
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
