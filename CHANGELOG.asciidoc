@@ -3,6 +3,24 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.3.2]]
+=== Beats version 7.3.2
+https://github.com/elastic/beats/compare/v7.3.1...v7.3.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix filebeat autodiscover fileset hint for container input. {pull}13296[13296]
+- Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
+- Fix timezone parsing of elasticsearch module ingest pipelines. {pull}13367[13367]
+- Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
+
+*Metricbeat*
+
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
+- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
+
 [[release-notes-7.3.1]]
 === Beats version 7.3.1
 https://github.com/elastic/beats/compare/v7.3.0...v7.3.1[View commits]
