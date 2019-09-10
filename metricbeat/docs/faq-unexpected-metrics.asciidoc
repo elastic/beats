@@ -1,10 +1,11 @@
 [[faq-unexpected-metrics]]
 === {beatname_uc} collects system metrics for interfaces you didn't configure
 
-The <<metricbeat-module-system,`system`>> module specifies several metricsets
-that are enabled by default unless you explicitly disable them. To disable the
-default metricsets, comment them out in the `modules.d/system.yml` configuration
-file.
+The <<metricbeat-module-system,System>> module specifies several metricsets
+that are enabled by default unless you explicitly disable them. To disable a
+default metricset, comment it out in the `modules.d/system.yml` configuration
+file. If _all_ metricsets are commented out and the System module is enabled,
+{beatname_uc} uses the default metricsets.
 
 For example, to disable the `network` metricset, comment it out:
 
