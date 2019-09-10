@@ -99,7 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `logstash/node_stats` metricset to also collect `logstash_stats.events.duration_in_millis` field when `xpack.enabled: true` is set. {pull}13082[13082]
 - Fix `logstash/node` metricset to also collect `logstash_state.pipeline.representation.{type,version,hash}` fields when `xpack.enabled: true` is set. {pull}13133[13133]
 - Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
-- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433]
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
 - Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
 
 *Packetbeat*
