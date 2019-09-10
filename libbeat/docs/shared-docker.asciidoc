@@ -14,9 +14,9 @@ endif::[]
 ifeval::["{release-state}"!="unreleased"]
 
 ["source", "sh", subs="attributes"]
-------------------------------------------------
+----
 docker pull {dockerimage}
-------------------------------------------------
+----
 
 endif::[]
 
@@ -39,11 +39,11 @@ One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ v
 With +docker run+, the bind-mount can be specified like this:
 
 ["source", "sh", subs="attributes"]
---------------------------------------------
+----
 docker run \
   -v ~/{beatname_lc}.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml \
   {dockerimage}
---------------------------------------------
+----
 
 [float]
 ==== Custom Image Configuration
@@ -52,10 +52,10 @@ It's possible to embed your {beatname_uc} configuration in a custom image.
 Here is an example Dockerfile to achieve this:
 
 ["source", "dockerfile", subs="attributes"]
---------------------------------------------
+----
 FROM {dockerimage}
 COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
 USER root
 RUN chown {beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
 USER {beatname_lc}
---------------------------------------------
+----
