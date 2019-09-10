@@ -6,9 +6,9 @@ options, you need to start the Beat in the foreground. For example, the
 following command starts Filebeat in debugging mode:
 
 ["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
+----
 ./filebeat -c filebeat.yml -e -d "*"
-----------------------------------------------------------------------
+----
 
 For additional command
 line options, see the documentation for your Beat.
