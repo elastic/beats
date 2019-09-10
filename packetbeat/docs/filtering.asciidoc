@@ -22,16 +22,16 @@ group of words surrounded by double quotation marks, such as `"test search"`.
 To search for all HTTP requests initiated by Mozilla Web browser version 5.0:
 
 [source,yaml]
----------------
+----
 "Mozilla/5.0"
---------------
+----
 
 To search for all the transactions that contain the following message:
 
 [source,yaml]
-------------------------------------
+----
 "Cannot change the info of a user"
-------------------------------------
+----
 
 NOTE: To search for an exact string, you need to wrap the string in double quotation 
 marks. Without quotation marks, the search in the example would match any documents containing one of the following words: "Cannot" OR "change" OR "the" OR "info" OR "a" OR "user".
@@ -39,9 +39,9 @@ marks. Without quotation marks, the search in the example would match any docume
 To search for all transactions with the "chunked" encoding:
 
 [source,yaml]
------------------------------
+----
 "Transfer-Encoding: chunked"
------------------------------
+----
 
 ===== Field-Based Queries
 
@@ -50,24 +50,24 @@ Kibana allows you to search specific fields.
 To view HTTP transactions only:
 
 [source,yaml]
---------------------
+----
 type: http
--------------------
+----
 
 To view failed transactions only:
 
 [source,yaml]
--------------------
+----
 status: Error
--------------------
+----
 
 
 To view MySQL INSERT queries only:
 
 [source,yaml]
----------------------
+----
 mysql.method: INSERT
----------------------
+----
 
 ===== Regexp Queries
 
@@ -75,9 +75,9 @@ Kibana supports regular expression for filters and expressions. For example,
 to search for all HTTP responses with JSON as the returned value type: 
 
 [source,yaml]
--------------------------
+----
 http.content_type: *json
--------------------------
+----
 
 See
 http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html[Elasticsearch regexp query]
@@ -93,16 +93,16 @@ brackets that you use.
 To search for slow transactions with a response time greater than or equal to 10ms:
 
 [source,yaml]
-------------------------
+----
 responsetime: [10 TO *]
-------------------------
+----
 
 To search for slow transactions with a response time greater than 10ms:
 
 [source,yaml]
--------------------------
+----
 responsetime: {10 TO *}
--------------------------
+----
 
 ===== Boolean Queries
 
@@ -113,17 +113,17 @@ NOTE: Operators such as AND, OR, and NOT must be capitalized. See http://lucene.
 To search for all transactions except MySQL transactions:
 
 [source,yaml]
-----------------
+----
 NOT type: mysql
----------------
+----
 
 
 To search for all MySQL SELECT queries with large attachments:
 
 [source,yaml]
--------------------------------------------------
+----
 mysql.method: SELECT AND mysql.size: [10000 TO *]
--------------------------------------------------
+----
 
 
 Lucene also supports parentheses to group sub-queries.
@@ -131,9 +131,9 @@ Lucene also supports parentheses to group sub-queries.
 To search for either INSERT or UPDATE MySQL queries with a response time greater than or equal to 30ms:
 
 [source,yaml]
----------------------------------------------------------------------------
+----
 (mysql.method: INSERT OR mysql.method: UPDATE) AND responsetime: [30 TO *]
----------------------------------------------------------------------------
+----
 
 ==== Creating Filters
 
