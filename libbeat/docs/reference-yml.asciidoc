@@ -24,6 +24,6 @@ endif::[]
 The contents of the file are included here for your convenience.
 
 [source,yaml]
---
+----
 include::../../{beatname_lc}/{beatname_lc}.reference.yml[]
---
+----
