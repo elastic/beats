@@ -30,9 +30,9 @@ endif::[]
 ifeval::["{release-state}"!="unreleased"]
 
 ["source", "sh", subs="attributes"]
-------------------------------------------------
+----
 docker pull {dockerimage}
-------------------------------------------------
+----
 
 Alternatively, you can download other Docker images that contain only features
 available under the Apache 2.0 license. To download the images, go to 
@@ -55,11 +55,11 @@ One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ v
 With +docker run+, the bind mount can be specified like this:
 
 ["source", "sh", subs="attributes"]
---------------------------------------------
+----
 docker run \
   --mount type=bind,source="$(pwd)"/{beatname_lc}.yml,target=/usr/share/{beatname_lc}/{beatname_lc}.yml \
   {dockerimage}
---------------------------------------------
+----
 
 [float]
 ===== Custom image configuration
@@ -70,22 +70,22 @@ Here is an example Dockerfile to achieve this:
 ifeval::["{beatname_lc}"!="auditbeat"]
 
 ["source", "dockerfile", subs="attributes"]
---------------------------------------------
+----
 FROM {dockerimage}
 COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
 USER root
 RUN chown root:{beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
 USER {beatname_lc}
---------------------------------------------
+----
 
 endif::[]
 
 ifeval::["{beatname_lc}"=="auditbeat"]
 
 ["source", "dockerfile", subs="attributes"]
---------------------------------------------
+----
 FROM {dockerimage}
 COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
---------------------------------------------
+----
 
 endif::[]

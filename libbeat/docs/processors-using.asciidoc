@@ -41,7 +41,11 @@ ifeval::["{beatname_lc}"=="filebeat"]
 :processor-scope: input
 endif::[]
 
-ifeval::["{beatname_lc}"=="auditbeat" or "{beatname_lc}"=="metricbeat"]
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
 :processor-scope: module
 endif::[]
 

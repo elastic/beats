@@ -2,6 +2,7 @@
 [[securing-beats]]
 == Configure {beatname_uc} to use {security}
 
+[subs="attributes"]
 ++++
 <titleabbrev>Use {security}</titleabbrev>
 ++++
