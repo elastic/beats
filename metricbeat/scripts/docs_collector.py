@@ -183,7 +183,7 @@ For a description of each field in the metricset, see the
     module_list_output = generated_note
 
     module_list_output += '[options="header"]\n'
-    module_list_output += '|===================================\n'
+    module_list_output += '|===\n'
     module_list_output += '|Modules   |Dashboards   |Metricsets   \n'
 
     for key, m in sorted(six.iteritems(modules_list)):
@@ -210,7 +210,7 @@ For a description of each field in the metricset, see the
 
             module_list_output += '|{} {}  \n'.format(ms["link"], release_label)
 
-    module_list_output += '|================================'
+    module_list_output += '|==='
 
     module_list_output += "\n\n--\n\n"
     for key, m in sorted(six.iteritems(modules_list)):

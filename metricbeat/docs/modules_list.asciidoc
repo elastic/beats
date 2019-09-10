@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [options="header"]
-|===================================
+|===
 |Modules   |Dashboards   |Metricsets   
 |<<metricbeat-module-aerospike,Aerospike>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>> beta[]  
@@ -128,7 +128,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-windows-service,service>> beta[]  
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
-|================================
+|===
 
 --
 

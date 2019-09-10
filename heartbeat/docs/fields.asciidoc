@@ -444,6 +444,8 @@ type: text
 Service url used by monitor.
 
 
+--
+
 *`http.url.raw`*::
 +
 --
@@ -451,8 +453,6 @@ type: keyword
 
 The service url used by monitor. This is a non-analyzed field that is useful for aggregations.
 
-
---
 
 --
 
