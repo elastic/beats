@@ -432,6 +432,7 @@ function process(evt) {
             assert "dissect.key" in evt
             assert evt["dissect.key"] == "hello"
 
+    @unittest.skipIf(sys.platform == "nt", "skipped on Windows")
     def test_javascript_processor_dns(self):
         """
         Check JS processor with add_locale
