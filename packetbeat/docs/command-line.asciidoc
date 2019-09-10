@@ -5,7 +5,7 @@ The following command line options are available for Packetbeat. To use these op
 you need to start Packetbeat in the foreground.
 
 [source,shell]
-------------------------------------------------------------------------
+----
 $ ./packetbeat -h
 Usage of ./packetbeat:
   -I string
@@ -35,7 +35,7 @@ Usage of ./packetbeat:
       Print version and exit
   -waitstop int
       Additional seconds to wait before shutting down
-----------------------------------------------------------------------------
+----
 
 ==== Packet-Beat Specific Options
 These command line options are specific to Packetbeat:
