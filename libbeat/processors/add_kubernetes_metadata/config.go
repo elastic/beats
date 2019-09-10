@@ -21,6 +21,8 @@ import (
 	"os"
 	"time"
 
+	"k8s.io/client-go/rest"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -36,6 +38,7 @@ type kubeAnnotatorConfig struct {
 	Matchers        PluginConfig  `config:"matchers"`
 	DefaultMatchers Enabled       `config:"default_matchers"`
 	DefaultIndexers Enabled       `config:"default_indexers"`
+	InCluster       bool
 }
 
 type Enabled struct {
@@ -56,6 +59,14 @@ func getSystemKubeConfig() string {
 	return homeKubeConfig
 }
 
+func inCluster() bool {
+	_, err := rest.InClusterConfig()
+	if err == nil {
+		return true
+	}
+	return false
+}
+
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
 		KubeConfig:      getSystemKubeConfig(),
@@ -63,5 +74,6 @@ func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},
+		InCluster:       inCluster(),
 	}
 }

@@ -73,6 +73,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
 	}
 
+	// In cluster mode is already detected so ignore any given config
+	if config.InCluster == true {
+		config.KubeConfig = ""
+	}
+
 	//Load default indexer configs
 	if config.DefaultIndexers.Enabled == true {
 		Indexing.RLock()
