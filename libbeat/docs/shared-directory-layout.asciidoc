@@ -83,17 +83,17 @@ all paths are set correctly:
 ifeval::["{beatname_lc}"!="winlogbeat"]
 
 ["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
+----
 ./{beatname_lc}
-------------------------------------------------------------------------------
+----
 
 endif::[]
 
 ifeval::["{beatname_lc}"=="winlogbeat"]
 
 ["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
+----
 Start-Service {beatname_lc}
-----------------------------------------------------------------------
+----
 
 endif::[]

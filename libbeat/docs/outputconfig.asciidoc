@@ -281,13 +281,13 @@ endif::[]
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+ifdef::ignores_max_retries[]
 
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
 
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+ifndef::ignores_max_retries[]
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
@@ -536,13 +536,13 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+ifdef::ignores_max_retries[]
 
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
 
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+ifndef::ignores_max_retries[]
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
@@ -735,13 +735,13 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+ifdef::ignores_max_retries[]
 
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
 
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="winlogbeat")]
+ifndef::ignores_max_retries[]
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
@@ -965,13 +965,13 @@ The Redis connection timeout in seconds. The default is 5 seconds.
 
 ===== `max_retries`
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
+ifdef::ignores_max_retries[]
 
 {beatname_uc} ignores the `max_retries` setting and retries indefinitely.
 
 endif::[]
 
-ifeval::["{beatname_lc}"!="filebeat" and "{beatname_lc}"!="winlogbeat"]
+ifndef::ignores_max_retries[]
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
