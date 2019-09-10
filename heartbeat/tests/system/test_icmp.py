@@ -34,7 +34,7 @@ class Test(BaseTest):
             if any(lastGroup > group for group in runningGroups):
                 return (True)
         except subprocess.CalledProcessError, e:
-            print "Error trying sysctl:\n", e.output
+            sys.stderr.write("Error trying sysctl:\n", e.output)
 
         return (False)
 
@@ -59,7 +59,7 @@ class Test(BaseTest):
         Basic test with icmp root non privilege ICMP test.
 
         """
-        print("STARTING ICMP TEST")
+        sys.stderr.write("STARTING ICMP TEST")
 
         config = {
             "monitors": [
@@ -76,16 +76,16 @@ class Test(BaseTest):
             **config
         )
 
-        print(sys.stderr, "DETECTED PLATFORM %s" % platform.system)
+        sys.stderr.write("DETECTED PLATFORM %s" % platform.system)
         if platform.system() in ["Linux", "Darwin"]:
             adminRights = self.has_admin()
             groupRights = self.has_group_permission()
             if groupRights == True or adminRights == True:
                 proc = self.start_beat()
-                print("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB %s")
+                sys.stderr.write("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB %s")
                 self.wait_until(lambda: self.log_contains(
                     "heartbeat is running"))
-                print("CHECK WAIT %s")
+                sys.stderr.write("CHECK WAIT %s")
                 proc.check_kill_and_wait()
             else:
                 exit_code = self.run_beat()
@@ -93,10 +93,10 @@ class Test(BaseTest):
                 assert self.log_contains(
                     "You dont have root permission to run ping") is True
         else:
-            print("ON WINDOWS %s")
+            sys.stderr.write("ON WINDOWS %s")
             # windows seems to allow all users to run sockets
             proc = self.start_beat()
             self.wait_until(lambda: self.log_contains(
                 "heartbeat is running"))
             proc.check_kill_and_wait()
-        print("FINISHED ICMP TEST")
+        sys.stderr.write("FINISHED ICMP TEST")
