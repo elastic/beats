@@ -4,15 +4,15 @@ To secure the communication between Packetbeat and Elasticsearch, you can use HT
 sample configuration:
 
 [source,yaml]
-----------------------------------------------
+----
 elasticsearch:
 
-	enabled: true
-	username: packetbeat <1>
-	password: verysecret <2>
-	protocol: https <3>
-	hosts: ["packetbeat.example.com:9200"] <4>
------------------------------------------------
+  enabled: true
+  username: packetbeat <1>
+  password: verysecret <2>
+  protocol: https <3>
+  hosts: ["packetbeat.example.com:9200"] <4>
+----
 
 <1> The username to use for authenticating to Elasticsearch.
 <2> The password to use for authenticating to Elasticsearch.
