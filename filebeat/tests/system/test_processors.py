@@ -434,7 +434,7 @@ function process(evt) {
             assert "dissect.key" in evt
             assert evt["dissect.key"] == "hello"
 
-    @unittest.skipIf(sys.platform == "nt", "Windows requires explicit DNS server configuration")
+    @unittest.skipIf(sys.platform == "win32", "Windows requires explicit DNS server configuration")
     def test_javascript_processor_dns(self):
         """
         Check JS processor with dns
