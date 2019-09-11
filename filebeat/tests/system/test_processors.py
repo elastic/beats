@@ -3,6 +3,7 @@ from filebeat import BaseTest
 import io
 import os
 import unittest
+import sys
 
 """
 Contains tests for filtering.
