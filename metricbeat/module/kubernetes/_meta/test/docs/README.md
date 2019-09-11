@@ -102,11 +102,16 @@ I haven't looked much into this, there seems to be something going on when kuber
 
 Kube-state-metrics needs to be deployed for all the `state_` prefix metricsets at kubernetes. Yamls are to be found at the [upstream project](https://github.com/kubernetes/kube-state-metrics/tree/master/kubernetes)
 
-For the sake of laziness they are copied under [02_kubestatemetrics](./02_kubestatemetrics)
+Installing kube-state-metrics can be done either installing the yamls one by one from their remote location or cloning and installing the folder contents. Be sure to checkout the target release version before installing.
 
 ```
-kubectl apply -f $GOPATH/src/github.com/elastic/beats/metricbeat/module/kubernetes/_meta/test/docs/02_kubestatemetrics/1.7.0
+git clone git@github.com:kubernetes/kube-state-metrics.git
+cd kube-state-metrics/
+
+git checkout -b release-1.7 origin/release-1.7
+kubectl apply -f kubernetes/
 ```
+
 
 ## Core components test
 
@@ -121,37 +126,14 @@ sonobuoy run --wait
 
 ## Regular kubernetes components
 
-For now only a CronJob example is added.
-When adding new examples, we should consider whether they should be created under a subfolder here, or at the metricset where the example makes sense.
-
-```
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: mycronjob
-spec:
-  schedule: "*/1 * * * *"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - name: mycron-container
-            image: alpine
-            imagePullPolicy: IfNotPresent
-            
-            command: ['sh', '-c', 'echo elastic world ; sleep 5']
-    
-          restartPolicy: OnFailure
-          terminationGracePeriodSeconds: 0
-  concurrencyPolicy: Allow
-```
+You can find at [./02_objects](./02_objects) example kubernetes objects used during development and testing.
+For now only a CronJob example is added, add your kubernetes object of choice under that folder if you consider it will be useful for other people when developing, testing and troubleshooting.
 
 # Going further
 
-- All improvements are welcome
+- All improvements are welcome.
 - Different ways to test are welcome and can live here side by side.
-- Using kind seems to be a lot more lightweight
-- Probably some steps above can be tackled using [telepresence](https://www.telepresence.io/)
-
+- Using kind seems to be a lot more lightweight.
+- Probably some steps above can be tackled using [telepresence](https://www.telepresence.io/).
+- Probably Sonobuoy can be replaced with kubernetes e2e tests.
 
