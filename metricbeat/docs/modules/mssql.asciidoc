@@ -30,6 +30,31 @@ The following Metricsets are already included:
 
 `performance` Metricset fetches information from what's commonly known as https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017[Performance Counters] in MSSQL.
 
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you can specify native user credentials 
+as part of the host string with the following format:
+
+----
+hosts: ["sqlserver://sa@localhost"]]
+----
+
+To use Active Directory domain credentials, you can separately specify the username and password
+using the respective configuration options to allow the domain to be included in the username:
+
+----
+metricbeat.modules:
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
+  period: 10
+----
+
+Store sensitive values like passwords in the <<keystore,secrets keystore>>.
 
 [float]
 === Example configuration
@@ -44,7 +69,9 @@ metricbeat.modules:
   metricsets:
     - "transaction_log"
     - "performance"
-  hosts: ["sqlserver://sa@localhost"]
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
   period: 10s
 
 ----
