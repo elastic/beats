@@ -57,6 +57,5 @@ type prometheusMetricSet struct {
 }
 
 func (m *prometheusMetricSet) Fetch(r mb.ReporterV2) error {
-	m.prometheus.ReportProcessedMetrics(m.mapping, r)
-	return nil
+	return m.prometheus.ReportProcessedMetrics(m.mapping, r)
 }
