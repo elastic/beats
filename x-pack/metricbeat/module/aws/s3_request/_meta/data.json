@@ -7,27 +7,26 @@
             }
         },
         "s3_request": {
-            "bucket": {
-                "name": "test-s3-ks-2"
-            },
             "downloaded": {
-                "bytes": 267
+                "bytes": 22307
             },
             "errors": {
                 "4xx": 0,
                 "5xx": 0
             },
             "latency": {
-                "first_byte.ms": 196,
-                "total_request.ms": 458
+                "first_byte.ms": 851,
+                "total_request.ms": 1146
             },
             "requests": {
-                "list": 1,
-                "put": 9,
-                "total": 10
+                "get": 2,
+                "head": 1,
+                "list": 2,
+                "put": 3,
+                "total": 8
             },
             "uploaded": {
-                "bytes": 14704
+                "bytes": 5557
             }
         }
     },

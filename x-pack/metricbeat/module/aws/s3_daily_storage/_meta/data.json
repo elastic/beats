@@ -8,12 +8,11 @@
         },
         "s3_daily_storage": {
             "bucket": {
-                "name": "test-s3-ks-2",
                 "size": {
-                    "bytes": 43983
+                    "bytes": 51665
                 }
             },
-            "number_of_objects": 47
+            "number_of_objects": 51
         }
     },
     "cloud": {
