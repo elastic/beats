@@ -57,10 +57,10 @@ func init() {
 func isKubernetesAvailable(client k8s.Interface) bool {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
-		logp.Debug("kubernetes", "%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
+		logp.Err("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
 		return false
 	}
-	logp.Debug("kubernetes", "%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
+	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
 	return true
 }
 
@@ -113,9 +113,9 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		if config.InCluster {
-			logp.Info("%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
+			logp.Err("%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
 		} else {
-			logp.Info("%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
+			logp.Err("%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
 		}
 		processor.kubernetesAvailable = false
 		return processor, nil
