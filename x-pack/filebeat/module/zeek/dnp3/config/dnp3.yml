@@ -1,0 +1,50 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.dnp3"
+
+        - from: "zeek.dnp3.id.orig_h"
+          to: "source.ip"
+
+        - from: "zeek.dnp3.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.dnp3.id.resp_h"
+          to: "destination.ip"
+
+        - from: "zeek.dnp3.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.dnp3.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.dnp3.fc_request"
+          to: "zeek.dnp3.function.request"
+
+        - from: "zeek.dnp3.fc_reply"
+          to: "zeek.dnp3.function.reply"
+
+        - from: "zeek.dnp3.iin"
+          to: "zeek.dnp3.id"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+{{ end }}

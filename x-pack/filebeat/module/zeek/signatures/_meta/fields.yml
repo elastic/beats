@@ -1,0 +1,63 @@
+- name: signatures
+  type: group
+  description: >
+    Fields exported by the Zeek Signature log
+  fields:
+    - name: source
+      type: group
+      fields:
+        - name: ip
+          type: ip
+          description: |
+            The host which triggered the signature match event.
+
+        - name: port
+          type: integer
+          description: |
+            The host port on which the signature-matching activity occurred.
+
+    - name: destination
+      type: group
+      fields:
+        - name: ip
+          type: ip
+          description: |
+            The destination host which was sent the payload that triggered the signature match.
+
+        - name: port
+          type: integer
+          description: |
+            The destination host port which was sent the payload that triggered the signature match.
+
+    - name: note
+      type: keyword
+      description: |
+        Notice associated with signature event.
+
+    - name: id
+      type: keyword
+      description: |
+        The name of the signature that matched.
+
+    - name: msg
+      type: group
+      fields:
+        - name: event
+          type: keyword
+          description: |
+            A more descriptive message of the signature-matching event.
+
+        - name: sub
+          type: keyword
+          description: |
+            Extracted payload data or extra message.
+
+    - name: count
+      type: integer
+      description: |
+        Number of sigs, usually from summary count.
+
+    - name: host_count
+      type: integer
+      description: |
+        Number of hosts, from a summary count.

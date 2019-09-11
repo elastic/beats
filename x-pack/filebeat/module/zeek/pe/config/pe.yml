@@ -16,6 +16,9 @@ processors:
         - from: "json"
           to: "zeek.pe"
 
+        - from: "zeek.pe.id"
+          to: "zeek.pe.session_id"
+
         - from: "zeek.pe.compile_ts"
           to: "zeek.pe.compile_time"
 

@@ -1,0 +1,47 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.signatures"
+
+        - from: "zeek.signatures.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.signatures.src_addr"
+          to: "zeek.signatures.source.ip"
+
+        - from: "zeek.signatures.dst_addr"
+          to: "zeek.signatures.destination.ip"
+
+        - from: "zeek.signatures.src_port"
+          to: "zeek.signatures.source.port"
+
+        - from: "zeek.signatures.dst_port"
+          to: "zeek.signatures.destination.port"
+
+        - from: "zeek.signatures.sig_id"
+          to: "zeek.signatures.id"
+
+        - from: "zeek.signatures.sig_count"
+          to: "zeek.signatures.count"
+
+        - from: "zeek.signatures.event_msg"
+          to: "zeek.signatures.msg.event"
+
+        - from: "zeek.signatures.sub_msg"
+          to: "zeek.signatures.msg.sub"
+
+      ignore_missing: true
+      fail_on_error: false

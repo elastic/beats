@@ -16,6 +16,9 @@ processors:
         - from: "json"
           to: "zeek.x509"
 
+        - from: "zeek.x509.id"
+          to: "zeek.session_id"
+
         - from: "zeek.x509.certificate.not_valid_before"
           to: "zeek.x509.certificate.valid.from"
 

@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/tunnel.log
+    os.linux:
+      - /var/log/bro/current/tunnel.log
+    os.darwin:
+      - /usr/local/var/logs/current/tunnel.log
+  - name: tags
+    default: [zeek.tunnel]
+
+ingest_pipeline: ingest/pipeline.json
+input: config/tunnel.yml

@@ -46,6 +46,42 @@
               description: >
                 Value of the User-Agent header from the client.
 
+            - name: name
+              type: keyword
+              description: >
+                User-Agent name.
+
+            - name: version
+              type: keyword
+              description: >
+                User-Agent version.
+
+            - name: device
+              type: group
+              fields:
+                - name: name
+                  type: keyword
+                  descripion: |
+                    User-Agent device name.
+
+            - name: os
+              type: group
+              fields:
+                - name: name
+                  type: keyword
+                  description: |
+                    User-Agent OS name.
+
+                - name: full
+                  type: keyword
+                  description: |
+                    User-Agent OS full name.
+
+                - name: version
+                  type: keyword
+                  description: |
+                    User-Agent OS version.
+
         - name: body_length
           type: integer
           description: >

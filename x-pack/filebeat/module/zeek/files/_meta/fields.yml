@@ -8,20 +8,18 @@
       description: >
         A file unique identifier
 
-    - name: tx_host
-      type: ip
-      description: >
-        The host that transferred the file
+    - name: hosts
+      type: group
+      fields:
+        - name: tx
+          type: ip
+          description: >
+            The host that transferred the file
 
-    - name: rx_host
-      type: ip
-      description: >
-        The host that received the file
-
-    - name: session_ids
-      type: keyword
-      description: >
-        The sessions that have this file
+        - name: rx
+          type: ip
+          description: >
+            The host that received the file
 
     - name: source
       type: keyword

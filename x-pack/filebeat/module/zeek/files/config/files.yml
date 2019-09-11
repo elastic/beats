@@ -17,7 +17,7 @@ processors:
           to: "zeek.files"
 
         - from: "zeek.files.conn_uids"
-          to: "zeek.files.session_ids"
+          to: "zeek.session_id"
 
         - from: "zeek.files.missing_bytes"
           to: "zeek.files.bytes.missing"
@@ -33,6 +33,12 @@ processors:
 
         - from: "zeek.files.timedout"
           to: "zeek.files.timed_out"
+
+        - from: "zeek.files.tx_hosts"
+          to: "zeek.files.hosts.tx"
+
+        - from: "zeek.files.rx_hosts"
+          to: "zeek.files.hosts.rx"
 
       ignore_missing: true
       fail_on_error: false
