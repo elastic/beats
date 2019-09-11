@@ -2,6 +2,7 @@
 from filebeat import BaseTest
 import io
 import os
+import unittest
 
 """
 Contains tests for filtering.
@@ -432,10 +433,10 @@ function process(evt) {
             assert "dissect.key" in evt
             assert evt["dissect.key"] == "hello"
 
-    @unittest.skipIf(sys.platform == "nt", "skipped on Windows")
+    @unittest.skipIf(sys.platform == "nt", "Windows requires explicit DNS server configuration")
     def test_javascript_processor_dns(self):
         """
-        Check JS processor with add_locale
+        Check JS processor with dns
         """
 
         self._test_javascript_processor_with_source("""\'var processor = require("processor");
@@ -457,7 +458,7 @@ function process(evt) {
 
     def test_javascript_processor_chain(self):
         """
-        Check JS processor with add_locale
+        Check JS processor chain of processors
         """
 
         self._test_javascript_processor_with_source("""\'var processor = require("processor");
@@ -490,22 +491,6 @@ function process(evt) {
             assert evt["hello"] == "world"
             assert "fields.foo" in evt
             assert evt["fields.foo"] == "bar"
-
-    def test_javascript_processor_add_locale(self):
-        """
-        Check JS processor with add_locale
-        """
-
-        self._test_javascript_processor_with_source("""\'var processor = require("processor");
-var addLocale = new processor.AddLocale();
-function process(evt) {
-    addLocale.Run(evt);
-}\'
-""")
-
-        output = self.read_output()
-        for evt in output:
-            assert "event.timezone" in evt
 
     def _test_javascript_processor_with_source(self, script_source, add_test_fields=False):
         js_proc = {
