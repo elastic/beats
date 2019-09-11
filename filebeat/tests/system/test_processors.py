@@ -457,42 +457,6 @@ function process(evt) {
 }\'
 """, True)
 
-    def test_javascript_processor_chain(self):
-        """
-        Check JS processor chain of processors
-        """
-
-        self._test_javascript_processor_with_source("""\'var processor = require("processor");
-var localeProcessor = new processor.AddLocale();
-var chain = new processor.Chain()
-    .Add(localeProcessor)
-    .Rename({
-        fields: [
-            {from: "event.timezone", to: "timezone"},
-        ],
-    })
-    .Add(function(evt) {
-        evt.Put("hello", "world");
-    })
-    .Build();
-
-var chainOfChains = new processor.Chain()
-    .Add(chain)
-    .AddFields({fields: {foo: "bar"}})
-    .Build();
-function process(evt) {
-    chainOfChains.Run(evt);
-}\'
-""")
-
-        output = self.read_output()
-        for evt in output:
-            assert "timezone" in evt
-            assert "hello" in evt
-            assert evt["hello"] == "world"
-            assert "fields.foo" in evt
-            assert evt["fields.foo"] == "bar"
-
     def _test_javascript_processor_with_source(self, script_source, add_test_fields=False):
         js_proc = {
             "script": {

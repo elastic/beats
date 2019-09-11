@@ -33,6 +33,10 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module/require"
 )
 
+func init() {
+	RegisterPlugin("Mock", newMock)
+}
+
 func testEvent() *beat.Event {
 	return &beat.Event{
 		Fields: common.MapStr{
@@ -61,7 +65,45 @@ function process(evt) {
 }
 `
 
-	RegisterPlugin("Mock", newMock)
+	logp.TestingSetup()
+	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	evt, err := p.Run(testEvent())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	checkEvent(t, evt, "added", "new_value")
+}
+
+func TestChainOfDummyProcessors(t *testing.T) {
+	const script = `
+var processor = require('processor');
+
+var hungarianHello = new processor.Mock({"fields": {"helló": "világ"}});
+var germanHello = new processor.Mock({"fields": {"hallo": "Welt"}});
+
+var chain = new processor.Chain()
+    .Add(hungarianHello)
+    .Mock({
+        fields: { "hola": "mundo" },
+    })
+    .Add(function(evt) {
+        evt.Put("hello", "world");
+    })
+    .Build();
+
+var chainOfChains = new processor.Chain()
+    .Add(chain)
+	.Add(germanHello)
+    .Build();
+function process(evt) {
+    chainOfChains.Run(evt);
+}
+`
 
 	logp.TestingSetup()
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
@@ -74,12 +116,20 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	s, err := evt.GetValue("added")
+	// checking if hello world is added to the event in different languages
+	checkEvent(t, evt, "helló", "világ")
+	checkEvent(t, evt, "hola", "mundo")
+	checkEvent(t, evt, "hello", "world")
+	checkEvent(t, evt, "hallo", "Welt")
+}
+
+func checkEvent(t *testing.T, evt *beat.Event, key, value string) {
+	s, err := evt.GetValue(key)
 	assert.NoError(t, err)
 
 	switch ss := s.(type) {
 	case string:
-		assert.Equal(t, ss, "new_value")
+		assert.Equal(t, ss, value)
 	default:
 		t.Fatal("unexpected type")
 	}
