@@ -19,6 +19,7 @@ package add_kubernetes_metadata
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 
 	"k8s.io/client-go/rest"
@@ -52,7 +53,7 @@ func getSystemKubeConfig() string {
 	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
 		return envKubeConfig
 	}
-	homeKubeConfig := os.Getenv("HOME") + "/.kube/config"
+	homeKubeConfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	if _, err := os.Stat(homeKubeConfig); !os.IsNotExist(err) {
 		return homeKubeConfig
 	}
