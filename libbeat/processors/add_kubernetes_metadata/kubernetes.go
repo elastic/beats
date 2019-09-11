@@ -57,7 +57,7 @@ func init() {
 func isKubernetesAvailable(client k8s.Interface) bool {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
-		logp.Debug("kubernetes", "%v: could not detect kubernetes env", "add_kubernetes_metadata")
+		logp.Debug("kubernetes", "%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
 		return false
 	}
 	logp.Debug("kubernetes", "%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
@@ -71,11 +71,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
-	}
-
-	// In cluster mode is already detected so ignore any given config
-	if config.InCluster == true {
-		config.KubeConfig = ""
 	}
 
 	//Load default indexer configs
@@ -117,7 +112,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
-		logp.Debug("kubernetes", "%v: could not create kubernetes client with config: %v", "add_kubernetes_metadata", config.KubeConfig)
+		if config.InCluster {
+			logp.Info("%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
+		} else {
+			logp.Info("%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
+		}
 		processor.kubernetesAvailable = false
 		return processor, nil
 	}

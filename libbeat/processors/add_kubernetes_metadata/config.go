@@ -56,7 +56,7 @@ func getSystemKubeConfig() string {
 	if _, err := os.Stat(homeKubeConfig); !os.IsNotExist(err) {
 		return homeKubeConfig
 	}
-	return homeKubeConfig
+	return ""
 }
 
 func inCluster() bool {
