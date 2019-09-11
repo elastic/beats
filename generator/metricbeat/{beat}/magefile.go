@@ -1,20 +1,3 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 // +build mage
 
 package main
@@ -24,10 +7,8 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
@@ -41,17 +22,22 @@ import (
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/collectors"
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/update"
 )
 
 func init() {
 	devtools.SetBuildVariableSources(devtools.DefaultBeatBuildVariableSources)
 
 	devtools.BeatDescription = "One sentence description of the Beat."
+	devtools.BeatVendor = "{full_name}"
 }
 
 // CollectAll generates the docs and the fields.
 func CollectAll() {
-	mg.Deps(CollectDocs, FieldsDocs)
+	mg.Deps(collectors.CollectDocs, FieldsDocs)
 }
 
 // Package packages the Beat for distribution.
@@ -63,19 +49,9 @@ func Package() {
 
 	devtools.UseCommunityBeatPackaging()
 
-	mg.Deps(Update)
+	mg.Deps(update.Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, pkg.PackageTest)
-}
-
-// Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
-}
-
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	return devtools.GenerateFieldsYAML("module")
 }
 
 // FieldsDocs generates docs/fields.asciidoc containing all fields
@@ -91,9 +67,9 @@ func FieldsDocs() error {
 	return devtools.Docs.FieldDocs(output)
 }
 
-// CollectDocs creates the documentation under docs/
-func CollectDocs() error {
-	return metricbeat.CollectDocs()
+// Fields generates a fields.yml for the Beat.
+func Fields() error {
+	return devtools.GenerateFieldsYAML("module")
 }
 
 // Config generates both the short/reference/docker configs.
