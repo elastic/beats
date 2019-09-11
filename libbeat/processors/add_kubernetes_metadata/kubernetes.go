@@ -57,7 +57,7 @@ func init() {
 func isKubernetesAvailable(client k8s.Interface) bool {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
-		logp.Err("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
+		logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
 		return false
 	}
 	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
@@ -105,14 +105,15 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	processor := &kubernetesAnnotator{
-		indexers: indexers,
-		matchers: matchers,
-		cache:    newCache(config.CleanupTimeout),
+		indexers:            indexers,
+		matchers:            matchers,
+		cache:               newCache(config.CleanupTimeout),
+		kubernetesAvailable: false,
 	}
 
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
-		if config.InCluster {
+		if kubernetes.IsInCluster(config.KubeConfig) {
 			logp.Err("%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
 		} else {
 			logp.Err("%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
@@ -122,11 +123,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	if !isKubernetesAvailable(client) {
-		processor.kubernetesAvailable = false
 		return processor, nil
 	}
-
-	processor.kubernetesAvailable = true
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
@@ -144,6 +142,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	processor.watcher = watcher
+	processor.kubernetesAvailable = true
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {

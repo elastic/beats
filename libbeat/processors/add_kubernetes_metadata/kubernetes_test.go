@@ -106,15 +106,6 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 		kubernetesAvailable: false,
 	}
 
-	processor.cache.set("foo", common.MapStr{
-		"pod": common.MapStr{
-			"labels": common.MapStr{
-				"dont":     "replace",
-				"original": "fields",
-			},
-		},
-	})
-
 	intialEventMap := common.MapStr{
 		"kubernetes": common.MapStr{
 			"pod": common.MapStr{

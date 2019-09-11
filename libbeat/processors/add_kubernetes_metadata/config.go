@@ -18,11 +18,7 @@
 package add_kubernetes_metadata
 
 import (
-	"os"
-	"path/filepath"
 	"time"
-
-	"k8s.io/client-go/rest"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -39,7 +35,6 @@ type kubeAnnotatorConfig struct {
 	Matchers        PluginConfig  `config:"matchers"`
 	DefaultMatchers Enabled       `config:"default_matchers"`
 	DefaultIndexers Enabled       `config:"default_indexers"`
-	InCluster       bool
 }
 
 type Enabled struct {
@@ -48,33 +43,11 @@ type Enabled struct {
 
 type PluginConfig []map[string]common.Config
 
-func getSystemKubeConfig() string {
-	envKubeConfig := os.Getenv("KUBECONFIG")
-	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
-		return envKubeConfig
-	}
-	homeKubeConfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
-	if _, err := os.Stat(homeKubeConfig); !os.IsNotExist(err) {
-		return homeKubeConfig
-	}
-	return ""
-}
-
-func inCluster() bool {
-	_, err := rest.InClusterConfig()
-	if err == nil {
-		return true
-	}
-	return false
-}
-
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
-		KubeConfig:      getSystemKubeConfig(),
 		SyncPeriod:      10 * time.Minute,
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},
-		InCluster:       inCluster(),
 	}
 }
