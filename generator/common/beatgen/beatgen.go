@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package beatgen
 
 import (
@@ -64,20 +81,20 @@ func Generate() error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%#v\n", cfg)
 	return genNewBeat(cfg)
 }
 
 // genNewBeat generates a new custom beat
+// We assume our config object is populated and valid here
 func genNewBeat(config map[string]string) error {
+	if config["type"] != "beat" && config["type"] != "metricbeat" {
+		return fmt.Errorf("%s is not a valid custom beat type. Valid types are 'beat' and 'metricbeat'", config["type"])
+	}
 
 	genPath := devtools.OSSBeatDir("generator", config["type"], "{beat}")
-	fmt.Printf("Attempting to read from gen directory %s\n", genPath)
 	err := filepath.Walk(genPath, func(path string, info os.FileInfo, err error) error {
-		//fmt.Printf("Got path %s, Fileinfo: %v Name: %s\n", path, info.IsDir(), info.Name())
 		newBase := filepath.Join(build.Default.GOPATH, "src", config["beat_path"])
 		replacePath := strings.Replace(path, genPath, newBase, -1)
-		//fmt.Printf("replacing with path %s\n", replacePath)
 
 		writePath := strings.Replace(replacePath, "{beat}", config["project_name"], -1)
 		writePath = strings.Replace(writePath, ".go.tmpl", ".go", -1)
@@ -95,7 +112,6 @@ func genNewBeat(config map[string]string) error {
 			}
 			newFile := replaceVars(config, string(tmplFile))
 
-			fmt.Printf("Attempting to write to %s\n", writePath)
 			err = ioutil.WriteFile(writePath, []byte(newFile), 0644)
 			if err != nil {
 				return err
@@ -123,7 +139,6 @@ func replaceVars(config map[string]string, fileBody string) string {
 
 // returns a "compleated" config object with everything we need
 func getConfig() (map[string]string, error) {
-
 	userCfg := make(map[string]string)
 	for _, cfgVal := range configList {
 		var cfgKey string
