@@ -32,16 +32,8 @@ var (
 		"logging.to_stderr": true,
 		"logging.to_files":  false,
 	})
-	esOverrides = common.MustNewConfigFrom(map[string]interface{}{
-		"queue.mem.events":                   "${output.elasticsearch.bulk_max_size}",
-		"output.elasticsearch.bulk_max_size": 50,
-	})
 	logstashOverrides = common.MustNewConfigFrom(map[string]interface{}{
-		"queue.mem.events": "${output.logstash.bulk_max_size}",
-		"output.logstash": map[string]interface{}{
-			"bulk_max_size": 50,
-			"pipelining":    0,
-		},
+		"output.logstash.pipelining": 0,
 	})
 
 	// Overrides overrides the default configuration provided by libbeat.
@@ -53,10 +45,6 @@ var (
 		cfgfile.ConditionalOverride{
 			Check:  isLogstash,
 			Config: logstashOverrides,
-		},
-		cfgfile.ConditionalOverride{
-			Check:  isElasticsearch,
-			Config: esOverrides,
 		},
 	}
 
@@ -100,10 +88,6 @@ var always = func(_ *common.Config) bool {
 
 var isLogstash = func(cfg *common.Config) bool {
 	return isOutput(cfg, "logstash")
-}
-
-var isElasticsearch = func(cfg *common.Config) bool {
-	return isOutput(cfg, "elasticsearch")
 }
 
 func isOutput(cfg *common.Config, name string) bool {
