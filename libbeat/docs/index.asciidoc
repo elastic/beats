@@ -1,4 +1,3 @@
-[[beats-reference]]
 = Beats Platform Reference
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/1.2
 :topbeat: http://www.elastic.co/guide/en/beats/topbeat/1.2
