@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_kubernetes_metadata
 
 import (
@@ -28,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -44,6 +47,7 @@ type kubernetesAnnotator struct {
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
+	jsprocessor.RegisterPlugin("AddKubernetesMetadata", New)
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
