@@ -19,7 +19,9 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "HTTP 5XX Errors"
+            },
             "gridData": {
               "h": 9,
               "i": "2",
@@ -30,10 +32,12 @@
             "panelIndex": "2",
             "panelRefName": "panel_0",
             "title": "HTTP 5XX Errors",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Request Count"
+            },
             "gridData": {
               "h": 11,
               "i": "3",
@@ -44,10 +48,12 @@
             "panelIndex": "3",
             "panelRefName": "panel_1",
             "title": "Request Count",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Unhealthy Host Count"
+            },
             "gridData": {
               "h": 8,
               "i": "4",
@@ -58,10 +64,12 @@
             "panelIndex": "4",
             "panelRefName": "panel_2",
             "title": "Unhealthy Host Count",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Healthy Host Count"
+            },
             "gridData": {
               "h": 8,
               "i": "5",
@@ -72,10 +80,12 @@
             "panelIndex": "5",
             "panelRefName": "panel_3",
             "title": "Healthy Host Count",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Latency in Seconds"
+            },
             "gridData": {
               "h": 12,
               "i": "6",
@@ -86,10 +96,12 @@
             "panelIndex": "6",
             "panelRefName": "panel_4",
             "title": "Latency in Seconds",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "HTTP Backend 4XX Errors"
+            },
             "gridData": {
               "h": 9,
               "i": "7",
@@ -100,10 +112,12 @@
             "panelIndex": "7",
             "panelRefName": "panel_5",
             "title": "HTTP Backend 4XX Errors",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Backend Connection Errors"
+            },
             "gridData": {
               "h": 9,
               "i": "8",
@@ -114,7 +128,7 @@
             "panelIndex": "8",
             "panelRefName": "panel_6",
             "title": "Backend Connection Errors",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -127,10 +141,12 @@
             },
             "panelIndex": "9",
             "panelRefName": "panel_7",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "HTTP Backend 2XX"
+            },
             "gridData": {
               "h": 9,
               "i": "10",
@@ -141,7 +157,7 @@
             "panelIndex": "10",
             "panelRefName": "panel_8",
             "title": "HTTP Backend 2XX",
-            "version": "7.2.0"
+            "version": "7.4.0"
           }
         ],
         "timeRestore": false,
@@ -150,7 +166,7 @@
       },
       "id": "e74bf320-b3ce-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "dashboard": "7.0.0"
+        "dashboard": "7.3.0"
       },
       "references": [
         {
@@ -200,8 +216,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-01T15:09:06.696Z",
-      "version": "WzYzNSw4XQ=="
+      "updated_at": "2019-09-12T02:24:38.326Z",
+      "version": "WzI0MTYsN10="
     },
     {
       "attributes": {
@@ -222,6 +238,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -234,8 +251,9 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -248,6 +266,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -286,12 +305,12 @@
       },
       "id": "b9703dd0-b3c9-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:37:04.544Z",
-      "version": "WzY0NSw5XQ=="
+      "updated_at": "2019-09-12T02:24:22.066Z",
+      "version": "WzI0MTUsN10="
     },
     {
       "attributes": {
@@ -312,6 +331,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -324,8 +344,9 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -338,6 +359,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -362,6 +384,7 @@
                 "stacked": "none",
                 "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
+                "type": "timeseries",
                 "value_template": "{{value}}"
               }
             ],
@@ -376,12 +399,12 @@
       },
       "id": "d560de70-b3c7-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:24:52.316Z",
-      "version": "WzY0MCw5XQ=="
+      "updated_at": "2019-09-12T02:22:46.781Z",
+      "version": "WzI0MDgsN10="
     },
     {
       "attributes": {
@@ -418,7 +441,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
             "filter": "",
             "gauge_color_rules": [
@@ -432,6 +455,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -446,7 +470,7 @@
                   {
                     "field": "aws.metrics.UnHealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
-                    "type": "sum"
+                    "type": "max"
                   }
                 ],
                 "point_size": 0,
@@ -470,12 +494,12 @@
       },
       "id": "6fc1efd0-b3c9-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:24:16.077Z",
-      "version": "WzYzOCw5XQ=="
+      "updated_at": "2019-09-12T01:00:47.505Z",
+      "version": "WzIzOTYsN10="
     },
     {
       "attributes": {
@@ -512,7 +536,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
             "filter": "",
             "gauge_color_rules": [
@@ -526,6 +550,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -540,7 +565,7 @@
                   {
                     "field": "aws.metrics.HealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
-                    "type": "sum"
+                    "type": "max"
                   }
                 ],
                 "point_size": 0,
@@ -564,12 +589,12 @@
       },
       "id": "6392bc30-b3c9-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:24:30.551Z",
-      "version": "WzYzOSw5XQ=="
+      "updated_at": "2019-09-12T01:00:18.978Z",
+      "version": "WzIzOTMsN10="
     },
     {
       "attributes": {
@@ -590,6 +615,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -602,8 +628,9 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -616,6 +643,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -654,12 +682,12 @@
       },
       "id": "b2ea15a0-b3c7-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:36:49.424Z",
-      "version": "WzY0Myw5XQ=="
+      "updated_at": "2019-09-12T02:23:16.083Z",
+      "version": "WzI0MTAsN10="
     },
     {
       "attributes": {
@@ -680,6 +708,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -692,8 +721,9 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -706,6 +736,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -744,12 +775,12 @@
       },
       "id": "21f30090-b3ca-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:28:25.630Z",
-      "version": "WzY0Miw5XQ=="
+      "updated_at": "2019-09-12T02:24:09.023Z",
+      "version": "WzI0MTQsN10="
     },
     {
       "attributes": {
@@ -770,6 +801,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -782,8 +814,9 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -796,6 +829,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -835,12 +869,12 @@
       },
       "id": "572d40e0-b3ca-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:28:18.932Z",
-      "version": "WzY0MSw5XQ=="
+      "updated_at": "2019-09-12T02:22:28.366Z",
+      "version": "WzI0MDcsN10="
     },
     {
       "attributes": {
@@ -887,7 +921,7 @@
       },
       "id": "b5308940-7347-11e9-816b-07687310a99a",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -897,8 +931,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-23T20:30:59.432Z",
-      "version": "WzMwMSwzXQ=="
+      "updated_at": "2019-09-12T00:55:22.007Z",
+      "version": "WzIwNjgsN10="
     },
     {
       "attributes": {
@@ -919,6 +953,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -931,8 +966,9 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
+            "default_index_pattern": "filebeat-*",
             "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -945,6 +981,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -983,13 +1020,13 @@
       },
       "id": "1f528f50-b3ce-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:36:56.883Z",
-      "version": "WzY0NCw5XQ=="
+      "updated_at": "2019-09-12T02:23:38.069Z",
+      "version": "WzI0MTIsN10="
     }
   ],
-  "version": "7.2.0"
+  "version": "7.4.0"
 }
