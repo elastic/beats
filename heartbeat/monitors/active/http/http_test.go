@@ -41,6 +41,8 @@ import (
 	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -102,7 +104,21 @@ func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 		httpBaseChecks(url),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
-				"response.status_code":   statusCode,
+				"response.status_code": statusCode,
+				"response.body.hash":   isdef.IsString,
+				// TODO add this isdef to lookslike in a robust way
+				"response.body.bytes": isdef.Is("an int64 greater than 0", func(path llpath.Path, v interface{}) *llresult.Results {
+					raw, ok := v.(int64)
+					if !ok {
+						return llresult.SimpleResult(path, false, "%s is not an int64", reflect.TypeOf(v))
+					}
+					if raw >= 0 {
+						return llresult.ValidResult(path)
+					}
+
+					return llresult.SimpleResult(path, false, "value %v not >= 0 ", raw)
+
+				}),
 				"rtt.content.us":         isdef.IsDuration,
 				"rtt.response_header.us": isdef.IsDuration,
 				"rtt.total.us":           isdef.IsDuration,

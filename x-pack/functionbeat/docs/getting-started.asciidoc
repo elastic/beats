@@ -198,8 +198,14 @@ Also make sure the user has the permissions required to deploy and run the
 function. For more information, see <<iam-permissions>>.
 
 After setting credentials and verifying permissions, run the `deploy` command to
-deploy the function. The following command deploys a function called
-`cloudwatch`: 
+deploy the function.
+
+TIP: Instead of deploying from the command line, you can export an
+{cloudformation-ref} template and use the template with automation software to
+deploy {beatname_uc} code to your cloud environment. For more information, see 
+<<export-cloudformation-template>>.
+
+The following command deploys a function called `cloudwatch`: 
 
 *linux and mac:*
 
@@ -222,6 +228,7 @@ If deployment fails, see <<faq>> for help troubleshooting.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
+
 
 [[view-kibana-dashboards]]
 [role="xpack"]

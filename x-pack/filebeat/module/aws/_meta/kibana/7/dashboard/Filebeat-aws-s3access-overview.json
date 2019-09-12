@@ -19,7 +19,9 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Top URLs"
+            },
             "gridData": {
               "h": 15,
               "i": "1",
@@ -30,10 +32,12 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Top URLs",
-            "version": "7.3.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Http Status over time"
+            },
             "gridData": {
               "h": 15,
               "i": "2",
@@ -44,10 +48,12 @@
             "panelIndex": "2",
             "panelRefName": "panel_1",
             "title": "Http Status over time",
-            "version": "7.3.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Error Logs"
+            },
             "gridData": {
               "h": 15,
               "i": "3",
@@ -58,7 +64,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_2",
             "title": "Error Logs",
-            "version": "7.3.0"
+            "version": "7.4.0"
           }
         ],
         "timeRestore": false,
@@ -87,8 +93,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-09T18:26:57.897Z",
-      "version": "Wzk3NywxXQ=="
+      "updated_at": "2019-09-11T15:17:53.090Z",
+      "version": "WzEyMDAsN10="
     },
     {
       "attributes": {
@@ -216,7 +222,7 @@
       },
       "id": "99ffdb00-bacb-11e9-9f70-1f7bda85a5eb",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -226,8 +232,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-08-09T17:32:03.632Z",
-      "version": "Wzk2NSwxXQ=="
+      "updated_at": "2019-09-11T15:11:59.518Z",
+      "version": "Wzk0Myw3XQ=="
     },
     {
       "attributes": {
@@ -333,12 +339,12 @@
       },
       "id": "5c93cd10-bac3-11e9-9f70-1f7bda85a5eb",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-09T16:33:04.609Z",
-      "version": "Wzk2MywxXQ=="
+      "updated_at": "2019-09-11T15:11:59.518Z",
+      "version": "Wzk0NCw3XQ=="
     },
     {
       "attributes": {
@@ -377,6 +383,31 @@
                     }
                   }
                 }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "fileset.name",
+                  "negate": false,
+                  "params": {
+                    "query": "s3access"
+                  },
+                  "type": "phrase",
+                  "value": "s3access"
+                },
+                "query": {
+                  "match": {
+                    "fileset.name": {
+                      "query": "s3access",
+                      "type": "phrase"
+                    }
+                  }
+                }
               }
             ],
             "highlightAll": true,
@@ -389,15 +420,17 @@
           }
         },
         "sort": [
-          "@timestamp",
-          "desc"
+          [
+            "@timestamp",
+            "desc"
+          ]
         ],
         "title": "Error Logs [Filebeat AWS]",
         "version": 1
       },
       "id": "5e5a3c90-bac0-11e9-9f70-1f7bda85a5eb",
       "migrationVersion": {
-        "search": "7.0.0"
+        "search": "7.4.0"
       },
       "references": [
         {
@@ -409,12 +442,17 @@
           "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
           "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
         }
       ],
       "type": "search",
-      "updated_at": "2019-08-09T18:24:47.345Z",
-      "version": "Wzk3NCwxXQ=="
+      "updated_at": "2019-09-11T15:17:42.648Z",
+      "version": "WzExOTksN10="
     }
   ],
-  "version": "7.3.0"
+  "version": "7.4.0"
 }

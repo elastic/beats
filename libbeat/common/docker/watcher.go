@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package docker
 
 import (
@@ -128,6 +130,12 @@ func NewWatcher(host string, tls *TLSConfig, storeShortID bool) (Watcher, error)
 	}
 
 	client, err := NewClient(host, httpClient, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extra check to confirm that Docker is available
+	_, err = client.Info(context.Background())
 	if err != nil {
 		return nil, err
 	}
