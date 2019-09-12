@@ -1,7 +1,8 @@
-== Overview
+[[beats-reference]]
+== Beats overview
 
 ++++
-<titleabbrev>Beats overview</titleabbrev>
+<titleabbrev>Overview</titleabbrev>
 ++++
 
 {beats} are open source data shippers that you install as agents on your
