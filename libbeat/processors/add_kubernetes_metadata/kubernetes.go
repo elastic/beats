@@ -21,13 +21,13 @@ import (
 	"fmt"
 	"time"
 
+	k8sclient "k8s.io/client-go/kubernetes"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-
-	k8s "k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -54,7 +54,7 @@ func init() {
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
-func isKubernetesAvailable(client k8s.Interface) bool {
+func isKubernetesAvailable(client k8sclient.Interface) bool {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
 		logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
@@ -114,11 +114,10 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		if kubernetes.IsInCluster(config.KubeConfig) {
-			logp.Err("%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
 		} else {
-			logp.Err("%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
 		}
-		processor.kubernetesAvailable = false
 		return processor, nil
 	}
 
