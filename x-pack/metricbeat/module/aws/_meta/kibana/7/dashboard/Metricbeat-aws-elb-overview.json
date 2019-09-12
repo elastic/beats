@@ -251,7 +251,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": "",
@@ -344,7 +344,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": "",
@@ -441,7 +441,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "filter": "",
             "gauge_color_rules": [
@@ -536,7 +536,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "filter": "",
             "gauge_color_rules": [
@@ -628,7 +628,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": "",
@@ -721,7 +721,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": "",
@@ -814,7 +814,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": "",
@@ -966,7 +966,7 @@
                 "id": "7db91990-b3c6-11e9-af6e-ef22c5680226"
               }
             ],
-            "default_index_pattern": "filebeat-*",
+            "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": "",
