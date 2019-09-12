@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_docker_metadata
 
 import (
@@ -35,6 +37,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -49,6 +52,7 @@ var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
+	jsprocessor.RegisterPlugin("AddDockerMetadata", New)
 }
 
 type addDockerMetadata struct {

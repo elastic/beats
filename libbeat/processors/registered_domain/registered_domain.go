@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -37,6 +38,7 @@ const (
 
 func init() {
 	processors.RegisterPlugin(procName, New)
+	jsprocessor.RegisterPlugin("RegisteredDomain", New)
 }
 
 type processor struct {
