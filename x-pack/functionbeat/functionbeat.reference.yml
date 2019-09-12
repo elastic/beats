@@ -227,6 +227,10 @@ functionbeat.provider.aws.functions:
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
 
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
     # The amount of time the function is allowed to run.
     #timeout: 3s
 
