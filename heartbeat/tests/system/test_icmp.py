@@ -78,26 +78,26 @@ class Test(BaseTest):
 
         sys.stderr.write("DETECTED PLATFORM %s\n" % platform.system()
         if platform.system() in ["Linux", "Darwin"]:
-            adminRights = self.has_admin()
-            groupRights = self.has_group_permission()
+            adminRights=self.has_admin()
+            groupRights=self.has_group_permission()
             if groupRights == True or adminRights == True:
                 sys.stderr.write("STARTING BEAT\n")
-                proc = self.start_beat()
+                proc=self.start_beat()
                 sys.stderr.write("STARTED BEAT\n")
                 sys.stderr.write("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB\n")
                 time.sleep(25)
-                #self.wait_until(lambda: self.log_contains("heartbeat is running"))
+                # self.wait_until(lambda: self.log_contains("heartbeat is running"))
                 sys.stderr.write("CHECK WAIT %s")
                 proc.check_kill_and_wait()
             else:
-                exit_code = self.run_beat()
+                exit_code=self.run_beat()
                 assert exit_code == 1
                 assert self.log_contains(
                     "You dont have root permission to run ping") is True
         else:
             sys.stderr.write("ON WINDOWS %s\n")
             # windows seems to allow all users to run sockets
-            proc = self.start_beat()
+            proc=self.start_beat()
             self.wait_until(lambda: self.log_contains(
                 "heartbeat is running"))
             proc.check_kill_and_wait()
