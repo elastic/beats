@@ -5,6 +5,10 @@
 package cmd
 
 import (
+	"os"
+
+	"github.com/spf13/cobra"
+
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
@@ -22,6 +26,12 @@ func init() {
 		Name:            Name,
 		ConfigOverrides: config.Overrides,
 	})
+
+	RootCmd.RemoveCommand(RootCmd.RunCmd)
+	RootCmd.Run = func(_ *cobra.Command, _ []string) {
+		RootCmd.Usage()
+		os.Exit(1)
+	}
 
 	RootCmd.AddCommand(genDeployCmd())
 	RootCmd.AddCommand(genUpdateCmd())

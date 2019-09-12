@@ -19,6 +19,28 @@
                     "\\[%{TIMESTAMP_ISO8601:elasticsearch.deprecation.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}*\\]\\[%{DATA:elasticsearch.component}%{SPACE}*\\] %{GREEDYMULTILINE:message}"
                 ]
             }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.deprecation.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "yyyy-MM-dd'T'HH:mm:ss,SSS"
+                ],
+                "ignore_failure": true
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.event.timezone != null",
+                "field": "elasticsearch.deprecation.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "yyyy-MM-dd'T'HH:mm:ss,SSS"
+                ],
+                "timezone": "{{ event.timezone }}",
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
         }
     ]
 }

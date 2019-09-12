@@ -316,7 +316,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "url.domain.keyword",
+                "field": "url.domain",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -431,7 +431,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "source.address.keyword",
+                "field": "source.address",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -594,7 +594,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "url.domain.keyword"
+                "field": "url.domain"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -730,7 +730,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "user_agent.name.keyword",
+                "field": "user_agent.name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -845,7 +845,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "envoyproxy.proxy_type.keyword",
+                "field": "envoyproxy.proxy_type",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",

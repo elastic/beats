@@ -811,7 +811,6 @@ metricbeat.modules:
   host: "localhost"
   port: "8125"
   enabled: false
-  #reservoir_size: 1000
   #ttl: "30s"
 
 #------------------------------- Traefik Module -------------------------------
@@ -1978,6 +1977,11 @@ logging.files:
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Metricbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.

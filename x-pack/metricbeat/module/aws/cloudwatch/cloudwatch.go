@@ -30,6 +30,7 @@ var (
 	identifierNameIdx  = 3
 	identifierValueIdx = 4
 	defaultStatistics  = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
+	labelSeperator     = "|"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -303,7 +304,7 @@ func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, period ti
 
 func constructLabel(metric cloudwatch.Metric, statistic string) string {
 	// label = metricName + namespace + statistic + dimKeys + dimValues
-	label := *metric.MetricName + " " + *metric.Namespace + " " + statistic
+	label := *metric.MetricName + labelSeperator + *metric.Namespace + labelSeperator + statistic
 	dimNames := ""
 	dimValues := ""
 	for i, dim := range metric.Dimensions {
@@ -316,43 +317,10 @@ func constructLabel(metric cloudwatch.Metric, statistic string) string {
 	}
 
 	if dimNames != "" && dimValues != "" {
-		label += " " + dimNames
-		label += " " + dimValues
+		label += labelSeperator + dimNames
+		label += labelSeperator + dimValues
 	}
 	return label
-}
-
-func getIdentifiers(metricsWithStatsTotal []metricsWithStatistics) map[string][]string {
-	if len(metricsWithStatsTotal) == 0 {
-		return nil
-	}
-
-	identifiers := map[string][]string{}
-	for _, metricsWithStats := range metricsWithStatsTotal {
-		identifierName := ""
-		identifierValue := ""
-		if len(metricsWithStats.cloudwatchMetric.Dimensions) == 0 {
-			continue
-		}
-
-		for i, dim := range metricsWithStats.cloudwatchMetric.Dimensions {
-			identifierName += *dim.Name
-			identifierValue += *dim.Value
-			if i != len(metricsWithStats.cloudwatchMetric.Dimensions)-1 {
-				identifierName += ","
-				identifierValue += ","
-			}
-		}
-
-		if identifiers[identifierName] != nil {
-			if !aws.StringInSlice(identifierValue, identifiers[identifierName]) {
-				identifiers[identifierName] = append(identifiers[identifierName], identifierValue)
-			}
-		} else {
-			identifiers[identifierName] = []string{identifierValue}
-		}
-	}
-	return identifiers
 }
 
 func statisticLookup(stat string) (string, bool) {
@@ -404,14 +372,9 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 		m.Logger().Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
 	}
 
-	identifiers := getIdentifiers(listMetricWithStatsTotal)
-	// Initialize events map per region, which stores one event per identifierValue
+	// Initialize events for each identifier.
 	events := map[string]mb.Event{}
-	for _, values := range identifiers {
-		for _, v := range values {
-			events[v] = aws.InitEvent(regionName)
-		}
-	}
+
 	// Initialize events for the ones without identifiers.
 	var eventsNoIdentifier []mb.Event
 
@@ -437,9 +400,13 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
-				labels := strings.Split(*output.Label, " ")
+				labels := strings.Split(*output.Label, labelSeperator)
 				if len(labels) == 5 {
 					identifierValue := labels[identifierValueIdx]
+					if _, ok := events[identifierValue]; !ok {
+						events[identifierValue] = aws.InitEvent(regionName)
+					}
+
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 					tags := resourceTagMap[identifierValue]
 					for _, tag := range tags {
