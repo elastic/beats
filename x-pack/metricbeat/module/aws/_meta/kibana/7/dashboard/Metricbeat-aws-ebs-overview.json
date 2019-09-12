@@ -19,9 +19,7 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {
-              "title": "Volume Write Ops"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "1",
@@ -35,9 +33,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Volume Read Ops"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "2",
@@ -51,9 +47,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Volume Write Bytes"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "3",
@@ -67,9 +61,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Volume Read Bytes"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "4",
@@ -83,9 +75,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Volume Queue Length"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "5",
@@ -99,9 +89,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Volume Total Write Time"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "6",
@@ -115,9 +103,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Volume Total Read Time"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "7",
@@ -131,9 +117,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Volume Idle Time"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 10,
               "i": "8",
@@ -147,9 +131,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "EBS Volume ID Filter"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 5,
               "i": "9",

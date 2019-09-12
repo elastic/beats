@@ -19,9 +19,7 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {
-              "title": "HTTP 5XX Errors"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 9,
               "i": "2",
@@ -35,9 +33,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Request Count"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 11,
               "i": "3",
@@ -51,9 +47,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Unhealthy Host Count"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 8,
               "i": "4",
@@ -67,9 +61,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Healthy Host Count"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 8,
               "i": "5",
@@ -83,9 +75,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Latency in Seconds"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 12,
               "i": "6",
@@ -99,9 +89,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "HTTP Backend 4XX Errors"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 9,
               "i": "7",
@@ -115,9 +103,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "Backend Connection Errors"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 9,
               "i": "8",
@@ -144,9 +130,7 @@
             "version": "7.4.0"
           },
           {
-            "embeddableConfig": {
-              "title": "HTTP Backend 2XX"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 9,
               "i": "10",
@@ -253,7 +237,6 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -346,7 +329,6 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -630,7 +612,6 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -723,7 +704,6 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -816,7 +796,6 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
@@ -968,7 +947,6 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
-            "drop_last_bucket": 0,
             "filter": "",
             "gauge_color_rules": [
               {
