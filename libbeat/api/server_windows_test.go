@@ -15,27 +15,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build windows
+
 package api
 
-import "os"
+import (
+	"io/ioutil"
+	"net/http"
+	"testing"
 
-// Config is the configuration for the API endpoint.
-type Config struct {
-	Enabled            bool   `config:"enabled"`
-	Host               string `config:"host"`
-	Port               int    `config:"port"`
-	User               string `config:"user"`
-	SecurityDescriptor string `config:"security_descriptor"`
-}
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-var (
-	// DefaultConfig is the default configuration used by the API endpoint.
-	DefaultConfig = Config{
-		Enabled: false,
-		Host:    "localhost",
-		Port:    5066,
-	}
+	"github.com/elastic/beats/libbeat/api/npipe"
+	"github.com/elastic/beats/libbeat/common"
 )
 
-// File mode for the socket file, owner of the process can do everything, member of the group can read.
-const socketFileMode = os.FileMode(0740)
+func TestNamedPipe(t *testing.T) {
+	p := "npipe:///hello"
+
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"host": p,
+	})
+
+	s, err := New(nil, simpleMux(), cfg)
+	require.NoError(t, err)
+	go s.Start()
+	defer s.Stop()
+
+	c := http.Client{
+		Transport: &http.Transport{
+			DialContext: npipe.DialContext(npipe.TransformString(p)),
+		},
+	}
+
+	r, err := c.Get("http://npipe/echo-hello")
+	require.NoError(t, err)
+	defer r.Body.Close()
+
+	body, err := ioutil.ReadAll(r.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, "ehlo!", string(body))
+}

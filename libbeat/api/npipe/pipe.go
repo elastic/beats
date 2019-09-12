@@ -15,27 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package api
+package npipe
 
-import "os"
+import "strings"
 
-// Config is the configuration for the API endpoint.
-type Config struct {
-	Enabled            bool   `config:"enabled"`
-	Host               string `config:"host"`
-	Port               int    `config:"port"`
-	User               string `config:"user"`
-	SecurityDescriptor string `config:"security_descriptor"`
+// IsNPipe returns true if the string has a npipe scheme.
+func IsNPipe(s string) bool {
+	return strings.HasPrefix(s, "npipe:///") || strings.HasPrefix(s, `\\.\pipe\`)
 }
-
-var (
-	// DefaultConfig is the default configuration used by the API endpoint.
-	DefaultConfig = Config{
-		Enabled: false,
-		Host:    "localhost",
-		Port:    5066,
-	}
-)
-
-// File mode for the socket file, owner of the process can do everything, member of the group can read.
-const socketFileMode = os.FileMode(0740)
