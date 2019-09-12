@@ -6,7 +6,7 @@ TEST_ENVIRONMENT?=true
 ES_BEATS?=..
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
-GOX_OS=linux windows
+GOX_OS=netbsd linux windows
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
 DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14-)
