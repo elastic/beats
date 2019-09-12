@@ -1276,8 +1276,18 @@ section.
 === Add Kubernetes metadata
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
-metadata based on which Kubernetes pod the event originated from. Each event is
-annotated with:
+metadata based on which Kubernetes pod the event originated from.
+At startup it will detect an `in_cluster` environment and cache the Kubernetes related metadata.
+
+The simple configuration below enables the processor.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_kubernetes_metadata: ~
+-------------------------------------------------------------------------------
+
+Each event is annotated with:
 
 * Pod Name
 * Pod UID
@@ -1360,7 +1370,17 @@ case you want to specify your own.
 === Add Docker metadata
 
 The `add_docker_metadata` processor annotates each event with relevant metadata
-from Docker containers:
+from Docker containers. At startup it will detect a docker environment and cache the metadata.
+
+The simple configuration below enables the processor.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_docker_metadata: ~
+-------------------------------------------------------------------------------
+
+Each event is annotated with:
 
 * Container ID
 * Name
