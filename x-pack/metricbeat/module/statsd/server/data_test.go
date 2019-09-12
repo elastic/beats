@@ -172,7 +172,7 @@ func TestParseMetrics(t *testing.T) {
 		assert.Equal(t, test.err, err, test.input)
 		assert.Equal(t, test.expected, actual, test.input)
 
-		processor := newMetricProcessor(1000, time.Second)
+		processor := newMetricProcessor(time.Second)
 		for _, e := range actual {
 			err := processor.processSingle(e)
 
@@ -194,7 +194,7 @@ func (u *testUDPEvent) GetMeta() server.Meta {
 	return u.meta
 }
 
-func process(t testing.TB, packets []string, ms *MetricSet) {
+func process(packets []string, ms *MetricSet) error {
 	for _, d := range packets {
 		udpEvent := &testUDPEvent{
 			event: common.MapStr{
@@ -204,9 +204,11 @@ func process(t testing.TB, packets []string, ms *MetricSet) {
 				"client_ip": "127.0.0.1",
 			},
 		}
-		err := ms.processor.Process(udpEvent)
-		require.NoError(t, err)
+		if err := ms.processor.Process(udpEvent); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func TestTagsGrouping(t *testing.T) {
@@ -219,7 +221,9 @@ func TestTagsGrouping(t *testing.T) {
 		"metric4:4|ms|#k1:v2,k2:v3",
 	}
 
-	process(t, testData, ms)
+	err := process(testData, ms)
+	require.NoError(t, err)
+
 	events := ms.getEvents()
 	assert.Len(t, events, 2)
 
@@ -249,28 +253,32 @@ func TestTagsGrouping(t *testing.T) {
 func TestTagsCleanup(t *testing.T) {
 	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
 	testData := []string{
-		"metric1:1|c|#k1:v1,k2:v2",
+		"metric1:1|g|#k1:v1,k2:v2",
 
-		"metric2:3|c|@0.1|#k1:v2,k2:v3",
+		"metric2:3|ms|#k1:v2,k2:v3",
 	}
-	process(t, testData, ms)
+	err := process(testData, ms)
+	require.NoError(t, err)
+
 	time.Sleep(1000 * time.Millisecond)
 
 	// they will be reported at least once
 	assert.Len(t, ms.getEvents(), 2)
 
 	testData = []string{
-		"metric1:+2|c|#k1:v1,k2:v2",
+		"metric1:+2|g|#k1:v1,k2:v2",
 	}
 	// refresh metrics1
-	process(t, testData, ms)
+	err = process(testData, ms)
+	require.NoError(t, err)
+
 	time.Sleep(500 * time.Millisecond)
 
 	// metrics2 should be out now
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{"metric1": map[string]interface{}{"count": int64(3)}})
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{"metric1": map[string]interface{}{"value": float64(3)}})
 }
 
 func TestSetReset(t *testing.T) {
@@ -279,7 +287,9 @@ func TestSetReset(t *testing.T) {
 		"metric1:hello|s|#k1:v1,k2:v2",
 		"metric1:again|s|#k1:v1,k2:v2",
 	}
-	process(t, testData, ms)
+	err := process(testData, ms)
+	require.NoError(t, err)
+
 	events := ms.getEvents()
 	require.Len(t, events, 1)
 
@@ -303,11 +313,138 @@ func TestData(t *testing.T) {
 		"metric09,k1=v1,k2=v2:8|h",
 		"metric10.with.dots,k1=v1,k2=v2:9|h",
 	}
-	process(t, testData, ms)
+	err := process(testData, ms)
+	require.NoError(t, err)
 
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
+}
+
+func TestGaugeDeltas(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1.0|g|#k1:v1,k2:v2",
+		"metric01:-2.0|g|#k1:v1,k2:v2",
+	}
+	err := process(testData, ms)
+	require.NoError(t, err)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"value": -1.0},
+	})
+
+	// same value reported again
+	events = ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"value": -1.0},
+	})
+}
+func TestCounter(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|c|#k1:v1,k2:v2",
+		"metric01:2|c|#k1:v1,k2:v2",
+	}
+	err := process(testData, ms)
+	require.NoError(t, err)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(3)},
+	})
+
+	// reset
+	events = ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(0)},
+	})
+}
+
+func TestCounterSampled(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|c|@0.1",
+		"metric01:2|c|@0.2",
+	}
+	err := process(testData, ms)
+	require.NoError(t, err)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(20)},
+	})
+}
+
+func TestCounterSampledZero(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|c|@0.0",
+	}
+	err := process(testData, ms)
+	assert.Error(t, err)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 0)
+}
+
+func TestTimerSampled(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:2|ms|@0.01",
+		"metric01:1|ms|@0.1",
+		"metric01:2|ms|@0.2",
+		"metric01:2|ms",
+	}
+
+	// total of 100 + 10 + 5 + 1 = 116 measurements
+	err := process(testData, ms)
+	require.NoError(t, err)
+
+	// rate gorutine runs every 5 sec
+	time.Sleep(time.Second * 6)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	actualMetric01 := events[0].MetricSetFields["metric01"].(map[string]interface{})
+
+	// returns the extrapolated count
+	assert.Equal(t, int64(116), actualMetric01["count"])
+
+	// rate numbers are updated by a gorutine periodically, so we cant tell exactly what they should be here
+	// we just need to check that the sample rate was applied
+	assert.True(t, actualMetric01["1m_rate"].(float64) > 10)
+	assert.True(t, actualMetric01["5m_rate"].(float64) > 10)
+	assert.True(t, actualMetric01["15m_rate"].(float64) > 10)
+}
+
+func TestChangeType(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|ms",
+		"metric01:2|c",
+	}
+	err := process(testData, ms)
+	require.NoError(t, err)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(2)},
+	}, events[0].MetricSetFields)
 }

@@ -34,4 +34,8 @@ type Log struct {
 	// This field is not indexed and doc_values are disabled so it can't be
 	// queried but the value can be retrieved from `_source`.
 	Original string `ecs:"original"`
+
+	// The name of the logger inside an application. This is usually the name
+	// of the class which initialized the logger, or can be a custom name.
+	Logger string `ecs:"logger"`
 }

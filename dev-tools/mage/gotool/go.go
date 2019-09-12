@@ -30,7 +30,7 @@ import (
 type Args struct {
 	extra map[string]string // extra flags one can pass to the command
 	env   map[string]string
-	flags map[string]string
+	flags map[string][]string
 	pos   []string
 }
 
@@ -83,7 +83,7 @@ func (goTest) Verbose() ArgOpt            { return flagArg("-test.v", "") }
 func runGoTest(opts ...ArgOpt) error {
 	args := buildArgs(opts)
 	if bin := args.Val("use"); bin != "" {
-		flags := map[string]string{}
+		flags := map[string][]string{}
 		for k, v := range args.flags {
 			if strings.HasPrefix(k, "-test.") {
 				flags[k] = v
@@ -231,9 +231,9 @@ func (a *Args) Env(k, v string) {
 // Flag adds a flag to be passed to the child process on exec.
 func (a *Args) Flag(flag, value string) {
 	if a.flags == nil {
-		a.flags = map[string]string{}
+		a.flags = map[string][]string{}
 	}
-	a.flags[flag] = value
+	a.flags[flag] = append(a.flags[flag], value)
 }
 
 // Add adds a positional argument to be passed to the child process on exec.
@@ -243,10 +243,12 @@ func (a *Args) Add(p string) {
 
 func (a *Args) build() []string {
 	args := make([]string, 0, 2*len(a.flags)+len(a.pos))
-	for k, v := range a.flags {
-		args = append(args, k)
-		if v != "" {
-			args = append(args, v)
+	for k, values := range a.flags {
+		for _, v := range values {
+			args = append(args, k)
+			if v != "" {
+				args = append(args, v)
+			}
 		}
 	}
 

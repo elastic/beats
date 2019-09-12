@@ -30,7 +30,7 @@ type Config struct {
 	Host           string        `config:"host"`
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
-	CleanupTimeout time.Duration `config:"cleanup_timeout"`
+	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`

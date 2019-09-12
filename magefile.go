@@ -103,6 +103,8 @@ func AddLicenseHeaders() error {
 		licenser(
 			licenser.License("ASL2"),
 			licenser.Exclude("x-pack"),
+			licenser.Exclude("generator/beat/{beat}"),
+			licenser.Exclude("generator/metricbeat/{beat}"),
 		),
 		licenser(
 			licenser.License("Elastic"),
@@ -125,6 +127,8 @@ func CheckLicenseHeaders() error {
 			licenser.Check(),
 			licenser.License("ASL2"),
 			licenser.Exclude("x-pack"),
+			licenser.Exclude("generator/beat/{beat}"),
+			licenser.Exclude("generator/metricbeat/{beat}"),
 		),
 		licenser(
 			licenser.Check(),

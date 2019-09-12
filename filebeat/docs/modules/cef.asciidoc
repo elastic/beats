@@ -1,0 +1,55 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-cef]]
+[role="xpack"]
+
+:modulename: cef
+:has-dashboards: false
+
+== CEF module
+
+This is a module for receiving Common Event Format (CEF) data over Syslog. When
+messages are received over the syslog protocol the syslog input will parse the
+header and set the timestamp value. Then the
+<<processor-decode-cef, `decode_cef`>> processor is applied to parse the CEF
+encoded data. The decoded data is written into a `cef` object field. Lastly any
+Elastic Common Schema (ECS) fields that can be populated with the CEF data are
+populated.
+
+include::../include/running-modules.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to `9003`
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-cef,exported fields>> section.
+

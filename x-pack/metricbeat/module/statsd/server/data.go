@@ -99,16 +99,30 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func newMetricProcessor(reservoirSize int, ttl time.Duration) *metricProcessor {
+func newMetricProcessor(ttl time.Duration) *metricProcessor {
 	return &metricProcessor{
-		registry:      &registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
-		reservoirSize: reservoirSize,
+		registry: &registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
 	}
 }
 
 func (p *metricProcessor) processSingle(m statsdMetric) error {
 	if len(m.value) < 1 {
 		return nil
+	}
+
+	// parse sample rate. Only applicable for timers and counters
+	var sampleRate float64
+	if m.sampleRate == "" {
+		sampleRate = 1.0
+	} else {
+		var err error
+		sampleRate, err = strconv.ParseFloat(m.sampleRate, 64)
+		if err != nil {
+			return errors.Wrapf(err, "failed to process metric `%s` sample rate `%s`", m.name, m.sampleRate)
+		}
+		if sampleRate <= 0.0 {
+			return errors.Errorf("sample rate of 0.0 is invalid for metric `%s`", m.name)
+		}
 	}
 
 	switch m.metricType {
@@ -118,27 +132,29 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to process counter `%s` with value `%s`", m.name, m.value)
 		}
-		// inc/dec or set
-		if m.value[0] == '+' || m.value[0] == '-' {
-			c.Inc(v)
-		} else {
-			c.Clear()
-			c.Inc(v)
-		}
+		// apply sample rate
+		v = int64(float64(v) * (1.0 / sampleRate))
+		c.Inc(v)
 	case "g":
 		c := p.registry.GetOrNewGauge64(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process gauge `%s` with value `%s`", m.name, m.value)
 		}
-		c.Update(v)
+
+		// inc/dec or set
+		if m.value[0] == '+' || m.value[0] == '-' {
+			c.Inc(v)
+		} else {
+			c.Set(v)
+		}
 	case "ms":
 		c := p.registry.GetOrNewTimer(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process timer `%s` with value `%s`", m.name, m.value)
 		}
-		c.Update(time.Duration(v))
+		c.SampledUpdate(time.Duration(v), sampleRate)
 	case "h": // TODO: can these be floats?
 		c := p.registry.GetOrNewHistogram(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)

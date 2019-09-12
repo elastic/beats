@@ -30,9 +30,14 @@ import (
 	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
 
 	devtools.Platforms = devtools.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
@@ -74,11 +79,6 @@ func CrossBuildXPack() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon(devtools.ImageSelector(selectImage))
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.

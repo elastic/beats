@@ -28,6 +28,7 @@ import (
 	pkgerrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/conditions"
 )
@@ -148,12 +149,16 @@ func checkJSON(checks []*jsonResponseCheck) (RespCheck, error) {
 
 	return func(r *http.Response) error {
 		decoded := &common.MapStr{}
-		err := json.NewDecoder(r.Body).Decode(decoded)
+		decoder := json.NewDecoder(r.Body)
+		decoder.UseNumber()
+		err := decoder.Decode(decoded)
 
 		if err != nil {
 			body, _ := ioutil.ReadAll(r.Body)
 			return pkgerrors.Wrapf(err, "could not parse JSON for body check with condition. Source: %s", body)
 		}
+
+		jsontransform.TransformNumbers(*decoded)
 
 		var errorDescs []string
 		for _, compiledCheck := range compiledChecks {

@@ -48,7 +48,7 @@ import (
 func Check() error {
 	fmt.Println(">> check: Checking source code for common problems")
 
-	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable, DashboardsFormat)
+	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
 
 	changes, err := GitDiffIndex()
 	if err != nil {
@@ -210,10 +210,13 @@ func CheckLicenseHeaders() error {
 	return licenser(licenser.Check(), licenser.License(license))
 }
 
-// DashboardsFormat checks the format of dashboards
-func DashboardsFormat() error {
+// CheckDashboardsFormat checks the format of dashboards
+func CheckDashboardsFormat() error {
 	dashboardSubDir := "/_meta/kibana/"
 	dashboardFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+		if strings.HasPrefix(path, "vendor") {
+			return false
+		}
 		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
 	})
 	if err != nil {
@@ -263,9 +266,25 @@ type Dashboard struct {
 type dashboardObject struct {
 	Type       string `json:"type"`
 	Attributes struct {
-		Description string `json:"description"`
-		Title       string `json:"title"`
+		Description           string `json:"description"`
+		Title                 string `json:"title"`
+		KibanaSavedObjectMeta *struct {
+			SearchSourceJSON struct {
+				Index string `json:"index"`
+			} `json:"searchSourceJSON,omitempty"`
+		} `json:"kibanaSavedObjectMeta"`
+		VisState *struct {
+			Params struct {
+				Controls []struct {
+					IndexPattern string
+				} `json:"controls"`
+			} `json:"params"`
+		} `json:"visState,omitempty"`
 	} `json:"attributes"`
+	References []struct {
+		Type string `json:"type"`
+		ID   string `json:"id"`
+	} `json:"references"`
 }
 
 var (
@@ -288,6 +307,11 @@ func (d *Dashboard) CheckFormat(module string) []error {
 			if err := checkTitle(visualizationTitleRegexp, o.Attributes.Title, module); err != nil {
 				return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", strings.Title(BeatName), o.Attributes.Title)
 			}
+		}
+
+		expectedIndexPattern := strings.ToLower(BeatName) + "-*"
+		if err := checkDashboardIndexPattern(expectedIndexPattern, o); err != nil {
+			return errors.Wrapf(err, "expected index pattern reference '%s'", expectedIndexPattern)
 		}
 		return nil
 	}
@@ -316,6 +340,27 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 	foundModule := replacer.Replace(strings.ToLower(match[2]))
 	if expectedModule != foundModule {
 		return errors.Errorf("expected module name (%s), found '%s'", module, match[2])
+	}
+	return nil
+}
+
+func checkDashboardIndexPattern(expectedIndex string, o *dashboardObject) error {
+	if objectMeta := o.Attributes.KibanaSavedObjectMeta; objectMeta != nil {
+		if index := objectMeta.SearchSourceJSON.Index; index != "" && index != expectedIndex {
+			return errors.Errorf("unexpected index pattern reference found in object meta: %s", index)
+		}
+	}
+	if visState := o.Attributes.VisState; visState != nil {
+		for _, control := range visState.Params.Controls {
+			if index := control.IndexPattern; index != "" && index != expectedIndex {
+				return errors.Errorf("unexpected index pattern reference found in visualization state: %s", index)
+			}
+		}
+	}
+	for _, reference := range o.References {
+		if reference.Type == "index-pattern" && reference.ID != expectedIndex {
+			return errors.Errorf("unexpected reference to index pattern %s", reference.ID)
+		}
 	}
 	return nil
 }

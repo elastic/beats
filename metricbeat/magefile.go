@@ -31,9 +31,14 @@ import (
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
@@ -66,11 +71,6 @@ func CrossBuild() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.

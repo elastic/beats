@@ -1,0 +1,8 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: s3
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/{{.input}}.yml

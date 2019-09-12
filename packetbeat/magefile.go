@@ -33,9 +33,14 @@ import (
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	packetbeat "github.com/elastic/beats/packetbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 }
 
@@ -112,11 +117,6 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -185,16 +185,6 @@ func fieldDocs() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
-}
-
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
