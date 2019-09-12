@@ -187,13 +187,3 @@ func FieldsDocs() error {
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
-
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
-}
-
-// CheckLicenseHeaders checks license headers
-func CheckLicenseHeaders() {
-	mg.Deps(devtools.CheckLicenseHeaders)
-}
