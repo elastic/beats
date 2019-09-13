@@ -313,6 +313,31 @@ type: keyword
 
 --
 
+*`monitor.next_run`*::
++
+--
+The next expected time this monitor will run on the reporting heartbeat agent based on its schedule. It may run sooner than this if the heartbeat daemon is restarted, and it may run later than this time for any number of reasons
+
+
+type: date
+
+--
+
+[float]
+=== next_run_in
+
+Duration between when this run occurred and when the next one is expected.
+
+
+*`monitor.next_run_in.us`*::
++
+--
+Duration between when this run occurred and when the next one is expected in microseconds.
+
+type: long
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 

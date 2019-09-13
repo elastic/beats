@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/scheduler"
+
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
@@ -35,21 +37,21 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, id string, name string, typ string) []jobs.Job {
+func WrapCommon(js []jobs.Job, id string, name string, typ string, schedule scheduler.Schedule) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(id, name, typ, len(js) > 1)
+			return addMonitorMeta(id, name, typ, len(js) > 1, schedule)
 		}, func() jobs.JobWrapper {
 			return makeAddSummary()
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWrapper {
+func addMonitorMeta(id string, name string, typ string, isMulti bool, schedule scheduler.Schedule) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, e := job(event)
@@ -65,13 +67,17 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWr
 				thisID = fmt.Sprintf("%s-%x", id, urlHash)
 			}
 
+			now := time.Now()
+			nextRun := schedule.Next(now)
 			eventext.MergeEventFields(
 				event,
 				common.MapStr{
 					"monitor": common.MapStr{
-						"id":   thisID,
-						"name": name,
-						"type": typ,
+						"id":          thisID,
+						"name":        name,
+						"type":        typ,
+						"next_run":    nextRun,
+						"next_run_in": common.MapStr{"us": nextRun.Sub(now)},
 					},
 				},
 			)

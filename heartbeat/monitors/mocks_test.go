@@ -23,6 +23,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/hbtestllext"
+
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
 
@@ -116,6 +118,7 @@ func mockEventMonitorValidator(id string) validator.Validator {
 				"check_group": isdef.IsString,
 			},
 		}),
+		hbtestllext.MonitorNextRunValidator,
 		hbtest.SummaryChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
 	))

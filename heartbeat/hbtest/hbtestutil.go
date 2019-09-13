@@ -30,6 +30,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/hbtestllext"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
@@ -107,17 +109,21 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	} else {
 		ipCheck = isdef.Optional(isdef.IsEqual(ip))
 	}
-	return lookslike.MustCompile(map[string]interface{}{
-		"monitor": map[string]interface{}{
-			"ip":          ipCheck,
-			"duration.us": isdef.IsDuration,
-			"status":      status,
-			"id":          isdef.IsNonEmptyString,
-			"name":        isdef.IsString,
-			"type":        typ,
-			"check_group": isdef.IsString,
-		},
-	})
+
+	return lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"monitor": map[string]interface{}{
+				"ip":          ipCheck,
+				"duration.us": isdef.IsDuration,
+				"status":      status,
+				"id":          isdef.IsNonEmptyString,
+				"name":        isdef.IsString,
+				"type":        typ,
+				"check_group": isdef.IsString,
+			},
+		}),
+		hbtestllext.MonitorNextRunValidator,
+	)
 }
 
 // SummaryChecks validates the "summary" field and its subfields.

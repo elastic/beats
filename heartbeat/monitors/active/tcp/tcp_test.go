@@ -28,6 +28,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/scheduler/schedule"
+
 	"github.com/elastic/go-lookslike/isdef"
 
 	"github.com/stretchr/testify/require"
@@ -58,7 +60,8 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -81,7 +84,8 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
