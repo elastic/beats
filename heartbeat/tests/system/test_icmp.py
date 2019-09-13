@@ -76,7 +76,7 @@ class Test(BaseTest):
             **config
         )
 
-        sys.stderr.write("DETECTED PLATFORM %s\n" % platform.system()
+        sys.stderr.write("DETECTED PLATFORM %s\n" % platform.system();
         if platform.system() in ["Linux", "Darwin"]:
             adminRights=self.has_admin()
             groupRights=self.has_group_permission()
