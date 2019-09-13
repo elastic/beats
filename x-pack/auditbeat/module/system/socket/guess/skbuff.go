@@ -235,7 +235,7 @@ type guessSkBuffProto struct {
 	ctx                    Context
 	doIPv6                 bool
 	cs                     inetClientServer
-	loopback               ipv6loopback
+	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
 	client, server         int
 	msg                    []byte
@@ -280,7 +280,7 @@ func (g *guessSkBuffProto) Prepare(ctx Context) (err error) {
 	g.doIPv6 = !g.doIPv6
 	g.msg = make([]byte, 0x123)
 	if g.doIPv6 {
-		g.loopback, err = newIPv6Loopback()
+		g.loopback, err = helper.NewIPv6Loopback()
 		if err != nil {
 			return errors.Wrap(err, "detect IPv6 loopback failed")
 		}
@@ -289,11 +289,11 @@ func (g *guessSkBuffProto) Prepare(ctx Context) (err error) {
 				g.loopback.Cleanup()
 			}
 		}()
-		clientIP, err := g.loopback.addRandomAddress()
+		clientIP, err := g.loopback.AddRandomAddress()
 		if err != nil {
 			return errors.Wrap(err, "failed adding first device address")
 		}
-		serverIP, err := g.loopback.addRandomAddress()
+		serverIP, err := g.loopback.AddRandomAddress()
 		if err != nil {
 			return errors.Wrap(err, "failed adding second device address")
 		}

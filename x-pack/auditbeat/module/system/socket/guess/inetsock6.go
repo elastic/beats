@@ -110,7 +110,7 @@ func init() {
 
 type guessInetSockIPv6 struct {
 	ctx                    Context
-	loopback               ipv6loopback
+	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
 	client, server         int
 	offsets                []int
@@ -216,7 +216,7 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 	if err != nil {
 		return err
 	}
-	g.loopback, err = newIPv6Loopback()
+	g.loopback, err = helper.NewIPv6Loopback()
 	if err != nil {
 		return errors.Wrap(err, "detect IPv6 loopback failed")
 	}
@@ -225,11 +225,11 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 			g.loopback.Cleanup()
 		}
 	}()
-	clientIP, err := g.loopback.addRandomAddress()
+	clientIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
 		return errors.Wrap(err, "failed adding first device address")
 	}
-	serverIP, err := g.loopback.addRandomAddress()
+	serverIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
 		return errors.Wrap(err, "failed adding second device address")
 	}
