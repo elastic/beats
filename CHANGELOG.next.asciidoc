@@ -239,6 +239,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 - Add `decompress_gzip_field` processor. {pull}12733[12733]
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
+- Fail with error when autodiscover providers have no defined configs. {pull}13078[13078]
 - Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
 - Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
 - Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
@@ -362,8 +363,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
 - Add Performance metricset to Oracle module {pull}12547[12547]
 - Add proc/vmstat data to the system/memory metricset on linux {pull}13322[13322]
-- Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414 [13414]
+- Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414[13414]
 - Add module for statsd. {pull}13109[13109]
+- Add support for NATS version 2. {pull}13601[13601]
 
 
 *Packetbeat*
