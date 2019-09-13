@@ -11,7 +11,7 @@
     - name: result
       type: keyword
       description: |
-        Status result for the connection. It’s a mix between RDP negotation failure messages and GCC server create response messages.
+        Status result for the connection. It's a mix between RDP negotation failure messages and GCC server create response messages.
 
     - name: security_protocol
       type: keyword

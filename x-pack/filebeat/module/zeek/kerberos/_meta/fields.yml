@@ -6,7 +6,7 @@
     - name: request_type
       type: keyword
       description: >
-        Request type - Authentication Service (“AS”) or Ticket Granting Service (“TGS”)
+        Request type - Authentication Service (AS) or Ticket Granting Service (TGS)
 
     - name: client
       type: keyword

@@ -19,5 +19,5 @@
     - name: id
       type: integer
       description: |
-        The response’s “internal indication number”.
+        The response's internal indication number.
 

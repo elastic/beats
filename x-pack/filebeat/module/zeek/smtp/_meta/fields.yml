@@ -101,7 +101,7 @@
     - name: process_received_from
       type: boolean
       description: |
-        Indicates if the “Received: from” headers should still be processed.
+        Indicates if the "Received: from" headers should still be processed.
 
     - name: has_client_activity
       type: boolean

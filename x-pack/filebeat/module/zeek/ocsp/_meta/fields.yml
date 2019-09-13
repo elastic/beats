@@ -22,12 +22,12 @@
             - name: name
               type: keyword
               description: |
-                Hash of the issuer’s distingueshed name.
+                Hash of the issuer's distingueshed name.
 
             - name: key
               type: keyword
               description: |
-                Hash of the issuer’s public key.
+                Hash of the issuer's public key.
 
     - name: serial_number
       type: keyword

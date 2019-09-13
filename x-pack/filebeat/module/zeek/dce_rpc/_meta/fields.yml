@@ -6,7 +6,7 @@
     - name: rtt
       type: integer
       description: |
-        Round trip time from the request to the response. If either the request or response wasn’t seen, this will be null.
+        Round trip time from the request to the response. If either the request or response wasn't seen, this will be null.
 
     - name: named_pipe
       type: keyword

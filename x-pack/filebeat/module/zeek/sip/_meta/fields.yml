@@ -37,7 +37,7 @@
         - name: from
           type: keyword
           description: >
-            Contents of the request From: header Note: The tag= value that’s usually appended to the sender is stripped off and not logged.
+            Contents of the request From: header Note: The tag= value that's usually appended to the sender is stripped off and not logged.
 
         - name: to
           type: keyword
@@ -60,7 +60,7 @@
         - name: from
           type: keyword
           description: >
-            Contents of the response From: header Note: The tag= value that’s usually appended to the sender is stripped off and not logged.
+            Contents of the response From: header Note: The tag= value that's usually appended to the sender is stripped off and not logged.
 
         - name: to
           type: keyword

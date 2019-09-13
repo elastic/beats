@@ -16,7 +16,7 @@
     - name: community
       type: keyword
       description: >
-        The community string of the first SNMP packet associated with the session. This is used as part of SNMP’s (v1 and v2c) administrative/security framework. See RFC 1157 or RFC 1901.
+        The community string of the first SNMP packet associated with the session. This is used as part of SNMP's (v1 and v2c) administrative/security framework. See RFC 1157 or RFC 1901.
 
     - name: get
       type: group
@@ -52,4 +52,4 @@
     - name: up_since
       type: date
       description: >
-        The time at which the SNMP responder endpoint claims it’s been up since.
+        The time at which the SNMP responder endpoint claims it's been up since.

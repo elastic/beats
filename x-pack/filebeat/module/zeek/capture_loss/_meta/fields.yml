@@ -26,4 +26,4 @@
     - name: percent_lost
       type: double
       description: |
-        Percentage of ACKs seen where the data being ACKed wasn’t seen.
+        Percentage of ACKs seen where the data being ACKed wasn't seen.

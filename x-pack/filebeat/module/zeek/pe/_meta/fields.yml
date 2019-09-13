@@ -6,7 +6,7 @@
     - name: client
       type: keyword
       description: >
-        The client’s version string
+        The client's version string
 
     - name: id
       type: keyword

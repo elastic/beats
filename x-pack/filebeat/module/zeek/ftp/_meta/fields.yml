@@ -83,7 +83,7 @@
     - name: cwd
       type: keyword
       description: |
-        Current working directory that this session is in. By making the default value ‘.’, we can indicate that unless something more concrete is discovered that the existing but unknown directory is ok to use.
+        Current working directory that this session is in. By making the default value '.', we can indicate that unless something more concrete is discovered that the existing but unknown directory is ok to use.
 
     - name: cmdarg
       type: group

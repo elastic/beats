@@ -21,7 +21,7 @@
     - name: status
       type: keyword
       description: |
-        Server reply to the client’s command.
+        Server reply to the client's command.
 
     - name: rtt
       type: integer

@@ -11,7 +11,7 @@
     - name: duration
       type: float
       description: |
-        Duration of the DHCP “session” representing the time from the first
+        Duration of the DHCP session representing the time from the first
         message to the last
 
     - name: hostname
@@ -128,5 +128,5 @@
           description: |
             (present if policy/protocols/dhcp/sub-opts.bro is loaded)
             The subscriber ID is a value independent of the physical network
-            configuration so that a customer’s DHCP configuration can be given
+            configuration so that a customer's DHCP configuration can be given
             to them correctly no matter where they are physically connected.

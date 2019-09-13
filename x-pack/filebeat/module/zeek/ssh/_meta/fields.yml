@@ -6,7 +6,7 @@
     - name: client
       type: keyword
       description: >
-        The client’s version string
+        The client's version string
 
     - name: direction
       type: keyword
@@ -48,7 +48,7 @@
         - name: host_key
           type: keyword
           description: >
-            The server host key’s algorithm
+            The server host key's algorithm
 
         - name: key_exchange
           type: keyword
@@ -66,9 +66,9 @@
         - name: attempts
           type: integer
           description: |
-            The number of authentication attemps we observed. There’s always at
+            The number of authentication attemps we observed. There's always at
             least one, since some servers might support no authentication at all.
-            It’s important to note that not all of these are failures, since some
+            It's important to note that not all of these are failures, since some
             servers require two-factor auth (e.g. password AND pubkey)
 
         - name: success

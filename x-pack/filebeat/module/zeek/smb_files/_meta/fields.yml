@@ -26,7 +26,7 @@
     - name: previous_name
       type: keyword
       description: >
-        If the rename action was seen, this will be the file’s previous name
+        If the rename action was seen, this will be the file's previous name
 
     - name: size
       type: long
