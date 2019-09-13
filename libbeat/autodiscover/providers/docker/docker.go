@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package docker
 
 import (
@@ -50,6 +52,9 @@ type Provider struct {
 	stop          chan interface{}
 	startListener bus.Listener
 	stopListener  bus.Listener
+	stoppers      map[string]*time.Timer
+	stopTrigger   chan *dockerContainerMetadata
+	logger        *logp.Logger
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -99,6 +104,9 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		stop:          make(chan interface{}),
 		startListener: start,
 		stopListener:  stop,
+		stoppers:      make(map[string]*time.Timer),
+		stopTrigger:   make(chan *dockerContainerMetadata),
+		logger:        logp.NewLogger("docker"),
 	}, nil
 }
 
@@ -110,18 +118,30 @@ func (d *Provider) Start() {
 			case <-d.stop:
 				d.startListener.Stop()
 				d.stopListener.Stop()
+
+				// Stop all timers before closing the channel
+				for _, stopper := range d.stoppers {
+					stopper.Stop()
+				}
+				close(d.stopTrigger)
 				return
 
 			case event := <-d.startListener.Events():
-				d.emitContainer(event, "start")
+				d.startContainer(event)
 
 			case event := <-d.stopListener.Events():
-				time.AfterFunc(d.config.CleanupTimeout, func() {
-					d.emitContainer(event, "stop")
-				})
+				d.scheduleStopContainer(event)
+
+			case target := <-d.stopTrigger:
+				d.stopContainer(target.container, target.metadata)
 			}
 		}
 	}()
+}
+
+type dockerContainerMetadata struct {
+	container *docker.Container
+	metadata  *dockerMetadata
 }
 
 type dockerMetadata struct {
@@ -139,7 +159,7 @@ type dockerMetadata struct {
 func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dockerMetadata) {
 	container, ok := event["container"].(*docker.Container)
 	if !ok {
-		logp.Error(errors.New("Couldn't get a container from watcher event"))
+		d.logger.Error(errors.New("Couldn't get a container from watcher event"))
 		return nil, nil
 	}
 
@@ -192,12 +212,51 @@ func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dock
 	return container, meta
 }
 
-func (d *Provider) emitContainer(event bus.Event, flag string) {
+func (d *Provider) startContainer(event bus.Event) {
 	container, meta := d.generateMetaDocker(event)
 	if container == nil || meta == nil {
 		return
 	}
 
+	if stopper, ok := d.stoppers[container.ID]; ok {
+		d.logger.Debugf("Container %s is restarting, aborting pending stop", container.ID)
+		stopper.Stop()
+		delete(d.stoppers, container.ID)
+		return
+	}
+
+	d.emitContainer(container, meta, "start")
+}
+
+func (d *Provider) scheduleStopContainer(event bus.Event) {
+	container, meta := d.generateMetaDocker(event)
+	if container == nil || meta == nil {
+		return
+	}
+
+	if d.config.CleanupTimeout <= 0 {
+		d.stopContainer(container, meta)
+		return
+	}
+
+	stopper := time.AfterFunc(d.config.CleanupTimeout, func() {
+		d.stopTrigger <- &dockerContainerMetadata{
+			container: container,
+			metadata:  meta,
+		}
+	})
+	d.stoppers[container.ID] = stopper
+}
+
+func (d *Provider) stopContainer(container *docker.Container, meta *dockerMetadata) {
+	if _, ok := d.stoppers[container.ID]; ok {
+		delete(d.stoppers, container.ID)
+	}
+
+	d.emitContainer(container, meta, "stop")
+}
+
+func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetadata, flag string) {
 	var host string
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]

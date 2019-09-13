@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type copyFields struct {
@@ -45,6 +46,7 @@ func init() {
 			checks.RequireFields("fields"),
 		),
 	)
+	jsprocessor.RegisterPlugin("CopyFields", NewCopyFields)
 }
 
 // NewCopyFields returns a new copy_fields processor.

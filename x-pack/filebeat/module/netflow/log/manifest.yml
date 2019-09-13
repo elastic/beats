@@ -12,7 +12,7 @@ var:
   - name: queue_size
     default: 8192
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/netflow.yml
 
 requires.processors:

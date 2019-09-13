@@ -1,6 +1,7 @@
 from filebeat import BaseTest
 import socket
 import ssl
+import unittest
 from os import path
 from nose.tools import raises, assert_raises
 

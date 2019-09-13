@@ -14,6 +14,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.0.6]
+
+### Added
+- Regenerate code with new stringer. (PR #9)
+- Add support for custom unfolders when generating gotype.Unfolder. (PR #14, PR #15, PR #17)
+- Add go.mod file
+
 ## [0.0.5]
 
 ### Added
@@ -47,7 +54,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fix invalid pointer indirections in struct to array/map.
 
-[Unreleased]: https://github.com/elastic/go-structform/compare/v0.0.5...HEAD
+[Unreleased]: https://github.com/elastic/go-structform/compare/v0.0.6...HEAD
+[0.0.6]: https://github.com/elastic/go-structform/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/elastic/go-structform/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/elastic/go-structform/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/elastic/go-structform/compare/v0.0.2...v0.0.3

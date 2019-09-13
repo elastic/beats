@@ -16,6 +16,7 @@
 
 :deploy-command-short-desc: Deploys the specified function to your serverless environment
 
+ifndef::serverless[]
 ifndef::no_dashboards[]
 :export-command-short-desc: Exports the configuration, index template, ILM policy, or a dashboard to stdout
 endif::no_dashboards[]
@@ -23,6 +24,11 @@ endif::no_dashboards[]
 ifdef::no_dashboards[]
 :export-command-short-desc: Exports the configuration, index template, or ILM policy to stdout
 endif::no_dashboards[]
+endif::serverless[]
+
+ifdef::serverless[]
+:export-command-short-desc: Exports the configuration, index template, or {cloudformation-ref} template to stdout
+endif::serverless[]
 
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
@@ -46,7 +52,6 @@ endif::[]
 :update-command-short-desc: Updates the specified function
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
-
 
 [[command-line-options]]
 === {beatname_uc} command reference
@@ -147,6 +152,7 @@ endif::[]
 [[export-command]]
 ==== `export` command
 
+ifndef::serverless[]
 ifndef::no_dashboards[]
 {export-command-short-desc}. You can use this
 command to quickly view your configuration, see the contents of the index
@@ -158,6 +164,13 @@ ifdef::no_dashboards[]
 command to quickly view your configuration or see the contents of the index
 template or the ILM policy.
 endif::no_dashboards[]
+endif::serverless[]
+
+ifdef::serverless[]
+{export-command-short-desc}. You can use this
+command to quickly view your configuration, see the contents of the index
+template and the ILM policy, or export an CloudFormation template.
+endif::serverless[]
 
 *SYNOPSIS*
 
@@ -208,6 +221,11 @@ Exports the index lifecycle management policy to stdout. You can specify the
 `--es.version` and a `--dir` to which the policy should be exported as a
 file rather than exporting to `stdout`.
 
+ifdef::serverless[]
+[[function-subcommand]]*`function` FUNCTION_NAME*::
+Exports an {cloudformation-ref} template to stdout.
+endif::serverless[]
+
 *FLAGS*
 
 *`--es.version VERSION`*::
@@ -237,6 +255,7 @@ endif::no_dashboards[]
 
 *EXAMPLES*
 
+ifndef::serverless[]
 ifndef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
@@ -253,6 +272,16 @@ ifdef::no_dashboards[]
 {beatname_lc} export template --es.version {stack-version} --index myindexname
 -----
 endif::no_dashboards[]
+endif::serverless[]
+
+ifdef::serverless[]
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} export config
+{beatname_lc} export template --es.version {stack-version} --index myindexname
+{beatname_lc} export function cloudwatch
+-----
+endif::serverless[]
 
 [[help-command]]
 ==== `help` command

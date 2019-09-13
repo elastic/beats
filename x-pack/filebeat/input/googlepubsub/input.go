@@ -19,7 +19,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -41,13 +40,14 @@ func init() {
 type pubsubInput struct {
 	config
 
-	log            *logp.Logger
-	outlet         channel.Outleter   // Output of received pubsub messages.
-	inputCtx       context.Context    // Wraps the Done channel from input.Context.
-	inputCtxCancel context.CancelFunc // Cancels inputCtx.
+	log      *logp.Logger
+	outlet   channel.Outleter // Output of received pubsub messages.
+	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
 
-	controlMutex sync.Mutex     // Mutex that guards against concurrent Run/Wait/Stop calls.
-	wg           sync.WaitGroup // Waits on main pubsub runner goroutine.
+	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
+	workerCancel context.CancelFunc // Used to signal that the worker should stop.
+	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
+	workerWg     sync.WaitGroup     // Waits on pubsub worker goroutine.
 
 	ackedCount *atomic.Uint32 // Total number of successfully ACKed pubsub messages.
 }
@@ -56,7 +56,7 @@ type pubsubInput struct {
 // a topic subscription.
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
 	// Extract and validate the input's configuration.
@@ -66,12 +66,17 @@ func NewInput(
 	}
 
 	// Build outlet for events.
-	out, err := outlet(cfg, inputContext.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: inputContext.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	// Wrap input.Context's Done channel with a context.Context.
+	// Wrap input.Context's Done channel with a context.Context. This goroutine
+	// stops with the parent closes the Done channel.
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
 		defer cancelInputCtx()
@@ -81,41 +86,47 @@ func NewInput(
 		}
 	}()
 
+	// If the input ever needs to be made restartable, then context would need
+	// to be recreated with each restart.
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+
 	in := &pubsubInput{
 		config: conf,
 		log: logp.NewLogger("google.pubsub").With(
 			"pubsub_project", conf.ProjectID,
 			"pubsub_topic", conf.Topic,
 			"pubsub_subscription", conf.Subscription),
-		outlet:         out,
-		inputCtx:       inputCtx,
-		inputCtxCancel: cancelInputCtx,
-		ackedCount:     atomic.NewUint32(0),
+		outlet:       out,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		ackedCount:   atomic.NewUint32(0),
 	}
 
 	in.log.Info("Initialized Google Pub/Sub input.")
 	return in, nil
 }
 
-// Run starts the pubsub input worker then returns. This is meant to be called
-// once.
+// Run starts the pubsub input worker then returns. Only the first invocation
+// will ever start the pubsub worker.
 func (in *pubsubInput) Run() {
-	in.controlMutex.Lock()
-	defer in.controlMutex.Unlock()
-
-	in.wg.Add(1)
-	go func() {
-		defer in.log.Info("Pub/Sub input worker has stopped.")
-		defer in.wg.Done()
-		if err := in.run(); err != nil {
-			in.log.Error(err)
-			return
-		}
-	}()
+	in.workerOnce.Do(func() {
+		in.workerWg.Add(1)
+		go func() {
+			in.log.Info("Pub/Sub input worker has started.")
+			defer in.log.Info("Pub/Sub input worker has stopped.")
+			defer in.workerWg.Done()
+			defer in.workerCancel()
+			if err := in.run(); err != nil {
+				in.log.Error(err)
+				return
+			}
+		}()
+	})
 }
 
 func (in *pubsubInput) run() error {
-	ctx, cancel := context.WithCancel(in.inputCtx)
+	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
 	// Make pubsub client.
@@ -157,11 +168,8 @@ func (in *pubsubInput) run() error {
 
 // Stop stops the pubsub input and waits for it to fully stop.
 func (in *pubsubInput) Stop() {
-	in.controlMutex.Lock()
-	defer in.controlMutex.Unlock()
-	in.inputCtxCancel()
-	in.wg.Wait()
-	in.log.Debugw("Pub/Sub input is stopped.", "pubsub_acked", in.ackedCount.Load())
+	in.workerCancel()
+	in.workerWg.Wait()
 }
 
 // Wait is an alias for Stop.
@@ -186,27 +194,27 @@ func makeTopicID(project, topic string) string {
 	return prefix[:10]
 }
 
-func makeEvent(topicID string, msg *pubsub.Message) *util.Data {
+func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 	id := topicID + "-" + msg.ID
 
-	event := beat.Event{
+	fields := common.MapStr{
+		"event": common.MapStr{
+			"id":      id,
+			"created": time.Now().UTC(),
+		},
+		"message": string(msg.Data),
+	}
+	if len(msg.Attributes) > 0 {
+		fields.Put("labels", msg.Attributes)
+	}
+
+	return beat.Event{
 		Timestamp: msg.PublishTime.UTC(),
 		Meta: common.MapStr{
 			"id": id,
 		},
-		Fields: common.MapStr{
-			"event": common.MapStr{
-				"id":      id,
-				"created": time.Now().UTC(),
-			},
-			"message": string(msg.Data),
-		},
+		Fields: fields,
 	}
-	if len(msg.Attributes) > 0 {
-		event.Fields.Put("labels", msg.Attributes)
-	}
-
-	return &util.Data{Event: event}
 }
 
 func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscription, error) {

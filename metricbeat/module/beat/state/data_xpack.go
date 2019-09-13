@@ -27,10 +27,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/beat"
+	b "github.com/elastic/beats/metricbeat/module/beat"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info b.Info, content []byte) error {
 	now := time.Now()
 
 	// Massage info into beat
@@ -54,7 +54,18 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []
 		"timestamp": now,
 	}
 
-	clusterUUID := getClusterUUID(state)
+	clusterUUID := getMonitoringClusterUUID(state)
+	if clusterUUID == "" {
+		if isOutputES(state) {
+			clusterUUID = getClusterUUID(state)
+			if clusterUUID == "" {
+				// Output is ES but cluster UUID could not be determined. No point sending monitoring
+				// data with empty cluster UUID since it will not be associated with the correct ES
+				// production cluster. Log error instead.
+				return errors.Wrap(b.ErrClusterUUID, "could not determine cluster UUID")
+			}
+		}
+	}
 
 	var event mb.Event
 	event.RootFields = common.MapStr{
@@ -97,6 +108,54 @@ func getClusterUUID(state map[string]interface{}) string {
 	}
 
 	c, exists := elasticsearch["cluster_uuid"]
+	if !exists {
+		return ""
+	}
+
+	clusterUUID, ok := c.(string)
+	if !ok {
+		return ""
+	}
+
+	return clusterUUID
+}
+
+func isOutputES(state map[string]interface{}) bool {
+	o, exists := state["output"]
+	if !exists {
+		return false
+	}
+
+	output, ok := o.(map[string]interface{})
+	if !ok {
+		return false
+	}
+
+	n, exists := output["name"]
+	if !exists {
+		return false
+	}
+
+	name, ok := n.(string)
+	if !ok {
+		return false
+	}
+
+	return name == "elasticsearch"
+}
+
+func getMonitoringClusterUUID(state map[string]interface{}) string {
+	m, exists := state["monitoring"]
+	if !exists {
+		return ""
+	}
+
+	monitoring, ok := m.(map[string]interface{})
+	if !ok {
+		return ""
+	}
+
+	c, exists := monitoring["cluster_uuid"]
 	if !exists {
 		return ""
 	}

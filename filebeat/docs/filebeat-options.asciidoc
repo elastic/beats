@@ -45,11 +45,13 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-log>>
 * <<{beatname_lc}-input-stdin>>
 * <<{beatname_lc}-input-container>>
+* <<{beatname_lc}-input-kafka>>
 * <<{beatname_lc}-input-redis>>
 * <<{beatname_lc}-input-udp>>
 * <<{beatname_lc}-input-docker>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-syslog>>
+* <<{beatname_lc}-input-s3>>
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-google-pubsub>>
 
@@ -60,6 +62,8 @@ include::inputs/input-stdin.asciidoc[]
 
 include::inputs/input-container.asciidoc[]
 
+include::inputs/input-kafka.asciidoc[]
+
 include::inputs/input-redis.asciidoc[]
 
 include::inputs/input-udp.asciidoc[]
@@ -69,6 +73,8 @@ include::inputs/input-docker.asciidoc[]
 include::inputs/input-tcp.asciidoc[]
 
 include::inputs/input-syslog.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 

@@ -36,6 +36,13 @@ func TestEventFormatString(t *testing.T) {
 		fields   []string
 	}{
 		{
+			"empty string",
+			"",
+			beat.Event{},
+			"",
+			nil,
+		},
+		{
 			"no fields configured",
 			"format string",
 			beat.Event{},
@@ -260,4 +267,16 @@ func TestEventFormatStringFromConfig(t *testing.T) {
 
 		assert.Equal(t, test.expected, actual)
 	}
+}
+
+func TestIsEmpty(t *testing.T) {
+	t.Run("when string is Empty", func(t *testing.T) {
+		fs := MustCompileEvent("")
+		assert.True(t, fs.IsEmpty())
+	})
+	t.Run("when string is not Empty", func(t *testing.T) {
+		fs := MustCompileEvent("hello")
+		assert.False(t, fs.IsEmpty())
+	})
+
 }

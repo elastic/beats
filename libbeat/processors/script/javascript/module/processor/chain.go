@@ -42,7 +42,7 @@ func newChainBuilder(runtime *goja.Runtime) func(call goja.ConstructorCall) *goj
 		}
 
 		c := &chainBuilder{runtime: runtime, this: call.This}
-		for name, fn := range constructors {
+		for name, fn := range registry.Constructors() {
 			c.this.Set(name, c.makeBuilderFunc(fn))
 		}
 		call.This.Set("Add", c.Add)
@@ -98,9 +98,7 @@ func (b *chainBuilder) Build(call goja.FunctionCall) goja.Value {
 	}
 
 	p := &beatProcessor{b.runtime, &b.chain}
-	o := b.runtime.NewObject()
-	o.Set("Run", p.Run)
-	return o
+	return b.runtime.ToValue(p)
 }
 
 type gojaCall interface {

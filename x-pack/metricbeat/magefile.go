@@ -17,6 +17,9 @@ import (
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 const (
@@ -24,8 +27,16 @@ const (
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -54,11 +65,6 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -84,7 +90,7 @@ func TestPackages() error {
 		devtools.WithModules(),
 
 		// To be increased or removed when more light modules are added
-		devtools.MinModules(1))
+		devtools.MinModules(3))
 }
 
 // Fields generates a fields.yml and fields.go for each module.
@@ -120,16 +126,6 @@ func Update() {
 	mg.SerialDeps(Fields, Dashboards, Config,
 		metricbeat.PrepareModulePackagingXPack,
 		devtools.GenerateModuleIncludeListGo)
-}
-
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

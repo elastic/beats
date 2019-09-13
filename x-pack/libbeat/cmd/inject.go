@@ -11,12 +11,15 @@ import (
 	// register central management
 	"github.com/elastic/beats/x-pack/libbeat/licenser"
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
+
+	// register autodiscover providers
+	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/elb"
 )
 
 const licenseDebugK = "license"
 
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {
-	licenser.Enforce(logp.NewLogger(licenseDebugK), licenser.BasicAndAboveOrTrial)
+	licenser.Enforce(logp.NewLogger(licenseDebugK), name, licenser.BasicAndAboveOrTrial)
 	root.AddCommand(genEnrollCmd(name, ""))
 }

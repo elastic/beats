@@ -41,11 +41,9 @@ If you've configured the Logstash output, see
 <<load-dashboards-logstash>>.
 endif::only-elasticsearch[]
 
-ifeval::["{requires-sudo}"=="yes"]
-
+ifdef::requires-sudo[]
 include::../../libbeat/docs/shared-note-sudo.asciidoc[]
-
-endif::[]
+endif::requires-sudo[]
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*

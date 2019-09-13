@@ -1,0 +1,70 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.cronjob",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "cronjob": {
+                "active": {
+                    "count": 1
+                },
+                "created": {
+                    "sec": 1563559712
+                },
+                "is_suspended": false,
+                "last_schedule": {
+                    "sec": 1563561180
+                },
+                "name": "hello",
+                "next_schedule": {
+                    "sec": 1563561240
+                }
+            },
+            "namespace": "default"
+        },
+        "metricset": {
+            "name": "state_cronjob",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.cronjob",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "cronjob": {
+                "active": {
+                    "count": 1
+                },
+                "created": {
+                    "sec": 1563559848
+                },
+                "is_suspended": false,
+                "last_schedule": {
+                    "sec": 1563561180
+                },
+                "name": "bye",
+                "next_schedule": {
+                    "sec": 1563561240
+                }
+            },
+            "namespace": "default"
+        },
+        "metricset": {
+            "name": "state_cronjob",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

@@ -76,7 +76,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.TestCmd = genTestCmd(settings, beatCreator)
 	rootCmd.SetupCmd = genSetupCmd(settings, beatCreator)
 	rootCmd.KeystoreCmd = genKeystoreCmd(settings)
-	rootCmd.VersionCmd = genVersionCmd(settings)
+	rootCmd.VersionCmd = GenVersionCmd(settings)
 	rootCmd.CompletionCmd = genCompletionCmd(settings, rootCmd)
 
 	// Root command is an alias for run
