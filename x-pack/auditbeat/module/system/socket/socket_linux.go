@@ -244,7 +244,7 @@ func (m *MetricSet) Setup() (err error) {
 	m.log.Debugf("IPv6 supported: %v", hasIPv6)
 	if m.config.EnableIPv6 != nil {
 		if *m.config.EnableIPv6 && !hasIPv6 {
-			return errors.New("requested IPv6 support but IPv6 is disabled in the system.")
+			return errors.New("requested IPv6 support but IPv6 is disabled in the system")
 		}
 		hasIPv6 = *m.config.EnableIPv6
 	}
