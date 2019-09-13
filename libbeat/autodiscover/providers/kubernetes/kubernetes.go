@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
@@ -56,20 +57,25 @@ type Provider struct {
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The kubernetes autodiscover is beta")
+
+	errWrap := func(err error) error {
+		return errors.Wrap(err, "error setting up kubernetes autodiscover provider")
+	}
+
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	metagen, err := kubernetes.NewMetaGenerator(c)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
@@ -80,22 +86,25 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("kubernetes: Couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
+		return nil, errWrap(fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err))
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
+	}
+	if len(mapper) == 0 && !config.Hints.Enabled() {
+		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
 	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	appenders, err := autodiscover.NewAppenders(config.Appenders)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	p := &Provider{
