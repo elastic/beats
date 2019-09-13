@@ -72,6 +72,16 @@ type EventualGuesser interface {
 	MaxRepeats() int
 }
 
+// ConditionalGuesser is a guess that might only need to run under certain
+// conditions (i.e. when IPv6 is enabled).
+type ConditionalGuesser interface {
+	Guesser
+	// Condition returns if this guess has to be run.
+	// When false, it must set all its Provides() to dummy values to ensure that
+	// dependent guesses are run.
+	Condition(ctx Context) (bool, error)
+}
+
 // Guess is a helper function to easily determine memory layouts of kernel
 // structs and similar tasks. It installs the guesser's Probe, starts a perf
 // channel and executes the Trigger function. Each record received through the
@@ -251,6 +261,16 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 	for len(list) > 0 {
 		var next []Guesser
 		for _, guesser := range list {
+			if cond, isCond := guesser.(ConditionalGuesser); isCond {
+				mustRun, err := cond.Condition(ctx)
+				if err != nil {
+					return errors.Wrapf(err, "condition failed for %s", cond.Name())
+				}
+				if !mustRun {
+					ctx.Log.Debugf("Guess %s skipped.", cond.Name())
+					continue
+				}
+			}
 			if !containsAll(guesser.Requires(), ctx.Vars) {
 				next = append(next, guesser)
 				continue
@@ -267,10 +287,33 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 			ctx.Log.Debugf("Guess %s completed: %v", guesser.Name(), result)
 		}
 		if len(next) == len(list) {
+			ctx.Log.Warnf("Internal error: No guess can be run (%d pending):", len(list))
+			for _, guess := range list {
+				requires := guess.Requires()
+				var missing []string
+				for _, req := range requires {
+					if _, found := ctx.Vars[req]; !found {
+						missing = append(missing, req)
+					}
+				}
+				ctx.Log.Warnf("   guess '%s' requires missing vars: %v", guess.Name(), missing)
+			}
 			return errors.New("no guess can be run")
 		}
 		list = next
 	}
 	ctx.Log.Infof("Guessing done after %v", time.Since(start))
 	return nil
+}
+
+func isIPv6Enabled(vars common.MapStr) (bool, error) {
+	iface, err := vars.GetValue("HAS_IPV6")
+	if err != nil && err != common.ErrKeyNotFound {
+		return false, err
+	}
+	hasIPv6, ok := iface.(bool)
+	if !ok {
+		return false, errors.New("HAS_IPV6 is not a bool")
+	}
+	return hasIPv6, nil
 }

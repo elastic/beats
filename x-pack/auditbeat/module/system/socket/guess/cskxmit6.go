@@ -69,6 +69,11 @@ func (g *guessInet6CskXmit) Requires() []string {
 	}
 }
 
+// Condition allows this probe to run only when IPv6 is enabled.
+func (g *guessInet6CskXmit) Condition(ctx Context) (bool, error) {
+	return isIPv6Enabled(ctx.Vars)
+}
+
 // Probes returns 2 probes:
 //   - kretprobe on inet_csk_accept, which returns a struct sock*
 //   - kprobe on inet6_csk_xmit, returning 1st argument as pointer and dump.

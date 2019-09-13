@@ -234,6 +234,7 @@ func (g *guessSkBuffLen) Reduce(results []common.MapStr) (result common.MapStr, 
 type guessSkBuffProto struct {
 	ctx                    Context
 	doIPv6                 bool
+	hasIPv6                bool
 	cs                     inetClientServer
 	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
@@ -277,7 +278,11 @@ func (g *guessSkBuffProto) Requires() []string {
 // Prepare sets up either two UDP sockets, using either IPv4 or IPv6.
 func (g *guessSkBuffProto) Prepare(ctx Context) (err error) {
 	g.ctx = ctx
-	g.doIPv6 = !g.doIPv6
+	g.hasIPv6, err = isIPv6Enabled(ctx.Vars)
+	if err != nil {
+		return errors.Wrap(err, "unable to determine if IPv6 is enabled")
+	}
+	g.doIPv6 = g.hasIPv6 && !g.doIPv6
 	g.msg = make([]byte, 0x123)
 	if g.doIPv6 {
 		g.loopback, err = helper.NewIPv6Loopback()
