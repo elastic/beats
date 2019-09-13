@@ -1,4 +1,4 @@
-This is the 'agent' Metricset of the Hashicorp's Consul Metricbeat module.
+The `agent` metricset fetches information from a Hashicorp Consul agent in 'Client' mode. It fetches information about the health of the autopilot, runtime metrics, and raft data.
 
 * *agent.autopilot.healthy*: Tracks the overall health of the local server cluster. If all servers are considered healthy by Autopilot, this will be set to 1. If any are unhealthy, this will be 0.
 * *agent.raft.apply*: This metric gives the number of logs committed since the last interval.

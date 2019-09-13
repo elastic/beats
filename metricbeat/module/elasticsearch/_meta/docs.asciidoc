@@ -9,7 +9,7 @@ default metricsets in this module are `ccr`, `cluster_stats`, `index`,
 `index_recovery`, `index_summary`, `ml_job`, `node_stats`, and `shard`.
 
 [float]
-=== Compability
+=== Compatibility
 
 The Elasticsearch module is tested with Elasticsearch 6.3 and is expected to
 work with all 6.x versions.
