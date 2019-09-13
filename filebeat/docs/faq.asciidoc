@@ -11,6 +11,7 @@ We do not recommend reading log files from network volumes. Whenever possible, i
 send the log files directly from there. Reading files from network volumes (especially on Windows) can have unexpected side
 effects. For example, changed file identifiers may result in Filebeat reading a log file from scratch again.
 
+[[_why_isn_t_filebeat_collecting_lines_from_my_file]]
 === Why isn’t Filebeat collecting lines from my file?
 
 Filebeat might be incorrectly configured or unable to send events to the output. To resolve the issue:
