@@ -19,6 +19,7 @@ package http
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"net/url"
@@ -81,14 +82,15 @@ type messageList struct {
 // HTTP application level protocol analyser plugin.
 type httpPlugin struct {
 	// config
-	ports               []int
-	sendRequest         bool
-	sendResponse        bool
-	splitCookie         bool
-	hideKeywords        []string
-	redactAuthorization bool
-	maxMessageSize      int
-	mustDecodeBody      bool
+	ports                  []int
+	sendRequest            bool
+	sendResponse           bool
+	splitCookie            bool
+	hideKeywords           []string
+	redactAuthorization    bool
+	maxMessageSize         int
+	mustDecodeBody         bool
+	storeRawDataWithBinary bool
 
 	parserConfig parserConfig
 
@@ -145,6 +147,7 @@ func (http *httpPlugin) setFromConfig(config *httpConfig) {
 	http.parserConfig.realIPHeader = strings.ToLower(config.RealIPHeader)
 	http.transactionTimeout = config.TransactionTimeout
 	http.mustDecodeBody = config.DecodeBody
+	http.storeRawDataWithBinary = config.StoreRawDataWithBinary
 
 	for _, list := range [][]string{config.IncludeBodyFor, config.IncludeRequestBodyFor} {
 		http.parserConfig.includeRequestBodyFor = append(http.parserConfig.includeRequestBodyFor, list...)
@@ -563,7 +566,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 
 		// packetbeat root fields
 		if http.sendRequest {
-			fields["request"] = string(http.makeRawMessage(requ))
+			http.createRawBodyForEvent(fields, "request", requ)
 		}
 		fields["method"] = httpFields.RequestMethod
 		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
@@ -589,12 +592,22 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 
 		// packetbeat root fields
 		if http.sendResponse {
-			fields["response"] = string(http.makeRawMessage(resp))
+			http.createRawBodyForEvent(fields, "response", resp)
 		}
 	}
 
 	pb.MarshalStruct(evt.Fields, "http", httpFields)
 	return evt
+}
+
+func (http *httpPlugin) createRawBodyForEvent(fields common.MapStr, key string, m *message) {
+	if http.storeRawDataWithBinary {
+		rawResp := http.makeRawMessageWithBase64(m)
+		fields[key] = common.NetString(rawResp)
+	} else {
+		rawResp := http.makeRawMessage(m)
+		fields[key] = rawResp
+	}
 }
 
 func (http *httpPlugin) makeRawMessage(m *message) string {
@@ -606,6 +619,16 @@ func (http *httpPlugin) makeRawMessage(m *message) string {
 		return b.String()
 	}
 	return string(m.rawHeaders)
+}
+
+func (http *httpPlugin) makeRawMessageWithBase64(m *message) string {
+	if m.sendBody {
+		rawData := make([]byte, 0, len(m.rawHeaders)+len(m.body))
+		rawData = append(rawData, m.rawHeaders...)
+		rawData = append(rawData, m.body...)
+		return base64.StdEncoding.EncodeToString(rawData)
+	}
+	return base64.StdEncoding.EncodeToString(m.rawHeaders)
 }
 
 func (http *httpPlugin) publishTransaction(event beat.Event) {

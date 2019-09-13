@@ -21,7 +21,9 @@ package http
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"regexp"
 	"strings"
@@ -1425,6 +1427,59 @@ func TestHttp_includeBodies(t *testing.T) {
 		hasKey, _ = trans.HasKey("http.response.body.content")
 		assert.Equal(t, testCase.hasResponse, hasKey, msg)
 	}
+}
+
+func TestHTTP_StoreRawDataWithBinary(t *testing.T) {
+	reqTp := "PUT /node HTTP/1.1\r\n" +
+		"Host: server\r\n" +
+		"Content-Length: 13\r\n" +
+		"Content-Type: text\r\n" +
+		"\r\n" +
+		"teşekkürler"
+	respTp := "HTTP/1.1 200 OK\r\n" +
+		"Content-Length: 13\r\n" +
+		"Content-Type: text\r\n" +
+		"\r\n" +
+		"teşekkürler"
+
+	var store eventStore
+	http := httpModForTests(&store)
+	config := defaultConfig
+	config.IncludeRequestBodyFor = []string{"text"}
+	config.IncludeResponseBodyFor = []string{"text"}
+	http.setFromConfig(&config)
+	http.sendRequest = true
+	http.sendResponse = true
+	http.storeRawDataWithBinary = true
+
+	tcptuple := testCreateTCPTuple()
+	packet := protos.Packet{Payload: []byte(reqTp)}
+	private := protos.ProtocolData(&httpConnectionData{})
+	private = http.Parse(&packet, tcptuple, 0, private)
+
+	packet.Payload = []byte(respTp)
+	private = http.Parse(&packet, tcptuple, 1, private)
+	http.ReceivedFin(tcptuple, 1, private)
+
+	trans := expectTransaction(t, &store)
+	assert.NotNil(t, trans)
+	requestRawBody := decodeBase64FromCommMap(t, trans, "request")
+	assert.Equal(t, reqTp, requestRawBody)
+	responseRawBody := decodeBase64FromCommMap(t, trans, "response")
+	assert.Equal(t, respTp, responseRawBody)
+}
+
+func decodeBase64FromCommMap(t *testing.T, fields common.MapStr, key string) string {
+	val, _ := fields.GetValue(key)
+	strVal := val.(common.NetString)
+
+	r := bytes.NewReader(strVal)
+	dec := base64.NewDecoder(base64.StdEncoding, r)
+	res, err := ioutil.ReadAll(dec)
+	if err != nil {
+		t.Error(err)
+	}
+	return string(res)
 }
 
 func TestHTTP_Encodings(t *testing.T) {
