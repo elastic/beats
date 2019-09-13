@@ -197,7 +197,7 @@ func (c *client) onPublished() {
 func (c *client) onFilteredOut(e beat.Event) {
 	log := c.logger()
 
-	log.Debug("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
+	log.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
 	c.pipeline.observer.filteredEvent()
 	if c.eventer != nil {
 		c.eventer.FilteredOut(e)
@@ -207,7 +207,7 @@ func (c *client) onFilteredOut(e beat.Event) {
 func (c *client) onDroppedOnPublish(e beat.Event) {
 	log := c.logger()
 
-	log.Debug("Pipeline client receives callback 'onDroppedOnPublish' for event: %+v", e)
+	log.Debugf("Pipeline client receives callback 'onDroppedOnPublish' for event: %+v", e)
 	c.pipeline.observer.failedPublishEvent()
 	if c.eventer != nil {
 		c.eventer.DroppedOnPublish(e)
