@@ -308,7 +308,7 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 
 func isIPv6Enabled(vars common.MapStr) (bool, error) {
 	iface, err := vars.GetValue("HAS_IPV6")
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil {
 		return false, err
 	}
 	hasIPv6, ok := iface.(bool)
