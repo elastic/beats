@@ -138,13 +138,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 	}
 
-	// Create events based on namespaceDetailTotal from configuration
-	for _, namespaceResourceType := range namespaceDetailTotal {
-		for _, regionName := range m.MetricSet.RegionsList {
-			awsConfig := m.MetricSet.AwsConfig.Copy()
-			awsConfig.Region = regionName
-			svcCloudwatch := cloudwatch.New(awsConfig)
+	for _, regionName := range m.MetricSet.RegionsList {
+		awsConfig := m.MetricSet.AwsConfig.Copy()
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 
+		var filteredMetricWithStatsTotal []metricsWithStatistics
+		var resourceTypes []string
+
+		// Create events based on namespaceDetailTotal from configuration
+		for _, namespaceResourceType := range namespaceDetailTotal {
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespaceResourceType.namespace, regionName, svcCloudwatch)
 			if err != nil {
 				m.Logger().Info(err.Error())
@@ -154,9 +158,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
 				continue
 			}
-
-			var filteredMetricWithStatsTotal []metricsWithStatistics
-			var resourceTypes []string
 
 			if namespaceResourceType.metricNames != nil && namespaceResourceType.dimensions == nil {
 				for _, listMetric := range listMetricsOutput {
@@ -199,12 +200,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					resourceTypes = []string{namespaceResourceType.resourceTypeFilter}
 				}
 			}
+		}
 
-			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
-			err = m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypes, regionName, startTime, endTime, report)
-			if err != nil {
-				return errors.Wrap(err, "createEvents failed for region "+regionName)
-			}
+		err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypes, regionName, startTime, endTime, report)
+		if err != nil {
+			return errors.Wrap(err, "createEvents failed for region "+regionName)
 		}
 	}
 
@@ -257,7 +257,6 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, []namespaceWit
 			namespaceDetailTotal = append(namespaceDetailTotal, namespaceWithDetail{
 				namespace:          config.Namespace,
 				metricNames:        config.MetricName,
-				dimensions:         cloudwatchDimensions,
 				resourceTypeFilter: config.ResourceTypeFilter,
 				statistic:          config.Statistic,
 			})
@@ -266,7 +265,6 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, []namespaceWit
 
 		namespaceDetailTotal = append(namespaceDetailTotal, namespaceWithDetail{
 			namespace:          config.Namespace,
-			dimensions:         cloudwatchDimensions,
 			resourceTypeFilter: config.ResourceTypeFilter,
 			statistic:          config.Statistic,
 		})
