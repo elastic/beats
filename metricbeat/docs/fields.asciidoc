@@ -844,6 +844,16 @@ type: object
 
 --
 
+*`aws.s3.bucket.name`*::
++
+--
+Name of a S3 bucket.
+
+
+type: keyword
+
+--
+
 [float]
 === cloudwatch
 
@@ -1784,16 +1794,6 @@ type: long
 
 
 
-*`aws.s3_daily_storage.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
-
 *`aws.s3_daily_storage.bucket.size.bytes`*::
 +
 --
@@ -1822,16 +1822,6 @@ type: long
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
-
-*`aws.s3_request.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
 
 *`aws.s3_request.requests.total`*::
 +
