@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
 - Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
 - Update to Golang 1.12.7. {pull}12931[12931]
+- Remove `in_cluster` configuration parameter for Kuberentes {pull}13051[13051]
 
 *Auditbeat*
 
