@@ -91,7 +91,9 @@ class Test(BaseTest):
                 sys.stderr.write("CHECK WAIT %s")
                 proc.check_kill_and_wait()
             else:
+                sys.stderr.write("NO RIGHTS\n")
                 exit_code = self.run_beat()
+                sys.stderr.write("RAN IT\n")
                 assert exit_code == 1
                 assert self.log_contains(
                     "You dont have root permission to run ping") is True
