@@ -8,18 +8,20 @@
       description: >
         A file unique identifier
 
-    - name: hosts
-      type: group
-      fields:
-        - name: tx
-          type: ip
-          description: >
-            The host that transferred the file
+    - name: tx_host
+      type: ip
+      description: >
+        The host that transferred the file
 
-        - name: rx
-          type: ip
-          description: >
-            The host that received the file
+    - name: rx_host
+      type: ip
+      description: >
+        The host that received the file
+
+    - name: session_ids
+      type: keyword
+      description: >
+        The sessions that have this file
 
     - name: source
       type: keyword
@@ -67,32 +69,29 @@
       description: >
         The duration the file was analyzed for. Not the duration of the session.
 
-    - name: bytes
-      type: group
-      fields:
-        - name: seen
-          type: long
-          description: >
-            Number of bytes provided to the file analysis engine for the file
+    - name: seen_bytes
+      type: long
+      description: >
+        Number of bytes provided to the file analysis engine for the file
 
-        - name: total
-          type: long
-          description: >
-            Total number of bytes that are supposed to comprise the full file
+    - name: total_bytes
+      type: long
+      description: >
+        Total number of bytes that are supposed to comprise the full file
 
-        - name: missing
-          type: long
-          description: |
-            The number of bytes in the file stream that were completely missed during the process
-            of analysis
+    - name: missing_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were completely missed during the process
+        of analysis
 
-        - name: overflow
-          type: long
-          description: |
-            The number of bytes in the file stream that were not delivered to stream file analyzers.
-            This could be overlapping bytes or bytes that couldn't be reassembled
+    - name: overflow_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were not delivered to stream file analyzers.
+        This could be overlapping bytes or bytes that couldn't be reassembled
 
-    - name: timed_out
+    - name: timedout
       type: boolean
       description: >
         Whether the file analysis timed out at least once for the file
@@ -137,4 +136,3 @@
       type: double
       description: >
         The information density of the contents of the file
-

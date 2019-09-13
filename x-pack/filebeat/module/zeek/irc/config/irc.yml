@@ -11,7 +11,7 @@ json.keys_under_root: false
 fields_under_root: true
 fields:
   network.transport: tcp
-  network.proocol: irc
+  network.protocol: irc
 
 processors:
   - rename:
