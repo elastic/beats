@@ -3,6 +3,6 @@ This is the Logstash module.
 The default metricsets are `node` and `node_stats`.
 
 [float]
-=== Compability
+=== Compatibility
 
 The logstash module is tested with logstash 6.3.
