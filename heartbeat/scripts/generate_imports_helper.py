@@ -23,7 +23,11 @@ def get_importable_lines(go_beat_path, import_line):
         package = "monitors/{}".format(mode)
         return [format(package, m) for m in collect_monitors(package)]
 
-    return sorted(imports("active") + imports("passive"))
+    return [{
+        "file_suffix": "",
+        "build_tags": "",
+        "imported_lines": sorted(imports("active") + imports("passive"))
+    }]
 
 
 def collect_monitors(package):

@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"cpu": {
@@ -40,6 +40,8 @@
 		"Error": null,
 		"Host": "",
 		"Service": "",
-		"Took": 0
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
 	}
 ]

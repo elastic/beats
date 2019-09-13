@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package kubernetes
 
 import (
@@ -193,7 +195,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 			"image":   c.Image,
 			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.ContainerMetadata(pod, c.Name)
+		meta := p.metagen.ContainerMetadata(pod, c.Name, c.Image)
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()

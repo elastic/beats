@@ -1,4 +1,2 @@
 The Statsd module is a Metricbeat module which opens a UDP port and listens for statsd metrics.
 
-NOTE: Sample rates are ignored at the moment.
-

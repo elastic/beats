@@ -13,7 +13,7 @@ The idea is simple, head to `beats/metricbeat/mb/testing/data` and run `go test 
 An alternative is to just run from metricbeat `mage mockedTests` to achieve the same result but using environment variables instead of flags, for example: `MODULE=apache GENERATE=true mage mockedTests`
 
 ##### Worth to mention
-- If the input file in `testdata` folder is prefixed (named) `docs`, whatever its extension is, and the flat `-generate` is passed; the framework will also create a `docs.json` file in `_meta` folder of the metricset as historically has been done in Metricbeat.
+- If the input file in `testdata` folder is prefixed (named) `docs`, whatever its extension is, and the flag `-generate` is passed; the framework will also create a `docs.json` file in `_meta` folder of the metricset as historically has been done in Metricbeat.
 - Config file **must** be called `config.yml` and be located inside `metricbeat/module/{module}/{metricset}/_meta/testdata`
 
 ### Available flags / environment variables

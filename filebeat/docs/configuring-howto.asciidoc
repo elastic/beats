@@ -41,7 +41,6 @@ The following topics describe how to configure Filebeat:
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<configuration-autodiscover>>
-//* <<configuration-central-management>>
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<http-endpoint>>

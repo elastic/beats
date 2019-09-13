@@ -69,6 +69,8 @@ include::../include/var-paths.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+include::../include/timezone-support.asciidoc[]
+
 :has-dashboards!:
 
 :fileset_ex!:

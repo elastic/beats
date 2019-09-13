@@ -190,6 +190,16 @@
                 "target_field": "log.level",
                 "ignore_missing": true
             }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.audit.@timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                "ignore_failure": true
+            }
         }
     ],
     "on_failure": [

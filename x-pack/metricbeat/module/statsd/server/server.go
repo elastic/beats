@@ -21,14 +21,12 @@ func init() {
 
 // Config for the statsd server metricset.
 type Config struct {
-	ReservoirSize int           `config:"reservoir_size"`
-	TTL           time.Duration `config:"ttl"`
+	TTL time.Duration `config:"ttl"`
 }
 
 func defaultConfig() Config {
 	return Config{
-		ReservoirSize: 1000,
-		TTL:           time.Second * 30,
+		TTL: time.Second * 30,
 	}
 }
 
@@ -56,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	processor := newMetricProcessor(config.ReservoirSize, config.TTL)
+	processor := newMetricProcessor(config.TTL)
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
