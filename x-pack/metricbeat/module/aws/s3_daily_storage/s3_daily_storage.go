@@ -212,7 +212,7 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 		return
 	}
 
-	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
+	event.RootFields.Put("aws.s3.bucket.name", bucketName)
 	return
 }
