@@ -1,0 +1,90 @@
+- name: pe
+  type: group
+  description: >
+    Fields exported by the Zeek pe log
+  fields:
+    - name: client
+      type: keyword
+      description: >
+        The client’s version string
+
+    - name: id
+      type: keyword
+      description: >
+        File id of this portable executable file.
+
+    - name: machine
+      type: keyword
+      description: >
+        The target machine that the file was compiled for.
+
+    - name: compile_time
+      type: date
+      description: >
+        The time that the file was created at.
+
+    - name: os
+      type: keyword
+      description: >
+        The required operating system.
+
+    - name: subsystem
+      type: keyword
+      description: >
+        The subsystem that is required to run this file.
+
+    - name: is_exe
+      type: boolean
+      description: >
+        Is the file an executable, or just an object file?
+
+    - name: is_64bit
+      type: boolean
+      description: >
+        Is the file a 64-bit executable?
+
+    - name: uses_aslr
+      type: boolean
+      description: >
+        Does the file support Address Space Layout Randomization?
+
+    - name: uses_dep
+      type: boolean
+      description: >
+        Does the file support Data Execution Prevention?
+
+    - name: uses_code_integrity
+      type: boolean
+      description: >
+        Does the file enforce code integrity checks?
+
+    - name: uses_seh
+      type: boolean
+      description: >
+        Does the file use structured exception handing?
+
+    - name: has_import_table
+      type: boolean
+      description: >
+        Does the file have an import table?
+
+    - name: has_export_table
+      type: boolean
+      description: >
+        Does the file have an export table?
+
+    - name: has_cert_table
+      type: boolean
+      description: >
+        Does the file have an attribute certificate table?
+
+    - name: has_debug_data
+      type: boolean
+      description: >
+        Does the file have a debug table?
+
+    - name: section_names
+      type: keyword
+      description: >
+        The names of the sections, in order.
+

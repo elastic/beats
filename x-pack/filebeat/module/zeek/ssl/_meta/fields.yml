@@ -1,0 +1,225 @@
+- name: ssl
+  type: group
+  description: >
+    Fields exported by the Zeek SSL log
+  fields:
+    - name: version
+      type: keyword
+      description: >
+        SSL/TLS version that was logged
+
+    - name: cipher
+      type: keyword
+      description: >
+        SSL/TLS cipher suite that was logged
+
+    - name: curve
+      type: keyword
+      description: >
+        Elliptic curve that was logged when using ECDH/ECDHE
+
+    - name: resumed
+      type: boolean
+      description: |
+        Flag to indicate if the session was resumed reusing the key material exchanged in an
+        earlier connection
+
+    - name: next_protocol
+      type: keyword
+      description: >
+        Next protocol the server chose using the application layer next protocol extension
+
+    - name: established
+      type: boolean
+      description: >
+        Flag to indicate if this ssl session has been established successfully
+
+    - name: validation
+      type: group
+      fields:
+        - name: status
+          type: keyword
+          description: >
+            Result of certificate validation for this connection
+
+        - name: code
+          type: keyword
+          description: >
+            Result of certificate validation for this connection, given as OpenSSL validation code
+
+    - name: last_alert
+      type: keyword
+      description: >
+        Last alert that was seen during the connection
+
+    - name: server
+      type: group
+      fields:
+        - name: name
+          type: keyword
+          description: |
+            Value of the Server Name Indicator SSL/TLS extension. It indicates the server name
+            that the client was requesting
+
+        - name: cert_chain
+          type: keyword
+          description: >
+            Chain of certificates offered by the server to validate its complete signing chain
+
+        - name: cert_chain_fuids
+          type: keyword
+          description: >
+            An ordered vector of certificate file identifiers for the certificates offered by the server
+
+        - name: issuer
+          type: group
+          description: >
+            Subject of the signer of the X.509 certificate offered by the server
+          fields:
+            - name: common_name
+              type: keyword
+              description: >
+                Common name of the signer of the X.509 certificate offered by the server
+
+            - name: country
+              type: keyword
+              description: >
+                Country code of the signer of the X.509 certificate offered by the server
+
+            - name: locality
+              type: keyword
+              description: >
+                Locality of the signer of the X.509 certificate offered by the server
+
+            - name: organization
+              type: keyword
+              description: >
+                Organization of the signer of the X.509 certificate offered by the server
+
+            - name: organizational_unit
+              type: keyword
+              description: >
+                Organizational unit of the signer of the X.509 certificate offered by the server
+
+            - name: state
+              type: keyword
+              description: >
+                State or province name of the signer of the X.509 certificate offered by the server
+
+        - name: subject
+          type: group
+          description: >
+            Subject of the X.509 certificate offered by the server
+          fields:
+            - name: common_name
+              type: keyword
+              description: >
+                Common name of the X.509 certificate offered by the server
+
+            - name: country
+              type: keyword
+              description: >
+                Country code of the X.509 certificate offered by the server
+
+            - name: locality
+              type: keyword
+              description: >
+                Locality of the X.509 certificate offered by the server
+
+            - name: organization
+              type: keyword
+              description: >
+                Organization of the X.509 certificate offered by the server
+
+            - name: organizational_unit
+              type: keyword
+              description: >
+                Organizational unit of the X.509 certificate offered by the server
+
+            - name: state
+              type: keyword
+              description: >
+                State or province name of the X.509 certificate offered by the server
+
+    - name: client
+      type: group
+      fields:
+        - name: cert_chain
+          type: keyword
+          description: >
+            Chain of certificates offered by the client to validate its complete signing chain
+
+        - name: cert_chain_fuids
+          type: keyword
+          description: >
+            An ordered vector of certificate file identifiers for the certificates offered by the client
+
+        - name: issuer
+          type: group
+          description: >
+            Subject of the signer of the X.509 certificate offered by the client
+          fields:
+            - name: common_name
+              type: keyword
+              description: >
+                Common name of the signer of the X.509 certificate offered by the client
+
+            - name: country
+              type: keyword
+              description: >
+                Country code of the signer of the X.509 certificate offered by the client
+
+            - name: locality
+              type: keyword
+              description: >
+                Locality of the signer of the X.509 certificate offered by the client
+
+            - name: organization
+              type: keyword
+              description: >
+                Organization of the signer of the X.509 certificate offered by the client
+
+            - name: organizational_unit
+              type: keyword
+              description: >
+                Organizational unit of the signer of the X.509 certificate offered by the client
+
+            - name: state
+              type: keyword
+              description: >
+                State or province name of the signer of the X.509 certificate offered by the client
+
+        - name: subject
+          type: group
+          description: >
+            Subject of the X.509 certificate offered by the client
+          fields:
+            - name: common_name
+              type: keyword
+              description: >
+                Common name of the X.509 certificate offered by the client
+
+            - name: country
+              type: keyword
+              description: >
+                Country code of the X.509 certificate offered by the client
+
+            - name: locality
+              type: keyword
+              description: >
+                Locality of the X.509 certificate offered by the client
+
+            - name: organization
+              type: keyword
+              description: >
+                Organization of the X.509 certificate offered by the client
+
+            - name: organizational_unit
+              type: keyword
+              description: >
+                Organizational unit of the X.509 certificate offered by the client
+
+            - name: state
+              type: keyword
+              description: >
+                State or province name of the X.509 certificate offered by the client

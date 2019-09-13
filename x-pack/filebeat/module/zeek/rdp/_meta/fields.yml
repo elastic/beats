@@ -1,0 +1,102 @@
+- name: rdp
+  type: group
+  description: >
+    Fields exported by the Zeek RDP log
+  fields:
+    - name: cookie
+      type: keyword
+      description: |
+        Cookie value used by the client machine. This is typically a username.
+
+    - name: result
+      type: keyword
+      description: |
+        Status result for the connection. It’s a mix between RDP negotation failure messages and GCC server create response messages.
+
+    - name: security_protocol
+      type: keyword
+      description: |
+        Security protocol chosen by the server.
+
+    - name: keyboard_layout
+      type: keyword
+      description: |
+        Keyboard layout (language) of the client machine.
+
+    - name: client
+      type: group
+      fields:
+        - name: build
+          type: keyword
+          description: |
+            RDP client version used by the client machine.
+
+        - name: client_name
+          type: keyword
+          description: |
+            Name of the client machine.
+
+        - name: product_id
+          type: keyword
+          description: |
+            Product ID of the client machine.
+
+    - name: desktop
+      type: group
+      fields:
+        - name: width
+          type: integer
+          description: |
+            Desktop width of the client machine.
+
+        - name: height
+          type: integer
+          description: |
+            Desktop height of the client machine.
+
+        - name: color_depth
+          type: keyword
+          description: |
+            The color depth requested by the client in the high_color_depth field.
+
+    - name: cert
+      type: group
+      fields:
+        - name: type
+          type: keyword
+          description: |
+            If the connection is being encrypted with native RDP encryption, this is the type of cert being used.
+
+        - name: count
+          type: integer
+          description: |
+            The number of certs seen. X.509 can transfer an entire certificate chain.
+
+        - name: permanent
+          type: boolean
+          description: |
+            Indicates if the provided certificate or certificate chain is permanent or temporary.
+
+    - name: encryption
+      type: group
+      fields:
+        - name: level
+          type: keyword
+          description: |
+            Encryption level of the connection.
+
+        - name: method
+          type: keyword
+          description: |
+            Encryption method of the connection.
+
+    - name: done
+      type: boolean
+      description: |
+        Track status of logging RDP connections.
+
+    - name: ssl
+      type: boolean
+      description: |
+        (present if policy/protocols/rdp/indicate_ssl.bro is loaded)
+        Flag the connection if it was seen over SSL.

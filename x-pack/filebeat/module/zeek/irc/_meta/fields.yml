@@ -1,0 +1,59 @@
+- name: irc
+  type: group
+  description: >
+    Fields exported by the Zeek IRC log
+  fields:
+    - name: nick
+      type: keyword
+      description: |
+        Nickname given for the connection.
+
+    - name: user
+      type: keyword
+      description: |
+        Username given for the connection.
+
+    - name: command
+      type: keyword
+      description: |
+        Command given by the client.
+
+    - name: value
+      type: keyword
+      description: |
+        Value for the command given by the client.
+
+    - name: addl
+      type: keyword
+      description: |
+        Any additional data for the command.
+
+    - name: dcc
+      type: group
+      fields:
+        - name: file
+          type: group
+          fields:
+            - name: name
+              type: keyword
+              description: |
+                (present if base/protocols/irc/dcc-send.bro is loaded)
+                DCC filename requested.
+
+            - name: size
+              type: integer
+              description: |
+                (present if base/protocols/irc/dcc-send.bro is loaded)
+                Size of the DCC transfer as indicated by the sender.
+
+        - name: mime_type
+          type: keyword
+          description: |
+            (present if base/protocols/irc/dcc-send.bro is loaded)
+            Sniffed mime type of the file.
+
+    - name: fuid
+      type: keyword
+      description: |
+        (present if base/protocols/irc/files.bro is loaded)
+        File unique ID.
