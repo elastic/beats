@@ -138,7 +138,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 	}
 
-	// Create events based on namespaceDetailTotal from configuration
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
@@ -148,6 +147,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		var filteredMetricWithStatsTotal []metricsWithStatistics
 		var resourceTypes []string
 
+		// Create events based on namespaceDetailTotal from configuration
 		for _, namespaceResourceType := range namespaceDetailTotal {
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespaceResourceType.namespace, regionName, svcCloudwatch)
 			if err != nil {

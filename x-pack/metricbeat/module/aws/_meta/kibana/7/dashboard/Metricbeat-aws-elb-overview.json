@@ -150,7 +150,7 @@
       },
       "id": "e74bf320-b3ce-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "dashboard": "7.3.0"
+        "dashboard": "7.2.0"
       },
       "references": [
         {
@@ -288,7 +288,7 @@
       },
       "id": "b9703dd0-b3c9-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -381,7 +381,7 @@
       },
       "id": "d560de70-b3c7-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -476,7 +476,7 @@
       },
       "id": "6fc1efd0-b3c9-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -571,7 +571,7 @@
       },
       "id": "6392bc30-b3c9-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -663,7 +663,7 @@
       },
       "id": "b2ea15a0-b3c7-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -755,7 +755,7 @@
       },
       "id": "21f30090-b3ca-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -848,7 +848,7 @@
       },
       "id": "572d40e0-b3ca-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -900,7 +900,7 @@
       },
       "id": "b5308940-7347-11e9-816b-07687310a99a",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -998,7 +998,7 @@
       },
       "id": "1f528f50-b3ce-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
