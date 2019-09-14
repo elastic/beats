@@ -9,6 +9,7 @@ from beat.beat import INTEGRATION_TESTS
 import nose.tools
 import logging
 import subprocess
+import time
 
 
 class Test(BaseTest):
