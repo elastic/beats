@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_docker_metadata
 
 import (
@@ -50,6 +52,20 @@ func init() {
 			return nil, os.ErrNotExist
 		}
 	}
+}
+
+func TestInitializationNoDocker(t *testing.T) {
+	var testConfig = common.NewConfig()
+	testConfig.SetString("host", -1, "unix:///var/run42/docker.sock")
+
+	p, err := buildDockerMetadataProcessor(testConfig, docker.NewWatcher)
+	assert.NoError(t, err, "initializing add_docker_metadata processor")
+
+	input := common.MapStr{}
+	result, err := p.Run(&beat.Event{Fields: input})
+	assert.NoError(t, err, "processing an event")
+
+	assert.Equal(t, common.MapStr{}, result.Fields)
 }
 
 func TestInitialization(t *testing.T) {

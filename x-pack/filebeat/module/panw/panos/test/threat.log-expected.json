@@ -11,6 +11,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -62,6 +64,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 37679,
         "source.port": 52984,
         "tags": [
             "pan-os"
@@ -80,6 +84,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -131,6 +137,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 28249,
         "source.port": 52983,
         "tags": [
             "pan-os"
@@ -149,6 +157,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -200,6 +210,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 63898,
         "source.port": 52986,
         "tags": [
             "pan-os"
@@ -218,6 +230,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -269,6 +283,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 7515,
         "source.port": 52985,
         "tags": [
             "pan-os"
@@ -287,6 +303,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -338,6 +356,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 3225,
         "source.port": 52987,
         "tags": [
             "pan-os"
@@ -356,6 +376,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -407,6 +429,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 60449,
         "source.port": 52988,
         "tags": [
             "pan-os"
@@ -425,6 +449,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -476,6 +502,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 60559,
         "source.port": 52990,
         "tags": [
             "pan-os"
@@ -494,6 +522,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -545,6 +575,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 47414,
         "source.port": 52989,
         "tags": [
             "pan-os"
@@ -563,6 +595,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -614,6 +648,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 37673,
         "source.port": 52992,
         "tags": [
             "pan-os"
@@ -632,6 +668,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -683,6 +721,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 8232,
         "source.port": 52991,
         "tags": [
             "pan-os"
@@ -701,6 +741,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -752,6 +794,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 32982,
         "source.port": 52994,
         "tags": [
             "pan-os"
@@ -770,6 +814,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -821,6 +867,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 10473,
         "source.port": 52993,
         "tags": [
             "pan-os"
@@ -839,6 +887,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -890,6 +940,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 20446,
         "source.port": 52995,
         "tags": [
             "pan-os"
@@ -908,6 +960,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -959,6 +1013,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 34699,
         "source.port": 52996,
         "tags": [
             "pan-os"
@@ -977,6 +1033,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1028,6 +1086,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 22820,
         "source.port": 52997,
         "tags": [
             "pan-os"
@@ -1046,6 +1106,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1097,6 +1159,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 41060,
         "source.port": 52998,
         "tags": [
             "pan-os"
@@ -1115,6 +1179,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1166,6 +1232,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 9058,
         "source.port": 52999,
         "tags": [
             "pan-os"
@@ -1184,6 +1252,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1235,6 +1305,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 54846,
         "source.port": 53001,
         "tags": [
             "pan-os"
@@ -1253,6 +1325,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1304,6 +1378,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 52731,
         "source.port": 53002,
         "tags": [
             "pan-os"
@@ -1322,6 +1398,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1373,6 +1451,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 15165,
         "source.port": 53003,
         "tags": [
             "pan-os"
@@ -1391,6 +1471,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.137.131",
+        "destination.nat.ip": "23.72.137.131",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1442,6 +1524,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 53918,
         "source.port": 53004,
         "tags": [
             "pan-os"
@@ -1460,6 +1544,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1511,6 +1597,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 40792,
         "source.port": 53000,
         "tags": [
             "pan-os"
@@ -1529,6 +1617,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1580,6 +1670,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 54044,
         "source.port": 53006,
         "tags": [
             "pan-os"
@@ -1598,6 +1690,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1649,6 +1743,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 19544,
         "source.port": 53007,
         "tags": [
             "pan-os"
@@ -1667,6 +1763,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1718,6 +1816,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 13462,
         "source.port": 53008,
         "tags": [
             "pan-os"
@@ -1736,6 +1836,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1787,6 +1889,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 44892,
         "source.port": 53010,
         "tags": [
             "pan-os"
@@ -1805,6 +1909,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1856,6 +1962,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 16487,
         "source.port": 53011,
         "tags": [
             "pan-os"
@@ -1874,6 +1982,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1925,6 +2035,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 23952,
         "source.port": 53012,
         "tags": [
             "pan-os"
@@ -1943,6 +2055,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -1994,6 +2108,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 2810,
         "source.port": 53013,
         "tags": [
             "pan-os"
@@ -2012,6 +2128,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2063,6 +2181,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 13272,
         "source.port": 53014,
         "tags": [
             "pan-os"
@@ -2081,6 +2201,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2132,6 +2254,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 8663,
         "source.port": 53022,
         "tags": [
             "pan-os"
@@ -2150,6 +2274,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2201,6 +2327,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 55738,
         "source.port": 53023,
         "tags": [
             "pan-os"
@@ -2219,6 +2347,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2270,6 +2400,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 10650,
         "source.port": 53024,
         "tags": [
             "pan-os"
@@ -2288,6 +2420,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2339,6 +2473,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 44087,
         "source.port": 53025,
         "tags": [
             "pan-os"
@@ -2357,6 +2493,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "152.195.55.192",
+        "destination.nat.ip": "152.195.55.192",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2408,6 +2546,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 15915,
         "source.port": 53026,
         "tags": [
             "pan-os"
@@ -2426,6 +2566,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "151.101.2.2",
+        "destination.nat.ip": "151.101.2.2",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2477,6 +2619,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 41165,
         "source.port": 53041,
         "tags": [
             "pan-os"
@@ -2498,6 +2642,8 @@
         "destination.geo.region_iso_code": "US-WA",
         "destination.geo.region_name": "Washington",
         "destination.ip": "54.192.7.152",
+        "destination.nat.ip": "54.192.7.152",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2549,6 +2695,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 54133,
         "source.port": 53040,
         "tags": [
             "pan-os"
@@ -2570,6 +2718,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2621,6 +2771,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 8485,
         "source.port": 53093,
         "tags": [
             "pan-os"
@@ -2642,6 +2794,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2693,6 +2847,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 12496,
         "source.port": 53094,
         "tags": [
             "pan-os"
@@ -2714,6 +2870,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2765,6 +2923,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 17029,
         "source.port": 53095,
         "tags": [
             "pan-os"
@@ -2786,6 +2946,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2837,6 +2999,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 23696,
         "source.port": 53096,
         "tags": [
             "pan-os"
@@ -2858,6 +3022,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2909,6 +3075,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 34769,
         "source.port": 53097,
         "tags": [
             "pan-os"
@@ -2930,6 +3098,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -2981,6 +3151,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 22486,
         "source.port": 53099,
         "tags": [
             "pan-os"
@@ -3002,6 +3174,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3053,6 +3227,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 12894,
         "source.port": 53100,
         "tags": [
             "pan-os"
@@ -3074,6 +3250,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3125,6 +3303,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 62348,
         "source.port": 53101,
         "tags": [
             "pan-os"
@@ -3146,6 +3326,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3197,6 +3379,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 6224,
         "source.port": 53104,
         "tags": [
             "pan-os"
@@ -3218,6 +3402,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3269,6 +3455,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 44120,
         "source.port": 53107,
         "tags": [
             "pan-os"
@@ -3290,6 +3478,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3341,6 +3531,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 44228,
         "source.port": 53108,
         "tags": [
             "pan-os"
@@ -3362,6 +3554,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "52.4.120.175",
+        "destination.nat.ip": "52.4.120.175",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3413,6 +3607,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 31322,
         "source.port": 53109,
         "tags": [
             "pan-os"
@@ -3434,6 +3630,8 @@
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
         "destination.ip": "216.58.194.98",
+        "destination.nat.ip": "216.58.194.98",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3485,6 +3683,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 1672,
         "source.port": 53118,
         "tags": [
             "pan-os"
@@ -3503,6 +3703,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3554,6 +3756,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 20801,
         "source.port": 53126,
         "tags": [
             "pan-os"
@@ -3572,6 +3776,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3623,6 +3829,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 24533,
         "source.port": 53127,
         "tags": [
             "pan-os"
@@ -3641,6 +3849,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3692,6 +3902,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 30150,
         "source.port": 53128,
         "tags": [
             "pan-os"
@@ -3710,6 +3922,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3761,6 +3975,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 36305,
         "source.port": 53129,
         "tags": [
             "pan-os"
@@ -3779,6 +3995,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3830,6 +4048,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 42682,
         "source.port": 53130,
         "tags": [
             "pan-os"
@@ -3848,6 +4068,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3899,6 +4121,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 22530,
         "source.port": 53131,
         "tags": [
             "pan-os"
@@ -3917,6 +4141,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -3968,6 +4194,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 43713,
         "source.port": 53132,
         "tags": [
             "pan-os"
@@ -3986,6 +4214,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4037,6 +4267,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 60608,
         "source.port": 53133,
         "tags": [
             "pan-os"
@@ -4055,6 +4287,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4106,6 +4340,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 9302,
         "source.port": 53134,
         "tags": [
             "pan-os"
@@ -4124,6 +4360,8 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "23.72.145.245",
+        "destination.nat.ip": "23.72.145.245",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4175,6 +4413,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 11634,
         "source.port": 53135,
         "tags": [
             "pan-os"
@@ -4196,6 +4436,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4247,6 +4489,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 30818,
         "source.port": 53152,
         "tags": [
             "pan-os"
@@ -4268,6 +4512,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4319,6 +4565,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 64260,
         "source.port": 53155,
         "tags": [
             "pan-os"
@@ -4340,6 +4588,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4391,6 +4641,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 7071,
         "source.port": 53158,
         "tags": [
             "pan-os"
@@ -4412,6 +4664,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4463,6 +4717,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 4512,
         "source.port": 53160,
         "tags": [
             "pan-os"
@@ -4484,6 +4740,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4535,6 +4793,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 3422,
         "source.port": 53161,
         "tags": [
             "pan-os"
@@ -4556,6 +4816,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4607,6 +4869,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 4651,
         "source.port": 53162,
         "tags": [
             "pan-os"
@@ -4628,6 +4892,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4679,6 +4945,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 19068,
         "source.port": 53163,
         "tags": [
             "pan-os"
@@ -4700,6 +4968,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4751,6 +5021,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 5831,
         "source.port": 53164,
         "tags": [
             "pan-os"
@@ -4772,6 +5044,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4823,6 +5097,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 7084,
         "source.port": 53165,
         "tags": [
             "pan-os"
@@ -4844,6 +5120,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4895,6 +5173,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 18633,
         "source.port": 53166,
         "tags": [
             "pan-os"
@@ -4916,6 +5196,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -4967,6 +5249,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 25557,
         "source.port": 53167,
         "tags": [
             "pan-os"
@@ -4988,6 +5272,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -5039,6 +5325,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 20661,
         "source.port": 53150,
         "tags": [
             "pan-os"
@@ -5060,6 +5348,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -5111,6 +5401,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 65438,
         "source.port": 53185,
         "tags": [
             "pan-os"
@@ -5132,6 +5424,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -5183,6 +5477,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 53101,
         "source.port": 53187,
         "tags": [
             "pan-os"
@@ -5204,6 +5500,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -5255,6 +5553,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 35463,
         "source.port": 53188,
         "tags": [
             "pan-os"
@@ -5276,6 +5576,8 @@
         "destination.geo.region_iso_code": "US-VA",
         "destination.geo.region_name": "Virginia",
         "destination.ip": "54.209.101.70",
+        "destination.nat.ip": "54.209.101.70",
+        "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": "security_threat",
@@ -5327,6 +5629,8 @@
         "source.address": "192.168.15.224",
         "source.geo.country_iso_code": "192.168.0.0-192.168.255.255",
         "source.ip": "192.168.15.224",
+        "source.nat.ip": "192.168.1.63",
+        "source.nat.port": 45769,
         "source.port": 53178,
         "tags": [
             "pan-os"

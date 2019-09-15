@@ -6,7 +6,12 @@
 --
 
 You can use the {stack} {monitor-features} to gain insight into the health of
-{beatname_uc} agents running in your environment. 
+ifndef::apm-server[]
+{beatname_uc} instances running in your environment. 
+endif::[]
+ifdef::apm-server[]
+{beatname_uc}. 
+endif::[]
 
 To monitor {beatname_uc}, make sure monitoring is enabled on your {es} cluster,
 then configure the method used to collect {beatname_uc} metrics. You

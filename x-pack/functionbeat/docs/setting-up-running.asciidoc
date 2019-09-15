@@ -19,7 +19,11 @@ This section includes additional information on how to set up and run
 
 * <<keystore>>
 
+* <<iam-permissions>>
+
 * <<command-line-options>>
+
+* <<export-cloudformation-template>>
 
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
@@ -30,5 +34,9 @@ include::{libbeat-dir}/docs/shared-directory-layout.asciidoc[]
 [role="xpack"]
 include::{libbeat-dir}/docs/keystore.asciidoc[]
 
+include::iam-permissions.asciidoc[]
+
 [role="xpack"]
 include::{libbeat-dir}/docs/command-reference.asciidoc[]
+
+include::export-cloudformation-template.asciidoc[]

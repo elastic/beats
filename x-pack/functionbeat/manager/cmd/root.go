@@ -5,8 +5,13 @@
 package cmd
 
 import (
+	"os"
+
+	"github.com/spf13/cobra"
+
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/beater"
 )
 
@@ -18,8 +23,15 @@ var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
-		Name: Name,
+		Name:            Name,
+		ConfigOverrides: config.Overrides,
 	})
+
+	RootCmd.RemoveCommand(RootCmd.RunCmd)
+	RootCmd.Run = func(_ *cobra.Command, _ []string) {
+		RootCmd.Usage()
+		os.Exit(1)
+	}
 
 	RootCmd.AddCommand(genDeployCmd())
 	RootCmd.AddCommand(genUpdateCmd())

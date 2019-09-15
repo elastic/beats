@@ -100,7 +100,7 @@ check: python-env
 .PHONY: check-headers
 check-headers:
 	@go get -u github.com/elastic/go-licenser
-	@go-licenser -d -exclude x-pack
+	@go-licenser -d -exclude x-pack -exclude generator/beat/\{beat\} -exclude generator/metricbeat/\{beat\}
 	@go-licenser -d -license Elastic x-pack
 
 .PHONY: add-headers

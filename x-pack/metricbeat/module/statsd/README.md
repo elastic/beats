@@ -6,7 +6,6 @@ For manual testing and development of this module, start metricbeat with the sta
   metricsets: ["server"]
   host: "localhost"
   port: "8125"
-  #reservoir_size: 1000
   enabled: true
   #ttl: "30s"
 ------------------------------------------------------------------------------

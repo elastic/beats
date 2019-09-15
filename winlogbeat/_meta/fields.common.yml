@@ -11,12 +11,6 @@
         The name of the file the event was read from when Winlogbeat is
         reading directly from an .evtx file.
 
-    - name: event.code
-      type: keyword
-      required: false
-      description: >
-        The code for this log message (Windows event ID).
-
     - name: event.original
       overwrite: true
       description: >

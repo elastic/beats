@@ -125,6 +125,16 @@
             "remove": {
                 "field": "elasticsearch.slowlog.message"
             }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.slowlog.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                "ignore_failure": true
+            }
         }
     ]
 }

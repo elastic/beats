@@ -22,12 +22,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd module: Normalized value of `event.category` field from `user-login` to `authentication`. {pull}11432[11432]
 - Auditd module: Unset `auditd.session` and `user.audit.id` fields are removed from audit events. {issue}11431[11431] {pull}11815[11815]
 - Socket dataset: Exclude localhost by default {pull}11993[11993]
+- Socket dataset: New implementation using Kprobes for finer-grained monitoring and UDP support. {pull}13058[13058]
 
 *Filebeat*
 
 - Add read_buffer configuration option. {pull}11739[11739]
 - `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
+- cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
+- cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
 
 *Heartbeat*
 
@@ -37,6 +40,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add new Dashboard for PostgreSQL database stats {pull}13187[13187]
+- Add new dashboard for CouchDB database {pull}13198[13198]
+- Add new dashboard for Ceph cluster stats {pull}13216[13216]
 - Add new dashboard for Aerospike database stats {pull}13217[13217]
 - Add new dashboard for Couchbase cluster stats {pull}13212[13212]
 - Add new dashboard for Prometheus server stats {pull}13126[13126]
@@ -53,6 +59,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 *Functionbeat*
+
+- Separate management and functions in Functionbeat. {pull}12939[12939]
 
 ==== Bugfixes
 
@@ -89,7 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix unexpected stops on docker autodiscover when a container is restarted before `cleanup_timeout`. {issue}12962[12962] {pull}13127[13127]
 - Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
 - Fix some incorrect types and formats in field.yml files. {pull}13188[13188]
-- Load DLLs only from Windows system directory. {pull}13234[13234]
+- Load DLLs only from Windows system directory. {pull}13234[13234] {pull}13384[13384]
 - Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
 - Fix case insensitive regular expressions not working correctly. {pull}13250[13250]
 
@@ -129,11 +137,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
+- Fix filebeat autodiscover fileset hint for container input. {pull}13296[13296]
+- Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
+- Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
+- Fix timezone parsing of elasticsearch module ingest pipelines. {pull}13367[13367]
+- Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
+- Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
+- Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
 
 *Heartbeat*
 
 - Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
+- Fix integer comparison on JSON responses. {pull}13348[13348]
 
 *Journalbeat*
 
@@ -167,7 +183,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incoherent behaviour in redis key metricset when keyspace is specified both in host URL and key pattern {pull}12913[12913]
 - Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
-- Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+- Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
+- Fix redis key metricset dashboard references to index pattern. {pull}13303[13303]
+- Check if fields in DBInstance is nil in rds metricset. {pull}13294[13294] {issue}13037[13037]
+- Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
+- Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
+- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
+- Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
 
 *Packetbeat*
 
@@ -184,6 +207,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Fix function name reference for Kinesis streams in CloudFormation templates {pull}11646[11646]
+- Fix Cloudwatch logs timestamp to use timestamp of the log record instead of when the record was processed {pull}13291[13291]
+- Look for the keystore under the correct path. {pull}13332[13332]
 
 ==== Added
 
@@ -200,7 +225,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
 - New processor: `truncate_fields`. {pull}11297[11297]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring cluster. {pull}9260[9260]
-- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
+- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}11394[11394]
 - Add `add_observer_metadata` processor. {pull}11394[11394]
 - Add `decode_csv_fields` processor. {pull}11753[11753]
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
@@ -214,9 +239,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 - Add `decompress_gzip_field` processor. {pull}12733[12733]
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
+- Fail with error when autodiscover providers have no defined configs. {pull}13078[13078]
 - Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
 - Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
+- Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
+- add_host_metadata is now GA. {pull}13148[13148]
+- Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
 - add_host_metadata is no GA. {pull}13148[13148]
+- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
+- Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
+- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
+- Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
+- Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
+
 
 *Auditbeat*
 
@@ -252,6 +287,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
 - Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
 - Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
+- Add support for virtual host in Apache access logs {pull}12778[12778]
 - Add support for client addresses with port in Apache error logs {pull}12695[12695]
 - Add `google-pubsub` input type for consuming messages from a Google Cloud Pub/Sub topic subscription. {pull}12746[12746]
 - Add module for ingesting Cisco IOS logs over syslog. {pull}12748[12748]
@@ -263,10 +299,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ingesting IBM MQ logs. {pull}8782[8782]
 - Add S3 input to retrieve logs from AWS S3 buckets. {pull}12640[12640] {issue}12582[12582]
 - Add aws module s3access metricset. {pull}13170[13170] {issue}12880[12880]
+- Update Suricata module to populate ECS DNS fields and handle EVE DNS version 2. {issue}13320[13320] {pull}13329[13329]
+- Update PAN-OS fileset to use the ECS NAT fields. {issue}13320[13320] {pull}13330[13330]
+- Add fields to the Zeek DNS fileset for ECS DNS. {issue}13320[13320] {pull}13324[13324]
+- Add container image in Kubernetes metadata {pull}13356[13356] {issue}12688[12688]
+- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
+- Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
+- Update CoreDNS module to populate ECS DNS fields. {issue}13320[13320] {pull}13505[13505]
 
 *Heartbeat*
 
 - Enable `add_observer_metadata` processor in default config. {pull}11394[11394]
+- Record HTTP body metadata and optionally contents in `http.response.body.*` fields. {pull}13022[13022]
 
 *Journalbeat*
 
@@ -315,15 +359,29 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
 - Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
 - Add AWS ebs metricset. {pull}13167[13167] {issue}11699[11699]
+- Add `metricset.period` field with the configured fetching period. {pull}13242[13242] {issue}12616[12616]
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
+- Add Performance metricset to Oracle module {pull}12547[12547]
+- Add proc/vmstat data to the system/memory metricset on linux {pull}13322[13322]
+- Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414[13414]
+- Add module for statsd. {pull}13109[13109]
+- Add support for NATS version 2. {pull}13601[13601]
+
 
 *Packetbeat*
+
+- Update DNS protocol plugin to produce events with ECS fields for DNS. {issue}13320[13320] {pull}13354[13354]
 
 *Functionbeat*
 
 - New options to configure roles and VPC. {pull}11779[11779]
 - Export automation templates used to create functions. {pull}11923[11923]
 - Configurable Amazon endpoint. {pull}12369[12369]
+- Add timeout option to reference configuration. {pull}13351[13351]
+- Configurable tags for Lambda functions. {pull}13352[13352]
+- Add input for Cloudwatch logs through Kinesis. {pull}13317[13317]
+- Enable Logstash output. {pull}13345[13345]
+- Make `bulk_max_size` configurable in outputs. {pull}13493[13493]
 
 *Winlogbeat*
 

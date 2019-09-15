@@ -22,7 +22,7 @@
               {
                 "fieldName": "redis.keyspace.id",
                 "id": "1545388837304",
-                "indexPattern": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                "indexPattern": "metricbeat-*",
                 "label": "Keyspace",
                 "options": {
                   "dynamicOptions": true,
@@ -61,7 +61,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.key.type",
                   "negate": false,
                   "params": {
@@ -81,7 +81,7 @@
                 }
               }
             ],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
@@ -243,7 +243,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
@@ -399,7 +399,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.key.type",
                   "negate": false,
                   "params": {
@@ -419,7 +419,7 @@
                 }
               }
             ],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
@@ -570,7 +570,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.key.expire.ttl",
                   "negate": false,
                   "params": {
@@ -588,7 +588,7 @@
                 }
               }
             ],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
@@ -758,7 +758,7 @@
                   "alias": null,
                   "controlledBy": "1545388837304",
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.keyspace.id",
                   "negate": false,
                   "params": [
