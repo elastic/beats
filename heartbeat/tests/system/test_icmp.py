@@ -23,7 +23,7 @@ class Test(BaseTest):
             runningGroups = runningGroups.split(" ")
             runningGroups = map(int, runningGroups)
             runningGroups.sort()
-            sys.stderr.write("RUNNING GROUPS: ", runningGroups)
+            sys.stderr.write("RUNNING GROUPS: %s\n" % runningGroups)
             result = subprocess.check_output(
                 ['sysctl', 'net.ipv4.ping_group_range']).strip()
             sys.stderr.write("GROUP RANGE: ", result)
@@ -37,7 +37,7 @@ class Test(BaseTest):
             if any(lastGroup > group for group in runningGroups):
                 return (True)
         except subprocess.CalledProcessError, e:
-            sys.stderr.write("Error trying sysctl:\n", e.output)
+            sys.stderr.write("Error trying sysctl: %s\n" % e.output)
 
         return (False)
 
@@ -52,7 +52,7 @@ class Test(BaseTest):
             else:
                 return (True)
         else:
-            sys.stderr.write("SUDO_USER: ", os.geteuid)
+            sys.stderr.write("SUDO_USER: %s\n" % os.geteuid)
             if 'SUDO_USER' in os.environ and os.geteuid() == 0:
                 return (True)
             else:
@@ -63,7 +63,7 @@ class Test(BaseTest):
         Basic test with icmp root non privilege ICMP test.
 
         """
-        sys.stderr.write("STARTING ICMP TEST")
+        sys.stderr.write("STARTING ICMP TEST\n")
 
         config = {
             "monitors": [
@@ -80,19 +80,19 @@ class Test(BaseTest):
             **config
         )
 
-        sys.stderr.write("DETECTED PLATFORM")
+        sys.stderr.write("DETECTED PLATFORM\n")
         if platform.system() in ["Linux", "Darwin"]:
-            sys.stderr.write("LINUX")
+            sys.stderr.write("LINUX\n")
             adminRights = self.has_admin()
             groupRights = self.has_group_permission()
             if groupRights == True or adminRights == True:
-                sys.stderr.write("STARTING BEAT\n")
+                sys.stderr.write("STARTING BEAT\n\n")
                 proc = self.start_beat()
                 sys.stderr.write("STARTED BEAT\n")
                 sys.stderr.write("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB\n")
                 time.sleep(25)
                 # self.wait_until(lambda: self.log_contains("heartbeat is running"))
-                sys.stderr.write("CHECK WAIT %s")
+                sys.stderr.write("CHECK WAIT %s\n")
                 proc.check_kill_and_wait()
             else:
                 sys.stderr.write("NO RIGHTS\n")
@@ -108,4 +108,4 @@ class Test(BaseTest):
             self.wait_until(lambda: self.log_contains(
                 "heartbeat is running"))
             proc.check_kill_and_wait()
-        sys.stderr.write("FINISHED ICMP TEST")
+        sys.stderr.write("FINISHED ICMP TEST\n")
