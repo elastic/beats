@@ -1277,10 +1277,10 @@ section.
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
 metadata based on which Kubernetes pod the event originated from.
-At startup it will detect an `in_cluster` environment and cache the
-Kubernetes related metadata. If it's not able to detect a valid Kuberentes
-configuration, the events will not be annotated with Kubernetes related
-metadata. Events will be annotated only if a valid configuration was detected.
+At startup it detects an `in_cluster` environment and caches the
+Kubernetes-related metadata. Events are only annotated if a valid configuration
+is detected. If it's not able to detect a valid Kubernetes configuration,
+the events are not annotated with Kubernetes-related metadata.
 
 Each event is annotated with:
 
@@ -1365,9 +1365,9 @@ case you want to specify your own.
 === Add Docker metadata
 
 The `add_docker_metadata` processor annotates each event with relevant metadata
-from Docker containers. At startup it will detect a docker environment and cache the metadata.
-The events will be annotated with Docker metadata, only if a valid configuration
-was detected and the processor is able to reach Docker api.
+from Docker containers. At startup it detects a docker environment and caches the metadata.
+The events are annotated with Docker metadata, only if a valid configuration
+is detected and the processor is able to reach Docker API.
 
 Each event is annotated with:
 
