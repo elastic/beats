@@ -55,7 +55,7 @@ func testRequest(t *testing.T, testURL string) *beat.Event {
 // an empty string no cert will be set.
 func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
-		"urls":    testURL,
+		"hosts":   testURL,
 		"timeout": "1s",
 	}
 
@@ -260,7 +260,7 @@ func TestLargeResponse(t *testing.T) {
 	defer server.Close()
 
 	configSrc := map[string]interface{}{
-		"urls":                server.URL,
+		"hosts":               server.URL,
 		"timeout":             "1s",
 		"check.response.body": "x",
 	}

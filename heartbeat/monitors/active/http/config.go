@@ -22,16 +22,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/conditions"
-
+	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-
-	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/libbeat/conditions"
 )
 
 type Config struct {
-	URLs         []string       `config:"urls" validate:"required"`
+	URLs         []string       `config:"urls"`
+	Hosts        []string       `config:"hosts"`
 	ProxyURL     string         `config:"proxy_url"`
 	Timeout      time.Duration  `config:"timeout"`
 	MaxRedirects int            `config:"max_redirects"`
@@ -149,6 +148,18 @@ func (c *compressionConfig) Validate() error {
 
 	if !(0 <= c.Level && c.Level <= 9) {
 		return fmt.Errorf("compression level %v invalid", c.Level)
+	}
+
+	return nil
+}
+
+func (c *Config) Validate() error {
+	if len(c.Hosts) == 0 && len(c.URLs) == 0 {
+		return fmt.Errorf("hosts is a mandatory parameter")
+	}
+
+	if len(c.URLs) != 0 {
+		c.Hosts = append(c.Hosts, c.URLs...)
 	}
 
 	return nil
