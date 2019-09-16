@@ -5,24 +5,26 @@
 package httpjson
 
 import (
+	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
+	"runtime"
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/libbeat/version"
 )
 
 const (
@@ -38,7 +40,6 @@ func init() {
 
 type httpjsonInput struct {
 	config
-
 	log      *logp.Logger
 	outlet   channel.Outleter // Output of received messages.
 	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
@@ -47,7 +48,6 @@ type httpjsonInput struct {
 	workerCancel context.CancelFunc // Used to signal that the worker should stop.
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
-
 }
 
 type requestInfo struct {
@@ -55,7 +55,7 @@ type requestInfo struct {
 	ContentMap common.MapStr
 }
 
-// NewInput creates a new misp input that consumes events from MISP with a configurable interval
+// NewInput creates a new httpjson input
 func NewInput(
 	cfg *common.Config,
 	connector channel.Connector,
@@ -66,7 +66,6 @@ func NewInput(
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
-
 	// Build outlet for events.
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
@@ -106,8 +105,8 @@ func NewInput(
 	return in, nil
 }
 
-// Run starts the misp input worker then returns. Only the first invocation
-// will ever start the misp worker.
+// Run starts the input worker then returns. Only the first invocation
+// will ever start the worker.
 func (in *httpjsonInput) Run() {
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
@@ -124,171 +123,170 @@ func (in *httpjsonInput) Run() {
 	})
 }
 
-// Create HTTP request for the input
+// createHTTPRequest creates an HTTP/HTTPs request for the input
 func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo) (*http.Request, error) {
 	b, _ := json.Marshal(ri.ContentMap)
-	body := strings.NewReader(string(b))
-	req, err := http.NewRequest(in.HTTPMethod, ri.URL, body)
+	body := bytes.NewReader(b)
+	req, err := http.NewRequest(in.config.HTTPMethod, ri.URL, body)
 	if err != nil {
 		return nil, err
 	}
 	req = req.WithContext(ctx)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", "filebeat-input-httpjson")
-	if in.APIKey != "" {
-		req.Header.Set("Authorization", in.APIKey)
+	req.Header.Set("User-Agent", userAgent())
+	if in.config.APIKey != "" {
+		req.Header.Set("Authorization", in.config.APIKey)
 	}
 	return req, nil
 }
 
 // Process HTTP request, recursively handle pagination if enable
 func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
-	msg, err := client.Do(req)
-	if err != nil {
-		in.log.Error(err)
-		return errors.New("Failed to do http request. Stopping input worker - ")
-	}
-	if msg.StatusCode != http.StatusOK {
-		e := fmt.Sprintf("HTTP return status is %s - ", msg.Status)
-		in.log.Error(e)
-		return errors.New(e)
-	}
-	responseData, err := ioutil.ReadAll(msg.Body)
-	defer msg.Body.Close()
-	if err != nil {
-		in.log.Error(err)
-		return err
-	}
-	var m, v interface{}
-	err = json.Unmarshal(responseData, &m)
-	if err != nil {
-		in.log.Error(err)
-		return err
-	}
-	switch m.(type) {
-	case map[string]interface{}:
-		break
-	default:
-		return errors.New("HTTP Response is not valid JSON - ")
-	}
-	if in.JSONObjects == "" {
-		ok := in.outlet.OnEvent(makeEvent(string(responseData)))
-		if !ok {
-			return errors.New("OnEvent returned false - ")
+	for {
+		msg, err := client.Do(req)
+		if err != nil {
+			return errors.New("failed to do http request. Stopping input worker - ")
 		}
-	} else {
-		v, err = common.MapStr(m.(map[string]interface{})).GetValue(in.JSONObjects)
+		if msg.StatusCode != http.StatusOK {
+			return errors.New(fmt.Sprintf("return HTTP status is %s - ", msg.Status))
+		}
+		responseData, err := ioutil.ReadAll(msg.Body)
+		defer msg.Body.Close()
 		if err != nil {
 			in.log.Error(err)
 			return err
 		}
-		switch v.(type) {
-		case []interface{}:
-			ts := v.([]interface{})
-			for _, t := range ts {
-				switch t.(type) {
-				case map[string]interface{}:
-					d, err := json.Marshal(t.(map[string]interface{}))
-					if err != nil {
-						in.log.Error(err)
-						return errors.New("Failed to process http response data - ")
-					}
-					ok := in.outlet.OnEvent(makeEvent(string(d)))
-					if !ok {
-						in.log.Error(ok)
-						return errors.New("OnEvent returned false - ")
+		var m, v interface{}
+		err = json.Unmarshal(responseData, &m)
+		if err != nil {
+			return err
+		}
+		switch mmap := m.(type) {
+		case map[string]interface{}:
+			if in.config.JSONObjects == "" {
+				ok := in.outlet.OnEvent(makeEvent(string(responseData)))
+				if !ok {
+					return errors.New("function OnEvent returned false - ")
+				}
+			} else {
+				v, err = common.MapStr(mmap).GetValue(in.config.JSONObjects)
+				if err != nil {
+					return err
+				}
+				switch ts := v.(type) {
+				case []interface{}:
+					for _, t := range ts {
+						switch t.(type) {
+						case map[string]interface{}:
+							d, err := json.Marshal(t.(map[string]interface{}))
+							if err != nil {
+								return errors.New("failed to process http response data - ")
+							}
+							ok := in.outlet.OnEvent(makeEvent(string(d)))
+							if !ok {
+								return errors.New("OnEvent returned false - ")
+							}
+						default:
+							return errors.New("invalid json_objects_array configuration")
+						}
 					}
 				default:
-					e := "Invalid json_objects_array configuration"
-					in.log.Error(e)
-					return errors.New(e)
+					return errors.New("invalid json_objects_array configuration")
 				}
 			}
-		default:
-			e := "Invalid json_objects_array configuration"
-			in.log.Error(e)
-			return errors.New(e)
-		}
-	}
-	if in.PaginationEnable {
-		v, err = common.MapStr(m.(map[string]interface{})).GetValue(in.PaginationIDField)
-		if err != nil {
-			in.log.Info("Successfully processed HTTP request. Pagination finished.")
+			if in.config.Pagination != nil && in.config.Pagination.IsEnabled {
+				v, err = common.MapStr(mmap).GetValue(in.config.Pagination.IDField)
+				if err != nil {
+					in.log.Info("Successfully processed HTTP request. Pagination finished.")
+					return nil
+				}
+				if in.config.Pagination.RequestField != "" {
+					ri.ContentMap.Put(in.config.Pagination.RequestField, v)
+					if in.config.Pagination.URL != "" {
+						ri.URL = in.config.Pagination.URL
+					}
+				} else {
+					switch v.(type) {
+					case string:
+						ri.URL = v.(string)
+					default:
+						return errors.New("pagination ID is not string, which is required for URL - ")
+					}
+				}
+				if in.config.Pagination.ExtraBodyContent != nil {
+					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
+				}
+				req, err = in.createHTTPRequest(ctx, ri)
+				if err != nil {
+					in.log.Error(err)
+					return err
+				}
+				continue
+			}
 			return nil
+		default:
+			return errors.New("response is not valid JSON - ")
 		}
-		if in.PaginationRequestField != "" {
-			ri.ContentMap.Put(in.PaginationRequestField, v)
-			if in.PaginationURL != "" {
-				ri.URL = in.PaginationURL
-			}
-		} else {
-			switch v.(type) {
-			case string:
-				ri.URL = v.(string)
-			default:
-				e := "Pagination ID is not string, which is required for URL - "
-				in.log.Error(e)
-				return errors.New(e)
-			}
-		}
-		if in.PaginationExtraBodyContent != nil {
-			switch in.PaginationExtraBodyContent.(type) {
-			case map[string]interface{}:
-				ri.ContentMap.Update(common.MapStr(in.PaginationExtraBodyContent.(map[string]interface{})))
-			default:
-			}
-		}
-		req, err = in.createHTTPRequest(ctx, ri)
-		if err != nil {
-			in.log.Error(err)
-			return err
-		}
-		in.processHTTPRequest(ctx, client, req, ri)
 	}
-	return nil
 }
 
 func (in *httpjsonInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
-	// Make http client.
-	var client *http.Client
-	if in.ServerName == "" {
-		in.log.Info("ServerName is empty, hence TLS will not be used.")
-		client = &http.Client{
-			Timeout:   time.Second * time.Duration(in.HTTPClientTimeout),
-			Transport: &http.Transport{DisableKeepAlives: true},
-		}
-	} else {
-		in.log.Info("ServerName is " + in.ServerName + ", and TLS  will be used.")
-		client = &http.Client{
-			Timeout: time.Second * time.Duration(in.HTTPClientTimeout),
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					ServerName: in.ServerName,
-					// InsecureSkipVerify: true,
-				},
-				DisableKeepAlives: true,
-			},
-		}
+	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
+	if err != nil {
+		return err
 	}
+
+	var dialer, tlsDialer transport.Dialer
+
+	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
+	if err != nil {
+		return err
+	}
+
+	// Make transport client
+	var client *http.Client
+	client = &http.Client{
+		Transport: &http.Transport{
+			Dial:              dialer.Dial,
+			DialTLS:           tlsDialer.Dial,
+			DisableKeepAlives: true,
+		},
+		Timeout: in.config.HTTPClientTimeout,
+	}
+
+	// if in.config.ServerName == "" {
+	// 	in.log.Info("ServerName is empty, hence TLS will not be used.")
+	// 	client = &http.Client{
+	// 		Timeout:   time.Second * time.Duration(in.config.HTTPClientTimeout),
+	// 		Transport: &http.Transport{DisableKeepAlives: true},
+	// 	}
+	// } else {
+	// 	in.log.Info("ServerName is " + in.config.ServerName + ", and TLS  will be used.")
+	// 	client = &http.Client{
+	// 		Timeout: time.Second * time.Duration(in.config.HTTPClientTimeout),
+	// 		Transport: &http.Transport{
+	// 			TLSClientConfig: &tls.Config{
+	// 				ServerName: in.config.ServerName,
+	// 				// InsecureSkipVerify: true,
+	// 			},
+	// 			DisableKeepAlives: true,
+	// 		},
+	// 	}
+	// }
 	ri := &requestInfo{
 		URL:        in.URL,
-		ContentMap: common.MapStr(make(map[string]interface{})),
+		ContentMap: common.MapStr{},
 	}
-	if in.HTTPMethod == "POST" && in.HTTPRequestBody != nil {
-		switch in.HTTPRequestBody.(type) {
-		case map[string]interface{}:
-			ri.ContentMap.Update(common.MapStr(in.HTTPRequestBody.(map[string]interface{})))
-		default:
-			in.log.Error("HTTPRequestBody configuration is wrong, hence ignored!")
-		}
+	if in.config.HTTPMethod == "POST" && in.config.HTTPRequestBody != nil {
+		ri.ContentMap.Update(common.MapStr(in.config.HTTPRequestBody))
 	}
 	req, err := in.createHTTPRequest(ctx, ri)
 	if err != nil {
-		in.log.Error(err)
 		return err
 	}
 	err = in.processHTTPRequest(ctx, client, req, ri)
@@ -319,11 +317,8 @@ func (in *httpjsonInput) Wait() {
 }
 
 func makeEvent(body string) beat.Event {
-	id := uuid.Must(uuid.NewV4())
-
 	fields := common.MapStr{
 		"event": common.MapStr{
-			"id":      id,
 			"created": time.Now().UTC(),
 		},
 		"message": body,
@@ -331,9 +326,12 @@ func makeEvent(body string) beat.Event {
 
 	return beat.Event{
 		Timestamp: time.Now().UTC(),
-		Meta: common.MapStr{
-			"id": id,
-		},
-		Fields: fields,
+		Fields:    fields,
 	}
+}
+
+func userAgent() string {
+	return fmt.Sprintf("Elastic Filebeat/%s (%s; %s; %s; %s)",
+		version.GetDefaultVersion(), runtime.GOOS, runtime.GOARCH,
+		version.Commit(), version.BuildTime())
 }

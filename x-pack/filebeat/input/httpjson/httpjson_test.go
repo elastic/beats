@@ -126,19 +126,9 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 
 func TestGET(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"api_key":                       "",
-		"http_client_timeout":           30,
-		"http_method":                   "GET",
-		"http_request_body":             nil,
-		"interval_in_seconds":           0,
-		"json_objects_array":            "",
-		"pagination_enable":             false,
-		"pagination_extra_body_content": nil,
-		"pagination_id_field":           "",
-		"pagination_req_field":          "",
-		"pagination_url":                "",
-		"server_name":                   "",
-		"url":                           "http://" + host + "/json",
+		"http_method": "GET",
+		"interval":    0,
+		"url":         "http://" + host + "/json",
 	})
 
 	runTest(t, cfg, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
@@ -159,19 +149,10 @@ func TestGET(t *testing.T) {
 
 func TestPOST(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"api_key":                       "",
-		"http_client_timeout":           30,
-		"http_method":                   "POST",
-		"http_request_body":             map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
-		"interval_in_seconds":           0,
-		"json_objects_array":            "",
-		"pagination_enable":             false,
-		"pagination_extra_body_content": nil,
-		"pagination_id_field":           "",
-		"pagination_req_field":          "",
-		"pagination_url":                "",
-		"server_name":                   "",
-		"url":                           "http://" + host + "/post",
+		"http_method":       "POST",
+		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
+		"interval":          0,
+		"url":               "https://" + host + "/post",
 	})
 
 	runTest(t, cfg, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
@@ -192,19 +173,9 @@ func TestPOST(t *testing.T) {
 
 func TestRunStop(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"api_key":                       "",
-		"http_client_timeout":           30,
-		"http_method":                   "GET",
-		"http_request_body":             nil,
-		"interval_in_seconds":           0,
-		"json_objects_array":            "",
-		"pagination_enable":             false,
-		"pagination_extra_body_content": nil,
-		"pagination_id_field":           "",
-		"pagination_req_field":          "",
-		"pagination_url":                "",
-		"server_name":                   "",
-		"url":                           "http://" + host + "/json",
+		"http_method": "GET",
+		"interval":    0,
+		"url":         "http://" + host + "/json",
 	})
 
 	runTest(t, cfg, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
