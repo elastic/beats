@@ -51,6 +51,7 @@ distributions under which the dataset is known to work:
 | CentOS 6.5     | 2.6.32-431.el6      | NO^<<anchor-1,[1]>>^
 | CentOS 6.9     | 2.6.32-696.30.1.el6 | &#10003;
 | CentOS 7.6     | 3.10.0-957.1.3.el7  | &#10003;
+| RHEL 8         | 4.18.0-80.rhel8     | &#10003;
 | Debian 8       | 3.16.0-6            | &#10003;
 | Debian 9       | 4.9.0-8             | &#10003;
 | Debian 10      | 4.19.0-5            | &#10003;
@@ -75,23 +76,25 @@ A kernel built with the following configuration options enabled is required:
 
 - `CONFIG_KPROBE_EVENTS`: Enables the KProbes subsystem.
 - `CONFIG_DEBUG_FS`: For kernels laking `tracefs` support (<4.1).
-- `CONFIG_IPV6`.
+- `CONFIG_IPV6`: IPv6 support in the kernel is needed even if disabled with
+`socket.enable_ipv6: false`.
 
 These settings are enabled by default in most distributions.
 
 The following configuration settings can prevent the dataset from starting:
 
 - `/sys/kernel/debug/kprobes/enabled` must be 1.
-- `/proc/sys/net/ipv6/conf/lo/disable_ipv6` must be 0
-(IPv6 enabled in the loopback device).
+- `/proc/sys/net/ipv6/conf/lo/disable_ipv6` (IPv6 enabled in loopback device) is
+required when running with IPv6 enabled.
+
 
 [float]
 ==== Running on docker
 
 The dataset can monitor the Docker host when running inside a container. However
-it needs to run on a `privileged` container with `CAP_NET_ADMIN` and IPv6
-support. The docker container running {beatname_uc} needs access to the host's
-tracefs or debugfs directory. This is achieved by bind-mounting `/sys`.
+it needs to run on a `privileged` container with `CAP_NET_ADMIN`. The docker
+container running {beatname_uc} needs access to the host's tracefs or debugfs
+directory. This is achieved by bind-mounting `/sys`.
 
 [float]
 === Configuration
@@ -105,6 +108,13 @@ Must point to the mount-point of `tracefs` or the `tracing` directory inside
 the default locations: `/sys/kernel/tracing` and `/sys/kernel/debug/tracing`.
 If not found, it will attempt to mount `tracefs` and `debugfs` at their
 default locations.
+
+- `socket.enable_ipv6` (default: unset)
+
+Determines whether IPv6 must be monitored. When unset (default), IPv6 support
+is automatically detected. Even when IPv6 is disabled, in order to run the
+dataset you still need a kernel with IPv6 support (the `ipv6` module must be
+loaded if compiled as a module).
 
 - `socket.flow_inactive_timeout` (default: 30s)
 
