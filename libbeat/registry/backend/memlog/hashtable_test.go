@@ -23,17 +23,18 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
 func TestHashtable(t *testing.T) {
 	t.Run("find is Nil on empty table", func(t *testing.T) {
 		tbl := newHashtable()
-		ref := tbl.find(keyPair{1, []byte("a")})
+		ref := tbl.find(keyPair{1, backend.Key("a")})
 		assert.True(t, ref.IsNil())
 	})
 
 	t.Run("overwrite key", func(t *testing.T) {
-		key := []byte("k")
+		key := backend.Key("k")
 		pos := keyPair{1, key}
 		v1 := common.MapStr{"a": 1}
 		v2 := common.MapStr{"a": 2}
@@ -50,43 +51,43 @@ func TestHashtable(t *testing.T) {
 		t.Run("find key", func(t *testing.T) {
 			b := bin{
 				{
-					key:   []byte("a"),
+					key:   backend.Key("a"),
 					value: common.MapStr{"v": 1},
 				},
 				{
-					key:   []byte("b"),
+					key:   backend.Key("b"),
 					value: common.MapStr{"v": 2},
 				},
 			}
 
-			assert.Equal(t, 0, b.index([]byte("a")))
-			assert.Equal(t, 1, b.index([]byte("b")))
-			assert.Equal(t, -1, b.index([]byte("c")))
+			assert.Equal(t, 0, b.index(backend.Key("a")))
+			assert.Equal(t, 1, b.index(backend.Key("b")))
+			assert.Equal(t, -1, b.index(backend.Key("c")))
 		})
 
 		t.Run("remove", func(t *testing.T) {
 			b := bin{
 				{
-					key:   []byte("a"),
+					key:   backend.Key("a"),
 					value: common.MapStr{"v": 1},
 				},
 				{
-					key:   []byte("b"),
+					key:   backend.Key("b"),
 					value: common.MapStr{"v": 2},
 				},
 				{
-					key:   []byte("c"),
+					key:   backend.Key("c"),
 					value: common.MapStr{"v": 2},
 				},
 			}
 
-			idx := b.index([]byte("b"))
+			idx := b.index(backend.Key("b"))
 			b.remove(idx)
 
 			assert.Equal(t, 2, len(b))
-			assert.Equal(t, 0, b.index([]byte("a")))
-			assert.Equal(t, -1, b.index([]byte("b")))
-			assert.Equal(t, 1, b.index([]byte("c")))
+			assert.Equal(t, 0, b.index(backend.Key("a")))
+			assert.Equal(t, -1, b.index(backend.Key("b")))
+			assert.Equal(t, 1, b.index(backend.Key("c")))
 		})
 	})
 }
