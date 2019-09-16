@@ -19,6 +19,7 @@ package http
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -164,6 +165,17 @@ func (c *Config) Validate() error {
 
 	if len(c.URLs) != 0 {
 		c.Hosts = append(c.Hosts, c.URLs...)
+	}
+
+	for i := 0; i < len(c.Hosts); i ++ {
+		host := c.Hosts[i]
+		if _, err := url.ParseRequestURI(host); err != nil {
+			if c.TLS != nil && *c.TLS.Enabled == true {
+				c.Hosts[i] = fmt.Sprint("https://", host)
+			} else {
+				c.Hosts[i] = fmt.Sprint("http://", host)
+			}
+		}
 	}
 
 	return nil

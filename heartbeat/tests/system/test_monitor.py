@@ -18,7 +18,7 @@ class Test(BaseTest):
         server = self.start_server("hello world", status_code)
 
         self.render_http_config(
-            ["http://localhost:{}".format(server.server_port)])
+            ["localhost:{}".format(server.server_port)])
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("heartbeat is running"))
@@ -74,7 +74,7 @@ class Test(BaseTest):
             self.render_config_template(
                 monitors=[{
                     "type": "http",
-                    "urls": ["http://localhost:{}".format(server.server_port)],
+                    "hosts": ["http://localhost:{}".format(server.server_port)],
                     "check_response_json": [{
                         "description": "foo equals bar",
                         "condition": {
@@ -111,7 +111,7 @@ class Test(BaseTest):
             self.render_config_template(
                 monitors=[{
                     "type": "http",
-                    "urls": ["http://localhost:{}".format(server.server_port)],
+                    "hosts": ["http://localhost:{}".format(server.server_port)],
                     "check_response_json": [{
                         "description": body,
                         "condition": {
@@ -176,6 +176,6 @@ class Test(BaseTest):
         self.render_config_template(
             monitors=[{
                 "type": "http",
-                "urls": urls,
+                "hosts": urls,
             }]
         )
