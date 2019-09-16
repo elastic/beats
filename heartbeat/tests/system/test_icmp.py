@@ -52,7 +52,7 @@ class Test(BaseTest):
             else:
                 return (True)
         else:
-            sys.stderr.write("SUDO_USER: %s\n" % os.geteuid)
+            sys.stderr.write("SUDO_USER: %s\n" % os.geteuid())
             if 'SUDO_USER' in os.environ and os.geteuid() == 0:
                 return (True)
             else:
