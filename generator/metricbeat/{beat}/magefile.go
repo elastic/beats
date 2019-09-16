@@ -73,7 +73,11 @@ func Fields() error {
 }
 
 // Config generates both the short/reference/docker configs.
-func Config() error {
+func Config() {
+	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
+}
+
+func configYML() error {
 	customDeps := devtools.ConfigFileParams{
 		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
 		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
