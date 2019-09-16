@@ -112,6 +112,7 @@ var defaultConfig = Config{
 	},
 }
 
+// Validate validates of the responseConfig object is valid or not
 func (r *responseConfig) Validate() error {
 	switch strings.ToLower(r.IncludeBody) {
 	case "always", "on_error", "never":
@@ -126,6 +127,7 @@ func (r *responseConfig) Validate() error {
 	return nil
 }
 
+// Validate validates of the requestParameters object is valid or not
 func (r *requestParameters) Validate() error {
 	switch strings.ToUpper(r.Method) {
 	case "HEAD", "GET", "POST":
@@ -136,6 +138,7 @@ func (r *requestParameters) Validate() error {
 	return nil
 }
 
+// Validate validates of the compressionConfig object is valid or not
 func (c *compressionConfig) Validate() error {
 	t := strings.ToLower(c.Type)
 	if t != "" && t != "gzip" {
@@ -153,6 +156,7 @@ func (c *compressionConfig) Validate() error {
 	return nil
 }
 
+// Validate validates of the Config object is valid or not
 func (c *Config) Validate() error {
 	if len(c.Hosts) == 0 && len(c.URLs) == 0 {
 		return fmt.Errorf("hosts is a mandatory parameter")
