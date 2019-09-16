@@ -53,7 +53,7 @@ func NewResourceQuotaMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_resourcequota_created": p.Metric("created.sec"),
-				"kube_resourcequota":         p.Metric("resourcequota"),
+				"kube_resourcequota":         p.Metric("quota"),
 			},
 			Labels: map[string]p.LabelMap{
 				"namespace":     p.KeyLabel(mb.ModuleDataKey + ".namespace"),
@@ -68,8 +68,6 @@ func NewResourceQuotaMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
-//
-// Copied from other kube state metrics.
 func (m *ResourceQuotaMetricSet) Fetch(reporter mb.ReporterV2) {
 	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
 	if err != nil {

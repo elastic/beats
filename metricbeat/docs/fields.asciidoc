@@ -17288,7 +17288,7 @@ type: double
 
 --
 
-*`kubernetes.resourcequota.resourcequota`*::
+*`kubernetes.resourcequota.quota`*::
 +
 --
 Quota informed (hard or used) for the resource
