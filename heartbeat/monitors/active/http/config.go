@@ -167,14 +167,24 @@ func (c *Config) Validate() error {
 		c.Hosts = append(c.Hosts, c.URLs...)
 	}
 
-	for i := 0; i < len(c.Hosts); i ++ {
+	// updateScheme looks at TLS config to decide if http or https should be used to update the host
+	updateScheme := func(host string) string {
+		if c.TLS != nil && *c.TLS.Enabled == true {
+			return fmt.Sprint("https://", host)
+		}
+		return fmt.Sprint("http://", host)
+	}
+
+	// Check if the URL is not parseable. If yes, then append scheme.
+	// If the url is valid but host or scheme is empty which can occur when someone configures host:port
+	// then update the scheme there as well.
+	for i := 0; i < len(c.Hosts); i++ {
 		host := c.Hosts[i]
-		if _, err := url.ParseRequestURI(host); err != nil {
-			if c.TLS != nil && *c.TLS.Enabled == true {
-				c.Hosts[i] = fmt.Sprint("https://", host)
-			} else {
-				c.Hosts[i] = fmt.Sprint("http://", host)
-			}
+		u, err := url.ParseRequestURI(host)
+		if err != nil {
+			c.Hosts[i] = updateScheme(host)
+		} else if u.Scheme == "" || u.Host == "" {
+			c.Hosts[i] = updateScheme(host)
 		}
 	}
 

@@ -47,16 +47,21 @@ import (
 	"github.com/elastic/go-lookslike/validator"
 )
 
-func testRequest(t *testing.T, testURL string) *beat.Event {
-	return testTLSRequest(t, testURL, nil)
+func testRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
+	return testTLSRequest(t, testURL, useUrls, nil)
 }
 
 // testTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) *beat.Event {
+func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
-		"hosts":   testURL,
 		"timeout": "1s",
+	}
+
+	if useUrls {
+		configSrc["urls"] = testURL
+	} else {
+		configSrc["hosts"] = testURL
 	}
 
 	if extraConfig != nil {
@@ -82,10 +87,10 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	return event
 }
 
-func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, *beat.Event) {
+func checkServer(t *testing.T, handlerFunc http.HandlerFunc, useUrls bool) (*httptest.Server, *beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
-	event := testRequest(t, server.URL)
+	event := testRequest(t, server.URL, useUrls)
 
 	return server, event
 }
@@ -217,7 +222,27 @@ func TestUpStatuses(t *testing.T) {
 	for _, status := range upStatuses {
 		status := status
 		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status), false)
+
+			testslike.Test(
+				t,
+				lookslike.Strict(lookslike.Compose(
+					hbtest.BaseChecks("127.0.0.1", "up", "http"),
+					hbtest.RespondingTCPChecks(),
+					hbtest.SummaryChecks(1, 0),
+					respondingHTTPChecks(server.URL, status),
+				)),
+				event.Fields,
+			)
+		})
+	}
+}
+
+func TestUpStatusesWithUrlsConfig(t *testing.T) {
+	for _, status := range upStatuses {
+		status := status
+		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status), true)
 
 			testslike.Test(
 				t,
@@ -237,7 +262,7 @@ func TestDownStatuses(t *testing.T) {
 	for _, status := range downStatuses {
 		status := status
 		t.Run(fmt.Sprintf("test down status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
+			server, event := checkServer(t, hbtest.HelloWorldHandler(status), false)
 
 			testslike.Test(
 				t,
@@ -312,7 +337,7 @@ func runHTTPSServerCheck(
 	// we give it a few attempts to see if the server can come up before we run the real assertions.
 	var event *beat.Event
 	for i := 0; i < 10; i++ {
-		event = testTLSRequest(t, server.URL, mergedExtraConfig)
+		event = testTLSRequest(t, server.URL, false, mergedExtraConfig)
 		if v, err := event.GetValue("monitor.status"); err == nil && reflect.DeepEqual(v, "up") {
 			break
 		}
@@ -383,7 +408,7 @@ func TestConnRefusedJob(t *testing.T) {
 
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url)
+	event := testRequest(t, url, false)
 
 	testslike.Test(
 		t,
@@ -405,7 +430,7 @@ func TestUnreachableJob(t *testing.T) {
 	port := uint16(1234)
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url)
+	event := testRequest(t, url, false)
 
 	testslike.Test(
 		t,

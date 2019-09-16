@@ -37,6 +37,36 @@ class Test(BaseTest):
             raise SkipTest
         self.assert_fields_are_documented(output[0])
 
+    @parameterized.expand([
+        "200", "404"
+    ])
+    def test_http_with_hosts_config(self, status_code):
+        """
+        Test http server
+        """
+        status_code = int(status_code)
+        server = self.start_server("hello world", status_code)
+
+        self.render_http_config_with_hosts(
+            ["localhost:{}".format(server.server_port)])
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
+
+        self.wait_until(
+            lambda: self.output_has(lines=1))
+
+        proc.check_kill_and_wait()
+
+        server.shutdown()
+        output = self.read_output()
+        assert status_code == output[0]["http.response.status_code"]
+
+        if os.name == "nt":
+            # Currently skipped on Windows as fields.yml not generated
+            raise SkipTest
+        self.assert_fields_are_documented(output[0])
+
     def test_http_delayed(self):
         """
         Ensure that the HTTP monitor consumes the whole body.
@@ -74,7 +104,7 @@ class Test(BaseTest):
             self.render_config_template(
                 monitors=[{
                     "type": "http",
-                    "hosts": ["http://localhost:{}".format(server.server_port)],
+                    "urls": ["http://localhost:{}".format(server.server_port)],
                     "check_response_json": [{
                         "description": "foo equals bar",
                         "condition": {
@@ -111,7 +141,7 @@ class Test(BaseTest):
             self.render_config_template(
                 monitors=[{
                     "type": "http",
-                    "hosts": ["http://localhost:{}".format(server.server_port)],
+                    "urls": ["http://localhost:{}".format(server.server_port)],
                     "check_response_json": [{
                         "description": body,
                         "condition": {
@@ -173,6 +203,14 @@ class Test(BaseTest):
             server.shutdown()
 
     def render_http_config(self, urls):
+        self.render_config_template(
+            monitors=[{
+                "type": "http",
+                "urls": urls,
+            }]
+        )
+
+    def render_http_config_with_hosts(self, urls):
         self.render_config_template(
             monitors=[{
                 "type": "http",
