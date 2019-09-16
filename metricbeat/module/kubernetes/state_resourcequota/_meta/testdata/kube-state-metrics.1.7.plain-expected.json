@@ -1,0 +1,578 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "requests.cpu",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "services",
+                "resourcequota": 1,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "created": {
+                    "sec": 1568629266
+                },
+                "name": "objects"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "replicationcontrollers",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "services.loadbalancers",
+                "resourcequota": 1,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "created": {
+                    "sec": 1568629266
+                },
+                "name": "resources"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "limits.cpu",
+                "resourcequota": 2,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "configmaps",
+                "resourcequota": 1,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "requests.memory",
+                "resourcequota": 1073741824,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "requests.memory",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "limits.memory",
+                "resourcequota": 2147483648,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "pods",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "services",
+                "resourcequota": 2,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "limits.memory",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "persistentvolumeclaims",
+                "resourcequota": 0,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "replicationcontrollers",
+                "resourcequota": 1,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "persistentvolumeclaims",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "requests.cpu",
+                "resourcequota": 1,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "secrets",
+                "resourcequota": 1,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "pods",
+                "resourcequota": 3,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "services.loadbalancers",
+                "resourcequota": 1,
+                "type": "hard"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "secrets",
+                "resourcequota": 1,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "objects",
+                "resource": "configmaps",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.resourcequota",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "rqtest",
+            "resourcequota": {
+                "name": "resources",
+                "resource": "limits.cpu",
+                "resourcequota": 0,
+                "type": "used"
+            }
+        },
+        "metricset": {
+            "name": "state_resourcequota",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]
