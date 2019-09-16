@@ -1,0 +1,530 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "requests.memory",
+			"resourcequota": 1073741824,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "configmaps",
+			"resourcequota": 1,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "replicationcontrollers",
+			"resourcequota": 1,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "secrets",
+			"resourcequota": 1,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "requests.cpu",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "configmaps",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "limits.memory",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "secrets",
+			"resourcequota": 1,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "requests.memory",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "services",
+			"resourcequota": 2,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "limits.cpu",
+			"resourcequota": 2,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1568629266
+			},
+			"name": "resources"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "pods",
+			"resourcequota": 3,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "services.loadbalancers",
+			"resourcequota": 1,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "persistentvolumeclaims",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "limits.memory",
+			"resourcequota": 2147483648,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "requests.cpu",
+			"resourcequota": 1,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "replicationcontrollers",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1568629266
+			},
+			"name": "objects"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "resources",
+			"resource": "limits.cpu",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "persistentvolumeclaims",
+			"resourcequota": 0,
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "services.loadbalancers",
+			"resourcequota": 1,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "pods",
+			"resourcequota": 0,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "rqtest"
+		},
+		"MetricSetFields": {
+			"name": "objects",
+			"resource": "services",
+			"resourcequota": 1,
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]
