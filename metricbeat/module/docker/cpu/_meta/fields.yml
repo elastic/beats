@@ -9,6 +9,11 @@
       format: percent
       description: >
         Percentage of time in kernel space.
+    - name: kernel.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in kernel space normalized by the number of CPU cores.
     - name: kernel.ticks
       type: long
       description: >
@@ -18,6 +23,11 @@
       format: percent
       description: >
         Percentage of total CPU time in the system.
+    - name: system.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of total CPU time in the system normalized by the number of CPU cores.
     - name: system.ticks
       type: long
       description: >
@@ -27,6 +37,11 @@
       format: percent
       description: >
         Percentage of time in user space.
+    - name: user.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Percentage of time in user space normalized by the number of CPU cores.
     - name: user.ticks
       type: long
       description: >
@@ -36,6 +51,11 @@
       format: percent
       description: >
         Total CPU usage.
+    - name: total.normal.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Total CPU usage normalized by the number of CPU cores.
     - name: core.*.pct
       type: object
       object_type: scaled_float

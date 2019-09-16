@@ -33,18 +33,30 @@ func eventMapping(r mb.ReporterV2, stats *CPUStats) {
 		"core": stats.PerCpuUsage,
 		"total": common.MapStr{
 			"pct": stats.TotalUsage,
+			"norm": common.MapStr{
+				"pct": stats.TotalUsageNormalized,
+			},
 		},
 		"kernel": common.MapStr{
 			"ticks": stats.UsageInKernelmode,
 			"pct":   stats.UsageInKernelmodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInKernelmodePercentageNormalized,
+			},
 		},
 		"user": common.MapStr{
 			"ticks": stats.UsageInUsermode,
 			"pct":   stats.UsageInUsermodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInUsermodePercentageNormalized,
+			},
 		},
 		"system": common.MapStr{
 			"ticks": stats.SystemUsage,
 			"pct":   stats.SystemUsagePercentage,
+			"norm": common.MapStr{
+				"pct": stats.SystemUsagePercentageNormalized,
+			},
 		},
 	}
 
