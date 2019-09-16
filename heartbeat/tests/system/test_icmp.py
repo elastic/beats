@@ -99,7 +99,7 @@ class Test(BaseTest):
                 proc = self.start_beat()
                 time.sleep(25)
                 sys.stderr.write("RAN IT\n")
-                #assert self.log_contains(
+                # assert self.log_contains(
                 #    "You dont have root permission to run ping") is True
         else:
             sys.stderr.write("ON WINDOWS %s\n")
