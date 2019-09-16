@@ -17273,6 +17273,58 @@ type: long
 --
 
 [float]
+=== resourcequota
+
+kubernetes resourcequota metrics
+
+
+
+*`kubernetes.resourcequota.created.sec`*::
++
+--
+Epoch seconds since the ResourceQuota was created
+
+type: double
+
+--
+
+*`kubernetes.resourcequota.resourcequota`*::
++
+--
+Quota informed (hard or used) for the resource
+
+type: double
+
+--
+
+*`kubernetes.resourcequota.name`*::
++
+--
+ResourceQuota name
+
+type: keyword
+
+--
+
+*`kubernetes.resourcequota.type`*::
++
+--
+Quota information type, `hard` or `used`
+
+type: keyword
+
+--
+
+*`kubernetes.resourcequota.resource`*::
++
+--
+Resource name the quota applies to
+
+type: keyword
+
+--
+
+[float]
 === statefulset
 
 kubernetes stateful set metrics
