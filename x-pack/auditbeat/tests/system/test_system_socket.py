@@ -79,16 +79,32 @@ class Test(AuditbeatXPackTest):
         """
         self.with_runner(MultiUDP4TestCase())
 
-    def with_runner(self, test):
+    def test_udp_ipv6_disabled(self):
+        """
+        test IPv4/UDP with IPv6 disabled
+        """
+        self.with_runner(MultiUDP4TestCase(),
+                         extra_conf={'socket.enable_ipv6': False})
+
+    def test_tcp_ipv6_disabled(self):
+        """
+        test IPv4/TCP with IPv6 disabled
+        """
+        self.with_runner(TCP4TestCase(),
+                         extra_conf={'socket.enable_ipv6': False})
+
+    def with_runner(self, test, extra_conf=dict()):
         enable_ipv6_loopback()
+        conf = {
+            "socket.flow_inactive_timeout": "2s",
+            "socket.flow_termination_timeout": "5s",
+            "socket.development_mode": "true",
+        }
+        conf.update(extra_conf)
         self.render_config_template(modules=[{
             "name": "system",
             "datasets": ["socket"],
-            "extras": {
-                "socket.flow_inactive_timeout": "2s",
-                "socket.flow_termination_timeout": "5s",
-                "socket.development_mode": "true",
-            }
+            "extras": conf,
         }])
         proc = self.start_beat()
         try:
