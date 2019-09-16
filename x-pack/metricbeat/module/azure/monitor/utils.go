@@ -5,11 +5,9 @@
 package monitor
 
 import (
-	"reflect"
-	"strings"
-	"time"
-
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"strings"
 )
 
 // filterMetrics will filter out any unsupported metrics based on the namespace selected
@@ -21,7 +19,7 @@ func filterMetrics(selectedRange []string, allRange []insights.MetricDefinition)
 		allMetrics = append(allMetrics, *definition.Name.Value)
 	}
 	for _, name := range selectedRange {
-		if stringInSlice(name, allMetrics) {
+		if azure.StringInSlice(name, allMetrics) {
 			inRange = append(inRange, name)
 		} else {
 			notInRange = append(notInRange, name)
@@ -47,16 +45,6 @@ func filterAggregations(selectedRange []string, metrics []insights.MetricDefinit
 		supported, difference = intersections(supported, selectedRange)
 	}
 	return supported, difference
-}
-
-// stringInSlice is a helper method, will check if string is part of a slice
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
 }
 
 // filter is a helper method, will filter out strings not part of a slice
@@ -96,67 +84,4 @@ func getMetricDefinitionsByNames(metricDefs []insights.MetricDefinition, names [
 		}
 	}
 	return metrics
-}
-
-// metricExists will check if the metric value has been retrieved in the past
-func metricExists(name string, metric insights.MetricValue, metrics []MetricValue) bool {
-	for _, met := range metrics {
-		if name == met.name && metric.TimeStamp.Time == met.timestamp && metric.Average == met.average && metric.Total == met.total && metric.Minimum == met.min && metric.Maximum == met.max && metric.Count == met.count {
-			return true
-		}
-	}
-	return false
-}
-
-// matchMetrics will compare current metrics
-func matchMetrics(prevMet Metric, met Metric) bool {
-	if prevMet.namespace == met.namespace && reflect.DeepEqual(prevMet.names, met.names) && prevMet.resource.ID == met.resource.ID && prevMet.aggregations == met.aggregations && prevMet.timeGrain == met.timeGrain {
-		return true
-	}
-	return false
-}
-
-// metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
-func metricIsEmpty(metric insights.MetricValue) bool {
-	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
-		return true
-	}
-	return false
-}
-
-// expired will check for an expiration time and assign a new one
-func (p *ResourceConfiguration) expired() bool {
-	if p.refreshInterval <= 0 {
-		return true
-	}
-	p.lastUpdate.Lock()
-	defer p.lastUpdate.Unlock()
-	if p.lastUpdate.Add(p.refreshInterval).After(time.Now()) {
-		return false
-	}
-	p.lastUpdate.Time = time.Now()
-	return true
-}
-
-// map resource group from resource ID
-func mapResourceGroupFormID(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "resourceGroups" {
-			return params[i+1]
-		}
-	}
-	return ""
-}
-
-// map resource tags
-func mapTags(azureTags map[string]*string) map[string]string {
-	if len(azureTags) == 0 {
-		return nil
-	}
-	var tags = map[string]string{}
-	for key, value := range azureTags {
-		tags[key] = *value
-	}
-	return tags
 }

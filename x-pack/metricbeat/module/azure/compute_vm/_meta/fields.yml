@@ -1,0 +1,10 @@
+- name: compute_vm
+  type: group
+  release: beta
+  description: >
+    compute_vm
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

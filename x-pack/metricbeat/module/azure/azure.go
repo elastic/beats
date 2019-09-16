@@ -25,8 +25,8 @@ type Config struct {
 
 // ResourceConfig contains resource and metric list specific configuration.
 type ResourceConfig struct {
-	ID      string         `config:"resource_id"`
-	Group   string         `config:"resource_group"`
+	ID      []string       `config:"resource_id"`
+	Group   []string       `config:"resource_group"`
 	Metrics []MetricConfig `config:"metrics"`
 	Type    string         `config:"resource_type"`
 	Query   string         `config:"resource_query"`

@@ -212,9 +212,19 @@ metricbeat.modules:
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
-  metricsets: ["monitor"]
+  metricsets:
+  - monitor
   enabled: true
-  period: 60s
+  period: 120s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+- module: azure
+  metricsets:
+  - compute_vm_scaleset
+  enabled: true
+  period: 120s
   client_id: '${AZURE_CLIENT_ID:""}'
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'

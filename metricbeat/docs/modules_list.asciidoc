@@ -19,7 +19,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>> beta[]  
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-azure-monitor,monitor>> beta[]  
+.3+| .3+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
+|<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
+|<<metricbeat-metricset-azure-monitor,monitor>> beta[]  
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   

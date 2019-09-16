@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package monitor
+package azure
 
 import (
 	"context"
@@ -17,6 +17,7 @@ import (
 type AzureMonitorService struct {
 	metricsClient          *insights.MetricsClient
 	metricDefinitionClient *insights.MetricDefinitionsClient
+	metricNamespaceClient  *insights.MetricNamespacesClient
 	resourceClient         *resources.Client
 	context                context.Context
 }
@@ -33,12 +34,15 @@ func NewAzureService(clientID string, clientSecret string, tenantID string, subs
 	metricsClient := insights.NewMetricsClient(subscriptionID)
 	metricsDefinitionClient := insights.NewMetricDefinitionsClient(subscriptionID)
 	resourceClient := resources.NewClient(subscriptionID)
+	metricNamespaceClient := insights.NewMetricNamespacesClient(subscriptionID)
 	metricsClient.Authorizer = authorizer
 	metricsDefinitionClient.Authorizer = authorizer
 	resourceClient.Authorizer = authorizer
+	metricNamespaceClient.Authorizer = authorizer
 	service := &AzureMonitorService{
 		metricDefinitionClient: &metricsDefinitionClient,
 		metricsClient:          &metricsClient,
+		metricNamespaceClient:  &metricNamespaceClient,
 		resourceClient:         &resourceClient,
 		context:                context.Background(),
 	}
@@ -46,19 +50,37 @@ func NewAzureService(clientID string, clientSecret string, tenantID string, subs
 }
 
 // GetResourceDefinitions will retrieve the azure resources based on the options entered
-func (service AzureMonitorService) GetResourceDefinitions(ID string, group string, rType string, query string) (resources.ListResultPage, error) {
+func (service AzureMonitorService) GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error) {
 	var resourceQuery string
-	if ID != "" {
-		resourceQuery = fmt.Sprintf("resourceID eq '%s'", ID)
-	} else if group != "" {
-		resourceQuery = fmt.Sprintf("resourceGroup eq '%s'", group)
+	if len(ID) > 0 {
+		var filterList []string
+		if len(ID) == 1 {
+			resourceQuery = fmt.Sprintf("resourceID eq '%s'", ID[0])
+		} else {
+			// listing resourceID conditions does not seem to work with the API but querying by name or resource types will work
+			for _, id := range ID {
+				filterList = append(filterList, fmt.Sprintf("(name eq '%s' AND resourceGroup eq '%s')", getResourceNameFormID(id), getResourceGroupFormID(id)))
+			}
+			resourceQuery = strings.Join(filterList, " OR ")
+		}
+	} else if len(group) > 0 {
+		var filterList []string
+		for _, gr := range group {
+			filterList = append(filterList, fmt.Sprintf("resourceGroup eq '%s'", gr))
+		}
+		resourceQuery = strings.Join(filterList, " OR ")
 		if rType != "" {
-			resourceQuery += fmt.Sprintf(" AND resourceType eq '%s'", rType)
+			resourceQuery = fmt.Sprintf("(%s) AND resourceType eq '%s'", resourceQuery, rType)
 		}
 	} else if query != "" {
 		resourceQuery = query
 	}
 	return service.resourceClient.List(service.context, resourceQuery, "true", nil)
+}
+
+// GetMetricNamespaces will return all supported namespaces based on the resource id and namespace
+func (service *AzureMonitorService) GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error) {
+	return service.metricNamespaceClient.List(service.context, resourceID, "")
 }
 
 // GetMetricDefinitions will return all supported metrics based on the resource id and namespace

@@ -7,37 +7,12 @@ package monitor
 import (
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
-
-// MockClient mock for the azure monitor client
-type MockClient struct {
-	mock.Mock
-}
-
-// InitResources is a mock function for the azure client
-func (client *MockClient) InitResources(report mb.ReporterV2) error {
-	args := client.Called(report)
-	return args.Error(0)
-}
-
-// GetMetricValues is a mock function for the azure client
-func (client *MockClient) GetResources() ResourceConfiguration {
-	args := client.Called()
-	return args.Get(0).(ResourceConfiguration)
-}
-
-// GetMetricValues is a mock function for the azure client
-func (client *MockClient) GetMetricValues(report mb.ReporterV2) error {
-	args := client.Called(report)
-	return args.Error(0)
-}
 
 var (
 	missingResourcesConfig = common.MapStr{
@@ -88,12 +63,5 @@ func TestFetch(t *testing.T) {
 	assert.NotNil(t, metricsets)
 	ms, ok := metricsets[0].(*MetricSet)
 	require.True(t, ok, "metricset must be MetricSet")
-
-	mockClient := &MockClient{}
-	mockClient.On("InitResources", mock.Anything).Return(errors.New("invalid resource query"))
-	ms.client = mockClient
-	mr := MockReporterV2{}
-	mr.On("Error", mock.Anything).Return(true)
-	err = ms.Fetch(&mr)
-	assert.Error(t, err, "invalid resource query")
+	assert.NotNil(t, ms)
 }

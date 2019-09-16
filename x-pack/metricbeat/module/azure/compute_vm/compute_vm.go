@@ -1,15 +1,10 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
-
-package monitor
+package compute_vm
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -17,7 +12,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("azure", "monitor", New, mb.DefaultMetricSet())
+	mb.Registry.MustAddMetricSet("azure", "compute_vm", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -32,18 +27,19 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The azure monitor metricset is beta.")
+	cfgwarn.Beta("The azure compute_vm metricset is beta.")
+
 	var config azure.Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 	if len(config.Resources) == 0 {
-		return nil, errors.New("no resource options defined: module azure - monitor metricset")
+		return nil, errors.New("no resource options defined: module azure - compute_vm metricset")
 	}
 	monitorClient, err := azure.NewClient(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error initializing the monitor client: module azure - monitor metricset")
+		return nil, errors.Wrap(err, "error initializing the monitor client: module azure - compute_vm metricset")
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -59,10 +55,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
+	// retrieve metrics
 	err = m.client.GetMetricValues(report)
 
 	if err == nil && len(m.client.Resources.Metrics) > 0 {
 		azure.EventsMapping(report, m.client.Resources.Metrics)
 	}
+
 	return nil
 }

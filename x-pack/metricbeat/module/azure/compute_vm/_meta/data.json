@@ -1,0 +1,19 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"azure",
+        "name":"compute_vm",
+        "rtt":44269
+    },
+    "azure":{
+        "compute_vm":{
+            "example": "compute_vm"
+        }
+    },
+    "type":"metricsets"
+}

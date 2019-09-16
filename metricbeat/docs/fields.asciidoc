@@ -2131,6 +2131,117 @@ azure module
 
 
 [float]
+=== compute_vm
+
+compute_vm
+
+
+
+*`azure.compute_vm.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
+=== compute_vm_scaleset
+
+compute_vm_scaleset
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm_scaleset.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
 === monitor
 
 monitor
