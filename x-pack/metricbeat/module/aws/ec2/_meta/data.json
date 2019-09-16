@@ -4,11 +4,11 @@
         "ec2": {
             "cpu": {
                 "credit_balance": 576,
-                "credit_usage": 0.186525,
+                "credit_usage": 0.221052,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 2.0000740946562456
+                    "pct": 2.2489071038250743
                 }
             },
             "diskio": {
@@ -51,16 +51,16 @@
             },
             "network": {
                 "in": {
-                    "bytes": 1368258.2,
-                    "bytes_per_sec": 4560.8606666666665,
-                    "packets": 2904.6,
-                    "packets_per_sec": 9.682
+                    "bytes": 1536716.6,
+                    "bytes_per_sec": 5122.388666666667,
+                    "packets": 3246,
+                    "packets_per_sec": 10.82
                 },
                 "out": {
-                    "bytes": 425826.8,
-                    "bytes_per_sec": 1419.4226666666666,
-                    "packets": 2910,
-                    "packets_per_sec": 9.7
+                    "bytes": 473658.4,
+                    "bytes_per_sec": 1578.8613333333335,
+                    "packets": 3114.8,
+                    "packets_per_sec": 10.382666666666667
                 }
             },
             "status": {
@@ -75,6 +75,9 @@
         }
     },
     "cloud": {
+        "account": {
+            "id": "elastic-test"
+        },
         "availability_zone": "us-east-1b",
         "instance": {
             "id": "i-77f84332"
@@ -91,7 +94,8 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "ec2"
+        "name": "ec2",
+        "period": 10000
     },
     "service": {
         "type": "aws"

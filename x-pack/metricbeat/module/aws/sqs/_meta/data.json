@@ -2,17 +2,17 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "sqs": {
-            "empty_receives": 28,
+            "empty_receives": 0,
             "messages": {
                 "delayed": 0,
                 "deleted": 0,
-                "not_visible": 1,
-                "received": 1,
+                "not_visible": 0,
+                "received": 0,
                 "sent": 0,
                 "visible": 0
             },
             "oldest_message_age": {
-                "sec": 676
+                "sec": 0
             },
             "queue": {
                 "name": "test-s3-notification"
@@ -21,6 +21,9 @@
         }
     },
     "cloud": {
+        "account": {
+            "id": "elastic-test"
+        },
         "provider": "aws",
         "region": "ap-southeast-1"
     },
@@ -30,7 +33,8 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "sqs"
+        "name": "sqs",
+        "period": 10000
     },
     "service": {
         "type": "aws"

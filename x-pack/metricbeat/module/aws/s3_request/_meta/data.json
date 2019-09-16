@@ -3,34 +3,32 @@
     "aws": {
         "s3": {
             "bucket": {
-                "name": "test-s3-ks-2"
+                "name": "test-s3-ks"
             }
         },
         "s3_request": {
             "downloaded": {
-                "bytes": 22307
+                "bytes": 530
             },
             "errors": {
                 "4xx": 0,
                 "5xx": 0
             },
             "latency": {
-                "first_byte.ms": 851,
-                "total_request.ms": 1146
+                "first_byte.ms": 3,
+                "total_request.ms": 3
             },
             "requests": {
-                "get": 2,
-                "head": 1,
                 "list": 2,
-                "put": 3,
-                "total": 8
+                "total": 2
             },
-            "uploaded": {
-                "bytes": 5557
-            }
+            "uploaded": {}
         }
     },
     "cloud": {
+        "account": {
+            "id": "elastic-test"
+        },
         "provider": "aws",
         "region": "ap-southeast-1"
     },
