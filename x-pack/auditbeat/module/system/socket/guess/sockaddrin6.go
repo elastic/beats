@@ -67,6 +67,11 @@ func (g *guessSockaddrIn6) Requires() []string {
 	}
 }
 
+// Condition allows this probe to run only when IPv6 is enabled.
+func (g *guessSockaddrIn6) Condition(ctx Context) (bool, error) {
+	return isIPv6Enabled(ctx.Vars)
+}
+
 // Probes returns a probe on tcp_v6_connect, dumping its second argument,
 // a struct sockaddr* (struct sockaddr_in6* for AF_INET6).
 func (g *guessSockaddrIn6) Probes() ([]helper.ProbeDef, error) {
