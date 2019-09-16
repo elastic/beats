@@ -22,6 +22,9 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/hbtestllext"
+	"github.com/elastic/beats/heartbeat/scheduler/schedule"
+
 	"github.com/elastic/go-lookslike/isdef"
 
 	"github.com/elastic/go-lookslike/validator"
@@ -54,7 +57,8 @@ type testDef struct {
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.fields.id, tt.fields.name, tt.fields.typ)
+		schedule, _ := schedule.Parse("@every 1s")
+		wrapped := WrapCommon(tt.jobs, tt.fields.id, tt.fields.name, tt.fields.typ, schedule)
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
@@ -93,6 +97,7 @@ func TestSimpleJob(t *testing.T) {
 						"check_group": isdef.IsString,
 					},
 				}),
+				hbtestllext.MonitorNextRunValidator,
 				summaryValidator(1, 0),
 			)},
 		nil,
@@ -127,6 +132,7 @@ func TestErrorJob(t *testing.T) {
 		[]validator.Validator{
 			lookslike.Compose(
 				errorJobValidator,
+				hbtestllext.MonitorNextRunValidator,
 				summaryValidator(0, 1),
 			)},
 		nil,
@@ -151,6 +157,7 @@ func TestMultiJobNoConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo("check_group"),
 				},
 			}),
+			hbtestllext.MonitorNextRunValidator,
 			summaryValidator(1, 0),
 		)
 	}
@@ -199,6 +206,7 @@ func TestMultiJobConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
+			hbtestllext.MonitorNextRunValidator,
 		)
 	}
 
@@ -258,6 +266,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
+			hbtestllext.MonitorNextRunValidator,
 		)
 	}
 

@@ -31,6 +31,8 @@ import (
 	"testing"
 	"time"
 
+	schedule "github.com/elastic/beats/heartbeat/scheduler/schedule"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
@@ -71,7 +73,8 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "tls", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "tls", "", "http", sched)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -271,7 +274,8 @@ func TestLargeResponse(t *testing.T) {
 	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
