@@ -26,7 +26,8 @@
     - name: query_name
       example: "pdo_stmt_00000001"
       description: >
-        Name given to a query when using extended query protocol
+        Name given to a query when using extended query protocol if it is present in
+        the logs and is not "<unnanmed>"
 
     - name: error.code
       type: long
