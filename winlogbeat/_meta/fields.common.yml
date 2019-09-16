@@ -69,6 +69,123 @@
             `param2`, and so on, because event log parameters are unnamed in
             earlier versions of Windows.
 
+        - name: event_data
+          type: group
+          description: >
+            This is a non-exhaustive list of parameters that are used in
+            Windows events. By having these fields defined in the template they
+            can be used in dashboards and machine-learning jobs.
+          fields:
+            - name: AuthenticationPackageName
+            - name: Binary
+            - name: BitlockerUserInputTime
+            - name: BootMode
+            - name: BootType
+            - name: BuildVersion
+            - name: Company
+            - name: CorruptionActionState
+            - name: CreationUtcTime
+            - name: Description
+            - name: Detail
+            - name: DeviceName
+            - name: DeviceNameLength
+            - name: DeviceTime
+            - name: DeviceVersionMajor
+            - name: DeviceVersionMinor
+            - name: DriveName
+            - name: DriverName
+            - name: DriverNameLength
+            - name: DwordVal
+            - name: EntryCount
+            - name: ExtraInfo
+            - name: FailureName
+            - name: FailureNameLength
+            - name: FileVersion
+            - name: FinalStatus
+            - name: Group
+            - name: IdleImplementation
+            - name: IdleStateCount
+            - name: ImpersonationLevel
+            - name: IntegrityLevel
+            - name: IpAddress
+            - name: IpPort
+            - name: KeyLength
+            - name: LastBootGood
+            - name: LastShutdownGood
+            - name: LmPackageName
+            - name: LogonGuid
+            - name: LogonId
+            - name: LogonProcessName
+            - name: LogonType
+            - name: MajorVersion
+            - name: MaximumPerformancePercent
+            - name: MinimumPerformancePercent
+            - name: MinimumThrottlePercent
+            - name: MinorVersion
+            - name: NewProcessId
+            - name: NewProcessName
+            - name: NewSchemeGuid
+            - name: NewTime
+            - name: NominalFrequency
+            - name: Number
+            - name: OldSchemeGuid
+            - name: OldTime
+            - name: OriginalFileName
+            - name: Path
+            - name: PerformanceImplementation
+            - name: PreviousCreationUtcTime
+            - name: PreviousTime
+            - name: PrivilegeList
+            - name: ProcessId
+            - name: ProcessName
+            - name: ProcessPath
+            - name: ProcessPid
+            - name: Product
+            - name: PuaCount
+            - name: PuaPolicyId
+            - name: QfeVersion
+            - name: Reason
+            - name: SchemaVersion
+            - name: ScriptBlockText
+            - name: ServiceName
+            - name: ServiceVersion
+            - name: ShutdownActionType
+            - name: ShutdownEventCode
+            - name: ShutdownReason
+            - name: Signature
+            - name: SignatureStatus
+            - name: Signed
+            - name: StartTime
+            - name: State
+            - name: Status
+            - name: StopTime
+            - name: SubjectDomainName
+            - name: SubjectLogonId
+            - name: SubjectUserName
+            - name: SubjectUserSid
+            - name: TSId
+            - name: TargetDomainName
+            - name: TargetInfo
+            - name: TargetLogonGuid
+            - name: TargetLogonId
+            - name: TargetServerName
+            - name: TargetUserName
+            - name: TargetUserSid
+            - name: TerminalSessionId
+            - name: TokenElevationType
+            - name: TransmittedServices
+            - name: UserSid
+            - name: Version
+            - name: Workstation
+            - name: param1
+            - name: param2
+            - name: param3
+            - name: param4
+            - name: param5
+            - name: param6
+            - name: param7
+            - name: param8
+
         - name: event_id
           type: keyword
           required: true
