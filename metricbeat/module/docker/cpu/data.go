@@ -30,7 +30,7 @@ func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
 
 func eventMapping(r mb.ReporterV2, stats *CPUStats) {
 	fields := common.MapStr{
-		"core": stats.PerCpuUsage,
+		"core": stats.PerCPUUsage,
 		"total": common.MapStr{
 			"pct": stats.TotalUsage,
 			"norm": common.MapStr{

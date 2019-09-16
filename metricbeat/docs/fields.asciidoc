@@ -4974,7 +4974,7 @@ format: percent
 
 --
 
-*`docker.cpu.total.normal.pct`*::
+*`docker.cpu.total.norm.pct`*::
 +
 --
 Total CPU usage normalized by the number of CPU cores.

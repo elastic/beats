@@ -28,7 +28,7 @@ import (
 type CPUStats struct {
 	Time                                  common.Time
 	Container                             *docker.Container
-	PerCpuUsage                           common.MapStr
+	PerCPUUsage                           common.MapStr
 	TotalUsage                            float64
 	TotalUsageNormalized                  float64
 	UsageInKernelmode                     uint64
@@ -81,7 +81,7 @@ func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 	}
 
 	if c.Cores {
-		stats.PerCpuUsage = usage.PerCPU()
+		stats.PerCPUUsage = usage.PerCPU()
 	}
 
 	return stats

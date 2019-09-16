@@ -51,7 +51,7 @@
       format: percent
       description: >
         Total CPU usage.
-    - name: total.normal.pct
+    - name: total.norm.pct
       type: scaled_float
       format: percent
       description: >

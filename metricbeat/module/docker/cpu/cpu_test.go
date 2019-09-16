@@ -80,7 +80,7 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 			s.(common.MapStr).Delete("ticks")
 		}
 		if !equalEvent(tt.expected, out) {
-			t.Errorf("PerCpuUsage(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.PercpuUsage, out, tt.expected)
+			t.Errorf("PerCPUUsage(%v) => %v, want %v", tt.given.CPUStats.CPUUsage.PercpuUsage, out, tt.expected)
 		}
 	}
 }
