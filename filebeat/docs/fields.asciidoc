@@ -13965,7 +13965,7 @@ example: parse
 *`postgresql.log.query_name`*::
 +
 --
-Name given to a query when using extended query protocol if it is present in the logs and is not "<unnanmed>"
+Name given to a query when using extended query protocol. If it is "<unnamed>", or not present, this field is ignored.
 
 
 example: pdo_stmt_00000001
