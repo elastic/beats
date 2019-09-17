@@ -15,19 +15,41 @@ import (
 
 // EventsMapping will map metric values to beats events
 func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
+	groupByResourceNamespace := make(map[string][]Metric)
 	for _, metric := range metrics {
-		// check if any valid values are returned
 		if len(metric.Values) == 0 {
 			continue
 		}
-		// group events by timestamp (api will return multiple timestamps)
+		key := fmt.Sprintf("%s,%s", metric.Resource.ID, metric.Namespace)
+		groupByResourceNamespace[key] = append(groupByResourceNamespace[key], metric)
+	}
+	groupByDimensions := make(map[string][]Metric)
+	for key, resourceMetrics := range groupByResourceNamespace {
+
+		for _, resourceMetric := range resourceMetrics {
+			if len(resourceMetric.Dimensions) == 0 {
+				groupByDimensions[key+"none"] = append(groupByDimensions[key+"none"], resourceMetric)
+			} else {
+				var dimKey string
+				for _, dim := range resourceMetric.Dimensions {
+					dimKey += dim.Name + dim.Value
+				}
+				groupByDimensions[key+dimKey] = append(groupByDimensions[key+dimKey], resourceMetric)
+			}
+
+		}
+	}
+
+	for _, grouped := range groupByDimensions {
 		groupByTimeMetrics := make(map[time.Time][]MetricValue)
-		for _, m := range metric.Values {
-			groupByTimeMetrics[m.timestamp] = append(groupByTimeMetrics[m.timestamp], m)
+		for _, metric := range grouped {
+			for _, m := range metric.Values {
+				groupByTimeMetrics[m.timestamp] = append(groupByTimeMetrics[m.timestamp], m)
+			}
 		}
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
 			// group events by dimension values
-			exists, validDimensions := returnAllDimensions(metric.Dimensions)
+			exists, validDimensions := returnAllDimensions(grouped[0].Dimensions)
 			if exists {
 				for _, selectedDimension := range validDimensions {
 					groupByDimensions := make(map[string][]MetricValue)
@@ -36,13 +58,14 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
 						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
 					}
 					for _, groupDimValues := range groupByDimensions {
-						report.Event(initEvent(timestamp, metric, groupDimValues))
+						report.Event(initEvent(timestamp, grouped[0], groupDimValues))
 					}
 				}
 			} else {
-				report.Event(initEvent(timestamp, metric, groupTimeValues))
+				report.Event(initEvent(timestamp, grouped[0], groupTimeValues))
 			}
 		}
+
 	}
 
 	return nil
@@ -52,6 +75,7 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
 func managePropertyName(metric string) string {
 	resultMetricName := strings.Replace(metric, " ", "_", -1)
 	resultMetricName = strings.Replace(resultMetricName, "/", "_per_", -1)
+	resultMetricName = strings.Replace(resultMetricName, "\\", "_", -1)
 	resultMetricName = strings.ToLower(resultMetricName)
 	return resultMetricName
 }

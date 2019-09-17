@@ -119,7 +119,7 @@ func mapTags(azureTags map[string]*string) map[string]string {
 	return tags
 }
 
-// stringInSlice is a helper method, will check if string is part of a slice
+// StringInSlice is a helper method, will check if string is part of a slice
 func StringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {

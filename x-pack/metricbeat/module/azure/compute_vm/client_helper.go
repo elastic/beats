@@ -53,10 +53,10 @@ func InitResources(client *azure.Client, report mb.ReporterV2) error {
 				// get all metric definitions supported by the namespace provided
 				metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*res.ID, *namespace.Name)
 				if err != nil {
-					return errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", resource.ID, namespace.Name)
+					return errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", resource.ID, *namespace.Name)
 				}
 				if len(*metricDefinitions.Value) == 0 {
-					return errors.Errorf("no metric definitions were found for resource %s and namespace %s.", resource.ID, namespace.Name)
+					return errors.Errorf("no metric definitions were found for resource %s and namespace %s.", resource.ID, *namespace.Name)
 				}
 				// map azure metric definitions to client metrics
 				metrics = append(metrics, mapMetric(client, res, metricDefinitions, *namespace.Name)...)

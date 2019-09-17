@@ -55,7 +55,7 @@ type ResourceConfiguration struct {
 	}
 }
 
-// expired will check for an expiration time and assign a new one
+// Expired will check for an expiration time and assign a new one
 func (p *ResourceConfiguration) Expired() bool {
 	if p.RefreshInterval <= 0 {
 		return true

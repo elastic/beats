@@ -68,7 +68,7 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 	return nil
 }
 
-// logError is used to reduce the number of lines written when logging errors
+// LogError is used to reduce the number of lines written when logging errors
 func (client *Client) LogError(report mb.ReporterV2, err error) {
 	client.Log.Error(err)
 	report.Error(err)

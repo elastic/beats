@@ -14,6 +14,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 )
 
+// AzureMonitorService service wrapper to the azure sdk for go
 type AzureMonitorService struct {
 	metricsClient          *insights.MetricsClient
 	metricDefinitionClient *insights.MetricDefinitionsClient
