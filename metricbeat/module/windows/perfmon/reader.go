@@ -51,7 +51,6 @@ func NewReader(config Config) (*Reader, error) {
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
-
 	r := &Reader{
 		query:         query,
 		instanceLabel: map[string]string{},

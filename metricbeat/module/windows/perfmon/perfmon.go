@@ -94,6 +94,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if m.reader.executed {
 		err = m.reader.RefreshCounterPaths()
 	}
+	if err != nil {
+		return errors.Wrap(err, "failed retrieving counters")
+	}
 	events, err := m.reader.Read()
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
@@ -105,7 +108,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
-
 	return nil
 }
 
