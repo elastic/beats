@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -22,7 +22,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -44,7 +44,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -66,7 +66,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -88,7 +88,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -110,7 +110,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -132,7 +132,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -154,7 +154,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -176,7 +176,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -198,7 +198,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -220,7 +220,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -242,7 +242,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -264,7 +264,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -286,7 +286,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -308,7 +308,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -330,7 +330,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -352,7 +352,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -374,7 +374,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -396,7 +396,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -418,7 +418,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -440,7 +440,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -462,7 +462,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -484,7 +484,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
@@ -506,7 +506,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": {
 			"namespace": "rqtest"
 		},
