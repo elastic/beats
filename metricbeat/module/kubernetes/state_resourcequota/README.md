@@ -36,12 +36,12 @@ https://github.com/elastic/beats/tree/master/metricbeat/module/kubernetes/_meta/
 
 The manifest are found at this location, not only creates the `ResourceQuota` objects, but also other resources that will fail because of the existence of the quota at the namespace:
 
-https://github.com/elastic/beats/tree/master/metricbeat/module/kubernetes/_meta/test/docs/02_objects/resourceqouta.yaml
+https://github.com/elastic/beats/tree/master/metricbeat/module/kubernetes/_meta/test/docs/02_objects/resourcequota.yaml
 
 It will create
 
 - named `rqtest` namespace, which will be assigned the resource quotas
-- named `resources` resource qouta, which will limit the ammount of CPU and memory that can be assigned to the namespace. (This settings won't be put to test) 
+- named `resources` resource quota, which will limit the ammount of CPU and memory that can be assigned to the namespace. (This settings won't be put to test) 
 - `objects` resource quota, which will limit the quantity of objects that can be created at this namespace:
   - 3 Pods
   - 1 Configmap
