@@ -5,7 +5,6 @@
 package httpjson
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -47,7 +46,7 @@ func (c *config) Validate() error {
 	case "POST":
 		break
 	default:
-		return errors.New(fmt.Sprintf("httpjson input: Invalid http_method, %s - ", c.HTTPMethod))
+		return errors.Errorf("httpjson input: Invalid http_method, %s - ", c.HTTPMethod)
 	}
 	return nil
 }
