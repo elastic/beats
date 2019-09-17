@@ -715,8 +715,8 @@ processors:
         with.dots: nested
       array:
         - do
-	- re
-	- with.field: mi
+        - re
+        - with.field: mi
 ------------------------------------------------------------------------------
 
 Adds these fields to every event:
