@@ -31,7 +31,12 @@ func RunSetup() error {
 		return errors.Wrap(err, "error copying pkg to vendor")
 	}
 
-	return sh.Run("ln", "-sf", filepath.Join(vendorPath, "elastic/beats/metricbeat/scripts/generate_imports_helper.py"))
+	pwd, err := os.Getwd()
+	if err != nil {
+		return errors.Wrap(err, "error gettting current directory")
+	}
+
+	return sh.Run("ln", "-sf", filepath.Join(pwd, vendorPath, "elastic/beats/metricbeat/scripts/generate_imports_helper.py"), filepath.Join(pwd, vendorPath, "elastic/beats/script/generate_imports_helper.py"))
 
 }
 
@@ -94,4 +99,9 @@ func GitAdd() error {
 		return errors.Wrap(err, "error running git add")
 	}
 	return sh.Run("git", "commit", "-q", "-m", "Initial commit, Add generated files")
+}
+
+// Update updates the generated files (aka make update).
+func Update() error {
+	return sh.Run("make", "update")
 }

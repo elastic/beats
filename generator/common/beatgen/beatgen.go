@@ -96,12 +96,13 @@ func Generate() error {
 	mg.Deps(GitInit)
 
 	if cfg["type"] == "metricbeat" {
-		err = sh.Run("make", "create-metricset")
+		err = sh.RunV("make", "create-metricset")
 		if err != nil {
 			return errors.Wrap(err, "error running create-metricset")
 		}
 	}
 
+	mg.Deps(Update)
 	mg.Deps(GitAdd)
 
 	return nil
