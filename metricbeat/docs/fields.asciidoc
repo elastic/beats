@@ -5010,7 +5010,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current reads per second
 
@@ -5062,7 +5062,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current writes per second
 
@@ -5114,7 +5114,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of reads and writes per second
 
@@ -13771,7 +13771,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -13783,7 +13783,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition ID
 
@@ -13898,7 +13898,7 @@ Partition data.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition id.
 
@@ -13971,7 +13971,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 topic error code.
 
@@ -13984,7 +13984,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -13997,7 +13997,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker id
 
@@ -14010,7 +14010,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker address
 
@@ -16850,7 +16850,7 @@ type: float
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU nanocores limit
 
@@ -16863,7 +16863,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU requested nanocores
 
@@ -25858,7 +25858,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Longest output list among current client connections (replaced by max_output_buffer).
 
@@ -25881,7 +25881,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Biggest input buffer among current client connections (replaced by max_input_buffer).
 
@@ -26478,7 +26478,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 The server's current replication offset
 
