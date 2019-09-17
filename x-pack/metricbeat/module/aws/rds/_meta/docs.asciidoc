@@ -16,6 +16,8 @@ rds:DescribeDBInstances
 
 The aws rds metricset comes with a predefined dashboard.
 
+image::./images/metricbeat-aws-rds-overview.png[]
+
 [float]
 === Configuration example
 [source,yaml]
