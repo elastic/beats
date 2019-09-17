@@ -52,8 +52,8 @@ class Test(BaseTest):
             else:
                 return (True)
         else:
-            sys.stderr.write("SUDO_USER: %s\n" % os.geteuid())
-            if 'SUDO_USER' in os.environ and os.geteuid() == 0:
+            sys.stderr.write("EUID: %s\n" % os.geteuid())
+            if os.geteuid() == 0:
                 return (True)
             else:
                 return (False)
@@ -91,7 +91,7 @@ class Test(BaseTest):
                 sys.stderr.write("STARTED BEAT\n")
                 sys.stderr.write("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB\n")
                 time.sleep(25)
-                # self.wait_until(lambda: self.log_contains("heartbeat is running"))
+                self.wait_until(lambda: self.log_contains("heartbeat is running"))
                 sys.stderr.write("CHECK WAIT %s\n")
                 proc.check_kill_and_wait()
             else:
@@ -99,8 +99,8 @@ class Test(BaseTest):
                 proc = self.start_beat()
                 time.sleep(25)
                 sys.stderr.write("RAN IT\n")
-                # assert self.log_contains(
-                #    "You dont have root permission to run ping") is True
+                assert self.log_contains(
+                    "You dont have root permission to run ping") is True
         else:
             sys.stderr.write("ON WINDOWS %s\n")
             # windows seems to allow all users to run sockets
