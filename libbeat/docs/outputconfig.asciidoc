@@ -1378,19 +1378,19 @@ See <<configuration-output-codec>> for more information.
 
 ===== `host_topology`
 
-deprecated[5.0.0]
+deprecated:[5.0.0]
 
 The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
 
 ===== `password_topology`
 
-deprecated[5.0.0]
+deprecated:[5.0.0]
 
 The password to use for authenticating with the Redis topology server. The default is no authentication.
 
 ===== `db_topology`
 
-deprecated[5.0.0]
+deprecated:[5.0.0]
 
 The Redis database number where the topology information is stored. The default is 1.
 
