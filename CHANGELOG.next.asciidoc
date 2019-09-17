@@ -393,6 +393,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
 - Add support for event ID 4672 to the Security module. {pull}12975[12975]
 - Add support for event ID 22 (DNS query) to the Sysmon module. {pull}12960[12960]
+- Add certain winlog.event_data.* fields to the index template. {issue}13700[13700] {pull}13704[13704]
 
 ==== Deprecated
 
