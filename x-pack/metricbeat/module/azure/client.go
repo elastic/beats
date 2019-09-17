@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package azure
 
 import (
@@ -6,9 +10,10 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
@@ -58,7 +63,7 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.Resource.ID, metric.Namespace)
 			client.LogError(report, err)
 		} else {
-			current, err := mapMetricValues(resp, client.Resources.Metrics[i].Values, endTime.Truncate(time.Minute).Add(client.Config.Period * (-1)), endTime.Truncate(time.Minute) )
+			current, err := mapMetricValues(resp, client.Resources.Metrics[i].Values, endTime.Truncate(time.Minute).Add(client.Config.Period*(-1)), endTime.Truncate(time.Minute))
 			if err != nil {
 				client.LogError(report, err)
 			}

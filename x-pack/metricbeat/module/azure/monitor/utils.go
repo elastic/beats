@@ -5,9 +5,11 @@
 package monitor
 
 import (
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 	"strings"
+
+	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+
+	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
 
 // filterMetrics will filter out any unsupported metrics based on the namespace selected

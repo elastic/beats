@@ -13,34 +13,44 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+const noDimension = "none"
+
 // EventsMapping will map metric values to beats events
 func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
+	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
+	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
+
+	// grouping metrics by resource and namespace
 	groupByResourceNamespace := make(map[string][]Metric)
 	for _, metric := range metrics {
+		// check if any values are returned
 		if len(metric.Values) == 0 {
 			continue
 		}
-		key := fmt.Sprintf("%s,%s", metric.Resource.ID, metric.Namespace)
-		groupByResourceNamespace[key] = append(groupByResourceNamespace[key], metric)
+		// build a resource key with unique resource namespace combination
+		resNamkey := fmt.Sprintf("%s,%s", metric.Resource.ID, metric.Namespace)
+		groupByResourceNamespace[resNamkey] = append(groupByResourceNamespace[resNamkey], metric)
 	}
+	// grouping metrics by the dimensions configured
 	groupByDimensions := make(map[string][]Metric)
-	for key, resourceMetrics := range groupByResourceNamespace {
-
+	for resNamKey, resourceMetrics := range groupByResourceNamespace {
 		for _, resourceMetric := range resourceMetrics {
 			if len(resourceMetric.Dimensions) == 0 {
-				groupByDimensions[key+"none"] = append(groupByDimensions[key+"none"], resourceMetric)
+				groupByDimensions[resNamKey+noDimension] = append(groupByDimensions[resNamKey+noDimension], resourceMetric)
 			} else {
 				var dimKey string
 				for _, dim := range resourceMetric.Dimensions {
 					dimKey += dim.Name + dim.Value
 				}
-				groupByDimensions[key+dimKey] = append(groupByDimensions[key+dimKey], resourceMetric)
+				groupByDimensions[resNamKey+dimKey] = append(groupByDimensions[resNamKey+dimKey], resourceMetric)
 			}
 
 		}
 	}
 
+	// grouping metric values by timestamp and creating events (for each metric the REST api can retrieve multiple metric values for same aggregation  but different timeframes)
 	for _, grouped := range groupByDimensions {
+		defaultMetric := grouped[0]
 		groupByTimeMetrics := make(map[time.Time][]MetricValue)
 		for _, metric := range grouped {
 			for _, m := range metric.Values {
@@ -49,7 +59,7 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
 		}
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
 			// group events by dimension values
-			exists, validDimensions := returnAllDimensions(grouped[0].Dimensions)
+			exists, validDimensions := returnAllDimensions(defaultMetric.Dimensions)
 			if exists {
 				for _, selectedDimension := range validDimensions {
 					groupByDimensions := make(map[string][]MetricValue)
@@ -58,11 +68,11 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
 						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
 					}
 					for _, groupDimValues := range groupByDimensions {
-						report.Event(initEvent(timestamp, grouped[0], groupDimValues))
+						report.Event(initEvent(timestamp, defaultMetric, groupDimValues))
 					}
 				}
 			} else {
-				report.Event(initEvent(timestamp, grouped[0], groupTimeValues))
+				report.Event(initEvent(timestamp, defaultMetric, groupTimeValues))
 			}
 		}
 

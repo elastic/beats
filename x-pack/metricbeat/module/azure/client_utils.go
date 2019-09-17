@@ -1,10 +1,15 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package azure
 
 import (
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/pkg/errors"

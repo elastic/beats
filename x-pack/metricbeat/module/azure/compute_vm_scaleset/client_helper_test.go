@@ -6,8 +6,9 @@ package compute_vm_scaleset
 
 import (
 	"errors"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"testing"
+
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 

@@ -11,9 +11,10 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
-	"github.com/pkg/errors"
 )
 
 // InitResources returns the list of resources and maps them.
@@ -45,8 +46,8 @@ func InitResources(client *azure.Client, report mb.ReporterV2) error {
 
 				met, err := mapMetric(client, metric, res)
 				if err != nil {
-					client.LogError(report, err)
-					continue
+					//client.LogError(report, err)
+					return err
 				}
 				metrics = append(metrics, met...)
 			}

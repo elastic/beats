@@ -6,6 +6,7 @@ package compute_vm
 
 import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
@@ -40,7 +41,7 @@ func InitResources(client *azure.Client, report mb.ReporterV2) error {
 	var metrics []azure.Metric
 	for _, resource := range client.Config.Resources {
 		// retrieve azure resources information
-		if len(resource.Group)>0 {
+		if len(resource.Group) > 0 {
 			resource.Type = defaultVMScalesetNamespace
 		}
 		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.ID, resource.Group, resource.Type, resource.Query)
@@ -100,7 +101,7 @@ func mapMetric(client *azure.Client, resource resources.GenericResource, metricD
 
 	// some of the metrics do not support the vmname dimension (or any), we will separate those in a different api call
 	for _, metric := range *metricDefinitions.Value {
-		if (metric.Name.LocalizedValue!=nil && !strings.Contains(*metric.Name.LocalizedValue, "(Deprecated)")) || metric.Name.LocalizedValue== nil {
+		if (metric.Name.LocalizedValue != nil && !strings.Contains(*metric.Name.LocalizedValue, "(Deprecated)")) || metric.Name.LocalizedValue == nil {
 			if (namespace == customVMNamespace && azure.StringInSlice(*metric.Name.Value, memoryMetrics)) || namespace == defaultVMScalesetNamespace {
 				if metric.Dimensions == nil || len(*metric.Dimensions) == 0 {
 					genericMetricNames = append(genericMetricNames, metric)
@@ -124,8 +125,6 @@ func mapMetric(client *azure.Client, resource resources.GenericResource, metricD
 	}
 	return metrics
 }
-
-
 
 // containsDimension will check if the dimension value is found in the list
 func containsDimension(dimension string, dimensions []insights.LocalizableString) bool {
