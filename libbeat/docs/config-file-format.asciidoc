@@ -48,7 +48,7 @@ form is somewhat similar to JSON using `{}` for dictionaries and `[]` for lists:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-person: \{name: "John Doe", age: 34, country: "Canada"}
+person: {name: "John Doe", age: 34, country: "Canada"}
 colors: ["Red", "Green", "Blue"]
 ------------------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ output:
 
 ------------------------------------------------------------------------------
 
-gets collapsed into +output.elasticsearch.index: \'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}\'+. The
+gets collapsed into +output.elasticsearch.index: \'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}'+. The
 full name of a setting is based on all parent structures involved.
 
 Lists create numeric names starting with 0.
@@ -228,7 +228,7 @@ For example the filebeat registry file defaults to:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-filebeat.registry: $\{path.data}/registry
+filebeat.registry: ${path.data}/registry
 ------------------------------------------------------------------------------
 
 With `path.data` being an implicit config setting, that is overridable from
@@ -238,10 +238,10 @@ Example referencing `es.host` in `output.elasticsearch.hosts`:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-es.host: '$\{ES_HOST:localhost}'
+es.host: '${ES_HOST:localhost}'
 
 output.elasticsearch:
-  hosts: ['http://$\{es.host}:9200']
+  hosts: ['http://${es.host}:9200']
 ------------------------------------------------------------------------------
 
 Introducing `es.host`, the host can be overwritten from command line using
