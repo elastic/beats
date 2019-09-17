@@ -9,6 +9,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
