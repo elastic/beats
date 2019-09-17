@@ -63,7 +63,7 @@ a list of configurations.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-co.elastic.logs/raw: "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]"
+co.elastic.logs/raw: "[{"containers\":{"ids\":[\"${data.container.id}"]},\"multiline\":{"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]"
 -------------------------------------------------------------------------------------
 
 [float]
