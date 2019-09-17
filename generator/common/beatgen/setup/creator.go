@@ -1,4 +1,4 @@
-package beatgen
+package setup
 
 import (
 	"fmt"
@@ -12,9 +12,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// genNewBeat generates a new custom beat
+// CfgPrefix specifies the env variable prefix used to configure the beat
+var CfgPrefix = "NEWBEAT"
+
+// GenNewBeat generates a new custom beat
 // We assume our config object is populated and valid here
-func genNewBeat(config map[string]string) error {
+func GenNewBeat(config map[string]string) error {
 	if config["type"] != "beat" && config["type"] != "metricbeat" {
 		return fmt.Errorf("%s is not a valid custom beat type. Valid types are 'beat' and 'metricbeat'", config["type"])
 	}

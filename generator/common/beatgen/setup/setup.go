@@ -1,4 +1,4 @@
-package beatgen
+package setup
 
 import (
 	"fmt"
@@ -53,9 +53,10 @@ func CopyVendor() error {
 	if err != nil {
 		return errors.Wrap(err, "error creating vendor dir")
 	}
-	if _, isDev := os.LookupEnv(cfgPrefix + "_DEV"); isDev {
+	if _, isDev := os.LookupEnv(CfgPrefix + "_DEV"); isDev {
 		//Dev mode. Use CP.
-		fmt.Printf("CopyVendor unning in dev mode.\n")
+		fmt.Printf("CopyVendor running in dev mode, elastic/beats will be copied into the vendor directory with cp\n")
+		vendorPath = filepath.Join(vendorPath, "beats")
 		err = sh.Run("cp", "-R", beatPath, vendorPath)
 		if err != nil {
 			return errors.Wrap(err, "error copying vendor dir")
@@ -84,6 +85,11 @@ func CopyVendor() error {
 	}
 
 	return nil
+
+}
+
+// getRealBeatsRepo gets a non
+func getRealBeatsRepo() {
 
 }
 

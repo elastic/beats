@@ -25,6 +25,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/generator/common/beatgen/setup"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
@@ -73,38 +75,52 @@ var configList = []ConfigItem{
 	},
 }
 
-var cfgPrefix = "NEWBEAT"
-
 // Generate generates a new custom beat
 func Generate() error {
 	cfg, err := getConfig()
 	if err != nil {
 		return err
 	}
-	err = genNewBeat(cfg)
+	err = setup.GenNewBeat(cfg)
 	if err != nil {
 		return err
 	}
 
-	err = os.Chdir(filepath.Join(build.Default.GOPATH, "src", cfg["beat_path"]))
+	absBeatPath := filepath.Join(build.Default.GOPATH, "src", cfg["beat_path"])
+
+	err = os.Chdir(absBeatPath)
 	if err != nil {
 		return err
 	}
 
-	mg.Deps(CopyVendor)
-	mg.Deps(RunSetup)
-	mg.Deps(GitInit)
+	mg.Deps(setup.CopyVendor)
+	mg.Deps(setup.RunSetup)
+	mg.Deps(setup.GitInit)
 
 	if cfg["type"] == "metricbeat" {
+		//This is runV because it'll ask for user input, so we need stdout.
 		err = sh.RunV("make", "create-metricset")
 		if err != nil {
 			return errors.Wrap(err, "error running create-metricset")
 		}
 	}
 
-	mg.Deps(Update)
-	mg.Deps(GitAdd)
+	//mg.Deps(setup.Update)
+	mg.Deps(setup.GitAdd)
 
+	return nil
+}
+
+// VendorUpdate updates the beat vendor directory
+func VendorUpdate() error {
+
+	err := sh.Rm("./vendor/github.com/elastic/beats")
+	if err != nil {
+		return errors.Wrap(err, "error removing vendor dir")
+	}
+
+	devtools.SetElasticBeatsDir(getAbsoluteBeatsPath())
+	mg.Deps(setup.CopyVendor)
 	return nil
 }
 
@@ -129,7 +145,7 @@ func getConfig() (map[string]string, error) {
 }
 
 func getEnvConfig(cfgKey string) (string, bool) {
-	EnvKey := fmt.Sprintf("%s_%s", cfgPrefix, strings.ToUpper(cfgKey))
+	EnvKey := fmt.Sprintf("%s_%s", setup.CfgPrefix, strings.ToUpper(cfgKey))
 
 	envKey := os.Getenv(EnvKey)
 
@@ -153,5 +169,17 @@ func getValFromUser(cfgKey, def string) (string, error) {
 		return def, nil
 	}
 	return strings.TrimSpace(str), nil
+
+}
+
+// getAbsoluteBeatsPath tries to infer the "real" non-vendor beats path
+func getAbsoluteBeatsPath() string {
+
+	beatsImportPath := "github.com/elastic/beats"
+	gopath := os.Getenv("GOPATH")
+	if gopath != "" {
+		return filepath.Join(gopath, "src", beatsImportPath)
+	}
+	return filepath.Join(build.Default.GOPATH, "src", beatsImportPath)
 
 }
