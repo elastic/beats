@@ -43,6 +43,7 @@ const (
 	ftSecondOfMinute
 	ftMillisOfDay
 	ftMillisOfSecond
+	ftTimeZoneOffset
 )
 
 func getIntField(ft fieldType, ctx *ctx, t time.Time) (int, error) {
@@ -125,9 +126,32 @@ func getTextField(ft fieldType, ctx *ctx, t time.Time) (string, error) {
 		return ctx.weekday.String(), nil
 	case ftMonthOfYear:
 		return ctx.month.String(), nil
+	case ftTimeZoneOffset:
+		return tzOffsetString(ctx)
 	default:
 		return "", errors.New("no text field")
 	}
+}
+
+func tzOffsetString(ctx *ctx) (string, error) {
+	buf := make([]byte, 6)
+
+	tzOffsetMinutes := ctx.tzOffset / 60 // convert to minutes
+	if tzOffsetMinutes >= 0 {
+		buf[0] = '+'
+	} else {
+		buf[0] = '-'
+		tzOffsetMinutes = -tzOffsetMinutes
+	}
+
+	tzOffsetHours := tzOffsetMinutes / 60
+	tzOffsetMinutes = tzOffsetMinutes % 60
+	buf[1] = byte(tzOffsetHours/10) + '0'
+	buf[2] = byte(tzOffsetHours%10) + '0'
+	buf[3] = ':'
+	buf[4] = byte(tzOffsetMinutes/10) + '0'
+	buf[5] = byte(tzOffsetMinutes%10) + '0'
+	return string(buf), nil
 }
 
 func getTextFieldShort(ft fieldType, ctx *ctx, t time.Time) (string, error) {

@@ -306,6 +306,8 @@ data:
 
 |`kibana_user` and `apm_user`
 |Use the APM UI
+|`admin`
+|Read and update APM Agent configuration via Kibana
 |====
 endif::apm-server[]
 

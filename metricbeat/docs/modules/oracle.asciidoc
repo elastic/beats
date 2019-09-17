@@ -65,7 +65,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-oracle-performance,performance>>
+
 * <<metricbeat-metricset-oracle-tablespace,tablespace>>
+
+include::oracle/performance.asciidoc[]
 
 include::oracle/tablespace.asciidoc[]
 

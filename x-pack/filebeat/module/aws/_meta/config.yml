@@ -3,7 +3,7 @@
     enabled: true
 
     # AWS SQS queue url
-    #var.queue_url: sqs_queue_url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws

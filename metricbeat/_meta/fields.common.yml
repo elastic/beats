@@ -15,10 +15,10 @@
       description: >
         The name of the metricset that generated the event.
 
-    - name: process.pgid
-      type: long
+    - name: metricset.period
+      type: integer
       description: >
-        Process group id.
+        Current data collection period for this event in milliseconds.
 
     - name: service.address
       description: >
