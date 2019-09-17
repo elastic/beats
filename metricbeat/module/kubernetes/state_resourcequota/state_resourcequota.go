@@ -82,25 +82,6 @@ func (m *ResourceQuotaMetricSet) Fetch(reporter mb.ReporterV2) {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}
-		// var moduleFieldsMapStr common.MapStr
-		// moduleFields, ok := event[mb.ModuleDataKey]
-		// if ok {
-		// 	moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-		// 	if !ok {
-		// 		m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-		// 	}
-		// }
-		// delete(event, mb.ModuleDataKey)
-
-		// if reported := reporter.Event(mb.Event{
-		// 	MetricSetFields: event,
-		// 	ModuleFields:    moduleFieldsMapStr,
-		// 	Namespace:       "kubernetes.resourcequota",
-		// }); !reported {
-		// 	m.Logger().Debug("error trying to emit event")
-		// 	return
-		// }
 	}
-
 	return
 }
