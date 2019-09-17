@@ -26,7 +26,7 @@ class Test(BaseTest):
             sys.stderr.write("RUNNING GROUPS: %s\n" % runningGroups)
             result = subprocess.check_output(
                 ['sysctl', 'net.ipv4.ping_group_range']).strip()
-            sys.stderr.write("GROUP RANGE: ", result)
+            sys.stderr.write("GROUP RANGE: %s\n" % result)
             result = result.split("= ")
             result = result[1].split("\t")
             result = map(int, result)
