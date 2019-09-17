@@ -33,7 +33,6 @@
     - state_container
     - state_cronjob
     - state_resourcequota
-
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
