@@ -47,6 +47,7 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 	for index := range statsList {
 		statsList[index].PreCPUStats.CPUUsage.PercpuUsage = oldPerCpuValuesTest[index]
 		statsList[index].CPUStats.CPUUsage.PercpuUsage = newPerCpuValuesTest[index]
+		statsList[index].CPUStats.OnlineCPUs = 4
 	}
 	testCase := []struct {
 		given    types.StatsJSON

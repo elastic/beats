@@ -100,17 +100,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	indexers := NewIndexers(config.Indexers, metaGen)
-
-	matchers := NewMatchers(config.Matchers)
-
-	if matchers.Empty() {
-		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
-	}
-
 	processor := &kubernetesAnnotator{
-		indexers:            indexers,
-		matchers:            matchers,
 		cache:               newCache(config.CleanupTimeout),
 		kubernetesAvailable: false,
 	}
@@ -128,6 +118,17 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	if !isKubernetesAvailable(client) {
 		return processor, nil
 	}
+
+	processor.indexers = NewIndexers(config.Indexers, metaGen)
+
+	matchers := NewMatchers(config.Matchers)
+
+	if matchers.Empty() {
+		logp.Debug("kubernetes", "%v: could not initialize kubernetes plugin with zero matcher plugins", "add_kubernetes_metadata")
+		return processor, nil
+	}
+
+	processor.matchers = matchers
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
