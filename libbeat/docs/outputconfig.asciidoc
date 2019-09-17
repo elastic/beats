@@ -219,7 +219,7 @@ for more information about the environment variables.
 
 ifndef::apm-server[]
 The index name to write events to when you're using daily indices. The default is
-+"{beatname_lc}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd\}"+ (for example,
++"{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
@@ -227,7 +227,7 @@ endif::apm-server[]
 
 ifdef::apm-server[]
 The index name to write events to. The default is
-+"apm-%\{[{beat_version_key}]\}-{type\}-%\{+yyyy.MM.dd\}"+ (for example,
++"apm-%{[{beat_version_key}]}-{type}-%{+yyyy.MM.dd}"+ (for example,
 +"apm-{version}-transaction-{localdate}"+). See
 <<exploring-es-data,Exploring data in Elasticsearch>> for more information on
 default index configuration.
@@ -262,7 +262,7 @@ to set the index:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "%\{[fields.log_type]\}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd}\" <1>
+  index: "%{[fields.log_type]}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}\" <1>
 ------------------------------------------------------------------------------
 
 <1> We recommend including +{beat_version_key}+ in the name to avoid mapping issues
@@ -283,7 +283,7 @@ to set the index:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "apm-%\{[observer.version]\}-%\{[processor.event]\}-%\{+yyyy.MM.dd}\" <1>
+  index: "apm-%{[observer.version]}-%{[processor.event]}-%{+yyyy.MM.dd}\" <1>
 ------------------------------------------------------------------------------
 
 <1>  `observer` refers to {beatname_uc}. We recommend including
@@ -410,7 +410,7 @@ NOTE: `observer` refers to {beatname_uc}. We recommend including
 {beatname_uc}.
 
 This is the default configuration for {beatname_uc} and results in indices
-named in the following format: +"apm-%\{[{beat_version_key}]\}-{type\}-%\{+yyyy.MM.dd\}"+
+named in the following format: +"apm-%{[{beat_version_key}]}-{type}-%{+yyyy.MM.dd}"+
 For example: +"apm-{version}-transaction-{localdate}"+.
 
 The following example sets the index by taking the name returned by the `index`
@@ -473,7 +473,7 @@ access any event field. For example, this configuration uses a custom field,
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  pipeline: "%\{[fields.log_type]\}_pipeline"
+  pipeline: "%{[fields.log_type]}_pipeline"
 ------------------------------------------------------------------------------
 
 
@@ -491,7 +491,7 @@ access any event field. For example, this configuration uses the field,
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  pipeline: "%\{[processor.event]\}_pipeline"
+  pipeline: "%{[processor.event]}_pipeline"
 ------------------------------------------------------------------------------
 
 
