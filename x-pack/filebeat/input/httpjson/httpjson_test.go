@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/tests/resources"
 )
 
 var (
@@ -38,11 +37,6 @@ func isInDockerIntegTestEnv() bool {
 }
 
 func runTest(t *testing.T, cfg *common.Config, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
-	if !isInDockerIntegTestEnv() {
-		// Don't test goroutines when using our compose.EnsureUp.
-		defer resources.NewGoroutinesChecker().Check(t)
-	}
-
 	// Setup httpbin environment
 	testSetup(t)
 

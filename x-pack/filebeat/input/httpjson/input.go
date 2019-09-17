@@ -149,12 +149,11 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			return errors.New("failed to do http request. Stopping input worker - ")
 		}
 		if msg.StatusCode != http.StatusOK {
-			return errors.New(fmt.Sprintf("return HTTP status is %s - ", msg.Status))
+			return errors.Errorf("return HTTP status is %s - ", msg.Status)
 		}
 		responseData, err := ioutil.ReadAll(msg.Body)
 		defer msg.Body.Close()
 		if err != nil {
-			in.log.Error(err)
 			return err
 		}
 		var m, v interface{}
@@ -219,7 +218,6 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				}
 				req, err = in.createHTTPRequest(ctx, ri)
 				if err != nil {
-					in.log.Error(err)
 					return err
 				}
 				continue
@@ -259,25 +257,6 @@ func (in *httpjsonInput) run() error {
 		Timeout: in.config.HTTPClientTimeout,
 	}
 
-	// if in.config.ServerName == "" {
-	// 	in.log.Info("ServerName is empty, hence TLS will not be used.")
-	// 	client = &http.Client{
-	// 		Timeout:   time.Second * time.Duration(in.config.HTTPClientTimeout),
-	// 		Transport: &http.Transport{DisableKeepAlives: true},
-	// 	}
-	// } else {
-	// 	in.log.Info("ServerName is " + in.config.ServerName + ", and TLS  will be used.")
-	// 	client = &http.Client{
-	// 		Timeout: time.Second * time.Duration(in.config.HTTPClientTimeout),
-	// 		Transport: &http.Transport{
-	// 			TLSClientConfig: &tls.Config{
-	// 				ServerName: in.config.ServerName,
-	// 				// InsecureSkipVerify: true,
-	// 			},
-	// 			DisableKeepAlives: true,
-	// 		},
-	// 	}
-	// }
 	ri := &requestInfo{
 		URL:        in.URL,
 		ContentMap: common.MapStr{},
@@ -292,6 +271,7 @@ func (in *httpjsonInput) run() error {
 	err = in.processHTTPRequest(ctx, client, req, ri)
 	if err == nil && in.Interval > 0 {
 		ticker := time.NewTicker(time.Duration(in.Interval) * time.Second)
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ctx.Done():
@@ -299,6 +279,9 @@ func (in *httpjsonInput) run() error {
 				return nil
 			case <-ticker.C:
 				err = in.processHTTPRequest(ctx, client, req, ri)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
