@@ -141,7 +141,7 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 	return req, nil
 }
 
-// Process HTTP request, recursively handle pagination if enable
+// processHTTPRequest processes HTTP request, and handles pagination if enabled
 func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
 	for {
 		msg, err := client.Do(req)
