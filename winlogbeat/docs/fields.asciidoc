@@ -4800,546 +4800,764 @@ This is a non-exhaustive list of parameters that are used in Windows events. By 
 *`winlog.event_data.AuthenticationPackageName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Binary`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.BitlockerUserInputTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.BootMode`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.BootType`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.BuildVersion`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Company`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.CorruptionActionState`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.CreationUtcTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Description`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Detail`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DeviceName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DeviceNameLength`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DeviceTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DeviceVersionMajor`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DeviceVersionMinor`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DriveName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DriverName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DriverNameLength`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.DwordVal`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.EntryCount`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ExtraInfo`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.FailureName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.FailureNameLength`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.FileVersion`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.FinalStatus`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Group`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.IdleImplementation`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.IdleStateCount`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ImpersonationLevel`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.IntegrityLevel`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.IpAddress`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.IpPort`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.KeyLength`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.LastBootGood`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.LastShutdownGood`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.LmPackageName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.LogonGuid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.LogonId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.LogonProcessName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.LogonType`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.MajorVersion`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.MaximumPerformancePercent`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.MinimumPerformancePercent`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.MinimumThrottlePercent`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.MinorVersion`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.NewProcessId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.NewProcessName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.NewSchemeGuid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.NewTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.NominalFrequency`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Number`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.OldSchemeGuid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.OldTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.OriginalFileName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Path`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.PerformanceImplementation`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.PreviousCreationUtcTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.PreviousTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.PrivilegeList`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ProcessId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ProcessName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ProcessPath`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ProcessPid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Product`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.PuaCount`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.PuaPolicyId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.QfeVersion`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Reason`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.SchemaVersion`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ScriptBlockText`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ServiceName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ServiceVersion`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ShutdownActionType`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ShutdownEventCode`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.ShutdownReason`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Signature`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.SignatureStatus`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Signed`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.StartTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.State`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Status`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.StopTime`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.SubjectDomainName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.SubjectLogonId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.SubjectUserName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.SubjectUserSid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TSId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TargetDomainName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TargetInfo`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TargetLogonGuid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TargetLogonId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TargetServerName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TargetUserName`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TargetUserSid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TerminalSessionId`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TokenElevationType`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.TransmittedServices`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.UserSid`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Version`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.Workstation`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param1`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param2`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param3`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param4`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param5`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param6`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param7`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_data.param8`*::
 +
 --
+type: keyword
+
 --
 
 *`winlog.event_id`*::
