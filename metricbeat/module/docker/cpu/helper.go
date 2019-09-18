@@ -124,6 +124,12 @@ func (u *cpuUsage) PerCPU() common.MapStr {
 				u.Stats.CPUStats.CPUUsage.PercpuUsage[index],
 				u.Stats.PreCPUStats.CPUUsage.PercpuUsage[index],
 				u.CPUs())
+			cpu["norm"] = common.MapStr{
+				"pct": u.calculatePercentage(
+					u.Stats.CPUStats.CPUUsage.PercpuUsage[index],
+					u.Stats.PreCPUStats.CPUUsage.PercpuUsage[index],
+					1),
+			}
 			cpu["ticks"] = u.Stats.CPUStats.CPUUsage.PercpuUsage[index]
 			output[strconv.Itoa(index)] = cpu
 		}

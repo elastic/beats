@@ -4998,6 +4998,18 @@ format: percent
 
 --
 
+*`docker.cpu.core.*.norm.pct`*::
++
+--
+Percentage of CPU time in this core, normalized by the number of CPU cores.
+
+
+type: object
+
+format: percent
+
+--
+
 *`docker.cpu.core.*.ticks`*::
 +
 --

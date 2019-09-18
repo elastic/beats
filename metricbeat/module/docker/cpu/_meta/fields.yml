@@ -62,6 +62,12 @@
       format: percent
       description: >
         Percentage of CPU time in this core.
+    - name: core.*.norm.pct
+      type: object
+      object_type: scaled_float
+      format: percent
+      description: >
+        Percentage of CPU time in this core, normalized by the number of CPU cores.
     - name: core.*.ticks
       type: object
       object_type: long
