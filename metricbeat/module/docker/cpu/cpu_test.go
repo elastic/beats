@@ -55,22 +55,22 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 		expected common.MapStr
 	}{
 		{statsList[0], common.MapStr{
-			"0": common.MapStr{"pct": float64(0.40), "norm": common.MapStr{"pct": float64(0.40)/float64(onlineCPUS)}},
-			"1": common.MapStr{"pct": float64(3.60), "norm": common.MapStr{"pct": float64(3.60)/float64(onlineCPUS)}},
-			"2": common.MapStr{"pct": float64(3.60), "norm": common.MapStr{"pct": float64(3.60)/float64(onlineCPUS)}},
-			"3": common.MapStr{"pct": float64(2.00), "norm": common.MapStr{"pct": float64(2.00)/float64(onlineCPUS)}},
+			"0": common.MapStr{"pct": float64(0.40), "norm": common.MapStr{"pct": float64(0.40) / float64(onlineCPUS)}},
+			"1": common.MapStr{"pct": float64(3.60), "norm": common.MapStr{"pct": float64(3.60) / float64(onlineCPUS)}},
+			"2": common.MapStr{"pct": float64(3.60), "norm": common.MapStr{"pct": float64(3.60) / float64(onlineCPUS)}},
+			"3": common.MapStr{"pct": float64(2.00), "norm": common.MapStr{"pct": float64(2.00) / float64(onlineCPUS)}},
 		}},
 		{statsList[1], common.MapStr{
-			"0": common.MapStr{"pct": float64(0.0000004), "norm": common.MapStr{"pct": float64(0.0000004)/float64(onlineCPUS)}},
-			"1": common.MapStr{"pct": float64(0.0000008), "norm": common.MapStr{"pct": float64(0.0000008)/float64(onlineCPUS)}},
-			"2": common.MapStr{"pct": float64(0.0000012), "norm": common.MapStr{"pct": float64(0.0000012)/float64(onlineCPUS)}},
-			"3": common.MapStr{"pct": float64(0.0000016), "norm": common.MapStr{"pct": float64(0.0000016)/float64(onlineCPUS)}},
+			"0": common.MapStr{"pct": float64(0.0000004), "norm": common.MapStr{"pct": float64(0.0000004) / float64(onlineCPUS)}},
+			"1": common.MapStr{"pct": float64(0.0000008), "norm": common.MapStr{"pct": float64(0.0000008) / float64(onlineCPUS)}},
+			"2": common.MapStr{"pct": float64(0.0000012), "norm": common.MapStr{"pct": float64(0.0000012) / float64(onlineCPUS)}},
+			"3": common.MapStr{"pct": float64(0.0000016), "norm": common.MapStr{"pct": float64(0.0000016) / float64(onlineCPUS)}},
 		}},
 		{statsList[2], common.MapStr{
-			"0": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0)/float64(onlineCPUS)}},
-			"1": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0)/float64(onlineCPUS)}},
-			"2": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0)/float64(onlineCPUS)}},
-			"3": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0)/float64(onlineCPUS)}},
+			"0": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
+			"1": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
+			"2": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
+			"3": common.MapStr{"pct": float64(0), "norm": common.MapStr{"pct": float64(0) / float64(onlineCPUS)}},
 		}},
 	}
 	for _, tt := range testCase {
