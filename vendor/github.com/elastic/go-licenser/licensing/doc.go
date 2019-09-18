@@ -15,20 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
-
-import (
-	"github.com/magefile/mage/mg"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
-)
-
-// Fmt formats source code (.go and .py) and adds license headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
-}
+// Package licensing provides a set of functions that read the top
+// lines of a file and can determine if they match a specific header.
+package licensing

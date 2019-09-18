@@ -15,20 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package gotool
 
 import (
-	"github.com/magefile/mage/mg"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/magefile/mage/sh"
 )
 
-// Fmt formats source code (.go and .py) and adds license headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
+type goLicenser func(opts ...ArgOpt) error
+
+// Licenser runs `go-licenser` and provides optionals for adding command line arguments.
+var Licenser goLicenser = runGoLicenser
+
+func runGoLicenser(opts ...ArgOpt) error {
+	args := buildArgs(opts).build()
+	return sh.RunV("go-licenser", args...)
 }
 
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
-}
+func (goLicenser) Check() ArgOpt                 { return flagBoolIf("-d", true) }
+func (goLicenser) License(license string) ArgOpt { return flagArgIf("-license", license) }
+func (goLicenser) Exclude(path string) ArgOpt    { return flagArgIf("-exclude", path) }
+func (goLicenser) Path(path string) ArgOpt       { return posArg(path) }

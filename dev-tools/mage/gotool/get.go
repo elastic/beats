@@ -15,20 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package gotool
 
-import (
-	"github.com/magefile/mage/mg"
+type goGet func(opts ...ArgOpt) error
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-)
+// Get runs `go get` and provides optionals for adding command line arguments.
+var Get goGet = runGoGet
 
-// Fmt formats source code (.go and .py) and adds license headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
+func runGoGet(opts ...ArgOpt) error {
+	args := buildArgs(opts)
+	return runVGo("get", args)
 }
 
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
-}
+func (goGet) Update() ArgOpt            { return flagBoolIf("-u", true) }
+func (goGet) Package(pkg string) ArgOpt { return posArg(pkg) }

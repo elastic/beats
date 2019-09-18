@@ -15,20 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package main
 
-import (
-	"github.com/magefile/mage/mg"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
+var (
+	version string
+	commit  string
 )
-
-// Fmt formats source code (.go and .py) and adds license headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
-}
