@@ -77,6 +77,12 @@ for more details.
 
 [float]
 === Parallel Processing
+Running multiple Filebeat instances in parallel to read from the same SQS queue
+is available for all users without any extra configuration for s3 input. This
+feature helps users to horizontally scale the processing when there are large
+amount of logs flowing into S3 bucket which leads to large amount of messages
+going through the queue.
+
 The usage of SQS ensures that each message in the queue is processed only once
 even with multiple Filebeat running in parallel. To prevent other consumers, which
 is Filebeat in this case, from processing the message again, visibility timeout
@@ -91,19 +97,6 @@ message becomes visible to other Filebeats and the message is received again.
 By default, visibility timeout is set to 5 minutes for s3 input in Filebeat.
 5-minute is high enough for SQS message to be read and related s3 log files to
 be processed.
-
-A basic test was done with three Filebeats running in parallel pointing to the same
-SQS queue in AWS. There were 1000 messages available in the queue and each message
-notifies a new S3 log has been generated. These S3 logs are simple .txt files and
-each contains 10 log lines. With three Filebeats, the messages were processed
-evenly without duplicating or missing messages. Test result looks like:
-
-|=======
-| Filebeat #  | Total # of Events | Total # of log files
-| 1 |  3350 |  335
-| 2| 3350 |  335
-| 3| 3300 |  330
-|=======
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
