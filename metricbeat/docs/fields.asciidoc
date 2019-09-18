@@ -4872,6 +4872,18 @@ format: percent
 
 --
 
+*`docker.cpu.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.kernel.ticks`*::
 +
 --
@@ -4886,6 +4898,18 @@ type: long
 +
 --
 Percentage of total CPU time in the system.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
 
 
 type: scaled_float
@@ -4916,6 +4940,18 @@ format: percent
 
 --
 
+*`docker.cpu.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.user.ticks`*::
 +
 --
@@ -4938,10 +4974,34 @@ format: percent
 
 --
 
+*`docker.cpu.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.core.*.pct`*::
 +
 --
 Percentage of CPU time in this core.
+
+
+type: object
+
+format: percent
+
+--
+
+*`docker.cpu.core.*.norm.pct`*::
++
+--
+Percentage of CPU time in this core, normalized by the number of CPU cores.
 
 
 type: object
