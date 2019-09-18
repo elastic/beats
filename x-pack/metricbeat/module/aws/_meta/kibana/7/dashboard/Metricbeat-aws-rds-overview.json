@@ -272,7 +272,7 @@
       },
       "id": "17fcda50-921b-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -354,7 +354,7 @@
       },
       "id": "8b8a7f80-921c-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -435,7 +435,7 @@
       },
       "id": "cc3a1950-921c-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -530,7 +530,7 @@
       },
       "id": "00b29040-921d-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -582,7 +582,7 @@
       },
       "id": "b5308940-7347-11e9-816b-07687310a99a",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0g"
       },
       "references": [
         {
@@ -670,7 +670,7 @@
       },
       "id": "c1afd130-921e-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -752,7 +752,7 @@
       },
       "id": "e06e4cf0-921e-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
@@ -835,7 +835,7 @@
       },
       "id": "966ae990-d979-11e9-9458-bbef63ad717b",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
