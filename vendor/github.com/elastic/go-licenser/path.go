@@ -15,20 +15,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package main
 
 import (
-	"github.com/magefile/mage/mg"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	"os"
+	"strings"
 )
 
-// Fmt formats source code (.go and .py) and adds license headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
+func needsExclusion(path string, exclude []string) bool {
+	for _, excluded := range exclude {
+		excluded = cleanPathSuffixes(excluded, []string{"*", string(os.PathSeparator)})
+		if strings.HasPrefix(path, excluded) {
+			return true
+		}
+	}
+
+	return false
 }
 
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
+func cleanPathSuffixes(path string, sufixes []string) string {
+	for _, suffix := range sufixes {
+		for strings.HasSuffix(path, suffix) && len(path) > 0 {
+			path = path[:len(path)-len(suffix)]
+		}
+	}
+
+	return path
+}
+
+func cleanPathPrefixes(path string, prefixes []string) string {
+	for _, prefix := range prefixes {
+		for strings.HasPrefix(path, prefix) && len(path) > 0 {
+			path = path[len(prefix):]
+		}
+	}
+
+	return path
 }

@@ -15,20 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package mage
 
 import (
-	"github.com/magefile/mage/mg"
+	"path/filepath"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
-// Fmt formats source code (.go and .py) and adds license headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
+var (
+	// GoLicenserImportPath controls the import path used to install go-licenser.
+	GoLicenserImportPath = "github.com/elastic/go-licenser"
+)
+
+// InstallVendored uses go get to install a command from its vendored source
+func InstallVendored(importPath string) error {
+	beatDir, err := ElasticBeatsDir()
+	if err != nil {
+		return errors.Wrap(err, "failed to obtain beats repository path")
+	}
+
+	get := gotool.Get
+	return get(
+		get.Package(filepath.Join(beatDir, "vendor", importPath)),
+	)
 }
 
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
+// InstallGoLicenser target installs go-licenser
+func InstallGoLicenser() error {
+	return InstallVendored(GoLicenserImportPath)
 }

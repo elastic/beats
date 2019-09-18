@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package main
 
-import (
-	"github.com/magefile/mage/mg"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
-)
-
-// Fmt formats source code (.go and .py) and adds license headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
+// Error wraps a normal error with an Exitcode.
+type Error struct {
+	err  error
+	code int
 }
 
-// AddLicenseHeaders adds license headers
-func AddLicenseHeaders() {
-	mg.Deps(devtools.AddLicenseHeaders)
+func (e Error) Error() string {
+	if e.err != nil {
+		return e.err.Error()
+	}
+	return "<nil>"
+}
+
+// Code returns the exitcode for the error
+func Code(e error) int {
+	if err, ok := e.(*Error); ok {
+		return err.code
+	}
+	return 0
 }
