@@ -13,31 +13,31 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-// AzureMockService mock for the azure monitor services
-type AzureMockService struct {
+// MockService mock for the azure monitor services
+type MockService struct {
 	mock.Mock
 }
 
 // GetResourceDefinitions is a mock function for the azure service
-func (client *AzureMockService) GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error) {
+func (client *MockService) GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error) {
 	args := client.Called(ID, group, rType, query)
 	return args.Get(0).(resources.ListResultPage), args.Error(1)
 }
 
 // GetMetricDefinitions is a mock function for the azure service
-func (client *AzureMockService) GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error) {
+func (client *MockService) GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error) {
 	args := client.Called(resourceID, namespace)
 	return args.Get(0).(insights.MetricDefinitionCollection), args.Error(1)
 }
 
 // GetMetricNamespaces is a mock function for the azure service
-func (client *AzureMockService) GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error) {
+func (client *MockService) GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error) {
 	args := client.Called(resourceID)
 	return args.Get(0).(insights.MetricNamespaceCollection), args.Error(1)
 }
 
 // GetMetricValues is a mock function for the azure service
-func (client *AzureMockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
+func (client *MockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
 	args := client.Called(resourceID, namespace)
 	return args.Get(0).([]insights.Metric), args.Error(1)
 }
@@ -61,7 +61,7 @@ func (reporter *MockReporterV2) Error(err error) bool {
 
 // NewMockClient instantiates a new client with the mock azure service
 func NewMockClient() *Client {
-	azureMockService := new(AzureMockService)
+	azureMockService := new(MockService)
 	client := &Client{
 		AzureMonitorService: azureMockService,
 		Config:              Config{},

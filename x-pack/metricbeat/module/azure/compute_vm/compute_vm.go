@@ -5,12 +5,16 @@
 package compute_vm
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
+
+const defaultVMNamespace = "Microsoft.Compute/virtualMachines"
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -33,14 +37,29 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The azure compute_vm metricset is beta.")
-
 	var config azure.Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 	if len(config.Resources) == 0 {
-		return nil, errors.New("no resource options defined: module azure - compute_vm metricset")
+		config.Resources = []azure.ResourceConfig{
+			{
+				Query: fmt.Sprintf("resourceType eq '%s'", defaultVMNamespace),
+			},
+		}
+	}
+	for index := range config.Resources {
+		// if any resource groups were configured the resource type should be added
+		if len(config.Resources[index].Group) > 0 {
+			config.Resources[index].Type = defaultVMNamespace
+		}
+		// one metric configuration will be added containing all metrics names
+		config.Resources[index].Metrics = []azure.MetricConfig{
+			{
+				Name: []string{"*"},
+			},
+		}
 	}
 	monitorClient, err := azure.NewClient(config)
 	if err != nil {
@@ -56,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := InitResources(m.client, report)
+	err := m.client.InitResources(mapMetric, report)
 	if err != nil {
 		return err
 	}

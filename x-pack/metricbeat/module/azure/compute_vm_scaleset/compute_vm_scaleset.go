@@ -5,6 +5,8 @@
 package compute_vm_scaleset
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -29,6 +31,13 @@ type MetricSet struct {
 	client *azure.Client
 }
 
+const (
+	defaultVMScalesetNamespace = "Microsoft.Compute/virtualMachineScaleSets"
+	customVMNamespace          = "Azure.VM.Windows.GuestMetrics"
+)
+
+var memoryMetrics = []string{"Memory\\Commit Limit", "Memory\\Committed Bytes", "Memory\\% Committed Bytes In Use", "Memory\\Available Bytes"}
+
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -39,7 +48,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 	if len(config.Resources) == 0 {
-		return nil, errors.New("no resource options defined: module azure - compute_vm_scaleset metricset")
+		config.Resources = []azure.ResourceConfig{
+			{
+				Query: fmt.Sprintf("resourceType eq '%s'", defaultVMScalesetNamespace),
+			},
+		}
+	}
+	for index := range config.Resources {
+		if len(config.Resources[index].Group) > 0 {
+			config.Resources[index].Type = defaultVMScalesetNamespace
+		}
+		config.Resources[index].Metrics = []azure.MetricConfig{
+			{
+				Name:      []string{"*"},
+				Namespace: defaultVMScalesetNamespace,
+			},
+			{
+				Name:      memoryMetrics,
+				Namespace: customVMNamespace,
+			},
+		}
 	}
 	monitorClient, err := azure.NewClient(config)
 	if err != nil {
@@ -55,7 +83,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := InitResources(m.client, report)
+	err := m.client.InitResources(mapMetric, report)
 	if err != nil {
 		return err
 	}
@@ -65,6 +93,5 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err == nil && len(m.client.Resources.Metrics) > 0 {
 		azure.EventsMapping(report, m.client.Resources.Metrics)
 	}
-
 	return nil
 }

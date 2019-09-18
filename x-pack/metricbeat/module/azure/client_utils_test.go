@@ -116,13 +116,3 @@ func TestExpired(t *testing.T) {
 	result := resConfig.Expired()
 	assert.True(t, result)
 }
-
-func TestStringInSlice(t *testing.T) {
-	s := "test"
-	exists := []string{"hello", "test", "goodbye"}
-	noExists := []string{"hello", "goodbye", "notest"}
-	result := StringInSlice(s, exists)
-	assert.True(t, result)
-	result = StringInSlice(s, noExists)
-	assert.False(t, result)
-}

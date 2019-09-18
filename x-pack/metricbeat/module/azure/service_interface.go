@@ -9,8 +9,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 )
 
-// AzureService interface for the azure monitor service and mock for testing
-type AzureService interface {
+// Service interface for the azure monitor service and mock for testing
+type Service interface {
 	GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error)
 	GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error)
 	GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error)

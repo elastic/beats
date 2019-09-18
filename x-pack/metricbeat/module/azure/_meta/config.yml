@@ -1,8 +1,58 @@
 - module: azure
-  metricsets: ["monitor"]
+  metricsets:
+  - monitor
   enabled: true
-  period: 60s
+  period: 300s
   client_id: '${AZURE_CLIENT_ID:""}'
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  refresh_list_interval: 600s
+  resources:
+  - resource_id: "subscriptions/1234qwe-4b1e-1234-1234-123456qwert/resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/apimanagement"
+    metrics:
+    - name: "Requests"
+      namespace: "Microsoft.ApiManagement/service"
+      aggregations: ["Maximum"]
+      timegrain: "PT1M"
+      dimensions:
+      - name: "Hostname"
+        value: "*"
+    - name: ["Capacity", "Requests"]
+      namespace: "Microsoft.ApiManagement/service"
+      aggregations: ["Average"]
+      dimensions:
+      - name: "Location"
+        value: "West Europe"
+  - resource_group: "testresourcegroup"
+    resource_type: "Microsoft.Compute/virtualMachines"
+    metrics:
+    - name: "*"
+      namespace: "Microsoft.Compute/virtualMachines"
+      timegrain: "PT1M"
+  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts' and name eq 'databaseAccount'"
+    metrics:
+    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+      namespace: "Microsoft.DocumentDb/databaseAccounts"
+
+- module: azure
+  metricsets:
+  - compute_vm
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  refresh_list_interval: 600s
+
+  - module: azure
+    metricsets:
+    - compute_vm_scaleset
+    enabled: true
+    period: 300s
+    client_id: '${AZURE_CLIENT_ID:""}'
+    client_secret: '${AZURE_CLIENT_SECRET:""}'
+    tenant_id: '${AZURE_TENANT_ID:""}'
+    subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+    refresh_list_interval: 600s

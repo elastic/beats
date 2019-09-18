@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
-
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/pkg/errors"
 )
+
+const DefaultTimeGrain = "PT5M"
 
 // mapMetricValues should map the metric values
 func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) ([]MetricValue, error) {
@@ -122,32 +122,4 @@ func mapTags(azureTags map[string]*string) map[string]string {
 		tags[key] = *value
 	}
 	return tags
-}
-
-// StringInSlice is a helper method, will check if string is part of a slice
-func StringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
-
-// MapMetricByPrimaryAggregation will map the primary aggregation of the metric definition to the client metric
-func MapMetricByPrimaryAggregation(client *Client, metrics []insights.MetricDefinition, resource resources.GenericResource, namespace string, dim []Dimension, timegrain string) []Metric {
-	var clientMetrics []Metric
-	metricGroups := make(map[string][]insights.MetricDefinition)
-
-	for _, met := range metrics {
-		metricGroups[string(met.PrimaryAggregationType)] = append(metricGroups[string(met.PrimaryAggregationType)], met)
-	}
-	for key, metricGroup := range metricGroups {
-		var metricNames []string
-		for _, metricName := range metricGroup {
-			metricNames = append(metricNames, *metricName.Name.Value)
-		}
-		clientMetrics = append(clientMetrics, client.CreateMetric(resource, namespace, metricNames, key, dim, timegrain))
-	}
-	return clientMetrics
 }

@@ -14,8 +14,8 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 )
 
-// AzureMonitorService service wrapper to the azure sdk for go
-type AzureMonitorService struct {
+// MonitorService service wrapper to the azure sdk for go
+type MonitorService struct {
 	metricsClient          *insights.MetricsClient
 	metricDefinitionClient *insights.MetricDefinitionsClient
 	metricNamespaceClient  *insights.MetricNamespacesClient
@@ -25,8 +25,8 @@ type AzureMonitorService struct {
 
 const metricNameLimit = 20
 
-// NewAzureService instantiates the Azure monitoring service
-func NewAzureService(clientID string, clientSecret string, tenantID string, subscriptionID string) (*AzureMonitorService, error) {
+// NewService instantiates the Azure monitoring service
+func NewService(clientID string, clientSecret string, tenantID string, subscriptionID string) (*MonitorService, error) {
 	clientConfig := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
 	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
@@ -40,7 +40,7 @@ func NewAzureService(clientID string, clientSecret string, tenantID string, subs
 	metricsDefinitionClient.Authorizer = authorizer
 	resourceClient.Authorizer = authorizer
 	metricNamespaceClient.Authorizer = authorizer
-	service := &AzureMonitorService{
+	service := &MonitorService{
 		metricDefinitionClient: &metricsDefinitionClient,
 		metricsClient:          &metricsClient,
 		metricNamespaceClient:  &metricNamespaceClient,
@@ -51,7 +51,7 @@ func NewAzureService(clientID string, clientSecret string, tenantID string, subs
 }
 
 // GetResourceDefinitions will retrieve the azure resources based on the options entered
-func (service AzureMonitorService) GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error) {
+func (service MonitorService) GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error) {
 	var resourceQuery string
 	if len(ID) > 0 {
 		var filterList []string
@@ -80,17 +80,17 @@ func (service AzureMonitorService) GetResourceDefinitions(ID []string, group []s
 }
 
 // GetMetricNamespaces will return all supported namespaces based on the resource id and namespace
-func (service *AzureMonitorService) GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error) {
+func (service *MonitorService) GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error) {
 	return service.metricNamespaceClient.List(service.context, resourceID, "")
 }
 
 // GetMetricDefinitions will return all supported metrics based on the resource id and namespace
-func (service *AzureMonitorService) GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error) {
+func (service *MonitorService) GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error) {
 	return service.metricDefinitionClient.List(service.context, resourceID, namespace)
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details
-func (service *AzureMonitorService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
+func (service *MonitorService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, error) {
 	var tg *string
 	if timegrain != "" {
 		tg = &timegrain

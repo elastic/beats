@@ -8,6 +8,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -23,7 +25,43 @@ var (
 					},
 				}}},
 	}
+	resourceQueryConfig = Config{
+		Resources: []ResourceConfig{
+			{
+				Query: "query",
+				Metrics: []MetricConfig{
+					{
+						Name: []string{"hello", "test"},
+					},
+				}}},
+	}
 )
+
+func mockMapMetric(client *Client, metric MetricConfig, resource resources.GenericResource) ([]Metric, error) {
+	return nil, nil
+}
+
+func TestInitResources(t *testing.T) {
+	t.Run("return error when no resource options were configured", func(t *testing.T) {
+		client := NewMockClient()
+		mr := MockReporterV2{}
+		err := client.InitResources(mockMapMetric, &mr)
+		assert.Error(t, err, "no resource options were configured")
+	})
+	t.Run("return error no resources were found", func(t *testing.T) {
+		client := NewMockClient()
+		client.Config = resourceQueryConfig
+		m := &MockService{}
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(resources.ListResultPage{}, errors.New("invalid resource query"))
+		client.AzureMonitorService = m
+		mr := MockReporterV2{}
+		mr.On("Error", mock.Anything).Return(true)
+		err := client.InitResources(mockMapMetric, &mr)
+		assert.Error(t, err, "no resources were found based on all the configurations options entered")
+		assert.Equal(t, len(client.Resources.Metrics), 0)
+		m.AssertExpectations(t)
+	})
+}
 
 func TestGetMetricValues(t *testing.T) {
 	client := NewMockClient()
@@ -39,7 +77,7 @@ func TestGetMetricValues(t *testing.T) {
 				},
 			},
 		}
-		m := &AzureMockService{}
+		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m
@@ -61,7 +99,7 @@ func TestGetMetricValues(t *testing.T) {
 				},
 			},
 		}
-		m := &AzureMockService{}
+		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m

@@ -13,56 +13,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
-
-// InitResources returns the list of resources and maps them.
-func InitResources(client *azure.Client, report mb.ReporterV2) error {
-	if len(client.Config.Resources) == 0 {
-		return errors.New("no resource options defined")
-	}
-	// check if refresh interval has been set and if it has expired
-	if !client.Resources.Expired() {
-		return nil
-	}
-	var metrics []azure.Metric
-	for _, resource := range client.Config.Resources {
-		// retrieve azure resources information
-		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.ID, resource.Group, resource.Type, resource.Query)
-		if err != nil {
-			err = errors.Wrap(err, "failed to retrieve resources")
-			client.LogError(report, err)
-			continue
-		}
-		if len(resourceList.Values()) == 0 {
-			err = errors.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
-				resource.ID, resource.Group, resource.Type, resource.Query)
-			client.LogError(report, err)
-			continue
-		}
-		for _, res := range resourceList.Values() {
-			for _, metric := range resource.Metrics {
-
-				met, err := mapMetric(client, metric, res)
-				if err != nil {
-					//client.LogError(report, err)
-					return err
-				}
-				metrics = append(metrics, met...)
-			}
-		}
-	}
-
-	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable, we log and create an event if this is the case (see above)
-	// but we return an error when absolutely no resources are found
-	if len(metrics) == 0 {
-		return errors.New("no resources were found based on all the configurations options entered")
-	}
-
-	client.Resources.Metrics = metrics
-	return nil
-}
 
 // mapMetric should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resources.GenericResource) ([]azure.Metric, error) {
@@ -80,20 +32,20 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 	// check if all metric names are selected (*)
 	var supportedMetricNames []string
 	var unsupportedMetricNames []string
-	if azure.StringInSlice("*", metric.Name) {
+	if strings.Contains(strings.Join(metric.Name, " "), "*") {
 		for _, definition := range *metricDefinitions.Value {
 			supportedMetricNames = append(supportedMetricNames, *definition.Name.Value)
 		}
 	} else {
 		// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
-		supportedMetricNames, unsupportedMetricNames = filterMetrics(metric.Name, *metricDefinitions.Value)
+		supportedMetricNames, unsupportedMetricNames = filterSConfiguredMetrics(metric.Name, *metricDefinitions.Value)
 		if len(unsupportedMetricNames) > 0 {
-			return nil, errors.Errorf("none of metric names configured are supported by the resources found : %s are not supported for namespace %s ",
-				strings.Join(unsupportedMetricNames, ","), metric.Namespace)
+			return nil, errors.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
+				strings.Join(unsupportedMetricNames, ","), *resource.ID, metric.Namespace)
 		}
 	}
 	if len(supportedMetricNames) == 0 {
-		return nil, errors.Errorf("the metric names configured : %s are not supported for namespace %s ", strings.Join(metric.Name, ","), metric.Namespace)
+		return nil, errors.Errorf("the metric names configured : %s are not supported for the resource %s and namespace %s ", strings.Join(metric.Name, ","), *resource.ID, metric.Namespace)
 	}
 	//validate aggregations and filter on supported ones
 	var supportedAggregations []string
@@ -115,9 +67,9 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 			return nil, errors.Errorf("no aggregations were found based on the aggregation values configured or supported between the metrics : %s",
 				strings.Join(supportedMetricNames, ","))
 		}
-		metricGroups[strings.Join(supportedAggregations, ",")] = append(metricGroups[strings.Join(supportedMetricNames, ",")], metricDefs...)
+		key := strings.Join(supportedAggregations, ",")
+		metricGroups[key] = append(metricGroups[key], metricDefs...)
 	}
-
 	// map dimensions
 	var dim []azure.Dimension
 	if len(metric.Dimensions) > 0 {
@@ -125,7 +77,6 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 			dim = append(dim, azure.Dimension{Name: dimension.Name, Value: dimension.Value})
 		}
 	}
-
 	for key, metricGroup := range metricGroups {
 		var metricNames []string
 		for _, metricName := range metricGroup {
@@ -134,4 +85,80 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		metrics = append(metrics, client.CreateMetric(resource, metric.Namespace, metricNames, key, dim, metric.Timegrain))
 	}
 	return metrics, nil
+}
+
+// filterMetrics will filter out any unsupported metrics based on the namespace selected
+func filterSConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
+	var inRange []string
+	var notInRange []string
+	var allMetrics string
+	for _, definition := range allRange {
+		allMetrics += *definition.Name.Value + " "
+	}
+	for _, name := range selectedRange {
+		if strings.Contains(allMetrics, name) {
+			inRange = append(inRange, name)
+		} else {
+			notInRange = append(notInRange, name)
+		}
+
+	}
+	return inRange, notInRange
+}
+
+// filterAggregations will filter out any unsupported aggregations based on the metrics selected
+func filterAggregations(selectedRange []string, metrics []insights.MetricDefinition) ([]string, []string) {
+	var difference []string
+	var supported = []string{"Average", "Maximum", "Minimum", "Count", "Total"}
+
+	for _, metric := range metrics {
+		var metricSupported []string
+		for _, agg := range *metric.SupportedAggregationTypes {
+			metricSupported = append(metricSupported, string(agg))
+		}
+		supported, _ = intersections(metricSupported, supported)
+	}
+	if len(selectedRange) != 0 {
+		supported, difference = intersections(supported, selectedRange)
+	}
+	return supported, difference
+}
+
+// filter is a helper method, will filter out strings not part of a slice
+func filter(src []string) (res []string) {
+	for _, s := range src {
+		newStr := strings.Join(res, " ")
+		if !strings.Contains(newStr, s) {
+			res = append(res, s)
+		}
+	}
+	return
+}
+
+// intersections is a helper method, will compare 2 slices and return their intersection and difference records
+func intersections(supported, selected []string) ([]string, []string) {
+	var intersection []string
+	var difference []string
+	str1 := strings.Join(filter(supported), " ")
+	for _, s := range filter(selected) {
+		if strings.Contains(str1, s) {
+			intersection = append(intersection, s)
+		} else {
+			difference = append(difference, s)
+		}
+	}
+	return intersection, difference
+}
+
+// getMetricDefinitionsByNames is a helper method, will compare 2 slices and return their intersection
+func getMetricDefinitionsByNames(metricDefs []insights.MetricDefinition, names []string) []insights.MetricDefinition {
+	var metrics []insights.MetricDefinition
+	for _, def := range metricDefs {
+		for _, supportedName := range names {
+			if *def.Name.Value == supportedName {
+				metrics = append(metrics, def)
+			}
+		}
+	}
+	return metrics
 }

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package compute_vm_scaleset
+package compute_vm
 
 import (
 	"testing"
@@ -26,6 +26,21 @@ func MockResource() resources.GenericResource {
 		Name:     &name,
 		Location: &location,
 		Type:     &rType,
+	}
+}
+
+func MockNamespace() insights.MetricNamespaceCollection {
+	name := "namespace"
+	property := insights.MetricNamespaceName{
+		MetricNamespaceName: &name,
+	}
+	namespace := insights.MetricNamespace{
+		Name:       &name,
+		Properties: &property,
+	}
+	list := []insights.MetricNamespace{namespace}
+	return insights.MetricNamespaceCollection{
+		Value: &list,
 	}
 }
 
@@ -55,27 +70,29 @@ func MockMetricDefinitions() *[]insights.MetricDefinition {
 
 func TestMapMetric(t *testing.T) {
 	resource := MockResource()
+	namespace := MockNamespace()
 	metricDefinitions := insights.MetricDefinitionCollection{
 		Value: MockMetricDefinitions(),
 	}
-	var emptyList []insights.MetricDefinition
+	emptyList := []insights.MetricDefinition{}
 	emptyMetricDefinitions := insights.MetricDefinitionCollection{
 		Value: &emptyList,
 	}
-	metricConfig := azure.MetricConfig{Name: []string{"*"}, Namespace: "namespace"}
+	metricConfig := azure.MetricConfig{Name: []string{"*"}}
 	client := azure.NewMockClient()
-	t.Run("return error when the metric metric definition api call returns an error", func(t *testing.T) {
+	t.Run("return error when the metric namespaces api call returns an error", func(t *testing.T) {
 		m := &azure.MockService{}
-		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, errors.New("invalid resource ID"))
+		m.On("GetMetricNamespaces", mock.Anything).Return(insights.MetricNamespaceCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
 		metric, err := mapMetric(client, metricConfig, resource)
 		assert.NotNil(t, err)
-		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace namespace: invalid resource ID")
+		assert.Equal(t, err.Error(), "no metric namespaces were found for resource 123: invalid resource ID")
 		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
+		m.On("GetMetricNamespaces", mock.Anything).Return(namespace, nil)
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
 		client.AzureMonitorService = m
 		metric, err := mapMetric(client, metricConfig, resource)
@@ -86,6 +103,7 @@ func TestMapMetric(t *testing.T) {
 	})
 	t.Run("return mapped metrics correctly", func(t *testing.T) {
 		m := &azure.MockService{}
+		m.On("GetMetricNamespaces", mock.Anything).Return(namespace, nil)
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metrics, err := mapMetric(client, metricConfig, resource)
@@ -108,30 +126,4 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[1].Dimensions, []azure.Dimension(nil))
 		m.AssertExpectations(t)
 	})
-}
-
-func TestContainsDimension(t *testing.T) {
-	dimension := "VMName"
-	dim1 := "SlotID"
-	dim2 := "VNU"
-	dim3 := "VMName"
-	dimensionList := []insights.LocalizableString{
-		{
-			Value:          &dim1,
-			LocalizedValue: &dim1,
-		},
-		{
-			Value:          &dim2,
-			LocalizedValue: &dim2,
-		},
-		{
-			Value:          &dim3,
-			LocalizedValue: &dim3,
-		},
-	}
-	result := containsDimension(dimension, dimensionList)
-	assert.True(t, result)
-	dimension = "VirtualMachine"
-	result = containsDimension(dimension, dimensionList)
-	assert.False(t, result)
 }

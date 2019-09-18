@@ -7,26 +7,14 @@ package monitor
 import (
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
-)
-
-var (
-	resourceQueryConfig = azure.Config{
-		Resources: []azure.ResourceConfig{
-			{
-				Query: "query",
-				Metrics: []azure.MetricConfig{
-					{
-						Name: []string{"hello", "test"},
-					},
-				}}},
-	}
 )
 
 func MockResource() resources.GenericResource {
@@ -49,40 +37,21 @@ func MockMetricDefinitions() *[]insights.MetricDefinition {
 	defs := []insights.MetricDefinition{
 		{
 			Name:                      &insights.LocalizableString{Value: &metric1},
+			PrimaryAggregationType:    insights.Average,
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Maximum, insights.Count, insights.Total, insights.Average},
 		},
 		{
 			Name:                      &insights.LocalizableString{Value: &metric2},
+			PrimaryAggregationType:    insights.Average,
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
 		},
 		{
 			Name:                      &insights.LocalizableString{Value: &metric3},
+			PrimaryAggregationType:    insights.Average,
 			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
 		},
 	}
 	return &defs
-}
-
-func TestInitResources(t *testing.T) {
-	t.Run("return error when no resource options were configured", func(t *testing.T) {
-		client := azure.NewMockClient()
-		mr := azure.MockReporterV2{}
-		err := InitResources(client, &mr)
-		assert.Error(t, err, "no resource options were configured")
-	})
-	t.Run("return error no resources were found", func(t *testing.T) {
-		client := azure.NewMockClient()
-		client.Config = resourceQueryConfig
-		m := &azure.AzureMockService{}
-		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(resources.ListResultPage{}, errors.New("invalid resource query"))
-		client.AzureMonitorService = m
-		mr := azure.MockReporterV2{}
-		mr.On("Error", mock.Anything).Return(true)
-		err := InitResources(client, &mr)
-		assert.Error(t, err, "no resources were found based on all the configurations options entered")
-		assert.Equal(t, len(client.Resources.Metrics), 0)
-		m.AssertExpectations(t)
-	})
 }
 
 func TestMapMetric(t *testing.T) {
@@ -93,17 +62,17 @@ func TestMapMetric(t *testing.T) {
 	metricConfig := azure.MetricConfig{Namespace: "namespace", Dimensions: []azure.DimensionConfig{{Name: "location", Value: "West Europe"}}}
 	client := azure.NewMockClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
-		m := &azure.AzureMockService{}
-		m.On("GetMetricDefinitions", "123", metricConfig.Namespace).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(insights.MetricDefinitionCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
 		metric, err := mapMetric(client, metricConfig, resource)
 		assert.NotNil(t, err)
-		assert.Equal(t, metric, azure.Metric{})
+		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when all metric names and aggregations were configured", func(t *testing.T) {
-		m := &azure.AzureMockService{}
-		m.On("GetMetricDefinitions", "123", metricConfig.Namespace).Return(metricDefinitions, nil)
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"*"}
 		metrics, err := mapMetric(client, metricConfig, resource)
@@ -114,16 +83,16 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
-		assert.Equal(t, metrics[0].Aggregations, "Average,Count")
+		assert.Equal(t, metrics[0].Aggregations, "Average")
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
 		m.AssertExpectations(t)
 	})
 	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
-		m := &azure.AzureMockService{}
-		m.On("GetMetricDefinitions", "123", metricConfig.Namespace).Return(metricDefinitions, nil)
+		m := &azure.MockService{}
+		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
-		metricConfig.Name = []string{"TotalRequests", "CPU"}
-		metricConfig.Aggregations = []string{"Average", "Total", "Minimum"}
+		metricConfig.Name = []string{"TotalRequests", "Capacity"}
+		metricConfig.Aggregations = []string{"Average"}
 		metrics, err := mapMetric(client, metricConfig, resource)
 		assert.Nil(t, err)
 
@@ -133,9 +102,51 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
-		assert.Equal(t, metrics[0].Names, []string{"TotalRequests"})
-		assert.Equal(t, metrics[0].Aggregations, "Average,Total")
+		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
+		assert.Equal(t, metrics[0].Aggregations, "Average")
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension{{Name: "location", Value: "West Europe"}})
 		m.AssertExpectations(t)
 	})
+}
+
+func TestFilterSConfiguredMetrics(t *testing.T) {
+	selectedRange := []string{"TotalRequests", "Capacity", "CPUUsage"}
+	intersection, difference := filterSConfiguredMetrics(selectedRange, *MockMetricDefinitions())
+	assert.Equal(t, intersection, []string{"TotalRequests", "Capacity"})
+	assert.Equal(t, difference, []string{"CPUUsage"})
+}
+
+func TestFilterAggregations(t *testing.T) {
+	selectedRange := []string{"Average", "Minimum"}
+	intersection, difference := filterAggregations(selectedRange, *MockMetricDefinitions())
+	assert.Equal(t, intersection, []string{"Average"})
+	assert.Equal(t, difference, []string{"Minimum"})
+}
+
+func TestFilter(t *testing.T) {
+	str := []string{"hello", "test", "goodbye", "test"}
+	filtered := filter(str)
+	assert.Equal(t, len(filtered), 3)
+}
+
+func TestIntersections(t *testing.T) {
+	firstStr := []string{"test1", "test2", "test2", "test3"}
+	sercondStr := []string{"test4", "test5", "test2", "test5", "test3"}
+	intersection, difference := intersections(firstStr, sercondStr)
+	assert.Equal(t, intersection, []string{"test2", "test3"})
+	assert.Equal(t, difference, []string{"test4", "test5"})
+
+	firstStr = []string{"test1", "test2", "test2", "test3"}
+	sercondStr = []string{"test4", "test5", "test5"}
+	intersection, difference = intersections(firstStr, sercondStr)
+	assert.Equal(t, len(intersection), 0)
+	assert.Equal(t, difference, []string{"test4", "test5"})
+
+}
+
+func TestGetMetricDefinitionsByNames(t *testing.T) {
+	metrics := []string{"TotalRequests", "CPUUsage"}
+	result := getMetricDefinitionsByNames(*MockMetricDefinitions(), metrics)
+	assert.Equal(t, len(result), 1)
+	assert.Equal(t, *result[0].Name.Value, "TotalRequests")
 }

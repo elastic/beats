@@ -215,20 +215,29 @@ metricbeat.modules:
   metricsets:
   - monitor
   enabled: true
-  period: 120s
+  period: 300s
   client_id: '${AZURE_CLIENT_ID:""}'
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 - module: azure
   metricsets:
-  - compute_vm_scaleset
+  - compute_vm
   enabled: true
-  period: 120s
+  period: 300s
   client_id: '${AZURE_CLIENT_ID:""}'
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  - module: azure
+    metricsets:
+    - compute_vm_scaleset
+    enabled: true
+    period: 300s
+    client_id: '${AZURE_CLIENT_ID:""}'
+    client_secret: '${AZURE_CLIENT_SECRET:""}'
+    tenant_id: '${AZURE_TENANT_ID:""}'
+    subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
 #--------------------------------- Beat Module ---------------------------------
 - module: beat

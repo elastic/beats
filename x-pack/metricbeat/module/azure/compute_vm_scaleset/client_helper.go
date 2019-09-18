@@ -13,117 +13,76 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 
-	"github.com/elastic/beats/metricbeat/mb"
-
 	"github.com/pkg/errors"
 )
 
 const (
-	defaultVMScalesetNamespace = "Microsoft.Compute/virtualMachineScaleSets"
-	customVMNamespace          = "Azure.VM.Windows.GuestMetrics"
-	defaultVMDimension         = "VMName"
-	customVMDimension          = "VirtualMachine"
-	defaultSlotIDDimension     = "SlotId"
-	defaultTimeGrain           = "PT5M"
+	defaultVMDimension     = "VMName"
+	customVMDimension      = "VirtualMachine"
+	defaultSlotIDDimension = "SlotId"
+	defaultTimeGrain       = "PT5M"
+	noDimension            = "none"
 )
 
-var memoryMetrics = []string{"Memory\\Commit Limit", "Memory\\Committed Bytes", "Memory\\% Committed Bytes In Use", "Memory\\Available Bytes"}
-
-// InitResources returns the list of resources and maps them.
-func InitResources(client *azure.Client, report mb.ReporterV2) error {
-	if len(client.Config.Resources) == 0 {
-		return errors.New("no resource options defined")
-	}
-	// check if refresh interval has been set and if it has expired
-	if !client.Resources.Expired() {
-		return nil
-	}
-	var metrics []azure.Metric
-	for _, resource := range client.Config.Resources {
-		// retrieve azure resources information
-		if len(resource.Group) > 0 {
-			resource.Type = defaultVMScalesetNamespace
-		}
-		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.ID, resource.Group, resource.Type, resource.Query)
-		if err != nil {
-			err = errors.Wrap(err, "failed to retrieve resources")
-			client.LogError(report, err)
-			continue
-		}
-		if len(resourceList.Values()) == 0 {
-			err = errors.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
-				resource.ID, resource.Group, resource.Type, resource.Query)
-			client.LogError(report, err)
-			continue
-		}
-		for _, res := range resourceList.Values() {
-			namespaces, err := client.AzureMonitorService.GetMetricNamespaces(*res.ID)
-			if err != nil {
-				return errors.Wrapf(err, "no metric namespaces were found for resource %s.", resource.ID)
-			}
-			for _, namespace := range *namespaces.Value {
-				metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*res.ID, *namespace.Properties.MetricNamespaceName)
-				if err != nil {
-					return errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s.", *res.ID, *namespace.Properties.MetricNamespaceName)
-				}
-				if len(*metricDefinitions.Value) == 0 {
-					return errors.Errorf("no metric definitions were found for resource %s and namespace %s.", *res.ID, *namespace.Properties.MetricNamespaceName)
-				}
-				// map azure metric definitions to client metrics
-				metrics = append(metrics, mapMetric(client, res, metricDefinitions, *namespace.Properties.MetricNamespaceName)...)
-			}
-			// get all metric definitions supported by the namespace provided
-
-		}
-	}
-
-	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable, we log and create an event if this is the case (see above)
-	// but we return an error when absolutely no resources are found
-	if len(metrics) == 0 {
-		return errors.New("no resources were found based on all the configurations options entered")
-	}
-	client.Resources.Metrics = metrics
-	return nil
-}
-
 // mapMetric should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetric(client *azure.Client, resource resources.GenericResource, metricDefinitions insights.MetricDefinitionCollection, namespace string) []azure.Metric {
+func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resources.GenericResource) ([]azure.Metric, error) {
 	var metrics []azure.Metric
-	var vmNameMetricNames []insights.MetricDefinition
-	var genericMetricNames []insights.MetricDefinition
-	var slotMetricNames []insights.MetricDefinition
+	metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
+	if err != nil {
+		return nil, errors.Wrapf(err, "no metric definitions were found for resource %s and namespace %s", *resource.ID, metric.Namespace)
+	}
+	if len(*metricDefinitions.Value) == 0 && metric.Namespace != customVMNamespace {
+		return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", *resource.ID, metric.Namespace)
+	}
+	var supportedMetricNames []insights.MetricDefinition
+	if strings.Contains(strings.Join(metric.Name, " "), "*") {
+		for _, definition := range *metricDefinitions.Value {
+			supportedMetricNames = append(supportedMetricNames, definition)
+		}
+	} else {
+		// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
+		for _, name := range metric.Name {
+			for _, metricDefinition := range *metricDefinitions.Value {
+				if name == *metricDefinition.Name.Value {
+					supportedMetricNames = append(supportedMetricNames, metricDefinition)
+				}
+			}
+		}
+	}
+	if len(supportedMetricNames) == 0 {
+		return nil, nil
+	}
+	groupedMetrics := make(map[string][]insights.MetricDefinition)
 	var vmdim string
-	if namespace == defaultVMScalesetNamespace {
+	if metric.Namespace == defaultVMScalesetNamespace {
 		vmdim = defaultVMDimension
-	} else if namespace == customVMNamespace {
+	} else if metric.Namespace == customVMNamespace {
 		vmdim = customVMDimension
 	}
-
-	// some of the metrics do not support the vmname dimension (or any), we will separate those in a different api call
-	for _, metric := range *metricDefinitions.Value {
-		if (metric.Name.LocalizedValue != nil && !strings.Contains(*metric.Name.LocalizedValue, "(Deprecated)")) || metric.Name.LocalizedValue == nil {
-			if (namespace == customVMNamespace && azure.StringInSlice(*metric.Name.Value, memoryMetrics)) || namespace == defaultVMScalesetNamespace {
-				if metric.Dimensions == nil || len(*metric.Dimensions) == 0 {
-					genericMetricNames = append(genericMetricNames, metric)
-				} else if containsDimension(vmdim, *metric.Dimensions) {
-					vmNameMetricNames = append(vmNameMetricNames, metric)
-				} else if containsDimension(defaultSlotIDDimension, *metric.Dimensions) {
-					slotMetricNames = append(slotMetricNames, metric)
-				}
+	for _, metricName := range supportedMetricNames {
+		if (metricName.Name.LocalizedValue != nil && !strings.Contains(*metricName.Name.LocalizedValue, "(Deprecated)")) || metricName.Name.LocalizedValue == nil {
+			if metricName.Dimensions == nil || len(*metricName.Dimensions) == 0 {
+				groupedMetrics[noDimension] = append(groupedMetrics[noDimension], metricName)
+			} else if containsDimension(vmdim, *metricName.Dimensions) {
+				groupedMetrics[vmdim] = append(groupedMetrics[vmdim], metricName)
+			} else if containsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
+				groupedMetrics[defaultSlotIDDimension] = append(groupedMetrics[defaultSlotIDDimension], metricName)
 			}
 		}
 	}
-	if len(genericMetricNames) > 0 {
+	for key, metricGroup := range groupedMetrics {
+		var metricNameList []string
+		for _, metricName := range metricGroup {
+			metricNameList = append(metricNameList, *metricName.Name.Value)
+		}
+		var dimensions []azure.Dimension
+		if key != noDimension {
+			dimensions = []azure.Dimension{{Name: vmdim, Value: "*"}}
+		}
+		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, metric.Namespace, dimensions, defaultTimeGrain)...)
+	}
 
-		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, genericMetricNames, resource, namespace, nil, defaultTimeGrain)...)
-	}
-	if len(vmNameMetricNames) > 0 {
-		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, vmNameMetricNames, resource, namespace, []azure.Dimension{{Name: vmdim, Value: "*"}}, defaultTimeGrain)...)
-	}
-	if len(slotMetricNames) > 0 {
-		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, slotMetricNames, resource, namespace, []azure.Dimension{{Name: defaultSlotIDDimension, Value: "*"}}, defaultTimeGrain)...)
-	}
-	return metrics
+	return metrics, nil
 }
 
 // containsDimension will check if the dimension value is found in the list
