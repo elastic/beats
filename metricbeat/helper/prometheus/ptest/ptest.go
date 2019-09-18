@@ -156,10 +156,10 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 			"hosts":      []string{server.URL},
 		}
 
-		f := mbtest.NewReportingMetricSetV2Error(t, config)
+		f := mbtest.NewFetcher(t, config)
 		reporter := &mbtest.CapturingReporterV2{}
-		f.Fetch(reporter)
-		assert.Nil(t, reporter.GetErrors(), "Errors while fetching metrics")
+		_, errs := f.FetchEvents()
+		assert.Nil(t, errs, "Errors while fetching metrics")
 
 		if *expectedFlag {
 			events := reporter.GetEvents()
