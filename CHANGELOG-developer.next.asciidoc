@@ -21,6 +21,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 ==== Breaking changes
 
 - Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
+- For "metricbeat style" generated custom beats, the mage target `GoTestIntegration` has changed to `GoIntegTest` and `GoTestUnit` has changed to `GoUnitTest`. {pull}13341[13341]
+- Build docker and kubernetes features only on supported platforms. {pull}13509[13509]
+- Need to register new processors to be used in the JS processor in their `init` functions. {pull}13509[13509]
 
 ==== Bugfixes
 

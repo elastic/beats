@@ -148,6 +148,7 @@ func fieldDocs() error {
 		devtools.XPackBeatDir("module"),
 		devtools.OSSBeatDir("input"),
 		devtools.XPackBeatDir("input"),
+		devtools.XPackBeatDir("processors"),
 	}
 	output := devtools.CreateDir("build/fields/fields.all.yml")
 	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {

@@ -15,17 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_kubernetes_metadata
 
 import (
 	"fmt"
 	"time"
 
+	k8sclient "k8s.io/client-go/kubernetes"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -33,14 +38,16 @@ const (
 )
 
 type kubernetesAnnotator struct {
-	watcher  kubernetes.Watcher
-	indexers *Indexers
-	matchers *Matchers
-	cache    *cache
+	watcher             kubernetes.Watcher
+	indexers            *Indexers
+	matchers            *Matchers
+	cache               *cache
+	kubernetesAvailable bool
 }
 
 func init() {
 	processors.RegisterPlugin("add_kubernetes_metadata", New)
+	jsprocessor.RegisterPlugin("AddKubernetesMetadata", New)
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
@@ -49,6 +56,16 @@ func init() {
 	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
+}
+
+func isKubernetesAvailable(client k8sclient.Interface) bool {
+	server, err := client.Discovery().ServerVersion()
+	if err != nil {
+		logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
+		return false
+	}
+	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
+	return true
 }
 
 // New constructs a new add_kubernetes_metadata processor.
@@ -83,18 +100,35 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	indexers := NewIndexers(config.Indexers, metaGen)
-
-	matchers := NewMatchers(config.Matchers)
-
-	if matchers.Empty() {
-		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
+	processor := &kubernetesAnnotator{
+		cache:               newCache(config.CleanupTimeout),
+		kubernetesAvailable: false,
 	}
 
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
-		return nil, err
+		if kubernetes.IsInCluster(config.KubeConfig) {
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
+		} else {
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
+		}
+		return processor, nil
 	}
+
+	if !isKubernetesAvailable(client) {
+		return processor, nil
+	}
+
+	processor.indexers = NewIndexers(config.Indexers, metaGen)
+
+	matchers := NewMatchers(config.Matchers)
+
+	if matchers.Empty() {
+		logp.Debug("kubernetes", "%v: could not initialize kubernetes plugin with zero matcher plugins", "add_kubernetes_metadata")
+		return processor, nil
+	}
+
+	processor.matchers = matchers
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
@@ -111,12 +145,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	processor := &kubernetesAnnotator{
-		watcher:  watcher,
-		indexers: indexers,
-		matchers: matchers,
-		cache:    newCache(config.CleanupTimeout),
-	}
+	processor.watcher = watcher
+	processor.kubernetesAvailable = true
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -139,6 +169,9 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
+	if !k.kubernetesAvailable {
+		return event, nil
+	}
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		return event, nil

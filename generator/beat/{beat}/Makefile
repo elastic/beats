@@ -24,7 +24,7 @@ pre-setup: copy-vendor git-init
 
 # Copy beats into vendor directory
 .PHONY: copy-vendor
-copy-vendor:
+copy-vendor: vendor-check
 	mkdir -p vendor/github.com/elastic/beats
 	git archive --remote ${BEAT_GOPATH}/src/github.com/elastic/beats HEAD | tar -x --exclude=x-pack -C vendor/github.com/elastic/beats
 	mkdir -p vendor/github.com/magefile
@@ -37,4 +37,9 @@ git-init:
 .PHONY: git-add
 git-add:
 	git add -A
-	git commit -m "Add generated {beat} files"
+	git commit -q -m "Add generated {beat} files"
+
+
+.PHONY: vendor-check
+vendor-check:
+	@if output=$$(git -C ${BEAT_GOPATH}/src/github.com/elastic/beats status --porcelain) && [ ! -z "$${output}" ]; then printf "\033[31mWARNING: elastic/beats has uncommitted changes, these will not be in the vendor directory!\033[0m\n"; fi

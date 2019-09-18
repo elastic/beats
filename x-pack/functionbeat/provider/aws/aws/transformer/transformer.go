@@ -5,6 +5,11 @@
 package transformer
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/base64"
+	"encoding/json"
+	"io"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -24,7 +29,7 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 
 	for idx, logEvent := range request.LogEvents {
 		events[idx] = beat.Event{
-			Timestamp: time.Now(), // TODO: time.Unix(logEvent.Timestamp, 0),
+			Timestamp: time.Unix(0, logEvent.Timestamp*1000000),
 			Fields: common.MapStr{
 				"message":              logEvent.Message,
 				"id":                   logEvent.ID,
@@ -80,6 +85,69 @@ func KinesisEvent(request events.KinesisEvent) []beat.Event {
 		}
 	}
 	return events
+}
+
+// CloudwatchKinesisEvent takes a Kinesis event containing Cloudwatch logs and creates events for all
+// Cloudwatch logs.
+func CloudwatchKinesisEvent(request events.KinesisEvent, base64Encoded, compressed bool) ([]beat.Event, error) {
+	var evts []beat.Event
+	for _, record := range request.Records {
+		envelopeFields := common.MapStr{
+			"event_id":                record.EventID,
+			"event_name":              record.EventName,
+			"event_source":            record.EventSource,
+			"event_source_arn":        record.EventSourceArn,
+			"event_version":           record.EventVersion,
+			"aws_region":              record.AwsRegion,
+			"kinesis_partition_key":   record.Kinesis.PartitionKey,
+			"kinesis_schema_version":  record.Kinesis.KinesisSchemaVersion,
+			"kinesis_sequence_number": record.Kinesis.SequenceNumber,
+			"kinesis_encryption_type": record.Kinesis.EncryptionType,
+		}
+
+		kinesisData := record.Kinesis.Data
+		if base64Encoded {
+			var err error
+			kinesisData, err = base64.StdEncoding.DecodeString(string(kinesisData))
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if compressed {
+			inBuf := bytes.NewBuffer(record.Kinesis.Data)
+			r, err := gzip.NewReader(inBuf)
+			if err != nil {
+				return nil, err
+			}
+
+			var outBuf bytes.Buffer
+			_, err = io.Copy(&outBuf, r)
+			if err != nil {
+				r.Close()
+				return nil, err
+			}
+
+			err = r.Close()
+			if err != nil {
+				return nil, err
+			}
+			kinesisData = outBuf.Bytes()
+		}
+
+		var cloudwatchEvents events.CloudwatchLogsData
+		err := json.Unmarshal(kinesisData, &cloudwatchEvents)
+		if err != nil {
+			return nil, err
+		}
+
+		cwEvts := CloudwatchLogs(cloudwatchEvents)
+		for _, cwe := range cwEvts {
+			cwe.Fields.DeepUpdate(envelopeFields)
+			evts = append(evts, cwe)
+		}
+	}
+	return evts, nil
 }
 
 // SQS takes a SQS event and create multiples beat events.

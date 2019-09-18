@@ -21,13 +21,13 @@ setup: copy-vendor git-init
 
 # Copy beats into vendor directory
 .PHONY: copy-vendor
-copy-vendor:
-	mkdir -p vendor/github.com/elastic
-	cp -R ${GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
+copy-vendor: vendor-check
+	mkdir -p vendor/github.com/elastic/beats
+	git archive --remote ${BEAT_GOPATH}/src/github.com/elastic/beats HEAD | tar -x --exclude=x-pack -C vendor/github.com/elastic/beats
 	ln -sf ${PWD}/vendor/github.com/elastic/beats/metricbeat/scripts/generate_imports_helper.py ${PWD}/vendor/github.com/elastic/beats/script/generate_imports_helper.py
-	rm -rf vendor/github.com/elastic/beats/.git vendor/github.com/elastic/beats/x-pack
 	mkdir -p vendor/github.com/magefile
 	cp -R ${BEAT_GOPATH}/src/github.com/elastic/beats/vendor/github.com/magefile/mage vendor/github.com/magefile
+	cp -R ${BEAT_GOPATH}/src/github.com/elastic/beats/vendor/github.com/pkg vendor/github.com/
 
 .PHONY: git-init
 git-init:
@@ -36,4 +36,8 @@ git-init:
 .PHONY: git-add
 git-add:
 	git add -A
-	git commit -m "Add generated {beat} files"
+	git commit -q -m "Add generated {beat} files"
+
+.PHONY: vendor-check
+vendor-check:
+	@if output=$$(git -C ${BEAT_GOPATH}/src/github.com/elastic/beats status --porcelain) && [ ! -z "$${output}" ]; then printf "\033[31mWARNING: elastic/beats has uncommitted changes, these will not be in the vendor directory!\033[0m\n"; fi
