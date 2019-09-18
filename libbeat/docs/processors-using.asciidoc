@@ -93,6 +93,20 @@ Processors are valid:
 collected by {beatname_uc}.
 * Under a specific {processor-scope}. The processor is applied to the data
 collected for that {processor-scope}.
+ifeval::["{beatname_lc}"=="winlogbeat"]
+For example:
++
+[source,yaml]
+----
+winlogbeat.event_logs:
+- name: <network_shipper_name>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
 ifeval::["{beatname_lc}"=="filebeat"]
 For example:
 +
@@ -170,20 +184,6 @@ For example:
 ----
 heartbeat.monitors:
 - type: <monitor_type>
-  processors:
-  - <processor_name>:
-      when:
-        <condition>
-      <parameters>
-----
-endif::[]
-ifeval::["{beatname_lc}"=="winlogbeat"]
-For example:
-+
-[source,yaml]
-----
-winlogbeat.event_logs:
-- name: <network_shipper_name>
   processors:
   - <processor_name>:
       when:
