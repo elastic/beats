@@ -157,12 +157,10 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 		}
 
 		f := mbtest.NewFetcher(t, config)
-		reporter := &mbtest.CapturingReporterV2{}
-		_, errs := f.FetchEvents()
+		events, errs := f.FetchEvents()
 		assert.Nil(t, errs, "Errors while fetching metrics")
 
 		if *expectedFlag {
-			events := reporter.GetEvents()
 			sort.SliceStable(events, func(i, j int) bool {
 				h1, _ := hashstructure.Hash(events[i], nil)
 				h2, _ := hashstructure.Hash(events[j], nil)
@@ -185,7 +183,7 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 			t.Fatal(err)
 		}
 
-		for _, event := range reporter.GetEvents() {
+		for _, event := range events {
 			// ensure the event is in expected list
 			found := -1
 			for i, expectedEvent := range expectedEvents {
