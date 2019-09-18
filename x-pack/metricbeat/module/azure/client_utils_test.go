@@ -105,10 +105,22 @@ func TestMetricIsEmpty(t *testing.T) {
 	assert.True(t, result)
 }
 
-func TestMapResourceGroupFormID(t *testing.T) {
+func TestGetResourceGroupFromID(t *testing.T) {
 	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	group := getResourceGroupFormID(path)
+	group := getResourceGroupFromID(path)
 	assert.Equal(t, group, "obs-infrastructure")
+}
+
+func TestGetResourceTypeFromID(t *testing.T) {
+	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
+	rType := getResourceTypeFromID(path)
+	assert.Equal(t, rType, "Microsoft.Compute/virtualMachines")
+}
+
+func TestGetResourceNameFromID(t *testing.T) {
+	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
+	name := getResourceNameFromID(path)
+	assert.Equal(t, name, "obstestmemleak")
 }
 
 func TestExpired(t *testing.T) {

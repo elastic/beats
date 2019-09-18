@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// DefaultTimeGrain is set as default timegrain for the azure metrics
 const DefaultTimeGrain = "PT5M"
 
 // mapMetricValues should map the metric values
@@ -92,7 +94,7 @@ func matchMetrics(prevMet Metric, met Metric) bool {
 }
 
 // getResourceGroupFormID maps resource group from resource ID
-func getResourceGroupFormID(path string) string {
+func getResourceGroupFromID(path string) string {
 	params := strings.Split(path, "/")
 	for i, param := range params {
 		if param == "resourceGroups" {
@@ -103,7 +105,18 @@ func getResourceGroupFormID(path string) string {
 }
 
 // getResourceNameFormID maps resource group from resource ID
-func getResourceNameFormID(path string) string {
+func getResourceTypeFromID(path string) string {
+	params := strings.Split(path, "/")
+	for i, param := range params {
+		if param == "providers" {
+			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
+		}
+	}
+	return ""
+}
+
+// getResourceNameFormID maps resource group from resource ID
+func getResourceNameFromID(path string) string {
 	params := strings.Split(path, "/")
 	if strings.HasSuffix(path, "/") {
 		return params[len(params)-2]

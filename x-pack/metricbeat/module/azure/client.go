@@ -128,7 +128,7 @@ func (client *Client) LogError(report mb.ReporterV2, err error) {
 
 // CreateMetric function will create a client metric based on the resource and metrics configured
 func (client *Client) CreateMetric(resource resources.GenericResource, namespace string, metrics []string, aggregations string, dimensions []Dimension, timegrain string) Metric {
-	met := Metric{Resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type, Group: getResourceGroupFormID(*resource.ID),
+	met := Metric{Resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type, Group: getResourceGroupFromID(*resource.ID),
 		Tags: mapTags(resource.Tags), Subscription: client.Config.SubscriptionID},
 		Namespace: namespace, Names: metrics, Dimensions: dimensions, Aggregations: aggregations, TimeGrain: timegrain}
 	for _, prevMet := range client.Resources.Metrics {

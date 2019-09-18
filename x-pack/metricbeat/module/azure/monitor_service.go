@@ -55,15 +55,11 @@ func (service MonitorService) GetResourceDefinitions(ID []string, group []string
 	var resourceQuery string
 	if len(ID) > 0 {
 		var filterList []string
-		if len(ID) == 1 {
-			resourceQuery = fmt.Sprintf("resourceID eq '%s'", ID[0])
-		} else {
-			// listing resourceID conditions does not seem to work with the API but querying by name or resource types will work
-			for _, id := range ID {
-				filterList = append(filterList, fmt.Sprintf("(name eq '%s' AND resourceGroup eq '%s')", getResourceNameFormID(id), getResourceGroupFormID(id)))
-			}
-			resourceQuery = strings.Join(filterList, " OR ")
+		// listing resourceID conditions does not seem to work with the API but querying by name or resource types will work
+		for _, id := range ID {
+			filterList = append(filterList, fmt.Sprintf("name eq '%s'", getResourceNameFromID(id)))
 		}
+		resourceQuery = fmt.Sprintf("(%s) AND resourceType eq '%s'", strings.Join(filterList, " OR "), getResourceTypeFromID(ID[0]))
 	} else if len(group) > 0 {
 		var filterList []string
 		for _, gr := range group {
@@ -76,7 +72,7 @@ func (service MonitorService) GetResourceDefinitions(ID []string, group []string
 	} else if query != "" {
 		resourceQuery = query
 	}
-	return service.resourceClient.List(service.context, resourceQuery, "true", nil)
+	return service.resourceClient.List(service.context, resourceQuery, "resourceID", nil)
 }
 
 // GetMetricNamespaces will return all supported namespaces based on the resource id and namespace
