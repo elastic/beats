@@ -6,6 +6,11 @@ package httpjson
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"sync"
 	"testing"
@@ -21,12 +26,11 @@ import (
 
 var (
 	once sync.Once
-	host = "httpbin.org"
+	url  string
 )
 
 func testSetup(t *testing.T) {
 	t.Helper()
-
 	once.Do(func() {
 		logp.TestingSetup()
 	})
@@ -36,10 +40,42 @@ func isInDockerIntegTestEnv() bool {
 	return os.Getenv("BEATS_DOCKER_INTEGRATION_TEST_ENV") != ""
 }
 
-func runTest(t *testing.T, cfg *common.Config, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
+func runTest(t *testing.T, m map[string]interface{}, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
 	// Setup httpbin environment
 	testSetup(t)
-
+	// Create test http server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			req, err := ioutil.ReadAll(r.Body)
+			defer r.Body.Close()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			var m interface{}
+			err = json.Unmarshal(req, &m)
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+			} else {
+				w.WriteHeader(http.StatusOK)
+				w.Write(req)
+			}
+		} else {
+			message := map[string]interface{}{
+				"hello": "world",
+				"embedded": map[string]string{
+					"hello": "world",
+				},
+			}
+			b, _ := json.Marshal(message)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write(b)
+		}
+	}))
+	defer ts.Close()
+	m["url"] = ts.URL
+	cfg := common.MustNewConfigFrom(m)
 	// Simulate input.Context from Filebeat input runner.
 	inputCtx := newInputContext()
 	defer close(inputCtx.Done)
@@ -119,13 +155,11 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 // --- Test Cases
 
 func TestGET(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	m := map[string]interface{}{
 		"http_method": "GET",
 		"interval":    0,
-		"url":         "http://" + host + "/json",
-	})
-
-	runTest(t, cfg, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	}
+	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -142,14 +176,12 @@ func TestGET(t *testing.T) {
 }
 
 func TestPOST(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	m := map[string]interface{}{
 		"http_method":       "POST",
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          0,
-		"url":               "https://" + host + "/post",
-	})
-
-	runTest(t, cfg, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	}
+	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -166,13 +198,11 @@ func TestPOST(t *testing.T) {
 }
 
 func TestRunStop(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	m := map[string]interface{}{
 		"http_method": "GET",
 		"interval":    0,
-		"url":         "http://" + host + "/json",
-	})
-
-	runTest(t, cfg, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	}
+	runTest(t, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
 		input.Run()
 		input.Stop()
 		input.Run()
