@@ -1,8 +1,8 @@
 [[configuration-heartbeat-options]]
-== Set up monitors
+== Set up {beatname_uc} monitors
 
 ++++
-<titleabbrev>Set up {beatname_uc} monitors</titleabbrev>
+<titleabbrev>Set up monitors</titleabbrev>
 ++++
 
 To configure {beatname_uc} define a set of `monitors` to check your remote hosts.
