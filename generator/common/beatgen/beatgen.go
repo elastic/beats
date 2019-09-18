@@ -105,7 +105,7 @@ func Generate() error {
 		}
 	}
 
-	//mg.Deps(setup.Update)
+	mg.Deps(setup.Update)
 	mg.Deps(setup.GitAdd)
 
 	return nil
