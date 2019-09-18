@@ -94,12 +94,6 @@ func isRetryErr(err error) bool {
 	return err == syscall.EINTR || err == syscall.EAGAIN
 }
 
-func unsafeString(b []byte) string {
-	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	str := reflect.StringHeader{Data: hdr.Data, Len: hdr.Len}
-	return *(*string)(unsafe.Pointer(&str))
-}
-
 func unsafeKeyRef(k backend.Key) []byte {
 	str := (*reflect.StringHeader)(unsafe.Pointer(&k))
 	hdr := reflect.SliceHeader{Data: str.Data, Len: str.Len, Cap: str.Len}
