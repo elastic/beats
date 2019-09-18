@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 )
 
+// MonitorNextRunValidator is tests for the `next_run` and `next_run_in.us` keys.
 var MonitorNextRunValidator = lookslike.MustCompile(map[string]interface{}{
 	"monitor": map[string]interface{}{
 		"next_run":       IsTime,

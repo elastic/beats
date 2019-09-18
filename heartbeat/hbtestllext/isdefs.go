@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/go-lookslike/llresult"
 )
 
+// IsTime checks that the value is a time.Time instance.
 var IsTime = isdef.Is("time", func(path llpath.Path, v interface{}) *llresult.Results {
 	_, ok := v.(time.Time)
 	if !ok {
