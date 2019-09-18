@@ -262,7 +262,7 @@ to set the index:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "%{[fields.log_type]}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}\" <1>
+  index: "%{[fields.log_type]}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}" <1>
 ------------------------------------------------------------------------------
 
 <1> We recommend including +{beat_version_key}+ in the name to avoid mapping issues
