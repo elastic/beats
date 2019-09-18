@@ -358,6 +358,8 @@ func (ns *ConfigNamespace) IsSet() bool {
 	return ns.config != nil
 }
 
+// DebugString prints a human readable representation of the underlying config using
+// JSON formatting.
 func DebugString(c *Config, filterPrivate bool) string {
 	var bufs []string
 
