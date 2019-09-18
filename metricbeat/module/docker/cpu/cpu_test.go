@@ -34,9 +34,6 @@ func cpuUsageFor(stats types.StatsJSON) *cpuUsage {
 		Stat:        &docker.Stat{Stats: stats},
 		systemDelta: 1000000000, // Nanoseconds in a second
 	}
-	//if len(stats.CPUStats.CPUUsage.PercpuUsage) == 0 {
-	//	u.cpus = 1
-	//}
 	return &u
 }
 
