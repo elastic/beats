@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 - Add new dashboard for Aerospike database stats {pull}13217[13217]
 - Add new dashboard for Couchbase cluster stats {pull}13212[13212]
 - Add new dashboard for Prometheus server stats {pull}13126[13126]
+- Add statistic option into cloudwatch metricset. If there is no statistic method specified, default is to collect Average, Sum, Maximum, Minimum and SampleCount. {issue}12370[12370] {pull}12840[12840]
 
 *Functionbeat*
 
@@ -70,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 - Fix silent failures in kafka and prometheus module. {pull}13353[13353] {issue}13252[13252]
 - Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
 - Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
+- In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
 
 *Packetbeat*
 
@@ -85,6 +87,14 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 *Affecting all Beats*
 
 - Add support for reading the `network.iana_number` field by default to the community_id processor. {pull}12701[12701]
+- Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
+- Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
+- Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
+- add_host_metadata is now GA. {pull}13148[13148]
+- Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
+- add_host_metadata is no GA. {pull}13148[13148]
+- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
+- Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
 - Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
 - Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
 - Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
@@ -150,6 +160,13 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 - Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
 - Add support for event ID 4672 to the Security module. {pull}12975[12975]
 - Add support for event ID 22 (DNS query) to the Sysmon module. {pull}12960[12960]
+- Add support for event ID 4634 and 4647 to the Security module. {pull}12906[12906]
+- Add `network.community_id` to Sysmon network events (event ID 3). {pull}13034[13034]
+- Add `event.module` to Winlogbeat modules. {pull}13047[13047]
+- Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
+- Add support for event ID 4672 to the Security module. {pull}12975[12975]
+- Add support for event ID 22 (DNS query) to the Sysmon module. {pull}12960[12960]
+- Add certain winlog.event_data.* fields to the index template. {issue}13700[13700] {pull}13704[13704]
 
 [[release-notes-7.1.1]]
 === Beats version 7.1.1

@@ -38,7 +38,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
-- Add statistic option into cloudwatch metricset. If there is no statistic method specified, default is to collect Average, Sum, Maximum, Minimum and SampleCount. {issue}12370[12370] {pull}12840[12840]
 
 *Packetbeat*
 
@@ -152,7 +151,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 - Reuse connections in PostgreSQL metricsets. {issue}12504[12504] {pull}12603[12603]
 - PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.{issue}12590[12590]{pull}12622[12622]
-- In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
 - Fix incoherent behaviour in redis key metricset when keyspace is specified both in host URL and key pattern {pull}12913[12913]
 - Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
@@ -203,14 +201,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 - Add `decompress_gzip_field` processor. {pull}12733[12733]
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
-- Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
-- Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
-- Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
-- add_host_metadata is now GA. {pull}13148[13148]
-- Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
-- add_host_metadata is no GA. {pull}13148[13148]
-- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
-- Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
 - Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
 
 *Auditbeat*
@@ -305,13 +295,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add support for reading from .evtx files. {issue}4450[4450]
-- Add support for event ID 4634 and 4647 to the Security module. {pull}12906[12906]
-- Add `network.community_id` to Sysmon network events (event ID 3). {pull}13034[13034]
-- Add `event.module` to Winlogbeat modules. {pull}13047[13047]
-- Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
-- Add support for event ID 4672 to the Security module. {pull}12975[12975]
-- Add support for event ID 22 (DNS query) to the Sysmon module. {pull}12960[12960]
-- Add certain winlog.event_data.* fields to the index template. {issue}13700[13700] {pull}13704[13704]
 
 ==== Deprecated
 
