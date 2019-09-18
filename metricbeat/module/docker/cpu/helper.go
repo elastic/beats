@@ -96,6 +96,8 @@ type cpuUsage struct {
 	systemDelta uint64
 }
 
+// CPUS returns the number of cpus. If number of cpus is equal to zero, the field will
+// be updated/initialized with the corresponding value retrieved from Docker API.
 func (u *cpuUsage) CPUs() uint32 {
 	if u.cpus == 0 {
 		u.cpus = u.Stats.CPUStats.OnlineCPUs
@@ -103,6 +105,7 @@ func (u *cpuUsage) CPUs() uint32 {
 	return u.cpus
 }
 
+// SystemDelta calculates system delta.
 func (u *cpuUsage) SystemDelta() uint64 {
 	if u.systemDelta == 0 {
 		u.systemDelta = u.Stats.CPUStats.SystemUsage - u.Stats.PreCPUStats.SystemUsage
@@ -110,6 +113,7 @@ func (u *cpuUsage) SystemDelta() uint64 {
 	return u.systemDelta
 }
 
+// PerCPU calculates per CPU usage.
 func (u *cpuUsage) PerCPU() common.MapStr {
 	var output common.MapStr
 	if len(u.Stats.CPUStats.CPUUsage.PercpuUsage) == len(u.Stats.PreCPUStats.CPUUsage.PercpuUsage) {
@@ -127,34 +131,42 @@ func (u *cpuUsage) PerCPU() common.MapStr {
 	return output
 }
 
+// TotalNormalized calculates total CPU usage normalized.
 func (u *cpuUsage) Total() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.TotalUsage, u.Stats.PreCPUStats.CPUUsage.TotalUsage, u.CPUs())
 }
 
+// TotalNormalized calculates total CPU usage normalized by the number of CPU cores.
 func (u *cpuUsage) TotalNormalized() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.TotalUsage, u.Stats.PreCPUStats.CPUUsage.TotalUsage, 1)
 }
 
+// InKernelMode calculates percentage of time in kernel space.
 func (u *cpuUsage) InKernelMode() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInKernelmode, u.Stats.PreCPUStats.CPUUsage.UsageInKernelmode, u.CPUs())
 }
 
+// InKernelModeNormalized calculates percentage of time in kernel space normalized by the number of CPU cores.
 func (u *cpuUsage) InKernelModeNormalized() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInKernelmode, u.Stats.PreCPUStats.CPUUsage.UsageInKernelmode, 1)
 }
 
+// InUserMode calculates percentage of time in user space.
 func (u *cpuUsage) InUserMode() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInUsermode, u.Stats.PreCPUStats.CPUUsage.UsageInUsermode, u.CPUs())
 }
 
+// InUserModeNormalized calculates percentage of time in user space normalized by the number of CPU cores.
 func (u *cpuUsage) InUserModeNormalized() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInUsermode, u.Stats.PreCPUStats.CPUUsage.UsageInUsermode, 1)
 }
 
+// System calculates percentage of total CPU time in the system.
 func (u *cpuUsage) System() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.SystemUsage, u.Stats.PreCPUStats.SystemUsage, u.CPUs())
 }
 
+// SystemNormalized calculates percentage of total CPU time in the system, normalized by the number of CPU cores.
 func (u *cpuUsage) SystemNormalized() float64 {
 	return u.calculatePercentage(u.Stats.CPUStats.SystemUsage, u.Stats.PreCPUStats.SystemUsage, 1)
 }
