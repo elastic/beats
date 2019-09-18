@@ -18,6 +18,8 @@
 package node
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
@@ -79,28 +81,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
 	body, err := m.http.FetchContent()
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error doing HTTP request to fetch 'node' Metricset data")
+
 	}
 
 	event, err := eventMapping(body)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error in mapping")
 	}
 
 	m.enricher.Enrich([]common.MapStr{event})
 
 	reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
 
-	return
+	return nil
 }
 
 // Close stops this metricset
