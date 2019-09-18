@@ -2076,6 +2076,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/grpc-ecosystem/go-grpc-prometheus
+Revision: ae0d8660c5f2108ca70a3776dbe0fb53cf79f1da
+License type (autodetected): Apache-2.0
+./vendor/github.com/grpc-ecosystem/go-grpc-prometheus/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/grpc-ecosystem/grpc-gateway
 Revision: d63917fcb0d53f39184485b9b6a0893af18a5668
 License type (autodetected): BSD-3-Clause
@@ -2108,15 +2117,6 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
-Dependency: github.com/grpc-ecosystem/go-grpc-prometheus
-Revision: ae0d8660c5f2108ca70a3776dbe0fb53cf79f1da
-License type (autodetected): Apache-2.0
-./vendor/github.com/grpc-ecosystem/go-grpc-prometheus/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
 
 --------------------------------------------------------------------
 Dependency: github.com/hashicorp/go-immutable-radix
