@@ -46,11 +46,13 @@ func init() {
 	)
 }
 
+// MetricSet for fetching prometheus data
 type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 }
 
+// New creates a new metricset
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	prometheus, err := p.NewPrometheusClient(base)
 	if err != nil {
@@ -63,12 +65,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+// Fetch fetches data and reports it
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.prometheus.GetFamilies()
 
 	if err != nil {
-		reporter.Error(fmt.Errorf("Unable to decode response from prometheus endpoint"))
-		return
+		return fmt.Errorf("unable to decode response from prometheus endpoint")
 	}
 
 	eventList := map[string]common.MapStr{}
@@ -97,8 +99,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	// Converts hash list to slice
 	for _, e := range eventList {
-		reporter.Event(mb.Event{
+		isOpen := reporter.Event(mb.Event{
 			RootFields: common.MapStr{"prometheus": e},
 		})
+		if !isOpen {
+			break
+		}
 	}
+
+	return nil
 }

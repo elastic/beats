@@ -18,6 +18,9 @@ import (
 
 	// Register JS "require" modules.
 	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module"
+	// Register required processors.
+	_ "github.com/elastic/beats/libbeat/cmd/instance"
+	_ "github.com/elastic/beats/libbeat/processors/timestamp"
 )
 
 var logInputHeaders = []string{

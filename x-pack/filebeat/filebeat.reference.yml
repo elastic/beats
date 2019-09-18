@@ -76,6 +76,25 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#--------------------------------- AWS Module ---------------------------------
+- module: aws
+  s3access:
+    enabled: true
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+#--------------------------------- CEF Module ---------------------------------
+- module: cef
+  log:
+    enabled: true
+    var:
+      syslog_host: localhost
+      syslog_port: 9003
+
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
@@ -94,6 +113,24 @@ filebeat.modules:
     # Set the log level from 1 (alerts only) to 7 (include all messages).
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
+
+  ftd:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9003.
+    #var.syslog_port: 9003
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
     #var.log_level: 7
 
   ios:
@@ -195,6 +232,16 @@ filebeat.modules:
 
     # Set which input to use between syslog (default) or file.
     #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#-------------------------------- Ibmmq Module --------------------------------
+- module: ibmmq
+  # All logs
+  errorlog:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -962,6 +1009,26 @@ filebeat.inputs:
 
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
+
+#------------------------------ S3 input --------------------------------
+# Beta: Config options for AWS S3 input
+#- type: s3
+  #enabled: false
+
+  # AWS Credentials
+  # If access_key_id and secret_access_key are configured, then use them to make api calls.
+  # If not, s3 input will load default AWS config or load with given profile name.
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-s3-input
+
+  # Queue urls (required) to receive queue messages from
+  #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+
+  # The duration (in seconds) that the received messages are hidden from subsequent
+  # retrieve requests after being retrieved by a ReceiveMessage request.
+  #visibility_timeout: 300
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -1067,7 +1134,7 @@ filebeat.inputs:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -2129,13 +2196,18 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # Filebeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Filebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.

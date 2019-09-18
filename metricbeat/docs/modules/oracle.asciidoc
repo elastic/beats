@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-oracle]]
+[role="xpack"]
 == Oracle module
 
 beta[]
@@ -64,7 +65,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-oracle-performance,performance>>
+
 * <<metricbeat-metricset-oracle-tablespace,tablespace>>
+
+include::oracle/performance.asciidoc[]
 
 include::oracle/tablespace.asciidoc[]
 

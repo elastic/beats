@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of Netflow",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

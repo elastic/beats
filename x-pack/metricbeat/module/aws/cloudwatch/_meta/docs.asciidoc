@@ -15,32 +15,36 @@ tag:getResources
 [float]
 === Metricset-specific configuration notes
 * *namespace*: The namespace to filter against. For example, AWS/EC2, AWS/S3.
-* *metricname*: The name of the metric to filter against. For example, CPUUtilization for EC2 instance.
+* *name*: The name of the metric to filter against. For example, CPUUtilization for EC2 instance.
 * *dimensions*: The dimensions to filter against. For example, InstanceId=i-123.
 * *tags.resource_type_filter*: The constraints on the resources that you want returned.
 The format of each resource type is service[:resourceType].
 For example, specifying a resource type of ec2 returns all Amazon EC2 resources
 (which includes EC2 instances). Specifying a resource type of ec2:instance returns
 only EC2 instances.
+* *statistic*: Statistics are metric data aggregations over specified periods of time.
+By default, statistic includes Average, Sum, Count, Maximum and Minimum.
 
 [float]
 === Configuration example
+To be more focused on `cloudwatch` metricset use cases, the examples below do
+not include configurations on AWS credentials.
+Please see <<aws-credentials-config,AWS credentials options>> for more details on setting AWS credentials
+in configurations in order for this metricset to make proper AWS API calls.
+
 [source,yaml]
 ----
 - module: aws
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EBS <1>
     - namespace: AWS/ELB <2>
       tags.resource_type_filter: elasticloadbalancing
     - namespace: AWS/EC2 <3>
-      metricname: CPUUtilization
+      name: CPUUtilization
+      statistic: ["Average"]
       dimensions:
         - name: InstanceId
           value: i-0686946e22cf9494a
@@ -71,11 +75,7 @@ from EBS, ELB and EC2 without tag information.
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
     - namespace: AWS/EC2
@@ -90,11 +90,7 @@ from EBS, ELB and EC2 with tags from these services.
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EBS
       tags.resource_type_filter: ebs
     - namespace: AWS/ELB
@@ -104,27 +100,26 @@ from EBS, ELB and EC2 with tags from these services.
 ----
 
 With the configuration below, users will be able to collect specific cloudwatch
-metrics. For example CPUUtilization metric from EC2 instance i-123 and NetworkIn
-metric from EC2 instance i-456.
+metrics. For example CPUUtilization metric(average) from EC2 instance i-123 and NetworkIn
+metric(average) from EC2 instance i-456.
 [source,yaml]
 ----
 - module: aws
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EC2
-      metricname: CPUUtilization
+      name: ["CPUUtilization"]
+      tags.resource_type_filter: ec2:intance
       dimensions:
         - name: InstanceId
           value: i-123
+      statistic: ["Average"]
     - namespace: AWS/EC2
-      metricname: NetworkIn
+      name: ["NetworkIn"]
       dimensions:
         - name: InstanceId
           value: i-456
+      statistic: ["Average"]
 ----

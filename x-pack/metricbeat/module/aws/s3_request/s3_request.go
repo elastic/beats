@@ -13,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -26,9 +25,7 @@ var metricsetName = "s3_request"
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-	)
+	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -189,12 +186,7 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 
 // CreateS3Events creates s3_request and s3_daily_storage events from Cloudwatch metric data.
 func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	// Cloud fields in ECS
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
-	event.RootFields.Put("cloud.provider", "aws")
+	event = aws.InitEvent(regionName)
 
 	// AWS s3_request metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
@@ -222,7 +214,7 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 		return
 	}
 
-	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
+	event.RootFields.Put("aws.s3.bucket.name", bucketName)
 	return
 }

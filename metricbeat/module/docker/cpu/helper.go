@@ -84,13 +84,13 @@ func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 type cpuUsage struct {
 	*docker.Stat
 
-	cpus        int
+	cpus        uint32
 	systemDelta uint64
 }
 
-func (u *cpuUsage) CPUs() int {
+func (u *cpuUsage) CPUs() uint32 {
 	if u.cpus == 0 {
-		u.cpus = len(u.Stats.CPUStats.CPUUsage.PercpuUsage)
+		u.cpus = u.Stats.CPUStats.OnlineCPUs
 	}
 	return u.cpus
 }

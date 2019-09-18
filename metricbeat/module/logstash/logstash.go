@@ -92,7 +92,10 @@ type graph struct {
 }
 
 type graphContainer struct {
-	Graph *graph `json:"graph,omitempty"`
+	Graph   *graph `json:"graph,omitempty"`
+	Type    string `json:"type"`
+	Version string `json:"version"`
+	Hash    string `json:"hash"`
 }
 
 // PipelineState represents the state (shape) of a Logstash pipeline

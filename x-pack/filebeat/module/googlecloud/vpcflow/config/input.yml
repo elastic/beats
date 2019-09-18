@@ -1,6 +1,6 @@
 {{ if eq .input "google-pubsub" }}
 
-type: google-pubsub 
+type: google-pubsub
 project_id: {{ .project_id }}
 topic: {{ .topic }}
 subscription.name: {{ .subscription_name }}

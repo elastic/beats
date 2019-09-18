@@ -1,0 +1,55 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-beat]]
+== Beat module
+
+This is the Beat module.
+
+The default metricsets are `state` and `stats`.
+
+[float]
+=== Compatibility
+
+The beat module is tested with metricbeat 7.3.0.
+
+
+[float]
+=== Example configuration
+
+The Beat module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: beat
+  metricsets:
+    - stats
+    - state
+  period: 10s
+  hosts: ["http://localhost:5066"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-beat-state,state>>
+
+* <<metricbeat-metricset-beat-stats,stats>>
+
+include::beat/state.asciidoc[]
+
+include::beat/stats.asciidoc[]
+

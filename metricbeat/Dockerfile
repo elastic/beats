@@ -1,5 +1,5 @@
 FROM store/oracle/database-instantclient:12.2.0.1 as oracle
-FROM golang:1.12.7
+FROM golang:1.12.9
 
 RUN \
     apt-get update \

@@ -211,11 +211,13 @@ The supported processors are:
  * <<community-id,`community_id`>>
  * <<convert,`convert`>>
  * <<decode-base64-field,`decode_base64_field`>>
+ifdef::has_decode_cef_processor[]
+* <<processor-decode-cef,`decode_cef`>>
+endif::[]
 ifdef::has_decode_csv_fields_processor[]
  * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
- * <<decode-base64-field,`decode_base64_field`>>
  * <<decompress-gzip-field,`decompress_gzip_field`>>
  * <<dissect, `dissect`>>
  * <<processor-dns, `dns`>>
@@ -223,6 +225,7 @@ endif::[]
  * <<drop-fields,`drop_fields`>>
  * <<extract-array,`extract_array`>>
  * <<include-fields,`include_fields`>>
+ * <<processor-registered-domain,`registered_domain`>>
  * <<rename-fields,`rename`>>
 ifdef::has_script_processor[]
  * <<processor-script,`script`>>
@@ -793,6 +796,45 @@ Adds the environment field to every event:
 }
 -------------------------------------------------------------------------------
 
+ifdef::has_decode_cef_processor[]
+[[processor-decode-cef]]
+[role="xpack"]
+=== Decode CEF
+
+beta[]
+
+The `decode_cef` processor decodes Common Event Format (CEF) messages. This
+processor is available in Filebeat.
+
+Below is an example configuration that decodes the `message` field as CEF after
+renaming it to `event.original`. It is best to rename `message` to
+`event.original` because the decoded CEF data contains its own `message` field.
+
+[source,yaml]
+----
+processors:
+- rename:
+    fields:
+      - {from: "message", to: "event.original"}
+- decode_cef:
+    field: event.original
+----
+
+The `decode_cef` processor has the following configuration settings.
+
+.Decode CEF options
+[options="header"]
+|======
+| `field`          | no       | message | Source field containing the CEF message to be parsed.                        |
+| `target_field`   | no       | cef     | Target field where the parsed CEF object will be written.                    |
+| `ecs`            | no       | true    | Generate Elastic Common Schema (ECS) fields from the CEF data.
+                                          Certain CEF header and extension values will be used to populate ECS fields. |
+| `ignore_missing` | no       | false   | Ignore errors when the source field is missing.                              |
+| `ignore_failure` | no       | false   | Ignore failures when the source field does not contain a CEF message.        |
+| `id`             | no       |         | An identifier for this processor instance. Useful for debugging.             |
+|======
+endif::[]
+
 ifdef::has_decode_csv_fields_processor[]
 [[decode-csv-fields]]
 === Decode CSV fields
@@ -890,8 +932,9 @@ processor to drop the field and then rename the field.
 -------
 processors:
 - decode_base64_field:
-    from: "field1"
-    to: "field2"
+    field:
+      from: "field1"
+      to: "field2"
     ignore_missing: false
     fail_on_error: true
 -------
@@ -924,8 +967,9 @@ processor to drop the field and then rename the field.
 -------
 processors:
 - decompress_gzip_field:
-    from: "field1"
-    to: "field2"
+    field:
+      from: "field1"
+      to: "field2"
     ignore_missing: false
     fail_on_error: true
 -------
@@ -1070,12 +1114,18 @@ processors:
      when:
         condition
      fields: ["field1", "field2", ...]
+     ignore_missing: false
 -----------------------------------------------------
 
 See <<conditions>> for a list of supported conditions.
 
 NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
+
+The `drop_fields` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If `true` the processor will not return an error
+when a specified field does not exist. Defaults to `false`.
 
 [[extract-array]]
 === Extract array
@@ -1144,6 +1194,40 @@ section.
 
 NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
+
+[[processor-registered-domain]]
+=== Registered Domain
+
+The `registered_domain` processor reads a field containing a hostname and then
+writes the "registered domain" contained in the hostname to the target field.
+For example, given `www.google.co.uk` the processor would output `google.co.uk`.
+In other words the "registered domain" is the effective top-level domain
+(`co.uk`) plus one level (`google`).
+
+This processor uses the Mozilla Public Suffix list to determine the value.
+
+[source,yaml]
+----
+processors:
+- registered_domain:
+    field: dns.question.name
+    target_field: dns.question.registered_domain
+    ignore_missing: true
+    ignore_failure: true
+----
+
+The `registered_domain` processor has the following configuration settings:
+
+.Registered Domain options
+[options="header"]
+|======
+| Name             | Required | Default    | Description                                                      |
+| `field`          | yes      |            | Source field containing a fully qualified domain name (FQDN).    |
+| `target_field`   | yes      |            | Target field for the registered domain value.                    |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                  |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                     |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging. |
+|======
 
 [[rename-fields]]
 === Rename fields from events
@@ -1226,7 +1310,6 @@ Kubernetes.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: true
 -------------------------------------------------------------------------------
 
 The configuration below enables the processor on a Beat running as a process on
@@ -1236,7 +1319,6 @@ the Kubernetes node.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: false
     host: <hostname>
     kube_config: ${HOME}/.kube/config
 -------------------------------------------------------------------------------
@@ -1248,7 +1330,6 @@ enables ones that the user is interested in.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: false
     host: <hostname>
     kube_config: ~/.kube/config
     default_indexers.enabled: false
@@ -1262,8 +1343,6 @@ processors:
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
 
-`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
-by default.
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
@@ -1356,8 +1435,6 @@ forget metadata for a container, 60s by default.
 
 [[add-host-metadata]]
 === Add Host metadata
-
-beta[]
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -1910,15 +1987,15 @@ If a layout does not contain a year then the current year in the specified
 .Timestamp options
 [options="header"]
 |======
-| Name             | Required | Default    | Description                                                                                 |
-| `field`          | yes      |            | Source field containing the time to be parsed.                                              |
-| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.          |
-| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format.                               |
-| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone. |
-| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                             |
-| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                |
-| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.               |
-| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                            |
+| Name             | Required | Default    | Description                                                                                                           |
+| `field`          | yes      |            | Source field containing the time to be parsed.                                                                        |
+| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.                                    |
+| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |
+| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone.                           |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                                                       |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                                          |
+| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.                                         |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                                                      |
 |======
 
 Here is an example that parses the `start_time` field and writes the result

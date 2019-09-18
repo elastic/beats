@@ -18,6 +18,7 @@
 package timestamp
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -61,6 +62,54 @@ func TestParsePatterns(t *testing.T) {
 			assert.Equal(t, expected, evt.Timestamp)
 		})
 	}
+
+	t.Run("UNIX", func(t *testing.T) {
+		p.Layouts = []string{"UNIX"}
+
+		epochSec := expected.Unix()
+		times := []interface{}{
+			epochSec,
+			float64(epochSec),
+			strconv.FormatInt(epochSec, 10),
+			strconv.FormatInt(epochSec, 10) + ".0",
+		}
+
+		for _, timeValue := range times {
+			evt.Timestamp = time.Time{}
+			evt.PutValue("ts", timeValue)
+
+			evt, err = p.Run(evt)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, expected, evt.Timestamp)
+		}
+	})
+
+	t.Run("UNIX_MS", func(t *testing.T) {
+		p.Layouts = []string{"UNIX_MS"}
+
+		epochMs := int64(expected.UnixNano()) / int64(time.Millisecond)
+		times := []interface{}{
+			epochMs,
+			float64(epochMs),
+			strconv.FormatInt(epochMs, 10),
+			strconv.FormatInt(epochMs, 10) + ".0",
+		}
+
+		for _, timeValue := range times {
+			evt.Timestamp = time.Time{}
+			evt.PutValue("ts", timeValue)
+
+			evt, err = p.Run(evt)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, expected, evt.Timestamp)
+		}
+	})
 }
 
 func TestParseNoYear(t *testing.T) {

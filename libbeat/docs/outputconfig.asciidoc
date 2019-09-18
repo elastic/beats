@@ -20,7 +20,7 @@ endif::[]
 
 ifndef::only-elasticsearch[]
 You configure {beatname_uc} to write to a specific output by setting options
-in the `output` section of the +{beatname_lc}.yml+ config file. Only a single
+in the Outputs section of the +{beatname_lc}.yml+ config file. Only a single
 output may be defined.
 
 The following topics describe how to configure each supported output:
@@ -218,7 +218,7 @@ for more information about the environment variables.
 ===== `index`
 
 ifndef::apm-server[]
-The index name to write events to. The default is
+The index name to write events to when you're using daily indices. The default is
 +"{beatname_lc}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
@@ -248,6 +248,12 @@ dashboards, you also need to set the `setup.dashboards.index` option (see
 endif::no_dashboards[]
 
 ifndef::apm-server[]
+ifndef::no_ilm[]
+The `index` setting is ignored when index lifecycle management is enabled. If
+you’re sending events to a cluster that supports index lifecycle management, see
+<<ilm>> to learn how to change the index name.
+endif::no_ilm[]
+
 You can set the index dynamically by using a format string to access any event
 field. For example, this configuration uses a custom field, `fields.log_type`,
 to set the index:
@@ -492,6 +498,9 @@ output.elasticsearch:
 With this configuration, all events with `processor.event: transaction` are sent to a pipeline
 named `transaction_pipeline`. Similarly, all events with `processor.event: error` are sent to a
 pipeline named `error_pipeline`.
+
+The default pipeline is `apm`. It adds user agent and geo ip information to events.
+To disable this, or any other pipeline, set `output.elasticsearch.pipeline: _none`.
 endif::apm-server[]
 
 TIP: To learn how to add custom fields to events, see the
@@ -626,6 +635,8 @@ output.elasticsearch:
 With this configuration, all events with `processor.event: transaction` are sent to a pipeline
 named `transaction_pipeline`, all events with `processor.event: error` are sent to a
 pipeline named `error_pipeline`, etc.
+
+NOTE: Defining any pipeline will deactivate the default `apm` pipeline.
 endif::apm-server[]
 
 For more information about ingest node pipelines, see

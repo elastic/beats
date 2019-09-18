@@ -43,9 +43,10 @@ import (
 // Default values are given defined by the colon operator. For example:
 // `%{[field.name]:default value}`.
 type EventFormatString struct {
-	formatter StringFormatter
-	fields    []fieldInfo
-	timestamp bool
+	expression string
+	formatter  StringFormatter
+	fields     []fieldInfo
+	timestamp  bool
 }
 
 type eventFieldEvaler struct {
@@ -142,9 +143,10 @@ func CompileEvent(in string) (*EventFormatString, error) {
 
 	ctx.keys = make([]string, len(keys))
 	efs := &EventFormatString{
-		formatter: sf,
-		fields:    keys,
-		timestamp: efComp.timestamp,
+		expression: in,
+		formatter:  sf,
+		fields:     keys,
+		timestamp:  efComp.timestamp,
 	}
 	return efs, nil
 }
@@ -264,6 +266,12 @@ func (fs *EventFormatString) collectFields(
 	}
 
 	return nil
+}
+
+// IsEmpty returns true if the format string expression is an empty string, can be used
+// when validating to make defining a string mandatory.
+func (fs *EventFormatString) IsEmpty() bool {
+	return len(fs.expression) == 0
 }
 
 func (e *eventFieldCompiler) compileExpression(

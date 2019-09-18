@@ -1,0 +1,56 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "Service": "ELB"
+            },
+            "namespace": "AWS/ELB"
+        },
+        "metrics": {
+            "BackendConnectionErrors": {
+                "sum": 18
+            },
+            "HTTPCode_Backend_2XX": {
+                "sum": 2
+            },
+            "HTTPCode_Backend_3XX": {
+                "sum": 2
+            },
+            "HTTPCode_Backend_4XX": {
+                "sum": 2
+            },
+            "HTTPCode_ELB_5XX": {
+                "sum": 4
+            },
+            "HealthyHostCount": {
+                "max": 2
+            },
+            "Latency": {
+                "avg": 0.001534899075826009
+            },
+            "RequestCount": {
+                "sum": 6
+            },
+            "UnHealthyHostCount": {
+                "max": 1
+            }
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "elb",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

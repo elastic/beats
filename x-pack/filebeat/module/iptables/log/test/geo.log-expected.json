@@ -32,6 +32,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "service.type": "iptables",
+        "source.as.number": 13041,
+        "source.as.organization.name": "Consorci de Serveis Universitaris de Catalunya",
         "source.geo.city_name": "Bellaterra",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",

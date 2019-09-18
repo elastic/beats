@@ -1,0 +1,92 @@
+- name: ftd
+  type: group
+  description: >
+    Fields for Cisco Firepower Threat Defense Firewall.
+  fields:
+  - name: message_id
+    type: keyword
+    description: >
+      The Cisco FTD message identifier.
+
+  - name: suffix
+    type: keyword
+    example: session
+    description: >
+      Optional suffix after %FTD identifier.
+
+  - name: source_interface
+    type: keyword
+    description: >
+      Source interface for the flow or event.
+
+  - name: destination_interface
+    type: keyword
+    description: >
+      Destination interface for the flow or event.
+
+  - name: rule_name
+    type: keyword
+    description: >
+      Name of the Access Control List rule that matched this event.
+
+  - name: source_username
+    type: keyword
+    description: >
+      Name of the user that is the source for this event.
+
+  - name: destination_username
+    type: keyword
+    description: >
+      Name of the user that is the destination for this event.
+
+  - name: mapped_source_ip
+    type: ip
+    description: >
+      The translated source IP address. Use ECS source.nat.ip.
+
+  - name: mapped_source_port
+    type: long
+    description: >
+      The translated source port. Use ECS source.nat.port.
+
+  - name: mapped_destination_ip
+    type: ip
+    description: >
+      The translated destination IP address. Use ECS destination.nat.ip.
+
+  - name: mapped_destination_port
+    type: long
+    description: >
+      The translated destination port. Use ECS destination.nat.port.
+
+  - name: threat_level
+    type: keyword
+    description: >
+      Threat level for malware / botnet traffic. One of very-low, low,
+      moderate, high or very-high.
+
+  - name: threat_category
+    type: keyword
+    description: >
+      Category for the malware / botnet traffic. For example: virus, botnet,
+      trojan, etc.
+
+  - name: connection_id
+    type: keyword
+    description: >
+      Unique identifier for a flow.
+
+  - name: icmp_type
+    type: short
+    description: >
+      ICMP type.
+
+  - name: icmp_code
+    type: short
+    description: >
+      ICMP code.
+
+  - name: security
+    type: object
+    description:
+      Raw fields for Security Events.
