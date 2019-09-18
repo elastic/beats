@@ -159,7 +159,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
 - Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
 - Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
-- Fix `docker.cpu.system.pct` calculation by using the reported number online cpus instead of the number of metrics per cpu. {pull}13691[13691]
 - Fix rds metricset dashboard. {pull}13721[13721]
 
 *Packetbeat*
