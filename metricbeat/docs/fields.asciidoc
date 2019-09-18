@@ -2137,13 +2137,90 @@ compute_vm
 
 
 
-*`azure.compute_vm.example`*::
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm.resource.name`*::
 +
 --
-Example field
+The name of the resource
 
 
 type: keyword
+
+--
+
+*`azure.compute_vm.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
 
 --
 
