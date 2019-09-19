@@ -127,7 +127,7 @@ func parseResponse() (map[string]*Response, error) {
 		count = count + 1
 		resp = new(Response)
 		resp.Values = make(map[string]interface{})
-		buf, err = GetMessageWithHObj(true, replyQObj)
+		buf, err = getMessageWithHObj(true, replyQObj)
 		elemList, _ := ParsePCFResponse(buf)
 
 		if err != nil {

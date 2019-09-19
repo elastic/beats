@@ -4,9 +4,6 @@
 - module: ibmmq
   #metricsets:
   #  - qmgr
-  #  - queue
-  #  - channel
-  #  - custom
   period: 10s
 
   hosts: ["localhost"]

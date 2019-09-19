@@ -80,8 +80,8 @@ func InitConnectionStats(qMgrName string, replyQ string, statsQ string, cc *Conn
 	if cc.Password != "" {
 		gocsp.Password = cc.Password
 	}
-	if cc.UserId != "" {
-		gocsp.UserId = cc.UserId
+	if cc.UserID != "" {
+		gocsp.UserId = cc.UserID
 		gocno.SecurityParms = gocsp
 	}
 
@@ -126,7 +126,11 @@ func InitConnectionStats(qMgrName string, replyQ string, statsQ string, cc *Conn
 	return err
 }
 
-//To change the target q manager call this function first to command queue to the new target
+/**
+OpenCommandQueue is opening a new command queue for the current queue manager.
+This enables the beat to collect from the different queue manager then the direct connection was made to.
+To change the target q manager call this function first to route the command queue to the new target
+*/
 func OpenCommandQueue(remoteQMgr string) error {
 	// MQOPEN of the COMMAND QUEUE
 	if commandQueueOpen {
@@ -158,7 +162,7 @@ func OpenCommandQueue(remoteQMgr string) error {
 }
 
 /**
-Discover important information about the qmgr - its real name
+DiscoverQmgrMetadata discovers important information about the qmgr - its real name
 and the platform type. Also check if it is at least V9 (on Distributed platforms)
 so that pub sub monitoring will work.
 */
@@ -233,10 +237,10 @@ A 32K buffer was created at the top of this file, and should always
 be big enough for what we are expecting.
 */
 func getMessage(wait bool) ([]byte, error) {
-	return GetMessageWithHObj(wait, replyQObj)
+	return getMessageWithHObj(wait, replyQObj)
 }
 
-func GetMessageWithHObj(wait bool, hObj ibmmq.MQObject) ([]byte, error) {
+func getMessageWithHObj(wait bool, hObj ibmmq.MQObject) ([]byte, error) {
 	var err error
 	var datalen int
 

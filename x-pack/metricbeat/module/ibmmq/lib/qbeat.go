@@ -1,7 +1,6 @@
 package ibmmqlib
 
 import (
-	"encoding/json"
 	"strings"
 	"time"
 
@@ -17,25 +16,37 @@ type RequestObject struct {
 	}
 }
 
+/**
+Config contains all configuration objects
+*/
 type Config struct {
 	QueueManager       string           `config:"bindingQueueManager"`
 	RemoteQueueManager []string         `config:"targetQueueManager"`
-	Queue        		   string           `config:"queue"`
-	QueueStatus        bool             `config:"queueStatus"`
-	QueueStats         bool             `config:"queueStats"`
-	Channel            string           `config:"channel"`
 	QMgrStat           bool             `config:"queueManagerStatus"`
 	PubSub             bool             `config:"pubSub"`
-	Custom             string           `config:"custom"`
 	ConnectionConfig   ConnectionConfig `config:"cc"`
 }
 
 type ConnectionConfig struct {
 	ClientMode bool   `config:"clientMode"`
 	MqServer   string `config:"mqServer"`
-	UserId     string `config:"userId"`
+	UserID     string `config:"user"`
 	Password   string `config:"password"`
 }
+
+var (
+	//DefaultConfig contains the default configuration for this module
+	DefaultConfig = Config{
+		PubSub:             false,
+		QMgrStat:           true,
+		RemoteQueueManager: []string{""},
+		ConnectionConfig: ConnectionConfig{
+			ClientMode: false,
+			UserID:     "",
+			Password:   "",
+		},
+	}
+)
 
 var (
 	first      = true
@@ -128,17 +139,16 @@ func collectPubSub(qmgrName string, eventType string) {
 
 func connectLegacyMode(qmgrName string, cc ConnectionConfig) error {
 
-		logp.Info("Connect in legacy mode")
+	logp.Info("Connect in legacy mode")
 
-		err = InitConnection(qmgrName, "SYSTEM.DEFAULT.MODEL.QUEUE", &cc)
+	err = InitConnection(qmgrName, "SYSTEM.DEFAULT.MODEL.QUEUE", &cc)
 
-		if err != nil {
-			return err
-		}
-
-		logp.Info("Connection successfull")
+	if err != nil {
 		return err
+	}
 
+	logp.Info("Connection successfull")
+	return err
 
 	return nil
 }
@@ -204,37 +214,9 @@ func generateConnectedObjectsField(events []beat.Event) []beat.Event {
 	return events
 }
 
-func CollectCustomMetricset(configString string, eventType string, qmgrName string, cc ConnectionConfig) ([]beat.Event, error) {
-	//Collect queue statistics
-	var err error
-	var events []beat.Event
-
-	if configString != "" {
-
-		connectLegacyMode(qmgrName, cc)
-
-		logp.Info("Start collecting in advance object")
-		var requestObject RequestObject
-		err := json.Unmarshal([]byte(configString), &requestObject)
-
-		if err != nil {
-			return nil, err
-		}
-		logp.Info("Advanced json: %v", requestObject)
-		for _, command := range requestObject.Commands {
-			responseObj, err := getAdvancedResponse(qmgrName, command.Cmd, command.Params)
-
-			if err != nil {
-				return nil, err
-			}
-
-			events = append(events, createEvents(eventType, qmgrName, responseObj)...)
-		}
-	}
-
-	return events, err
-}
-
+/**
+CollectQmgrMetricset is responsible for collecting data from Queue Manager
+*/
 func CollectQmgrMetricset(eventType string, qmgrName string, cc ConnectionConfig) ([]beat.Event, error) {
 	//Collect queue statistics
 	var err error
@@ -254,59 +236,5 @@ func CollectQmgrMetricset(eventType string, qmgrName string, cc ConnectionConfig
 	tmpEvents := createEvents(eventType, qmgrName, qMgrMetadata)
 	events = append(events, mergeEventsWithResponseObj(tmpEvents, qMgrStatus)...)
 
-	return events, err
-}
-
-func CollectChannelMetricset(channelPattern string, eventType string, qmgrName string, cc ConnectionConfig) ([]beat.Event, error) {
-	//Collect queue statistics
-	var err error
-	var events []beat.Event
-
-	if channelPattern != "" {
-
-		connectLegacyMode(qmgrName, cc)
-
-		chMetadata, err := getChannelMetadata(qmgrName, channelPattern)
-		if err != nil {
-			return nil, err
-		}
-		chStatus, err := getChannelStatus(qmgrName, channelPattern)
-		if err != nil {
-			return nil, err
-		}
-
-		tmpEvents := createEvents(eventType, qmgrName, chMetadata)
-		events = append(events, mergeEventsWithResponseObj(tmpEvents, chStatus)...)
-	}
-	return events, err
-}
-
-func CollectQueueMetricset(queuePattern string, eventType string, qmgrName string, cc ConnectionConfig) ([]beat.Event, error) {
-	//Collect queue statistics
-	var err error
-	var events []beat.Event
-
-	if queuePattern != "" {
-
-		connectLegacyMode(qmgrName, cc)
-
-		qMetadata, err := getQueueMetadata(qmgrName, queuePattern)
-		if err != nil {
-			return nil, err
-		}
-
-		qStatus, err := getQueueStatus(qmgrName, queuePattern)
-		if err != nil {
-			return nil, err
-		}
-
-		qStatistics, err := getQueueStatistics(qmgrName, queuePattern)
-		if err != nil {
-			return nil, err
-		}
-		tmpEvents := createEvents(eventType, qmgrName, qMetadata)
-		tmpEvents = mergeEventsWithResponseObj(tmpEvents, qStatus)
-		events = append(events, mergeEventsWithResponseObj(tmpEvents, qStatistics)...)
-	}
 	return events, err
 }

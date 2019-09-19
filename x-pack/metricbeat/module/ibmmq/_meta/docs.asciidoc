@@ -1,9 +1,9 @@
-This is the IBM MQ module.
+This is the IBM MQ metricbeat module. This module uses PCF messages to collect metrics and status information from different IBM MQ objects.
+With IBM MQ > v9 its also possible to collect data using the subscribe mode.
 
-The default metricsets are `qmgr`, `queue` and `channel`.
-You also can add any PCF command by using the 'advanced' metricset.
+At the moment this is collecting data from Queue Manager.
 
 [float]
 === Compability
 
-This module is tested with IBM MQ v... TODO .
+This module is tested with IBM MQ v9.1.0 but older version will work as well. The subscribe mode only works with IBM MQ > v9.

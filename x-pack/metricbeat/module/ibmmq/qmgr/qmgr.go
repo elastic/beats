@@ -20,8 +20,8 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	queueManager string
-	connectionConfig					ibmmqlib.ConnectionConfig
+	queueManager     string
+	connectionConfig ibmmqlib.ConnectionConfig
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -29,14 +29,14 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The ibmmq qmgr metricset is experimental.")
 
-	config := DefaultConfig
+	config := ibmmqlib.DefaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		queueManager:  config.QueueManager,
+		BaseMetricSet:    base,
+		queueManager:     config.QueueManager,
 		connectionConfig: config.ConnectionConfig,
 	}, nil
 }
