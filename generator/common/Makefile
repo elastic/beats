@@ -13,13 +13,10 @@ test: prepare-test
 	export GOPATH=${PWD}/build ; \
 	export PATH=$${GOPATH}/bin:${PATH}; \
 	cd ${BEAT_PATH} ; \
-	$(MAKE) copy-vendor || exit 1  ; \
 	${PREPARE_COMMAND} \
-	$(MAKE) git-init || exit 1 ; \
 	$(MAKE) update fmt || exit 1 ; \
 	git config user.email "beats-jenkins@test.com" || exit 1 ; \
 	git config user.name "beats-jenkins" || exit 1 ; \
-	$(MAKE) git-add || exit 1 ; \
 	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
@@ -29,17 +26,21 @@ prepare-test:: python-env
 	# Makes sure to use current version of beats for testing
 	rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
 	git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
-
 	rm -fr ${BEAT_PATH}
 	mkdir -p ${BEAT_PATH}
+	cd ${PWD}/${BUILD_DIR}/src/github.com/elastic/beats/ ; \
+	export MODULE=elastic ; \
+	export METRICSET=test ; \
+	export GO111MODULE=off; \
 	export GOPATH=${PWD}/build ; \
-	. ${PYTHON_ENV}/bin/activate && \
-	  python ${PWD}/build/src/github.com/elastic/beats/script/generate.py \
-	    --type=${BEAT_TYPE} \
-	    --project_name=Testbeat \
-	    --github_name=ruflin \
-	    --beat_path=beatpath/testbeat \
-	    --full_name="Nicolas Ruflin"
+	export NEWBEAT_PROJECT_NAME=Testbeat ; \
+	export NEWBEAT_GITHUB_NAME=ruflin ; \
+	export NEWBEAT_BEAT_PATH=beatpath/testbeat ; \
+	export NEWBEAT_FULL_NAME="Nicolas Ruflin" ; \
+	export NEWBEAT_TYPE=${BEAT_TYPE} ; \
+	export NEWBEAT_DEV=1 ; \
+	mage GenerateCustomBeat
+
 
 # Runs test build for the created beat
 .PHONY: test-build
