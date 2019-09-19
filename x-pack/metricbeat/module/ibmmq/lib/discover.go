@@ -577,7 +577,7 @@ func ProcessPublications() error {
 }
 
 /*
-Parse a PCF response message, returning the
+ParsePCFResponse message, returning the
 elements. If an element represents a PCF group, that element
 has the pieces of the group attached to itself. While
 it is theoretically possible for groups to contain groups, MQ never

@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+//RequestObject contains the object for requesting data at IBM MQ
 type RequestObject struct {
 	Commands []struct {
 		Cmd    string

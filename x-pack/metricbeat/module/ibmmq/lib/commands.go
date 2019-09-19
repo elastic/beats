@@ -9,6 +9,7 @@ import (
 	"github.com/ibm-messaging/mq-golang/ibmmq"
 )
 
+//Response contains the return values of IBM MQ
 type Response struct {
 	TargetObject string
 	Metricset    string
@@ -83,21 +84,8 @@ func getQManagerStatus(targetQMgrName string) (map[string]*Response, error) {
 	return parseResponse()
 }
 
-func getAdvancedResponse(targetQMgrName string, cmdString string, paramsInput map[string]interface{}) (map[string]*Response, error) {
-	var params = make(map[int32]interface{})
-	var cmd int32
-
-	cmd = GetMQConstant(cmdString)
-	for paramNameString, paramValue := range paramsInput {
-		params[GetMQConstant(paramNameString)] = paramValue
-	}
-
-	err = putCommand(targetQMgrName, cmd, params)
-	return parseResponse()
-}
-
-/***
-Translates a value that is delivered as number to a string
+/*
+translateValue translates a value that is delivered as number to a string
 */
 func translateValue(key string, value int64) string {
 	var mapping = make(map[string]string)

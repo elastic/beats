@@ -126,7 +126,7 @@ func InitConnectionStats(qMgrName string, replyQ string, statsQ string, cc *Conn
 	return err
 }
 
-/**
+/*
 OpenCommandQueue is opening a new command queue for the current queue manager.
 This enables the beat to collect from the different queue manager then the direct connection was made to.
 To change the target q manager call this function first to route the command queue to the new target
@@ -161,7 +161,7 @@ func OpenCommandQueue(remoteQMgr string) error {
 	return err
 }
 
-/**
+/*
 DiscoverQmgrMetadata discovers important information about the qmgr - its real name
 and the platform type. Also check if it is at least V9 (on Distributed platforms)
 so that pub sub monitoring will work.
