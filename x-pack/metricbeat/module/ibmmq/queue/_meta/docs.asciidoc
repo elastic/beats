@@ -1,9 +1,0 @@
-This is the IBM MQ module.
-
-The default metricsets are `qmgr`, `queue` and `channel`.
-You also can add any PCF command by using the 'advanced' metricset.
-
-[float]
-=== Compability
-
-This module is tested with IBM MQ v... TODO .

@@ -16,10 +16,7 @@ import (
 
 	"github.com/elastic/beats/x-pack/metricbeat/cmd"
 	_ "github.com/felix-lessoer/beats/x-pack/metricbeat/module/ibmmq"
-	_ "github.com/felix-lessoer/beats/x-pack/metricbeat/module/ibmmq/channel"
-	_ "github.com/felix-lessoer/beats/x-pack/metricbeat/module/ibmmq/custom"
 	_ "github.com/felix-lessoer/beats/x-pack/metricbeat/module/ibmmq/qmgr"
-	_ "github.com/felix-lessoer/beats/x-pack/metricbeat/module/ibmmq/queue"
 )
 
 func main() {
