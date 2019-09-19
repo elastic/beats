@@ -77,11 +77,10 @@ for more details.
 
 [float]
 === Parallel Processing
-Running multiple Filebeat instances in parallel to read from the same SQS queue
-is available for all users without any extra configuration for s3 input. This
+Multiple Filebeat instances can read from the same SQS queues at the same time. This
 feature helps users to horizontally scale the processing when there are large
 amount of logs flowing into S3 bucket which leads to large amount of messages
-going through the queue.
+going through the queue. No additional configuration is needed for this.
 
 The usage of SQS ensures that each message in the queue is processed only once
 even with multiple Filebeat running in parallel. To prevent other consumers, which
