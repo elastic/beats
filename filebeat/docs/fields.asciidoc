@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
@@ -1240,6 +1241,18 @@ The Transport Layer Security (TLS) version negotiated by the client.
 type: keyword
 
 --
+
+[[exported-fields-azure]]
+== azure fields
+
+azure Module
+
+
+
+[float]
+=== azure
+
+
 
 [[exported-fields-beat-common]]
 == Beat fields

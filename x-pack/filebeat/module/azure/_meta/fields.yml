@@ -1,0 +1,9 @@
+- key: azure
+  title: "azure"
+  description: >
+    azure Module
+  fields:
+    - name: azure
+      type: group
+      description: >
+      fields:

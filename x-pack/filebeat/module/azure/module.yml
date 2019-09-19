@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-azure-monitor-Dashboard
+  file: Filebeat-azure-monitor.json
