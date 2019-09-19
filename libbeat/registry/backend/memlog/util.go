@@ -25,11 +25,13 @@ import (
 	"reflect"
 	"syscall"
 	"unsafe"
+
+	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
 var errno0 = syscall.Errno(0)
 
-type hashFn func(k []byte) uint64
+type hashFn func(k backend.Key) uint64
 
 type ensureWriter struct {
 	w io.Writer
@@ -53,8 +55,8 @@ func newHash() hash.Hash64 {
 
 func newHashFn() hashFn {
 	fn := newHash()
-	return func(k []byte) uint64 {
-		fn.Write(k)
+	return func(k backend.Key) uint64 {
+		fn.Write(unsafeKeyRef(k))
 		hash := fn.Sum64()
 		fn.Reset()
 		return hash
@@ -92,13 +94,7 @@ func isRetryErr(err error) bool {
 	return err == syscall.EINTR || err == syscall.EAGAIN
 }
 
-func unsafeString(b []byte) string {
-	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	str := reflect.StringHeader{Data: hdr.Data, Len: hdr.Len}
-	return *(*string)(unsafe.Pointer(&str))
-}
-
-func unsafeKeyRef(k string) []byte {
+func unsafeKeyRef(k backend.Key) []byte {
 	str := (*reflect.StringHeader)(unsafe.Pointer(&k))
 	hdr := reflect.SliceHeader{Data: str.Data, Len: str.Len, Cap: str.Len}
 	return *(*[]byte)(unsafe.Pointer(&hdr))

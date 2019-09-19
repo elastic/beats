@@ -50,5 +50,5 @@ func (g *idGen) Make() Key {
 	if err != nil {
 		panic(err)
 	}
-	return k
+	return Key(k)
 }

@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
 func TestTx(t *testing.T) {
@@ -31,13 +32,13 @@ func TestTx(t *testing.T) {
 
 		store := bin{
 			{
-				key:   []byte("a"),
+				key:   backend.Key("a"),
 				value: common.MapStr{"a": 1},
 			},
 		}
 		txCache := txCacheLine{
 			{
-				key:      []byte("b"),
+				key:      backend.Key("b"),
 				value:    common.MapStr{"b": 2},
 				exists:   true,
 				modified: true,

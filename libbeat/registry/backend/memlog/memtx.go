@@ -17,7 +17,10 @@
 
 package memlog
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/registry/backend"
+)
 
 type memTx struct {
 	parent memTxParent
@@ -111,7 +114,7 @@ func (tx *memTx) CommitTo(tbl *hashtable, cpy bool) {
 	}
 }
 
-func (tx *memTx) Has(k []byte) bool {
+func (tx *memTx) Has(k backend.Key) bool {
 	key := tx.makeKeyPair(k)
 	if ref := tx.state.find(key); !ref.IsNil() {
 		return ref.Access().exists
@@ -119,7 +122,7 @@ func (tx *memTx) Has(k []byte) bool {
 	return tx.store.has(key)
 }
 
-func (tx *memTx) Get(k []byte) *txCacheEntry {
+func (tx *memTx) Get(k backend.Key) *txCacheEntry {
 	key := tx.makeKeyPair(k)
 
 	// try to read value from tx cache
@@ -143,7 +146,7 @@ func (tx *memTx) Get(k []byte) *txCacheEntry {
 	return txRef.Access()
 }
 
-func (tx *memTx) GetReadonly(k []byte) *valueDecoder {
+func (tx *memTx) GetReadonly(k backend.Key) *valueDecoder {
 	ref := tx.store.find(tx.makeKeyPair(k))
 	if ref.IsNil() {
 		return nil // key is unknown
@@ -151,7 +154,7 @@ func (tx *memTx) GetReadonly(k []byte) *valueDecoder {
 	return newValueDecoder(tx.parent, ref.Access().value)
 }
 
-func (tx *memTx) Set(k []byte, v interface{}) error {
+func (tx *memTx) Set(k backend.Key, v interface{}) error {
 	opValue, err := tx.decodeOpValue(v)
 	if err != nil {
 		return err
@@ -163,7 +166,7 @@ func (tx *memTx) Set(k []byte, v interface{}) error {
 	return nil
 }
 
-func (tx *memTx) Update(k []byte, v interface{}) error {
+func (tx *memTx) Update(k backend.Key, v interface{}) error {
 	opValue, err := tx.decodeOpValue(v)
 	if err != nil {
 		return err
@@ -190,11 +193,10 @@ func (tx *memTx) Update(k []byte, v interface{}) error {
 	return nil
 }
 
-func (tx *memTx) insertKV(txRef cacheEntryRef, k []byte, value common.MapStr) {
-	var rawKey []byte
+func (tx *memTx) insertKV(txRef cacheEntryRef, k backend.Key, value common.MapStr) {
+	var rawKey backend.Key
 	if txRef.IsNil() {
-		rawKey = make([]byte, len(k))
-		copy(rawKey, k)
+		rawKey = k
 	} else {
 		rawKey = txRef.Access().key
 	}
@@ -205,11 +207,11 @@ func (tx *memTx) insertKV(txRef cacheEntryRef, k []byte, value common.MapStr) {
 	tx.state.setEntry(txRef, entry)
 }
 
-func (tx *memTx) Remove(k []byte) {
+func (tx *memTx) Remove(k backend.Key) {
 	key := tx.makeKeyPair(k)
 	txRef := tx.state.find(key)
 
-	var rawKey []byte
+	var rawKey backend.Key
 	if txRef.IsNil() {
 		ref := tx.store.find(key)
 		if ref.IsNil() {
@@ -237,14 +239,14 @@ func (tx *memTx) cacheEntry(at cacheEntryRef, ref valueRef) cacheEntryRef {
 	})
 }
 
-func (tx *memTx) makeKeyPair(k []byte) keyPair {
+func (tx *memTx) makeKeyPair(k backend.Key) keyPair {
 	return keyPair{
 		hash: tx.hash(k),
 		key:  k,
 	}
 }
 
-func (tx *memTx) hash(k []byte) uint64 { return tx.hashFn(k) }
+func (tx *memTx) hash(k backend.Key) uint64 { return tx.hashFn(k) }
 
 func (tx *memTx) decodeOpValue(in interface{}) (common.MapStr, error) {
 	var opVal map[string]interface{}
