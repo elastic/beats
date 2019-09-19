@@ -1,0 +1,923 @@
+html/en/beats/functionbeat/master/add-cloud-metadata.html
+html/en/beats/functionbeat/master/add-docker-metadata.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/add-docker-metadata.html
+@@ -172,10 +172,7 @@
+            <code class="literal">
+             add_docker_metadata
+            </code>
+-           processor annotates each event with relevant metadata from Docker containers. At startup it detects a docker environment and caches the metadata. The events are annotated with Docker metadata, only if a valid configuration is detected and the processor is able to reach Docker API.
+-          </p>
+-          <p>
+-           Each event is annotated with:
++           processor annotates each event with relevant metadata from Docker containers:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist" type="disc">
+html/en/beats/functionbeat/master/add-fields.html
+html/en/beats/functionbeat/master/add-host-metadata.html
+html/en/beats/functionbeat/master/add-kubernetes-metadata.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/add-kubernetes-metadata.html
+@@ -172,14 +172,7 @@
+            <code class="literal">
+             add_kubernetes_metadata
+            </code>
+-           processor annotates each event with relevant metadata based on which Kubernetes pod the event originated from. At startup it detects an
+-           <code class="literal">
+-            in_cluster
+-           </code>
+-           environment and caches the Kubernetes-related metadata. Events are only annotated if a valid configuration is detected. If it’s not able to detect a valid Kubernetes configuration, the events are not annotated with Kubernetes-related metadata.
+-          </p>
+-          <p>
+-           Each event is annotated with:
++           processor annotates each event with relevant metadata based on which Kubernetes pod the event originated from. Each event is annotated with:
+           </p>
+           <div class="itemizedlist">
+            <ul class="itemizedlist" type="disc">
+html/en/beats/functionbeat/master/add-labels.html
+html/en/beats/functionbeat/master/add-locale.html
+html/en/beats/functionbeat/master/add-observer-metadata.html
+html/en/beats/functionbeat/master/add-process-metadata.html
+html/en/beats/functionbeat/master/add-tags.html
+html/en/beats/functionbeat/master/beats-basic-auth.html
+html/en/beats/functionbeat/master/beats-system-user.html
+html/en/beats/functionbeat/master/beats-tls.html
+html/en/beats/functionbeat/master/command-line-options.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/command-line-options.html
+@@ -617,6 +617,12 @@
+               </code>
+               .
+              </dd>
++            </dl>
++           </div>
++           <div class="variablelist">
++            <a id="ilm-policy-subcommand">
++            </a>
++            <dl class="variablelist">
+              <dt>
+               <span class="term">
+                <span class="strong strong">
+@@ -667,8 +673,6 @@
+             </dl>
+            </div>
+            <p>
+-            <a id="ilm-policy-subcommand">
+-            </a>
+             <span class="strong strong">
+              <strong>
+               FLAGS
+html/en/beats/functionbeat/master/community-id.html
+html/en/beats/functionbeat/master/configuration-functionbeat-options.html
+html/en/beats/functionbeat/master/configuration-general-options.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/configuration-general-options.html
+@@ -189,7 +189,7 @@
+ tags: ["service-X", "web-tier"]</pre>
+           </div>
+           <h4>
+-           <a id="_literal_name_literal">
++           <a id="_name">
+            </a>
+            <code class="literal">
+             name
+@@ -216,7 +216,7 @@
+            <pre class="programlisting prettyprint lang-yaml">name: "my-shipper"</pre>
+           </div>
+           <h4>
+-           <a id="_literal_tags_literal">
++           <a id="_tags">
+            </a>
+            <code class="literal">
+             tags
+@@ -266,7 +266,7 @@
+            <pre class="programlisting prettyprint lang-yaml">fields: {project: "myproject", instance-id: "574734885120952459"}</pre>
+           </div>
+           <h4>
+-           <a id="_literal_fields_under_root_literal">
++           <a id="_fields_under_root">
+            </a>
+            <code class="literal">
+             fields_under_root
+@@ -296,7 +296,7 @@
+   region: us-east-1</pre>
+           </div>
+           <h4>
+-           <a id="_literal_processors_literal">
++           <a id="_processors">
+            </a>
+            <code class="literal">
+             processors
+@@ -318,7 +318,7 @@
+            for information about specifying processors in your config.
+           </p>
+           <h4>
+-           <a id="_literal_max_procs_literal">
++           <a id="_max_procs">
+            </a>
+            <code class="literal">
+             max_procs
+html/en/beats/functionbeat/master/configuration-logging.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/configuration-logging.html
+@@ -316,7 +316,7 @@
+            to display all the debug messages related to event publishing.
+           </p>
+           <h4>
+-           <a id="_literal_logging_metrics_enabled_literal">
++           <a id="_logging_metrics_enabled">
+            </a>
+            <code class="literal">
+             logging.metrics.enabled
+@@ -338,7 +338,7 @@
+            Note that we currently offer no backwards compatible guarantees for the internal metrics and for this reason they are also not documented.
+           </p>
+           <h4>
+-           <a id="_literal_logging_metrics_period_literal">
++           <a id="_logging_metrics_period">
+            </a>
+            <code class="literal">
+             logging.metrics.period
+@@ -351,7 +351,7 @@
+            The period after which to log the internal metrics. The default is 30s.
+           </p>
+           <h4>
+-           <a id="_literal_logging_files_rotateonstartup_literal">
++           <a id="_logging_files_rotateonstartup">
+            </a>
+            <code class="literal">
+             logging.files.rotateonstartup
+@@ -364,7 +364,7 @@
+            If the log file already exists on startup, immediately rotate it and start writing to a new file instead of appending to the existing one. Defaults to true.
+           </p>
+           <h4>
+-           <a id="_literal_logging_json_literal">
++           <a id="_logging_json">
+            </a>
+            <code class="literal">
+             logging.json
+@@ -417,17 +417,17 @@
+           </p>
+           <p>
+            <code class="literal">
+-            2017-12-17T18:54:16.241-0500   INFO    logp/core_test.go:13    unnamed global logger
+-           </code>
+-          </p>
+-          <p>
+-           <code class="literal">
+-            2017-12-17T18:54:16.242-0500   INFO    [example]       logp/core_test.go:16    some message
+-           </code>
+-          </p>
+-          <p>
+-           <code class="literal">
+-            2017-12-17T18:54:16.242-0500   INFO    [example]       logp/core_test.go:19    some message    {"x": 1}
++            2017-12-17T18:54:16.241-0500	INFO	logp/core_test.go:13	unnamed global logger
++           </code>
++          </p>
++          <p>
++           <code class="literal">
++            2017-12-17T18:54:16.242-0500	INFO	[example]	logp/core_test.go:16	some message
++           </code>
++          </p>
++          <p>
++           <code class="literal">
++            2017-12-17T18:54:16.242-0500	INFO	[example]	logp/core_test.go:19	some message	{"x": 1}
+            </code>
+           </p>
+          </div>
+html/en/beats/functionbeat/master/configuration-monitor.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/configuration-monitor.html
+@@ -184,7 +184,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_monitoring_enabled_literal">
++               <a id="_monitoring_enabled">
+                </a>
+                <code class="literal">
+                 monitoring.enabled
+@@ -220,7 +220,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_monitoring_elasticsearch_literal">
++               <a id="_monitoring_elasticsearch">
+                </a>
+                <code class="literal">
+                 monitoring.elasticsearch
+@@ -241,7 +241,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_bulk_max_size_literal_2">
++               <a id="_bulk_max_size_2">
+                </a>
+                <code class="literal">
+                 bulk_max_size
+@@ -270,7 +270,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_backoff_init_literal_2">
++               <a id="_backoff_init_2">
+                </a>
+                <code class="literal">
+                 backoff.init
+@@ -299,7 +299,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_backoff_max_literal_2">
++               <a id="_backoff_max_2">
+                </a>
+                <code class="literal">
+                 backoff.max
+@@ -320,7 +320,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_compression_level_literal_2">
++               <a id="_compression_level_2">
+                </a>
+                <code class="literal">
+                 compression_level
+@@ -357,7 +357,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_headers_literal_2">
++               <a id="_headers_2">
+                </a>
+                <code class="literal">
+                 headers
+@@ -382,7 +382,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_hosts_literal">
++               <a id="_hosts">
+                </a>
+                <code class="literal">
+                 hosts
+@@ -407,7 +407,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_max_retries_literal_2">
++               <a id="_max_retries_2">
+                </a>
+                <code class="literal">
+                 max_retries
+@@ -436,7 +436,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_parameters_literal_2">
++               <a id="_parameters_2">
+                </a>
+                <code class="literal">
+                 parameters
+@@ -457,7 +457,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_password_literal_2">
++               <a id="_password_2">
+                </a>
+                <code class="literal">
+                 password
+@@ -478,7 +478,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_metrics_period_literal">
++               <a id="_metrics_period">
+                </a>
+                <code class="literal">
+                 metrics.period
+@@ -499,7 +499,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_state_period_literal">
++               <a id="_state_period">
+                </a>
+                <code class="literal">
+                 state.period
+@@ -520,7 +520,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_protocol_literal">
++               <a id="_protocol">
+                </a>
+                <code class="literal">
+                 protocol
+@@ -557,7 +557,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_proxy_url_literal_2">
++               <a id="_proxy_url_2">
+                </a>
+                <code class="literal">
+                 proxy_url
+@@ -582,7 +582,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_timeout_literal_2">
++               <a id="_timeout_2">
+                </a>
+                <code class="literal">
+                 timeout
+@@ -607,7 +607,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_ssl_literal_2">
++               <a id="_ssl_2">
+                </a>
+                <code class="literal">
+                 ssl
+@@ -638,7 +638,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_username_literal_2">
++               <a id="_username_2">
+                </a>
+                <code class="literal">
+                 username
+html/en/beats/functionbeat/master/configuration-ssl.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/configuration-ssl.html
+@@ -179,6 +179,7 @@
+              <a class="link" href="setup-kibana-endpoint.html" title="Configure the Kibana endpoint">
+               Kibana endpoint
+              </a>
++             endif::["functionbeat"!="apm-server"]
+             </li>
+            </ul>
+           </div>
+@@ -221,7 +222,7 @@
+            config file:
+           </p>
+           <h4>
+-           <a id="_literal_enabled_literal_2">
++           <a id="_enabled_2">
+            </a>
+            <code class="literal">
+             enabled
+@@ -268,7 +269,7 @@
+            </div>
+           </div>
+           <h4>
+-           <a id="_literal_certificate_authorities_literal">
++           <a id="_certificate_authorities">
+            </a>
+            <code class="literal">
+             certificate_authorities
+@@ -326,7 +327,7 @@
+            is specified.
+           </p>
+           <h4>
+-           <a id="_literal_key_passphrase_literal">
++           <a id="_key_passphrase">
+            </a>
+            <code class="literal">
+             key_passphrase
+@@ -343,7 +344,7 @@
+            file.
+           </p>
+           <h4>
+-           <a id="_literal_supported_protocols_literal">
++           <a id="_supported_protocols">
+            </a>
+            <code class="literal">
+             supported_protocols
+@@ -383,7 +384,7 @@
+            .
+           </p>
+           <h4>
+-           <a id="_literal_verification_mode_literal">
++           <a id="_verification_mode">
+            </a>
+            <code class="literal">
+             verification_mode
+@@ -419,7 +420,7 @@
+            .
+           </p>
+           <h4>
+-           <a id="_literal_cipher_suites_literal">
++           <a id="_cipher_suites">
+            </a>
+            <code class="literal">
+             cipher_suites
+@@ -539,7 +540,7 @@
+            </ul>
+           </div>
+           <h4>
+-           <a id="_literal_curve_types_literal">
++           <a id="_curve_types">
+            </a>
+            <code class="literal">
+             curve_types
+@@ -571,7 +572,7 @@
+            </ul>
+           </div>
+           <h4>
+-           <a id="_literal_renegotiation_literal">
++           <a id="_renegotiation">
+            </a>
+            <code class="literal">
+             renegotiation
+html/en/beats/functionbeat/master/configuration-template.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/configuration-template.html
+@@ -346,7 +346,7 @@
+               cross-cluster replication
+              </a>
+              to replicate Functionbeat indices to another cluster, you will need to add additional template settings to
+-             <a class="ulink" href="https://www.elastic.co/guide/en/elasticsearch/reference/master/ccr-requirements.html#ccr-overview-beats" target="_top">
++             <a class="ulink" href="https://www.elastic.co/guide/en/elastic-stack-overview/master/ccr-requirements.html#ccr-overview-beats" target="_top">
+               enable soft deletes
+              </a>
+              on the underlying indices.
+html/en/beats/functionbeat/master/configure-cloud-id.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/configure-cloud-id.html
+@@ -192,7 +192,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_cloud_id_literal">
++               <a id="_cloud_id">
+                </a>
+                <code class="literal">
+                 cloud.id
+@@ -221,7 +221,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_literal_cloud_auth_literal">
++               <a id="_cloud_auth">
+                </a>
+                <code class="literal">
+                 cloud.auth
+html/en/beats/functionbeat/master/configuring-howto-functionbeat.html
+html/en/beats/functionbeat/master/configuring-ingest-node.html
+html/en/beats/functionbeat/master/configuring-internal-queue.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/configuring-internal-queue.html
+@@ -256,7 +256,7 @@
+            config file:
+           </p>
+           <h5>
+-           <a id="_literal_events_literal">
++           <a id="_events">
+            </a>
+            <code class="literal">
+             events
+@@ -272,7 +272,7 @@
+            The default value is 4096 events.
+           </p>
+           <h5>
+-           <a id="_literal_flush_min_events_literal">
++           <a id="_flush_min_events">
+            </a>
+            <code class="literal">
+             flush.min_events
+@@ -288,7 +288,7 @@
+            The default value is 2048.
+           </p>
+           <h5>
+-           <a id="_literal_flush_timeout_literal">
++           <a id="_flush_timeout">
+            </a>
+            <code class="literal">
+             flush.timeout
+@@ -382,7 +382,7 @@
+            config file:
+           </p>
+           <h5>
+-           <a id="_literal_file_path_literal">
++           <a id="_file_path">
+            </a>
+            <code class="literal">
+             file.path
+@@ -398,7 +398,7 @@
+            The default value is "${path.data}/spool.dat".
+           </p>
+           <h5>
+-           <a id="_literal_file_permissions_literal">
++           <a id="_file_permissions">
+            </a>
+            <code class="literal">
+             file.permissions
+@@ -418,7 +418,7 @@
+            The default value is 0600.
+           </p>
+           <h5>
+-           <a id="_literal_file_size_literal">
++           <a id="_file_size">
+            </a>
+            <code class="literal">
+             file.size
+@@ -454,7 +454,7 @@
+            </div>
+           </div>
+           <h5>
+-           <a id="_literal_file_page_size_literal">
++           <a id="_file_page_size">
+            </a>
+            <code class="literal">
+             file.page_size
+@@ -501,7 +501,7 @@
+            </div>
+           </div>
+           <h5>
+-           <a id="_literal_file_prealloc_literal">
++           <a id="_file_prealloc">
+            </a>
+            <code class="literal">
+             file.prealloc
+@@ -548,7 +548,7 @@
+            .
+           </p>
+           <h5>
+-           <a id="_literal_write_buffer_size_literal">
++           <a id="_write_buffer_size">
+            </a>
+            <code class="literal">
+             write.buffer_size
+@@ -567,7 +567,7 @@
+            The default value is 1MiB.
+           </p>
+           <h5>
+-           <a id="_literal_write_codec_literal">
++           <a id="_write_codec">
+            </a>
+            <code class="literal">
+             write.codec
+@@ -595,7 +595,7 @@
+            .
+           </p>
+           <h5>
+-           <a id="_literal_write_flush_timeout_literal">
++           <a id="_write_flush_timeout">
+            </a>
+            <code class="literal">
+             write.flush.timeout
+@@ -619,7 +619,7 @@
+            The default value is 1s.
+           </p>
+           <h5>
+-           <a id="_literal_write_flush_events_literal">
++           <a id="_write_flush_events">
+            </a>
+            <code class="literal">
+             write.flush.events
+@@ -635,7 +635,7 @@
+            The default value is 16384.
+           </p>
+           <h5>
+-           <a id="_literal_read_flush_timeout_literal">
++           <a id="_read_flush_timeout">
+            </a>
+            <code class="literal">
+             read.flush.timeout
+@@ -670,7 +670,7 @@
+            events have been read or the oldest read event has been waiting for the configured duration.
+           </p>
+           <p>
+-           The default value is 0s. :allplatforms!:
++           The default value is 0s.
+           </p>
+          </div>
+          <div class="navfooter">
+html/en/beats/functionbeat/master/configuring-output.html
+html/en/beats/functionbeat/master/convert.html
+html/en/beats/functionbeat/master/decode-base64-field.html
+html/en/beats/functionbeat/master/decode-json-fields.html
+html/en/beats/functionbeat/master/decompress-gzip-field.html
+html/en/beats/functionbeat/master/defining-processors.html
+html/en/beats/functionbeat/master/directory-layout.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/directory-layout.html
+@@ -207,10 +207,6 @@
+                </p>
+               </td>
+               <td align="left" valign="top">
+-               <p>
+-                <code class="literal">
+-                </code>
+-               </p>
+               </td>
+               <td align="left" valign="top">
+                <p>
+@@ -243,10 +239,6 @@
+                </p>
+               </td>
+               <td align="left" valign="top">
+-               <p>
+-                <code class="literal">
+-                </code>
+-               </p>
+               </td>
+              </tr>
+              <tr>
+html/en/beats/functionbeat/master/dissect.html
+html/en/beats/functionbeat/master/drop-event.html
+html/en/beats/functionbeat/master/drop-fields.html
+html/en/beats/functionbeat/master/elasticsearch-output.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/elasticsearch-output.html
+@@ -288,7 +288,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_enabled_literal">
++                <a id="_enabled">
+                 </a>
+                 <code class="literal">
+                  enabled
+@@ -412,7 +412,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_compression_level_literal">
++                <a id="_compression_level">
+                 </a>
+                 <code class="literal">
+                  compression_level
+@@ -439,7 +439,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_escape_html_literal">
++                <a id="_escape_html">
+                 </a>
+                 <code class="literal">
+                  escape_html
+@@ -471,7 +471,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_worker_literal">
++                <a id="_worker">
+                 </a>
+                 <code class="literal">
+                  worker
+@@ -495,7 +495,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_username_literal">
++                <a id="_username">
+                 </a>
+                 <code class="literal">
+                  username
+@@ -516,7 +516,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_password_literal">
++                <a id="_password">
+                 </a>
+                 <code class="literal">
+                  password
+@@ -537,7 +537,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_parameters_literal">
++                <a id="_parameters">
+                 </a>
+                 <code class="literal">
+                  parameters
+@@ -622,7 +622,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_headers_literal">
++                <a id="_headers">
+                 </a>
+                 <code class="literal">
+                  headers
+@@ -650,7 +650,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_proxy_url_literal">
++                <a id="_proxy_url">
+                 </a>
+                 <code class="literal">
+                  proxy_url
+@@ -1286,7 +1286,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_max_retries_literal">
++                <a id="_max_retries">
+                 </a>
+                 <code class="literal">
+                  max_retries
+@@ -1317,7 +1317,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_bulk_max_size_literal">
++                <a id="_bulk_max_size">
+                 </a>
+                 <code class="literal">
+                  bulk_max_size
+@@ -1355,7 +1355,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_backoff_init_literal">
++                <a id="_backoff_init">
+                 </a>
+                 <code class="literal">
+                  backoff.init
+@@ -1384,7 +1384,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_backoff_max_literal">
++                <a id="_backoff_max">
+                 </a>
+                 <code class="literal">
+                  backoff.max
+@@ -1405,7 +1405,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_timeout_literal">
++                <a id="_timeout">
+                 </a>
+                 <code class="literal">
+                  timeout
+@@ -1426,7 +1426,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_ssl_literal">
++                <a id="_ssl">
+                 </a>
+                 <code class="literal">
+                  ssl
+html/en/beats/functionbeat/master/enable-functionbeat-debugging.html
+html/en/beats/functionbeat/master/error-found-unexpected-character.html
+html/en/beats/functionbeat/master/error-loading-config.html
+html/en/beats/functionbeat/master/export-cloudformation-template.html
+html/en/beats/functionbeat/master/exported-fields-beat-common.html
+html/en/beats/functionbeat/master/exported-fields-cloud.html
+html/en/beats/functionbeat/master/exported-fields-docker-processor.html
+html/en/beats/functionbeat/master/exported-fields-ecs.html
+html/en/beats/functionbeat/master/exported-fields-functionbeat.html
+html/en/beats/functionbeat/master/exported-fields-host-processor.html
+html/en/beats/functionbeat/master/exported-fields-jolokia-autodiscover.html
+html/en/beats/functionbeat/master/exported-fields-kubernetes-processor.html
+html/en/beats/functionbeat/master/exported-fields-process.html
+html/en/beats/functionbeat/master/exported-fields.html
+html/en/beats/functionbeat/master/extract-array.html
+html/en/beats/functionbeat/master/faq.html
+html/en/beats/functionbeat/master/feature-roles.html
+html/en/beats/functionbeat/master/filtering-and-enhancing-data.html
+html/en/beats/functionbeat/master/functionbeat-configuration.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/functionbeat-configuration.html
+@@ -492,17 +492,17 @@
+                      </a>
+                      or equivalent privileges.
+                     </p>
+-                    <p>
+-                     For more information, see
+-                     <a class="xref" href="securing-functionbeat.html" title="Securing Functionbeat">
+-                      Securing Functionbeat
+-                     </a>
+-                     .
+-                    </p>
+                    </td>
+                   </tr>
+                  </table>
+                 </div>
++                <p class="simpara">
++                 For more information, see
++                 <a class="xref" href="securing-functionbeat.html" title="Securing Functionbeat">
++                  Securing Functionbeat
++                 </a>
++                 .
++                </p>
+                </li>
+               </ul>
+              </div>
+html/en/beats/functionbeat/master/functionbeat-deploying.html
+html/en/beats/functionbeat/master/functionbeat-geoip.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/functionbeat-geoip.html
+@@ -206,8 +206,8 @@
+               </code>
+               processors to add location information to the event. For example, you can use the Console in Kibana to create the following pipeline:
+              </p>
+-             <div class="pre_wrapper lang-json">
+-              <pre class="programlisting prettyprint lang-json">PUT _ingest/pipeline/geoip-info
++             <div class="pre_wrapper lang-console">
++              <pre class="programlisting prettyprint lang-console">PUT _ingest/pipeline/geoip-info
+ {
+   "description": "Add geoip info",
+   "processors": [
+html/en/beats/functionbeat/master/functionbeat-getting-started.html
+html/en/beats/functionbeat/master/functionbeat-installation.html
+html/en/beats/functionbeat/master/functionbeat-overview.html
+html/en/beats/functionbeat/master/functionbeat-reference-yml.html
+html/en/beats/functionbeat/master/functionbeat-template.html
+html/en/beats/functionbeat/master/getting-help.html
+html/en/beats/functionbeat/master/iam-permissions.html
+html/en/beats/functionbeat/master/ilm.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/ilm.html
+@@ -278,7 +278,7 @@
+           <p>
+            The index lifecycle write alias name. The default is
+            <code class="literal">
+-            functionbeat-{agent.version}
++            functionbeat-%{agent.version}
+            </code>
+            . Setting this option changes the alias name.
+           </p>
+html/en/beats/functionbeat/master/include-fields.html
+html/en/beats/functionbeat/master/index.html
+html/en/beats/functionbeat/master/keystore.html
+html/en/beats/functionbeat/master/monitoring-internal-collection.html
+html/en/beats/functionbeat/master/monitoring-shows-fewer-than-expected-beats.html
+html/en/beats/functionbeat/master/monitoring.html
+html/en/beats/functionbeat/master/processor-dns.html
+html/en/beats/functionbeat/master/processor-registered-domain.html
+html/en/beats/functionbeat/master/regexp-support.html
+html/en/beats/functionbeat/master/rename-fields.html
+html/en/beats/functionbeat/master/securing-beats.html
+html/en/beats/functionbeat/master/securing-communication-elasticsearch.html
+html/en/beats/functionbeat/master/securing-functionbeat.html
+html/en/beats/functionbeat/master/setting-up-and-running.html
+html/en/beats/functionbeat/master/setup-kibana-endpoint.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/setup-kibana-endpoint.html
+@@ -203,7 +203,7 @@
+            config file:
+           </p>
+           <h4>
+-           <a id="_literal_setup_kibana_host_literal">
++           <a id="_setup_kibana_host">
+            </a>
+            <code class="literal">
+             setup.kibana.host
+@@ -326,7 +326,7 @@
+ setup.kibana.path: /kibana</pre>
+           </div>
+           <h4>
+-           <a id="_literal_setup_kibana_username_literal">
++           <a id="_setup_kibana_username">
+            </a>
+            <code class="literal">
+             setup.kibana.username
+@@ -343,7 +343,7 @@
+            specified for the Elasticsearch output.
+           </p>
+           <h4>
+-           <a id="_literal_setup_kibana_password_literal">
++           <a id="_setup_kibana_password">
+            </a>
+            <code class="literal">
+             setup.kibana.password
+@@ -373,7 +373,7 @@
+            An HTTP path prefix that is prepended to the HTTP API calls. This is useful for the cases where Kibana listens behind an HTTP reverse proxy that exports the API under a custom prefix.
+           </p>
+           <h4>
+-           <a id="_literal_setup_kibana_ssl_enabled_literal">
++           <a id="_setup_kibana_ssl_enabled">
+            </a>
+            <code class="literal">
+             setup.kibana.ssl.enabled
+html/en/beats/functionbeat/master/toc.html
+html/en/beats/functionbeat/master/troubleshooting.html
+html/en/beats/functionbeat/master/unable-to-deploy-resource-limit.html
+html/en/beats/functionbeat/master/unable-to-deploy.html
+html/en/beats/functionbeat/master/using-environ-vars.html
+--- /dev/fd/63
++++ html/en/beats/functionbeat/master/using-environ-vars.html
+@@ -469,7 +469,7 @@
+              <code class="literal">
+               \
+              </code>
+-             ) will be interpreted as an escape character. :standalone!:
++             ) will be interpreted as an escape character.
+             </p>
+            </div>
+           </div>
+html/en/beats/functionbeat/master/view-kibana-dashboards.html
+html/en/beats/functionbeat/master/yaml-tips.html
