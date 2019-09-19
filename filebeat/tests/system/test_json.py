@@ -243,7 +243,6 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_id.log"],
-                        source_dir="../files",
                         target_dir="log")
         proc = self.start_beat()
         self.wait_until(
@@ -256,7 +255,7 @@ class Test(BaseTest):
         assert len(output) == 3
         for i in xrange(len(output)):
             assert("@metadata.id" in output[i])
-            assert(output[i]["@metadata.id"] == i)
+            assert(output[i]["@metadata.id"] == str(i))
             assert("json.id" not in output[i])
 
     def test_with_generic_filtering(self):
