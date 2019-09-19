@@ -81,7 +81,6 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		}
 		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, metric.Namespace, dimensions, defaultTimeGrain)...)
 	}
-
 	return metrics, nil
 }
 

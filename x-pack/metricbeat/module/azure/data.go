@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -17,6 +18,9 @@ const noDimension = "none"
 
 // EventsMapping will map metric values to beats events
 func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
+	if len(metrics) == 0 {
+		return errors.New("no metrics found")
+	}
 	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
 	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
 
