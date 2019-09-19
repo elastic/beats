@@ -15,19 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readjson
+package main
 
-// Config holds the options a JSON reader.
-type Config struct {
-	MessageKey          string `config:"message_key"`
-	DocumentID          string `config:"document_id"`
-	KeysUnderRoot       bool   `config:"keys_under_root"`
-	OverwriteKeys       bool   `config:"overwrite_keys"`
-	AddErrorKey         bool   `config:"add_error_key"`
-	IgnoreDecodingError bool   `config:"ignore_decoding_error"`
+// Error wraps a normal error with an Exitcode.
+type Error struct {
+	err  error
+	code int
 }
 
-// Validate validates the Config option for JSON reader.
-func (c *Config) Validate() error {
-	return nil
+func (e Error) Error() string {
+	if e.err != nil {
+		return e.err.Error()
+	}
+	return "<nil>"
+}
+
+// Code returns the exitcode for the error
+func Code(e error) int {
+	if err, ok := e.(*Error); ok {
+		return err.code
+	}
+	return 0
 }

@@ -15,19 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readjson
+package mage
 
-// Config holds the options a JSON reader.
-type Config struct {
-	MessageKey          string `config:"message_key"`
-	DocumentID          string `config:"document_id"`
-	KeysUnderRoot       bool   `config:"keys_under_root"`
-	OverwriteKeys       bool   `config:"overwrite_keys"`
-	AddErrorKey         bool   `config:"add_error_key"`
-	IgnoreDecodingError bool   `config:"ignore_decoding_error"`
+import (
+	"path/filepath"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/dev-tools/mage/gotool"
+)
+
+var (
+	// GoLicenserImportPath controls the import path used to install go-licenser.
+	GoLicenserImportPath = "github.com/elastic/go-licenser"
+)
+
+// InstallVendored uses go get to install a command from its vendored source
+func InstallVendored(importPath string) error {
+	beatDir, err := ElasticBeatsDir()
+	if err != nil {
+		return errors.Wrap(err, "failed to obtain beats repository path")
+	}
+
+	get := gotool.Get
+	return get(
+		get.Package(filepath.Join(beatDir, "vendor", importPath)),
+	)
 }
 
-// Validate validates the Config option for JSON reader.
-func (c *Config) Validate() error {
-	return nil
+// InstallGoLicenser target installs go-licenser
+func InstallGoLicenser() error {
+	return InstallVendored(GoLicenserImportPath)
 }
