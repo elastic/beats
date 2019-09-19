@@ -42,6 +42,8 @@ def generate_and_write_to_file(outfile, go_beat_path):
     outputs = get_importable_lines(go_beat_path, import_line_format)
 
     for output_data in outputs:
+        if output_data["imported_lines"]:
+            continue
         imported_lines = "\n".join(output_data["imported_lines"])
         package = basename(dirname(outfile))
         list_go = import_template.format(package=package,
