@@ -36,7 +36,8 @@ type Registry struct {
 }
 
 // Key is the type used for all keys in a store.
-type Key []byte
+// type Key []byte
+type Key string
 
 // ValueDecoder is used to decode retrieved from an actual store.  A
 // ValueDecoder instance is valid for the lifetime of the transaction only.

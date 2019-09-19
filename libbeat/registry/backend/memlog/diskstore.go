@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cleanup"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
 type diskStore struct {
@@ -302,7 +303,7 @@ func (s *diskStore) checkpointTmpFile(baseName string, tbl *hashtable) (string, 
 			}
 
 			err = enc.Encode(storeEntry{
-				Key:    unsafeString(entry.key),
+				Key:    string(entry.key),
 				Fields: entry.value,
 			})
 			if err != nil {
@@ -436,7 +437,7 @@ func loadDataFile(path string) (hashtable, error) {
 	}
 
 	hashFn := newHashFn()
-	err := readDataFile(path, func(key []byte, state common.MapStr) {
+	err := readDataFile(path, func(key backend.Key, state common.MapStr) {
 		tbl.set(hashFn(key), key, state)
 	})
 	return tbl, err
@@ -463,15 +464,15 @@ func loadLogFile(
 			switch op := rawOp.(type) {
 			case *opInsertWith:
 				entries++
-				tx.Set(unsafeKeyRef(op.K), op.V)
+				tx.Set(backend.Key(op.K), op.V)
 
 			case *opUpdate:
 				entries++
-				tx.Update(unsafeKeyRef(op.K), op.V)
+				tx.Update(backend.Key(op.K), op.V)
 
 			case *opRemove:
 				entries++
-				tx.Remove(unsafeKeyRef(op.K))
+				tx.Remove(backend.Key(op.K))
 
 			case *opBegin:
 				// current transaction is incomplete -> stop processing any ops
@@ -531,7 +532,7 @@ func loadLogFile(
 	return txid, entries, complete, err
 }
 
-func readDataFile(path string, fn func([]byte, common.MapStr)) error {
+func readDataFile(path string, fn func(backend.Key, common.MapStr)) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -545,9 +546,9 @@ func readDataFile(path string, fn func([]byte, common.MapStr)) error {
 	}
 
 	for _, state := range states {
-		key := []byte(state[keyField].(string))
+		key := state[keyField].(string)
 		delete(state, keyField)
-		fn(key, state)
+		fn(backend.Key(key), state)
 	}
 
 	return nil

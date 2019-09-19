@@ -105,7 +105,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 		defer tx.Close()
 
 		for key, val := range expected.Entries {
-			dec, err := tx.Get([]byte(key))
+			dec, err := tx.Get(backend.Key(key))
 			require.NoError(t, err, "error reading entry")
 			assert.NotNil(t, dec, "entry is missing")
 

@@ -139,12 +139,12 @@ func (s *Store) View(fn func(tx *Tx)) {
 }
 
 // Set sets a key-value using a temporary transaction.
-func (s *Store) Set(key []byte, val interface{}) {
+func (s *Store) Set(key backend.Key, val interface{}) {
 	s.MustUpdate(func(tx *Tx) { tx.MustSet(key, val) })
 }
 
 // UpdValue updates a key-value pair using a temporary write transaction.
-func (s *Store) UpdValue(key []byte, val interface{}) {
+func (s *Store) UpdValue(key backend.Key, val interface{}) {
 	s.MustUpdate(func(tx *Tx) {
 		t := s.Registry.T
 		must(t, tx.Update(key, val), "update failed")
@@ -152,7 +152,7 @@ func (s *Store) UpdValue(key []byte, val interface{}) {
 }
 
 // Remove removes a key-value pair using a temporary write transaction.
-func (s *Store) Remove(key []byte) {
+func (s *Store) Remove(key backend.Key) {
 	s.MustUpdate(func(tx *Tx) {
 		t := s.Registry.T
 		must(t, tx.Remove(key), "unexpected error on remove")
@@ -160,13 +160,13 @@ func (s *Store) Remove(key []byte) {
 }
 
 // Has checks if a key exists in the store, using a temporary readonly transaction.
-func (s *Store) Has(key []byte) (found bool) {
+func (s *Store) Has(key backend.Key) (found bool) {
 	s.View(func(tx *Tx) { found = tx.Has(key) })
 	return found
 }
 
 // GetValue decodes a key-value pair into to, using a temporary readonly transaction.
-func (s *Store) GetValue(k []byte, to interface{}) {
+func (s *Store) GetValue(k backend.Key, to interface{}) {
 	s.View(func(tx *Tx) {
 		tx.MustGetValue(k, to)
 	})
@@ -174,7 +174,7 @@ func (s *Store) GetValue(k []byte, to interface{}) {
 
 // Has checks if a key exists in the store or within the current transaction.
 // The test fails if the backend reports an error.
-func (tx *Tx) Has(k []byte) bool {
+func (tx *Tx) Has(k backend.Key) bool {
 	t := tx.Store.Registry.T
 	found, err := tx.Tx.Has(k)
 	must(t, err, "error testing for key presence")
@@ -183,7 +183,7 @@ func (tx *Tx) Has(k []byte) bool {
 
 // MustGet returns the value decoder for a key-value pair, or nil if the key is unknown.
 // The test fails if the backend reports an error.
-func (tx *Tx) MustGet(k []byte) backend.ValueDecoder {
+func (tx *Tx) MustGet(k backend.Key) backend.ValueDecoder {
 	dec, err := tx.Get(k)
 	must(tx.Store.Registry.T, err, "unknown key")
 	return dec
@@ -191,7 +191,7 @@ func (tx *Tx) MustGet(k []byte) backend.ValueDecoder {
 
 // GetValue decodes a key-value pair into to, only if the key exists.
 // Error returned by the backend will be returned.
-func (tx *Tx) GetValue(k []byte, to interface{}) error {
+func (tx *Tx) GetValue(k backend.Key, to interface{}) error {
 	dec, err := tx.Get(k)
 	if err == nil && dec != nil {
 		err = dec.Decode(to)
@@ -201,7 +201,7 @@ func (tx *Tx) GetValue(k []byte, to interface{}) error {
 
 // MustGetValue decodes a key-value pair into to, only if the key exists.
 // The test fails if the backend reports an error.
-func (tx *Tx) MustGetValue(k []byte, to interface{}) {
+func (tx *Tx) MustGetValue(k backend.Key, to interface{}) {
 	t := tx.Store.Registry.T
 
 	err := tx.GetValue(k, to)
@@ -212,7 +212,7 @@ func (tx *Tx) MustGetValue(k []byte, to interface{}) {
 
 // MustSet sets a key value pair in the current transaction.
 // The test fails if the backend reports an error.
-func (tx *Tx) MustSet(k []byte, v interface{}) {
+func (tx *Tx) MustSet(k backend.Key, v interface{}) {
 	t := tx.Store.Registry.T
 	must(t, tx.Tx.Set(k, v), "must set value")
 }

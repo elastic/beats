@@ -401,7 +401,7 @@ func testUpdate(t *testing.T, factory BackendFactory) {
 func testIter(t *testing.T, factory BackendFactory) {
 	type entry struct{ A int }
 
-	insert := func(store *Store, keys [][]byte) {
+	insert := func(store *Store, keys []backend.Key) {
 		store.MustUpdate(func(tx *Tx) {
 			for i, k := range keys {
 				tx.MustSet(k, entry{i})
