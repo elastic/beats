@@ -62,6 +62,12 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 - Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
 - Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 - Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
+- Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
+- Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
+
+*Heartbeat*
+
+- Fix integer comparison on JSON responses. {pull}13348[13348]
 
 *Metricbeat*
 
@@ -72,6 +78,10 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 - Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
 - Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
 - In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
+- Print errors that were being omitted in vSphere metricsets. {pull}12816[12816]
+- Fix issue with aws cloudwatch module where dimensions and/or namespaces that contain space are not being parsed correctly {pull}13389[13389]
+- Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
+- Fix data race affecting config validation at startup. {issue}13005[13005]
 
 *Packetbeat*
 
@@ -103,6 +113,7 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 - add_host_metadata is no GA. {pull}13148[13148]
 - Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
 - Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
+- Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
 
 *Filebeat*
 
