@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
 - Add new dashboard for Couchbase cluster stats {pull}13212[13212]
 - Add new dashboard for Prometheus server stats {pull}13126[13126]
 - Add statistic option into cloudwatch metricset. If there is no statistic method specified, default is to collect Average, Sum, Maximum, Minimum and SampleCount. {issue}12370[12370] {pull}12840[12840]
+- Fix rds metricset dashboard. {pull}13721[13721]
 
 *Functionbeat*
 
