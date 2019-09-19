@@ -17,7 +17,10 @@
 
 package memlog
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/registry/backend"
+)
 
 type txState struct {
 	bins map[uint64]txCacheLine
@@ -39,7 +42,7 @@ type txCacheLine []txCacheEntry
 type txCacheEntry struct {
 	tx memTxParent
 
-	key     []byte
+	key     backend.Key
 	value   common.MapStr
 	updates common.MapStr
 
@@ -64,9 +67,9 @@ func (st *txState) find(k keyPair) cacheEntryRef {
 	return cacheEntryRef{line: line, hash: k.hash, idx: idx}
 }
 
-func (st *txState) findHash(hash uint64, k []byte) (txCacheLine, int) {
+func (st *txState) findHash(hash uint64, k backend.Key) (txCacheLine, int) {
 	bin := st.bins[hash]
-	idx := tblBinFind(len(bin), k, func(i int) []byte {
+	idx := tblBinFind(len(bin), k, func(i int) backend.Key {
 		return bin[i].key
 	})
 	return bin, idx
@@ -92,11 +95,11 @@ func (st *txState) addEntry(at cacheEntryRef, entry txCacheEntry) cacheEntryRef 
 	return pos
 }
 
-func (l *txCacheLine) keyFn(i int) []byte {
+func (l *txCacheLine) keyFn(i int) backend.Key {
 	return (*l)[i].key
 }
 
-func (l *txCacheLine) index(k []byte) int {
+func (l *txCacheLine) index(k backend.Key) int {
 	if l == nil {
 		return -1
 	}
@@ -106,7 +109,7 @@ func (l *txCacheLine) index(k []byte) int {
 func (e *txCacheEntry) recordInsert(v common.MapStr) {
 	e.value = nil
 	e.updates = v
-	e.ops = []op{&opInsertWith{K: unsafeString(e.key), V: v}}
+	e.ops = []op{&opInsertWith{K: string(e.key), V: v}}
 	e.modified = true
 	e.exists = true
 }
@@ -118,13 +121,13 @@ func (e *txCacheEntry) recordUpdate(v common.MapStr) {
 	} else {
 		e.updates.DeepUpdate(v)
 	}
-	e.recordOp(&opUpdate{K: unsafeString(e.key), V: v})
+	e.recordOp(&opUpdate{K: string(e.key), V: v})
 }
 
 func (e *txCacheEntry) recordRemove() {
 	e.value = nil
 	e.updates = nil
-	e.ops = []op{&opRemove{K: unsafeString(e.key)}}
+	e.ops = []op{&opRemove{K: string(e.key)}}
 	e.modified = true
 	e.exists = false
 }

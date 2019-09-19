@@ -22,6 +22,8 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
 // RunWithPath uses the factory to create and configure a registry with a
@@ -82,12 +84,12 @@ func WithStore(factory BackendFactory, fn func(*testing.T, *Store)) func(*testin
 	})
 }
 
-func makeKey(s string) []byte {
-	return []byte(s)
+func makeKey(s string) backend.Key {
+	return backend.Key(s)
 }
 
-func makeKeys(n int) [][]byte {
-	keys := make([][]byte, n)
+func makeKeys(n int) []backend.Key {
+	keys := make([]backend.Key, n)
 	for i := range keys {
 		keys[i] = makeKey(fmt.Sprintf("key%v", i))
 	}
