@@ -113,17 +113,23 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
-		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
-		assert.Equal(t, metrics[0].Aggregations, "Average")
-		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension(nil))
 		assert.Equal(t, metrics[1].Resource.ID, "123")
 		assert.Equal(t, metrics[1].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[1].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[1].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[1].Namespace, "namespace")
-		assert.Equal(t, metrics[1].Names, []string{"BytesRead"})
-		assert.Equal(t, metrics[1].Aggregations, "Minimum")
+		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension(nil))
 		assert.Equal(t, metrics[1].Dimensions, []azure.Dimension(nil))
+
+		// order cam be different
+
+		if metrics[0].Aggregations == "Average" {
+			assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
+		} else {
+			assert.Equal(t, metrics[0].Names, []string{"BytesRead"})
+			assert.Equal(t, metrics[0].Aggregations, "Minimum")
+		}
+
 		m.AssertExpectations(t)
 	})
 }
