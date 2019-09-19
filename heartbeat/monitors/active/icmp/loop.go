@@ -167,8 +167,8 @@ func (l *icmpLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 				if neterr.Timeout() {
 					continue
 				} else {
-					logp.Err("error in ICMP loop: %v", err)
-					break
+					// TODO: report error and quit loop?
+					return
 				}
 			}
 		}
