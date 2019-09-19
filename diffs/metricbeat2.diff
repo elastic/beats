@@ -1,0 +1,49 @@
+html/en/beats/metricbeat/master/_compatibility_36.html
+--- /dev/fd/63
++++ html/en/beats/metricbeat/master/_compatibility_36.html
+@@ -195,7 +195,7 @@
+   hosts: ["localhost:8080"]</pre>
+           </div>
+           <h3>
+-           <a id="_metricsets_44">
++           <a id="_metricsets_45">
+            </a>
+            Metricsets
+            <a class="edit_me" href="https://github.com/elastic/beats/edit/master/metricbeat/docs/modules/traefik.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+html/en/beats/metricbeat/master/_galera_status_metricset.html
+--- /dev/fd/63
++++ html/en/beats/metricbeat/master/_galera_status_metricset.html
+@@ -178,7 +178,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_fields_93">
++               <a id="_fields_94">
+                </a>
+                Fields
+                <a class="edit_me" href="https://github.com/elastic/beats/edit/master/metricbeat/docs/modules/mysql/galera_status.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+html/en/beats/metricbeat/master/_live_reloading.html
+html/en/beats/metricbeat/master/_module_specific_configuration_notes_3.html
+--- /dev/fd/63
++++ html/en/beats/metricbeat/master/_module_specific_configuration_notes_3.html
+@@ -179,7 +179,7 @@
+             <div>
+              <div>
+               <h3 class="title">
+-               <a id="_fields_62">
++               <a id="_fields_63">
+                </a>
+                Fields
+                <a class="edit_me" href="https://github.com/elastic/beats/edit/master/metricbeat/docs/modules/kibana/stats.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+html/en/beats/metricbeat/master/add-cloud-metadata.html
+html/en/beats/metricbeat/master/add-docker-metadata.html
+html/en/beats/metricbeat/master/add-fields.html
+html/en/beats/metricbeat/master/add-host-metadata.html
+html/en/beats/metricbeat/master/add-kubernetes-metadata.html
+html/en/beats/metricbeat/master/add-labels.html
+html/en/beats/metricbeat/master/add-locale.html
+html/en/beats/metricbeat/master/add-observer-metadata.html
+html/en/beats/metricbeat/master/add-process-metadata.html
+html/en/beats/metricbeat/master/add-tags.html
+html/en/beats/metricbeat/master/bandwidth-throttling.html
+html/en/beats/metricbeat/master/beats-basic-auth.html
