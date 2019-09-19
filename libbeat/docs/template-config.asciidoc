@@ -71,7 +71,7 @@ setup.template.settings:
 
 NOTE: If you want to use {stack-ov}/xpack-ccr.html[{ccr}] to replicate {beatname_uc}
 indices to another cluster, you will need to add additional template settings to
-{stack-ov}/ccr-requirements.html#ccr-overview-beats[enable soft deletes] on the
+{ref}/ccr-requirements.html#ccr-overview-beats[enable soft deletes] on the
 underlying indices.
 
 *`setup.template.settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,

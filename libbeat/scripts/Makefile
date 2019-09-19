@@ -125,17 +125,15 @@ check: check-headers mage ## @build Checks project and source code if everything
 	@mage check
 
 .PHONY: $(.OVER)check-headers
-$(.OVER)check-headers:
+$(.OVER)check-headers: mage
 ifndef CHECK_HEADERS_DISABLED
-	@go get -u github.com/elastic/go-licenser
-	@go-licenser -d -license ${LICENSE}
+	@mage checkLicenseHeaders
 endif
 
 .PHONY: $(.OVER)add-headers
-$(.OVER)add-headers:
+$(.OVER)add-headers: mage
 ifndef CHECK_HEADERS_DISABLED
-	@go get github.com/elastic/go-licenser
-	@go-licenser -license ${LICENSE}
+	@mage addLicenseHeaders
 endif
 
 .PHONY: fmt

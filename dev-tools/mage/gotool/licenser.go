@@ -15,19 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readjson
+package gotool
 
-// Config holds the options a JSON reader.
-type Config struct {
-	MessageKey          string `config:"message_key"`
-	DocumentID          string `config:"document_id"`
-	KeysUnderRoot       bool   `config:"keys_under_root"`
-	OverwriteKeys       bool   `config:"overwrite_keys"`
-	AddErrorKey         bool   `config:"add_error_key"`
-	IgnoreDecodingError bool   `config:"ignore_decoding_error"`
+import (
+	"github.com/magefile/mage/sh"
+)
+
+type goLicenser func(opts ...ArgOpt) error
+
+// Licenser runs `go-licenser` and provides optionals for adding command line arguments.
+var Licenser goLicenser = runGoLicenser
+
+func runGoLicenser(opts ...ArgOpt) error {
+	args := buildArgs(opts).build()
+	return sh.RunV("go-licenser", args...)
 }
 
-// Validate validates the Config option for JSON reader.
-func (c *Config) Validate() error {
-	return nil
-}
+func (goLicenser) Check() ArgOpt                 { return flagBoolIf("-d", true) }
+func (goLicenser) License(license string) ArgOpt { return flagArgIf("-license", license) }
+func (goLicenser) Exclude(path string) ArgOpt    { return flagArgIf("-exclude", path) }
+func (goLicenser) Path(path string) ArgOpt       { return posArg(path) }
