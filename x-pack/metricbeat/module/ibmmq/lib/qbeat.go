@@ -16,9 +16,7 @@ type RequestObject struct {
 	}
 }
 
-/**
-Config contains all configuration objects
-*/
+//Config contains all configuration objects
 type Config struct {
 	QueueManager       string           `config:"bindingQueueManager"`
 	RemoteQueueManager []string         `config:"targetQueueManager"`
@@ -27,6 +25,7 @@ type Config struct {
 	ConnectionConfig   ConnectionConfig `config:"cc"`
 }
 
+//ConnectionConfig contains the configuration to connect to MQ
 type ConnectionConfig struct {
 	ClientMode bool   `config:"clientMode"`
 	MqServer   string `config:"mqServer"`
@@ -214,9 +213,7 @@ func generateConnectedObjectsField(events []beat.Event) []beat.Event {
 	return events
 }
 
-/**
-CollectQmgrMetricset is responsible for collecting data from Queue Manager
-*/
+//CollectQmgrMetricset is responsible for collecting data from Queue Manager
 func CollectQmgrMetricset(eventType string, qmgrName string, cc ConnectionConfig) ([]beat.Event, error) {
 	//Collect queue statistics
 	var err error
