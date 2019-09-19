@@ -22,8 +22,8 @@ class ComposeMixin(object):
     # List of required services to run INTEGRATION_TESTS
     COMPOSE_SERVICES = []
 
-    # docker-compose.yml dir path
-    COMPOSE_PROJECT_DIR = '.'
+    # Additional build arguments for docker compose build
+    COMPOSE_BUILD_ARGS = {}
 
     # timeout waiting for health (seconds)
     COMPOSE_TIMEOUT = 300
@@ -51,10 +51,13 @@ class ComposeMixin(object):
             return container.inspect()['State']['Health']['Status'] == 'healthy'
 
         project = cls.compose_project()
+        project.build(
+            service_names=cls.COMPOSE_SERVICES,
+            build_args=cls.COMPOSE_BUILD_ARGS)
         project.up(
             strategy=ConvergenceStrategy.always,
             service_names=cls.COMPOSE_SERVICES,
-            do_build=BuildAction.force,
+            do_build=BuildAction.skip,
             timeout=30)
 
         # Wait for them to be healthy
@@ -126,7 +129,11 @@ class ComposeMixin(object):
             return
 
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
-            cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
+            # Use down on per-module scenarios to release network pools too
+            if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
+                cls.compose_project().down(remove_image_type=None, include_volumes=True)
+            else:
+                cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
     def get_hosts(cls):
@@ -183,5 +190,24 @@ class ComposeMixin(object):
         return cls._exposed_host(info, port)
 
     @classmethod
+    def compose_project_name(cls):
+        basename = os.path.basename(cls.find_compose_path())
+
+        def positivehash(x):
+            return hash(x) % ((sys.maxsize+1) * 2)
+
+        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_BUILD_ARGS.items())))
+
+    @classmethod
     def compose_project(cls):
-        return get_project(cls.COMPOSE_PROJECT_DIR, project_name=os.environ.get('DOCKER_COMPOSE_PROJECT_NAME'))
+        return get_project(cls.find_compose_path(), project_name=cls.compose_project_name())
+
+    @classmethod
+    def find_compose_path(cls):
+        class_dir = os.path.abspath(os.path.dirname(sys.modules[cls.__module__].__file__))
+        while True:
+            if os.path.exists(os.path.join(class_dir, "docker-compose.yml")):
+                return class_dir
+            class_dir, current = os.path.split(class_dir)
+            if current == '':  # We have reached root
+                raise Exception("failed to find a docker-compose.yml file")
