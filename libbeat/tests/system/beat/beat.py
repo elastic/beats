@@ -408,7 +408,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logfile is None:
             logfile = self.beat_name + ".log"
 
-
         try:
             with open(os.path.join(self.working_dir, logfile), "r") as f:
                 for line in f:
