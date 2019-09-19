@@ -66,7 +66,7 @@ func Package() {
 
 	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package, pkg.TestPackages)
+	mg.SerialDeps(devtools.Package, pkg.PackageTest)
 }
 
 // Update updates the generated files (aka make update).
