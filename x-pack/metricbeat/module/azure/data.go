@@ -5,7 +5,6 @@
 package azure
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -18,9 +17,6 @@ const noDimension = "none"
 
 // EventsMapping will map metric values to beats events
 func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
-	if len(metrics) == 0 {
-		return errors.New("no metrics found")
-	}
 	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
 	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
 
@@ -85,12 +81,28 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
 	return nil
 }
 
-// managePropertyName function will handle metric names
+// managePropertyName function will handle metric names, there are several formats the metric names are written
 func managePropertyName(metric string) string {
+	// replace spaces with underscores
 	resultMetricName := strings.Replace(metric, " ", "_", -1)
+	// replace backslashes with "per"
 	resultMetricName = strings.Replace(resultMetricName, "/", "_per_", -1)
 	resultMetricName = strings.Replace(resultMetricName, "\\", "_", -1)
-	resultMetricName = strings.ToLower(resultMetricName)
+	// replace actual percentage symbol with the smbol "pct"
+	resultMetricName = strings.Replace(resultMetricName, "_%_", "_pct_", -1)
+	// create an object in case of ":"
+	resultMetricName = strings.Replace(resultMetricName, ":", ".", -1)
+	// create an object in case of ":"
+	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
+	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
+	obj := strings.Split(resultMetricName, ".")
+	for index := range obj {
+		// in some cases a trailing "_" is found
+		obj[index] = strings.TrimPrefix(obj[index], "_")
+		obj[index] = strings.TrimSuffix(obj[index], "_")
+	}
+	resultMetricName = strings.ToLower(strings.Join(obj, "."))
+
 	return resultMetricName
 }
 
@@ -116,20 +128,22 @@ func initEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) m
 		}
 	}
 	event := mb.Event{
-		Timestamp: timestamp,
-		MetricSetFields: common.MapStr{
+		ModuleFields: common.MapStr{
 			"resource": common.MapStr{
 				"name":  metric.Resource.Name,
 				"type":  metric.Resource.Type,
 				"group": metric.Resource.Group,
 			},
-			"namespace":       metric.Namespace,
 			"subscription_id": metric.Resource.Subscription,
 			"metrics":         metricList,
 		},
+		Timestamp: timestamp,
+		MetricSetFields: common.MapStr{
+			"namespace": metric.Namespace,
+		},
 	}
 	if len(metric.Resource.Tags) > 0 {
-		event.MetricSetFields.Put("resource.tags", metric.Resource.Tags)
+		event.ModuleFields.Put("resource.tags", metric.Resource.Tags)
 	}
 	if len(metric.Dimensions) > 0 {
 		for _, dimension := range metric.Dimensions {

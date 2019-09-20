@@ -44,7 +44,8 @@ func NewClient(config Config) (*Client, error) {
 	return client, nil
 }
 
-// InitResources returns the list of resources and maps them.
+// InitResources function will retrieve and validate the resources configured by the users and then map the information configured to client metrics.
+// the mapMetric function sent in this case will handle the mapping part as different metric and aggregation options work for different metricsets
 func (client *Client) InitResources(fn mapMetric, report mb.ReporterV2) error {
 	if len(client.Config.Resources) == 0 {
 		return errors.New("no resource options defined")
@@ -110,10 +111,7 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.Resource.ID, metric.Namespace)
 			client.LogError(report, err)
 		} else {
-			current, err := mapMetricValues(resp, client.Resources.Metrics[i].Values, endTime.Truncate(time.Minute).Add(client.Config.Period*(-1)), endTime.Truncate(time.Minute))
-			if err != nil {
-				client.LogError(report, err)
-			}
+			current := mapMetricValues(resp, client.Resources.Metrics[i].Values, endTime.Truncate(time.Minute).Add(client.Config.Period*(-1)), endTime.Truncate(time.Minute))
 			client.Resources.Metrics[i].Values = current
 		}
 	}
@@ -128,9 +126,21 @@ func (client *Client) LogError(report mb.ReporterV2, err error) {
 
 // CreateMetric function will create a client metric based on the resource and metrics configured
 func (client *Client) CreateMetric(resource resources.GenericResource, namespace string, metrics []string, aggregations string, dimensions []Dimension, timegrain string) Metric {
-	met := Metric{Resource: Resource{ID: *resource.ID, Name: *resource.Name, Location: *resource.Location, Type: *resource.Type, Group: getResourceGroupFromID(*resource.ID),
-		Tags: mapTags(resource.Tags), Subscription: client.Config.SubscriptionID},
-		Namespace: namespace, Names: metrics, Dimensions: dimensions, Aggregations: aggregations, TimeGrain: timegrain}
+	met := Metric{
+		Resource: Resource{
+			ID:           *resource.ID,
+			Name:         *resource.Name,
+			Location:     *resource.Location,
+			Type:         *resource.Type,
+			Group:        getResourceGroupFromID(*resource.ID),
+			Tags:         mapTags(resource.Tags),
+			Subscription: client.Config.SubscriptionID},
+		Namespace:    namespace,
+		Names:        metrics,
+		Dimensions:   dimensions,
+		Aggregations: aggregations,
+		TimeGrain:    timegrain,
+	}
 	for _, prevMet := range client.Resources.Metrics {
 		if len(prevMet.Values) != 0 && matchMetrics(prevMet, met) {
 			met.Values = prevMet.Values

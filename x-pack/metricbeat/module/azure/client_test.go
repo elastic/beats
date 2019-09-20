@@ -8,9 +8,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
-
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

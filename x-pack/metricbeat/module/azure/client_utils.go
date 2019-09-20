@@ -11,17 +11,13 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/pkg/errors"
 )
 
 // DefaultTimeGrain is set as default timegrain for the azure metrics
 const DefaultTimeGrain = "PT5M"
 
 // mapMetricValues should map the metric values
-func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) ([]MetricValue, error) {
-	if len(metrics) == 0 {
-		return nil, errors.New("no metric values found")
-	}
+func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metrics {
@@ -62,7 +58,7 @@ func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, s
 			}
 		}
 	}
-	return currentMetrics, nil
+	return currentMetrics
 }
 
 // metricExists will check if the metric value has been retrieved in the past

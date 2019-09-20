@@ -8,12 +8,10 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
-
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
-
-	"github.com/pkg/errors"
 )
 
 const (

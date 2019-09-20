@@ -87,7 +87,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 	return metrics, nil
 }
 
-// filterMetrics will filter out any unsupported metrics based on the namespace selected
+// filterSConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
 func filterSConfiguredMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
 	var inRange []string
 	var notInRange []string

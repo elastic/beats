@@ -24,35 +24,35 @@
       dimensions:
       - name: "Location"
         value: "West Europe"
-  - resource_group: "testresourcegroup"
-    resource_type: "Microsoft.Compute/virtualMachines"
-    metrics:
-    - name: "*"
-      namespace: "Microsoft.Compute/virtualMachines"
-      timegrain: "PT1M"
-  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts' and name eq 'databaseAccount'"
-    metrics:
-    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
-      namespace: "Microsoft.DocumentDb/databaseAccounts"
+#  - resource_group: "testresourcegroup"
+#    resource_type: "Microsoft.Compute/virtualMachines"
+#    metrics:
+#    - name: "*"
+#      namespace: "Microsoft.Compute/virtualMachines"
+#      timegrain: "PT1M"
+#  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts' and name eq 'databaseAccount'"
+#    metrics:
+#    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+#      namespace: "Microsoft.DocumentDb/databaseAccounts"
 
-- module: azure
-  metricsets:
-  - compute_vm
-  enabled: true
-  period: 300s
-  client_id: '${AZURE_CLIENT_ID:""}'
-  client_secret: '${AZURE_CLIENT_SECRET:""}'
-  tenant_id: '${AZURE_TENANT_ID:""}'
-  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  refresh_list_interval: 600s
+#- module: azure
+#  metricsets:
+#  - compute_vm
+#  enabled: true
+#  period: 300s
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#  refresh_list_interval: 600s
 
-  - module: azure
-    metricsets:
-    - compute_vm_scaleset
-    enabled: true
-    period: 300s
-    client_id: '${AZURE_CLIENT_ID:""}'
-    client_secret: '${AZURE_CLIENT_SECRET:""}'
-    tenant_id: '${AZURE_TENANT_ID:""}'
-    subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-    refresh_list_interval: 600s
+#- module: azure
+#  metricsets:
+#  - compute_vm_scaleset
+#  enabled: true
+#  period: 300s
+#  client_id: '${AZURE_CLIENT_ID:""}'
+#  client_secret: '${AZURE_CLIENT_SECRET:""}'
+#  tenant_id: '${AZURE_TENANT_ID:""}'
+#  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+#  refresh_list_interval: 600s

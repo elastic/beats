@@ -121,8 +121,7 @@ func TestMapMetric(t *testing.T) {
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension(nil))
 		assert.Equal(t, metrics[1].Dimensions, []azure.Dimension(nil))
 
-		// order cam be different
-
+		//order of elements can be different when running the test
 		if metrics[0].Aggregations == "Average" {
 			assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
 		} else {

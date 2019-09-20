@@ -5,11 +5,10 @@
 package compute_vm
 
 import (
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
-
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
-
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
 
 // mapMetric should validate and map the metric related configuration to relevant azure monitor api parameters
