@@ -1,8 +1,0 @@
-- type: kafka
-  hosts: ["obseventhuba.servicebus.windows.net:9093"]
-  topics: ["insights-operational-logs"]
-  group_id: "$Default"
-
-  username: "$ConnectionString"
-  password: "Endpoint=sb://obseventhuba.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=f0FlBLjw6/MFfMqm0RbRzgimkFmtOtHBsjBp+A97zwg="
-  ssl.enabled: true

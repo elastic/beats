@@ -1,0 +1,5 @@
+- name: activitylogs
+  type: group
+  description: >
+    Fields for azure Activity logs.
+  fields:
