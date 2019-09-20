@@ -213,6 +213,13 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		data = append(data, beatEvent.Fields)
 	}
 
+	// Override the non-deterministic fields with a specific value, otherwise the sorting will not work
+	for _, fieldToRemove := range config.RemoveFieldsForComparison {
+		for eventIndex := range data {
+			data[eventIndex].Put(fieldToRemove, "")
+		}
+	}
+
 	// Sorting the events is necessary as events are not necessarily sent in the same order
 	sort.SliceStable(data, func(i, j int) bool {
 		h1, _ := hashstructure.Hash(data[i], nil)
