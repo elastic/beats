@@ -93,7 +93,7 @@ During this time, Filebeat processes and deletes the message. However, if
 Filebeat fails before deleting the message and your system doesn't call the
 DeleteMessage action for that message before the visibility timeout expires, the
 message becomes visible to other Filebeats and the message is received again.
-By default, visibility timeout is set to 5 minutes for s3 input in Filebeat.
+By default, the visibility timeout is set to 5 minutes for s3 input in {beatname_uc}.
 5-minute is high enough for SQS message to be read and related s3 log files to
 be processed.
 
