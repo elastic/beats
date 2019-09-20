@@ -77,22 +77,25 @@ for more details.
 
 [float]
 === Parallel Processing
-Multiple Filebeat instances can read from the same SQS queues at the same time. This
-feature helps users to horizontally scale the processing when there are large
-amount of logs flowing into S3 bucket which leads to large amount of messages
-going through the queue. No additional configuration is needed for this.
+Multiple Filebeat instances can read from the same SQS queues at the same time.
+To horizontally scale processing when there are large amounts of log data
+flowing into an S3 bucket, you can run multiple {beatname_uc} instances that
+read from the same SQS queues at the same time. No additional configuration is
+required.
 
 Using SQS ensures that each message in the queue is processed only once
-even when multiple {beatname_uc} instances are running in parallel. To prevent {beatname_uc}
-from receiving and processing the message more than once, set the visibility timeout.
+even when multiple {beatname_uc} instances are running in parallel. To prevent
+{beatname_uc} from receiving and processing the message more than once, set the
+visibility timeout.
 
 The visibility timeout begins when SQS returns a message to Filebeat.
 During this time, Filebeat processes and deletes the message. However, if
 Filebeat fails before deleting the message and your system doesn't call the
 DeleteMessage action for that message before the visibility timeout expires, the
-message becomes visible to other {beatname_uc} instances, and the message is received again.
-By default, the visibility timeout is set to 5 minutes for s3 input in {beatname_uc}.
-5 minutes is sufficient time for {beatname_uc} to read SQS messages and process related s3 log files.
+message becomes visible to other {beatname_uc} instances, and the message is
+received again. By default, the visibility timeout is set to 5 minutes for s3
+input in {beatname_uc}. 5 minutes is sufficient time for {beatname_uc} to read
+SQS messages and process related s3 log files.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
