@@ -5,4 +5,4 @@ var:
     default: kafka
 
 ingest_pipeline: ingest/pipeline.yml
-input: config/{{.input}}.yml
+input: config/kafka.yml
