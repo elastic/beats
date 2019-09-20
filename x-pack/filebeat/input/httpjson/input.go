@@ -53,6 +53,7 @@ type httpjsonInput struct {
 type requestInfo struct {
 	URL        string
 	ContentMap common.MapStr
+	Headers    common.MapStr
 }
 
 // NewInput creates a new httpjson input
@@ -137,6 +138,13 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 	req.Header.Set("User-Agent", userAgent())
 	if in.config.APIKey != "" {
 		req.Header.Set("Authorization", in.config.APIKey)
+	}
+	for k, v := range ri.Headers {
+		switch vv := v.(type) {
+		case string:
+			req.Header.Set(k, vv)
+		default:
+		}
 	}
 	return req, nil
 }
@@ -260,6 +268,7 @@ func (in *httpjsonInput) run() error {
 	ri := &requestInfo{
 		URL:        in.URL,
 		ContentMap: common.MapStr{},
+		Headers:    in.HTTPHeaders,
 	}
 	if in.config.HTTPMethod == "POST" && in.config.HTTPRequestBody != nil {
 		ri.ContentMap.Update(common.MapStr(in.config.HTTPRequestBody))

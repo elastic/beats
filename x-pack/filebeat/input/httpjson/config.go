@@ -18,6 +18,7 @@ import (
 type config struct {
 	APIKey            string            `config:"api_key"`
 	HTTPClientTimeout time.Duration     `config:"http_client_timeout"`
+	HTTPHeaders       common.MapStr     `config:"http_headers"`
 	HTTPMethod        string            `config:"http_method" validate:"required"`
 	HTTPRequestBody   common.MapStr     `config:"http_request_body"`
 	Interval          time.Duration     `config:"interval" validate:"required"`
