@@ -255,7 +255,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
 - Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
 - Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
-
+- Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
 
 *Auditbeat*
 
