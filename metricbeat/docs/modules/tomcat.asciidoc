@@ -8,13 +8,15 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This module periodically fetches metrics from Tomcat.
+This module periodically fetches JMX metrics from Apache Tomcat.
 
 [float]
 === Compatibility
+The module has been tested with Tomcat 7.0.24 and 9.0.24. Other versions are expected to work.
 
-TODO
-
+[float]
+=== Usage
+Tomcat module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
 
 
 [float]
@@ -30,6 +32,7 @@ metricbeat.modules:
   metricsets: ['threading', 'cache', 'memory', 'requests']
   period: 10s
   hosts: ['localhost:8080']
+  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
 ----
 
 [float]
