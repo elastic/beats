@@ -1,0 +1,520 @@
+html/en/beats/libbeat/7.4/beats-reference.html
+html/en/beats/libbeat/7.4/breaking-changes-7.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/breaking-changes-7.0.html
+@@ -273,7 +273,7 @@
+            </a>
+           </h4>
+           <div class="table">
+-           <a id="id-1.8.8.16">
++           <a id="id-1.8.8.13">
+            </a>
+            <p class="title">
+             <strong>
+@@ -926,7 +926,7 @@
+            </div>
+           </div>
+           <div class="table">
+-           <a id="id-1.8.8.17">
++           <a id="id-1.8.8.14">
+            </a>
+            <p class="title">
+             <strong>
+@@ -5659,7 +5659,7 @@
+            </div>
+           </div>
+           <div class="table">
+-           <a id="id-1.8.8.18">
++           <a id="id-1.8.8.15">
+            </a>
+            <p class="title">
+             <strong>
+@@ -6024,7 +6024,7 @@
+            </div>
+           </div>
+           <div class="table">
+-           <a id="id-1.8.8.19">
++           <a id="id-1.8.8.16">
+            </a>
+            <p class="title">
+             <strong>
+@@ -6341,7 +6341,7 @@
+            </div>
+           </div>
+           <div class="table">
+-           <a id="id-1.8.8.20">
++           <a id="id-1.8.8.17">
+            </a>
+            <p class="title">
+             <strong>
+@@ -7362,7 +7362,7 @@
+            </div>
+           </div>
+           <div class="table">
+-           <a id="id-1.8.8.21">
++           <a id="id-1.8.8.18">
+            </a>
+            <p class="title">
+             <strong>
+@@ -8063,7 +8063,7 @@
+            </div>
+           </div>
+           <div class="table">
+-           <a id="id-1.8.8.22">
++           <a id="id-1.8.8.19">
+            </a>
+            <p class="title">
+             <strong>
+@@ -8695,7 +8695,7 @@
+            The Auditbeat JSON data types produced by the output have been changed to align with the data types used in the Elasticsearch index template.
+           </p>
+           <div class="table">
+-           <a id="id-1.8.8.26">
++           <a id="id-1.8.8.22">
+            </a>
+            <p class="title">
+             <strong>
+html/en/beats/libbeat/7.4/breaking-changes-7.1.html
+html/en/beats/libbeat/7.4/breaking-changes-7.2.html
+html/en/beats/libbeat/7.4/breaking-changes-7.3.html
+html/en/beats/libbeat/7.4/breaking-changes.html
+html/en/beats/libbeat/7.4/community-beats.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/community-beats.html
+@@ -167,7 +167,7 @@
+           </p>
+           <p>
+            Have you created a Beat that’s not listed? Add the name and description of your Beat to the source document for
+-           <a class="ulink" href="https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/libbeat/docs/communitybeats.asciidoc" target="_top">
+             Community Beats
+            </a>
+            and
+html/en/beats/libbeat/7.4/config-file-format-cli.html
+html/en/beats/libbeat/7.4/config-file-format-env-vars.html
+html/en/beats/libbeat/7.4/config-file-format-namespacing.html
+html/en/beats/libbeat/7.4/config-file-format-tips.html
+html/en/beats/libbeat/7.4/config-file-format-type.html
+html/en/beats/libbeat/7.4/config-file-format.html
+html/en/beats/libbeat/7.4/config-file-permissions.html
+html/en/beats/libbeat/7.4/config-gile-format-refs.html
+html/en/beats/libbeat/7.4/contributing-to-beats.html
+html/en/beats/libbeat/7.4/getting-started.html
+html/en/beats/libbeat/7.4/index.html
+html/en/beats/libbeat/7.4/release-highlights-7.0.0.html
+html/en/beats/libbeat/7.4/release-highlights-7.1.0.html
+html/en/beats/libbeat/7.4/release-highlights-7.2.0.html
+html/en/beats/libbeat/7.4/release-highlights-7.3.0.html
+html/en/beats/libbeat/7.4/release-highlights.html
+html/en/beats/libbeat/7.4/release-notes-1.0.0-beta4.html
+html/en/beats/libbeat/7.4/release-notes-1.0.0-rc1.html
+html/en/beats/libbeat/7.4/release-notes-1.0.0-rc2.html
+html/en/beats/libbeat/7.4/release-notes-1.0.0.html
+html/en/beats/libbeat/7.4/release-notes-1.0.1.html
+html/en/beats/libbeat/7.4/release-notes-1.1.0.html
+html/en/beats/libbeat/7.4/release-notes-1.1.1.html
+html/en/beats/libbeat/7.4/release-notes-1.1.2.html
+html/en/beats/libbeat/7.4/release-notes-1.2.0.html
+html/en/beats/libbeat/7.4/release-notes-1.2.1.html
+html/en/beats/libbeat/7.4/release-notes-1.2.2.html
+html/en/beats/libbeat/7.4/release-notes-1.2.3.html
+html/en/beats/libbeat/7.4/release-notes-1.3.0.html
+html/en/beats/libbeat/7.4/release-notes-1.3.1.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0-alpha1.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0-alpha2.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-5.0.0-alpha2.html
+@@ -329,7 +329,11 @@
+               </a>
+              </li>
+              <li class="listitem">
+-              Seed random number generator using crypto.rand package. ]
++              Seed random number generator using crypto.rand package.
++              <a class="ulink" href="https://github.com/elastic/beats/pull/1503{1503" target="_top">
++               https://github.com/elastic/beats/pull/1503{1503
++              </a>
++              ]
+              </li>
+              <li class="listitem">
+               Fix beats hanging in -configtest
+html/en/beats/libbeat/7.4/release-notes-5.0.0-alpha3.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0-alpha4.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0-alpha5.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0-beta1.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0-ga.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0-rc1.html
+html/en/beats/libbeat/7.4/release-notes-5.0.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-5.0.0.html
+@@ -715,7 +715,11 @@
+               </a>
+              </li>
+              <li class="listitem">
+-              Seed random number generator using crypto.rand package. ]
++              Seed random number generator using crypto.rand package.
++              <a class="ulink" href="https://github.com/elastic/beats/pull/1503{1503" target="_top">
++               https://github.com/elastic/beats/pull/1503{1503
++              </a>
++              ]
+              </li>
+              <li class="listitem">
+               Fix beats hanging in
+html/en/beats/libbeat/7.4/release-notes-5.0.1.html
+html/en/beats/libbeat/7.4/release-notes-5.0.2.html
+html/en/beats/libbeat/7.4/release-notes-5.1.0.html
+html/en/beats/libbeat/7.4/release-notes-5.1.1.html
+html/en/beats/libbeat/7.4/release-notes-5.1.2.html
+html/en/beats/libbeat/7.4/release-notes-5.2.0.html
+html/en/beats/libbeat/7.4/release-notes-5.2.1.html
+html/en/beats/libbeat/7.4/release-notes-5.2.2.html
+html/en/beats/libbeat/7.4/release-notes-5.3.0.html
+html/en/beats/libbeat/7.4/release-notes-5.3.1.html
+html/en/beats/libbeat/7.4/release-notes-5.3.2.html
+html/en/beats/libbeat/7.4/release-notes-5.4.0.html
+html/en/beats/libbeat/7.4/release-notes-5.4.1.html
+html/en/beats/libbeat/7.4/release-notes-5.4.2.html
+html/en/beats/libbeat/7.4/release-notes-5.5.0.html
+html/en/beats/libbeat/7.4/release-notes-5.5.1.html
+html/en/beats/libbeat/7.4/release-notes-5.5.2.html
+html/en/beats/libbeat/7.4/release-notes-5.5.3.html
+html/en/beats/libbeat/7.4/release-notes-5.6.0.html
+html/en/beats/libbeat/7.4/release-notes-5.6.1.html
+html/en/beats/libbeat/7.4/release-notes-5.6.10.html
+html/en/beats/libbeat/7.4/release-notes-5.6.11.html
+html/en/beats/libbeat/7.4/release-notes-5.6.12.html
+html/en/beats/libbeat/7.4/release-notes-5.6.13.html
+html/en/beats/libbeat/7.4/release-notes-5.6.14.html
+html/en/beats/libbeat/7.4/release-notes-5.6.2.html
+html/en/beats/libbeat/7.4/release-notes-5.6.3.html
+html/en/beats/libbeat/7.4/release-notes-5.6.4.html
+html/en/beats/libbeat/7.4/release-notes-5.6.5.html
+html/en/beats/libbeat/7.4/release-notes-5.6.6.html
+html/en/beats/libbeat/7.4/release-notes-5.6.7.html
+html/en/beats/libbeat/7.4/release-notes-5.6.8.html
+html/en/beats/libbeat/7.4/release-notes-5.6.9.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0-alpha1.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0-alpha2.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0-beta1.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0-beta2.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0-ga.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0-rc1.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0-rc2.html
+html/en/beats/libbeat/7.4/release-notes-6.0.0.html
+html/en/beats/libbeat/7.4/release-notes-6.0.1.html
+html/en/beats/libbeat/7.4/release-notes-6.1.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.1.0.html
+@@ -301,7 +301,11 @@
+               </a>
+              </li>
+              <li class="listitem">
+-              Fix logstash output debug message. ]
++              Fix logstash output debug message.
++              <a class="ulink" href="https://github.com/elastic/beats/pull/5799{5799" target="_top">
++               https://github.com/elastic/beats/pull/5799{5799
++              </a>
++              ]
+              </li>
+              <li class="listitem">
+               Fix isolation of modules when merging local and global field settings.
+html/en/beats/libbeat/7.4/release-notes-6.1.1.html
+html/en/beats/libbeat/7.4/release-notes-6.1.2.html
+html/en/beats/libbeat/7.4/release-notes-6.1.3.html
+html/en/beats/libbeat/7.4/release-notes-6.2.0.html
+html/en/beats/libbeat/7.4/release-notes-6.2.1.html
+html/en/beats/libbeat/7.4/release-notes-6.2.2.html
+html/en/beats/libbeat/7.4/release-notes-6.2.3.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.2.3.html
+@@ -247,6 +247,10 @@
+            <div class="itemizedlist">
+             <ul class="itemizedlist" type="disc">
+              <li class="listitem">
++              Fix Kubernetes overview dashboard views for non default time ranges.
++              <a class="ulink" href="https://github.com/elastic/beats/issues/6395{6395}" target="_top">
++               https://github.com/elastic/beats/issues/6395{6395}
++              </a>
+              </li>
+             </ul>
+            </div>
+html/en/beats/libbeat/7.4/release-notes-6.3.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.3.0.html
+@@ -570,6 +570,10 @@
+               </a>
+              </li>
+              <li class="listitem">
++              Fix Kubernetes calculated fields store.
++              <a class="ulink" href="https://github.com/elastic/beats/pull/6564{6564}" target="_top">
++               https://github.com/elastic/beats/pull/6564{6564}
++              </a>
+              </li>
+              <li class="listitem">
+               Exclude bind mounts in fsstat and filesystem metricsets.
+html/en/beats/libbeat/7.4/release-notes-6.3.1.html
+html/en/beats/libbeat/7.4/release-notes-6.4.0.html
+html/en/beats/libbeat/7.4/release-notes-6.4.1.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.4.1.html
+@@ -265,10 +265,7 @@
+            <div class="itemizedlist">
+             <ul class="itemizedlist" type="disc">
+              <li class="listitem">
+-              Fixed a docker input error due to the offset update bug in partial log join.
+-              <a class="ulink" href="https://github.com/elastic/beats/pull/8177" target="_top">
+-               8177
+-              </a>
++              Fixed a docker input error due to the offset update bug in partial log join.https://github.com/elastic/beats/pull/8177[8177]
+              </li>
+              <li class="listitem">
+               Update CRI format to support partial/full tags.
+html/en/beats/libbeat/7.4/release-notes-6.4.2.html
+html/en/beats/libbeat/7.4/release-notes-6.4.3.html
+html/en/beats/libbeat/7.4/release-notes-6.5.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.5.0.html
+@@ -381,10 +381,7 @@
+               </a>
+              </li>
+              <li class="listitem">
+-              Fixed a docker input error due to the offset update bug in partial log join.
+-              <a class="ulink" href="https://github.com/elastic/beats/pull/8177" target="_top">
+-               8177
+-              </a>
++              Fixed a docker input error due to the offset update bug in partial log join.https://github.com/elastic/beats/pull/8177[8177]
+              </li>
+              <li class="listitem">
+               Update CRI format to support partial/full tags.
+@@ -1081,10 +1078,7 @@
+               <code class="literal">
+                replication.master.offset
+               </code>
+-              .
+-              <a class="ulink" href="https://github.com/elastic/beats/pull/7695" target="_top">
+-               7695
+-              </a>
++              .https://github.com/elastic/beats/pull/7695[7695]
+              </li>
+              <li class="listitem">
+               Redis
+html/en/beats/libbeat/7.4/release-notes-6.5.1.html
+html/en/beats/libbeat/7.4/release-notes-6.5.2.html
+html/en/beats/libbeat/7.4/release-notes-6.5.3.html
+html/en/beats/libbeat/7.4/release-notes-6.5.4.html
+html/en/beats/libbeat/7.4/release-notes-6.6.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.6.0.html
+@@ -393,6 +393,7 @@
+               </a>
+              </li>
+              <li class="listitem">
++              Fix macOS default log path for elasticsearch module based on homebrew paths. {pul}8939[8939]
+              </li>
+              <li class="listitem">
+               Support IPv6 addresses with zone id in IIS ingest pipeline.
+html/en/beats/libbeat/7.4/release-notes-6.6.1.html
+html/en/beats/libbeat/7.4/release-notes-6.6.2.html
+html/en/beats/libbeat/7.4/release-notes-6.7.0.html
+html/en/beats/libbeat/7.4/release-notes-6.7.1.html
+html/en/beats/libbeat/7.4/release-notes-6.7.2.html
+html/en/beats/libbeat/7.4/release-notes-6.8.0.html
+html/en/beats/libbeat/7.4/release-notes-6.8.1.html
+html/en/beats/libbeat/7.4/release-notes-6.8.2.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.8.2.html
+@@ -226,9 +226,10 @@
+             <ul class="itemizedlist" type="disc">
+              <li class="listitem">
+               Limit memory usage of Redis replication sessions.
+-              <a class="ulink" href="https://github.com/elastic/beats/issues/12657[12657" target="_top">
+-               https://github.com/elastic/beats/issues/12657[12657
+-              </a>
++              <a class="ulink" href="https://github.com/elastic/beats/issues/12657" target="_top">
++               https://github.com/elastic/beats/issues/12657
++              </a>
++              [12657
+              </li>
+             </ul>
+            </div>
+html/en/beats/libbeat/7.4/release-notes-6.8.3.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-6.8.3.html
+@@ -162,10 +162,10 @@
+            </div>
+           </div>
+           <p>
+-           <a class="ulink" href="https://github.com/elastic/beats/compare/v6.8.2…v6.8.3[View" target="_top">
+-            https://github.com/elastic/beats/compare/v6.8.2…v6.8.3[View
+-           </a>
+-           commits
++           <a class="ulink" href="https://github.com/elastic/beats/compare/v6.8.2…v6.8.3" target="_top">
++            https://github.com/elastic/beats/compare/v6.8.2…v6.8.3
++           </a>
++           [View commits
+           </p>
+           <div class="section">
+            <div class="titlepage">
+html/en/beats/libbeat/7.4/release-notes-7.0.0-alpha1.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-7.0.0-alpha1.html
+@@ -359,7 +359,11 @@
+               </a>
+              </li>
+              <li class="listitem">
+-              Fixed Support ‘add_docker_metadata` in Windows by identifying systems’ path separator.
++              Fixed Support
++              <code class="literal">
++               add_docker_metadata
++              </code>
++              in Windows by identifying systems' path separator.
+               <a class="ulink" href="https://github.com/elastic/beats/issues/7797" target="_top">
+                7797
+               </a>
+@@ -410,6 +414,7 @@
+               </a>
+              </li>
+              <li class="listitem">
++              Fix macOS default log path for elasticsearch module based on homebrew paths. {pul}8939[8939]
+              </li>
+             </ul>
+            </div>
+html/en/beats/libbeat/7.4/release-notes-7.0.0-alpha2.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-7.0.0-alpha2.html
+@@ -961,9 +961,10 @@
+              </li>
+              <li class="listitem">
+               Add MS SQL module to X-Pack
+-              <a class="ulink" href="https://github.com/elastic/beats/pull/9414[9414" target="_top">
+-               https://github.com/elastic/beats/pull/9414[9414
+-              </a>
++              <a class="ulink" href="https://github.com/elastic/beats/pull/9414" target="_top">
++               https://github.com/elastic/beats/pull/9414
++              </a>
++              [9414
+              </li>
+             </ul>
+            </div>
+html/en/beats/libbeat/7.4/release-notes-7.0.0-beta1.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-7.0.0-beta1.html
+@@ -1300,6 +1300,7 @@
+               </a>
+              </li>
+              <li class="listitem">
++              Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
+              </li>
+              <li class="listitem">
+               Allow functionbeat to use the keystore.
+@@ -1869,6 +1870,7 @@
+               </a>
+              </li>
+              <li class="listitem">
++              Calls to Elasticsearch X-Pack APIs made by Beats won’t cause deprecation logs in Elasticsearch logs. {9656}9656[9656]
+              </li>
+              <li class="listitem">
+               Allow to unenroll a Beat from the UI.
+html/en/beats/libbeat/7.4/release-notes-7.0.0-ga.html
+html/en/beats/libbeat/7.4/release-notes-7.0.0-rc1.html
+html/en/beats/libbeat/7.4/release-notes-7.0.0-rc2.html
+html/en/beats/libbeat/7.4/release-notes-7.0.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-7.0.0.html
+@@ -1767,7 +1767,11 @@
+            <div class="itemizedlist">
+             <ul class="itemizedlist" type="disc">
+              <li class="listitem">
+-              Fix support of ‘add_docker_metadata` in Windows by identifying systems’ path separator.
++              Fix support of
++              <code class="literal">
++               add_docker_metadata
++              </code>
++              in Windows by identifying systems' path separator.
+               <a class="ulink" href="https://github.com/elastic/beats/issues/7797" target="_top">
+                7797
+               </a>
+html/en/beats/libbeat/7.4/release-notes-7.0.1.html
+html/en/beats/libbeat/7.4/release-notes-7.1.0.html
+html/en/beats/libbeat/7.4/release-notes-7.1.1.html
+html/en/beats/libbeat/7.4/release-notes-7.2.0.html
+html/en/beats/libbeat/7.4/release-notes-7.2.1.html
+html/en/beats/libbeat/7.4/release-notes-7.3.0.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/release-notes-7.3.0.html
+@@ -484,10 +484,7 @@
+               </a>
+              </li>
+              <li class="listitem">
+-              PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.
+-              <a class="ulink" href="https://github.com/elastic/beats/issues/12590" target="_top">
+-               12590
+-              </a>
++              PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.https://github.com/elastic/beats/issues/12590[12590]
+               <a class="ulink" href="https://github.com/elastic/beats/pull/12622" target="_top">
+                12622
+               </a>
+html/en/beats/libbeat/7.4/release-notes-7.3.1.html
+html/en/beats/libbeat/7.4/release-notes-7.3.2.html
+html/en/beats/libbeat/7.4/release-notes-7.4.0.html
+html/en/beats/libbeat/7.4/release-notes.html
+html/en/beats/libbeat/7.4/toc.html
+html/en/beats/libbeat/7.4/troubleshooting-upgrade.html
+--- /dev/fd/63
++++ html/en/beats/libbeat/7.4/troubleshooting-upgrade.html
+@@ -263,7 +263,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_cluster_monitor_main_is_unauthorized_for_user_literal">
++                <a id="_clustermonitormain_is_unauthorized_for_user">
+                 </a>
+                 <code class="literal">
+                  [cluster:monitor/main] is unauthorized for user
+@@ -301,7 +301,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_cluster_admin_ilm_put_is_unauthorized_for_user_literal">
++                <a id="_clusteradminilmput_is_unauthorized_for_user">
+                 </a>
+                 <code class="literal">
+                  [cluster:admin/ilm/put] is unauthorized for user
+@@ -339,7 +339,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_indices_admin_template_put_is_unauthorized_for_user_literal">
++                <a id="_indicesadmintemplateput_is_unauthorized_for_user">
+                 </a>
+                 <code class="literal">
+                  [indices:admin/template/put] is unauthorized for user
+@@ -377,7 +377,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_indices_admin_aliases_is_unauthorized_for_user_literal">
++                <a id="_indicesadminaliases_is_unauthorized_for_user">
+                 </a>
+                 <code class="literal">
+                  [indices:admin/aliases] is unauthorized for user
+@@ -415,7 +415,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_literal_indices_data_write_bulk_is_unauthorized_for_user_literal">
++                <a id="_indicesdatawritebulk_is_unauthorized_for_user">
+                 </a>
+                 <code class="literal">
+                  [indices:data/write/bulk] is unauthorized for user
+@@ -549,7 +549,7 @@
+            </p>
+            <p>
+             For example, here’s a snippet that shows how to add default search fields to a Metricbeat 6.6 index. This example is truncated. Full examples for Metricbeat and Filebeat are available in
+-            <a class="ulink" href="https://github.com/elastic/beats/blob/master/libbeat/docs/troubleshooting/default_field.md" target="_top">
++            <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/libbeat/docs/troubleshooting/default_field.md" target="_top">
+              this file
+             </a>
+             .
+html/en/beats/libbeat/7.4/upgrading-6-to-7.html
+html/en/beats/libbeat/7.4/upgrading-minor-versions.html
+html/en/beats/libbeat/7.4/upgrading.html
