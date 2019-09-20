@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"sync"
 	"testing"
 
@@ -34,10 +33,6 @@ func testSetup(t *testing.T) {
 	once.Do(func() {
 		logp.TestingSetup()
 	})
-}
-
-func isInDockerIntegTestEnv() bool {
-	return os.Getenv("BEATS_DOCKER_INTEGRATION_TEST_ENV") != ""
 }
 
 func runTest(t *testing.T, m map[string]interface{}, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
