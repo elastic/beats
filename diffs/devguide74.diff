@@ -1,0 +1,820 @@
+html/en/beats/devguide/7.4/_migrating_dashboards_from_kibana_5_x_to_6_x.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/_migrating_dashboards_from_kibana_5_x_to_6_x.html
+@@ -240,7 +240,7 @@
+           </div>
+           <p>
+            You can export the dashboards via the Kibana API by using the
+-           <a class="ulink" href="https://github.com/elastic/beats/blob/master/dev-tools/cmd/dashboards/export_dashboards.go" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/dev-tools/cmd/dashboards/export_dashboards.go" target="_top">
+             export_dashboards.go
+            </a>
+            application.
+html/en/beats/devguide/7.4/archive-dashboards.html
+html/en/beats/devguide/7.4/beater-interface.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/beater-interface.html
+@@ -177,13 +177,13 @@
+ // shutdown signal is received. The Stop()-method normally will stop the Run()-loop,
+ // such that the beat can gracefully shutdown.
+ type Beater interface {
+-        // The main event loop. This method should block until signalled to stop by an
+-        // invocation of the Stop() method.
+-        Run(b *Beat) error
+-
+-        // Stop is invoked to signal that the Run method should finish its execution.
+-        // It will be invoked at most once.
+-        Stop()
++	// The main event loop. This method should block until signalled to stop by an
++	// invocation of the Stop() method.
++	Run(b *Beat) error
++
++	// Stop is invoked to signal that the Run method should finish its execution.
++	// It will be invoked at most once.
++	Stop()
+ }</pre>
+           </div>
+           <p>
+@@ -203,20 +203,20 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">type Countbeat struct {
+-        done   chan struct{} <a id="CO1-1"></a><i class="conum" data-value="1"></i>
+-        config config.Config <a id="CO1-2"></a><i class="conum" data-value="2"></i>
+-        client publisher.Client <a id="CO1-3"></a><i class="conum" data-value="3"></i>
+-
+-        ...
++	done   chan struct{} <a id="CO1-1"></a><i class="conum" data-value="1"></i>
++	config config.Config <a id="CO1-2"></a><i class="conum" data-value="2"></i>
++	client publisher.Client <a id="CO1-3"></a><i class="conum" data-value="3"></i>
++
++	...
+ }
+ 
+ func (bt *Countbeat) Run(b *beat.Beat) error {
+-        ...
++	...
+ }
+ 
+ 
+ func (bt *Countbeat) Stop() {
+-        ...
++	...
+ }</pre>
+           </div>
+           <p>
+@@ -427,16 +427,16 @@
+            </p>
+            <div class="pre_wrapper lang-go">
+             <pre class="programlisting prettyprint lang-go">func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+-        config := config.DefaultConfig
+-        if err := cfg.Unpack(&amp;config); err != nil {
+-                return nil, fmt.Errorf("Error reading config file: %v", err)
+-        }
+-
+-        bt := &amp;Countbeat{
+-                done:   make(chan struct{}),
+-                config: config,
+-        }
+-        return bt, nil
++	config := config.DefaultConfig
++	if err := cfg.Unpack(&amp;config); err != nil {
++		return nil, fmt.Errorf("Error reading config file: %v", err)
++	}
++
++	bt := &amp;Countbeat{
++		done:   make(chan struct{}),
++		config: config,
++	}
++	return bt, nil
+ }</pre>
+            </div>
+            <p>
+@@ -466,11 +466,11 @@
+ import "time"
+ 
+ type Config struct {
+-        Period time.Duration `config:"period"`
++	Period time.Duration `config:"period"`
+ }
+ 
+ var DefaultConfig = Config{
+-        Period: 1 * time.Second,
++	Period: 1 * time.Second,
+ }</pre>
+            </div>
+            <p>
+@@ -583,27 +583,27 @@
+            </p>
+            <div class="pre_wrapper lang-go">
+             <pre class="programlisting prettyprint lang-go">func (bt *Countbeat) Run(b *beat.Beat) error {
+-        logp.Info("countbeat is running! Hit CTRL-C to stop it.")
+-
+-        bt.client = b.Publisher.Connect()
+-        ticker := time.NewTicker(bt.config.Period)
+-        counter := 1
+-        for {
+-                select {
+-                case &lt;-bt.done:
+-                        return nil
+-                case &lt;-ticker.C:
+-                }
+-
+-                event := common.MapStr{ <a id="CO2-1"></a><i class="conum" data-value="1"></i>
+-                        "@timestamp": common.Time(time.Now()), <a id="CO2-2"></a><i class="conum" data-value="2"></i>
+-                        "type":       b.Name,
+-                        "counter":    counter,
+-                }
+-                bt.client.PublishEvent(event) <a id="CO2-3"></a><i class="conum" data-value="3"></i>
+-                logp.Info("Event sent")
+-                counter++
+-        }
++	logp.Info("countbeat is running! Hit CTRL-C to stop it.")
++
++	bt.client = b.Publisher.Connect()
++	ticker := time.NewTicker(bt.config.Period)
++	counter := 1
++	for {
++		select {
++		case &lt;-bt.done:
++			return nil
++		case &lt;-ticker.C:
++		}
++
++		event := common.MapStr{ <a id="CO2-1"></a><i class="conum" data-value="1"></i>
++			"@timestamp": common.Time(time.Now()), <a id="CO2-2"></a><i class="conum" data-value="2"></i>
++			"type":       b.Name,
++			"counter":    counter,
++		}
++		bt.client.PublishEvent(event) <a id="CO2-3"></a><i class="conum" data-value="3"></i>
++		logp.Info("Event sent")
++		counter++
++	}
+ }</pre>
+            </div>
+            <div class="calloutlist">
+@@ -738,8 +738,8 @@
+            </p>
+            <div class="pre_wrapper lang-go">
+             <pre class="programlisting prettyprint lang-go">func (bt *Countbeat) Stop() {
+-        bt.client.Close()
+-        close(bt.done)
++	bt.client.Close()
++	close(bt.done)
+ }</pre>
+            </div>
+           </div>
+@@ -773,21 +773,21 @@
+             <pre class="programlisting prettyprint lang-go">package main
+ 
+ import (
+-        "os"
+-
+-        "github.com/elastic/beats/libbeat/beat"
+-        "github.com/elastic/beats/libbeat/cmd"
+-        "github.com/elastic/beats/libbeat/cmd/instance"
+-
+-        "github.com/kimjmin/countbeat/beater"
++	"os"
++
++	"github.com/elastic/beats/libbeat/beat"
++	"github.com/elastic/beats/libbeat/cmd"
++	"github.com/elastic/beats/libbeat/cmd/instance"
++
++	"github.com/kimjmin/countbeat/beater"
+ )
+ 
+ var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: "countbeat"})
+ 
+ func main() {
+-        if err := RootCmd.Execute(); err != nil {
+-                os.Exit(1)
+-        }
++	if err := RootCmd.Execute(); err != nil {
++		os.Exit(1)
++	}
+ }</pre>
+            </div>
+           </div>
+html/en/beats/devguide/7.4/beats-contributing.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/beats-contributing.html
+@@ -200,7 +200,7 @@
+           </div>
+           <p>
+            In the pull request, describe what your changes do and mention any bugs/issues related to the pull request. Please also add a changelog entry to
+-           <a class="ulink" href="https://github.com/elastic/beats/blob/master/CHANGELOG.next.asciidoc" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/CHANGELOG.next.asciidoc" target="_top">
+             CHANGELOG.next.asciidoc
+            </a>
+            .
+@@ -221,7 +221,7 @@
+             </em>
+            </a>
+            . You don’t need to submit the code to this repository. Most new Beats start in their own repository and just make use of the libbeat packages. After you have a working Beat that you’d like to share with others, open a PR to add it to our list of
+-           <a class="ulink" href="https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/libbeat/docs/communitybeats.asciidoc" target="_top">
+             community Beats
+            </a>
+            .
+@@ -542,7 +542,7 @@
+           </h3>
+           <p>
+            To keep up to date with changes to the official Beats for community developers, follow the developer changelog
+-           <a class="ulink" href="https://github.com/elastic/beats/blob/master/CHANGELOG-developer.next.asciidoc" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/CHANGELOG-developer.next.asciidoc" target="_top">
+             here
+            </a>
+            .
+html/en/beats/devguide/7.4/build-dashboards.html
+html/en/beats/devguide/7.4/community-beats.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/community-beats.html
+@@ -167,7 +167,7 @@
+           </p>
+           <p>
+            Have you created a Beat that’s not listed? Add the name and description of your Beat to the source document for
+-           <a class="ulink" href="https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/libbeat/docs/communitybeats.asciidoc" target="_top">
+             Community Beats
+            </a>
+            and
+html/en/beats/devguide/7.4/compiling-and-running.html
+html/en/beats/devguide/7.4/creating-beat-from-metricbeat.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/creating-beat-from-metricbeat.html
+@@ -226,7 +226,8 @@
+            fetches the master branch. To build your beat on a specific version of libbeat, check out the specific branch (7.4 in the example below):
+           </p>
+           <div class="pre_wrapper lang-sh">
+-           <pre class="programlisting prettyprint lang-sh">git checkout 7.4</pre>
++           <pre class="programlisting prettyprint lang-sh">cd ${GOPATH}/src/github.com/elastic/beats
++git checkout 7.4</pre>
+           </div>
+           <p>
+            Note: If you have multiple go paths use
+@@ -292,7 +293,7 @@
+            .
+           </p>
+           <h4>
+-           <a id="_step_4_build_amp_run">
++           <a id="_step_4_build_run">
+            </a>
+            Step 4 - Build &amp; Run
+            <a class="edit_me" href="https://github.com/elastic/beats/edit/7.4/docs/devguide/creating-beat-from-metricbeat.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+html/en/beats/devguide/7.4/creating-metricbeat-module.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/creating-metricbeat-module.html
+@@ -332,7 +332,7 @@
+             testing.go
+            </code>
+            file, look at the
+-           <a class="ulink" href="https://github.com/elastic/beats/tree/master/metricbeat/module/mysql" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/tree/7.4/metricbeat/module/mysql" target="_top">
+             mysql module
+            </a>
+            .
+@@ -434,7 +434,7 @@
+            <pre class="programlisting prettyprint lang-yaml">$ cat modules.d/mysql.yml
+ 
+ # Module: mysql
+-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mysql.html
++# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.4/metricbeat-module-mysql.html
+ 
+ - module: mysql
+   metricsets:
+html/en/beats/devguide/7.4/creating-metricsets.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/creating-metricsets.html
+@@ -313,17 +313,17 @@
+            The generated file looks like this:
+           </p>
+           <p>
+-           <a class="ulink" href="https://github.com/elastic/beats/blob/master/metricbeat/scripts/module/metricset/metricset.go.tmpl" target="_top">
+-            https://github.com/elastic/beats/blob/master/metricbeat/scripts/module/metricset/metricset.go.tmpl
++           <a class="ulink" href="https://github.com/elastic/beats/blob/7.4/metricbeat/scripts/module/metricset/metricset.go.tmpl" target="_top">
++            https://github.com/elastic/beats/blob/7.4/metricbeat/scripts/module/metricset/metricset.go.tmpl
+            </a>
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">package {metricset}
+ 
+ import (
+-        "github.com/elastic/beats/libbeat/common"
+-        "github.com/elastic/beats/libbeat/common/cfgwarn"
+-        "github.com/elastic/beats/metricbeat/mb"
++	"github.com/elastic/beats/libbeat/common"
++	"github.com/elastic/beats/libbeat/common/cfgwarn"
++	"github.com/elastic/beats/metricbeat/mb"
+ )
+ 
+ // init registers the MetricSet with the central registry as soon as the program
+@@ -331,7 +331,7 @@
+ // the MetricSet for each host defined in the module's configuration. After the
+ // MetricSet has been created then Fetch will begin to be called periodically.
+ func init() {
+-        mb.Registry.MustAddMetricSet("{module}", "{metricset}", New)
++	mb.Registry.MustAddMetricSet("{module}", "{metricset}", New)
+ }
+ 
+ // MetricSet holds any configuration or state information. It must implement
+@@ -339,38 +339,38 @@
+ // mb.BaseMetricSet because it implements all of the required mb.MetricSet
+ // interface methods except for Fetch.
+ type MetricSet struct {
+-        mb.BaseMetricSet
+-        counter int
++	mb.BaseMetricSet
++	counter int
+ }
+ 
+ // New creates a new instance of the MetricSet. New is responsible for unpacking
+ // any MetricSet specific configuration options if there are any.
+ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+-        cfgwarn.Beta("The {module} {metricset} metricset is beta.")
+-
+-        config := struct{}{}
+-        if err := base.Module().UnpackConfig(&amp;config); err != nil {
+-                return nil, err
+-        }
+-
+-        return &amp;MetricSet{
+-                BaseMetricSet: base,
+-                counter:       1,
+-        }, nil
++	cfgwarn.Beta("The {module} {metricset} metricset is beta.")
++
++	config := struct{}{}
++	if err := base.Module().UnpackConfig(&amp;config); err != nil {
++		return nil, err
++	}
++
++	return &amp;MetricSet{
++		BaseMetricSet: base,
++		counter:       1,
++	}, nil
+ }
+ 
+ // Fetch methods implements the data gathering and data conversion to the right
+ // format. It publishes the event which is then forwarded to the output. In case
+ // of an error set the Error field of mb.Event or simply call report.Error().
+ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+-        report.Event(mb.Event{
+-                MetricSetFields: common.MapStr{
+-                        "counter": m.counter,
+-                },
+-        })
+-        m.counter++
+-
+-        return nil
++	report.Event(mb.Event{
++		MetricSetFields: common.MapStr{
++			"counter": m.counter,
++		},
++	})
++	m.counter++
++
++	return nil
+ }</pre>
+           </div>
+           <p>
+@@ -412,9 +412,9 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">func init() {
+-        if err := mb.Registry.AddMetricSet("{module}", "{metricset}", New); err != nil {
+-                panic(err)
+-        }
++	if err := mb.Registry.AddMetricSet("{module}", "{metricset}", New); err != nil {
++		panic(err)
++	}
+ }</pre>
+           </div>
+           <h5>
+@@ -445,9 +445,9 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">type MetricSet struct {
+-        mb.BaseMetricSet
+-        username    string
+-        password    string
++	mb.BaseMetricSet
++	username    string
++	password    string
+ }</pre>
+           </div>
+           <h5>
+@@ -483,15 +483,15 @@
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+ 
+-        config := struct{}{}
+-
+-        if err := base.Module().UnpackConfig(&amp;config); err != nil {
+-                return nil, err
+-        }
+-
+-        return &amp;MetricSet{
+-                BaseMetricSet: base,
+-        }, nil
++	config := struct{}{}
++
++	if err := base.Module().UnpackConfig(&amp;config); err != nil {
++		return nil, err
++	}
++
++	return &amp;MetricSet{
++		BaseMetricSet: base,
++	}, nil
+ }</pre>
+           </div>
+           <h5>
+@@ -561,14 +561,14 @@
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+ 
+-        report.Event(mb.Event{
+-                MetricSetFields: common.MapStr{
+-                        "counter": m.counter,
+-                }
+-        })
+-        m.counter++
+-
+-        return nil
++	report.Event(mb.Event{
++		MetricSetFields: common.MapStr{
++			"counter": m.counter,
++		}
++	})
++	m.counter++
++
++	return nil
+ }</pre>
+           </div>
+           <p>
+@@ -640,11 +640,11 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">input := map[string]interface{}{
+-        "testString":     "hello",
+-        "testInt":        "42",
+-        "testBool":       "true",
+-        "testFloat":      "42.1",
+-        "testObjString":  "hello, object",
++	"testString":     "hello",
++	"testInt":        "42",
++	"testBool":       "true",
++	"testFloat":      "42.1",
++	"testObjString":  "hello, object",
+ }</pre>
+           </div>
+           <p>
+@@ -652,13 +652,13 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">common.MapStr{
+-        "test_string": "hello",
+-        "test_int":    int64(42),
+-        "test_bool":   true,
+-        "test_float":  42.1,
+-        "test_obj": common.MapStr{
+-                "test_obj_string": "hello, object",
+-        },
++	"test_string": "hello",
++	"test_int":    int64(42),
++	"test_bool":   true,
++	"test_float":  42.1,
++	"test_obj": common.MapStr{
++		"test_obj_string": "hello, object",
++	},
+ }</pre>
+           </div>
+           <p>
+@@ -666,24 +666,24 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">import (
+-        s "github.com/elastic/beats/libbeat/common/schema"
+-        c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
++	s "github.com/elastic/beats/libbeat/common/schema"
++	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
+ )
+ 
+ var (
+-        schema = s.Schema{
+-                "test_string": c.Str("testString", s.Required), <a id="CO3-1"></a><i class="conum" data-value="1"></i>
+-                "test_int":    c.Int("testInt"), <a id="CO3-2"></a><i class="conum" data-value="2"></i>
+-                "test_bool":   c.Bool("testBool", s.Optional), <a id="CO3-3"></a><i class="conum" data-value="3"></i>
+-                "test_float":  c.Float("testFloat"),
+-                "test_obj": s.Object{
+-                        "test_obj_string": c.Str("testObjString", s.IgnoreAllErrors), <a id="CO3-4"></a><i class="conum" data-value="4"></i>
+-                },
+-        }
++	schema = s.Schema{
++		"test_string": c.Str("testString", s.Required), <a id="CO3-1"></a><i class="conum" data-value="1"></i>
++		"test_int":    c.Int("testInt"), <a id="CO3-2"></a><i class="conum" data-value="2"></i>
++		"test_bool":   c.Bool("testBool", s.Optional), <a id="CO3-3"></a><i class="conum" data-value="3"></i>
++		"test_float":  c.Float("testFloat"),
++		"test_obj": s.Object{
++			"test_obj_string": c.Str("testObjString", s.IgnoreAllErrors), <a id="CO3-4"></a><i class="conum" data-value="4"></i>
++		},
++	}
+ )
+ 
+ func eventMapping(input map[string]interface{}) common.MapStr {
+-        return schema.Apply(input) <a id="CO3-5"></a><i class="conum" data-value="5"></i>
++	return schema.Apply(input) <a id="CO3-5"></a><i class="conum" data-value="5"></i>
+ }</pre>
+           </div>
+           <div class="calloutlist">
+@@ -816,33 +816,33 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">var (
+-        schema = s.Schema{
+-                "test_string": c.Str("testString"),
+-                "test_int":    c.Int("testInt"),
+-                "test_bool":   c.Bool("testBool"),
+-                "test_float":  c.Float("testFloat"),
+-                "test_obj": s.Object{
+-                        "test_obj_string": c.Str("testObjString"),
+-                },
+-        }
+-
+-        additionalSchema = s.Schema{
+-                "second_string": c.Str("secondString"),
+-                "second_int": c.Int("secondInt"),
+-        }
++	schema = s.Schema{
++		"test_string": c.Str("testString"),
++		"test_int":    c.Int("testInt"),
++		"test_bool":   c.Bool("testBool"),
++		"test_float":  c.Float("testFloat"),
++		"test_obj": s.Object{
++			"test_obj_string": c.Str("testObjString"),
++		},
++	}
++
++	additionalSchema = s.Schema{
++		"second_string": c.Str("secondString"),
++		"second_int": c.Int("secondInt"),
++	}
+ )
+ 
+-        data, err := schema.Apply(input)
+-        if err != nil {
+-                return err
+-        }
+-
+-        if m.parseMoreData{
+-                _, err := additionalSchema.ApplyTo(data, input)
+-                if len(err) &gt; 0 { <a id="CO4-1"></a><i class="conum" data-value="1"></i>
+-                        return err.Err()
+-                }
+-        }</pre>
++	data, err := schema.Apply(input)
++	if err != nil {
++		return err
++	}
++
++	if m.parseMoreData{
++		_, err := additionalSchema.ApplyTo(data, input)
++		if len(err) &gt; 0 { <a id="CO4-1"></a><i class="conum" data-value="1"></i>
++			return err.Err()
++		}
++	}</pre>
+           </div>
+           <div class="calloutlist">
+            <table border="0" summary="Callout list">
+html/en/beats/devguide/7.4/dev-faq.html
+html/en/beats/devguide/7.4/event-conventions.html
+html/en/beats/devguide/7.4/export-dashboards.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/export-dashboards.html
+@@ -167,7 +167,7 @@
+             export_dashboards.go
+            </code>
+            from
+-           <a class="ulink" href="https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/tree/7.4/dev-tools/cmd/dashboards" target="_top">
+             dev-tools
+            </a>
+            for exporting Kibana 6.0 dashboards or later, and the Python script
+@@ -175,7 +175,7 @@
+             export_5x_dashboards.py
+            </code>
+            for exporting Kibana 5.x dashboards. See the dev-tools
+-           <a class="ulink" href="https://github.com/elastic/beats/tree/master/dev-tools/README.md" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/tree/7.4/dev-tools/README.md" target="_top">
+             readme
+            </a>
+            for more info.
+@@ -263,7 +263,7 @@
+              <div>
+               <div>
+                <h4 class="title">
+-                <a id="_export_all_module_beat_dashboards">
++                <a id="_export_all_modulebeat_dashboards">
+                 </a>
+                 Export all module/Beat dashboards
+                 <a class="edit_me" href="https://github.com/elastic/beats/edit/7.4/docs/devguide/newdashboards.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+html/en/beats/devguide/7.4/filebeat-modules-devguide.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/filebeat-modules-devguide.html
+@@ -280,7 +280,7 @@
+            script for exporting dashboards. Each dashboard is defined by an id and the name of json file where the dashboard is saved locally. At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset. Please ensure that this settings are correct.
+           </p>
+           <h4>
+-           <a id="_meta_docs_asciidoc">
++           <a id="_metadocs_asciidoc">
+            </a>
+            _meta/docs.asciidoc
+            <a class="edit_me" href="https://github.com/elastic/beats/edit/7.4/docs/devguide/modules-dev-guide.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+@@ -291,7 +291,7 @@
+            This file contains module-specific documentation. You should include information about which versions of the service were tested and the variables that are defined in each fileset.
+           </p>
+           <h4>
+-           <a id="_meta_fields_yml">
++           <a id="_metafields_yml">
+            </a>
+            _meta/fields.yml
+            <a class="edit_me" href="https://github.com/elastic/beats/edit/7.4/docs/devguide/modules-dev-guide.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+@@ -306,7 +306,7 @@
+            contains descriptions for the module-level fields. Please review and update the title and the descriptions in this file. The title is used as a title in the docs, so it’s best to capitalize it.
+           </p>
+           <h4>
+-           <a id="_meta_kibana">
++           <a id="_metakibana">
+            </a>
+            _meta/kibana
+            <a class="edit_me" href="https://github.com/elastic/beats/edit/7.4/docs/devguide/modules-dev-guide.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+@@ -877,7 +877,7 @@
+            command. This uploads pipelines even if they are already available on the node.
+           </p>
+           <h4>
+-           <a id="_meta_fields_yml_2">
++           <a id="_metafields_yml_2">
+            </a>
+            _meta/fields.yml
+            <a class="edit_me" href="https://github.com/elastic/beats/edit/7.4/docs/devguide/modules-dev-guide.asciidoc" rel="nofollow" title="Edit this page on GitHub">
+html/en/beats/devguide/7.4/generate-index-pattern.html
+html/en/beats/devguide/7.4/getting-ready-new-protocol.html
+html/en/beats/devguide/7.4/import-dashboards.html
+html/en/beats/devguide/7.4/index.html
+html/en/beats/devguide/7.4/metricbeat-dev-overview.html
+html/en/beats/devguide/7.4/metricbeat-developer-guide.html
+html/en/beats/devguide/7.4/metricset-details.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/metricset-details.html
+@@ -213,27 +213,27 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">type MetricSet struct {
+-        mb.BaseMetricSet
+-        password string
++	mb.BaseMetricSet
++	password string
+ }
+ 
+ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+ 
+-        // Unpack additional configuration options.
+-        config := struct {
+-                Password string `config:"password"`
+-        }{
+-                Password: "",
+-        }
+-        err := base.Module().UnpackConfig(&amp;config)
+-        if err != nil {
+-                return nil, err
+-        }
+-
+-        return &amp;MetricSet{
+-                BaseMetricSet: base,
+-                password:      config.Password,
+-        }, nil
++	// Unpack additional configuration options.
++	config := struct {
++		Password string `config:"password"`
++	}{
++		Password: "",
++	}
++	err := base.Module().UnpackConfig(&amp;config)
++	if err != nil {
++		return nil, err
++	}
++
++	return &amp;MetricSet{
++		BaseMetricSet: base,
++		password:      config.Password,
++	}, nil
+ }</pre>
+           </div>
+           <h4>
+@@ -371,7 +371,7 @@
+             module/{module}/{metricset}/_meta/fields.yml
+            </code>
+            that contains all fields retrieved by the metricset. As field types, each field must have a core data type
+-           <a class="ulink" href="https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-types.html#_core_datatypes" target="_top">
++           <a class="ulink" href="https://www.elastic.co/guide/en/elasticsearch/reference/7.4/mapping-types.html#_core_datatypes" target="_top">
+             supported by elasticsearch
+            </a>
+            . Here’s a very basic example that shows one group from the MySQL
+@@ -638,37 +638,37 @@
+           </p>
+           <div class="pre_wrapper lang-go">
+            <pre class="programlisting prettyprint lang-go">import (
+-        "os"
+-        "testing"
+-
+-        "github.com/stretchr/testify/assert"
+-
+-        "github.com/elastic/beats/libbeat/tests/compose"
+-        mbtest "github.com/elastic/beats/metricbeat/mb/testing"
++	"os"
++	"testing"
++
++	"github.com/stretchr/testify/assert"
++
++	"github.com/elastic/beats/libbeat/tests/compose"
++	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+ )
+ 
+ func TestFetch(t *testing.T) {
+-        compose.EnsureUp(t, "{module}") <a id="CO6-1"></a><i class="conum" data-value="1"></i>
+-
+-        f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+-
+-        events, errs := mbtest.ReportingFetchV2Error(f)
+-        if len(errs) &gt; 0 {
+-                t.Fatalf("Expected 0 errord, had %d. %v\n", len(errs), errs)
+-        }
+-
+-        assert.NotEmpty(t, events) <a id="CO6-2"></a><i class="conum" data-value="2"></i>
++	compose.EnsureUp(t, "{module}") <a id="CO6-1"></a><i class="conum" data-value="1"></i>
++
++	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
++
++	events, errs := mbtest.ReportingFetchV2Error(f)
++	if len(errs) &gt; 0 {
++		t.Fatalf("Expected 0 errord, had %d. %v\n", len(errs), errs)
++	}
++
++	assert.NotEmpty(t, events) <a id="CO6-2"></a><i class="conum" data-value="2"></i>
+ 
+ }
+ 
+ func TestData(t *testing.T) {
+ 
+-        f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+-
+-        err := mbtest.WriteEventsReporterV2Error(f, t, "") <a id="CO6-3"></a><i class="conum" data-value="3"></i>
+-        if !assert.NoError(t, err) {
+-                t.FailNow()
+-        }
++	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
++
++	err := mbtest.WriteEventsReporterV2Error(f, t, "") <a id="CO6-3"></a><i class="conum" data-value="3"></i>
++	if !assert.NoError(t, err) {
++		t.FailNow()
++	}
+ }</pre>
+           </div>
+           <div class="calloutlist">
+html/en/beats/devguide/7.4/new-beat.html
+html/en/beats/devguide/7.4/new-dashboards.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/new-dashboards.html
+@@ -172,7 +172,7 @@
+           </p>
+           <p>
+            To make sure the dashboards are compatible with the latest version of Kibana and Elasticsearch, we recommend that you use the virtual environment under
+-           <a class="ulink" href="https://github.com/elastic/beats/tree/master/testing/environments" target="_top">
++           <a class="ulink" href="https://github.com/elastic/beats/tree/7.4/testing/environments" target="_top">
+             beats/testing/environments
+            </a>
+            to import, create, and export the Kibana dashboards.
+html/en/beats/devguide/7.4/new-protocol.html
+html/en/beats/devguide/7.4/newbeat-generate.html
+html/en/beats/devguide/7.4/newbeat-getting-ready.html
+html/en/beats/devguide/7.4/newbeat-overview.html
+html/en/beats/devguide/7.4/newbeat-sharing.html
+html/en/beats/devguide/7.4/pr-review.html
+html/en/beats/devguide/7.4/protocol-modules.html
+--- /dev/fd/63
++++ html/en/beats/devguide/7.4/protocol-modules.html
+@@ -163,8 +163,8 @@
+           </div>
+           <p>
+            We are working on updating this section. While you’re waiting for updates, you might want to try out the TCP protocol generator at
+-           <a class="ulink" href="https://github.com/elastic/beats/tree/master/packetbeat/scripts/tcp-protocol" target="_top">
+-            https://github.com/elastic/beats/tree/master/packetbeat/scripts/tcp-protocol
++           <a class="ulink" href="https://github.com/elastic/beats/tree/7.4/packetbeat/scripts/tcp-protocol" target="_top">
++            https://github.com/elastic/beats/tree/7.4/packetbeat/scripts/tcp-protocol
+            </a>
+            .
+           </p>
+html/en/beats/devguide/7.4/setting-up-beat.html
+html/en/beats/devguide/7.4/share-beat-dashboards.html
+html/en/beats/devguide/7.4/testing.html
+html/en/beats/devguide/7.4/toc.html
