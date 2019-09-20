@@ -2041,7 +2041,7 @@
   to: status
   alias: false
   comment: >
-    Status reflects whether or not an error occured. Its values are either
+    Status reflects whether or not an error occurred. Its values are either
     OK or Error.
   beat: packetbeat
 

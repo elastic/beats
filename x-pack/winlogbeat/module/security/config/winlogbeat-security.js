@@ -237,7 +237,7 @@ var security = (function () {
         "2109": "Undefined UserAccountControl Bit 29' - Enabled",
         "2110": "Undefined UserAccountControl Bit 30' - Enabled",
         "2111": "Undefined UserAccountControl Bit 31' - Enabled",
-        "2304": "An Error occured during Logon.",
+        "2304": "An Error occurred during Logon.",
         "2305": "The specified user account has expired.",
         "2306": "The NetLogon component is not active.",
         "2307": "Account locked out.",

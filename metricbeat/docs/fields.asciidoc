@@ -23687,7 +23687,7 @@ type: long
 [float]
 === parse
 
-Parses statistic information that occured in the current session
+Parses statistic information that occurred in the current session
 
 
 *`oracle.performance.cursors.parse.real`*::

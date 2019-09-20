@@ -214,7 +214,7 @@ class Test(BaseTest):
         self._init_and_read_test_input([
             u"This is my super long line\n",
             u"This is an even longer long line\n",
-            u"A végrehajtás során hiba történt\n",  # Error occured during execution (Hungarian)
+            u"A végrehajtás során hiba történt\n",  # Error occurred during execution (Hungarian)
             u"This is OK\n",
         ])
 
@@ -241,7 +241,7 @@ class Test(BaseTest):
 
         self._init_and_read_test_input([
             u"This is my super long line\n",
-            u"A végrehajtás során hiba történt\n",  # Error occured during execution (Hungarian)
+            u"A végrehajtás során hiba történt\n",  # Error occurred during execution (Hungarian)
             u"This is OK\n",
         ])
 

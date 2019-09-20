@@ -301,7 +301,7 @@ func (clstr *Cluster) tend() error {
 		go func(node *Node) {
 			defer wg.Done()
 			if err := node.Refresh(peers); err != nil {
-				Logger.Debug("Error occured while refreshing node: %s", node.String())
+				Logger.Debug("Error occurred while refreshing node: %s", node.String())
 			}
 		}(node)
 	}

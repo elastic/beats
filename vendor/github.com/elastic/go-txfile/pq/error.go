@@ -93,7 +93,7 @@ func (e *Error) Error() string { return txerr.Report(e, false) }
 // Use %+v to create a multiline string containing the full trace of errors.
 func (e *Error) Format(s fmt.State, c rune) { txerr.Format(e, s, c) }
 
-// Op returns the operation the error occured at. Returns "" if the error value
+// Op returns the operation the error occurred at. Returns "" if the error value
 // is used to wrap another error. Better use `txerr.GetOp(err)` to query an
 // error value for the causing operation.
 func (e *Error) Op() string { return e.op }
