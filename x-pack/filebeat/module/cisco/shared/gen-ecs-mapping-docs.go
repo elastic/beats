@@ -10,6 +10,7 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"github.com/elastic/beats/libbeat/common"
 	"io"
 	"os"
 	"sort"
@@ -39,7 +40,7 @@ var outputTables = []struct {
 
 type idMappings map[string]fieldMappings
 
-type fieldMappings map[string]stringSet
+type fieldMappings map[string]common.StringSet
 
 func main() {
 	if err := generate(); err != nil {

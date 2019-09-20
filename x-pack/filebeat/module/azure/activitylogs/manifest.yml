@@ -1,0 +1,7 @@
+module_version: 1.0
+
+var:
+  - name: input
+
+ingest_pipeline: ingest/pipeline.json
+input: config/activitylogs.yml

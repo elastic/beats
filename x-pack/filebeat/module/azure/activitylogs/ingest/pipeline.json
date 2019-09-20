@@ -1,5 +1,5 @@
 {
-  "description": "Pipeline for parsing azure monitor logs",
+  "description": "Pipeline for parsing azure activity logs",
   "processors": [
     ],
   "on_failure" : [{
