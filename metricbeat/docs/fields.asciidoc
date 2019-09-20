@@ -15680,7 +15680,7 @@ type: float
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU nanocores limit
 
@@ -15693,7 +15693,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU requested nanocores
 
