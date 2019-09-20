@@ -92,5 +92,5 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-	return azure.EventsMapping(report, m.client.Resources.Metrics)
+	return azure.EventsMapping(report, m.client.Resources.Metrics, m.BaseMetricSet.Name())
 }

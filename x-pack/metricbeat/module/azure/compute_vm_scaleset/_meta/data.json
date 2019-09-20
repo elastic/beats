@@ -7,7 +7,11 @@
             "group" : "resource-group"
         },
         "subscription_id" : "123456-qwer-1234-5678-12345678",
-        "metrics" : {
+        "namespace" : "Microsoft.Compute/virtualMachineScaleSets",
+        "dimensions" : {
+            "vmname" : "winvmss_3"
+        },
+        "compute_vm_scaleset" : {
             "outbound_flows" : {
                 "avg" : 10.6
             },
@@ -70,12 +74,6 @@
             },
             "os_disk_queue_depth" : {
                 "avg" : 0.005
-            }
-        },
-        "compute_vm_scaleset" : {
-            "namespace" : "Microsoft.Compute/virtualMachineScaleSets",
-            "dimensions" : {
-                "vmname" : "winvmss_3"
             }
         }
     },

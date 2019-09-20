@@ -13,10 +13,13 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-const noDimension = "none"
+const (
+	noDimension     = "none"
+	nativeMetricset = "monitor"
+)
 
 // EventsMapping will map metric values to beats events
-func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
+func EventsMapping(report mb.ReporterV2, metrics []Metric, metricset string) error {
 	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
 	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
 
@@ -68,11 +71,11 @@ func EventsMapping(report mb.ReporterV2, metrics []Metric) error {
 						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
 					}
 					for _, groupDimValues := range groupByDimensions {
-						report.Event(initEvent(timestamp, defaultMetric, groupDimValues))
+						report.Event(initEvent(timestamp, defaultMetric, groupDimValues, metricset))
 					}
 				}
 			} else {
-				report.Event(initEvent(timestamp, defaultMetric, groupTimeValues))
+				report.Event(initEvent(timestamp, defaultMetric, groupTimeValues, metricset))
 			}
 		}
 
@@ -107,7 +110,7 @@ func managePropertyName(metric string) string {
 }
 
 // initEvent will create a new base event
-func initEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) mb.Event {
+func initEvent(timestamp time.Time, metric Metric, metricValues []MetricValue, metricset string) mb.Event {
 	metricList := common.MapStr{}
 	for _, value := range metricValues {
 		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
@@ -135,12 +138,10 @@ func initEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) m
 				"group": metric.Resource.Group,
 			},
 			"subscription_id": metric.Resource.Subscription,
-			"metrics":         metricList,
+			"namespace":       metric.Namespace,
 		},
-		Timestamp: timestamp,
-		MetricSetFields: common.MapStr{
-			"namespace": metric.Namespace,
-		},
+		MetricSetFields: common.MapStr{},
+		Timestamp:       timestamp,
 	}
 	if len(metric.Resource.Tags) > 0 {
 		event.ModuleFields.Put("resource.tags", metric.Resource.Tags)
@@ -148,13 +149,21 @@ func initEvent(timestamp time.Time, metric Metric, metricValues []MetricValue) m
 	if len(metric.Dimensions) > 0 {
 		for _, dimension := range metric.Dimensions {
 			if dimension.Value == "*" {
-				event.MetricSetFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(dimension.Name)), getDimensionValue(dimension.Name, metricValues[0].dimensions))
+				event.ModuleFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(dimension.Name)), getDimensionValue(dimension.Name, metricValues[0].dimensions))
 			} else {
-				event.MetricSetFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(dimension.Name)), dimension.Value)
+				event.ModuleFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(dimension.Name)), dimension.Value)
 			}
 
 		}
 	}
+	if metricset == nativeMetricset {
+		event.ModuleFields.Put("metrics", metricList)
+	} else {
+		for key, metric := range metricList {
+			event.MetricSetFields.Put(key, metric)
+		}
+	}
+
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("cloud.provider", "azure")
 	event.RootFields.Put("cloud.region", metric.Resource.Location)

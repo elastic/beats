@@ -16,9 +16,7 @@
             "name":"vmwindows",
             "type":"Microsoft.Compute/virtualMachines"
         },
-        "monitor":{
-            "namespace":"Microsoft.Compute/virtualMachines"
-        }
+        "namespace":"Microsoft.Compute/virtualMachines"
     },
     "cloud":{
         "provider":"azure",
