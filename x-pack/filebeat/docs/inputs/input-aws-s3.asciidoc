@@ -82,7 +82,7 @@ feature helps users to horizontally scale the processing when there are large
 amount of logs flowing into S3 bucket which leads to large amount of messages
 going through the queue. No additional configuration is needed for this.
 
-The usage of SQS ensures that each message in the queue is processed only once
+Using SQS ensures that each message in the queue is processed only once
 even with multiple Filebeat running in parallel. To prevent other consumers, which
 is Filebeat in this case, from processing the message again, visibility timeout
 can be set to prevent other consumers from receiving and processing the same
