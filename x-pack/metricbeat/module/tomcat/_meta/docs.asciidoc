@@ -1,0 +1,7 @@
+This module periodically fetches metrics from Tomcat.
+
+[float]
+=== Compatibility
+
+TODO
+
