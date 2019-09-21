@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -45,6 +46,11 @@ var (
 	eventCount    uint64
 )
 
+var defaultMounts = []*mountPoint{
+	{fsType: "tracefs", path: "/sys/kernel/tracing"},
+	{fsType: "debugfs", path: "/sys/kernel/debug"},
+}
+
 // MetricSet for system/socket.
 type MetricSet struct {
 	system.SystemMetricSet
@@ -54,6 +60,7 @@ type MetricSet struct {
 	detailLog    *logp.Logger
 	installer    helper.ProbeInstaller
 	perfChannel  *tracing.PerfChannel
+	mountedFS    *mountPoint
 	isDebug      bool
 	isDetailed   bool
 }
@@ -194,6 +201,24 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	var traceFS *tracing.TraceFS
 	if m.config.TraceFSPath == nil {
+
+		if err := tracing.IsTraceFSAvailable(); err != nil {
+			m.log.Debugf("tracefs/debugfs not found. Attempting to mount")
+			for _, mount := range defaultMounts {
+				if err = mount.mount(); err != nil {
+					m.log.Debugf("Mount %s returned %v", mount, err)
+					continue
+				}
+				if tracing.IsTraceFSAvailable() != nil {
+					m.log.Warnf("Mounted %s but no kprobes available", mount, err)
+					mount.unmount()
+					continue
+				}
+				m.log.Debugf("Mounted %s", mount)
+				m.mountedFS = mount
+				break
+			}
+		}
 		traceFS, err = tracing.NewTraceFS()
 	} else {
 		traceFS, err = tracing.NewTraceFSWithPath(*m.config.TraceFSPath)
@@ -207,6 +232,24 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	m.templateVars.Update(baseTemplateVars)
 	m.templateVars.Update(archVariables)
+
+	//
+	// Detect IPv6 support
+	//
+
+	hasIPv6, err := detectIPv6()
+	if err != nil {
+		return errors.Wrap(err, "error detecting IPv6 support")
+	}
+	m.log.Debugf("IPv6 supported: %v", hasIPv6)
+	if m.config.EnableIPv6 != nil {
+		if *m.config.EnableIPv6 && !hasIPv6 {
+			return errors.New("requested IPv6 support but IPv6 is disabled in the system")
+		}
+		hasIPv6 = *m.config.EnableIPv6
+	}
+	m.log.Debugf("IPv6 enabled: %v", hasIPv6)
+	m.templateVars["HAS_IPV6"] = hasIPv6
 
 	//
 	// Create probe installer
@@ -266,7 +309,7 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	// Make sure all the required kernel functions are available
 	//
-	for _, probeDef := range installKProbes {
+	for _, probeDef := range getKProbes(hasIPv6) {
 		probeDef = probeDef.ApplyTemplate(m.templateVars)
 		name := probeDef.Probe.Address
 		if !m.isKernelFunctionAvailable(name, functions) {
@@ -315,7 +358,7 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	// Register Kprobes
 	//
-	for _, probeDef := range installKProbes {
+	for _, probeDef := range getKProbes(hasIPv6) {
 		format, decoder, err := m.installer.Install(probeDef)
 		if err != nil {
 			return errors.Wrapf(err, "unable to register probe %s", probeDef.Probe.String())
@@ -337,6 +380,13 @@ func (m *MetricSet) Cleanup() {
 	if m.installer != nil {
 		if err := m.installer.UninstallIf(isOwnProbe); err != nil {
 			m.log.Warnf("Failed to remove KProbes on exit: %v", err)
+		}
+	}
+	if m.mountedFS != nil {
+		if err := m.mountedFS.unmount(); err != nil {
+			m.log.Errorf("Failed to umount %s: %v", m.mountedFS, err)
+		} else {
+			m.log.Debugf("Unmounted %s", m.mountedFS)
 		}
 	}
 }
@@ -389,4 +439,32 @@ func triggerClockSync() {
 
 func isOwnProbe(probe tracing.Probe) bool {
 	return probe.Group == auditbeatGroup
+}
+
+type mountPoint struct {
+	fsType string
+	path   string
+}
+
+func (m mountPoint) mount() error {
+	return unix.Mount(m.fsType, m.path, m.fsType, 0, "")
+}
+
+func (m mountPoint) unmount() error {
+	return syscall.Unmount(m.path, 0)
+}
+
+func (m *mountPoint) String() string {
+	return m.fsType + " at " + m.path
+}
+
+func detectIPv6() (bool, error) {
+	loopback, err := helper.NewIPv6Loopback()
+	if err != nil {
+		return false, err
+	}
+	defer loopback.Cleanup()
+	_, err = loopback.AddRandomAddress()
+	// Assume that all failures for Add..() are caused by missing IPv6 support.
+	return err == nil, nil
 }

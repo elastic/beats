@@ -7,6 +7,7 @@
 package socket
 
 import (
+	"strings"
 	"unsafe"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -34,11 +35,11 @@ var baseTemplateVars = common.MapStr{
 // These functions names vary between kernel versions. The first available one
 // will be selected during setup.
 var functionAlternatives = map[string][]string{
-	"SYS_UNAME":         syscallAlternatives("newuname"),
-	"SYS_EXECVE":        syscallAlternatives("execve"),
 	"IP_LOCAL_OUT":      {"ip_local_out", "ip_local_out_sk"},
+	"RECV_UDP_DATAGRAM": {"__skb_recv_udp", "__skb_recv_datagram", "skb_recv_datagram"},
+	"SYS_EXECVE":        syscallAlternatives("execve"),
 	"SYS_GETTIMEOFDAY":  syscallAlternatives("gettimeofday"),
-	"RECV_UDP_DATAGRAM": {"__skb_recv_udp", "__skb_recv_datagram"},
+	"SYS_UNAME":         syscallAlternatives("newuname"),
 }
 
 func syscallAlternatives(syscall string) []string {
@@ -58,7 +59,12 @@ func LoadTracingFunctions(tfs *tracing.TraceFS) (common.StringSet, error) {
 	// doesn't allow to create empty sets.
 	functions := common.StringSet(make(map[string]struct{}, len(fnList)))
 	for _, fn := range fnList {
-		functions.Add(fn)
+		// Strip the module name (if any)
+		end := strings.IndexByte(fn, ' ')
+		if end == -1 {
+			end = len(fn)
+		}
+		functions.Add(fn[:end])
 	}
 	return functions, nil
 }

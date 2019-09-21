@@ -21,6 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -56,7 +57,7 @@ func init() {
 }
 
 // Input is a input for s3
-type Input struct {
+type s3Input struct {
 	outlet     channel.Outleter // Output of received s3 logs.
 	config     config
 	awsConfig  awssdk.Config
@@ -154,7 +155,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	}
 
 	closeChannel := make(chan struct{})
-	p := &Input{
+	p := &s3Input{
 		outlet:    out,
 		config:    config,
 		awsConfig: awsConfig,
@@ -166,7 +167,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 }
 
 // Run runs the input
-func (p *Input) Run() {
+func (p *s3Input) Run() {
 	p.workerOnce.Do(func() {
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
@@ -181,25 +182,17 @@ func (p *Input) Run() {
 
 		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)
+		p.workerWg.Done()
 	})
 }
 
-func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int64) {
+func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibilityTimeout int64) {
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
-	defer p.workerWg.Done()
+
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 	for p.context.Err() == nil {
 		// receive messages from sqs
-		req := svcSQS.ReceiveMessageRequest(
-			&sqs.ReceiveMessageInput{
-				QueueUrl:              &p.config.QueueURL,
-				MessageAttributeNames: []string{"All"},
-				MaxNumberOfMessages:   &maxNumberOfMessage,
-				VisibilityTimeout:     &visibilityTimeout,
-				WaitTimeSeconds:       &waitTimeSecond,
-			})
-
-		output, err := req.Send(p.context)
+		output, err := p.receiveMessage(svcSQS, visibilityTimeout)
 		if err != nil {
 			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 				continue
@@ -220,7 +213,7 @@ func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int6
 }
 
 // Stop stops the s3 input
-func (p *Input) Stop() {
+func (p *s3Input) Stop() {
 	p.stopOnce.Do(func() {
 		defer p.outlet.Close()
 		close(p.close)
@@ -230,26 +223,26 @@ func (p *Input) Stop() {
 }
 
 // Wait stops the s3 input.
-func (p *Input) Wait() {
+func (p *s3Input) Wait() {
 	p.Stop()
 	p.workerWg.Wait()
 }
 
-func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 *s3.Client, svcSQS *sqs.Client) {
+func (p *s3Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 s3iface.ClientAPI, svcSQS sqsiface.ClientAPI) {
 	var wg sync.WaitGroup
 	numMessages := len(messages)
-	wg.Add(numMessages)
+	wg.Add(numMessages * 2)
 
 	// process messages received from sqs
 	for i := range messages {
 		errC := make(chan error)
 		go p.processMessage(svcS3, messages[i], &wg, errC)
-		go p.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
+		go p.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, &wg, errC)
 	}
 	wg.Wait()
 }
 
-func (p *Input) processMessage(svcS3 *s3.Client, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
+func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
 	defer wg.Done()
 
 	s3Infos, err := handleSQSMessage(message)
@@ -267,7 +260,8 @@ func (p *Input) processMessage(svcS3 *s3.Client, message sqs.Message, wg *sync.W
 	}
 }
 
-func (p *Input) processorKeepAlive(svcSQS *sqs.Client, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) {
+func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Message, queueURL string, visibilityTimeout int64, wg *sync.WaitGroup, errC chan error) {
+	defer wg.Done()
 	for {
 		select {
 		case <-p.close:
@@ -301,8 +295,22 @@ func (p *Input) processorKeepAlive(svcSQS *sqs.Client, message sqs.Message, queu
 	}
 }
 
-func (p *Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svc *sqs.Client, receiptHandle *string) error {
-	req := svc.ChangeMessageVisibilityRequest(&sqs.ChangeMessageVisibilityInput{
+func (p *s3Input) receiveMessage(svcSQS sqsiface.ClientAPI, visibilityTimeout int64) (*sqs.ReceiveMessageResponse, error) {
+	// receive messages from sqs
+	req := svcSQS.ReceiveMessageRequest(
+		&sqs.ReceiveMessageInput{
+			QueueUrl:              &p.config.QueueURL,
+			MessageAttributeNames: []string{"All"},
+			MaxNumberOfMessages:   &maxNumberOfMessage,
+			VisibilityTimeout:     &visibilityTimeout,
+			WaitTimeSeconds:       &waitTimeSecond,
+		})
+
+	return req.Send(p.context)
+}
+
+func (p *s3Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI, receiptHandle *string) error {
+	req := svcSQS.ChangeMessageVisibilityRequest(&sqs.ChangeMessageVisibilityInput{
 		QueueUrl:          &queueURL,
 		VisibilityTimeout: &visibilityTimeout,
 		ReceiptHandle:     receiptHandle,
@@ -343,7 +351,7 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) error {
+func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) error {
 	s3Context := &s3Context{
 		refs: 1,
 		errC: errC,
@@ -412,10 +420,13 @@ func newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info, context *channelCon
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
 
+	if resp.Body == nil {
+		return nil, errors.New("s3 get object response body is empty")
+	}
 	return bufio.NewReader(resp.Body), nil
 }
 
-func (p *Input) forwardEvent(event beat.Event) error {
+func (p *s3Input) forwardEvent(event beat.Event) error {
 	ok := p.outlet.OnEvent(event)
 	if !ok {
 		return errOutletClosed
@@ -423,7 +434,7 @@ func (p *Input) forwardEvent(event beat.Event) error {
 	return nil
 }
 
-func (p *Input) deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.Client) error {
+func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS sqsiface.ClientAPI) error {
 	deleteMessageInput := &sqs.DeleteMessageInput{
 		QueueUrl:      awssdk.String(queueURL),
 		ReceiptHandle: awssdk.String(messagesReceiptHandle),

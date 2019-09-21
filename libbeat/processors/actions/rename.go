@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type renameFields struct {
@@ -48,6 +49,8 @@ func init() {
 	processors.RegisterPlugin("rename",
 		checks.ConfigChecked(NewRenameFields,
 			checks.RequireFields("fields")))
+
+	jsprocessor.RegisterPlugin("Rename", NewRenameFields)
 }
 
 // NewRenameFields returns a new rename processor.

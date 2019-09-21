@@ -21,7 +21,7 @@ type Config struct {
 	LostQueueSize int `config:"socket.lost_queue_size,min=1"`
 
 	// ErrQueueSize defines the size of the error queue. A single error is fatal.
-	ErrQueueSize int `config:"socket.err_buffer_size,min=1"`
+	ErrQueueSize int `config:"socket.err_queue_size,min=1"`
 
 	// RingSizeExp configures the exponent size for the per-cpu ring buffer used
 	// by the kernel to pass tracing events.
@@ -54,6 +54,10 @@ type Config struct {
 	// DevelopmentMode is an undocumented flag to ignore SSH traffic so that the
 	// dataset can be run with debug output without creating a feedback loop.
 	DevelopmentMode bool `config:"socket.development_mode"`
+
+	// EnableIPv6 allows to control IPv6 support. When unset (default) IPv6
+	// will be automatically detected on runtime.
+	EnableIPv6 *bool `config:"socket.enable_ipv6"`
 }
 
 // Validate validates the host metricset config.

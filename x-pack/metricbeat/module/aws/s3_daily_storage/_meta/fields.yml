@@ -4,10 +4,6 @@
     `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
   release: beta
   fields:
-    - name: bucket.name
-      type: keyword
-      description: >
-        Name of a S3 bucket.
     - name: bucket.size.bytes
       type: long
       format: bytes

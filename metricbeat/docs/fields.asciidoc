@@ -844,6 +844,16 @@ type: object
 
 --
 
+*`aws.s3.bucket.name`*::
++
+--
+Name of a S3 bucket.
+
+
+type: keyword
+
+--
+
 [float]
 === cloudwatch
 
@@ -1343,7 +1353,7 @@ type: keyword
 The number of outstanding IOs (read/write requests) waiting to access the disk.
 
 
-type: long
+type: float
 
 --
 
@@ -1515,7 +1525,7 @@ type: long
 The average number of commit operations per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1525,7 +1535,7 @@ type: long
 The average number of delete queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1535,7 +1545,7 @@ type: long
 The average number of DDL requests per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1545,7 +1555,7 @@ type: long
 The average number of inserts, updates, and deletes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1555,7 +1565,7 @@ type: long
 The average number of insert queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1565,7 +1575,7 @@ type: long
 The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1575,7 +1585,7 @@ type: long
 The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1585,7 +1595,7 @@ type: long
 The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1595,7 +1605,7 @@ type: long
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 --
 
@@ -1605,7 +1615,7 @@ type: long
 The average number of select queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1615,7 +1625,7 @@ type: long
 The average number of update queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1625,7 +1635,7 @@ type: long
 The average number of bytes written to disk per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1635,7 +1645,7 @@ type: long
 The amount of latency for commit operations, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1647,7 +1657,7 @@ format: duration
 The amount of latency for data definition language (DDL) requests, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1659,7 +1669,7 @@ format: duration
 The amount of latency for inserts, updates, and deletes, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1671,7 +1681,7 @@ format: duration
 The amount of latency for insert queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1683,7 +1693,7 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1695,7 +1705,7 @@ format: duration
 The amount of latency for select queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1707,7 +1717,7 @@ format: duration
 The amount of latency for update queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1719,7 +1729,7 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1784,16 +1794,6 @@ type: long
 
 
 
-*`aws.s3_daily_storage.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
-
 *`aws.s3_daily_storage.bucket.size.bytes`*::
 +
 --
@@ -1822,16 +1822,6 @@ type: long
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
-
-*`aws.s3_request.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
 
 *`aws.s3_request.requests.total`*::
 +
@@ -4882,6 +4872,18 @@ format: percent
 
 --
 
+*`docker.cpu.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.kernel.ticks`*::
 +
 --
@@ -4896,6 +4898,18 @@ type: long
 +
 --
 Percentage of total CPU time in the system.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
 
 
 type: scaled_float
@@ -4926,6 +4940,18 @@ format: percent
 
 --
 
+*`docker.cpu.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.user.ticks`*::
 +
 --
@@ -4948,10 +4974,34 @@ format: percent
 
 --
 
+*`docker.cpu.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.core.*.pct`*::
 +
 --
 Percentage of CPU time in this core.
+
+
+type: object
+
+format: percent
+
+--
+
+*`docker.cpu.core.*.norm.pct`*::
++
+--
+Percentage of CPU time in this core, normalized by the number of CPU cores.
 
 
 type: object

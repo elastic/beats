@@ -25,11 +25,11 @@ import (
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
 var (
@@ -87,21 +87,54 @@ func PackageBeatDashboards() error {
 // Fmt formats code and adds license headers.
 func Fmt() {
 	mg.Deps(devtools.GoImports, devtools.PythonAutopep8)
-	mg.Deps(addLicenseHeaders)
+	mg.Deps(AddLicenseHeaders)
 }
 
-// addLicenseHeaders adds ASL2 headers to .go files outside of x-pack and
+// AddLicenseHeaders adds ASL2 headers to .go files outside of x-pack and
 // add Elastic headers to .go files in x-pack.
-func addLicenseHeaders() error {
+func AddLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	if err := sh.Run("go", "get", devtools.GoLicenserImportPath); err != nil {
-		return err
-	}
+	mg.Deps(devtools.InstallGoLicenser)
+
+	licenser := gotool.Licenser
 
 	return multierr.Combine(
-		sh.RunV("go-licenser", "-license", "ASL2", "-exclude", "x-pack"),
-		sh.RunV("go-licenser", "-license", "Elastic", "x-pack"),
+		licenser(
+			licenser.License("ASL2"),
+			licenser.Exclude("x-pack"),
+			licenser.Exclude("generator/beat/{beat}"),
+			licenser.Exclude("generator/metricbeat/{beat}"),
+		),
+		licenser(
+			licenser.License("Elastic"),
+			licenser.Path("x-pack"),
+		),
+	)
+}
+
+// CheckLicenseHeaders checks ASL2 headers in .go files outside of x-pack and
+// checks Elastic headers in .go files in x-pack.
+func CheckLicenseHeaders() error {
+	fmt.Println(">> fmt - go-licenser: Checking for missing headers")
+
+	mg.Deps(devtools.InstallGoLicenser)
+
+	licenser := gotool.Licenser
+
+	return multierr.Combine(
+		licenser(
+			licenser.Check(),
+			licenser.License("ASL2"),
+			licenser.Exclude("x-pack"),
+			licenser.Exclude("generator/beat/{beat}"),
+			licenser.Exclude("generator/metricbeat/{beat}"),
+		),
+		licenser(
+			licenser.Check(),
+			licenser.License("Elastic"),
+			licenser.Path("x-pack"),
+		),
 	)
 }
 

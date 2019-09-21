@@ -19,19 +19,6 @@ services:
     ports:
       - 3000
 
-  apache:
-    build: ./module/apache/_meta
-    ports:
-      - 80
-
-  apache_2_4_12:
-    build:
-      context: ./module/apache/_meta
-      args:
-        APACHE_VERSION: 2.4.12
-    ports:
-      - 80
-
   metricbeat:
     build: ./module/beat/_meta
     ports:
@@ -271,7 +258,16 @@ services:
       - 3306
 
   nats:
-    build: ./module/nats/_meta
+    build:
+      context: ./module/nats/_meta
+      dockerfile: Dockerfile.2.0.X
+    ports:
+      - 8222
+
+  nats_1_3:
+    build:
+      context: ./module/nats/_meta
+      dockerfile: Dockerfile.1.3
     ports:
       - 8222
 

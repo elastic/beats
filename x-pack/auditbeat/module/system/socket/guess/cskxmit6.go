@@ -40,9 +40,12 @@ func init() {
 }
 
 type guessInet6CskXmit struct {
-	guessInetSockIPv6
-	sock       uintptr
-	acceptedFd int
+	ctx                    Context
+	loopback               helper.IPv6Loopback
+	clientAddr, serverAddr unix.SockaddrInet6
+	client, server         int
+	sock                   uintptr
+	acceptedFd             int
 }
 
 // Name of this guess.
@@ -64,6 +67,11 @@ func (g *guessInet6CskXmit) Requires() []string {
 		"RET",
 		"P1",
 	}
+}
+
+// Condition allows this probe to run only when IPv6 is enabled.
+func (g *guessInet6CskXmit) Condition(ctx Context) (bool, error) {
+	return isIPv6Enabled(ctx.Vars)
 }
 
 // Probes returns 2 probes:
@@ -93,12 +101,39 @@ func (g *guessInet6CskXmit) Probes() ([]helper.ProbeDef, error) {
 
 // Prepare setups an IPv6 TCP client/server where the server is listening
 // and the client is connecting to it.
-func (g *guessInet6CskXmit) Prepare(ctx Context) error {
+func (g *guessInet6CskXmit) Prepare(ctx Context) (err error) {
+	g.ctx = ctx
 	g.acceptedFd = -1
-	if err := g.guessInetSockIPv6.Prepare(ctx); err != nil {
-		return err
+	g.loopback, err = helper.NewIPv6Loopback()
+	if err != nil {
+		return errors.Wrap(err, "detect IPv6 loopback failed")
 	}
-	if err := unix.Connect(g.client, &g.serverAddr); err != nil {
+	defer func() {
+		if err != nil {
+			g.loopback.Cleanup()
+		}
+	}()
+	clientIP, err := g.loopback.AddRandomAddress()
+	if err != nil {
+		return errors.Wrap(err, "failed adding first device address")
+	}
+	serverIP, err := g.loopback.AddRandomAddress()
+	if err != nil {
+		return errors.Wrap(err, "failed adding second device address")
+	}
+	copy(g.clientAddr.Addr[:], clientIP)
+	copy(g.serverAddr.Addr[:], serverIP)
+
+	if g.client, g.clientAddr, err = createSocket6WithProto(unix.SOCK_STREAM, g.clientAddr); err != nil {
+		return errors.Wrap(err, "error creating server")
+	}
+	if g.server, g.serverAddr, err = createSocket6WithProto(unix.SOCK_STREAM, g.serverAddr); err != nil {
+		return errors.Wrap(err, "error creating client")
+	}
+	if err = unix.Listen(g.server, 1); err != nil {
+		return errors.Wrap(err, "error in listen")
+	}
+	if err = unix.Connect(g.client, &g.serverAddr); err != nil {
 		return errors.Wrap(err, "connect failed")
 	}
 	return nil
@@ -109,7 +144,9 @@ func (g *guessInet6CskXmit) Terminate() error {
 	if g.acceptedFd != -1 {
 		unix.Close(g.acceptedFd)
 	}
-	return g.guessInetSockIPv6.Terminate()
+	unix.Close(g.client)
+	unix.Close(g.server)
+	return g.loopback.Cleanup()
 }
 
 // Trigger accepts the client connection on the server, triggering a call
