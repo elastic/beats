@@ -419,14 +419,14 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
+        except IOError:
+            counter = -1
 
         if counter < 1:
             with open(os.path.join(self.working_dir, logfile), 'r') as fin:
                 sys.stderr.write("LOGFILE CONTENTS\n")
                 sys.stderr.write(fin.read())
 
-        except IOError:
-            counter = -1
 
         return counter
 
