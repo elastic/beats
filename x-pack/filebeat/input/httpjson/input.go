@@ -184,9 +184,9 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				switch ts := v.(type) {
 				case []interface{}:
 					for _, t := range ts {
-						switch t.(type) {
+						switch tv := t.(type) {
 						case map[string]interface{}:
-							d, err := json.Marshal(t.(map[string]interface{}))
+							d, err := json.Marshal(tv)
 							if err != nil {
 								return errors.New("failed to process http response data - ")
 							}
