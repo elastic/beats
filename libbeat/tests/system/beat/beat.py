@@ -428,7 +428,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 sys.stderr.write("LOGFILE CONTENTS\n")
                 sys.stderr.write(fin.read())
 
-
         return counter
 
     def log_contains_countmap(self, pattern, capture_group, logfile=None):
