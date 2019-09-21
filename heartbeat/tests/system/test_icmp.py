@@ -75,6 +75,7 @@ class Test(BaseTest):
             ]
         }
 
+        sys.stderr.write("WROTE THE THING")
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             **config

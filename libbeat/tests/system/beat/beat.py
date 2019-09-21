@@ -243,6 +243,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         output_path = os.path.join(self.working_dir, output)
         with open(output_path, "wb") as f:
+            sys.stderr.write("CHMOD %s\n" % output_path)
             os.chmod(output_path, 0o600)
             f.write(output_str.encode('utf8'))
 
