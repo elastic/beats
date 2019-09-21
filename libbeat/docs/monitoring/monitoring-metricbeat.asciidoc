@@ -80,9 +80,7 @@ For more information, see
 <<configuration-monitor,Monitoring configuration options>>.
 --
 
-ifndef::serverless[]
 . Start {beatname_uc}.
-endif::[]
 
 [float]
 [[configure-metricbeat]]
@@ -108,7 +106,6 @@ locations.
 endif::[]
 
 . Enable the `beat-xpack` module in {metricbeat}. +
-endif::[]
 +
 --
 // tag::enable-beat-module[]
