@@ -1,0 +1,24 @@
+{
+    "description": "A little example log driver for docker",
+    "documentation": "https://docs.docker.com/engine/extend/plugin_api/",
+    "entrypoint": ["/usr/bin/hellologdriver"],
+    "network": {
+      "type": "host"
+    },
+    "interface": {
+      "types": ["docker.logdriver/1.0"],
+      "socket": "hellologdriver.sock"
+    },
+    "env":[
+      {
+        "description": "libbeat env hack",
+        "name": "BEAT_STRICT_PERMS",
+        "value": "false"
+      }, 
+      {
+        "description": "config for dockerlogbeat",
+        "name": "BEAT_UNIX_SOCK_PATH",
+        "value": "/contmount/controller.sock"
+      }
+    ]
+  }
