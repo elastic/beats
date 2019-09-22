@@ -9,7 +9,7 @@ To build and install, just run `make all`
 
 ## Running
 
-`docker run --log-driver=ossifrage/hellologdriver:0.0.1 -log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
+`docker run --log-driver=ossifrage/hellologdriver:0.0.1 --log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
 
 
 ## How it works
@@ -46,3 +46,4 @@ The logs are in `/var/log/docker`. If you want to make the logs useful, you need
 - issues with `mage fmt`
 - need to standardize make/mage targets and build tooling
 - Sort out Vendor
+- Settle licensing questions 
