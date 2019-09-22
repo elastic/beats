@@ -106,7 +106,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             config file:
            </p>
            <h4>
--           <a id="_literal_setup_dashboards_enabled_literal">
+-           <a id="_setup_dashboards_enabled_literal">
 +           <a id="_setup_dashboards_enabled">
             </a>
             <code class="literal">
@@ -115,7 +115,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             The file archive (zip file) that contains the dashboards to load. If this option is set, Winlogbeat looks for a dashboard archive in the specified path instead of using the local directory.
            </p>
            <h4>
--           <a id="_literal_setup_dashboards_beat_literal">
+-           <a id="_setup_dashboards_beat_literal">
 +           <a id="_setup_dashboards_beat">
             </a>
             <code class="literal">
@@ -124,7 +124,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             .
            </p>
            <h4>
--           <a id="_literal_setup_dashboards_kibana_index_literal">
+-           <a id="_setup_dashboards_kibana_index_literal">
 +           <a id="_setup_dashboards_kibana_index">
             </a>
             <code class="literal">
@@ -133,7 +133,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             </code>
            </p>
            <h4>
--           <a id="_literal_setup_dashboards_index_literal">
+-           <a id="_setup_dashboards_index_literal">
 +           <a id="_setup_dashboards_index">
             </a>
             <code class="literal">
@@ -142,7 +142,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             </div>
            </div>
            <h4>
--           <a id="_literal_setup_dashboards_always_kibana_literal">
+-           <a id="_setup_dashboards_always_kibana_literal">
 +           <a id="_setup_dashboards_always_kibana">
             </a>
             <code class="literal">
@@ -151,7 +151,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             .
            </p>
            <h4>
--           <a id="_literal_setup_dashboards_retry_enabled_literal">
+-           <a id="_setup_dashboards_retry_enabled_literal">
 +           <a id="_setup_dashboards_retry_enabled">
             </a>
             <code class="literal">
@@ -160,7 +160,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             If this option is set to true, and Kibana is not reachable at the time when dashboards are loaded, Winlogbeat will retry to reconnect to Kibana instead of exiting with an error. Disabled by default.
            </p>
            <h4>
--           <a id="_literal_setup_dashboards_retry_interval_literal">
+-           <a id="_setup_dashboards_retry_interval_literal">
 +           <a id="_setup_dashboards_retry_interval">
             </a>
             <code class="literal">
@@ -169,7 +169,7 @@ html/en/beats/winlogbeat/7.2/configuration-dashboards.html
             Duration interval between Kibana connection retries. Defaults to 1 second.
            </p>
            <h4>
--           <a id="_literal_setup_dashboards_retry_maximum_literal">
+-           <a id="_setup_dashboards_retry_maximum_literal">
 +           <a id="_setup_dashboards_retry_maximum">
             </a>
             <code class="literal">
@@ -181,7 +181,7 @@ html/en/beats/winlogbeat/7.2/configuration-general-options.html
  tags: ["service-X", "web-tier"]</pre>
            </div>
            <h4>
--           <a id="_literal_name_literal">
+-           <a id="_name_literal">
 +           <a id="_name">
             </a>
             <code class="literal">
@@ -190,7 +190,7 @@ html/en/beats/winlogbeat/7.2/configuration-general-options.html
             <pre class="programlisting prettyprint lang-yaml">name: "my-shipper"</pre>
            </div>
            <h4>
--           <a id="_literal_tags_literal">
+-           <a id="_tags_literal">
 +           <a id="_tags">
             </a>
             <code class="literal">
@@ -199,7 +199,7 @@ html/en/beats/winlogbeat/7.2/configuration-general-options.html
             <pre class="programlisting prettyprint lang-yaml">fields: {project: "myproject", instance-id: "574734885120952459"}</pre>
            </div>
            <h4>
--           <a id="_literal_fields_under_root_literal">
+-           <a id="_fields_under_root_literal">
 +           <a id="_fields_under_root">
             </a>
             <code class="literal">
@@ -208,7 +208,7 @@ html/en/beats/winlogbeat/7.2/configuration-general-options.html
    region: us-east-1</pre>
            </div>
            <h4>
--           <a id="_literal_processors_literal">
+-           <a id="_processors_literal">
 +           <a id="_processors">
             </a>
             <code class="literal">
@@ -217,7 +217,7 @@ html/en/beats/winlogbeat/7.2/configuration-general-options.html
             for information about specifying processors in your config.
            </p>
            <h4>
--           <a id="_literal_max_procs_literal">
+-           <a id="_max_procs_literal">
 +           <a id="_max_procs">
             </a>
             <code class="literal">
@@ -229,7 +229,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             config file:
            </p>
            <h4>
--           <a id="_literal_logging_to_stderr_literal">
+-           <a id="_logging_to_stderr_literal">
 +           <a id="_logging_to_stderr">
             </a>
             <code class="literal">
@@ -238,7 +238,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             command line option.
            </p>
            <h4>
--           <a id="_literal_logging_to_syslog_literal">
+-           <a id="_logging_to_syslog_literal">
 +           <a id="_logging_to_syslog">
             </a>
             <code class="literal">
@@ -247,7 +247,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             </div>
            </div>
            <h4>
--           <a id="_literal_logging_to_eventlog_literal">
+-           <a id="_logging_to_eventlog_literal">
 +           <a id="_logging_to_eventlog">
             </a>
             <code class="literal">
@@ -256,7 +256,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             When true, writes all logging output to the Windows Event Log.
            </p>
            <h4>
--           <a id="_literal_logging_to_files_literal">
+-           <a id="_logging_to_files_literal">
 +           <a id="_logging_to_files">
             </a>
             <code class="literal">
@@ -265,7 +265,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             also sets the debug log level).
            </p>
            <h4>
--           <a id="_literal_logging_metrics_enabled_literal">
+-           <a id="_logging_metrics_enabled_literal">
 +           <a id="_logging_metrics_enabled">
             </a>
             <code class="literal">
@@ -274,7 +274,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             Note that we currently offer no backwards compatible guarantees for the internal metrics and for this reason they are also not documented.
            </p>
            <h4>
--           <a id="_literal_logging_metrics_period_literal">
+-           <a id="_logging_metrics_period_literal">
 +           <a id="_logging_metrics_period">
             </a>
             <code class="literal">
@@ -283,7 +283,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             The period after which to log the internal metrics. The default is 30s.
            </p>
            <h4>
--           <a id="_literal_logging_files_path_literal">
+-           <a id="_logging_files_path_literal">
 +           <a id="_logging_files_path">
             </a>
             <code class="literal">
@@ -292,7 +292,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             section for details.
            </p>
            <h4>
--           <a id="_literal_logging_files_name_literal">
+-           <a id="_logging_files_name_literal">
 +           <a id="_logging_files_name">
             </a>
             <code class="literal">
@@ -301,7 +301,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             .
            </p>
            <h4>
--           <a id="_literal_logging_files_rotateeverybytes_literal">
+-           <a id="_logging_files_rotateeverybytes_literal">
 +           <a id="_logging_files_rotateeverybytes">
             </a>
             <code class="literal">
@@ -310,7 +310,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             The maximum size of a log file. If the limit is reached, a new log file is generated. The default size limit is 10485760 (10 MB).
            </p>
            <h4>
--           <a id="_literal_logging_files_keepfiles_literal">
+-           <a id="_logging_files_keepfiles_literal">
 +           <a id="_logging_files_keepfiles">
             </a>
             <code class="literal">
@@ -319,7 +319,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             options has to be in the range of 2 to 1024 files.
            </p>
            <h4>
--           <a id="_literal_logging_files_permissions_literal">
+-           <a id="_logging_files_permissions_literal">
 +           <a id="_logging_files_permissions">
             </a>
             <code class="literal">
@@ -328,7 +328,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             </ul>
            </div>
            <h4>
--           <a id="_literal_logging_files_interval_literal">
+-           <a id="_logging_files_interval_literal">
 +           <a id="_logging_files_interval">
             </a>
             <code class="literal">
@@ -337,7 +337,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             Enable log file rotation on time intervals in addition to size-based rotation. Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h are boundary-aligned with minutes, hours, days, weeks, months, and years as reported by the local system clock. All other intervals are calculated from the unix epoch. Defaults to disabled.
            </p>
            <h4>
--           <a id="_literal_logging_files_rotateonstartup_literal">
+-           <a id="_logging_files_rotateonstartup_literal">
 +           <a id="_logging_files_rotateonstartup">
             </a>
             <code class="literal">
@@ -346,7 +346,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             If the log file already exists on startup, immediately rotate it and start writing to a new file instead of appending to the existing one. Defaults to true.
            </p>
            <h4>
--           <a id="_literal_logging_json_literal">
+-           <a id="_logging_json_literal">
 +           <a id="_logging_json">
             </a>
             <code class="literal">
@@ -355,7 +355,7 @@ html/en/beats/winlogbeat/7.2/configuration-logging.html
             When true, logs messages in JSON format. The default is false.
            </p>
            <h4>
--           <a id="_literal_logging_files_redirect_stderr_literal_phrase_role_experimental_phrase">
+-           <a id="_logging_files_redirect_stderr_literal_phrase_role_experimental_phrase">
 +           <a id="_logging_files_redirect_stderr">
             </a>
             <code class="literal">
@@ -396,7 +396,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             config file:
            </p>
            <h3>
--           <a id="_literal_enabled_literal_8">
+-           <a id="_enabled_literal_8">
 +           <a id="_enabled_8">
             </a>
             <code class="literal">
@@ -405,7 +405,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h3>
--           <a id="_literal_elasticsearch_literal">
+-           <a id="_elasticsearch_literal">
 +           <a id="_elasticsearch">
             </a>
             <code class="literal">
@@ -414,7 +414,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             The Elasticsearch instances that you want to ship your Winlogbeat metrics to. This configuration option contains the following fields:
            </p>
            <h4>
--           <a id="_literal_bulk_max_size_literal_6">
+-           <a id="_bulk_max_size_literal_6">
 +           <a id="_bulk_max_size_6">
             </a>
             <code class="literal">
@@ -423,7 +423,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h4>
--           <a id="_literal_backoff_init_literal_4">
+-           <a id="_backoff_init_literal_4">
 +           <a id="_backoff_init_4">
             </a>
             <code class="literal">
@@ -432,7 +432,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             . After a successful connection, the backoff timer is reset. The default is 1s.
            </p>
            <h5>
--           <a id="_literal_backoff_max_literal_4">
+-           <a id="_backoff_max_literal_4">
 +           <a id="_backoff_max_4">
             </a>
             <code class="literal">
@@ -441,7 +441,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             The maximum number of seconds to wait before attempting to connect to Elasticsearch after a network error. The default is 60s.
            </p>
            <h4>
--           <a id="_literal_compression_level_literal_4">
+-           <a id="_compression_level_literal_4">
 +           <a id="_compression_level_4">
             </a>
             <code class="literal">
@@ -450,7 +450,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             . Increasing the compression level reduces the network usage but increases the CPU usage.
            </p>
            <h4>
--           <a id="_literal_headers_literal_2">
+-           <a id="_headers_literal_2">
 +           <a id="_headers_2">
             </a>
             <code class="literal">
@@ -459,7 +459,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h4>
--           <a id="_literal_hosts_literal_3">
+-           <a id="_hosts_literal_3">
 +           <a id="_hosts_3">
             </a>
             <code class="literal">
@@ -468,7 +468,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h4>
--           <a id="_literal_max_retries_literal_5">
+-           <a id="_max_retries_literal_5">
 +           <a id="_max_retries_5">
             </a>
             <code class="literal">
@@ -477,7 +477,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h4>
--           <a id="_literal_parameters_literal_2">
+-           <a id="_parameters_literal_2">
 +           <a id="_parameters_2">
             </a>
             <code class="literal">
@@ -486,7 +486,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             Dictionary of HTTP parameters to pass within the url with index operations.
            </p>
            <h4>
--           <a id="_literal_password_literal_4">
+-           <a id="_password_literal_4">
 +           <a id="_password_4">
             </a>
             <code class="literal">
@@ -495,7 +495,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             The password that Winlogbeat uses to authenticate with the Elasticsearch instances for shipping monitoring data.
            </p>
            <h4>
--           <a id="_literal_metrics_period_literal">
+-           <a id="_metrics_period_literal">
 +           <a id="_metrics_period">
             </a>
             <code class="literal">
@@ -504,7 +504,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             The time interval (in seconds) when metrics are sent to the Elasticsearch cluster. A new snapshot of Winlogbeat metrics is generated and scheduled for publishing each period. The default value is 10 * time.Second.
            </p>
            <h4>
--           <a id="_literal_state_period_literal">
+-           <a id="_state_period_literal">
 +           <a id="_state_period">
             </a>
             <code class="literal">
@@ -513,7 +513,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             The time interval (in seconds) when state information are sent to the Elasticsearch cluster. A new snapshot of Winlogbeat state is generated and scheduled for publishing each period. The default value is 60 * time.Second.
            </p>
            <h4>
--           <a id="_literal_protocol_literal">
+-           <a id="_protocol_literal">
 +           <a id="_protocol">
             </a>
             <code class="literal">
@@ -522,7 +522,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             , however, the value of protocol is overridden by the scheme you specify in the URL.
            </p>
            <h4>
--           <a id="_literal_proxy_url_literal_4">
+-           <a id="_proxy_url_literal_4">
 +           <a id="_proxy_url_4">
             </a>
             <code class="literal">
@@ -531,7 +531,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h4>
--           <a id="_literal_timeout_literal_5">
+-           <a id="_timeout_literal_5">
 +           <a id="_timeout_5">
             </a>
             <code class="literal">
@@ -540,7 +540,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h4>
--           <a id="_literal_ssl_literal_5">
+-           <a id="_ssl_literal_5">
 +           <a id="_ssl_5">
             </a>
             <code class="literal">
@@ -549,7 +549,7 @@ html/en/beats/winlogbeat/7.2/configuration-monitor.html
             .
            </p>
            <h4>
--           <a id="_literal_username_literal_3">
+-           <a id="_username_literal_3">
 +           <a id="_username_3">
             </a>
             <code class="literal">
@@ -562,7 +562,7 @@ html/en/beats/winlogbeat/7.2/configuration-path.html
             config file:
            </p>
            <h4>
--           <a id="_literal_home_literal">
+-           <a id="_home_literal">
 +           <a id="_home">
             </a>
             <code class="literal">
@@ -571,7 +571,7 @@ html/en/beats/winlogbeat/7.2/configuration-path.html
             <pre class="programlisting prettyprint lang-yaml">path.home: /usr/share/beats</pre>
            </div>
            <h4>
--           <a id="_literal_config_literal">
+-           <a id="_config_literal">
 +           <a id="_config">
             </a>
             <code class="literal">
@@ -580,7 +580,7 @@ html/en/beats/winlogbeat/7.2/configuration-path.html
             <pre class="programlisting prettyprint lang-yaml">path.config: /usr/share/beats/config</pre>
            </div>
            <h4>
--           <a id="_literal_data_literal">
+-           <a id="_data_literal">
 +           <a id="_data">
             </a>
             <code class="literal">
@@ -589,7 +589,7 @@ html/en/beats/winlogbeat/7.2/configuration-path.html
             </div>
            </div>
            <h4>
--           <a id="_literal_logs_literal">
+-           <a id="_logs_literal">
 +           <a id="_logs">
             </a>
             <code class="literal">
@@ -601,7 +601,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             config file:
            </p>
            <h4>
--           <a id="_literal_enabled_literal_7">
+-           <a id="_enabled_literal_7">
 +           <a id="_enabled_7">
             </a>
             <code class="literal">
@@ -610,7 +610,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             </div>
            </div>
            <h4>
--           <a id="_literal_certificate_authorities_literal">
+-           <a id="_certificate_authorities_literal">
 +           <a id="_certificate_authorities">
             </a>
             <code class="literal">
@@ -619,7 +619,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             is specified.
            </p>
            <h4>
--           <a id="_literal_key_passphrase_literal">
+-           <a id="_key_passphrase_literal">
 +           <a id="_key_passphrase">
             </a>
             <code class="literal">
@@ -628,7 +628,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             file.
            </p>
            <h4>
--           <a id="_literal_supported_protocols_literal">
+-           <a id="_supported_protocols_literal">
 +           <a id="_supported_protocols">
             </a>
             <code class="literal">
@@ -637,7 +637,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             .
            </p>
            <h4>
--           <a id="_literal_verification_mode_literal">
+-           <a id="_verification_mode_literal">
 +           <a id="_verification_mode">
             </a>
             <code class="literal">
@@ -646,7 +646,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             .
            </p>
            <h4>
--           <a id="_literal_cipher_suites_literal">
+-           <a id="_cipher_suites_literal">
 +           <a id="_cipher_suites">
             </a>
             <code class="literal">
@@ -655,7 +655,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             </ul>
            </div>
            <h4>
--           <a id="_literal_curve_types_literal">
+-           <a id="_curve_types_literal">
 +           <a id="_curve_types">
             </a>
             <code class="literal">
@@ -664,7 +664,7 @@ html/en/beats/winlogbeat/7.2/configuration-ssl.html
             </ul>
            </div>
            <h4>
--           <a id="_literal_renegotiation_literal">
+-           <a id="_renegotiation_literal">
 +           <a id="_renegotiation">
             </a>
             <code class="literal">
@@ -677,7 +677,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
             config file:
            </p>
            <h4>
--           <a id="_literal_registry_file_literal">
+-           <a id="_registry_file_literal">
 +           <a id="_registry_file">
             </a>
             <code class="literal">
@@ -686,7 +686,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
             </div>
            </div>
            <h4>
--           <a id="_literal_shutdown_timeout_literal">
+-           <a id="_shutdown_timeout_literal">
 +           <a id="_shutdown_timeout">
             </a>
             <code class="literal">
@@ -695,7 +695,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
             <pre class="programlisting prettyprint lang-yaml">winlogbeat.shutdown_timeout: 30s</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_literal">
+-           <a id="_event_logs_literal">
 +           <a id="_event_logs">
             </a>
             <code class="literal">
@@ -704,7 +704,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
    - name: Application</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_batch_read_size_literal">
+-           <a id="_event_logs_batch_read_size_literal">
 +           <a id="_event_logs_batch_read_size">
             </a>
             <code class="literal">
@@ -713,7 +713,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
    - name: 'C:\backup\sysmon-2019.08.evtx'</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_ignore_older_literal">
+-           <a id="_event_logs_ignore_older_literal">
 +           <a id="_event_logs_ignore_older">
             </a>
             <code class="literal">
@@ -722,7 +722,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
      ignore_older: 168h</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_forwarded_literal">
+-           <a id="_event_logs_forwarded_literal">
 +           <a id="_event_logs_forwarded">
             </a>
             <code class="literal">
@@ -731,7 +731,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
             This settings allows Winlogbeat to optimize reads for forwarded events that are already rendered. When the value is true Winlogbeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
            </p>
            <h4>
--           <a id="_literal_event_logs_event_id_literal">
+-           <a id="_event_logs_event_id_literal">
 +           <a id="_event_logs_event_id">
             </a>
             <code class="literal">
@@ -740,7 +740,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
             </div>
            </div>
            <h4>
--           <a id="_literal_event_logs_level_literal">
+-           <a id="_event_logs_level_literal">
 +           <a id="_event_logs_level">
             </a>
             <code class="literal">
@@ -749,7 +749,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
      level: critical, error, warning</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_provider_literal">
+-           <a id="_event_logs_provider_literal">
 +           <a id="_event_logs_provider">
             </a>
             <code class="literal">
@@ -758,7 +758,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
  Microsoft-Windows-Eventlog</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_include_xml_literal">
+-           <a id="_event_logs_include_xml_literal">
 +           <a id="_event_logs_include_xml">
             </a>
             <code class="literal">
@@ -767,7 +767,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
      include_xml: true</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_tags_literal">
+-           <a id="_event_logs_tags_literal">
 +           <a id="_event_logs_tags">
             </a>
             <code class="literal">
@@ -776,7 +776,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
        customer_id: 51415432</pre>
            </div>
            <h4>
--           <a id="_literal_event_logs_fields_under_root_literal">
+-           <a id="_event_logs_fields_under_root_literal">
 +           <a id="_event_logs_fields_under_root">
             </a>
             <code class="literal">
@@ -785,7 +785,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
             sub-dictionary. If the custom field names conflict with other field names added by Winlogbeat, then the custom fields overwrite the other fields.
            </p>
            <h4>
--           <a id="_literal_event_logs_processors_literal">
+-           <a id="_event_logs_processors_literal">
 +           <a id="_event_logs_processors">
             </a>
             <code class="literal">
@@ -794,7 +794,7 @@ html/en/beats/winlogbeat/7.2/configuration-winlogbeat-options.html
             for information about specifying processors in your config.
            </p>
            <h4>
--           <a id="_literal_event_logs_no_more_events_literal">
+-           <a id="_event_logs_no_more_events_literal">
 +           <a id="_event_logs_no_more_events">
             </a>
             <code class="literal">
@@ -806,7 +806,7 @@ html/en/beats/winlogbeat/7.2/configure-cloud-id.html
              <div>
               <div>
                <h3 class="title">
--               <a id="_literal_cloud_id_literal">
+-               <a id="_cloud_id_literal">
 +               <a id="_cloud_id">
                 </a>
                 <code class="literal">
@@ -815,7 +815,7 @@ html/en/beats/winlogbeat/7.2/configure-cloud-id.html
              <div>
               <div>
                <h3 class="title">
--               <a id="_literal_cloud_auth_literal">
+-               <a id="_cloud_auth_literal">
 +               <a id="_cloud_auth">
                 </a>
                 <code class="literal">
@@ -829,7 +829,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             config file:
            </p>
            <h5>
--           <a id="_literal_events_literal">
+-           <a id="_events_literal">
 +           <a id="_events">
             </a>
             <code class="literal">
@@ -838,7 +838,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             The default value is 4096 events.
            </p>
            <h5>
--           <a id="_literal_flush_min_events_literal">
+-           <a id="_flush_min_events_literal">
 +           <a id="_flush_min_events">
             </a>
             <code class="literal">
@@ -847,7 +847,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             The default value is 2048.
            </p>
            <h5>
--           <a id="_literal_flush_timeout_literal">
+-           <a id="_flush_timeout_literal">
 +           <a id="_flush_timeout">
             </a>
             <code class="literal">
@@ -856,7 +856,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             config file:
            </p>
            <h5>
--           <a id="_literal_file_path_literal">
+-           <a id="_file_path_literal">
 +           <a id="_file_path">
             </a>
             <code class="literal">
@@ -865,7 +865,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             The default value is "${path.data}/spool.dat".
            </p>
            <h5>
--           <a id="_literal_file_permissions_literal">
+-           <a id="_file_permissions_literal">
 +           <a id="_file_permissions">
             </a>
             <code class="literal">
@@ -874,7 +874,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             The default value is 0600.
            </p>
            <h5>
--           <a id="_literal_file_size_literal">
+-           <a id="_file_size_literal">
 +           <a id="_file_size">
             </a>
             <code class="literal">
@@ -883,7 +883,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             </div>
            </div>
            <h5>
--           <a id="_literal_file_page_size_literal">
+-           <a id="_file_page_size_literal">
 +           <a id="_file_page_size">
             </a>
             <code class="literal">
@@ -892,7 +892,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             </div>
            </div>
            <h5>
--           <a id="_literal_file_prealloc_literal">
+-           <a id="_file_prealloc_literal">
 +           <a id="_file_prealloc">
             </a>
             <code class="literal">
@@ -901,7 +901,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             .
            </p>
            <h5>
--           <a id="_literal_write_buffer_size_literal">
+-           <a id="_write_buffer_size_literal">
 +           <a id="_write_buffer_size">
             </a>
             <code class="literal">
@@ -910,7 +910,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             The default value is 1MiB.
            </p>
            <h5>
--           <a id="_literal_write_codec_literal">
+-           <a id="_write_codec_literal">
 +           <a id="_write_codec">
             </a>
             <code class="literal">
@@ -919,7 +919,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             .
            </p>
            <h5>
--           <a id="_literal_write_flush_timeout_literal">
+-           <a id="_write_flush_timeout_literal">
 +           <a id="_write_flush_timeout">
             </a>
             <code class="literal">
@@ -928,7 +928,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             The default value is 1s.
            </p>
            <h5>
--           <a id="_literal_write_flush_events_literal">
+-           <a id="_write_flush_events_literal">
 +           <a id="_write_flush_events">
             </a>
             <code class="literal">
@@ -937,7 +937,7 @@ html/en/beats/winlogbeat/7.2/configuring-internal-queue.html
             The default value is 16384.
            </p>
            <h5>
--           <a id="_literal_read_flush_timeout_literal">
+-           <a id="_read_flush_timeout_literal">
 +           <a id="_read_flush_timeout">
             </a>
             <code class="literal">
@@ -952,7 +952,7 @@ html/en/beats/winlogbeat/7.2/console-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_pretty_literal">
+-                <a id="_pretty_literal">
 +                <a id="_pretty">
                  </a>
                  <code class="literal">
@@ -961,7 +961,7 @@ html/en/beats/winlogbeat/7.2/console-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_codec_literal_4">
+-                <a id="_codec_literal_4">
 +                <a id="_codec_4">
                  </a>
                  <code class="literal">
@@ -970,7 +970,7 @@ html/en/beats/winlogbeat/7.2/console-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_enabled_literal_6">
+-                <a id="_enabled_literal_6">
 +                <a id="_enabled_6">
                  </a>
                  <code class="literal">
@@ -979,7 +979,7 @@ html/en/beats/winlogbeat/7.2/console-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_bulk_max_size_literal_5">
+-                <a id="_bulk_max_size_literal_5">
 +                <a id="_bulk_max_size_5">
                  </a>
                  <code class="literal">
@@ -1036,7 +1036,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_enabled_literal">
+-                <a id="_enabled_literal">
 +                <a id="_enabled">
                  </a>
                  <code class="literal">
@@ -1045,7 +1045,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_compression_level_literal">
+-                <a id="_compression_level_literal">
 +                <a id="_compression_level">
                  </a>
                  <code class="literal">
@@ -1054,7 +1054,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_escape_html_literal">
+-                <a id="_escape_html_literal">
 +                <a id="_escape_html">
                  </a>
                  <code class="literal">
@@ -1063,7 +1063,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_worker_literal">
+-                <a id="_worker_literal">
 +                <a id="_worker">
                  </a>
                  <code class="literal">
@@ -1072,7 +1072,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_username_literal">
+-                <a id="_username_literal">
 +                <a id="_username">
                  </a>
                  <code class="literal">
@@ -1081,7 +1081,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_password_literal">
+-                <a id="_password_literal">
 +                <a id="_password">
                  </a>
                  <code class="literal">
@@ -1090,7 +1090,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_parameters_literal">
+-                <a id="_parameters_literal">
 +                <a id="_parameters">
                  </a>
                  <code class="literal">
@@ -1099,7 +1099,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_headers_literal">
+-                <a id="_headers_literal">
 +                <a id="_headers">
                  </a>
                  <code class="literal">
@@ -1108,7 +1108,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_proxy_url_literal">
+-                <a id="_proxy_url_literal">
 +                <a id="_proxy_url">
                  </a>
                  <code class="literal">
@@ -1158,7 +1158,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_max_retries_literal">
+-                <a id="_max_retries_literal">
 +                <a id="_max_retries">
                  </a>
                  <code class="literal">
@@ -1167,7 +1167,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_bulk_max_size_literal">
+-                <a id="_bulk_max_size_literal">
 +                <a id="_bulk_max_size">
                  </a>
                  <code class="literal">
@@ -1176,7 +1176,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_backoff_init_literal">
+-                <a id="_backoff_init_literal">
 +                <a id="_backoff_init">
                  </a>
                  <code class="literal">
@@ -1185,7 +1185,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_backoff_max_literal">
+-                <a id="_backoff_max_literal">
 +                <a id="_backoff_max">
                  </a>
                  <code class="literal">
@@ -1194,7 +1194,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_timeout_literal">
+-                <a id="_timeout_literal">
 +                <a id="_timeout">
                  </a>
                  <code class="literal">
@@ -1203,7 +1203,7 @@ html/en/beats/winlogbeat/7.2/elasticsearch-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_ssl_literal">
+-                <a id="_ssl_literal">
 +                <a id="_ssl">
                  </a>
                  <code class="literal">
@@ -1232,7 +1232,7 @@ html/en/beats/winlogbeat/7.2/file-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_enabled_literal_5">
+-                <a id="_enabled_literal_5">
 +                <a id="_enabled_5">
                  </a>
                  <code class="literal">
@@ -1241,7 +1241,7 @@ html/en/beats/winlogbeat/7.2/file-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_filename_literal">
+-                <a id="_filename_literal">
 +                <a id="_filename">
                  </a>
                  <code class="literal">
@@ -1250,7 +1250,7 @@ html/en/beats/winlogbeat/7.2/file-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_rotate_every_kb_literal">
+-                <a id="_rotate_every_kb_literal">
 +                <a id="_rotate_every_kb">
                  </a>
                  <code class="literal">
@@ -1259,7 +1259,7 @@ html/en/beats/winlogbeat/7.2/file-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_number_of_files_literal">
+-                <a id="_number_of_files_literal">
 +                <a id="_number_of_files">
                  </a>
                  <code class="literal">
@@ -1268,7 +1268,7 @@ html/en/beats/winlogbeat/7.2/file-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_permissions_literal">
+-                <a id="_permissions_literal">
 +                <a id="_permissions">
                  </a>
                  <code class="literal">
@@ -1277,7 +1277,7 @@ html/en/beats/winlogbeat/7.2/file-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_codec_literal_3">
+-                <a id="_codec_literal_3">
 +                <a id="_codec_3">
                  </a>
                  <code class="literal">
@@ -1315,7 +1315,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_enabled_literal_3">
+-                <a id="_enabled_literal_3">
 +                <a id="_enabled_3">
                  </a>
                  <code class="literal">
@@ -1324,7 +1324,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_hosts_literal">
+-                <a id="_hosts_literal">
 +                <a id="_hosts">
                  </a>
                  <code class="literal">
@@ -1333,7 +1333,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_version_literal">
+-                <a id="_version_literal">
 +                <a id="_version">
                  </a>
                  <code class="literal">
@@ -1342,7 +1342,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_username_literal_2">
+-                <a id="_username_literal_2">
 +                <a id="_username_2">
                  </a>
                  <code class="literal">
@@ -1351,7 +1351,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_password_literal_2">
+-                <a id="_password_literal_2">
 +                <a id="_password_2">
                  </a>
                  <code class="literal">
@@ -1360,7 +1360,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_key_literal">
+-                <a id="_key_literal">
 +                <a id="_key">
                  </a>
                  <code class="literal">
@@ -1369,7 +1369,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_partition_literal">
+-                <a id="_partition_literal">
 +                <a id="_partition">
                  </a>
                  <code class="literal">
@@ -1378,7 +1378,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_client_id_literal">
+-                <a id="_client_id_literal">
 +                <a id="_client_id">
                  </a>
                  <code class="literal">
@@ -1387,7 +1387,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_worker_literal_3">
+-                <a id="_worker_literal_3">
 +                <a id="_worker_3">
                  </a>
                  <code class="literal">
@@ -1396,7 +1396,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_codec_literal">
+-                <a id="_codec_literal">
 +                <a id="_codec">
                  </a>
                  <code class="literal">
@@ -1405,7 +1405,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_metadata_literal">
+-                <a id="_metadata_literal">
 +                <a id="_metadata">
                  </a>
                  <code class="literal">
@@ -1414,7 +1414,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_max_retries_literal_3">
+-                <a id="_max_retries_literal_3">
 +                <a id="_max_retries_3">
                  </a>
                  <code class="literal">
@@ -1423,7 +1423,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_bulk_max_size_literal_3">
+-                <a id="_bulk_max_size_literal_3">
 +                <a id="_bulk_max_size_3">
                  </a>
                  <code class="literal">
@@ -1432,7 +1432,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_timeout_literal_3">
+-                <a id="_timeout_literal_3">
 +                <a id="_timeout_3">
                  </a>
                  <code class="literal">
@@ -1441,7 +1441,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_broker_timeout_literal">
+-                <a id="_broker_timeout_literal">
 +                <a id="_broker_timeout">
                  </a>
                  <code class="literal">
@@ -1450,7 +1450,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_channel_buffer_size_literal">
+-                <a id="_channel_buffer_size_literal">
 +                <a id="_channel_buffer_size">
                  </a>
                  <code class="literal">
@@ -1459,7 +1459,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_keep_alive_literal">
+-                <a id="_keep_alive_literal">
 +                <a id="_keep_alive">
                  </a>
                  <code class="literal">
@@ -1468,7 +1468,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_compression_literal">
+-                <a id="_compression_literal">
 +                <a id="_compression">
                  </a>
                  <code class="literal">
@@ -1477,7 +1477,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_compression_level_literal_3">
+-                <a id="_compression_level_literal_3">
 +                <a id="_compression_level_3">
                  </a>
                  <code class="literal">
@@ -1486,7 +1486,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_required_acks_literal">
+-                <a id="_required_acks_literal">
 +                <a id="_required_acks">
                  </a>
                  <code class="literal">
@@ -1495,7 +1495,7 @@ html/en/beats/winlogbeat/7.2/kafka-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_ssl_literal_3">
+-                <a id="_ssl_literal_3">
 +                <a id="_ssl_3">
                  </a>
                  <code class="literal">
@@ -1544,7 +1544,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_enabled_literal_2">
+-                <a id="_enabled_literal_2">
 +                <a id="_enabled_2">
                  </a>
                  <code class="literal">
@@ -1553,7 +1553,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_compression_level_literal_2">
+-                <a id="_compression_level_literal_2">
 +                <a id="_compression_level_2">
                  </a>
                  <code class="literal">
@@ -1562,7 +1562,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_escape_html_literal_2">
+-                <a id="_escape_html_literal_2">
 +                <a id="_escape_html_2">
                  </a>
                  <code class="literal">
@@ -1571,7 +1571,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_worker_literal_2">
+-                <a id="_worker_literal_2">
 +                <a id="_worker_2">
                  </a>
                  <code class="literal">
@@ -1580,7 +1580,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_ttl_literal">
+-                <a id="_ttl_literal">
 +                <a id="_ttl">
                  </a>
                  <code class="literal">
@@ -1589,7 +1589,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_pipelining_literal">
+-                <a id="_pipelining_literal">
 +                <a id="_pipelining">
                  </a>
                  <code class="literal">
@@ -1598,7 +1598,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_proxy_url_literal_2">
+-                <a id="_proxy_url_literal_2">
 +                <a id="_proxy_url_2">
                  </a>
                  <code class="literal">
@@ -1607,7 +1607,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_ssl_literal_2">
+-                <a id="_ssl_literal_2">
 +                <a id="_ssl_2">
                  </a>
                  <code class="literal">
@@ -1616,7 +1616,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_timeout_literal_2">
+-                <a id="_timeout_literal_2">
 +                <a id="_timeout_2">
                  </a>
                  <code class="literal">
@@ -1625,7 +1625,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_max_retries_literal_2">
+-                <a id="_max_retries_literal_2">
 +                <a id="_max_retries_2">
                  </a>
                  <code class="literal">
@@ -1634,7 +1634,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_bulk_max_size_literal_2">
+-                <a id="_bulk_max_size_literal_2">
 +                <a id="_bulk_max_size_2">
                  </a>
                  <code class="literal">
@@ -1643,7 +1643,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_slow_start_literal">
+-                <a id="_slow_start_literal">
 +                <a id="_slow_start">
                  </a>
                  <code class="literal">
@@ -1652,7 +1652,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_backoff_init_literal_2">
+-                <a id="_backoff_init_literal_2">
 +                <a id="_backoff_init_2">
                  </a>
                  <code class="literal">
@@ -1661,7 +1661,7 @@ html/en/beats/winlogbeat/7.2/logstash-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_backoff_max_literal_2">
+-                <a id="_backoff_max_literal_2">
 +                <a id="_backoff_max_2">
                  </a>
                  <code class="literal">
@@ -1679,7 +1679,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_enabled_literal_4">
+-                <a id="_enabled_literal_4">
 +                <a id="_enabled_4">
                  </a>
                  <code class="literal">
@@ -1688,7 +1688,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_hosts_literal_2">
+-                <a id="_hosts_literal_2">
 +                <a id="_hosts_2">
                  </a>
                  <code class="literal">
@@ -1697,7 +1697,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_index_literal">
+-                <a id="_index_literal">
 +                <a id="_index">
                  </a>
                  <code class="literal">
@@ -1706,7 +1706,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_password_literal_3">
+-                <a id="_password_literal_3">
 +                <a id="_password_3">
                  </a>
                  <code class="literal">
@@ -1715,7 +1715,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_db_literal">
+-                <a id="_db_literal">
 +                <a id="_db">
                  </a>
                  <code class="literal">
@@ -1724,7 +1724,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_datatype_literal">
+-                <a id="_datatype_literal">
 +                <a id="_datatype">
                  </a>
                  <code class="literal">
@@ -1733,7 +1733,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_codec_literal_2">
+-                <a id="_codec_literal_2">
 +                <a id="_codec_2">
                  </a>
                  <code class="literal">
@@ -1742,7 +1742,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_host_topology_literal">
+-                <a id="_host_topology_literal">
 +                <a id="_host_topology">
                  </a>
                  <code class="literal">
@@ -1779,7 +1779,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_password_topology_literal">
+-                <a id="_password_topology_literal">
 +                <a id="_password_topology">
                  </a>
                  <code class="literal">
@@ -1816,7 +1816,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_db_topology_literal">
+-                <a id="_db_topology_literal">
 +                <a id="_db_topology">
                  </a>
                  <code class="literal">
@@ -1853,7 +1853,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_worker_literal_4">
+-                <a id="_worker_literal_4">
 +                <a id="_worker_4">
                  </a>
                  <code class="literal">
@@ -1862,7 +1862,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_loadbalance_literal">
+-                <a id="_loadbalance_literal">
 +                <a id="_loadbalance">
                  </a>
                  <code class="literal">
@@ -1871,7 +1871,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_timeout_literal_4">
+-                <a id="_timeout_literal_4">
 +                <a id="_timeout_4">
                  </a>
                  <code class="literal">
@@ -1880,7 +1880,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_backoff_init_literal_3">
+-                <a id="_backoff_init_literal_3">
 +                <a id="_backoff_init_3">
                  </a>
                  <code class="literal">
@@ -1889,7 +1889,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_backoff_max_literal_3">
+-                <a id="_backoff_max_literal_3">
 +                <a id="_backoff_max_3">
                  </a>
                  <code class="literal">
@@ -1898,7 +1898,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_max_retries_literal_4">
+-                <a id="_max_retries_literal_4">
 +                <a id="_max_retries_4">
                  </a>
                  <code class="literal">
@@ -1907,7 +1907,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_bulk_max_size_literal_4">
+-                <a id="_bulk_max_size_literal_4">
 +                <a id="_bulk_max_size_4">
                  </a>
                  <code class="literal">
@@ -1916,7 +1916,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_ssl_literal_4">
+-                <a id="_ssl_literal_4">
 +                <a id="_ssl_4">
                  </a>
                  <code class="literal">
@@ -1925,7 +1925,7 @@ html/en/beats/winlogbeat/7.2/redis-output.html
               <div>
                <div>
                 <h4 class="title">
--                <a id="_literal_proxy_url_literal_3">
+-                <a id="_proxy_url_literal_3">
 +                <a id="_proxy_url_3">
                  </a>
                  <code class="literal">
@@ -1942,7 +1942,7 @@ html/en/beats/winlogbeat/7.2/setup-kibana-endpoint.html
             config file:
            </p>
            <h4>
--           <a id="_literal_setup_kibana_host_literal">
+-           <a id="_setup_kibana_host_literal">
 +           <a id="_setup_kibana_host">
             </a>
             <code class="literal">
@@ -1951,7 +1951,7 @@ html/en/beats/winlogbeat/7.2/setup-kibana-endpoint.html
  setup.kibana.path: /kibana</pre>
            </div>
            <h4>
--           <a id="_literal_setup_kibana_username_literal">
+-           <a id="_setup_kibana_username_literal">
 +           <a id="_setup_kibana_username">
             </a>
             <code class="literal">
@@ -1960,7 +1960,7 @@ html/en/beats/winlogbeat/7.2/setup-kibana-endpoint.html
             specified for the Elasticsearch output.
            </p>
            <h4>
--           <a id="_literal_setup_kibana_password_literal">
+-           <a id="_setup_kibana_password_literal">
 +           <a id="_setup_kibana_password">
             </a>
             <code class="literal">
@@ -1969,7 +1969,7 @@ html/en/beats/winlogbeat/7.2/setup-kibana-endpoint.html
             An HTTP path prefix that is prepended to the HTTP API calls. This is useful for the cases where Kibana listens behind an HTTP reverse proxy that exports the API under a custom prefix.
            </p>
            <h4>
--           <a id="_literal_setup_kibana_ssl_enabled_literal">
+-           <a id="_setup_kibana_ssl_enabled_literal">
 +           <a id="_setup_kibana_ssl_enabled">
             </a>
             <code class="literal">
