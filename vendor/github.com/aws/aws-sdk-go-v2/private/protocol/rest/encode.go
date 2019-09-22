@@ -45,7 +45,7 @@ func NewEncoder(req *http.Request) *Encoder {
 // Encode will return the request and body if one was set. If the body
 // payload was not set the io.ReadSeeker will be nil.
 //
-// returns any error if one occurred while encoding the API's parameters.
+// returns any error if one occured while encoding the API's parameters.
 func (e *Encoder) Encode() (*http.Request, io.ReadSeeker, error) {
 	if e.err != nil {
 		return nil, nil, e.err
