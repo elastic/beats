@@ -475,7 +475,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 						if tagsFilter != nil {
 							continue
 						}
-						eventNew := aws.InitEvent(regionName)
+						eventNew := aws.InitEvent(regionName, m.AccountName, m.AccountID)
 						eventNew = insertRootFields(eventNew, output.Values[timestampIdx], labels)
 						eventsNoIdentifier = append(eventsNoIdentifier, eventNew)
 						continue
@@ -485,7 +485,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 					tags := resourceTagMap[identifierValue]
 					if tags != nil {
 						if _, ok := events[identifierValue]; !ok {
-							events[identifierValue] = aws.InitEvent(regionName)
+							events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 						}
 						events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 						for _, tag := range tags {
@@ -531,7 +531,7 @@ func (m *MetricSet) createEventsWithNoTags(svcCloudwatch cloudwatchiface.ClientA
 			if exists {
 				labels := strings.Split(*output.Label, labelSeperator)
 				if len(labels) != 5 {
-					eventNew := aws.InitEvent(regionName)
+					eventNew := aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					eventNew = insertRootFields(eventNew, output.Values[timestampIdx], labels)
 					eventsNoIdentifier = append(eventsNoIdentifier, eventNew)
 					continue
@@ -539,7 +539,7 @@ func (m *MetricSet) createEventsWithNoTags(svcCloudwatch cloudwatchiface.ClientA
 
 				identifierValue := labels[identifierValueIdx]
 				if _, ok := events[identifierValue]; !ok {
-					events[identifierValue] = aws.InitEvent(regionName)
+					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 				}
 				events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 			}
