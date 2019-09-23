@@ -5,7 +5,7 @@
 
 [[release-notes-7.4.0]]
 === Beats version 7.4.0
-https://github.com/elastic/beats/compare/v7.4.0...v7.3.1[View commits]
+https://github.com/elastic/beats/compare/v7.3.1...v7.4.0[View commits]
 
 ==== Breaking changes
 
