@@ -80,6 +80,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: contrib.go.opencensus.io/exporter/ocagent
+Revision: 8110e6c0236bb231b19119275a6be6ec666d05c8
+License type (autodetected): Apache-2.0
+./vendor/contrib.go.opencensus.io/exporter/ocagent/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/aerospike/aerospike-client-go
 Revision: 0f3b54da6bdc2c31c505f9afbc5f434dd2089658
 License type (autodetected): Apache-2.0
@@ -241,6 +250,30 @@ GoFormation
 Copyright 2011-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
 
 --------------------------------------------------------------------
+Dependency: github.com/Azure/azure-sdk-for-go
+Revision: 7a9d2769e4a581b0b1bc609c71b59af043e05c98
+License type (autodetected): Apache-2.0
+./vendor/github.com/Azure/azure-sdk-for-go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Microsoft Azure-SDK-for-Go
+Copyright 2014-2017 Microsoft
+
+This product includes software developed at
+the Microsoft Corporation (https://www.microsoft.com).
+
+--------------------------------------------------------------------
+Dependency: github.com/Azure/go-autorest
+Revision: ba1147dc57f993013ef255c128ca1cac8a557409
+License type (autodetected): Apache-2.0
+./vendor/github.com/Azure/go-autorest/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/beorn7/perks
 Revision: 37c8de3658fcb183f997c4e13e8337516ab753e6
 License type (autodetected): MIT
@@ -295,6 +328,15 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/census-instrumentation/opencensus-proto
+Revision: 26aa36c099c2041b432cf3cc8a26c5fb858d218b
+License type (autodetected): Apache-2.0
+./vendor/github.com/census-instrumentation/opencensus-proto/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/cloudflare/cfssl
@@ -520,10 +562,34 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/dgrijalva/jwt-go
+Revision: 5e25c22bd5d6de03265bbe5462dcd162f85046f6
+License type (autodetected): MIT
+./vendor/github.com/dgrijalva/jwt-go/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2012 Dave Grijalva
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------
 Dependency: github.com/digitalocean/go-libvirt
 Revision: 59d541f19311883ad82708651353009fb207d8a9
 License type (autodetected): Apache-2.0
 ./metricbeat/module/kvm/vendor/github.com/digitalocean/go-libvirt/LICENSE.md:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/dimchansky/utfbom
+Revision: d2133a1ce379ef6fa992b0514a77146c60db9d1c
+License type (autodetected): Apache-2.0
+./vendor/github.com/dimchansky/utfbom/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -858,6 +924,22 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/elastic/go-licenser
+Version: 0.2.0
+Revision: 2b2abd4ee9b58025ebd0630d7621cfd7619f58ac
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-licenser/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Elastic go-licenser
+Copyright 2018 Elasticsearch B.V.
+
+This product includes software developed at
+Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-lookslike
@@ -1740,8 +1822,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
-Version: v1.3.1
-Revision: b5d812f8a3706043e23a9cd5babf2e5423744d30
+Revision: 6c65a5562fc06764971b7c5d05c76c75e84bdbf7
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
@@ -2002,6 +2083,40 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/grpc-ecosystem/grpc-gateway
+Revision: d63917fcb0d53f39184485b9b6a0893af18a5668
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/grpc-ecosystem/grpc-gateway/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2015, Gengo, Inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+
+    * Neither the name of Gengo, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived from this
+      software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/hashicorp/go-immutable-radix
@@ -4008,6 +4123,34 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+--------------------------------------------------------------------
+Dependency: github.com/mitchellh/go-homedir
+Revision: af06845cf3004701891bf4fdb884bfe4920b3727
+License type (autodetected): MIT
+./vendor/github.com/mitchellh/go-homedir/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2013 Mitchell Hashimoto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/mitchellh/hashstructure

@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type dataType uint8
@@ -370,8 +372,10 @@ func toType(value string, typ dataType) (interface{}, error) {
 		return toBoolean(value)
 	case IP:
 		return toIP(value)
+	case Timestamp:
+		return toTimestamp(value)
 	default:
-		panic("invalid data type")
+		panic(errors.Errorf("invalid data type: %v", typ))
 	}
 }
 
@@ -425,9 +429,9 @@ var timeLayouts = []string{
 	"Jan _2 2006 15:04:05",
 }
 
-func toTimestamp(v string) (time.Time, error) {
+func toTimestamp(v string) (common.Time, error) {
 	if unixMs, err := toLong(v); err == nil {
-		return time.Unix(0, unixMs*int64(time.Millisecond)), nil
+		return common.Time(time.Unix(0, unixMs*int64(time.Millisecond))), nil
 	}
 
 	for _, layout := range timeLayouts {
@@ -439,9 +443,9 @@ func toTimestamp(v string) (time.Time, error) {
 				ts = ts.AddDate(currentYear, 0, 0)
 			}
 
-			return ts, nil
+			return common.Time(ts), nil
 		}
 	}
 
-	return time.Time{}, errors.New("value is not a valid timestamp")
+	return common.Time(time.Time{}), errors.New("value is not a valid timestamp")
 }

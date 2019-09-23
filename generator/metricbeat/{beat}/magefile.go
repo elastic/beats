@@ -9,6 +9,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
@@ -73,7 +74,11 @@ func Fields() error {
 }
 
 // Config generates both the short/reference/docker configs.
-func Config() error {
+func Config() {
+	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
+}
+
+func configYML() error {
 	customDeps := devtools.ConfigFileParams{
 		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
 		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},

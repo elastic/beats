@@ -29,7 +29,7 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
-            "version": "7.0.0-beta1"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -42,7 +42,7 @@
             },
             "panelIndex": "2",
             "panelRefName": "panel_1",
-            "version": "7.0.0-beta1"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -55,7 +55,7 @@
             },
             "panelIndex": "3",
             "panelRefName": "panel_2",
-            "version": "7.0.0-beta1"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -68,7 +68,7 @@
             },
             "panelIndex": "4",
             "panelRefName": "panel_3",
-            "version": "7.0.0-beta1"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -81,7 +81,7 @@
             },
             "panelIndex": "5",
             "panelRefName": "panel_4",
-            "version": "7.0.0-beta1"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -94,7 +94,7 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_5",
-            "version": "7.0.0-beta1"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -107,7 +107,7 @@
             },
             "panelIndex": "7",
             "panelRefName": "panel_6",
-            "version": "7.0.0-beta1"
+            "version": "7.4.0"
           }
         ],
         "timeRestore": false,
@@ -116,7 +116,7 @@
       },
       "id": "a096b830-4762-11e9-8062-c98a86cb6f94",
       "migrationVersion": {
-        "dashboard": "7.0.0"
+        "dashboard": "7.3.0"
       },
       "references": [
         {
@@ -156,8 +156,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-03-15T20:56:09.373Z",
-      "version": "WzkyNCw3XQ=="
+      "updated_at": "2019-09-12T21:18:24.987Z",
+      "version": "Wzc3NjAsN10="
     },
     {
       "attributes": {
@@ -242,8 +242,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T20:23:22.120Z",
-      "version": "WzkxMSw3XQ=="
+      "updated_at": "2019-09-12T21:13:42.937Z",
+      "version": "Wzc0MzQsN10="
     },
     {
       "attributes": {
@@ -320,8 +320,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T20:30:52.573Z",
-      "version": "WzkxMyw3XQ=="
+      "updated_at": "2019-09-12T21:13:42.937Z",
+      "version": "Wzc0MzUsN10="
     },
     {
       "attributes": {
@@ -413,8 +413,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T20:37:36.827Z",
-      "version": "WzkxNCw3XQ=="
+      "updated_at": "2019-09-12T21:13:42.937Z",
+      "version": "Wzc0MzYsN10="
     },
     {
       "attributes": {
@@ -488,8 +488,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T20:40:02.231Z",
-      "version": "WzkxNSw3XQ=="
+      "updated_at": "2019-09-12T21:13:42.937Z",
+      "version": "Wzc0MzcsN10="
     },
     {
       "attributes": {
@@ -563,8 +563,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T20:40:17.936Z",
-      "version": "WzkxNiw3XQ=="
+      "updated_at": "2019-09-12T21:13:42.937Z",
+      "version": "Wzc0MzgsN10="
     },
     {
       "attributes": {
@@ -601,7 +601,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "aws.s3_request.bucket.name",
+                "fieldName": "aws.s3.bucket.name",
                 "id": "1549512142947",
                 "indexPattern": "metricbeat-*",
                 "label": "s3 bucket name",
@@ -630,8 +630,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T20:47:17.880Z",
-      "version": "WzkyMCw3XQ=="
+      "updated_at": "2019-09-12T21:18:08.498Z",
+      "version": "Wzc3NTgsN10="
     },
     {
       "attributes": {
@@ -709,9 +709,9 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-15T20:55:49.785Z",
-      "version": "WzkyMyw3XQ=="
+      "updated_at": "2019-09-12T21:13:42.937Z",
+      "version": "Wzc0NDAsN10="
     }
   ],
-  "version": "7.0.0-beta1"
+  "version": "7.4.0"
 }
