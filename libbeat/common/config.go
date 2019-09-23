@@ -265,7 +265,7 @@ func (c *Config) PrintDebugf(msg string, params ...interface{}) {
 		}
 	}
 
-	debugStr := configDebugString(c, filtered)
+	debugStr := DebugString(c, filtered)
 	if debugStr != "" {
 		configDebugf(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
 	}
@@ -358,7 +358,9 @@ func (ns *ConfigNamespace) IsSet() bool {
 	return ns.config != nil
 }
 
-func configDebugString(c *Config, filterPrivate bool) string {
+// DebugString prints a human readable representation of the underlying config using
+// JSON formatting.
+func DebugString(c *Config, filterPrivate bool) string {
 	var bufs []string
 
 	if c.IsDict() {
