@@ -7,6 +7,7 @@ package qmgr
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/metricbeat/module/ibmmq/util"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -24,7 +25,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	queueManager     string
-	connectionConfig ibmmqlib.ConnectionConfig
+	connectionConfig util.ConnectionConfig
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -32,7 +33,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The ibmmq qmgr metricset is experimental.")
 
-	config := ibmmqlib.DefaultConfig
+	config := util.DefaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -49,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
-	events, _ := ibmmqlib.CollectQmgrMetricset("QueueManager", m.queueManager, m.connectionConfig)
+	events, _ := util.CollectQmgrMetricset("QueueManager", m.queueManager, m.connectionConfig)
 
 	for _, beatEvent := range events {
 		var mbEvent mb.Event
