@@ -21,11 +21,11 @@
             - name: heap_used.bytes
               type: long
               description: >
-                Head used by the JVM in bytes.
+                Heap used by the JVM in bytes.
             - name: heap_committed.bytes
               type: long
               description: >
-                Commited heap to the JVM in bytes.
+                Committed heap to the JVM in bytes.
             - name: heap_max.bytes
               type: long
               description: >
@@ -37,7 +37,7 @@
             - name: non_heap_committed.bytes
               type: long
               description: >
-                Non-Heap commited memory used by the JVM in bytes.
+                Non-Heap committed memory used by the JVM in bytes.
     - name: queues
       type: group
       description: >
