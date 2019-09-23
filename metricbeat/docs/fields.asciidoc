@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -2103,6 +2104,301 @@ SQS queue name
 
 
 type: keyword
+
+--
+
+[[exported-fields-azure]]
+== azure fields
+
+azure module
+
+
+
+[float]
+=== azure
+
+
+
+
+[float]
+=== compute_vm
+
+compute_vm
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== compute_vm_scaleset
+
+compute_vm_scaleset
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm_scaleset.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== monitor
+
+monitor
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.monitor.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.monitor.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.monitor.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.monitor.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.monitor.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
 
 --
 
