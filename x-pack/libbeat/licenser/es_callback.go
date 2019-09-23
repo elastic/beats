@@ -21,7 +21,9 @@ func Enforce(log *logp.Logger, name string, checks ...CheckFunc) {
 		license, err := fetcher.Fetch()
 
 		if err != nil {
-			return errors.Wrapf(err, "cannot retrieve the elasticsearch license")
+			return errors.Wrapf(err, "cannot retrieve the elasticsearch license from the /_xpack endpoint, "+
+				"%s requires the default distribution of Elasticsearch. Please make the endpoint accessible "+
+				"to %s so it can verify the license.", name, name)
 		}
 
 		if license == OSSLicense {
