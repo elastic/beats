@@ -12,27 +12,27 @@ have the same indentation level.
 Dictionaries are represented by simple `key: value` pairs all having the same
 indentation level. The colon after `key` must be followed by a space.
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 name: John Doe
 age: 34
 country: Canada
-------------------------------------------------------------------------------
+-----
 
 Lists are introduced by dashes `- `. All list members will be lines beginning
 with `- ` at the same indentation level.
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 - Red
 - Green
 - Blue
-------------------------------------------------------------------------------
+-----
 
 Lists and dictionaries are used in beats to build structured configurations.
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat:
   inputs:
     - type: log
@@ -41,16 +41,16 @@ filebeat:
       multiline:
         pattern: '^['
         match: after
-------------------------------------------------------------------------------
+-----
 
 Lists and dictionaries can also be represented in abbreviated form. Abbreviated
 form is somewhat similar to JSON using `{}` for dictionaries and `[]` for lists:
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 person: {name: "John Doe", age: 34, country: "Canada"}
 colors: ["Red", "Green", "Blue"]
-------------------------------------------------------------------------------
+-----
 
 The following topics provide more detail to help you understand and work with config files in YAML:
 
@@ -73,13 +73,11 @@ file.
 For example this setting:
 
 ["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-
+-----
 output:
   elasticsearch:
     index: 'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}'
-
-------------------------------------------------------------------------------
+-----
 
 gets collapsed into +output.elasticsearch.index: \'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}'+. The
 full name of a setting is based on all parent structures involved.
@@ -88,14 +86,12 @@ Lists create numeric names starting with 0.
 
 For example this filebeat setting:
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-
+[source,yaml]
+-----
 filebeat:
   inputs:
     - type: log
-
-------------------------------------------------------------------------------
+-----
 
 Gets collapsed into `filebeat.inputs.0.type: log`.
 
@@ -106,9 +102,8 @@ Note: having two settings with same fully collapsed path is invalid.
 Simple filebeat example with partially collapsed setting names and use of compact form:
 
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-
+[source,yaml]
+-----
 filebeat.inputs:
 - type: log
   paths: ["/var/log/*.log"]
@@ -116,8 +111,7 @@ filebeat.inputs:
   multiline.match: after
 
 output.elasticsearch.hosts: ["http://localhost:9200"]
-
-------------------------------------------------------------------------------
+-----
 
 [[config-file-format-type]]
 === Config file data types
@@ -131,23 +125,23 @@ string is given when a number is required - the beat will fail to start up.
 Boolean values can be either `true` or `false`. Alternative names for `true` are
 `yes` and `on`. Instead of `false` the values `no` and `off` can be used.
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 enabled: true
 disabled: false
-------------------------------------------------------------------------------
+-----
 
 ==== Number
 
 Number values require you to enter the number to use without using single or
 double quotes. Some settings only support a restricted number range though.
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 integer: 123
 negative: -1
 float: 5.4
-------------------------------------------------------------------------------
+-----
 
 ==== String
 
@@ -174,12 +168,12 @@ Durations require a numeric value with optional fraction and required unit.
 Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Sometimes features based
 on durations can be disabled by using zero or negative durations.
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 duration1: 2.5s
 duration2: 6h
 duration_disabled: -1s
-------------------------------------------------------------------------------
+-----
 
 ==== Regular expression
 
@@ -203,12 +197,12 @@ You can also format time stored in the
 `@timestamp` field using the `+FORMAT` syntax where FORMAT is a valid https://godoc.org/github.com/elastic/beats/libbeat/common/dtfmt[time
 format].
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 constant-format-string: 'constant string'
 field-format-string: '%{[fieldname]} string'
 format-string-with-date: '%{[fieldname]}-%{+yyyy.MM.dd}'
-------------------------------------------------------------------------------
+-----
 
 
 [[config-file-format-env-vars]]
@@ -226,23 +220,23 @@ referenced to.
 
 For example the filebeat registry file defaults to:
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.registry: ${path.data}/registry
-------------------------------------------------------------------------------
+-----
 
 With `path.data` being an implicit config setting, that is overridable from
 command line, as well as in the configuration file.
 
 Example referencing `es.host` in `output.elasticsearch.hosts`:
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 es.host: '${ES_HOST:localhost}'
 
 output.elasticsearch:
   hosts: ['http://${es.host}:9200']
-------------------------------------------------------------------------------
+-----
 
 Introducing `es.host`, the host can be overwritten from command line using
 `-E es.host=another-host`.
@@ -252,8 +246,8 @@ references or strings can reference complete namespaces.
 
 These setting with duplicate content:
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
+[source,yaml]
+-----
 namespace1:
   subnamespace:
     host: localhost
@@ -263,20 +257,20 @@ namespace2:
   subnamespace:
     host: localhost
     sleep: 1s
-------------------------------------------------------------------------------
+-----
 
 can be rewritten to
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-namespace1: $\{shared}
-namespace2: $\{shared}
+[source,yaml]
+-----
+namespace1: ${shared}
+namespace2: ${shared}
 
 shared:
   subnamespace:
     host: localhost
     sleep: 1s
-------------------------------------------------------------------------------
+-----
 
 when using plain references.
 
@@ -299,21 +293,21 @@ file is owned by `root` and has file permissions of `0644` (`-rw-r--r--`).
 
 You may encounter the following errors if your config file fails these checks:
 
-["source","sh"]
---------------------------------------------------------------------------------
+[source,sh]
+-----
 Exiting: error loading config file: config file ("{beatname}.yml") must be
 owned by the beat user (uid=501) or root
---------------------------------------------------------------------------------
+-----
 
 To correct this problem you can use either `chown root {beatname}.yml` or
 `chown 501 {beatname}.yml` to change the owner of the configuration file.
 
-["source","sh"]
---------------------------------------------------------------------------------
+[source,sh]
+-----
 Exiting: error loading config file: config file ("{beatname}.yml") can only be
 writable by the owner but the permissions are "-rw-rw-r--" (to fix the
 permissions use: 'chmod go-w /etc/{beatname}/{beatname}.yml')
---------------------------------------------------------------------------------
+-----
 
 To correct this problem, use `chmod go-w /etc/{beatname}/{beatname}.yml` to
 remove write privileges from anyone other than the owner.
@@ -343,27 +337,27 @@ dictionary.
 
 For example, given the following configuration:
 
-["source","yaml"]
---------------------------------------------------------------------------------
+[source,yaml]
+-----
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
   username: username
   password: password
---------------------------------------------------------------------------------
+-----
 
 You can disable the Elasticsearch output and write all events to the console by
 setting:
 
-["source","sh"]
---------------------------------------------------------------------------------
+[source,sh]
+-----
 -E output='{elasticsearch.enabled: false, console.pretty: true}'
---------------------------------------------------------------------------------
+-----
 
 Any complex objects that you specify at the command line are merged with the
 original configuration, and the following configuration is passed to the Beat:
 
-["source","yaml"]
---------------------------------------------------------------------------------
+[source,yaml]
+-----
 output.elasticsearch:
   enabled: false
   hosts: ["http://localhost:9200"]
@@ -372,7 +366,7 @@ output.elasticsearch:
 
 output.console:
   pretty: true
---------------------------------------------------------------------------------
+-----
 
 
 [[config-file-format-tips]]
