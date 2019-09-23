@@ -121,10 +121,6 @@ func (r *Reader) RefreshCounterPaths() error {
 
 // Read executes a query and returns those values in an event.
 func (r *Reader) Read() ([]mb.Event, error) {
-	//if r.config.IgnoreNECounters && len(r.query.counters) == 0 {
-	//	return nil, nil
-	//}
-
 	if err := r.query.CollectData(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
 	}

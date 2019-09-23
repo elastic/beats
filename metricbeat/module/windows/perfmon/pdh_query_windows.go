@@ -131,7 +131,7 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		return nil, err
 	}
 	if expdPaths == nil {
-		return nil, errors.New("No counter paths found")
+		return nil, errors.New("no counter paths found")
 	}
 	return UTF16ToStringArray(expdPaths), nil
 }
