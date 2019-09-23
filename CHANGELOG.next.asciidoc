@@ -373,6 +373,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for statsd. {pull}13109[13109]
 - Add support for NATS version 2. {pull}13601[13601]
 - Add `docker.cpu.*.norm.pct` metrics for `cpu` metricset of Docker Metricbeat module. {pull}13695[13695]
+- Add `instance` label by default when using Prometheus collector. {pull}13737[13737]
 
 
 *Packetbeat*
