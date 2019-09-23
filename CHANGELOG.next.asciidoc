@@ -194,6 +194,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
 - Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
 - Fix `docker.cpu.system.pct` calculation by using the reported number online cpus instead of the number of metrics per cpu. {pull}13691[13691]
+- Fix rds metricset dashboard. {pull}13721[13721]
 
 *Packetbeat*
 
@@ -255,7 +256,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
 - Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
 
-
 *Auditbeat*
 
 - Auditd module: Add `event.outcome` and `event.type` for ECS. {pull}11432[11432]
@@ -310,6 +310,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
 - Update CoreDNS module to populate ECS DNS fields. {issue}13320[13320] {pull}13505[13505]
 - Parse query steps in PostgreSQL slowlogs. {issue}13496[13496] {pull}13701[13701]
+- Add support to set the document id in the json reader. {pull}5844[5844]
 
 *Heartbeat*
 

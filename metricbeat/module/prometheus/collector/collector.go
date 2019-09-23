@@ -18,7 +18,7 @@
 package collector
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
@@ -70,7 +70,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.prometheus.GetFamilies()
 
 	if err != nil {
-		return fmt.Errorf("unable to decode response from prometheus endpoint")
+		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
 	}
 
 	eventList := map[string]common.MapStr{}
