@@ -19,5 +19,5 @@ func init() {
 // AssetAzure returns asset data.
 // This is the base64 encoded gzipped contents of module/azure.
 func AssetAzure() string {
-	return "eJxsjLsNAyEQRHOqGJHTwAbuwEUgs7ZWxoBgCXD1J7iTSG6y+T2HLw+C//fKBlDRyAS7vDVA4PaqUlRyIjwMgHOLZw49zstbOIZGq3JI/scbN6WjMOFTcy9XcsPcmCMAAP//fWgqmA=="
+	return "eJx0z00KwyAQBeC9p3hknx7ARaGb7nqIECdhqI2iY8GevmjsTyCZnb7nh9PjTlljeKVAChAWSxpdPXcKMBTHwF7YLRpnBWDt4uZMsuXJxGRN1DXqsQwP+nFlJHvSmINLvt3smFtmQ43CT5Zs3Ry/4Z56KK9zrT4mF9oClwajyKe/7ucn7wAAAP//cWNQHw=="
 }

@@ -90,7 +90,7 @@ filebeat.modules:
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
-  {fileset}:
+  activitylogs:
     enabled: true
 
     # Set custom paths for the log files. If left empty,

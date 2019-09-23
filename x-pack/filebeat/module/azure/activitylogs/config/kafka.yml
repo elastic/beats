@@ -1,8 +1,13 @@
 type: kafka
-hosts: [""]
+hosts: ["{}.servicebus.windows.net:9093"]
 topics: ["insights-operational-logs"]
 group_id: "$Default"
 
 username: "$ConnectionString"
 password: ""
 ssl.enabled: true
+
+processors:
+- decode_json_fields:
+    fields: ["message"]
+    target: ""

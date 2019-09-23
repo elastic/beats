@@ -1,0 +1,6 @@
+- key: azure
+  title: Decode azure processor fields
+  description: >
+    Common Event Format (azure) data.
+  fields:
+

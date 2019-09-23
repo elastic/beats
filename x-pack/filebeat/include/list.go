@@ -26,5 +26,6 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/rabbitmq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/zeek"
+	_ "github.com/elastic/beats/x-pack/filebeat/processors/decode_azure"
 	_ "github.com/elastic/beats/x-pack/filebeat/processors/decode_cef"
 )

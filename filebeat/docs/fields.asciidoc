@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-azure>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
@@ -1252,6 +1253,19 @@ azure Module
 [float]
 === azure
 
+
+
+
+[float]
+=== activitylogs
+
+Fields for azure Activity logs.
+
+
+[[exported-fields-azure]]
+== Decode CEF processor fields fields
+
+Common Event Format (CEF) data.
 
 
 [[exported-fields-beat-common]]
