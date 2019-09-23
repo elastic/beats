@@ -53,3 +53,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add checks for types and formats used in fields definitions in `fields.yml` files. {pull}13188[13188]
 - Makefile included in generator copies files from beats repository using `git archive` instead of cp. {pull}13193[13193]
 - Strip debug symbols from binaries to reduce binary sizes. {issue}12768[12768]
+- Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
