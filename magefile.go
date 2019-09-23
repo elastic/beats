@@ -109,7 +109,6 @@ func AddLicenseHeaders() error {
 		licenser(
 			licenser.License("Elastic"),
 			licenser.Path("x-pack"),
-			licenser.Path("dockerlogbeat"),
 		),
 	)
 }
@@ -135,7 +134,6 @@ func CheckLicenseHeaders() error {
 			licenser.Check(),
 			licenser.License("Elastic"),
 			licenser.Path("x-pack"),
-			licenser.Path("dockerlogbeat"),
 		),
 	)
 }

@@ -11,8 +11,7 @@
 *beat/logs
 *beat/data
 x-pack/functionbeat/pkg
-dockerlogbeat/rootfs
-dockerlogbeat/vendor/github.com/elastic/beats
+
 
 # Files
 .DS_Store
