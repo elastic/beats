@@ -211,6 +211,9 @@ The supported processors are:
  * <<community-id,`community_id`>>
  * <<convert,`convert`>>
  * <<decode-base64-field,`decode_base64_field`>>
+ifdef::has_decode_cef_processor[]
+* <<processor-decode-cef,`decode_cef`>>
+endif::[]
 ifdef::has_decode_csv_fields_processor[]
  * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
@@ -222,6 +225,7 @@ endif::[]
  * <<drop-fields,`drop_fields`>>
  * <<extract-array,`extract_array`>>
  * <<include-fields,`include_fields`>>
+ * <<processor-registered-domain,`registered_domain`>>
  * <<rename-fields,`rename`>>
 ifdef::has_script_processor[]
  * <<processor-script,`script`>>
@@ -792,6 +796,45 @@ Adds the environment field to every event:
 }
 -------------------------------------------------------------------------------
 
+ifdef::has_decode_cef_processor[]
+[[processor-decode-cef]]
+[role="xpack"]
+=== Decode CEF
+
+beta[]
+
+The `decode_cef` processor decodes Common Event Format (CEF) messages. This
+processor is available in Filebeat.
+
+Below is an example configuration that decodes the `message` field as CEF after
+renaming it to `event.original`. It is best to rename `message` to
+`event.original` because the decoded CEF data contains its own `message` field.
+
+[source,yaml]
+----
+processors:
+- rename:
+    fields:
+      - {from: "message", to: "event.original"}
+- decode_cef:
+    field: event.original
+----
+
+The `decode_cef` processor has the following configuration settings.
+
+.Decode CEF options
+[options="header"]
+|======
+| `field`          | no       | message | Source field containing the CEF message to be parsed.                        |
+| `target_field`   | no       | cef     | Target field where the parsed CEF object will be written.                    |
+| `ecs`            | no       | true    | Generate Elastic Common Schema (ECS) fields from the CEF data.
+                                          Certain CEF header and extension values will be used to populate ECS fields. |
+| `ignore_missing` | no       | false   | Ignore errors when the source field is missing.                              |
+| `ignore_failure` | no       | false   | Ignore failures when the source field does not contain a CEF message.        |
+| `id`             | no       |         | An identifier for this processor instance. Useful for debugging.             |
+|======
+endif::[]
+
 ifdef::has_decode_csv_fields_processor[]
 [[decode-csv-fields]]
 === Decode CSV fields
@@ -1071,12 +1114,18 @@ processors:
      when:
         condition
      fields: ["field1", "field2", ...]
+     ignore_missing: false
 -----------------------------------------------------
 
 See <<conditions>> for a list of supported conditions.
 
 NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
+
+The `drop_fields` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If `true` the processor will not return an error
+when a specified field does not exist. Defaults to `false`.
 
 [[extract-array]]
 === Extract array
@@ -1146,6 +1195,40 @@ section.
 NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
 
+[[processor-registered-domain]]
+=== Registered Domain
+
+The `registered_domain` processor reads a field containing a hostname and then
+writes the "registered domain" contained in the hostname to the target field.
+For example, given `www.google.co.uk` the processor would output `google.co.uk`.
+In other words the "registered domain" is the effective top-level domain
+(`co.uk`) plus one level (`google`).
+
+This processor uses the Mozilla Public Suffix list to determine the value.
+
+[source,yaml]
+----
+processors:
+- registered_domain:
+    field: dns.question.name
+    target_field: dns.question.registered_domain
+    ignore_missing: true
+    ignore_failure: true
+----
+
+The `registered_domain` processor has the following configuration settings:
+
+.Registered Domain options
+[options="header"]
+|======
+| Name             | Required | Default    | Description                                                      |
+| `field`          | yes      |            | Source field containing a fully qualified domain name (FQDN).    |
+| `target_field`   | yes      |            | Target field for the registered domain value.                    |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                  |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                     |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging. |
+|======
+
 [[rename-fields]]
 === Rename fields from events
 
@@ -1193,8 +1276,13 @@ section.
 === Add Kubernetes metadata
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
-metadata based on which Kubernetes pod the event originated from. Each event is
-annotated with:
+metadata based on which Kubernetes pod the event originated from.
+At startup it detects an `in_cluster` environment and caches the
+Kubernetes-related metadata. Events are only annotated if a valid configuration
+is detected. If it's not able to detect a valid Kubernetes configuration,
+the events are not annotated with Kubernetes-related metadata.
+
+Each event is annotated with:
 
 * Pod Name
 * Pod UID
@@ -1277,7 +1365,11 @@ case you want to specify your own.
 === Add Docker metadata
 
 The `add_docker_metadata` processor annotates each event with relevant metadata
-from Docker containers:
+from Docker containers. At startup it detects a docker environment and caches the metadata.
+The events are annotated with Docker metadata, only if a valid configuration
+is detected and the processor is able to reach Docker API.
+
+Each event is annotated with:
 
 * Container ID
 * Name
@@ -1904,15 +1996,15 @@ If a layout does not contain a year then the current year in the specified
 .Timestamp options
 [options="header"]
 |======
-| Name             | Required | Default    | Description                                                                                 |
-| `field`          | yes      |            | Source field containing the time to be parsed.                                              |
-| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.          |
-| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format.                               |
-| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone. |
-| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                             |
-| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                |
-| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.               |
-| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                            |
+| Name             | Required | Default    | Description                                                                                                           |
+| `field`          | yes      |            | Source field containing the time to be parsed.                                                                        |
+| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.                                    |
+| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |
+| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone.                           |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                                                       |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                                          |
+| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.                                         |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                                                      |
 |======
 
 Here is an example that parses the `start_time` field and writes the result

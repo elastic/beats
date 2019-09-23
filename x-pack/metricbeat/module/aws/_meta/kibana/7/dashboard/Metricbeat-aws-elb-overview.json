@@ -30,7 +30,7 @@
             "panelIndex": "2",
             "panelRefName": "panel_0",
             "title": "HTTP 5XX Errors",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -44,7 +44,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_1",
             "title": "Request Count",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -58,7 +58,7 @@
             "panelIndex": "4",
             "panelRefName": "panel_2",
             "title": "Unhealthy Host Count",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -72,7 +72,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_3",
             "title": "Healthy Host Count",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -86,7 +86,7 @@
             "panelIndex": "6",
             "panelRefName": "panel_4",
             "title": "Latency in Seconds",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -100,7 +100,7 @@
             "panelIndex": "7",
             "panelRefName": "panel_5",
             "title": "HTTP Backend 4XX Errors",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -114,7 +114,7 @@
             "panelIndex": "8",
             "panelRefName": "panel_6",
             "title": "Backend Connection Errors",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -127,7 +127,7 @@
             },
             "panelIndex": "9",
             "panelRefName": "panel_7",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -141,7 +141,7 @@
             "panelIndex": "10",
             "panelRefName": "panel_8",
             "title": "HTTP Backend 2XX",
-            "version": "7.2.0"
+            "version": "7.4.0"
           }
         ],
         "timeRestore": false,
@@ -150,7 +150,7 @@
       },
       "id": "e74bf320-b3ce-11e9-87a4-078dbbae220d",
       "migrationVersion": {
-        "dashboard": "7.0.0"
+        "dashboard": "7.2.0"
       },
       "references": [
         {
@@ -200,8 +200,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-01T15:09:06.696Z",
-      "version": "WzYzNSw4XQ=="
+      "updated_at": "2019-09-12T02:24:38.326Z",
+      "version": "WzI0MTYsN10="
     },
     {
       "attributes": {
@@ -222,6 +222,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -248,6 +249,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -290,8 +292,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:37:04.544Z",
-      "version": "WzY0NSw5XQ=="
+      "updated_at": "2019-09-12T02:24:22.066Z",
+      "version": "WzI0MTUsN10="
     },
     {
       "attributes": {
@@ -312,6 +314,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -338,6 +341,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -362,6 +366,7 @@
                 "stacked": "none",
                 "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
+                "type": "timeseries",
                 "value_template": "{{value}}"
               }
             ],
@@ -380,8 +385,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:24:52.316Z",
-      "version": "WzY0MCw5XQ=="
+      "updated_at": "2019-09-12T02:22:46.781Z",
+      "version": "WzI0MDgsN10="
     },
     {
       "attributes": {
@@ -432,6 +437,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -446,7 +452,7 @@
                   {
                     "field": "aws.metrics.UnHealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
-                    "type": "sum"
+                    "type": "max"
                   }
                 ],
                 "point_size": 0,
@@ -474,8 +480,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:24:16.077Z",
-      "version": "WzYzOCw5XQ=="
+      "updated_at": "2019-09-12T01:00:47.505Z",
+      "version": "WzIzOTYsN10="
     },
     {
       "attributes": {
@@ -526,6 +532,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -540,7 +547,7 @@
                   {
                     "field": "aws.metrics.HealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
-                    "type": "sum"
+                    "type": "max"
                   }
                 ],
                 "point_size": 0,
@@ -568,8 +575,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:24:30.551Z",
-      "version": "WzYzOSw5XQ=="
+      "updated_at": "2019-09-12T01:00:18.978Z",
+      "version": "WzIzOTMsN10="
     },
     {
       "attributes": {
@@ -590,6 +597,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -616,6 +624,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -658,8 +667,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:36:49.424Z",
-      "version": "WzY0Myw5XQ=="
+      "updated_at": "2019-09-12T02:23:16.083Z",
+      "version": "WzI0MTAsN10="
     },
     {
       "attributes": {
@@ -680,6 +689,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -706,6 +716,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -748,8 +759,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:28:25.630Z",
-      "version": "WzY0Miw5XQ=="
+      "updated_at": "2019-09-12T02:24:09.023Z",
+      "version": "WzI0MTQsN10="
     },
     {
       "attributes": {
@@ -770,6 +781,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -796,6 +808,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -839,8 +852,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:28:18.932Z",
-      "version": "WzY0MSw5XQ=="
+      "updated_at": "2019-09-12T02:22:28.366Z",
+      "version": "WzI0MDcsN10="
     },
     {
       "attributes": {
@@ -854,7 +867,7 @@
             }
           }
         },
-        "title": "AWS Region Filter",
+        "title": "Region Filter [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -897,8 +910,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-23T20:30:59.432Z",
-      "version": "WzMwMSwzXQ=="
+      "updated_at": "2019-09-12T00:55:22.007Z",
+      "version": "WzIwNjgsN10="
     },
     {
       "attributes": {
@@ -919,6 +932,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -945,6 +959,7 @@
             "id": "35d3cbc0-b3c6-11e9-bf3f-29d51aa3d971",
             "index_pattern": "metricbeat-*",
             "interval": "5m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -987,9 +1002,9 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T18:36:56.883Z",
-      "version": "WzY0NCw5XQ=="
+      "updated_at": "2019-09-12T02:23:38.069Z",
+      "version": "WzI0MTIsN10="
     }
   ],
-  "version": "7.2.0"
+  "version": "7.4.0"
 }

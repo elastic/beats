@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [1.1.0] - 2019-08-22
+
+### Added
+
+- Add `VMStat` interface for Linux. [#59](https://github.com/elastic/go-sysinfo/pull/59)
+
 ## [1.0.2] - 2019-07-09
 
 ### Fixed
@@ -51,6 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed the host containerized check to reduce false positives. [#42](https://github.com/elastic/go-sysinfo/pull/42) [#43](https://github.com/elastic/go-sysinfo/pull/43)
 
-[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/elastic/go-sysinfo/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.1.0
+[1.0.2]: https://github.com/elastic/go-sysinfo/releases/tag/v1.0.2
 [1.0.1]: https://github.com/elastic/go-sysinfo/releases/tag/v1.0.1
 [1.0.0]: https://github.com/elastic/go-sysinfo/releases/tag/v1.0.0

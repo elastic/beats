@@ -394,12 +394,21 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			Format:          reporterSettings.Format,
+			ClusterUUID:     reporterSettings.ClusterUUID,
 		}
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return err
 		}
 		defer reporter.Stop()
+
+		// Expose monitoring.cluster_uuid in state API
+		if reporterSettings.ClusterUUID != "" {
+			stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+			monitoringRegistry := stateRegistry.NewRegistry("monitoring")
+			clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
+			clusterUUIDRegVar.Set(reporterSettings.ClusterUUID)
+		}
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {

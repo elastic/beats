@@ -14,7 +14,6 @@ data:
         - /var/log/containers/*.log
       processors:
         - add_kubernetes_metadata:
-            in_cluster: true
             host: ${NODE_NAME}
             matchers:
             - logs_path:

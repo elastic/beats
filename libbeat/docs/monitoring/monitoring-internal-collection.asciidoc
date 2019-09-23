@@ -48,9 +48,13 @@ monitoring:
     password: somepassword
 --------------------
 +
-If you configured a different output, such as {ls} or you want to send {beatname_uc}
-monitoring events to a separate {es} cluster (referred to as the _monitoring cluster_),
-you must specify additional configuration options. For example:
+If you
+ifndef::only-elasticsearch[]
+configured a different output, such as {ls} or you
+endif::only-elasticsearch[]
+want to send {beatname_uc} monitoring events to a separate {es} cluster
+(referred to as the _monitoring cluster_), you must specify additional
+configuration options. For example:
 +
 ["source","yml",subs="attributes"]
 --------------------
@@ -65,12 +69,12 @@ monitoring:
 that are part of the monitoring cluster.
 
 ifndef::serverless[]
-. <<{beatname_lc}-starting,Start {beatname_uc}>>.
-endif::serverless[]
+. Start {beatname_uc}.
+endif::[]
 
 ifdef::serverless[]
-. <<{beatname_lc}-deploying,Deploy {beatname_uc}>>.
-endif::serverless[]
+. Deploy {beatname_uc}.
+endif::[]
 
 . {kibana-ref}/monitoring-data.html[View the monitoring data in {kib}]. 
 

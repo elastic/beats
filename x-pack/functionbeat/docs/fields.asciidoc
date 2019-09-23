@@ -364,6 +364,34 @@ example: 6.0.0-rc2
 --
 
 [float]
+=== as
+
+An autonomous system (AS) is a collection of connected Internet Protocol (IP) routing prefixes under the control of one or more network operators on behalf of a single administrative entity or domain that presents a common, clearly defined routing policy to the internet.
+
+
+*`as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+[float]
 === client
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
@@ -378,6 +406,28 @@ Some event client addresses are defined ambiguously. The event will sometimes li
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 type: keyword
+
+--
+
+*`client.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`client.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
 
 --
 
@@ -512,6 +562,28 @@ type: keyword
 
 --
 
+*`client.nat.ip`*::
++
+--
+Translated IP of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`client.nat.port`*::
++
+--
+Translated port of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`client.packets`*::
 +
 --
@@ -531,6 +603,16 @@ Port of the client.
 type: long
 
 format: string
+
+--
+
+*`client.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -764,6 +846,28 @@ type: keyword
 
 --
 
+*`destination.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`destination.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
 *`destination.bytes`*::
 +
 --
@@ -895,6 +999,28 @@ type: keyword
 
 --
 
+*`destination.nat.ip`*::
++
+--
+Translated ip of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`destination.nat.port`*::
++
+--
+Port the source session is translated to by NAT Device.
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`destination.packets`*::
 +
 --
@@ -914,6 +1040,16 @@ Port of the destination.
 type: long
 
 format: string
+
+--
+
+*`destination.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -982,6 +1118,198 @@ Short name or login of the user.
 type: keyword
 
 example: albert
+
+--
+
+[float]
+=== dns
+
+Fields describing DNS queries and answers.
+DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
+
+
+*`dns.answers`*::
++
+--
+An array containing an object for each answer section returned by the server.
+The main keys that should be present in these objects are defined by ECS. Records that have more information may contain more keys than what ECS defines.
+Not all DNS data sources give all details about DNS answers. At minimum, answer objects must contain the `data` key. If more information is available, map as much of it to ECS as possible, and add any additional fields to the answer objects as custom fields.
+
+type: object
+
+--
+
+*`dns.answers.class`*::
++
+--
+The class of DNS data contained in this resource record.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.answers.data`*::
++
+--
+The data describing the resource.
+The meaning of this data depends on the type and class of the resource record.
+
+type: keyword
+
+example: 10.10.10.10
+
+--
+
+*`dns.answers.name`*::
++
+--
+The domain name to which this resource record pertains.
+If a chain of CNAME is being resolved, each answer's `name` should be the one that corresponds with the answer's `data`. It should not simply be the original `question.name` repeated.
+
+type: keyword
+
+example: www.google.com
+
+--
+
+*`dns.answers.ttl`*::
++
+--
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
+
+type: long
+
+example: 180
+
+--
+
+*`dns.answers.type`*::
++
+--
+The type of data contained in this resource record.
+
+type: keyword
+
+example: CNAME
+
+--
+
+*`dns.header_flags`*::
++
+--
+Array of 2 letter DNS header flags.
+Expected values are: AA, TC, RD, RA, AD, CD, DO.
+
+type: keyword
+
+example: ['RD', 'RA']
+
+--
+
+*`dns.id`*::
++
+--
+The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
+
+type: keyword
+
+example: 62111
+
+--
+
+*`dns.op_code`*::
++
+--
+The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
+
+type: keyword
+
+example: QUERY
+
+--
+
+*`dns.question.class`*::
++
+--
+The class of of records being queried.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.question.name`*::
++
+--
+The name being queried.
+If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
+
+type: keyword
+
+example: www.google.com
+
+--
+
+*`dns.question.registered_domain`*::
++
+--
+The highest registered domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
+*`dns.question.type`*::
++
+--
+The type of record being queried.
+
+type: keyword
+
+example: AAAA
+
+--
+
+*`dns.resolved_ip`*::
++
+--
+Array containing all IPs seen in `answers.data`.
+The `answers` array can be difficult to use, because of the variety of data formats it can contain. Extracting all IP addresses seen in there to `dns.resolved_ip` makes it possible to index them as IP addresses, and makes them easier to visualize and query for.
+
+type: ip
+
+example: ['10.10.10.10', '10.10.10.11']
+
+--
+
+*`dns.response_code`*::
++
+--
+The DNS response code.
+
+type: keyword
+
+example: NOERROR
+
+--
+
+*`dns.type`*::
++
+--
+The type of DNS event captured, query or answer.
+If your source of DNS events only gives you DNS queries, you should only create dns events of type `dns.type:query`.
+If your source of DNS events gives you answers as well, you should create one event per query (optionally as soon as the query is seen). And a second event containing all query details as well as an array of answers.
+
+type: keyword
+
+example: answer
 
 --
 
@@ -1070,6 +1398,18 @@ example: user-management
 
 --
 
+*`event.code`*::
++
+--
+Identification code for this event, if one exists.
+Some event sources use event codes to identify messages unambiguously, regardless of message language or wording adjustments over time. An example of this is the Windows Event ID.
+
+type: keyword
+
+example: 4648
+
+--
+
 *`event.created`*::
 +
 --
@@ -1086,11 +1426,12 @@ type: date
 +
 --
 Name of the dataset.
-The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
+If an event source publishes more than one type of log or events (e.g. access log, error log), the dataset is used to specify which one the event comes from.
+It's recommended but not required to start the dataset name with the module name, followed by a dot, then the dataset name.
 
 type: keyword
 
-example: stats
+example: apache.access
 
 --
 
@@ -1153,11 +1494,11 @@ example: state
 +
 --
 Name of the module this data is coming from.
-This information is coming from the modules used in Beats or Logstash.
+If your monitoring agent supports the concept of modules or plugins to process events of a given source (e.g. Apache logs), `event.module` should contain the name of this module.
 
 type: keyword
 
-example: mysql
+example: apache
 
 --
 
@@ -1185,6 +1526,18 @@ example: success
 
 --
 
+*`event.provider`*::
++
+--
+Source of the event.
+Event transports such as Syslog or the Windows Event Log typically mention the source of an event. It can be the name of the software that generated the event (e.g. Sysmon, httpd), or of a subsystem of the operating system (kernel, Microsoft-Windows-Security-Auditing).
+
+type: keyword
+
+example: kernel
+
+--
+
 *`event.risk_score`*::
 +
 --
@@ -1201,6 +1554,18 @@ Normalized risk score or priority of the event, on a scale of 0 to 100.
 This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
 
 type: float
+
+--
+
+*`event.sequence`*::
++
+--
+Sequence number of the event.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regarless of the timestamp precision.
+
+type: long
+
+format: string
 
 --
 
@@ -1253,10 +1618,31 @@ A file is defined as a set of information that has been created on, or has exist
 File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
 
 
+*`file.accessed`*::
++
+--
+Last time the file was accessed.
+Note that not all filesystems keep track of access time.
+
+type: date
+
+--
+
+*`file.created`*::
++
+--
+File creation time.
+Note that not all filesystems store the creation time.
+
+type: date
+
+--
+
 *`file.ctime`*::
 +
 --
-Last time file metadata changed.
+Last time the file attributes or metadata changed.
+Note that changes to the file content will update `mtime`. This implies `ctime` will be adjusted at the same time, since `mtime` is an attribute of the file.
 
 type: date
 
@@ -1269,13 +1655,25 @@ Device that is the source of the file.
 
 type: keyword
 
+example: sda
+
+--
+
+*`file.directory`*::
++
+--
+Directory where the file is located.
+
+type: keyword
+
+example: /home/alice
+
 --
 
 *`file.extension`*::
 +
 --
 File extension.
-This should allow easy filtering by file extensions.
 
 type: keyword
 
@@ -1290,12 +1688,52 @@ Primary group ID (GID) of the file.
 
 type: keyword
 
+example: 1001
+
 --
 
 *`file.group`*::
 +
 --
 Primary group name of the file.
+
+type: keyword
+
+example: alice
+
+--
+
+*`file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha512`*::
++
+--
+SHA512 hash.
 
 type: keyword
 
@@ -1308,6 +1746,8 @@ Inode representing the file in the filesystem.
 
 type: keyword
 
+example: 256383
+
 --
 
 *`file.mode`*::
@@ -1317,16 +1757,27 @@ Mode of the file in octal representation.
 
 type: keyword
 
-example: 416
+example: 0640
 
 --
 
 *`file.mtime`*::
 +
 --
-Last time file content was modified.
+Last time the file content was modified.
 
 type: date
+
+--
+
+*`file.name`*::
++
+--
+Name of the file including the extension, without the directory.
+
+type: keyword
+
+example: example.png
 
 --
 
@@ -1337,23 +1788,30 @@ File owner's username.
 
 type: keyword
 
+example: alice
+
 --
 
 *`file.path`*::
 +
 --
-Path to the file.
+Full path to the file.
 
 type: keyword
+
+example: /home/alice/example.png
 
 --
 
 *`file.size`*::
 +
 --
-File size in bytes (field is only added when `type` is `file`).
+File size in bytes.
+Only relevant when `file.type` is "file".
 
 type: long
+
+example: 16384
 
 --
 
@@ -1373,6 +1831,8 @@ File type (file, dir, or symlink).
 
 type: keyword
 
+example: file
+
 --
 
 *`file.uid`*::
@@ -1381,6 +1841,8 @@ type: keyword
 The user ID (UID) or security identifier (SID) of the file owner.
 
 type: keyword
+
+example: 1001
 
 --
 
@@ -1500,6 +1962,49 @@ type: keyword
 +
 --
 Name of the group.
+
+type: keyword
+
+--
+
+[float]
+=== hash
+
+The hash fields represent different hash algorithms and their values.
+Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+
+
+*`hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`hash.sha512`*::
++
+--
+SHA512 hash.
 
 type: keyword
 
@@ -1738,6 +2243,27 @@ type: keyword
 
 --
 
+*`host.uptime`*::
++
+--
+Seconds the host has been up.
+
+type: long
+
+example: 1325
+
+--
+
+*`host.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
 *`host.user.email`*::
 +
 --
@@ -1948,6 +2474,17 @@ Some examples are `warn`, `error`, `i`.
 type: keyword
 
 example: err
+
+--
+
+*`log.logger`*::
++
+--
+The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name.
+
+type: keyword
+
+example: org.elasticsearch.bootstrap.Bootstrap
 
 --
 
@@ -2466,6 +3003,42 @@ example: /usr/bin/ssh
 
 --
 
+*`process.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
 *`process.name`*::
 +
 --
@@ -2475,6 +3048,17 @@ Sometimes called program name or similar.
 type: keyword
 
 example: ssh
+
+--
+
+*`process.pgid`*::
++
+--
+Identifier of the group of processes the process belongs to.
+
+type: long
+
+format: string
 
 --
 
@@ -2528,6 +3112,17 @@ format: string
 
 --
 
+*`process.thread.name`*::
++
+--
+Thread name.
+
+type: keyword
+
+example: thread-0
+
+--
+
 *`process.title`*::
 +
 --
@@ -2535,6 +3130,17 @@ Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
 type: keyword
+
+--
+
+*`process.uptime`*::
++
+--
+Seconds the process has been up.
+
+type: long
+
+example: 1325
 
 --
 
@@ -2581,6 +3187,28 @@ Some event server addresses are defined ambiguously. The event will sometimes li
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 type: keyword
+
+--
+
+*`server.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`server.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
 
 --
 
@@ -2715,6 +3343,28 @@ type: keyword
 
 --
 
+*`server.nat.ip`*::
++
+--
+Translated ip of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`server.nat.port`*::
++
+--
+Translated port of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`server.packets`*::
 +
 --
@@ -2734,6 +3384,16 @@ Port of the server.
 type: long
 
 format: string
+
+--
+
+*`server.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -2827,9 +3487,9 @@ example: 8a4f500f
 *`service.id`*::
 +
 --
-Unique identifier of the running service.
-This id should uniquely identify this service. This makes it possible to correlate logs and metrics for one specific service.
-Example: If you are experiencing issues with one redis instance, you can filter on that id to see metrics and logs for that single instance.
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
 
 type: keyword
 
@@ -2899,6 +3559,28 @@ Some event source addresses are defined ambiguously. The event will sometimes li
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 type: keyword
+
+--
+
+*`source.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`source.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
 
 --
 
@@ -3033,6 +3715,28 @@ type: keyword
 
 --
 
+*`source.nat.ip`*::
++
+--
+Translated ip of source based NAT sessions (e.g. internal client to internet)
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`source.nat.port`*::
++
+--
+Translated port of source based NAT sessions. (e.g. internal client to internet)
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
 *`source.packets`*::
 +
 --
@@ -3052,6 +3756,16 @@ Port of the source.
 type: long
 
 format: string
+
+--
+
+*`source.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
 
 --
 
@@ -3120,6 +3834,36 @@ Short name or login of the user.
 type: keyword
 
 example: albert
+
+--
+
+[float]
+=== tracing
+
+Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
+
+
+*`tracing.trace.id`*::
++
+--
+Unique identifier of the trace.
+A trace groups multiple events like transactions that belong together. For example, a user request handled by multiple inter-connected services.
+
+type: keyword
+
+example: 4bf92f3577b34da6a3ce929d0e0e4736
+
+--
+
+*`tracing.transaction.id`*::
++
+--
+Unique identifier of the transaction.
+A transaction is the highest level of work measured within a service, such as a request to a server.
+
+type: keyword
+
+example: 00f067aa0ba902b7
 
 --
 
@@ -3243,6 +3987,16 @@ type: keyword
 The user fields describe information about the user that is relevant to the event.
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
+
+*`user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
 
 *`user.email`*::
 +
@@ -3601,7 +4355,7 @@ type: keyword
 
 --
 
-*`kubernetes.labels`*::
+*`kubernetes.labels.*`*::
 +
 --
 Kubernetes labels map
@@ -3611,7 +4365,7 @@ type: object
 
 --
 
-*`kubernetes.annotations`*::
+*`kubernetes.annotations.*`*::
 +
 --
 Kubernetes annotations map

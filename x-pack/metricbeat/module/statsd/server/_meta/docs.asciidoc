@@ -1,0 +1,17 @@
+This is the server metricset of the statsd module.
+
+Events sent to the stats endpoint will be put by default under the `statsd` prefix.
+
+_ttl_ defines how long a metric will be reported after it was last recorded.
+Irrespective of the given ttl, metrics will be reported at least once.
+A ttl of zero means metrics will never expire.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+- module: statsd
+  metricsets: ["server"]
+  host: "localhost"
+  port: "8125"
+  #ttl: "30s"
+------------------------------------------------------------------------------
+

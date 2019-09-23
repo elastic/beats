@@ -25,12 +25,12 @@ import (
 
 type parseError struct {
 	field  string
-	time   string
+	time   interface{}
 	causes []error
 }
 
 func (e *parseError) Error() string {
-	return "failed parsing time field " + e.field + "='" + e.time + "'"
+	return fmt.Sprintf("failed parsing time field %v='%v'", e.field, e.time)
 }
 
 // Errors returns a list of parse errors. This implements the errorGroup

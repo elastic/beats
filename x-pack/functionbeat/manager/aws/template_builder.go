@@ -165,6 +165,15 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 		}
 	}
 
+	var tags []cloudformation.Tag
+	for name, val := range lambdaConfig.Tags {
+		tag := cloudformation.Tag{
+			Key:   name,
+			Value: val,
+		}
+		tags = append(tags, tag)
+	}
+
 	// Create the lambda
 	// Doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
 	template.Resources[prefix("")] = &AWSLambdaFunction{
@@ -190,6 +199,7 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 			MemorySize:                   lambdaConfig.MemorySize.Megabytes(),
 			ReservedConcurrentExecutions: lambdaConfig.Concurrency,
 			Timeout:                      int(lambdaConfig.Timeout.Seconds()),
+			Tags:                         tags,
 		},
 		DependsOn: dependsOn,
 	}

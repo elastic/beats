@@ -40,13 +40,27 @@ var (
 	patDigits = mustParse(`\d`)
 )
 
+func isRegular(r *syntax.Regexp) bool {
+	const irregular = syntax.FoldCase
+	return (r.Flags & irregular) == 0
+}
+
+func isRegularLiteral(r *syntax.Regexp) bool {
+	return r.Op == syntax.OpLiteral && isRegular(r)
+}
+
+func isSubstringLiteral(r *syntax.Regexp) bool {
+	return isRegularLiteral(r)
+}
+
 // isPrefixLiteral checks regular expression being literal checking string
 // starting with literal pattern (like '^PATTERN')
 func isPrefixLiteral(r *syntax.Regexp) bool {
 	return r.Op == syntax.OpConcat &&
 		len(r.Sub) == 2 &&
 		r.Sub[0].Op == syntax.OpBeginText &&
-		r.Sub[1].Op == syntax.OpLiteral
+		isRegularLiteral(r.Sub[1]) &&
+		isRegular(r)
 }
 
 func isAltLiterals(r *syntax.Regexp) bool {
@@ -55,10 +69,11 @@ func isAltLiterals(r *syntax.Regexp) bool {
 	}
 
 	for _, sub := range r.Sub {
-		if sub.Op != syntax.OpLiteral {
+		if !isRegularLiteral(sub) {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -66,8 +81,9 @@ func isExactLiteral(r *syntax.Regexp) bool {
 	return r.Op == syntax.OpConcat &&
 		len(r.Sub) == 3 &&
 		r.Sub[0].Op == syntax.OpBeginText &&
-		r.Sub[1].Op == syntax.OpLiteral &&
-		r.Sub[2].Op == syntax.OpEndText
+		isRegularLiteral(r.Sub[1]) &&
+		r.Sub[2].Op == syntax.OpEndText &&
+		isRegular(r)
 }
 
 func isOneOfLiterals(r *syntax.Regexp) bool {
@@ -90,7 +106,7 @@ func isPrefixAltLiterals(r *syntax.Regexp) bool {
 	}
 
 	for _, sub := range r.Sub[1].Sub {
-		if sub.Op != syntax.OpLiteral {
+		if !isRegularLiteral(sub) {
 			return false
 		}
 	}
@@ -103,7 +119,7 @@ func isPrefixNumDate(r *syntax.Regexp) bool {
 	}
 
 	i := 1
-	if r.Sub[i].Op == syntax.OpLiteral {
+	if isRegularLiteral(r.Sub[i]) {
 		i++
 	}
 
@@ -115,7 +131,7 @@ func isPrefixNumDate(r *syntax.Regexp) bool {
 
 	for i < len(r.Sub) {
 		// check separator
-		if r.Sub[i].Op != syntax.OpLiteral {
+		if !isRegularLiteral(r.Sub[i]) {
 			return false
 		}
 		i++

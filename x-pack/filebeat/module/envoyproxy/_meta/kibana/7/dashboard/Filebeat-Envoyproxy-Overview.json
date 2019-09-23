@@ -98,7 +98,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "Filebeat-Envoyproxy-Overview",
+        "title": "[Filebeat Envoyproxy] Overview",
         "version": 1
       },
       "id": "0c610510-5cbd-11e9-8477-077ec9664dbd",
@@ -316,7 +316,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "url.domain.keyword",
+                "field": "url.domain",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -431,7 +431,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "source.address.keyword",
+                "field": "source.address",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -594,7 +594,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "url.domain.keyword"
+                "field": "url.domain"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -730,7 +730,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "user_agent.name.keyword",
+                "field": "user_agent.name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -829,7 +829,7 @@
             }
           }
         },
-        "title": "Proxy Request Distribution [Filebeat Envoyproxy] ",
+        "title": "Proxy Request Distribution [Filebeat Envoyproxy]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -845,7 +845,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "envoyproxy.proxy_type.keyword",
+                "field": "envoyproxy.proxy_type",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",

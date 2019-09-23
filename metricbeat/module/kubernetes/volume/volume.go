@@ -18,6 +18,8 @@
 package volume
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -73,18 +75,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	body, err := m.http.FetchContent()
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error doing HTTP request to fetch 'volume' Metricset data")
 	}
 
 	events, err := eventMapping(body)
 	for _, e := range events {
-		reporter.Event(mb.Event{MetricSetFields: e})
+		isOpen := reporter.Event(mb.TransformMapStrToEvent("kubernetes", e, nil))
+		if !isOpen {
+			return nil
+		}
 	}
 
-	return
+	return nil
 }
