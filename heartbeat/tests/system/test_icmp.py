@@ -91,17 +91,15 @@ class Test(BaseTest):
                 proc = self.start_beat()
                 sys.stderr.write("STARTED BEAT\n")
                 sys.stderr.write("HAS GROUP OR ADMIN RIGHTS WAITING FOR HB\n")
-                time.sleep(25)
                 self.wait_until(lambda: self.log_contains("heartbeat is running"))
                 sys.stderr.write("CHECK WAIT %s\n")
                 proc.check_kill_and_wait()
             else:
                 sys.stderr.write("NO RIGHTS\n")
                 proc = self.start_beat()
-                time.sleep(25)
+                expected = "You dont have root permission to run ping"
+                self.wait_until(lambda: self.log_contains(expected))
                 sys.stderr.write("RAN IT\n")
-                assert self.log_contains(
-                    "You dont have root permission to run ping") is True
         else:
             sys.stderr.write("ON WINDOWS %s\n")
             # windows seems to allow all users to run sockets
