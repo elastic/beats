@@ -9,12 +9,8 @@ PREPARE_COMMAND?=
 # Runs test build for mock beat
 .PHONY: test
 test: prepare-test
-	. ${PYTHON_ENV}/bin/activate; \
-	export GOPATH=${PWD}/build ; \
-	export PATH=$${GOPATH}/bin:${PATH}; \
-	cd ${BEAT_PATH} ; \
-	${PREPARE_COMMAND} \
-	$(MAKE) update fmt || exit 1 ; \
+	cd ${GOPATH}/src/beatpath/testbeat ; \
+	export PATH=$${GOPATH}/bin:$${PATH}; \
 	git config user.email "beats-jenkins@test.com" || exit 1 ; \
 	git config user.name "beats-jenkins" || exit 1 ; \
 	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
@@ -22,17 +18,16 @@ test: prepare-test
 	$(MAKE) unit
 
 .PHONY: prepare-test
-prepare-test:: python-env
+prepare-test:: #python-env
 	# Makes sure to use current version of beats for testing
-	rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
-	git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
+	#rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
+	#git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
 	rm -fr ${BEAT_PATH}
 	mkdir -p ${BEAT_PATH}
-	cd ${PWD}/${BUILD_DIR}/src/github.com/elastic/beats/ ; \
+	cd ${GOPATH}/src/github.com/elastic/beats/ ; \
 	export MODULE=elastic ; \
 	export METRICSET=test ; \
 	export GO111MODULE=off; \
-	export GOPATH=${PWD}/build ; \
 	export NEWBEAT_PROJECT_NAME=Testbeat ; \
 	export NEWBEAT_GITHUB_NAME=ruflin ; \
 	export NEWBEAT_BEAT_PATH=beatpath/testbeat ; \
