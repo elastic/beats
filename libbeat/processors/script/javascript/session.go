@@ -23,6 +23,7 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -204,8 +205,25 @@ func (s *session) setEvent(b *beat.Event) error {
 }
 
 // runProcessFunc executes process() from the JS script.
-func (s *session) runProcessFunc(b *beat.Event) (*beat.Event, error) {
-	var err error
+func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			s.log.Errorw("The javascript processor caused an unexpected panic "+
+				"while processing an event. Recovering, but please report this.",
+				"event", common.MapStr{"original": b.Fields.String()},
+				"panic", r,
+				zap.Stack("stack"))
+			if !s.evt.IsCancelled() {
+				out = b
+			}
+			err = errors.Errorf("unexpected panic in javascript processor: %v", r)
+			if s.tagOnException != "" {
+				common.AddTags(b.Fields, []string{s.tagOnException})
+			}
+			appendString(b.Fields, "error.message", err.Error(), false)
+		}
+	}()
+
 	if err = s.setEvent(b); err != nil {
 		// Always return the event even if there was an error.
 		return b, err

@@ -102,6 +102,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
 - Fix case insensitive regular expressions not working correctly. {pull}13250[13250]
 - Disable `add_kubernetes_metadata` if no matchers found. {pull}13709[13709]
+- Recover from panics in the javascript process and log details about the failure to aid in future debugging. {pull}13690[13690]
 
 *Auditbeat*
 
