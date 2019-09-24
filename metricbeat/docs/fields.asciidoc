@@ -3897,7 +3897,14 @@ Network metrics.
 --
 type: keyword
 
+<<<<<<< HEAD
 Network interface name.
+=======
+deprecated:[6.4]
+
+Number of current reads per second
+
+>>>>>>> 9fcc834c4... [7.2][DOCS] Fix markup issues for asciidoctor migration (#13760)
 
 
 --
@@ -3946,7 +3953,14 @@ Total errors on incoming packets.
 --
 type: long
 
+<<<<<<< HEAD
 Total number of incoming packets.
+=======
+deprecated:[6.4]
+
+Number of current writes per second
+
+>>>>>>> 9fcc834c4... [7.2][DOCS] Fix markup issues for asciidoctor migration (#13760)
 
 
 --
@@ -3995,7 +4009,14 @@ Total errors on outgoing packets.
 --
 type: long
 
+<<<<<<< HEAD
 Total number of outgoing packets.
+=======
+deprecated:[6.4]
+
+Number of reads and writes per second
+
+>>>>>>> 9fcc834c4... [7.2][DOCS] Fix markup issues for asciidoctor migration (#13760)
 
 
 --
@@ -11040,7 +11061,7 @@ Consumer Group ID
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: keyword
 
@@ -11052,7 +11073,7 @@ Topic name
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -11167,7 +11188,7 @@ Partition data.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -11240,7 +11261,7 @@ Error code from fetching partition.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -11253,7 +11274,7 @@ topic error code.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: keyword
 
@@ -11266,7 +11287,7 @@ Topic name
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -11279,7 +11300,7 @@ Broker id
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: keyword
 
@@ -12873,7 +12894,7 @@ Container CPU requested cores
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: long
 
@@ -12886,7 +12907,7 @@ Container CPU nanocores limit
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: long
 
@@ -21033,7 +21054,7 @@ Number of client connections (excluding connections from slaves).
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 type: long
 
@@ -21056,7 +21077,7 @@ Longest output list among current client connections.
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 type: long
 
@@ -21652,7 +21673,7 @@ Number of connected slaves
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
