@@ -86,7 +86,7 @@ var (
 )
 
 func noPingCapabilityError(message string) error {
-	return errors.New(fmt.Sprintf("Insufficient privileges to perform ICMP ping. %s", message))
+	return fmt.Errorf(fmt.Sprintf("Insufficient privileges to perform ICMP ping. %s", message))
 }
 
 func newICMPLoop() (*icmpLoop, error) {
