@@ -18,7 +18,7 @@ Example configuration:
 {beatname_lc}.inputs:
 - type: redis
   hosts: ["localhost:6379"]
-  password: "$\{redis_pwd\}"
+  password: "${redis_pwd}"
 ----
 
 
