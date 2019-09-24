@@ -85,6 +85,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 					"metrics": common.MapStr{},
 				}
 
+				// Add default instance label if not already there
+				if exists, _ := promEvent.labels.HasKey("instance"); !exists {
+					promEvent.labels.Put("instance", m.Host())
+				}
 				// Add labels
 				if len(promEvent.labels) > 0 {
 					eventList[labelsHash]["labels"] = promEvent.labels
