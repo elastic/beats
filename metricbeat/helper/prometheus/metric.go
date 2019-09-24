@@ -195,6 +195,13 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 		return value
 	}
 
+	untyped := metric.GetUntyped()
+	if untyped != nil {
+		if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
+			return untyped.GetValue()
+		}
+	}
+
 	// Other types are not supported here
 	return nil
 }
