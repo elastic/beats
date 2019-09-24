@@ -32,8 +32,6 @@ import (
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type icmpLoop struct {
@@ -87,6 +85,10 @@ var (
 	loop     *icmpLoop
 )
 
+func noPingCapabilityError(message string) error {
+	return errors.New(fmt.Sprintf("Insufficient privileges to perform ICMP ping. %s", message))
+}
+
 func newICMPLoop() (*icmpLoop, error) {
 	// Log errors at info level, as the loop is setup globally when ICMP module is loaded
 	// first (not yet configured).
@@ -123,14 +125,14 @@ func newICMPLoop() (*icmpLoop, error) {
 		if unprivilegedPossible {
 			var buffer bytes.Buffer
 			path, _ := os.Executable()
-			buffer.WriteString("You dont have root permission to run ping. You can run without root by setting cap_net_raw:\n sudo setcap cap_net_raw+eip ")
+			buffer.WriteString("You can run without root by setting cap_net_raw:\n sudo setcap cap_net_raw+eip ")
 			buffer.WriteString(path + " \n")
 			buffer.WriteString("Your system allows the use of unprivileged ping by setting net.ipv4.ping_group_range \n sysctl -w net.ipv4.ping_group_range='<min-uid> <max-uid>' ")
-			logp.Info(buffer.String())
-		} else {
-			logp.Info("You don't have permission to run ping")
+			return nil, noPingCapabilityError(buffer.String())
 		}
+		return nil, noPingCapabilityError("You must provide the appropriate permissions to this executable")
 	}
+
 	return l, nil
 }
 
@@ -226,6 +228,7 @@ func (l *icmpLoop) ping(
 	timeout time.Duration,
 	interval time.Duration,
 ) (time.Duration, int, error) {
+	debugf("INVOKE PING")
 
 	var err error
 	toTimer := time.NewTimer(timeout)
@@ -296,6 +299,8 @@ func (l *icmpLoop) ping(
 	if !success {
 		return 0, requests, timeoutError{}
 	}
+
+	debugf("PING DONE %v", rtt)
 	return rtt, requests, nil
 }
 

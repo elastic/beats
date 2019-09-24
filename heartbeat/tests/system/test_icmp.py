@@ -9,51 +9,10 @@ from beat.beat import INTEGRATION_TESTS
 import nose.tools
 import logging
 import subprocess
+import time
 
 
 class Test(BaseTest):
-
-    def has_group_permission(self):
-
-        try:
-            runningUser = subprocess.check_output(['whoami']).strip()
-            runningGroups = subprocess.check_output(
-                ['id', '-G', runningUser]).strip()
-            runningGroups = runningGroups.split(" ")
-            runningGroups = map(int, runningGroups)
-            runningGroups.sort()
-            result = subprocess.check_output(
-                ['sysctl', 'net.ipv4.ping_group_range']).strip()
-            result = result.split("= ")
-            result = result[1].split("\t")
-            result = map(int, result)
-            firstGroup = result[0]
-            lastGroup = result[1]
-            if any(firstGroup == group for group in runningGroups):
-                return (True)
-            if any(lastGroup > group for group in runningGroups):
-                return (True)
-        except subprocess.CalledProcessError, e:
-            print "Error trying sysctl:\n", e.output
-
-        return (False)
-
-    def has_admin(self):
-        if os.name == 'nt':
-            try:
-                # only windows users with admin privileges can read the C:\windows\temp
-                temp = os.listdir(os.sep.join(
-                    [os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
-            except:
-                return (False)
-            else:
-                return (True)
-        else:
-            if 'SUDO_USER' in os.environ and os.geteuid() == 0:
-                return (True)
-            else:
-                return (False)
-
     def test_base(self):
         """
         Basic test with icmp root non privilege ICMP test.
@@ -65,7 +24,7 @@ class Test(BaseTest):
                 {
                     "type": "icmp",
                     "schedule": "*/5 * * * * * *",
-                    "hosts": ["8.8.8.8"],
+                    "hosts": ["127.0.0.1"],
                 }
             ]
         }
@@ -75,22 +34,19 @@ class Test(BaseTest):
             **config
         )
 
-        if platform.system() in ["Linux", "Darwin"]:
-            adminRights = self.has_admin()
-            groupRights = self.has_group_permission()
-            if groupRights == True or adminRights == True:
-                proc = self.start_beat()
-                self.wait_until(lambda: self.log_contains(
-                    "heartbeat is running"))
-                proc.check_kill_and_wait()
-            else:
-                exit_code = self.run_beat()
-                assert exit_code == 1
-                assert self.log_contains(
-                    "You dont have root permission to run ping") is True
+        proc = self.start_beat()
+
+        def has_started_message(): return self.log_contains("ICMP loop successfully initialized")
+
+        def has_failed_message(): return self.log_contains("Failed to initialize ICMP loop")
+
+        # We don't know if the system tests are running is configured to support or not support ping, but we can at least check that the ICMP loop
+        # was initiated. In the future we should start up VMs with the correct perms configured and be more specific. In addition to that
+        # we should run pings on those machines and make sure they work.
+        self.wait_until(lambda: has_started_message() or has_failed_message(), 30)
+
+        if has_failed_message():
+            proc.check_kill_and_wait(1)
         else:
-            # windows seems to allow all users to run sockets
-            proc = self.start_beat()
-            self.wait_until(lambda: self.log_contains(
-                "heartbeat is running"))
-            proc.check_kill_and_wait()
+            # Check that documents are moving through
+            self.wait_until(lambda: self.output_has(lines=1))
