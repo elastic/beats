@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build ibm
+
 package util
 
 import (
@@ -147,6 +149,8 @@ func connectLegacyMode(qmgrName string, cc ConnectionConfig) error {
 
 	err = InitConnection(qmgrName, "SYSTEM.DEFAULT.MODEL.QUEUE", &cc)
 
+	logp.Info("Ok to goooooo")
+
 	if err != nil {
 		return err
 	}
@@ -224,7 +228,11 @@ func CollectQmgrMetricset(eventType string, qmgrName string, cc ConnectionConfig
 	var err error
 	var events []beat.Event
 
-	connectLegacyMode(qmgrName, cc)
+	err = connectLegacyMode(qmgrName, cc)
+	if err != nil {
+		logp.Err("error establishing connection: %v", err)
+		return nil, err
+	}
 
 	qMgrMetadata, err := getQManagerMetadata(qmgrName)
 	if err != nil {
