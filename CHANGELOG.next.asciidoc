@@ -180,7 +180,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
 - When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 - Reuse connections in PostgreSQL metricsets. {issue}12504[12504] {pull}12603[12603]
-- PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.{issue}12590[12590]{pull}12622[12622]
+- PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function. {issue}12590[12590] {pull}12622[12622]
 - In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
 - Ramdisk is not filtered out when collecting disk performance counters in diskio metricset {issue}12814[12814] {pull}12829[12829]
 - Fix incoherent behaviour in redis key metricset when keyspace is specified both in host URL and key pattern {pull}12913[12913]
@@ -196,6 +196,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix reporting empty events in cloudwatch metricset. {pull}13458[13458]
 - Fix `docker.cpu.system.pct` calculation by using the reported number online cpus instead of the number of metrics per cpu. {pull}13691[13691]
 - Fix rds metricset dashboard. {pull}13721[13721]
+- Ignore prometheus untyped metrics with NaN value. {issue}13750[13750] {pull}13790[13790]
 
 *Packetbeat*
 
