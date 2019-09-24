@@ -234,6 +234,24 @@ func (m *MetricSet) Setup() (err error) {
 	m.templateVars.Update(archVariables)
 
 	//
+	// Detect IPv6 support
+	//
+
+	hasIPv6, err := detectIPv6()
+	if err != nil {
+		return errors.Wrap(err, "error detecting IPv6 support")
+	}
+	m.log.Debugf("IPv6 supported: %v", hasIPv6)
+	if m.config.EnableIPv6 != nil {
+		if *m.config.EnableIPv6 && !hasIPv6 {
+			return errors.New("requested IPv6 support but IPv6 is disabled in the system")
+		}
+		hasIPv6 = *m.config.EnableIPv6
+	}
+	m.log.Debugf("IPv6 enabled: %v", hasIPv6)
+	m.templateVars["HAS_IPV6"] = hasIPv6
+
+	//
 	// Create probe installer
 	//
 	extra := WithNoOp()
@@ -291,7 +309,7 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	// Make sure all the required kernel functions are available
 	//
-	for _, probeDef := range installKProbes {
+	for _, probeDef := range getKProbes(hasIPv6) {
 		probeDef = probeDef.ApplyTemplate(m.templateVars)
 		name := probeDef.Probe.Address
 		if !m.isKernelFunctionAvailable(name, functions) {
@@ -340,7 +358,7 @@ func (m *MetricSet) Setup() (err error) {
 	//
 	// Register Kprobes
 	//
-	for _, probeDef := range installKProbes {
+	for _, probeDef := range getKProbes(hasIPv6) {
 		format, decoder, err := m.installer.Install(probeDef)
 		if err != nil {
 			return errors.Wrapf(err, "unable to register probe %s", probeDef.Probe.String())
@@ -438,4 +456,15 @@ func (m mountPoint) unmount() error {
 
 func (m *mountPoint) String() string {
 	return m.fsType + " at " + m.path
+}
+
+func detectIPv6() (bool, error) {
+	loopback, err := helper.NewIPv6Loopback()
+	if err != nil {
+		return false, err
+	}
+	defer loopback.Cleanup()
+	_, err = loopback.AddRandomAddress()
+	// Assume that all failures for Add..() are caused by missing IPv6 support.
+	return err == nil, nil
 }

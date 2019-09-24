@@ -1,9 +1,12 @@
 import os
-import metricbeat
 import unittest
 from nose.plugins.attrib import attr
 import urllib2
 import time
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
@@ -83,7 +86,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
 
 class ApacheOldStatusTest(ApacheStatusTest):
 
-    COMPOSE_SERVICES = ['apache_2_4_12']
+    COMPOSE_BUILD_ARGS = {'APACHE_VERSION': '2.4.12'}
 
     def verify_fields(self, evt):
         self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())

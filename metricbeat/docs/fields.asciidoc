@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -1353,7 +1354,7 @@ type: keyword
 The number of outstanding IOs (read/write requests) waiting to access the disk.
 
 
-type: long
+type: float
 
 --
 
@@ -1525,7 +1526,7 @@ type: long
 The average number of commit operations per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1535,7 +1536,7 @@ type: long
 The average number of delete queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1545,7 +1546,7 @@ type: long
 The average number of DDL requests per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1555,7 +1556,7 @@ type: long
 The average number of inserts, updates, and deletes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1565,7 +1566,7 @@ type: long
 The average number of insert queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1575,7 +1576,7 @@ type: long
 The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1585,7 +1586,7 @@ type: long
 The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1595,7 +1596,7 @@ type: long
 The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1605,7 +1606,7 @@ type: long
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 --
 
@@ -1615,7 +1616,7 @@ type: long
 The average number of select queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1625,7 +1626,7 @@ type: long
 The average number of update queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1635,7 +1636,7 @@ type: long
 The average number of bytes written to disk per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1645,7 +1646,7 @@ type: long
 The amount of latency for commit operations, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1657,7 +1658,7 @@ format: duration
 The amount of latency for data definition language (DDL) requests, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1669,7 +1670,7 @@ format: duration
 The amount of latency for inserts, updates, and deletes, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1681,7 +1682,7 @@ format: duration
 The amount of latency for insert queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1693,7 +1694,7 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1705,7 +1706,7 @@ format: duration
 The amount of latency for select queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1717,7 +1718,7 @@ format: duration
 The amount of latency for update queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1729,7 +1730,7 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -2103,6 +2104,301 @@ SQS queue name
 
 
 type: keyword
+
+--
+
+[[exported-fields-azure]]
+== azure fields
+
+azure module
+
+
+
+[float]
+=== azure
+
+
+
+
+[float]
+=== compute_vm
+
+compute_vm
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== compute_vm_scaleset
+
+compute_vm_scaleset
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm_scaleset.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== monitor
+
+monitor
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.monitor.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.monitor.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.monitor.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.monitor.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.monitor.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
 
 --
 
@@ -4872,6 +5168,18 @@ format: percent
 
 --
 
+*`docker.cpu.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.kernel.ticks`*::
 +
 --
@@ -4886,6 +5194,18 @@ type: long
 +
 --
 Percentage of total CPU time in the system.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
 
 
 type: scaled_float
@@ -4916,6 +5236,18 @@ format: percent
 
 --
 
+*`docker.cpu.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.user.ticks`*::
 +
 --
@@ -4938,10 +5270,34 @@ format: percent
 
 --
 
+*`docker.cpu.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.core.*.pct`*::
 +
 --
 Percentage of CPU time in this core.
+
+
+type: object
+
+format: percent
+
+--
+
+*`docker.cpu.core.*.norm.pct`*::
++
+--
+Percentage of CPU time in this core, normalized by the number of CPU cores.
 
 
 type: object
@@ -5010,7 +5366,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current reads per second
 
@@ -5062,7 +5418,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current writes per second
 
@@ -5114,7 +5470,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of reads and writes per second
 
@@ -13771,7 +14127,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -13783,7 +14139,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition ID
 
@@ -13898,7 +14254,7 @@ Partition data.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition id.
 
@@ -13971,7 +14327,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 topic error code.
 
@@ -13984,7 +14340,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -13997,7 +14353,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker id
 
@@ -14010,7 +14366,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker address
 
@@ -16850,7 +17206,7 @@ type: float
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU nanocores limit
 
@@ -16863,7 +17219,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU requested nanocores
 
@@ -25910,7 +26266,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Longest output list among current client connections (replaced by max_output_buffer).
 
@@ -25933,7 +26289,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Biggest input buffer among current client connections (replaced by max_input_buffer).
 
@@ -26530,7 +26886,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 The server's current replication offset
 

@@ -13915,7 +13915,7 @@ Fields from the PostgreSQL log files.
 +
 --
 
-deprecated[7.3.0]
+deprecated:[7.3.0]
 
 The timestamp from the log line.
 
@@ -13937,6 +13937,7 @@ type: long
 --
 Name of database
 
+
 example: mydb
 
 --
@@ -13946,7 +13947,28 @@ example: mydb
 --
 Query statement.
 
+
 example: SELECT * FROM users;
+
+--
+
+*`postgresql.log.query_step`*::
++
+--
+Statement step when using extended query protocol (one of statement, parse, bind or execute)
+
+
+example: parse
+
+--
+
+*`postgresql.log.query_name`*::
++
+--
+Name given to a query when using extended query protocol. If it is "<unnamed>", or not present, this field is ignored.
+
+
+example: pdo_stmt_00000001
 
 --
 

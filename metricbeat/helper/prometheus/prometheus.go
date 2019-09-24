@@ -38,7 +38,7 @@ type Prometheus interface {
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
 
-	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2)
+	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
 
 type prometheus struct {
@@ -214,11 +214,10 @@ type infoMetricData struct {
 	Meta   common.MapStr
 }
 
-func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) {
+func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error {
 	events, err := p.GetProcessedMetrics(mapping)
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error getting processed metrics")
 	}
 	for _, event := range events {
 		r.Event(mb.Event{
@@ -226,6 +225,8 @@ func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.Report
 			Namespace:       mapping.Namespace,
 		})
 	}
+
+	return nil
 }
 
 func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {

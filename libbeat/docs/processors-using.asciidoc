@@ -94,7 +94,6 @@ collected by {beatname_uc}.
 * Under a specific {processor-scope}. The processor is applied to the data
 collected for that {processor-scope}.
 ifeval::["{beatname_lc}"=="filebeat"]
-For example:
 +
 [source,yaml]
 ------
@@ -111,6 +110,7 @@ Similarly, for {beatname_uc} modules, you can define processors under the
 `input` section of the module definition.
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
++
 [source,yaml]
 ----
 - module: <module_name>
@@ -123,7 +123,6 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -137,7 +136,6 @@ auditbeat.modules:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -164,7 +162,6 @@ packetbeat.flows:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -178,7 +175,6 @@ heartbeat.monitors:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -715,8 +711,8 @@ processors:
         with.dots: nested
       array:
         - do
-	- re
-	- with.field: mi
+        - re
+        - with.field: mi
 ------------------------------------------------------------------------------
 
 Adds these fields to every event:
@@ -1276,8 +1272,13 @@ section.
 === Add Kubernetes metadata
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
-metadata based on which Kubernetes pod the event originated from. Each event is
-annotated with:
+metadata based on which Kubernetes pod the event originated from.
+At startup it detects an `in_cluster` environment and caches the
+Kubernetes-related metadata. Events are only annotated if a valid configuration
+is detected. If it's not able to detect a valid Kubernetes configuration,
+the events are not annotated with Kubernetes-related metadata.
+
+Each event is annotated with:
 
 * Pod Name
 * Pod UID
@@ -1360,7 +1361,11 @@ case you want to specify your own.
 === Add Docker metadata
 
 The `add_docker_metadata` processor annotates each event with relevant metadata
-from Docker containers:
+from Docker containers. At startup it detects a docker environment and caches the metadata.
+The events are annotated with Docker metadata, only if a valid configuration
+is detected and the processor is able to reach Docker API.
+
+Each event is annotated with:
 
 * Container ID
 * Name
