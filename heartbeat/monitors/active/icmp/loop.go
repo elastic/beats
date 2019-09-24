@@ -130,6 +130,8 @@ func newICMPLoop() (*icmpLoop, error) {
 		} else {
 			logp.Info("You don't have permission to run ping")
 		}
+	} else {
+		logp.Info("You have the correct permissions to run ping")
 	}
 	return l, nil
 }
