@@ -1263,9 +1263,9 @@ Fields for azure Activity logs.
 
 
 [[exported-fields-azure]]
-== Decode CEF processor fields fields
+== Decode azure processor fields fields
 
-Common Event Format (CEF) data.
+Common Event Format (azure) data.
 
 
 [[exported-fields-beat-common]]

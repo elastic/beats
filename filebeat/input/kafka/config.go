@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
-type kafkaInputConfig struct {
+type KafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
 	Hosts          []string          `config:"hosts" validate:"required"`
 	Topics         []string          `config:"topics" validate:"required"`
@@ -103,8 +103,8 @@ var (
 
 // The default config for the kafka input. When in doubt, default values
 // were chosen to match sarama's defaults.
-func defaultConfig() kafkaInputConfig {
-	return kafkaInputConfig{
+func DefaultConfig() KafkaInputConfig {
+	return KafkaInputConfig{
 		Version:        kafka.Version("1.0.0"),
 		InitialOffset:  initialOffsetOldest,
 		ClientID:       "filebeat",
@@ -128,7 +128,7 @@ func defaultConfig() kafkaInputConfig {
 }
 
 // Validate validates the config.
-func (c *kafkaInputConfig) Validate() error {
+func (c *KafkaInputConfig) Validate() error {
 	if len(c.Hosts) == 0 {
 		return errors.New("no hosts configured")
 	}
@@ -143,7 +143,7 @@ func (c *kafkaInputConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
+func NewSaramaConfig(config KafkaInputConfig) (*sarama.Config, error) {
 	k := sarama.NewConfig()
 
 	version, ok := config.Version.Get()

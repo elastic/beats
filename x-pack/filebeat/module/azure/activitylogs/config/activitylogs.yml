@@ -1,0 +1,13 @@
+type: azure
+hosts: {{ .eventhubs_namespace }}
+topics: {{ .topics }}
+group_id: {{ .consumer_group }}
+
+username: "$ConnectionString"
+password: {{ .connection_string }}
+ssl.enabled: true
+
+processors:
+- decode_json_fields:
+    fields: ["message"]
+    target: "activitylogs"

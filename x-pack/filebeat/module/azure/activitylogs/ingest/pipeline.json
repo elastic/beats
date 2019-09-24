@@ -2,16 +2,6 @@
   "description": "Pipeline for parsing azure activity logs.",
   "processors": [
     {
-    "foreach": {
-      "field": "records",
-      "processor" : {
-        "uppercase" : {
-          "field" : "_ingest._value.category"
-        }
-      }
-    }
-  },
-    {
       "remove": {
         "field":"message",
         "ignore_missing": true

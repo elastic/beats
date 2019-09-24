@@ -10,10 +10,11 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"github.com/elastic/beats/libbeat/common"
 	"io"
 	"os"
 	"sort"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/pkg/errors"
 )

@@ -8,6 +8,7 @@ package include
 
 import (
 	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/x-pack/filebeat/input/azure"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/googlepubsub"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/x-pack/filebeat/input/s3"
@@ -26,6 +27,5 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/rabbitmq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/zeek"
-	_ "github.com/elastic/beats/x-pack/filebeat/processors/decode_azure"
 	_ "github.com/elastic/beats/x-pack/filebeat/processors/decode_cef"
 )

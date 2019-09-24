@@ -1,28 +1,18 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
-package kafka
+package azure
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
+
+	kafka2 "github.com/elastic/beats/filebeat/input/kafka"
 
 	"github.com/Shopify/sarama"
 
@@ -38,15 +28,15 @@ import (
 )
 
 func init() {
-	err := input.Register("kafka", NewInput)
+	err := input.Register("azure", NewInput)
 	if err != nil {
 		panic(err)
 	}
 }
 
 // Input contains the input and its config
-type kafkaInput struct {
-	config          KafkaInputConfig
+type azureInput struct {
+	config          kafka2.KafkaInputConfig
 	saramaConfig    *sarama.Config
 	context         input.Context
 	outlet          channel.Outleter
@@ -62,7 +52,7 @@ func NewInput(
 	inputContext input.Context,
 ) (input.Input, error) {
 
-	config := DefaultConfig()
+	config := kafka2.DefaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading kafka input config")
 	}
@@ -85,12 +75,12 @@ func NewInput(
 		return nil, err
 	}
 
-	saramaConfig, err := NewSaramaConfig(config)
+	saramaConfig, err := kafka2.NewSaramaConfig(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initializing Sarama config")
 	}
 
-	input := &kafkaInput{
+	input := &azureInput{
 		config:       config,
 		saramaConfig: saramaConfig,
 		context:      inputContext,
@@ -101,7 +91,7 @@ func NewInput(
 	return input, nil
 }
 
-func (input *kafkaInput) runConsumerGroup(
+func (input *azureInput) runConsumerGroup(
 	context context.Context, consumerGroup sarama.ConsumerGroup,
 ) {
 	handler := &groupHandler{
@@ -129,7 +119,7 @@ func (input *kafkaInput) runConsumerGroup(
 }
 
 // Run starts the input by scanning for incoming messages and errors.
-func (input *kafkaInput) Run() {
+func (input *azureInput) Run() {
 	input.runOnce.Do(func() {
 		go func() {
 			// Sarama uses standard go contexts to control cancellation, so we need
@@ -171,14 +161,14 @@ func (input *kafkaInput) Run() {
 // input's outlet both have a context based on input.context.Done and will
 // shut themselves down, since the done channel is already closed as part of
 // the shutdown process in Runner.Stop().
-func (input *kafkaInput) Stop() {
+func (input *azureInput) Stop() {
 }
 
 // Wait should shut down the input and wait for it to complete, however (see
 // Stop above) we don't need to take actions to shut down as long as the
 // input.config.Done channel is closed, so we just make a (currently no-op)
 // call to Stop() and then wait for sarama to signal completion.
-func (input *kafkaInput) Wait() {
+func (input *azureInput) Wait() {
 	input.Stop()
 	// Wait for sarama to shut down
 	input.saramaWaitGroup.Wait()
@@ -247,7 +237,7 @@ func (h *groupHandler) createEvent(
 	sess sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
-) beat.Event {
+) []beat.Event {
 	timestamp := time.Now()
 	kafkaFields := common.MapStr{
 		"topic":     claim.Topic(),
@@ -266,19 +256,49 @@ func (h *groupHandler) createEvent(
 	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
 		kafkaFields["headers"] = arrayForKafkaHeaders(message.Headers)
 	}
-	event := beat.Event{
-		Timestamp: timestamp,
-		Fields: common.MapStr{
-			"message": string(message.Value),
-			"kafka":   kafkaFields,
-		},
-		Private: eventMeta{
-			handler: h,
-			message: message,
-		},
+	list := parseMultipleMessages(message.Value)
+	var events []beat.Event
+	for _, messageItem := range list {
+		event := beat.Event{
+			Timestamp: timestamp,
+			Fields: common.MapStr{
+				"message": messageItem,
+				"azure":   kafkaFields,
+			},
+			Private: eventMeta{
+				handler: h,
+				message: message,
+			},
+		}
+		events = append(events, event)
 	}
 
-	return event
+	return events
+}
+
+func parseMultipleMessages(bMessage []byte) []string {
+	var messages []string
+	originalMessage := []string{string(bMessage)}
+	if !json.Valid(bMessage) {
+		return originalMessage
+	}
+	var obj common.MapStr
+	err := json.Unmarshal(bMessage, &obj)
+	if err != nil {
+		return originalMessage
+	}
+	if obj["records"] != nil && len(obj["records"].([]interface{})) > 0 {
+		msgs := obj["records"].([]interface{})
+		for _, ms := range msgs {
+			js, err := json.Marshal(ms)
+			if err != nil {
+				return originalMessage
+			}
+			messages = append(messages, string(js))
+		}
+		return messages
+	}
+	return originalMessage
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -307,8 +327,10 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 
 func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		event := h.createEvent(sess, claim, msg)
-		h.outlet.OnEvent(event)
+		events := h.createEvent(sess, claim, msg)
+		for _, event := range events {
+			h.outlet.OnEvent(event)
+		}
 	}
 	return nil
 }

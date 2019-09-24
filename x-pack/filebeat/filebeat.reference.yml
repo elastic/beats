@@ -92,6 +92,11 @@ filebeat.modules:
   # All logs
   activitylogs:
     enabled: true
+    var:
+      eventhubs_namespace: ""
+      topics: ["insights-operational-logs"]
+      consumer_group: "$Default"
+      connection_string: ""
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

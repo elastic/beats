@@ -2,7 +2,11 @@ module_version: 1.0
 
 var:
   - name: input
-    default: kafka
+    default: azure
+  - name: topics
+    default: "insights-operational-logs"
+  - name: consumer_group
+    default: "$Default"
 
 ingest_pipeline: ingest/pipeline.json
-input: config/kafka.yml
+input: config/activitylogs.yml
