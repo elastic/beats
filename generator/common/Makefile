@@ -18,7 +18,7 @@ test: prepare-test
 	$(MAKE) unit
 
 .PHONY: prepare-test
-prepare-test:: #python-env
+prepare-test:: mage-setup
 	# Makes sure to use current version of beats for testing
 	#rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
 	#git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
@@ -46,6 +46,13 @@ test-build: test
 	cd ${BEAT_PATH}/dev-tools/packer ; \
 	$(MAKE) deps ; \
 	$(MAKE) images
+
+.PHONY: mage-setup
+mage-setup: ${GOPATH}/bin/mage
+	go get -u -d github.com/magefile/mage
+	cd $${GOPATH}/src/github.com/magefile/mage;  \
+	go run bootstrap.go
+
 
 # Sets up the virtual python environment
 .PHONY: python-env
