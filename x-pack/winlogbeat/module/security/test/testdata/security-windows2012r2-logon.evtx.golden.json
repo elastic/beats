@@ -1,0 +1,1323 @@
+[
+  {
+    "@timestamp": "2019-03-29T21:10:39.7868321Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 536
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1535,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:10:40.2555609Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 556
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1538,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:10:40.3805426Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t2\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-3541430928-2051711210-1391384369-1001\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\tLogon ID:\t\t0x1008E\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1c0\n\tProcess Name:\t\tC:\\Windows\\System32\\winlogon.exe\n\nNetwork Information:\n\tWorkstation Name:\tVAGRANT-2012-R2\n\tSource Network Address:\t127.0.0.1\n\tSource Port:\t\t0\n\nDetailed Authentication Information:\n\tLogon Process:\t\tUser32 \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\winlogon.exe",
+      "name": "winlogon.exe",
+      "pid": 448
+    },
+    "source": {
+      "domain": "VAGRANT-2012-R2",
+      "ip": "127.0.0.1",
+      "port": 0
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "User32 ",
+        "LogonType": "2",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x1008e",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x1008e"
+        ],
+        "type": "Interactive"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 556
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1542,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:10:40.5055514Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 556
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1545,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:10:40.6305447Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\t-\n\tAccount Domain:\t\t-\n\tLogon ID:\t\t0x0\n\nLogon Type:\t\t\t3\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-7\n\tAccount Name:\t\tANONYMOUS LOGON\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x129F1\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x0\n\tProcess Name:\t\t-\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tNtLmSsp \n\tAuthentication Package:\tNTLM\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\tNTLM V1\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "-",
+      "name": "-",
+      "pid": 0
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-7",
+      "name": "ANONYMOUS LOGON"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "NTLM",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "NTLM V1",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "NtLmSsp ",
+        "LogonType": "3",
+        "SubjectDomainName": "-",
+        "SubjectLogonId": "0x0",
+        "SubjectUserName": "-",
+        "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x129f1",
+        "TargetUserName": "ANONYMOUS LOGON",
+        "TargetUserSid": "S-1-5-7",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x129f1"
+        ],
+        "type": "Network"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 556
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1547,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:10:53.6617957Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\t-\n\tAccount Domain:\t\t-\n\tLogon ID:\t\t0x0\n\nLogon Type:\t\t\t3\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-3541430928-2051711210-1391384369-1001\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\tLogon ID:\t\t0x28D31\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x0\n\tProcess Name:\t\t-\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tNtLmSsp \n\tAuthentication Package:\tNTLM\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\tNTLM V2\n\tKey Length:\t\t128\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "-",
+      "name": "-",
+      "pid": 0
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "NTLM",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "128",
+        "LmPackageName": "NTLM V2",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "NtLmSsp ",
+        "LogonType": "3",
+        "SubjectDomainName": "-",
+        "SubjectLogonId": "0x0",
+        "SubjectUserName": "-",
+        "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x28d31",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x28d31"
+        ],
+        "type": "Network"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 556
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1550,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:10:54.6618303Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\t-\n\tAccount Domain:\t\t-\n\tLogon ID:\t\t0x0\n\nLogon Type:\t\t\t3\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-3541430928-2051711210-1391384369-1001\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\tLogon ID:\t\t0x29F0F\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x0\n\tProcess Name:\t\t-\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tNtLmSsp \n\tAuthentication Package:\tNTLM\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\tNTLM V2\n\tKey Length:\t\t128\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "-",
+      "name": "-",
+      "pid": 0
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "NTLM",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "128",
+        "LmPackageName": "NTLM V2",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "NtLmSsp ",
+        "LogonType": "3",
+        "SubjectDomainName": "-",
+        "SubjectLogonId": "0x0",
+        "SubjectUserName": "-",
+        "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x29f0f",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x29f0f"
+        ],
+        "type": "Network"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 548
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1553,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:10:55.4587259Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\t-\n\tAccount Domain:\t\t-\n\tLogon ID:\t\t0x0\n\nLogon Type:\t\t\t3\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-3541430928-2051711210-1391384369-1001\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\tLogon ID:\t\t0x2A362\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x0\n\tProcess Name:\t\t-\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tNtLmSsp \n\tAuthentication Package:\tNTLM\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\tNTLM V2\n\tKey Length:\t\t128\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "-",
+      "name": "-",
+      "pid": 0
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "NTLM",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "128",
+        "LmPackageName": "NTLM V2",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "NtLmSsp ",
+        "LogonType": "3",
+        "SubjectDomainName": "-",
+        "SubjectLogonId": "0x0",
+        "SubjectUserName": "-",
+        "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x2a362",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x2a362"
+        ],
+        "type": "Network"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 548
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1556,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:13:17.3025591Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\t-\n\tAccount Domain:\t\t-\n\tLogon ID:\t\t0x0\n\nLogon Type:\t\t\t3\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-3541430928-2051711210-1391384369-1001\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\tLogon ID:\t\t0x324F8\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x0\n\tProcess Name:\t\t-\n\nNetwork Information:\n\tWorkstation Name:\t127.0.0.1\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tNtLmSsp \n\tAuthentication Package:\tNTLM\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\tNTLM V2\n\tKey Length:\t\t128\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "-",
+      "name": "-",
+      "pid": 0
+    },
+    "source": {
+      "domain": "127.0.0.1"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "NTLM",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "128",
+        "LmPackageName": "NTLM V2",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "NtLmSsp ",
+        "LogonType": "3",
+        "SubjectDomainName": "-",
+        "SubjectLogonId": "0x0",
+        "SubjectUserName": "-",
+        "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x324f8",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x324f8"
+        ],
+        "type": "Network"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 808
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1561,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:13:17.5213056Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t2\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-90-2\n\tAccount Name:\t\tDWM-2\n\tAccount Domain:\t\tWindow Manager\n\tLogon ID:\t\t0x33444\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0xafc\n\tProcess Name:\t\tC:\\Windows\\System32\\winlogon.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\winlogon.exe",
+      "name": "winlogon.exe",
+      "pid": 2812
+    },
+    "user": {
+      "domain": "Window Manager",
+      "id": "S-1-5-90-2",
+      "name": "DWM-2"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "2",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "Window Manager",
+        "TargetLogonId": "0x33444",
+        "TargetUserName": "DWM-2",
+        "TargetUserSid": "S-1-5-90-2",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x33444"
+        ],
+        "type": "Interactive"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 548
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1563,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:13:17.6149946Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t10\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-3541430928-2051711210-1391384369-1001\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\tLogon ID:\t\t0x3444F\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0xafc\n\tProcess Name:\t\tC:\\Windows\\System32\\winlogon.exe\n\nNetwork Information:\n\tWorkstation Name:\tVAGRANT-2012-R2\n\tSource Network Address:\t10.0.2.2\n\tSource Port:\t\t0\n\nDetailed Authentication Information:\n\tLogon Process:\t\tUser32 \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\winlogon.exe",
+      "name": "winlogon.exe",
+      "pid": 2812
+    },
+    "source": {
+      "domain": "VAGRANT-2012-R2",
+      "ip": "10.0.2.2",
+      "port": 0
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "User32 ",
+        "LogonType": "10",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x3444f",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x3444f"
+        ],
+        "type": "RemoteInteractive"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 808
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1567,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:13:18.7869259Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t2\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-90-3\n\tAccount Name:\t\tDWM-3\n\tAccount Domain:\t\tWindow Manager\n\tLogon ID:\t\t0x357FD\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x88c\n\tProcess Name:\t\tC:\\Windows\\System32\\winlogon.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\winlogon.exe",
+      "name": "winlogon.exe",
+      "pid": 2188
+    },
+    "user": {
+      "domain": "Window Manager",
+      "id": "S-1-5-90-3",
+      "name": "DWM-3"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "2",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "Window Manager",
+        "TargetLogonId": "0x357fd",
+        "TargetUserName": "DWM-3",
+        "TargetUserSid": "S-1-5-90-3",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x357fd"
+        ],
+        "type": "Interactive"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 556
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1570,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:20:48.7402309Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 1132
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1574,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:20:48.7402309Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 1132
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1576,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:20:50.5840151Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 504
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1578,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:23:42.5201798Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 1132
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1581,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:26:24.1764267Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4624,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "type": "authentication_success"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account was successfully logged on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tVAGRANT-2012-R2$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nLogon Type:\t\t\t5\n\nImpersonation Level:\t\tImpersonation\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tSYSTEM\n\tAccount Domain:\t\tNT AUTHORITY\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t\t{00000000-0000-0000-0000-000000000000}\n\nProcess Information:\n\tProcess ID:\t\t0x1fc\n\tProcess Name:\t\tC:\\Windows\\System32\\services.exe\n\nNetwork Information:\n\tWorkstation Name:\t\n\tSource Network Address:\t-\n\tSource Port:\t\t-\n\nDetailed Authentication Information:\n\tLogon Process:\t\tAdvapi  \n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon session is created. It is generated on the computer that was accessed.\n\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\n\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\n\nThe network fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe impersonation level field indicates the extent to which a process in the logon session can impersonate.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Logon GUID is a unique identifier that can be used to correlate this event with a KDC event.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\services.exe",
+      "name": "services.exe",
+      "pid": 508
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "ImpersonationLevel": "%%1833",
+        "IpAddress": "-",
+        "IpPort": "-",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "LogonProcessName": "Advapi  ",
+        "LogonType": "5",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "VAGRANT-2012-R2$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4624,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 344
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1583,
+      "task": "Logon",
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2019-03-29T21:45:35.177054Z",
+    "event": {
+      "action": "Logon",
+      "category": "authentication",
+      "code": 4625,
+      "kind": "event",
+      "module": "security",
+      "outcome": "failure",
+      "type": "authentication_failure"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An account failed to log on.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-3541430928-2051711210-1391384369-1001\n\tAccount Name:\t\tvagrant\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\tLogon ID:\t\t0x1008E\n\nLogon Type:\t\t\t2\n\nAccount For Which Logon Failed:\n\tSecurity ID:\t\tS-1-0-0\n\tAccount Name:\t\tbosch\n\tAccount Domain:\t\tVAGRANT-2012-R2\n\nFailure Information:\n\tFailure Reason:\t\tUnknown user name or bad password.\n\tStatus:\t\t\t0xC000006D\n\tSub Status:\t\t0xC0000064\n\nProcess Information:\n\tCaller Process ID:\t0x344\n\tCaller Process Name:\tC:\\Windows\\System32\\svchost.exe\n\nNetwork Information:\n\tWorkstation Name:\tVAGRANT-2012-R2\n\tSource Network Address:\t::1\n\tSource Port:\t\t0\n\nDetailed Authentication Information:\n\tLogon Process:\t\tseclogo\n\tAuthentication Package:\tNegotiate\n\tTransited Services:\t-\n\tPackage Name (NTLM only):\t-\n\tKey Length:\t\t0\n\nThis event is generated when a logon request fails. It is generated on the computer where access was attempted.\n\nThe Subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\n\nThe Logon Type field indicates the kind of logon that was requested. The most common types are 2 (interactive) and 3 (network).\n\nThe Process Information fields indicate which account and process on the system requested the logon.\n\nThe Network Information fields indicate where a remote logon request originated. Workstation name is not always available and may be left blank in some cases.\n\nThe authentication information fields provide detailed information about this specific logon request.\n\t- Transited services indicate which intermediate services have participated in this logon request.\n\t- Package name indicates which sub-protocol was used among the NTLM protocols.\n\t- Key length indicates the length of the generated session key. This will be 0 if no session key was requested.",
+    "process": {
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 836
+    },
+    "source": {
+      "domain": "VAGRANT-2012-R2",
+      "ip": "::1",
+      "port": 0
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-0-0",
+      "name": "bosch"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuthenticationPackageName": "Negotiate",
+        "FailureReason": "%%2313",
+        "KeyLength": "0",
+        "LmPackageName": "-",
+        "LogonProcessName": "seclogo",
+        "LogonType": "2",
+        "Status": "0xc000006d",
+        "SubStatus": "0xc0000064",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1008e",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetUserName": "bosch",
+        "TargetUserSid": "S-1-0-0",
+        "TransmittedServices": "-"
+      },
+      "event_id": 4625,
+      "keywords": [
+        "Audit Failure"
+      ],
+      "logon": {
+        "failure": {
+          "reason": "Unknown user name or bad password.",
+          "status": "This is either due to a bad username or authentication information",
+          "sub_status": "User logon with misspelled or bad user account"
+        },
+        "id": "0x1008e",
+        "type": "Interactive"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 516,
+        "thread": {
+          "id": 2756
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1585,
+      "task": "Logon"
+    }
+  }
+]

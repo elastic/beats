@@ -29,9 +29,9 @@ include::./getting-started.asciidoc[]
 
 include::{libbeat-dir}/docs/repositories.asciidoc[]
 
-include::./breaking.asciidoc[]
-
 include::./setting-up-running.asciidoc[]
+
+include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 

@@ -47,7 +47,7 @@ func (r *RunnerFactory) Create(
 	c *common.Config,
 	meta *common.MapStrPointer,
 ) (cfgfile.Runner, error) {
-	connector := channel.ConnectTo(pipeline, r.outlet)
+	connector := r.outlet(pipeline)
 	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), meta)
 	if err != nil {
 		// In case of error with loading state, input is still returned
@@ -55,10 +55,4 @@ func (r *RunnerFactory) Create(
 	}
 
 	return p, nil
-}
-
-// CheckConfig checks if a config is valid or not
-func (r *RunnerFactory) CheckConfig(config *common.Config) error {
-	// TODO: add code here once we know that spinning up a filebeat input to check for errors doesn't cause memory leaks.
-	return nil
 }

@@ -150,6 +150,15 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
 
+    - os: osx
+      env: TARGETS="-C generator/metricbeat test"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="-C generator/beat test"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
     # Docs
     - os: linux
       env: TARGETS="docs"

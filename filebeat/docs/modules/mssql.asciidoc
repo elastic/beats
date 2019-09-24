@@ -1,0 +1,65 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-mssql]]
+:modulename: mssql
+:has-dashboards: false
+
+== MSSQL module
+
+The +{modulename}+ module parses error logs created by MSSQL.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+include::../include/running-modules.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for Træfik logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: mssql
+  access:
+    enabled: true
+    var.paths: ["/var/opt/mssql/log/error*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "mssql.access.var.paths=[/var/opt/mssql/log/error*]"
+-----
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-mssql,exported fields>> section.
+

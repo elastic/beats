@@ -90,10 +90,11 @@ For data relevant to security analytics, {filebeat} adds a
 {filebeat-ref}/filebeat-module-zeek.html[Zeek] module that integrates with the
 popular open-source Zeek project, formerly known as Bro, and a
 {filebeat-ref}/filebeat-module-santa.html[Santa] module, which tracks process
-executions on macOS. These modules add to the list of modules added already in
-the 6.x series, including {filebeat-ref}/filebeat-module-suricata.html[Suricata],
+executions on macOS. These modules add to the list of data sources already
+supported in the 6.x series, including
+{filebeat-ref}/filebeat-module-suricata.html[Suricata],
 {filebeat-ref}/filebeat-module-iptables.html[IPtables], and
-{filebeat-ref}/filebeat-module-netflow.html[NetFlow].
+{filebeat-ref}/filebeat-input-netflow.html[NetFlow].
 
 In addition, the {auditbeat}
 {auditbeat-ref}/auditbeat-module-system.html[system] module keeps improving, and

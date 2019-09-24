@@ -134,13 +134,15 @@ var errorNames = map[uint32]string{
 }
 
 type ServiceStatus struct {
-	DisplayName  string
-	ServiceName  string
-	CurrentState string
-	StartType    ServiceStartType
-	PID          uint32 // ID of the associated process.
-	Uptime       time.Duration
-	ExitCode     uint32 // Exit code for stopped services.
+	DisplayName      string
+	ServiceName      string
+	CurrentState     string
+	StartType        ServiceStartType
+	PID              uint32 // ID of the associated process.
+	Uptime           time.Duration
+	ExitCode         uint32 // Exit code for stopped services.
+	ServiceStartName string
+	BinaryPathName   string
 }
 
 type ServiceReader struct {
@@ -373,6 +375,21 @@ func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatu
 		}
 		serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
 		service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
+		serviceStartNameOffset := uintptr(unsafe.Pointer(serviceQueryConfig.LpServiceStartName)) - (uintptr)(unsafe.Pointer(&buffer[0]))
+		binaryPathNameOffset := uintptr(unsafe.Pointer(serviceQueryConfig.LpBinaryPathName)) - (uintptr)(unsafe.Pointer(&buffer[0]))
+
+		strBuf := new(bytes.Buffer)
+		if err := sys.UTF16ToUTF8Bytes(buffer[serviceStartNameOffset:], strBuf); err != nil {
+			return err
+		}
+		service.ServiceStartName = strBuf.String()
+
+		strBuf.Reset()
+		if err := sys.UTF16ToUTF8Bytes(buffer[binaryPathNameOffset:], strBuf); err != nil {
+			return err
+		}
+		service.BinaryPathName = strBuf.String()
+
 		break
 	}
 
@@ -476,6 +493,8 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 			"name":         service.ServiceName,
 			"state":        service.CurrentState,
 			"start_type":   service.StartType.String(),
+			"start_name":   service.ServiceStartName,
+			"path_name":    service.BinaryPathName,
 		}
 
 		if service.CurrentState == "Stopped" {

@@ -25,12 +25,6 @@ When you run the module, it performs a few tasks under the hood:
 
 * Deploys dashboards for visualizing the log data.
 
-[float]
-=== Compatibility
-
-This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
-Elasticsearch plugins.
-
 include::../include/running-modules.asciidoc[]
 
 [float]
@@ -69,6 +63,19 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to `9001`
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

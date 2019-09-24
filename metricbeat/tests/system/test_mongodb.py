@@ -34,7 +34,3 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(MONGODB_FIELDS + ["process"]), evt.keys())
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return [os.getenv('MONGODB_HOST', 'localhost') + ':' +
-                os.getenv('MONGODB_PORT', '27017')]

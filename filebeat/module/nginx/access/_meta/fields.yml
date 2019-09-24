@@ -14,10 +14,6 @@
       type: alias
       path: http.response.body.bytes
       migration: true
-    - name: remote_ip
-      type: alias
-      path: source.address
-      migration: true
     - name: user_name
       type: alias
       path: user.name

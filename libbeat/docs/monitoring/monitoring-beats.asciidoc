@@ -1,15 +1,3 @@
-//////////////////////////////////////////////////////////////////////////
-//// This content is shared by all Elastic Beats. Make sure you keep the
-//// descriptions here generic enough to work for all Beats that include
-//// this file. When using cross references, make sure that the cross
-//// references resolve correctly for any files that include this one.
-//// Use the appropriate variables defined in the index.asciidoc file to
-//// resolve Beat names: beatname_uc and beatname_lc.
-//// Use the following include to pull this content into a doc file:
-//// include::../../libbeat/docs/monitoring/configuring.asciidoc[]
-//// Make sure this content appears below a level 2 heading.
-//////////////////////////////////////////////////////////////////////////
-
 [role="xpack"]
 [[monitoring]]
 = Monitoring {beatname_uc}
@@ -17,56 +5,35 @@
 [partintro]
 --
 
-NOTE: The {monitor-features} for {beatname_uc} require {es} {beat_monitoring_version} or later.
+You can use the {stack} {monitor-features} to gain insight into the health of
+ifndef::apm-server[]
+{beatname_uc} instances running in your environment. 
+endif::[]
+ifdef::apm-server[]
+{beatname_uc}. 
+endif::[]
 
-The {stack} {monitor-features} enable you to easily monitor {beatname_uc} from {kib}. For more
-information, see
-{stack-ov}/xpack-monitoring.html[Monitoring the {stack}] and
-{kibana-ref}/beats-page.html[Beats Monitoring Metrics].
+To monitor {beatname_uc}, make sure monitoring is enabled on your {es} cluster,
+then configure the method used to collect {beatname_uc} metrics. You
+ifndef::serverless[]
+can use one of following methods:
+endif::[]
+ifdef::serverless[]
+can use the following method:
+endif::[]
 
-To configure {beatname_uc} to collect and send monitoring metrics:
+* <<monitoring-internal-collection,Internal collection>>
+ifndef::serverless[]
+* <<monitoring-metricbeat-collection, {metricbeat} collection>>
+endif::[]
 
-. Create a user that has appropriate authority to send system-level monitoring
-data to {es}. For example, you can use the built-in +{beat_monitoring_user}+ user or
-assign the built-in +{beat_monitoring_user}+ role to another user. For more
-information, see
-{stack-ov}/setting-up-authentication.html[Setting Up User Authentication] and
-{stack-ov}/built-in-roles.html[Built-in Roles].
+To learn about monitoring in general, see 
+{stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
 
-. Add the `monitoring` settings in the {beatname_uc} configuration file. If you
-configured the {es} output and want to send {beatname_uc} monitoring events to
-the same {es} cluster, specify the following minimal configuration:
-+
---
-[source, yml]
---------------------
-monitoring.enabled: true
---------------------
-
-If you configured a different output, such as {ls} or you want to send {beatname_uc}
-monitoring events to a separate {es} cluster (referred to as the _monitoring cluster_),
-you must specify additional configuration options. For example:
-
-["source","yml",subs="attributes"]
---------------------
-monitoring:
-  enabled: true
-  elasticsearch:
-    hosts: ["https://example.com:9200", "https://example2.com:9200"] <1>
-    username: {beat_monitoring_user}
-    password: somepassword
---------------------
-<1> This setting identifies the hosts and port numbers of {es} nodes
-that are part of the monitoring cluster.
 --
 
-. {kibana-ref}/monitoring-xpack-kibana.html[Configure monitoring in {kib}].
+include::monitoring-internal-collection.asciidoc[]
 
-. To verify your monitoring configuration, point your web browser at your {kib}
-host, and select Monitoring from the side navigation. Metrics reported from
-{beatname_uc} should be visible in the Beats section. When {security} is enabled,
-to view the monitoring dashboards you must log in to {kib} as a user who has the
-`kibana_user` and `monitoring_user` roles.
---
-
-include::shared-monitor-config.asciidoc[]
+ifndef::serverless[]
+include::monitoring-metricbeat.asciidoc[]
+endif::[]

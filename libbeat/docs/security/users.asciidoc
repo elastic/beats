@@ -1,0 +1,324 @@
+[role="xpack"]
+[[feature-roles]]
+=== Grant users access to secured resources
+
+You can use role-based access control to grant users access to secured
+resources. The roles that you set up depend on your organization's security
+requirements and the minimum privileges required to use specific features.
+
+Typically you need the create the following separate roles:
+
+* <<privileges-to-setup-beats,setup role>> for setting up index templates and
+other dependencies
+* <<privileges-to-publish-monitoring,monitoring role>> for sending monitoring
+information
+* <<privileges-to-publish-events,writer role>>  for publishing events collected
+by {beatname_uc}
+* <<kibana-user-privileges,reader role>> for {kib} users who need to view and
+create visualizations that access {beatname_uc} data
+
+
+{security} provides built-in roles that grant a subset of the privileges
+needed by {beatname_uc} users. When possible, use the built-in roles to minimize
+the affect of future changes on your security strategy.
+
+
+[[privileges-to-setup-beats]]
+==== Grant privileges and roles needed for setup
+
+IMPORTANT: Setting up {beatname_uc} is an admin-level task that requires extra
+privileges. As a best practice, grant the setup role to administrators only, and
+use a less restrictive role for event publishing.  
+
+Administrators who set up {beatname_uc} typically need to load mappings,
+dashboards, and other objects used to index data into {es} and visualize it in
+{kib}. 
+
+To grant users the required privileges:
+
+. Create a *setup role*, called something like +{beat_default_index_prefix}_setup+, that has
+the following privileges:
++
+[options="header"]
+|====
+|Privileges | Why needed?
+
+|`monitor`
+|Send monitoring data to the cluster
+
+ifndef::no_ilm[]
+|`manage_ilm`
+|Set up and manage index lifecycle management (ILM) policy
+endif::no_ilm[]
+
+ifdef::has_ml_jobs[]
+|`manage_ml`
+|Set up machine learning job configurations
+endif::has_ml_jobs[]
+
+|`manage` on +{beat_default_index_prefix}-*+ indices
+|Set up aliases used by ILM
+ 
+ifdef::has_ml_jobs[]
+|`read` on +{beat_default_index_prefix}-*+ indices
+|Read {beatname_uc} indices in order to set up machine learning jobs
+endif::has_ml_jobs[]
+|====
++
+Omit any privileges that aren't relevant in your environment.
++
+NOTE: These instructions assume that you are using the default name for
+{beatname_uc} indices. If you are using a custom name, modify the privileges to
+match your index naming pattern.
+
+. Assign the *setup role*, along with the following built-in roles, to users who
+need to set up {beatname_uc}: 
++
+[options="header"]
+|====
+|Roles | Why needed?
+
+|`kibana_user`
+|Load dependencies, such as example dashboards, if available, into {kib}
+
+|`ingest_admin`
+|Set up index templates and, if available, ingest pipelines
+
+ifdef::apm-server[]
+|`ingest_admin`
+|Set up ingest pipelines
+endif::apm-server[]
+
+ifdef::has_central_config[]
+|`beats_admin`
+|Enroll and manage configurations in Beats central management
+endif::has_central_config[]
+|====
++
+Omit any roles that aren't relevant in your environment.
+
+[[privileges-to-publish-monitoring]]
+==== Grant privileges and roles needed for monitoring
+
+{security} provides built-in users and roles for monitoring. The privileges and
+roles needed depend on the method used to collect monitoring data.
+
+===== Internal collection
+
+For <<monitoring-internal-collection,internal collection>>, {security}
+provides the +{beat_default_index_prefix}_system+
+{stack-ov}/built-in-users.html[built-in user] and
++{beat_default_index_prefix}_system+ {stack-ov}/built-in-roles.html[built-in
+role] for sending monitoring information. You can use the built-in user, or
+create a user who has the privileges needed to send monitoring information.
+
+If you use the +{beat_default_index_prefix}_system+ user, make sure you
+<<beats-system-user,set the password>>.
+
+If you don't use the +{beat_default_index_prefix}_system+ user:
+
+. Create a *monitoring role*, called something like
++{beat_default_index_prefix}_monitoring+, that has the following privileges:
++
+[options="header"]
+|====
+|Privileges | Why needed?
+
+|`monitor`
+|Send monitoring info
+
+|`kibana_user`
+|Use {kib}
+|====
+
+. Assign the *monitoring role*, along with the following built-in role, to
+users who need to monitor {beatname_uc}: 
++
+[options="header"]
+|====
+|Role | Why needed?
+|`monitoring_user`
+|Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
+|====
+
+ifndef::serverless[]
+===== {metricbeat} collection
+
+For <<monitoring-metricbeat-collection,{metricbeat} collection>>, {security}
+provides the `remote_monitoring_user` {stack-ov}/built-in-users.html[built-in
+user], and the `remote_monitoring_collector` and `remote_monitoring_agent`
+{stack-ov}/built-in-roles.html[built-in roles] for collecting and sending
+monitoring information. You can use the built-in user, or
+create a user who has the privileges needed to collect and send monitoring
+information.
+
+If you use the `remote_monitoring_user` user, make sure you
+<<beats-system-user,set the password>>.
+
+If you don't use the `remote_monitoring_user` user:
+
+. Create a user on the production cluster who will collect and send monitoring
+information.
+
+. Assign the following roles to the user: 
++
+[options="header"]
+|====
+|Role | Why needed?
+|`remote_monitoring_collector`
+|Collect monitoring metrics from {beatname_uc}
+|`remote_monitoring_agent`
+|Send monitoring data to the monitoring cluster
+|====
+
+. Assign the following role to users who will view the monitoring data in
+{kib}:
+
+[options="header"]
+|====
+|Role | Why needed?
+|`monitoring_user`
+|Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
+|====
+endif::serverless[]
+
+[[privileges-to-publish-events]]
+==== Grant privileges and roles needed for publishing
+
+Users who publish events to {es} need to create and read from {beatname_uc}
+indices. To minimize the privileges required by the writer role, you can use the
+<<privileges-to-setup-beats,setup role>> to pre-load dependencies. Then turn off
+setup options in the  {beatname_uc} config file before running {beatname_uc} to
+publish events. For example:
+
+ifndef::no_ilm[]
+[source,yaml]
+----
+setup.template.enabled: false
+setup.ilm.check_exists: false
+setup.ilm.overwrite: false <1>
+----
+<1> Omit `ilm.check_exists` and `ilm.overwrite` if ILM is disabled.
+endif::no_ilm[]
+
+ifdef::no_ilm[]
+[source,yaml]
+----
+setup.template.enabled: false
+----
+endif::no_ilm[]
+
+To grant the required privileges:
+
+. Create a *writer role*, called something like +{beat_default_index_prefix}_writer+, that has
+the following privileges (this list assumes the setup options shown earlier are
+set to `false`):
++
+[options="header"]
+|====
+|Privileges | Why needed?
+
+ifndef::apm-server[]
+|`monitor`
+|Send monitoring info
+endif::apm-server[]
+
+ifndef::no_ilm[]
+|`read_ilm`
+|Read the ILM policy when connecting to clusters that support ILM
+endif::no_ilm[]
+
+ifeval::["{beatname_lc}"=="filebeat"]
+|`manage_pipeline`
+|Load ingest pipelines used by modules
+endif::[]
+
+ifndef::no_ilm[]
+|`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
+|Check for alias when connecting to clusters that support ILM
+endif::no_ilm[]
+
+|`index` on +{beat_default_index_prefix}-*+ indices
+|Index events into {es}
+
+|`create_index` on +{beat_default_index_prefix}-*+ indices
+|Create daily indices when connecting to clusters that do not support ILM
+|====
+ifndef::apm-server[]
++
+Omit any privileges that aren't relevant in your environment.
+endif::apm-server[]
+
+. Assign the *writer role* to users who will index events into {es}. 
+
+[[kibana-user-privileges]]
+==== Grant privileges and roles needed to read {beatname_uc} data
+
+{kib} users typically need to view dashboards and visualizations that contain
+{beatname_uc} data. These users might also need to create and edit dashboards
+and visualizations.
+ifdef::has_central_config[]
+If you're using Beats central management, some of these users might need to
+create and manage configurations.
+endif::has_central_config[]
+
+To grant users the required privileges:
+
+ifndef::apm-server[]
+. Create a *reader role*, called something like +{beat_default_index_prefix}_reader+, that has
+the following privilege:
++
+[options="header"]
+|====
+|Privilege | Why needed?
+
+|`read` on +{beat_default_index_prefix}-*+ indices
+|Read data indexed by {beatname_uc}
+|====
+
+. Assign the *reader role*, along with the following built-in roles, to
+users who need to read {beatname_uc} data:
++
+[options="header"]
+|====
+|Roles | Why needed?
+
+|`kibana_user` or `kibana_dashboard_only_user`
+|Use {kib}. `kibana_dashboard_only_user` grants read-only access to dashboards.
+
+ifdef::has_central_config[]
+|`beats_admin`
+|Create and manage configurations in Beats central management. Only assign this
+role to users who need to use Beats central management.
+endif::[]
+|====
++
+Omit any roles that aren't relevant in your environment.
+endif::apm-server[]
+
+ifdef::apm-server[]
+. Assign the following built-in roles to users who need to read {beatname_uc}
+data:
++
+[options="header"]
+|====
+|Roles | Why needed?
+
+|`kibana_user` and `apm_user`
+|Use the APM UI
+|`admin`
+|Read and update APM Agent configuration via Kibana
+|====
+endif::apm-server[]
+
+
+[[learn-more-security]]
+==== Learn more about users and roles
+
+Want to learn more about creating users and roles? See
+{stack-ov}/elasticsearch-security.html[Securing the {stack}]. Also see:
+
+* {stack-ov}/security-privileges.html[Security privileges] for a description of
+available privileges
+* {stack-ov}/built-in-roles.html[Built-in roles] for a description of roles that
+you can assign to users

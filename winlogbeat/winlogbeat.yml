@@ -1,13 +1,13 @@
-###################### Winlogbeat Configuration Example ##########################
+###################### Winlogbeat Configuration Example ########################
 
 # This file is an example configuration file highlighting only the most common
-# options. The winlogbeat.reference.yml file from the same directory contains all the
-# supported options with more comments. You can use it as a reference.
+# options. The winlogbeat.reference.yml file from the same directory contains
+# all the supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/winlogbeat/index.html
 
-#======================= Winlogbeat specific options ==========================
+#======================= Winlogbeat specific options ===========================
 
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
@@ -20,15 +20,18 @@
 winlogbeat.event_logs:
   - name: Application
     ignore_older: 72h
-  - name: Security
+
   - name: System
 
-#==================== Elasticsearch template setting ==========================
+  - name: Security
+
+#==================== Elasticsearch template settings ==========================
 
 setup.template.settings:
   index.number_of_shards: 1
   #index.codec: best_compression
   #_source.enabled: false
+
 
 #================================ General =====================================
 
@@ -77,7 +80,7 @@ setup.kibana:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using winlogbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Winlogbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -124,6 +127,8 @@ output.elasticsearch:
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
 
 #================================ Logging =====================================
 
@@ -136,13 +141,18 @@ processors:
 # "publish", "service".
 #logging.selectors: ["*"]
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # winlogbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Winlogbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.

@@ -1,0 +1,72 @@
+[[release-highlights-7.2.0]]
+=== 7.2.0 release highlights
+++++
+<titleabbrev>7.2.0</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Here are the highlights of the new features and enhancements in 7.2.0.
+
+Refer to the {beats} <<breaking-changes-7.2, Breaking Changes>> and <<release-notes, 
+Release Notes>> for a list of bug fixes and other changes.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+// ADD NOTABLE HIGHLIGHTS HERE
+[float]
+==== Scripted processing
+
+In this release, Beats offers a {filebeat-ref}/processor-script.html[script
+processor] for processing events with Javascript code. It also includes an event
+API that eases the overall event manipulation experience. As Beats often run on
+host servers, the script processor has been properly sandboxed to only execute
+https://www.ecma-international.org/ecma-262/5.1/[ECMAScript 5.1 code]. It can
+therefore only manipulate the event that it’s given and cannot interact with the
+host or any external services.
+
+[float]
+==== Security analytics
+
+{beats} adds several new integrations for security use cases. {filebeat} offers
+new logging modules for popular firewall technologies. The
+{filebeat-ref}/filebeat-module-panw.html[Palo Alto Networks module] monitors
+PAN-OS firewall logs, and the {filebeat-ref}/filebeat-module-cisco.html[Cisco
+ASA module] monitors Cisco ASA firewall logs. These logs can be received via
+syslog or extracted directly from a file. {filebeat} also offers a new
+{filebeat-ref}/filebeat-module-netflow.html[NetFlow module] that monitors
+NetFlow and IPFIX flow records.
+
+Beyond these integrations, the 7.2 release introduces the Elastic
+{kibana-ref}/xpack-siem.html[SIEM application in {kib}]. 
+
+[float]
+==== Cloud monitoring
+
+The {filebeat-ref}/filebeat-module-nats.html[NATS module] is now available in
+{filebeat} for monitoring the NATS messaging system logs. This complements the
+{metricbeat-ref}/metricbeat-module-nats.html[NATS module in {metricbeat}] that
+was introduced in {beats} 7.0.0. This release also adds
+{filebeat-ref}/filebeat-module-coredns.html[CoreDNS modules in {filebeat}] and
+{metricbeat-ref}/metricbeat-module-coredns.html[{metricbeat}] to monitor CoreDNS
+logs and metrics.
+
+{filebeat} also introduces a new
+{filebeat-ref}/filebeat-input-container.html[container input] as a more dynamic
+way of collecting container logs. It supports auto-detection of both Docker and
+CRI-O log formats. CRI-O is an increasingly popular container runtime for
+Kubernetes. You should use the container input in favor of the existing Docker
+input, which is now deprecated. 
+
+[float]
+==== Windows monitoring
+
+Winlogbeat adds two new modules in this release. The
+{winlogbeat-ref}/winlogbeat-module-sysmon.html[Sysmon module] monitors event log
+records from the Sysinternals System Monitor, and the
+{winlogbeat-ref}/winlogbeat-module-security.html[Security module] monitors
+Windows security event logs. This release also adds support for the newer
+Windows XML Event Log (EVTX) format. 
+
+// end::notable-highlights[]

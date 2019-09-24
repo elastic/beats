@@ -6,7 +6,6 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
 * <<{beatname_lc}-template>>
-* <<load-kibana-dashboards>>
 * <<{beatname_lc}-starting>>
 * <<view-kibana-dashboards>>
 * <<setup-repositories>>
@@ -123,15 +122,15 @@ path. For example:
 +
 If no paths are specified, {beatname_uc} reads from the default journal.
 
-. Set the <<{beatname_lc}-seek,`seek`>> option to control the position where
+. Set the <<seek,`seek`>> option to control the position where
 {beatname_uc} starts reading the journal. The available options are `head`,
 `tail`, and `cursor`. The default is `cursor`, which means that on first read,
 {beatname_uc} starts reading at the beginning of the file, but continues reading
 at the last known position after a reload or restart. For more detail about
 the settings, see the reference docs for the
-<<{beatname_lc}-seek,`seek` option>>. 
+<<seek,`seek` option>>. 
 
-. (Optional) Set the <<{beatname_lc}-include-matches,`include_matches`>> option
+. (Optional) Set the <<include-matches,`include_matches`>> option
 to filter entries in journald before collecting any log events. This reduces the
 number of events that {beatname_uc} needs to process. For example, to fetch only
 Redis events from a Docker container tagged as `redis`, use: 
@@ -157,22 +156,15 @@ include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 
 [id="{beatname_lc}-template"]
-=== Step 3: Load the index template in Elasticsearch
+=== Step 3: Load the index template in {es}
 
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
-
-[[load-kibana-dashboards]]
-=== Step 4: Set up the Kibana dashboards
-
-:requires-sudo: yes
-include::../../libbeat/docs/dashboards.asciidoc[]
-:requires-sudo!:
 
 [id="{beatname_lc}-starting"]
 === Step 5: Start {beatname_uc}
 
 Start {beatname_uc} by issuing the appropriate command for your platform. If you
-are accessing a secured Elasticsearch cluster, make sure you've configured
+are accessing a secured {es} cluster, make sure you've configured
 credentials as described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can't
@@ -202,27 +194,22 @@ in the _Beats Platform Reference_.
 {beatname_uc} is now ready to send journal events to the defined output.
 
 [[view-kibana-dashboards]]
-=== Step 6: View the sample Kibana dashboards
+=== Step 6: Explore your data in {kib}
 
-To make it easier for you to visualize your log data, we have created example
-{beatname_uc} dashboards. You loaded the dashboards earlier when you ran the
-`setup` command.
+To start exploring your data, go to the Discover application in {kib}. From
+there, you can submit search queries, filter the search results, and view
+document data.
 
-include::../../libbeat/docs/opendashboards.asciidoc[]
+To learn how to build visualizations and dashboards to view your data, see the
+_{kibana-ref}/index.html[{kib} User Guide]_.
 
-The dashboards are provided as examples. We recommend that you
-{kibana-ref}/dashboard.html[customize] them to meet your needs.
+[role="xpack"]
+==== Want to tail logs in real time?
 
-[role="screenshot"]
-image:./images/journald-log-data.png[Journald data]
-
-
-[NOTE]
-=====
-You can also use the {infra-guide}/logs-ui-overview.html[Logs UI] in {kib} to
-tail logs in real time. By default, however, the Logs UI only shows logs from
-`filebeat-*` indexes. To show {beatname_uc} indexes, add the following settings
-to the {kib} configuration: 
+Use the {infra-guide}/logs-ui-overview.html[Logs UI] in {kib}. The UI shows logs
+from `filebeat-*` indices by default. To show {beatname_uc} indices, configure
+the source to include `journalbeat-*`. You can do this in the Logs UI when you
+configure the source, or you can modify the {kib} configuration. For example:
 
 [source,yaml]
 ----
@@ -231,5 +218,3 @@ xpack.infra:
    default:
      logAlias: "filebeat-*,journalbeat-*"
 ----
-
-=====

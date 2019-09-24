@@ -2,10 +2,6 @@
 [role="xpack"]
 = {beats} central management
 
-++++
-<titleabbrev>Central management</titleabbrev>
-++++
-
 [partintro]
 --
 
@@ -146,7 +142,7 @@ ifndef::no_dashboards[]
 <<load-kibana-dashboards,load the dashboards>> before enrolling the
 Beat.
 endif::[]
-ifeval::[("{beatname_lc}"=="filebeat")]
+ifeval::["{beatname_lc}"=="filebeat"]
 * If you plan to define module configurations in central management, set up the
 ingest pipelines before enrolling the Beat. For more information, see
 <<load-ingest-pipelines>>.

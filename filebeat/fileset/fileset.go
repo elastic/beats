@@ -352,6 +352,11 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error reading input config: %v", err)
 	}
 
+	cfg, err = mergePathDefaults(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	// overrides
 	if len(fs.fcfg.Input) > 0 {
 		overrides, err := common.NewConfigFrom(fs.fcfg.Input)

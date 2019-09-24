@@ -32,7 +32,6 @@ The following topics describe how to configure Heartbeat:
 * <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
-* <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
@@ -47,6 +46,8 @@ The following topics describe how to configure Heartbeat:
 include::./heartbeat-options.asciidoc[]
 
 include::./heartbeat-general-options.asciidoc[]
+
+include::./heartbeat-observer-options.asciidoc[]
 
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
@@ -74,7 +75,9 @@ include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
 include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
 :standalone!:
 
+:autodiscoverAWSELB:
 include::{libbeat-dir}/docs/shared-autodiscover.asciidoc[]
+:autodiscoverAWSELB!:
 
 :standalone:
 include::{libbeat-dir}/docs/yaml.asciidoc[]

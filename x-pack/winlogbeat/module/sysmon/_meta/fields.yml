@@ -1,0 +1,10 @@
+- key: sysmon
+  title: "Sysmon module"
+  description: >
+    These are the event fields specific to the Sysmon module.
+  release: beta
+  fields:
+
+    - name: sysmon.dns.status
+      type: keyword
+      description: Windows status code returned for the DNS query.

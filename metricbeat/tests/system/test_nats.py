@@ -5,7 +5,7 @@ import unittest
 NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
 
 
-class Test(metricbeat.BaseTest):
+class TestNats(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['nats']
 
@@ -109,8 +109,6 @@ class Test(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
-    def get_hosts(self):
-        return ["{}:{}".format(
-            os.getenv('NATS_HOST', 'localhost'),
-            os.getenv('NATS_PORT', '8222')
-        )]
+
+class TestNats1_3(TestNats):
+    COMPOSE_SERVICES = ['nats_1_3']

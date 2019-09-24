@@ -26,7 +26,6 @@ NOTE: Elastic provides no warranty or support for community-sourced Beats.
 https://github.com/awormuth/amazonbeat[amazonbeat]:: Reads data from a specified Amazon product.
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
 https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contextual data and metrics from Java applications via the  http://toolkits.verticle.io[APEX] toolkit.
-https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag using Burrow.
 https://github.com/hsngerami/hsnburrowbeat[hsnburrowbeat]:: Monitors Kafka consumer lag for Burrow V1.0.0(API V3).
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
 https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
@@ -36,8 +35,10 @@ https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log e
 https://github.com/eBay/collectbeat[collectbeat]:: Adds discovery on top of Filebeat and Metricbeat in environments like Kubernetes.
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
 https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
+https://github.com/hellmouthengine/discobeat[discobeat]:: Reads messages from Discord and indexes them in Elasticsearch
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
+https://github.com/radoondas/earthquakebeat[earthquakebeat]:: Pulls data from https://earthquake.usgs.gov/fdsnws/event/1/[USGS] earthquake API.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
 https://github.com/berfinsari/envoyproxybeat[envoyproxybeat]:: Reads stats from the Envoy Proxy and indexes them into Elasticsearch.
 https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API and indexes them into Elasticsearch.
@@ -45,9 +46,11 @@ https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
 https://github.com/ctindel/fastcombeat[fastcombeat]:: Periodically gather internet download speed from  https://fast.com[fast.com].
+https://github.com/cloudronics/fileoccurancebeat[fileoccurencebeat]:: Checks for file existence recurssively under a given directory, handy while handling queues/pipeline buffers.
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/GeneralElectric/GABeat[gabeat]:: Collects data from Google Analytics Realtime API.
 https://github.com/GoogleCloudPlatform/gcsbeat[gcsbeat]:: Reads data from https://cloud.google.com/storage/[Google Cloud Storage] buckets.
+https://github.com/threatstack/gelfbeat[gelfbeat]:: Collects and parses GELF-encoded UDP messages.
 https://github.com/josephlewis42/githubbeat[githubbeat]:: Easily monitors GitHub repository activity.
 https://github.com/hpcugent/gpfsbeat[gpfsbeat]:: Collects GPFS metric and quota information.
 https://github.com/ullaakut/hackerbeat[hackerbeat]:: Indexes the top stories of HackerNews into an ElasticSearch instance.
@@ -67,6 +70,7 @@ https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Lo
 https://github.com/bozdag/macwifibeat[macwifibeat]:: Reads various indicators for a MacBook's WiFi Signal Strength
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
 https://developer.cisco.com/codeexchange/github/repo/CiscoDevNet/merakibeat[merakibeat]:: Collects https://dashboard.meraki.com/api_docs#wireless-health[wireless health] and users https://documentation.meraki.com/MR/Monitoring_and_Reporting/Scanning_API[location analytics] data using Cisco  Meraki APIs.
+https://github.com/berfinsari/mesosbeat[mesosbeat]:: Reads stats from the Mesos API and indexes them into Elasticsearch.
 https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
 https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
@@ -85,6 +89,8 @@ https://github.com/WuerthIT/perfstatbeat[perfstatbeat]:: Collect performance met
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.
+https://github.com/kckecheng/powermaxbeat[powermaxbeat]:: Collects performance metrics from Dell EMC PowerMax storage array.
+https://github.com/pawankt/processbeat[processbeat]:: Collects process health status and performance.
 https://github.com/carlpett/prombeat[prombeat]:: Indexes https://prometheus.io[Prometheus] metrics.
 https://github.com/infonova/prometheusbeat[prometheusbeat]:: Send Prometheus metrics to Elasticsearch via the remote write feature.
 https://github.com/hartfordfive/protologbeat[protologbeat]:: Accepts structured and unstructured logs via UDP or TCP.  Can also be used to receive syslog messages or GELF formatted messages. (To be used as a successor to udplogbeat)
@@ -115,3 +121,4 @@ https://github.com/phenomenes/varnishstatbeat[varnishstatbeat]:: Reads stats dat
 https://gitlab.com/msvechla/vaultbeat[vaultbeat]:: Collects performance metrics and statistics from Hashicorp's Vault.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
 https://github.com/IBM/yarnbeat[yarnbeat]:: Polls YARN and MapReduce APIs for cluster and application metrics.
+https://github.com/maireanu/zfsbeat[zfsbeat]:: Querying ZFS Storage and Pool Status

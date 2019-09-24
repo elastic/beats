@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package docker
 
 import (
@@ -30,13 +32,12 @@ type Config struct {
 	Host           string                  `config:"host"`
 	TLS            *docker.TLSConfig       `config:"ssl"`
 	Prefix         string                  `config:"prefix"`
-	HintsEnabled   bool                    `config:"hints.enabled"`
-	DefaultDisable bool                    `config:"default.disable"`
+	Hints          *common.Config          `config:"hints"`
 	Builders       []*common.Config        `config:"builders"`
 	Appenders      []*common.Config        `config:"appenders"`
 	Templates      template.MapperSettings `config:"templates"`
 	Dedot          bool                    `config:"labels.dedot"`
-	CleanupTimeout time.Duration           `config:"cleanup_timeout"`
+	CleanupTimeout time.Duration           `config:"cleanup_timeout" validate:"positive"`
 }
 
 func defaultConfig() *Config {

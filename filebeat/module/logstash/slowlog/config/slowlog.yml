@@ -5,7 +5,5 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 
-{{ if .convert_timezone }}
 processors:
 - add_locale: ~
-{{ end }}

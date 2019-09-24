@@ -1,0 +1,9 @@
+The Beat module contains a minimal set of metrics to enable monitoring of any Beat or other software based on libbeat across
+multiple versions. To monitor more Beat metrics, use our {stack-ov}/xpack-monitoring.html[monitoring] feature.
+
+The default metricset is `stats`.
+
+[float]
+=== Compatibility
+
+The Beat module is tested with Metricbeat 7.2 and is expected to work with all 7.x versions.

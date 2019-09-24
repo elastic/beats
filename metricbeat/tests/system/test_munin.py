@@ -36,7 +36,3 @@ class Test(metricbeat.BaseTest):
         assert evt["munin"]["metrics"]["user"] > 0
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return [self.compose_hosts()[0] + ':' +
-                os.getenv('MUNIN_PORT', '4949')]

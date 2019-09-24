@@ -1,0 +1,39 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-statsd]]
+[role="xpack"]
+== Statsd module
+
+beta[]
+
+The Statsd module is a Metricbeat module which opens a UDP port and listens for statsd metrics.
+
+
+
+[float]
+=== Example configuration
+
+The Statsd module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #ttl: "30s"
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-statsd-server,server>>
+
+include::statsd/server.asciidoc[]
+

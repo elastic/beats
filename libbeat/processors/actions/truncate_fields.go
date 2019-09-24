@@ -29,6 +29,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type truncateFieldsConfig struct {
@@ -48,11 +50,12 @@ type truncater func(*truncateFields, []byte) ([]byte, bool, error)
 
 func init() {
 	processors.RegisterPlugin("truncate_fields",
-		configChecked(NewTruncateFields,
-			requireFields("fields"),
-			mutuallyExclusiveRequiredFields("max_bytes", "max_characters"),
+		checks.ConfigChecked(NewTruncateFields,
+			checks.RequireFields("fields"),
+			checks.MutuallyExclusiveRequiredFields("max_bytes", "max_characters"),
 		),
 	)
+	jsprocessor.RegisterPlugin("TruncateFields", NewTruncateFields)
 }
 
 // NewTruncateFields returns a new truncate_fields processor.
@@ -84,10 +87,12 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	for _, field := range f.config.Fields {
 		event, err := f.truncateSingleField(field, event)
-		if err != nil && f.config.FailOnError {
+		if err != nil {
 			logp.Debug("truncate_fields", "Failed to truncate fields: %s", err)
-			event.Fields = backup
-			return event, err
+			if f.config.FailOnError {
+				event.Fields = backup
+				return event, err
+			}
 		}
 	}
 

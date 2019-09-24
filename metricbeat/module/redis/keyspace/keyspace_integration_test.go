@@ -25,22 +25,19 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/redis"
 
 	rd "github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
 )
 
-var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
-
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
 
-	addEntry(t)
+	addEntry(t, service.Host())
 
 	// Fetch data
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, err := mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	events, err := mbtest.ReportingFetchV2Error(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
@@ -59,19 +56,19 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
 
-	addEntry(t)
+	addEntry(t, service.Host())
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
 // addEntry adds an entry to redis
-func addEntry(t *testing.T) {
+func addEntry(t *testing.T, host string) {
 	// Insert at least one event to make sure db exists
 	c, err := rd.Dial("tcp", host)
 	if err != nil {
@@ -84,7 +81,7 @@ func addEntry(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"keyspace"},

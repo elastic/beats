@@ -22,11 +22,14 @@ import (
 
 	"github.com/elastic/ecs/code/go/ecs"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/libbeat/processors/timeseries"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The
@@ -45,6 +48,11 @@ type builder struct {
 	builtinMeta common.MapStr
 	fields      common.MapStr
 	tags        []string
+
+	// Time series id will be calculated for Events with the TimeSeries flag if this
+	// is enabled (disabled by default)
+	timeSeries       bool
+	timeseriesFields mapping.Fields
 
 	// global pipeline processors
 	processors *group
@@ -93,6 +101,7 @@ func MakeDefaultSupport(
 		cfg := struct {
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
+			TimeSeries           bool                    `config:"timeseries.enabled"`
 		}{}
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
@@ -103,7 +112,7 @@ func MakeDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize), nil
+		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries)
 	}
 }
 
@@ -155,11 +164,14 @@ func newBuilder(
 	eventMeta common.EventMetadata,
 	modifiers []modifier,
 	skipNormalize bool,
-) *builder {
+	timeSeries bool,
+) (*builder, error) {
 	b := &builder{
 		skipNormalize: skipNormalize,
 		modifiers:     modifiers,
 		log:           log,
+		info:          info,
+		timeSeries:    timeSeries,
 	}
 
 	hasProcessors := processors != nil && len(processors.List) > 0
@@ -187,11 +199,25 @@ func newBuilder(
 		common.MergeFields(b.fields, fields.Clone(), eventMeta.FieldsUnderRoot)
 	}
 
+	if timeSeries {
+		rawFields, err := asset.GetFields(info.Beat)
+		if err != nil {
+			return nil, err
+		}
+
+		fields, err := mapping.LoadFields(rawFields)
+		if err != nil {
+			return nil, err
+		}
+
+		b.timeseriesFields = fields
+	}
+
 	if t := eventMeta.Tags; len(t) > 0 {
 		b.tags = t
 	}
 
-	return b
+	return b, nil
 }
 
 // Create combines the builder configuration with the client settings
@@ -206,8 +232,9 @@ func newBuilder(
 //  6. (C) client processors list
 //  7. (P) add builtins
 //  8. (P) pipeline processors list
-//  9. (P) (if publish/debug enabled) log event
-// 10. (P) (if output disabled) dropEvent
+//  9. (P) timeseries mangling
+//  10. (P) (if publish/debug enabled) log event
+//  11. (P) (if output disabled) dropEvent
 func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
 	var (
 		// pipeline processors
@@ -289,12 +316,17 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 8: pipeline processors list
 	processors.add(b.processors)
 
-	// setup 9: debug print final event (P)
+	// setup 9: time series metadata
+	if b.timeSeries {
+		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields))
+	}
+
+	// setup 10: debug print final event (P)
 	if b.log.IsDebug() {
 		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 
-	// setup 10: drop all events if outputs are disabled (P)
+	// setup 11: drop all events if outputs are disabled (P)
 	if drop {
 		processors.add(dropDisabledProcessor)
 	}

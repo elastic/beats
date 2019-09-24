@@ -8,13 +8,6 @@ var:
       - /usr/local/var/log/nginx/error.log*
     os.windows:
       - c:/programdata/nginx/logs/error.log*
-  - name: convert_timezone
-    default: false
-    # if ES < 6.1.0, this flag switches to false automatically when evaluating the
-    # pipeline
-    min_elasticsearch_version:
-      version: 6.1.0
-      value: false
 
 ingest_pipeline: ingest/pipeline.json
 input: config/nginx-error.yml

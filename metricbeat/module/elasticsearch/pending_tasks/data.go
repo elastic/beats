@@ -47,13 +47,11 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 	err := json.Unmarshal(content, &tasksStruct)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Pending Tasks API response")
 	}
 
 	if tasksStruct.Tasks == nil {
-		return elastic.ReportErrorForMissingField("tasks", elastic.Elasticsearch, r)
+		return elastic.MakeErrorForMissingField("tasks", elastic.Elasticsearch)
 	}
 
 	var errs multierror.Errors
@@ -69,8 +67,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		event.MetricSetFields, err = schema.Apply(task)
 		if err != nil {
-			event.Error = errors.Wrap(err, "failure applying task schema")
-			errs = append(errs, event.Error)
+			errs = append(errs, errors.Wrap(err, "failure applying task schema"))
+			continue
 		}
 
 		r.Event(event)

@@ -773,7 +773,7 @@ class Test(BaseTest):
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path1))["offset"] == 9
             assert self.get_registry_entry_by_path(os.path.abspath(testfile_path2))["offset"] == 8
 
-    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/8102')
+    @unittest.skipIf(os.name == 'nt' or platform.system() == "Darwin", 'flaky test https://github.com/elastic/beats/issues/8102')
     def test_clean_inactive(self):
         """
         Checks that states are properly removed after clean_inactive
@@ -870,6 +870,7 @@ class Test(BaseTest):
         # Make sure the last file in the registry is the correct one and has the correct offset
         assert data[0]["offset"] == self.input_logs.size(file2)
 
+    @unittest.skip('flaky test https://github.com/elastic/beats/issues/10606')
     def test_clean_removed_with_clean_inactive(self):
         """
         Checks that files which were removed, the state is removed

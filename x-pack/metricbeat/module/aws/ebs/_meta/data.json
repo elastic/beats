@@ -1,0 +1,50 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "VolumeId": "vol-06ba46b489bbc0d96"
+            },
+            "namespace": "AWS/EBS"
+        },
+        "metrics": {
+            "BurstBalance": {
+                "avg": 100
+            },
+            "VolumeIdleTime": {
+                "sum": 300
+            },
+            "VolumeQueueLength": {
+                "avg": 0
+            },
+            "VolumeReadOps": {
+                "avg": 0
+            },
+            "VolumeTotalWriteTime": {
+                "sum": 0
+            },
+            "VolumeWriteBytes": {
+                "avg": 46421.333333333336
+            },
+            "VolumeWriteOps": {
+                "avg": 30
+            }
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.ebs",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "ebs",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

@@ -22,8 +22,13 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/winlogbeat/beater"
 
-	// Import the script processor.
+	// Register fields.
+	_ "github.com/elastic/beats/winlogbeat/include"
+
+	// Import processors and supporting modules.
 	_ "github.com/elastic/beats/libbeat/processors/script"
+	_ "github.com/elastic/beats/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
 // Name of this beat

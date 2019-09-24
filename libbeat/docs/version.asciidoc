@@ -1,9 +1,10 @@
 :stack-version: 8.0.0
 :doc-branch: master
-:go-version: 1.11.5
+:go-version: 1.12.9
 :release-state: unreleased
 :python: 2.7.9
 :docker: 1.12
 :docker-compose: 1.11
 :branch: master
 :major-version: 8.x
+:ecs_version: 1.1

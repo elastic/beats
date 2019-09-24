@@ -1,0 +1,5 @@
+type: http
+url: "/server-status?auto="
+suffix: plain
+remove_fields_from_comparison:
+  - "apache.status.hostname"

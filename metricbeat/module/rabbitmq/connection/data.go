@@ -20,21 +20,23 @@ package connection
 import (
 	"encoding/json"
 
-	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
 	schema = s.Schema{
-		"name":        c.Str("name"),
-		"vhost":       c.Str("vhost"),
-		"user":        c.Str("user"),
-		"node":        c.Str("node"),
+		"name": c.Str("name"),
+		"client_provided": s.Object{
+			"name": c.Str("client_properties.connection_name"),
+		},
+		"vhost":       c.Str("vhost", s.Required),
+		"user":        c.Str("user", s.Required),
+		"node":        c.Str("node", s.Required),
 		"channels":    c.Int("channels"),
 		"channel_max": c.Int("channel_max"),
 		"frame_max":   c.Int("frame_max"),
@@ -57,30 +59,33 @@ var (
 	}
 )
 
-func eventsMapping(content []byte, r mb.ReporterV2) {
+func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 	var connections []map[string]interface{}
 	err := json.Unmarshal(content, &connections)
 	if err != nil {
-		logp.Err("Error: %+v", err)
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error in unmarshal")
 	}
 
-	var errors multierror.Errors
 	for _, node := range connections {
-		err := eventMapping(node, r)
+		evt, err := eventMapping(node)
 		if err != nil {
-			errors = append(errors, err)
+			m.Logger().Errorf("error in mapping: %s", err)
+			r.Error(err)
+			continue
+		}
+
+		if !r.Event(evt) {
+			return nil
 		}
 	}
-
-	if len(errors) > 0 {
-		r.Error(errors.Err())
-	}
+	return nil
 }
 
-func eventMapping(connection map[string]interface{}, r mb.ReporterV2) error {
-	fields, err := schema.Apply(connection)
+func eventMapping(connection map[string]interface{}) (mb.Event, error) {
+	fields, err := schema.Apply(connection, s.FailOnRequired)
+	if err != nil {
+		return mb.Event{}, errors.Wrap(err, "error applying schema")
+	}
 
 	rootFields := common.MapStr{}
 	if v, err := fields.GetValue("user"); err == nil {
@@ -104,6 +109,5 @@ func eventMapping(connection map[string]interface{}, r mb.ReporterV2) error {
 		RootFields:      rootFields,
 		ModuleFields:    moduleFields,
 	}
-	r.Event(event)
-	return err
+	return event, nil
 }

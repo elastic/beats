@@ -29,6 +29,7 @@ import (
 )
 
 const maxMessageSize = 20
+const maxSocketSize = 0
 const timeout = time.Second * 15
 
 type info struct {
@@ -56,7 +57,12 @@ func TestReceiveEventFromUDP(t *testing.T) {
 
 	ch := make(chan info)
 	host := "localhost:0"
-	config := &Config{Host: host, MaxMessageSize: maxMessageSize, Timeout: timeout}
+	config := &Config{
+		Host:           host,
+		MaxMessageSize: maxMessageSize,
+		Timeout:        timeout,
+		ReadBuffer:     maxSocketSize,
+	}
 	fn := func(message []byte, metadata inputsource.NetworkMetadata) {
 		ch <- info{message: message, mt: metadata}
 	}

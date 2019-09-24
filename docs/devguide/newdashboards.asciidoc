@@ -46,16 +46,20 @@ To import the dashboards, run the `setup` command.
 ./metricbeat setup
 -------------------------
 
-The `setup` phase loads:
+The `setup` phase loads several dependencies, such as: 
 
 - Index mapping template in Elasticsearch
 - Kibana dashboards
-- Machine Learning jobs (if available)
+- Machine Learning (ML) jobs
+- Ingest pipelines
+- ILM policy
 
-For more details about the `setup` command, run the following:
+The dependencies vary depending on the Beat you're setting up.
+
+For more details about the `setup` command, see the command-line help. For example:
 
 [source,shell]
--------------------------
+----
 ./metricbeat help setup
 
 This command does initial setup of the environment:
@@ -63,25 +67,27 @@ This command does initial setup of the environment:
  * Index mapping template in Elasticsearch to ensure fields are mapped.
  * Kibana dashboards (where available).
  * ML jobs (where available).
+ * Ingest pipelines (where available).
+ * ILM policy (for Elasticsearch 6.5 and newer).
 
 Usage:
-  filebeat setup [flags]
+  metricbeat setup [flags]
 
 Flags:
-      --dashboards         Setup dashboards only
+      --dashboards         Setup dashboards
   -h, --help               help for setup
-      --machine-learning   Setup machine learning job configurations only
-      --modules string     List of enabled modules (comma separated)
-      --template           Setup index template only
----------------------------
+      --index-management   Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias
+      --machine-learning   Setup machine learning job configurations
+      --pipelines          Setup Ingest pipelines
+----
 
 The flags are useful when you don't want to load everything. For example, to
 import only the dashboards, use the `--dashboards` flag:
 
 [source,shell]
----------------------
+----
 ./metricbeat setup --dashboards
--------------------------------
+----
 
 Starting with Beats 6.0.0, the dashboards are no longer loaded directly into Elasticsearch. Instead, they are imported directly into Kibana.
 Thus, if your Kibana instance is not listening on localhost, or you enabled
@@ -90,9 +96,9 @@ the config for the Beat, or pass the Kibana host and credentials as
 arguments to the `setup` command. For example:
 
 [source,shell]
--------------------------
+----
 ./metricbeat setup -E setup.kibana.host=192.168.3.206:5601 -E setup.kibana.username=elastic -E setup.kibana.password=secret
---------------------------
+----
 
 By default, the `setup` command imports the dashboards from the `kibana`
 directory, which is available in the Beat package.

@@ -1,0 +1,30 @@
+[
+    {
+        "@timestamp": "2016-12-26T16:15:55.103Z",
+        "apache.error.module": "mpm_prefork",
+        "event.dataset": "apache.error",
+        "event.module": "apache",
+        "event.timezone": "+00:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 0,
+        "message": "AH00163: Apache/2.4.23 (Unix) configured -- resuming normal operations",
+        "process.pid": 11379,
+        "service.type": "apache"
+    },
+    {
+        "@timestamp": "2016-12-26T16:15:55.103Z",
+        "apache.error.module": "core",
+        "event.dataset": "apache.error",
+        "event.module": "apache",
+        "event.timezone": "+00:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 138,
+        "message": "AH00094: Command line: '/usr/local/Cellar/httpd24/2.4.23_2/bin/httpd'",
+        "process.pid": 11379,
+        "service.type": "apache"
+    }
+]

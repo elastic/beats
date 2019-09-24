@@ -15,3 +15,9 @@ The maximum size of the message received over UDP. The default is `10KiB`.
 ==== `host`
 
 The host and UDP port to listen on for event streams.
+
+[float]
+[id="{beatname_lc}-input-{type}-udp-read-buffer"]
+=== `read_buffer`
+
+The size of the read buffer on the UDP socket.

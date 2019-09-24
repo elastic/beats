@@ -41,8 +41,13 @@ Example config:
   server:
     enabled: true
     var.paths:
-      - /var/log/elasticsearch/*.log
+      - /var/log/elasticsearch/*.log          # Plain text logs
+      - /var/log/elasticsearch/*_server.json  # JSON logs
 ----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
 
 [float]
 ==== `gc` log fileset settings
@@ -70,8 +75,13 @@ Example config:
 ----
   audit:
     var.paths:
-      - /var/log/elasticsearch/*_access.log
+      - /var/log/elasticsearch/*_access.log  # Plain text logs
+      - /var/log/elasticsearch/*_audit.json  # JSON logs
 ----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
 
 [float]
 ==== `slowlog` log fileset settings
@@ -84,9 +94,15 @@ Example config:
 ----
   slowlog:
     var.paths:
-      - /var/log/elasticsearch/*_index_search_slowlog.log
-      - /var/log/elasticsearch/*_index_indexing_slowlog.log
+      - /var/log/elasticsearch/*_index_search_slowlog.log     # Plain text logs
+      - /var/log/elasticsearch/*_index_indexing_slowlog.log   # Plain text logs
+      - /var/log/elasticsearch/*_index_search_slowlog.json    # JSON logs
+      - /var/log/elasticsearch/*_index_indexing_slowlog.json  # JSON logs
 ----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
 
 [float]
 ==== `deprecation` log fileset settings
@@ -99,8 +115,15 @@ Example config:
 ----
   deprecation:
     var.paths:
-      - /var/log/elasticsearch/*_deprecation.log
+      - /var/log/elasticsearch/*_deprecation.log   # Plain text logs
+      - /var/log/elasticsearch/*_deprecation.json  # JSON logs
 ----
++
+NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
+`var.paths` setting to point to JSON logs. Otherwise, configure it
+to point to plain text logs.
+
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

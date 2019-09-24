@@ -1,0 +1,168 @@
+{{ if eq .input "syslog" }}
+
+type: syslog
+protocol.udp:
+  host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags}}
+
+processors:
+  - add_locale: ~
+
+  - decode_csv_fields:
+      fields:
+        message: csv
+
+  - extract_array:
+      field: csv
+      overwrite_keys: true
+      mappings:
+        event.created: 1
+        observer.serial_number: 2
+        _temp_.message_type: 3
+        _temp_.message_subtype: 4
+        _temp_.generated_time: 6
+
+  - extract_array:
+      when:
+        equals:
+          _temp_.message_type: TRAFFIC
+      field: csv
+      overwrite_keys: true
+      omit_empty: true
+      fail_on_error: false
+      mappings:
+        client.ip: 7
+        source.ip: 7
+        source.address: 7
+        server.ip: 8
+        destination.ip: 8
+        destination.address: 8
+        source.nat.ip: 9
+        destination.nat.ip: 10
+        panw.panos.ruleset: 11
+        client.user.name: 12
+        source.user.name: 12
+        server.user.name: 13
+        destination.user.name: 13
+        network.application: 14
+        panw.panos.source.zone: 16
+        panw.panos.destination.zone: 17
+        panw.panos.source.interface: 18
+        panw.panos.destination.interface: 19
+        panw.panos.flow_id: 22
+        client.port: 24
+        source.port: 24
+        destination.port: 25
+        server.port: 25
+        source.nat.port: 26
+        destination.nat.port: 27
+        _temp_.labels: 28
+        network.transport: 29
+        event.outcome: 30
+        network.bytes: 31
+        client.bytes: 32
+        destination.bytes: 32
+        server.bytes: 33
+        source.bytes: 33
+        network.packets: 34
+        event.start: 35
+        event.duration: 36
+        panw.panos.url.category: 37
+        panw.panos.sequence_number: 39
+        server.packets: 44
+        destination.packets: 44
+        client.packets: 45
+        source.packets: 45
+        observer.hostname: 52
+
+  - extract_array:
+      when:
+       equals:
+          _temp_.message_type: THREAT
+      field: csv
+      omit_empty: true
+      overwrite_keys: true
+      fail_on_error: false
+      mappings:
+        client.ip: 7
+        source.ip: 7
+        source.address: 7
+        server.ip: 8
+        destination.ip: 8
+        destination.address: 8
+        source.nat.ip: 9
+        destination.nat.ip: 10
+        panw.panos.ruleset: 11
+        client.user.name: 12
+        source.user.name: 12
+        server.user.name: 13
+        destination.user.name: 13
+        network.application: 14
+        panw.panos.source.zone: 16
+        panw.panos.destination.zone: 17
+        panw.panos.source.interface: 18
+        panw.panos.destination.interface: 19
+        panw.panos.flow_id: 22
+        client.port: 24
+        source.port: 24
+        destination.port: 25
+        server.port: 25
+        source.nat.port: 26
+        destination.nat.port: 27
+        _temp_.labels: 28
+        network.transport: 29
+        event.outcome: 30
+        panw.panos.threat.resource: 31
+        url.original: 31
+        panw.panos.threat.name: 32
+        panw.panos.url.category: 33
+        log.level: 34
+        _temp_.direction: 35
+        source.geo.country_iso_code: 38
+        destination.geo.country_iso_code: 39
+        panw.panos.network.pcap_id: 42
+        panw.panos.file.hash: 43
+        user_agent.original: 46
+        file.type: 47
+        network.forwarded_ip: 48
+        http.request.referer: 49
+        source.user.email: 50
+        panw.panos.subject: 51
+        destination.user.email: 52
+        observer.hostname: 59
+
+  - drop_fields:
+      fields:
+        - csv
+
+  - community_id: ~
+
+  - community_id:
+      target: panw.panos.network.nat.community_id
+      fields:
+        source_ip: source.nat.ip
+        source_port: source.nat.port
+        destination_ip: destination.nat.ip
+        destination_port: destination.nat.port
+
+  # Copy NAT data from ECS fields to the original non-ECS fields to retain
+  # backward compatibility. This should be removed for 8.0.
+  - convert:
+      ignore_missing: true
+      fields:
+        - {from: source.nat.ip, to: panw.panos.source.nat.ip, type: ip}
+        - {from: destination.nat.ip, to: panw.panos.destination.nat.ip, type: ip}
+        - {from: source.nat.port, to: panw.panos.source.nat.port, type: long}
+        - {from: destination.nat.port, to: panw.panos.destination.nat.port, type: long}

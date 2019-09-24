@@ -55,7 +55,3 @@ class ConsulAgentTest(metricbeat.BaseTest):
         assert(consul_agent["runtime"]["heap_objects"] > 0)
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return [os.getenv('CONSUL_HOST', 'localhost') + ':' +
-                os.getenv('CONSUL_PORT', '8500')]

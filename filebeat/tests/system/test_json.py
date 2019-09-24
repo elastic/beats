@@ -160,9 +160,9 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
-                message_key="msg",
                 keys_under_root=True,
-                overwrite_keys=True
+                overwrite_keys=True,
+                add_error_key=True,
             ),
         )
         os.mkdir(self.working_dir + "/log/")
@@ -203,7 +203,8 @@ class Test(BaseTest):
             json=dict(
                 message_key="msg",
                 keys_under_root=True,
-                overwrite_keys=True
+                overwrite_keys=True,
+                add_error_key=True,
             ),
         )
         os.mkdir(self.working_dir + "/log/")
@@ -228,6 +229,34 @@ class Test(BaseTest):
         assert "type" not in output[2]
         assert output[2]["error.message"] == \
             "type not overwritten (not string)"
+
+    def test_id_in_message(self):
+        """
+        Extract document ID from json contents.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                message_key="msg",
+                document_id="id",
+            ),
+        )
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_id.log"],
+                        target_dir="log")
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+
+        assert len(output) == 3
+        for i in xrange(len(output)):
+            assert("@metadata.id" in output[i])
+            assert(output[i]["@metadata.id"] == str(i))
+            assert("json.id" not in output[i])
 
     def test_with_generic_filtering(self):
         """
