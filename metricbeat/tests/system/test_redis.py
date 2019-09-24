@@ -162,8 +162,8 @@ class Test(metricbeat.BaseTest):
 
 
 class TestRedis4(Test):
-    COMPOSE_SERVICES = ['redis_4']
+    COMPOSE_ENV = {'REDIS_VERSION': '4.0.11'}
 
 
 class TestRedis5(Test):
-    COMPOSE_SERVICES = ['redis_5']
+    COMPOSE_ENV = {'REDIS_VERSION': '5.0.5'}
