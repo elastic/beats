@@ -105,7 +105,9 @@ endif::[]
 ifdef::has_modules_command[]
 |<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
+ifndef::serverless[]
 |<<run-command,`run`>> |{run-command-short-desc}.
+endif::[]
 |<<setup-command,`setup`>> |{setup-command-short-desc}.
 |<<test-command,`test`>> |{test-command-short-desc}.
 ifeval::["{beatname_lc}"=="functionbeat"]
@@ -286,8 +288,10 @@ endif::serverless[]
 [[help-command]]
 ==== `help` command
 
-{help-command-short-desc}. If no command is specified, shows help for the
-`run` command.
+{help-command-short-desc}.
+ifndef::serverless[]
+If no command is specified, shows help for the `run` command.
+endif::[]
 
 *SYNOPSIS*
 
@@ -488,7 +492,7 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 endif::[]
 endif::[]
 
-
+ifndef::serverless[]
 [[run-command]]
 ==== `run` command
 
@@ -618,6 +622,8 @@ Or:
 -----
 {beatname_lc} -e
 -----
+endif::[]
+
 
 [[setup-command]]
 ==== `setup` command
@@ -686,12 +692,12 @@ Sets up components related to Elasticsearch index management including
 template, ILM policy, and write alias (if supported and configured).
 
 *`--template`*::
-deprecated[7.2]
+deprecated:[7.2]
 Sets up the index template only.
 It is recommended to use `--index-management` instead.
 
 *`--ilm-policy`*::
-deprecated[7.2]
+deprecated:[7.2]
 Sets up the index lifecycle management policy.
 It is recommended to use `--index-management` instead.
 
