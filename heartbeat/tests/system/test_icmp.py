@@ -98,7 +98,8 @@ class Test(BaseTest):
                 sys.stderr.write("NO RIGHTS\n")
                 proc = self.start_beat()
                 expected = "You dont have root permission to run ping"
-                self.wait_until(lambda: self.log_contains(expected), 30)
+                time.sleep(30)
+                assert self.log_contains(expected)
                 sys.stderr.write("RAN IT\n")
         else:
             sys.stderr.write("ON WINDOWS %s\n")
