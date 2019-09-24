@@ -18,7 +18,7 @@ test: prepare-test
 	$(MAKE) unit
 
 .PHONY: prepare-test
-prepare-test:: mage-setup
+prepare-test:: ${GOPATH}/bin/mage
 	# Makes sure to use current version of beats for testing
 	#rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
 	#git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
@@ -47,8 +47,8 @@ test-build: test
 	$(MAKE) deps ; \
 	$(MAKE) images
 
-.PHONY: mage-setup
-mage-setup: ${GOPATH}/bin/mage
+
+${GOPATH}/bin/mage:
 	go get -u -d github.com/magefile/mage
 	cd $${GOPATH}/src/github.com/magefile/mage;  \
 	go run bootstrap.go
