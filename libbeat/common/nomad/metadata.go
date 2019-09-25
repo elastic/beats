@@ -69,7 +69,7 @@ func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 
 // ResourceMetadata generates metadata for the *given Nomad allocation*
 func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
-	tasksMeta := g.GroupMeta(obj.Job)
+	tasksMeta := g.groupMeta(obj.Job)
 
 	for _, task := range tasksMeta {
 		labelMap := common.MapStr{}
@@ -115,7 +115,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 }
 
 // returns a tuple of maps (group/task name to metadata)
-func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
+func (g *metaGenerator) groupMeta(job *Job) []common.MapStr {
 	tasksMeta := []common.MapStr{}
 
 	for _, group := range job.TaskGroups {
@@ -159,10 +159,6 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) common.MapStr {
 
 		taskMap.Put(task.Name, meta)
 	}
-
-	// apply IncludeLabels
-
-	// apply ExcludeLabels
 
 	return taskMap
 }
