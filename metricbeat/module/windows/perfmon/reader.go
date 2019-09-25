@@ -76,15 +76,12 @@ func NewReader(config Config) (*Reader, error) {
 		}
 		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
 		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
-			query.Close()
 			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.Query)
 		}
 		for _, v := range childQueries {
 			if err := query.AddCounter(v, counter, len(childQueries) > 1); err != nil {
-				query.Close()
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
-
 			r.instanceLabel[v] = counter.InstanceLabel
 			r.measurement[v] = counter.MeasurementLabel
 		}
@@ -95,26 +92,42 @@ func NewReader(config Config) (*Reader, error) {
 
 // RefreshCounterPaths will recheck for any new instances and add them to the counter list
 func (r *Reader) RefreshCounterPaths() error {
+	var newCounters []string
 	for _, counter := range r.config.CounterConfig {
-		if !strings.Contains(counter.Query, "*") {
-			continue
-		}
 		childQueries, err := r.query.ExpandWildCardPath(counter.Query)
+		if err != nil {
+			if r.config.IgnoreNECounters {
+				switch err {
+				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
+					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
+					r.log.Infow("Ignoring non existent counter", "error", err,
+						logp.Namespace("perfmon"), "query", counter.Query)
+					continue
+				}
+			} else {
+				return errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
+			}
+		}
+		newCounters = append(newCounters, childQueries...)
+		// there are cases when the ExpandWildCardPath will retrieve a successful status but not an expanded query so we need to check for the size of the list
 		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
 			for _, v := range childQueries {
 				if err := r.query.AddCounter(v, counter, len(childQueries) > 1); err != nil {
-					r.query.Close()
-					return errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
+					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.Query)
 				}
 				r.instanceLabel[v] = counter.InstanceLabel
 				r.measurement[v] = counter.MeasurementLabel
 			}
-			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
-			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-			if err := r.query.CollectData(); err != nil {
-				return errors.Wrap(err, "failed querying counter values")
-			}
 		}
+	}
+	err := r.query.RemoveUnusedCounters(newCounters)
+	if err != nil {
+		return errors.Wrap(err, "failed removing unused counter values")
+	}
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+	if err = r.query.CollectData(); err != nil {
+		return errors.Wrap(err, "failed querying counter values")
 	}
 	return nil
 }

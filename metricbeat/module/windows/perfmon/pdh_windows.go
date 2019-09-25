@@ -30,6 +30,7 @@ import (
 // Windows API calls
 //sys _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhOpenQueryW
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhRemoveCounter
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValueDouble(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueDouble) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
 //sys _PdhGetFormattedCounterValueLarge(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLarge) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
@@ -96,6 +97,15 @@ func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (
 	}
 
 	return handle, nil
+}
+
+// PdhRemoveCounter removes the specified counter to the query.
+func PdhRemoveCounter(counter PdhCounterHandle) error {
+	if err := _PdhRemoveCounter(counter); err != nil {
+		return PdhErrno(err.(syscall.Errno))
+	}
+
+	return nil
 }
 
 // PdhCollectQueryData collects the current raw data value for all counters in the specified query.

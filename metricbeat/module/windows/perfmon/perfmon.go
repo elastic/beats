@@ -92,7 +92,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// refresh performance counter list
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-	// A flag s set if the second call has been executed else refresh will fail (reader.executed)
+	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
 	if m.reader.executed {
 		err := m.reader.RefreshCounterPaths()
 		if err != nil {
