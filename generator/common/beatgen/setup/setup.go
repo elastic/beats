@@ -106,11 +106,6 @@ func CopyVendor() error {
 
 }
 
-// getRealBeatsRepo gets a non
-func getRealBeatsRepo() {
-
-}
-
 // GitInit initializes a new git repo in the current directory
 func GitInit() error {
 	return sh.Run("git", "init")

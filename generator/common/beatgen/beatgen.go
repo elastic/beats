@@ -113,7 +113,6 @@ func Generate() error {
 
 // VendorUpdate updates the beat vendor directory
 func VendorUpdate() error {
-
 	err := sh.Rm("./vendor/github.com/elastic/beats")
 	if err != nil {
 		return errors.Wrap(err, "error removing vendor dir")
@@ -174,7 +173,6 @@ func getValFromUser(cfgKey, def string) (string, error) {
 
 // getAbsoluteBeatsPath tries to infer the "real" non-vendor beats path
 func getAbsoluteBeatsPath() string {
-
 	beatsImportPath := "github.com/elastic/beats"
 	gopath := os.Getenv("GOPATH")
 	if gopath != "" {
