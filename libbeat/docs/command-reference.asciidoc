@@ -698,7 +698,7 @@ template, ILM policy, and write alias (if supported and configured).
 ifdef::apm-server[]
 *`--pipelines`*::
 Registers the <<configuring-ingest-node,pipeline>> definitions set in `ingest/pipeline/definition.json`.
-end::apm-server[]
+endif::apm-server[]
 
 *`--template`*::
 deprecated:[7.2]
