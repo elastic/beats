@@ -106,9 +106,8 @@ events from CloudWatch Logs and forwards the events to {es}.
     description: "lambda function for cloudwatch logs"
     triggers:
       - log_group_name: /aws/lambda/my-lambda-function
-output.elasticsearch:
-  cloud.id: "MyESDeployment:SomeLongString=="
-  cloud.auth: "elastic:SomeLongString"
+cloud.id: "MyESDeployment:SomeLongString=="
+cloud.auth: "elastic:SomeLongString"
 -------------------------------------------------------------------------------------
 
 To configure {beatname_uc}:
