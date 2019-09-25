@@ -1,11 +1,356 @@
-- key: ibmmq
-  title: "ibmmq"
-  description: >
-    experimental[]
-
-    ibmmq module
+- name: qmgr
+  type: group
+  description: Contains statistics related to Queue Manager
+  release: beta
   fields:
-    - name: ibmmq
-      type: group
-      description: >
-      fields:
+    - name: mqca_alteration_date
+      type: string
+      description: The date, in the form yyyy-mm-dd, on which the information was last altered.
+    - name: mqca_alteration_time
+      type: string
+      description: The time, in the form hh.mm.ss, at which the information was last altered.
+    - name: mqca_cert_label
+      type: string
+      description: Certificate label for this queue manager to use. The label identifies which personal certificate in the key repository has been selected.
+    - name: mqca_channel_auto_def_exit
+      type: string
+      description: Channel auto-definition exit name.
+    - name: mqca_cluster_workload_data
+      type: string
+      description: Data passed to the cluster workload exit.
+    - name: mqca_cluster_workload_exit
+      type: string
+      description: Name of the cluster workload exit.
+    - name: mqca_command_input_q_name
+      type: string
+      description: Command input queue name.
+    - name: mqca_conn_auth
+      type: string
+      description: Name of the authentication information object that is used to provide the location of user ID and password authentication.
+    - name: mqca_creation_date
+      type: string
+      description: Queue creation date, in the form yyyy-mm-dd
+    - name: mqca_creation_time
+      type: string
+      description: Creation time, in the form hh.mm.ss
+    - name: mqca_custom
+      type: string
+      description: Custom attribute for new features.
+    - name: mqca_dead_letter_q_name
+      type: string
+      description: Dead letter (undelivered message) queue name.
+    - name: mqca_def_xmit_q_name
+      type: string
+      description: Default transmission queue name.
+    - name: mqca_installation_desc
+      type: string
+      description:
+    - name: mqca_installation_name
+      type: string
+      description:
+    - name: mqca_installation_path
+      type: string
+      description:
+    - name: mqca_parent
+      type: string
+      description:
+    - name: mqca_q_mgr_desc
+      type: string
+      description:
+    - name: mqca_q_mgr_identifier
+      type: string
+      description:
+    - name: mqca_repository_name
+      type: string
+      description:
+    - name: mqca_repository_namelist
+      type: string
+      description:
+    - name: mqca_ssl_crl_namelist
+      type: string
+      description:
+    - name: mqca_ssl_crypto_hardware
+      type: string
+      description:
+    - name: mqca_ssl_key_repository
+      type: string
+      description:
+    - name: mqca_version
+      type: string
+      description:
+    - name: mqcacf_archive_log_extent_name
+      type: string
+      description:
+    - name: mqcacf_current_log_extent_name
+      type: string
+      description:
+    - name: mqcacf_log_path
+      type: string
+      description:
+    - name: mqcacf_media_log_extent_name
+      type: string
+      description:
+    - name: mqcacf_q_mgr_start_date
+      type: string
+      description:
+    - name: mqcacf_q_mgr_start_time
+      type: string
+      description:
+    - name: mqcacf_restart_log_extent_name
+      type: string
+      description:
+    - name: mqia_accounting_conn_override
+      type: long
+      description: Specifies whether applications can override the settings of the QueueAccounting and MQIAccounting queue manager parameters.
+    - name: mqia_accounting_interval
+      type: long
+      decsription: The time interval, in seconds, at which intermediate accounting records are written.
+    - name: mqia_accounting_mqi
+      type: long
+      description:
+    - name: mqia_accounting_q
+      type: long
+      description:
+    - name: mqia_activity_conn_override
+      type: long
+      description: Specifies whether applications can override the setting of the ACTVTRC value in the queue manager attribute.
+    - name: mqia_activity_recording
+      type: long
+      description: Whether activity reports can be generated.
+    - name: mqia_activity_trace
+      type: long
+      description: Whether activity reports can be generated.
+    - name: mqia_advanced_capability
+      type: long
+      description:
+    - name: mqia_amqp_capability
+      type: long
+      description:
+    - name: mqia_authority_event
+      type: long
+      description:
+    - name: mqia_cert_val_policy
+      type: long
+      description: Specifies which SSL/TLS certificate validation policy is used to validate digital certificates received from remote partner systems
+    - name: mqia_channel_auto_def
+      type: long
+      description: Controls whether receiver and server-connection channels can be auto-defined.
+    - name: mqia_channel_auto_def_event
+      type: long
+      description: Controls whether channel auto-definition events are generated, when a receiver, server-connection, or cluster-sender channel is auto-defined.
+    - name: mqia_channel_event
+      type: long
+      description: Controls whether channel events are generated.
+    - name: mqia_chinit_control
+      type: long
+      description: Start the channel initiator during queue manager start.
+    - name: mqia_chlauth_records
+      type: long
+      description:
+    - name: mqia_cluster_workload_length
+      type: long
+      description: Cluster workload length.
+    - name: mqia_clwl_mru_channels
+      type: long
+      description: Cluster workload most recently used (MRU) channels.
+    - name: mqia_clwl_useq
+      type: long
+      description: Use of remote queue. Specifies whether a cluster queue manager is to use remote puts to other queues defined in other queue managers within the cluster during workload management.
+    - name: mqia_cmd_server_control
+      type: long
+      description: Start the command server during queue manager start.
+    - name: mqia_coded_char_set_id
+      type: long
+      description:
+    - name: mqia_command_event
+      type: long
+      description:
+    - name: mqia_command_level
+      type: long
+      description:
+    - name: mqia_configuration_event
+      type: long
+      description:
+    - name: mqia_def_cluster_xmit_q_type
+      type: long
+      description: The DefClusterXmitQueueType attribute controls which transmission queue is selected by default by cluster-sender channels to get messages from, to send the messages to cluster-receiver channels.
+    - name: mqia_dist_lists
+      type: long
+      description: Distribution list support
+    - name: mqia_inhibit_event
+      type: long
+      description: Controls whether inhibit.
+    - name: mqia_ip_address_version
+      type: long
+      description: IP address version selector
+    - name: mqia_local_event
+      type: long
+      description: Controls whether local error events are generated.
+    - name: mqia_logger_event
+      type: long
+      description: Controls whether recovery log events are generated.
+    - name: mqia_max_handles
+      type: long
+      description: Maximum number of handles.
+    - name: mqia_max_msg_length
+      type: long
+      description: Maximum message length.
+    - name: mqia_max_priority
+      type: long
+      description: Maximum priority.
+    - name: mqia_max_properties_length
+      type: long
+      description: Maximum properties length.
+    - name: mqia_max_uncommitted_msgs
+      type: long
+      description: Maximum number of uncommitted messages within a unit of work.
+    - name: mqia_media_image_interval
+      type: long
+      description: Controls whether local error events are generated.
+    - name: mqia_media_image_log_length
+      type: long
+      description: Controls whether local error events are generated.
+    - name: mqia_media_image_recover_obj
+      type: long
+      description: Controls whether local error events are generated.
+    - name: mqia_media_image_recover_q
+      type: long
+      description: Controls whether local error events are generated.
+    - name: mqia_media_image_recover_q
+      type: long
+      description:
+    - name: mqia_monitoring_auto_clussdr
+      type: long
+      description:
+    - name: mqia_monitoring_channel
+      type: long
+      description:
+    - name: mqia_monitoring_q
+      type: long
+      description:
+    - name: mqia_msg_mark_browse_interval
+      type: long
+      description:
+    - name: mqia_performance_event
+      type: long
+      description: Controls whether performance-related events are generated.
+    - name: mqia_platform
+      type: long
+      description: Platform on which the queue manager resides.
+    - name: mqia_prot_policy_capability
+      type: long
+      description:
+    - name: mqia_pubsub_cluster
+      type: long
+      description: Controls whether the queue manager participates in publish/subscribe clustering.
+    - name: mqia_pubsub_maxmsg_retry_count
+      type: long
+      description: The number of attempts to reprocess a failed command message under sync point.
+    - name: mqia_pubsub_mode
+      type: long
+      description: Specifies whether the publish/subscribe engine and the queued publish/subscribe interface are running.
+    - name: mqia_pubsub_np_msg
+      type: long
+      description: Specifies whether to discard or keep an undelivered input message.
+    - name: mqia_pubsub_np_resp
+      type: long
+      description: Controls the behavior of undelivered response messages.
+    - name: mqia_pubsub_sync_pt
+      type: long
+      description: Specifies whether only persistent messages or all messages are processed under sync point.
+    - name: mqia_remote_event
+      type: long
+      description: Controls whether remote error events are generated.
+    - name: mqia_reverse_dns_lookup
+      type: long
+      description: Whether reverse lookup of the host name from a Domain Name Server is carried out.
+    - name: mqia_ssl_event
+      type: long
+      description: Controls whether SSL events are generated.
+    - name: mqia_ssl_fips_required
+      type: long
+      description: Controls whether only FIPS-certified algorithms are to be used if cryptography is executed in IBM MQ itself.
+    - name: mqia_ssl_reset_count
+      type: long
+      description:
+    - name: mqia_start_stop_event
+      type: long
+      description: Controls whether start and stop events are generated.
+    - name: mqia_statistics_auto_clussdr
+      type: long
+      description:
+    - name: mqia_statistics_channel
+      type: long
+      description:
+    - name: mqia_statistics_interval
+      type: long
+      description: The time interval, in seconds, at which statistics monitoring data is written to the monitoring queue.
+    - name: mqia_statistics_mqi
+      type: long
+      description:
+    - name: mqia_statistics_q
+      type: long
+      description:
+    - name: mqia_suite_b_strength_0
+      type: long
+      description:
+    - name: mqia_suite_b_strength_1
+      type: long
+      description:
+    - name: mqia_suite_b_strength_2
+      type: long
+      description:
+    - name: mqia_suite_b_strength_3
+      type: long
+      description:
+    - name: mqia_syncpoint
+      type: long
+      description: Sync point availability.
+    - name: mqia_trace_route_recording
+      type: long
+      description: Specifies whether trace-route information can be recorded and a reply message generated.
+    - name: mqia_tree_life_time
+      type: long
+      description: The lifetime in seconds of non-administrative topics.
+    - name: mqia_trigger_interval
+      type: long
+      description: Trigger interval.
+    - name: mqia_xr_capability
+      type: long
+      description: Specifies whether the IBM MQ Telemetry capability and commands are supported by the queue manager.
+    - name: mqiacf_archive_log_size
+      type: long
+      description:
+    - name: mqiacf_chinit_status
+      type: long
+      description:
+    - name: mqiacf_cmd_server_status
+      type: long
+      description:
+    - name: mqiacf_connection_count
+      type: long
+      description:
+    - name: mqiacf_ldap_connection_status
+      type: long
+      description:
+    - name: mqiacf_log_in_use
+      type: long
+      description:
+    - name: mqiacf_log_utilization
+      type: long
+      description:
+    - name: mqiacf_media_log_size
+      type: long
+      description:
+    - name: mqiacf_permit_standby
+      type: long
+      description:
+    - name: mqiacf_q_mgr_status
+      type: long
+      description:
+    - name: mqiacf_restart_log_size
+      type: long
+      description:
+    - name: mqiacf_reusable_log_size
+      type: long
+      description:

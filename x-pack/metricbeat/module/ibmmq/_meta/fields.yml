@@ -8,4 +8,5 @@
     - name: ibmmq
       type: group
       description: >
+        `ibmmq` contains statistics that were read from IBM MQ
       fields:
