@@ -313,7 +313,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to set the document id in the json reader. {pull}5844[5844]
 
 *Heartbeat*
-- Add non-privileged icmp on linux and darwin(mac). {pull}11610[11610] {issue}11498[11498]
+- Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
 
 - Enable `add_observer_metadata` processor in default config. {pull}11394[11394]
 - Record HTTP body metadata and optionally contents in `http.response.body.*` fields. {pull}13022[13022]

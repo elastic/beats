@@ -228,7 +228,6 @@ func (l *icmpLoop) ping(
 	timeout time.Duration,
 	interval time.Duration,
 ) (time.Duration, int, error) {
-	debugf("INVOKE PING")
 
 	var err error
 	toTimer := time.NewTimer(timeout)
@@ -300,7 +299,6 @@ func (l *icmpLoop) ping(
 		return 0, requests, timeoutError{}
 	}
 
-	debugf("PING DONE %v", rtt)
 	return rtt, requests, nil
 }
 
