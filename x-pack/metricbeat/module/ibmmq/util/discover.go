@@ -605,6 +605,9 @@ func ParsePCFResponse(buf []byte) ([]*ibmmq.PCFParameter, bool) {
 	// the number of bytes read so we know where to start
 	// looking for the next element
 	cfh, offset := ibmmq.ReadPCFHeader(buf)
+	if cfh == nil {
+		return elemList, rc
+	}
 
 	if cfh.CompCode != 0 {
 		logp.Critical("There was a problem while reading response: CompCode: %v, Reason: %v", cfh.CompCode, cfh.Reason)
