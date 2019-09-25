@@ -3,7 +3,7 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "VolumeId": "vol-053e1fa82db46df30"
+                "VolumeId": "vol-6ae467c0"
             },
             "namespace": "AWS/EBS"
         },
@@ -12,28 +12,29 @@
                 "avg": 100
             },
             "VolumeIdleTime": {
-                "sum": 298.28
+                "sum": 299.97
             },
             "VolumeQueueLength": {
-                "avg": 0.0471333333333333
+                "avg": 0.0001
             },
             "VolumeReadOps": {
                 "avg": 0
             },
             "VolumeTotalWriteTime": {
-                "sum": 14.14
+                "sum": 0.03
             },
             "VolumeWriteBytes": {
-                "avg": 31700.312513233115
+                "avg": 10330.79802955665
             },
             "VolumeWriteOps": {
-                "avg": 4723
+                "avg": 203
             }
         }
     },
     "cloud": {
         "account": {
-            "id": "elastic-test"
+            "id": "627959692251",
+            "name": "elastic-test"
         },
         "provider": "aws",
         "region": "us-east-1"

@@ -407,7 +407,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 				if len(labels) == 5 {
 					identifierValue := labels[identifierValueIdx]
 					if _, ok := events[identifierValue]; !ok {
-						events[identifierValue] = aws.InitEvent(regionName, m.AccountName)
+						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					}
 
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
@@ -416,7 +416,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 						events[identifierValue].RootFields.Put("aws.tags."+*tag.Key, *tag.Value)
 					}
 				} else {
-					eventNew := aws.InitEvent(regionName, m.AccountName)
+					eventNew := aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					eventNew = insertRootFields(eventNew, output.Values[timestampIdx], labels)
 					eventsNoIdentifier = append(eventsNoIdentifier, eventNew)
 				}

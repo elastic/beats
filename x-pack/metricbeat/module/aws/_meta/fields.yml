@@ -18,3 +18,7 @@
           type: keyword
           description: >
             Name of a S3 bucket.
+    - name: cloud.account.name
+      type: keyword
+      description: >
+        The cloud account name or alias used to identify different entities in a multi-tenant environment.

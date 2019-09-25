@@ -4,7 +4,7 @@
         "rds": {
             "cpu": {
                 "total": {
-                    "pct": 1.33333333333212
+                    "pct": 0.999999999997575
                 }
             },
             "database_connections": 0,
@@ -14,31 +14,32 @@
                 "identifier": "database-1",
                 "status": "available"
             },
-            "disk_queue_depth": 0.0002000166680556713,
+            "disk_queue_depth": 0.00006666888896296543,
             "disk_usage": {
-                "bin_log.bytes": 3007
+                "bin_log.bytes": 2752
             },
             "free_storage.bytes": 20402475008,
-            "freeable_memory.bytes": 453394432,
+            "freeable_memory.bytes": 441335808,
             "latency": {
                 "read": 0,
-                "write": 0.0003243243243243243
+                "write": 0.0002909090909090909
             },
             "read_io.ops_per_sec": 0,
-            "swap_usage.bytes": 823296,
+            "swap_usage.bytes": 1167360,
             "throughput": {
-                "network_receive": 463.3666666666667,
-                "network_transmit": 2658.5333333333333,
+                "network_receive": 570.7618714269047,
+                "network_transmit": 3228.0614030701536,
                 "read": 0,
-                "write": 4164.266666666666
+                "write": 3754.7918263942133
             },
             "transactions": {},
-            "write_io.ops_per_sec": 0.45
+            "write_io.ops_per_sec": 0.40002000100005003
         }
     },
     "cloud": {
         "account": {
-            "id": "elastic-test"
+            "id": "627959692251",
+            "name": "elastic-test"
         },
         "availability_zone": "ap-southeast-1a",
         "provider": "aws",

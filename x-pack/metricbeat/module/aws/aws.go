@@ -35,6 +35,7 @@ type MetricSet struct {
 	Period      time.Duration
 	AwsConfig   *awssdk.Config
 	AccountName string
+	AccountID   string
 }
 
 // Tag holds a configuration specific for ec2 and cloudwatch metricset.
@@ -84,19 +85,28 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		AwsConfig:     &awsConfig,
 	}
 
-	// Get IAM  account name or account id
+	// Get IAM account name
 	svcIam := iam.New(awsConfig)
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
 	output, err := req.Send(context.TODO())
-	if output.AccountAliases != nil && err == nil {
-		metricSet.AccountName = output.AccountAliases[0]
-	} else {
-		// get account id if account alias is empty
-		svcSts := sts.New(awsConfig)
-		reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
-		outputIdentity, _ := reqIdentity.Send(context.TODO())
-		metricSet.AccountName = *outputIdentity.Account
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list account aliases")
 	}
+
+	// There can be more than one aliases for each account, for now we are only
+	// collecting the first one.
+	if output.AccountAliases != nil {
+		metricSet.AccountName = output.AccountAliases[0]
+	}
+
+	// Get IAM account id
+	svcSts := sts.New(awsConfig)
+	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
+	outputIdentity, err := reqIdentity.Send(context.TODO())
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get caller identity")
+	}
+	metricSet.AccountID = *outputIdentity.Account
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
@@ -143,7 +153,7 @@ func StringInSlice(str string, list []string) (bool, int) {
 }
 
 // InitEvent initialize mb.Event with basic information like service.name, cloud.provider
-func InitEvent(regionName string, accountName string) mb.Event {
+func InitEvent(regionName string, accountName string, accountID string) mb.Event {
 	event := mb.Event{}
 	event.MetricSetFields = common.MapStr{}
 	event.ModuleFields = common.MapStr{}
@@ -153,7 +163,10 @@ func InitEvent(regionName string, accountName string) mb.Event {
 		event.RootFields.Put("cloud.region", regionName)
 	}
 	if accountName != "" {
-		event.RootFields.Put("cloud.account.id", accountName)
+		event.RootFields.Put("cloud.account.name", accountName)
+	}
+	if accountID != "" {
+		event.RootFields.Put("cloud.account.id", accountID)
 	}
 	return event
 }

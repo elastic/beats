@@ -4,11 +4,11 @@
         "ec2": {
             "cpu": {
                 "credit_balance": 576,
-                "credit_usage": 0.221052,
+                "credit_usage": 0.217777,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 2.2489071038250743
+                    "pct": 2.1374965268131265
                 }
             },
             "diskio": {
@@ -51,16 +51,16 @@
             },
             "network": {
                 "in": {
-                    "bytes": 1536716.6,
-                    "bytes_per_sec": 5122.388666666667,
-                    "packets": 3246,
-                    "packets_per_sec": 10.82
+                    "bytes": 1510123.4,
+                    "bytes_per_sec": 5033.7446666666665,
+                    "packets": 3126.4,
+                    "packets_per_sec": 10.421333333333333
                 },
                 "out": {
-                    "bytes": 473658.4,
-                    "bytes_per_sec": 1578.8613333333335,
-                    "packets": 3114.8,
-                    "packets_per_sec": 10.382666666666667
+                    "bytes": 464863,
+                    "bytes_per_sec": 1549.5433333333333,
+                    "packets": 3031.2,
+                    "packets_per_sec": 10.104
                 }
             },
             "status": {
@@ -76,7 +76,8 @@
     },
     "cloud": {
         "account": {
-            "id": "elastic-test"
+            "id": "627959692251",
+            "name": "elastic-test"
         },
         "availability_zone": "us-east-1b",
         "instance": {

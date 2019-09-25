@@ -3,7 +3,7 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "AvailabilityZone": "us-east-1b"
+                "AvailabilityZone": "us-east-1c"
             },
             "namespace": "AWS/ELB"
         },
@@ -21,7 +21,8 @@
     },
     "cloud": {
         "account": {
-            "id": "elastic-test"
+            "id": "627959692251",
+            "name": "elastic-test"
         },
         "provider": "aws",
         "region": "us-east-1"

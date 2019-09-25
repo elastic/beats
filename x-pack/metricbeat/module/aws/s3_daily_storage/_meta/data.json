@@ -3,21 +3,22 @@
     "aws": {
         "s3": {
             "bucket": {
-                "name": "test-s3-ks"
+                "name": "test-s3-ks-2"
             }
         },
         "s3_daily_storage": {
             "bucket": {
                 "size": {
-                    "bytes": 103531
+                    "bytes": 207372
                 }
             },
-            "number_of_objects": 2
+            "number_of_objects": 128
         }
     },
     "cloud": {
         "account": {
-            "id": "elastic-test"
+            "id": "627959692251",
+            "name": "elastic-test"
         },
         "provider": "aws",
         "region": "ap-southeast-1"
