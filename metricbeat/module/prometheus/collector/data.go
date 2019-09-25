@@ -136,12 +136,14 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 		untyped := metric.GetUntyped()
 		if untyped != nil {
-			events = append(events, PromEvent{
-				data: common.MapStr{
-					name: untyped.GetValue(),
-				},
-				labels: labels,
-			})
+			if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name: untyped.GetValue(),
+					},
+					labels: labels,
+				})
+			}
 		}
 	}
 	return events
