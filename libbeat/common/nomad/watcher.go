@@ -47,6 +47,7 @@ type watcher struct {
 	nodeID    string
 	lastFetch time.Time
 	handler   ResourceEventHandlerFuncs
+	waitIndex uint64
 }
 
 // WatchOptions controls watch behaviors
@@ -65,9 +66,10 @@ type WatchOptions struct {
 // resource from the cluster (filtered to the given node)
 func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 	w := &watcher{
-		client:  client,
-		options: options,
-		logger:  logp.NewLogger("nomad"),
+		client:    client,
+		options:   options,
+		logger:    logp.NewLogger("nomad"),
+		waitIndex: 0,
 	}
 
 	return w, nil
@@ -100,7 +102,7 @@ func (w *watcher) sync() error {
 	queryOpts := &api.QueryOptions{
 		WaitTime:   w.options.SyncTimeout,
 		AllowStale: true,
-		WaitIndex:  1,
+		WaitIndex:  w.waitIndex,
 	}
 
 	if w.nodeID == "" {
@@ -120,6 +122,8 @@ func (w *watcher) sync() error {
 		}
 	}
 
+	w.logger.Infof("Filtering allocations running in node: [%s, %s]", w.nodeID, w.options.Node)
+
 	// Do we need to keep direct access to the metadata as well?
 	allocations, meta, err := w.client.Nodes().Allocations(w.nodeID, queryOpts)
 	if err != nil {
@@ -127,18 +131,20 @@ func (w *watcher) sync() error {
 		return err
 	}
 
+	w.logger.Infof("Found %d allocations", len(allocations))
+
 	remoteWaitIndex := meta.LastIndex
 	localWaitIndex := queryOpts.WaitIndex
 
-	// Only work if the WaitIndex have changed
-	if remoteWaitIndex == localWaitIndex {
-		w.logger.Debug("Allocations index is unchanged (%d == %d)",
-			fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
-		return nil
-	}
+	// Only emit updated metadata if the WaitIndex have changed
+	// if remoteWaitIndex == localWaitIndex {
+	// 	w.logger.Debugf("Allocations index is unchanged (%d == %d)",
+	// 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
+	// 	return nil
+	// }
 
 	for _, alloc := range allocations {
-		// "Patch" the local hostname/node name into the allocations. filebeat
+		// "patch" the local hostname/node name into the allocations. filebeat
 		// runs locally on each client filters the allocations based on the
 		// hostname/client node name. Due this particular setup all allocations
 		// fetched from the API are coming from the same client.
@@ -147,6 +153,8 @@ func (w *watcher) sync() error {
 		if len(alloc.NodeName) == 0 {
 			alloc.NodeName = w.options.Node
 		}
+
+		w.logger.Debugf("Received allocation: %s - %s", alloc.ID, alloc.DesiredStatus)
 
 		switch alloc.DesiredStatus {
 		case AllocDesiredStatusRun:
@@ -158,6 +166,7 @@ func (w *watcher) sync() error {
 		}
 
 		// allocation was updated after our last fetch
+		// TODO verify if this is needed while relying on the WaitIndex
 		if alloc.ModifyTime > w.lastFetch.Unix() {
 			w.handler.OnUpdate(*alloc)
 		}
@@ -166,7 +175,7 @@ func (w *watcher) sync() error {
 	w.logger.Debug("Allocations index has changed (%d != %d)",
 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 
-	queryOpts.WaitIndex = meta.LastIndex
+	w.waitIndex = meta.LastIndex
 	w.lastFetch = time.Now()
 
 	return nil
