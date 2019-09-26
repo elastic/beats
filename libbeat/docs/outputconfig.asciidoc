@@ -723,6 +723,7 @@ include::./shared-logstash-config.asciidoc[]
 Every event sent to Logstash contains the following metadata fields that you can
 use in Logstash for indexing and filtering:
 
+ifndef::apm-server[]
 ["source","json",subs="attributes"]
 ------------------------------------------------------------------------------
 {
@@ -730,7 +731,6 @@ use in Logstash for indexing and filtering:
     "@metadata": { <1>
       "beat": "{beat_default_index_prefix}", <2>
       "version": "{stack-version}" <3>
-      "type": "doc" <4>
     }
 }
 ------------------------------------------------------------------------------
@@ -739,21 +739,39 @@ use in Logstash for indexing and filtering:
 for more about the `@metadata` field.
 <2> The default is {beat_default_index_prefix}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
-<3> The beats current version.
-<4> The value of `type` is currently hardcoded to `doc`. It was used by previous
-Logstash configs to set the type of the document in Elasticsearch.
+<3> The current version of {beatname_uc}.
+endif::[]
 
-
-WARNING: The `@metadata.type` field, added by the Logstash output, is
-deprecated, hardcoded to `doc`, and will be removed in {beatname_uc} 7.0.
+ifdef::apm-server[]
+["source","json",subs="attributes"]
+------------------------------------------------------------------------------
+{
+    ...
+    "@metadata": { <1>
+      "beat": "{beat_default_index_prefix}", <2>
+      "pipeline":"apm", <3>
+      "version": "{stack-version}" <4>
+    }
+}
+------------------------------------------------------------------------------
+<1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. See the
+{logstash-ref}/event-dependent-configuration.html#metadata[Logstash documentation]
+for more about the `@metadata` field.
+<2> The default is {beat_default_index_prefix}. To change this value, set the
+<<logstash-index,`index`>> option in the {beatname_uc} config file.
+<3> The default pipeline configuration: `apm`. Additional pipelines can be enabled
+with a {logstash-ref}/use-ingest-pipelines.html[Logstash pipeline config].
+<4> The current version of {beatname_uc}.
+endif::[]
 
 You can access this metadata from within the Logstash config file to set values
 dynamically based on the contents of the metadata.
 
-For example, the following Logstash configuration file for versions 2.x and
-5.x sets Logstash to use the index and document type reported by Beats for
-indexing events into Elasticsearch:
+For example, the following Logstash configuration file tells
+Logstash to use the index reported by {beatname_uc} for indexing events
+into Elasticsearch:
 
+ifndef::apm-server[]
 [source,logstash]
 ------------------------------------------------------------------------------
 
@@ -774,11 +792,76 @@ output {
 of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to
 the Beat's version. For example:
 +{beat_default_index_prefix}-{version}+.
+endif::[]
+
+ifdef::apm-server[]
+[source,logstash]
+------
+input {
+    beats {
+        port => 5044
+    }
+}
+
+filter {
+    if [@metadata][beat] == "apm" {
+        if [processor][event] == "sourcemap" {
+            mutate {
+                add_field => { "[@metadata][index]" => "%{[@metadata][beat]}-%{[@metadata][version]}-%{[processor][event]}" } <1>
+            }
+        } else {
+            mutate {
+                add_field => { "[@metadata][index]" => "%{[@metadata][beat]}-%{[@metadata][version]}-%{[processor][event]}-%{+yyyy.MM.dd}" } <2>
+            }
+        }
+    }
+}
+
+output {
+    elasticsearch {
+        hosts => ["http://localhost:9200"]
+        index => "%{[@metadata][index]}"
+    }
+}
+------
+<1> Creates a new field named `@metadata.index`.
+`%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field.
+`%{[@metadata][version]}` sets the second part to {beatname_uc}'s version.
+`%{[processor][event]}` sets the final part based on the APM event type.
+For example: +{beat_default_index_prefix}-{version}-sourcemap+.
+<2> In addition to the above rules, this pattern appends a date to the `index` name so Logstash creates a new index each day.
+For example: +{beat_default_index_prefix}-{version}-transaction-{sample_date_0}+.
+endif::[]
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
-will be similar to events directly indexed by Beats into Elasticsearch.
+will be similar to events directly indexed by {beatname_uc} into Elasticsearch.
 
+ifndef::apm-server[]
 NOTE: If ILM is not being used, set `index` to `%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}` instead so Logstash creates an index per day, based on the `@timestamp` value of the events coming from Beats.
+endif::[]
+
+ifdef::apm-server[]
+==== Logstash and ILM
+
+When used with {apm-server-ref}/manual-ilm-setup.html[Index lifecycle management], Logstash does not need to create a new index each day.
+Here's a sample Logstash configuration file that would accomplish this:
+
+[source,logstash]
+------
+input {
+    beats {
+        port => 5044
+    }
+}
+
+output {
+    elasticsearch {
+        hosts => ["http://localhost:9200"]
+        index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{[processor][event]}"
+    }
+}
+------
+endif::[]
 
 ==== Compatibility
 
@@ -796,7 +879,7 @@ You can specify the following options in the `logstash` section of the
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
-The default value is true.
+The default value is `true`.
 
 [[hosts]]
 ===== `hosts`
