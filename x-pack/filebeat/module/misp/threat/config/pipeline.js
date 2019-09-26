@@ -25,7 +25,7 @@ var threat = (function () {
     });
 
     var setThreatFeedField = function (evt) {
-        evt.Put("threat.threat_indicator.feed", "misp") 
+        evt.Put("threat.threat_indicator.feed", "misp");
     };
 
     var convertFields = new processor.Convert({
@@ -40,6 +40,8 @@ var threat = (function () {
     var setAttackPattern = function (evt) {
         var indicator_type = evt.Get("json.type");
         var attackPattern;
+        var arr;
+        var filename;
         var v = evt.Get("json.value");
         switch (indicator_type) {
             case "ip-dst":
@@ -68,6 +70,7 @@ var threat = (function () {
                 break;
             case "link":
                 attackPattern = '[' + 'url.full = ' + '"' + v + '"' + ']';
+                break;
             case "url":
                 attackPattern = '[' + 'url.full = ' + '"' + v + '"' + ']';
                 break;
@@ -75,35 +78,35 @@ var threat = (function () {
                 attackPattern = '[' + 'dns.question.name = ' + '"' + v + '"' + ' OR zeek.dns.query = ' + '"' + v + '"' + ' OR url.domain = ' + '"' + v + '"' + ']';
                 break;
             case "domain|ip":
-                var arr = v.split("|");
+                arr = v.split("|");
                 if (arr.length == 2) {
-                    var domain = arr[0]
-                    var ip = arr[1]
+                    var domain = arr[0];
+                    var ip = arr[1];
                     attackPattern = '[' + '(' + 'dns.question.name = ' + '"' + domain + '"' + ' OR zeek.dns.query = ' + '"' + domain + '"' + ' OR url.domain = ' + '"' + domain + '"' + ')' +
                         ' AND ' + '(' + 'source.ip = ' + '"' + ip + '"' + ' OR destination.ip = ' + '"' + ip + '"' + ')' + ']';
                 }
                 break;
             case "filename|sha256":
-                var arr = v.split("|");
+                arr = v.split("|");
                 if (arr.length == 2) {
-                    var filename = arr[0]
-                    var sha256 = arr[1]
+                    filename = arr[0];
+                    var sha256 = arr[1];
                     attackPattern = '[' + 'file.sha256 = ' + '"' + sha256 + '"' + ' AND file.path = ' + '"' + filename + '"' + ']';
                 }
                 break;
             case "filename|sha1":
-                var arr = v.split("|");
+                arr = v.split("|");
                 if (arr.length == 2) {
-                    var filename = arr[0]
-                    var sha1 = arr[1]
+                    filename = arr[0];
+                    var sha1 = arr[1];
                     attackPattern = '[' + 'file.sha1 = ' + '"' + sha1 + '"' + ' AND file.path = ' + '"' + filename + '"' + ']';
                 }
                 break;
             case "filename|md5":
-                var arr = v.split("|");
+                arr = v.split("|");
                 if (arr.length == 2) {
-                    var filename = arr[0]
-                    var md5 = arr[1]
+                    filename = arr[0];
+                    var md5 = arr[1];
                     attackPattern = '[' + 'file.md5 = ' + '"' + md5 + '"' + ' AND file.path = ' + '"' + filename + '"' + ']';
                 }
                 break;
