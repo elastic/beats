@@ -79,7 +79,7 @@
     level: core
     type: date
     description: >
-      This field defines the Campaign’s primary goal, objective, desired outcome, or intended effect.
+      This field defines the Campaign's primary goal, objective, desired outcome, or intended effect.
 
 - name: course_of_action
   title: Cause of Action
