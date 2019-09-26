@@ -1,0 +1,10 @@
+- key: misp
+  title: MISP
+  description: >
+    Module for handling threat information from MISP.
+  fields:
+    - name: threat
+      type: group
+      description: >
+        Fields from MISP threat information.
+      fields:

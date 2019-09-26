@@ -20,6 +20,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/googlecloud"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/ibmmq"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/iptables"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/misp"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/mssql"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/netflow"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/panw"
