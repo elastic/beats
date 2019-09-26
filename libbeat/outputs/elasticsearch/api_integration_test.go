@@ -46,7 +46,7 @@ func TestIndex(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, resp, err := client.Index(index, "test", "1", params, body)
+	_, resp, err := client.Index(index, "", "1", params, body)
 	if err != nil {
 		t.Fatalf("Index() returns error: %s", err)
 	}
