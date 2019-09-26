@@ -3,8 +3,8 @@
 :modulename: misp
 :has-dashboards: false
 
-== MISP
+== MISP module
 
 beta[]
 
-This is a module for MISP. It supports reading threat information from MISP.
+This is a filebeat module for reading threat intel information from MISP.
