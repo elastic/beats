@@ -105,9 +105,8 @@ events from CloudWatch Logs and forwards the events to {es}.
     description: "lambda function for cloudwatch logs"
     triggers:
       - log_group_name: /aws/lambda/my-lambda-function
-output.elasticsearch:
-  cloud.id: "MyESDeployment:SomeLongString=="
-  cloud.auth: "elastic:SomeLongString"
+cloud.id: "MyESDeployment:SomeLongString=="
+cloud.auth: "elastic:SomeLongString"
 -------------------------------------------------------------------------------------
 
 To configure {beatname_uc}:
@@ -129,9 +128,10 @@ specify:
 are:
 * `cloudwatch_logs` to collect data from CloudWatch logs
 * `sqs` to collect messages from Amazon Simple Queue Service (SQS)
+* `kinesis` to collect data from Kinesis data streams
 `triggers`:: The triggers that will cause the function to execute. If `type`
-is `cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs`,
-specify a list of Amazon Resource Names (ARNs). 
+is `cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs` or
+`kinesis`, specify a list of Amazon Resource Names (ARNs). 
 +
 When a message is sent to the specified log group or queue, the Lambda function
 executes and sends message events to the output configured for {beatname_uc}.
@@ -168,9 +168,9 @@ include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 === Step 4: Deploy {beatname_uc} code to your serverless environment
 
 Before deploying functions to your serverless environment, make sure your user
-has the credentials required by your cloud service provider. For example, if you
-are deploying an AWS Lambda function, you can set environment variables that
-contain your credentials:
+has the credentials required to authenticate with your cloud service provider.
+For example, if you are deploying an AWS Lambda function, you can set
+environment variables that contain your credentials:
 
 *linux and mac*:
 
@@ -192,8 +192,12 @@ set AWS_DEFAULT_REGION=us-east-1
 
 Set `AWS_DEFAULT_REGION` to the region where your services are running.
 
-After setting credentials, run the `deploy` command to deploy the function.
-The following command deploys a function called `cloudwatch`: 
+Also make sure the user has the permissions required to deploy and run the
+function. For more information, see <<iam-permissions>>.
+
+After setting credentials and verifying permissions, run the `deploy` command to
+deploy the function. The following command deploys a function called
+`cloudwatch`: 
 
 *linux and mac:*
 
@@ -211,6 +215,8 @@ The following command deploys a function called `cloudwatch`:
 
 {beatname_uc} is now deployed in your serverless environment and ready to send
 log events to the configured output.
+
+If deployment fails, see <<faq>> for help troubleshooting.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.

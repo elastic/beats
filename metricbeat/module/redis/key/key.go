@@ -104,9 +104,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				r.Error(err)
 				continue
 			}
+			if keyInfo == nil {
+				m.Logger().Debugf("Ignoring removed key %s from keyspace %d", key, p.Keyspace)
+				continue
+			}
 			event := eventMapping(p.Keyspace, keyInfo)
 			if !r.Event(event) {
-				return errors.New("metricset has closed")
+				m.Logger().Debug("Failed to report event, interrupting fetch")
+				return nil
 			}
 		}
 	}

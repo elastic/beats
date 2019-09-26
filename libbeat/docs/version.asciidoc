@@ -7,3 +7,4 @@
 :docker-compose: 1.11
 :branch: 7.2
 :major-version: 7.x
+:ecs_version: 1.0

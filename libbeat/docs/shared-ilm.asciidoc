@@ -51,8 +51,8 @@ required license; otherwise, {beatname_uc} creates daily indices.
 ==== `setup.ilm.rollover_alias`
 
 The index lifecycle write alias name. The default is
-+{beatname_lc}-\{{beat_version_key}\}+. Setting this option changes the prefix
-in the alias name. It doesn't remove +{beat_version_key}+ from the alias name. 
++{beatname_lc}-%{{beat_version_key}}+. Setting this option changes the prefix
+in the alias name. It doesn't remove +{beat_version_key}+ from the alias name.
 
 NOTE: If you modify this setting after loading the index template, you must
 overwrite the template to apply the changes.
@@ -82,7 +82,7 @@ overwrite the template to apply the changes.
 ==== `setup.ilm.policy_name`
 
 The name to use for the lifecycle policy. The default is
-+{beatname_lc}-\{{beat_version_key}\}+.
++{beatname_lc}-%{[{beat_version_key}]}+.
 
 [float]
 [[setup-ilm-policy_file-option]]

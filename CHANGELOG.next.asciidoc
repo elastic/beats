@@ -30,11 +30,14 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
+
 *Auditbeat*
 
 *Filebeat*
 
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
+- Fix filebeat autodiscover fileset hint for container input. {pull}13296[13296]
 
 *Heartbeat*
 
@@ -43,6 +46,8 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 *Metricbeat*
 
 - Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+- Fix module-level fields in Kubernetes metricsets. {pull}13433[13433] {pull}13544[13544]
+- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
 
 *Packetbeat*
 
