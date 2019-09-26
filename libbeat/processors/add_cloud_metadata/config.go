@@ -42,7 +42,7 @@ func defaultConfig() config {
 	return config{
 		Timeout:   defaultTimeout,
 		Overwrite: defaultOverwrite,
-		Providers: nil, // enable all providers by default
+		Providers: nil, // enable all local-only providers by default
 	}
 }
 

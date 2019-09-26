@@ -64,20 +64,20 @@ var cloudMetaProviders = map[string]provider{
 	"tencent":      qcloudMetadataFetcher,
 }
 
-func selectProviders(list providerList, providers map[string]provider) map[string]provider {
-	return filterMetaProviders(providersFilter(list, providers), providers)
+func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
+	return filterMetaProviders(providersFilter(configList, providers), providers)
 }
 
-func providersFilter(list providerList, providers map[string]provider) func(string) bool {
-	if len(list) == 0 {
+func providersFilter(configList providerList, allProviders map[string]provider) func(string) bool {
+	if len(configList) == 0 {
 		return func(name string) bool {
-			ff, ok := providers[name]
+			ff, ok := allProviders[name]
 			return ok && ff.Local
 		}
 	}
 	return func(name string) (ok bool) {
-		if ok = list.Has(name); ok {
-			_, ok = providers[name]
+		if ok = configList.Has(name); ok {
+			_, ok = allProviders[name]
 		}
 		return ok
 	}
@@ -97,6 +97,11 @@ func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataF
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
+	// Iterate over all providers and create an unique meta-data fetcher per provider type.
+	// Some providers might appear twice in the set of providers to support aliases on provider names.
+	// For example aws and ec2 both use the same provider.
+	// The loop tracks already seen providers in the `visited` set, to ensure that we do not create
+	// duplicate providers for aliases.
 	for name, ff := range providers {
 		if visited[ff.Name] {
 			continue
