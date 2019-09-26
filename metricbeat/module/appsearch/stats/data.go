@@ -19,6 +19,7 @@ package stats
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
@@ -72,8 +73,17 @@ func eventMapping(input []byte) (common.MapStr, error) {
 		return nil, err
 	}
 
-	var queues = data["queues"].(map[string]interface{})
-	var failed = queues["failed"].([]interface{})
+	var queues map[string]interface{}
+	var ok bool
+	queues, ok = data["queues"].(map[string]interface{})
+	if !ok {
+		return nil, errors.New("queues is not a map")
+	}
+	var failed []interface{}
+	failed, ok = queues["failed"].([]interface{})
+	if !ok {
+		return nil, errors.New("queues.failed is not an array of maps")
+	}
 	queues["failed.count"] = len(failed)
 
 	dataFields, err := schema.Apply(data)
