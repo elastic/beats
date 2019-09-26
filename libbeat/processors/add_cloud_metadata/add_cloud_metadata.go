@@ -97,7 +97,7 @@ func (p *addCloudMetadata) init() {
 
 func (p *addCloudMetadata) getMeta() common.MapStr {
 	p.init()
-	return p.metadata
+	return p.metadata.Clone()
 }
 
 func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
