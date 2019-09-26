@@ -15,7 +15,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
 	"github.com/elastic/beats/libbeat/service"
-	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelineManager"
+	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemanager"
 )
 
 // genNewMonitoringConfig is a hacked-in function to enable a debug stderr logger
@@ -45,7 +45,7 @@ func main() {
 		panic(err)
 	}
 
-	pipelines := pipelineManager.NewPipelineManager(logcfg)
+	pipelines := pipelinemanager.NewPipelineManager(logcfg)
 
 	sdkHandler := sdk.NewHandler(`{"Implements": ["LoggingDriver"]}`)
 	// Create handlers for startup and shutdown of the log driver

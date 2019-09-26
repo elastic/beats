@@ -10,10 +10,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelineManager"
-
 	"github.com/docker/engine/daemon/logger"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemanager"
 
 	"github.com/pkg/errors"
 )
@@ -35,7 +34,7 @@ type ProcessorPipeline struct {
 }
 
 // This gets called when a container starts that requests the log driver
-func startLoggingHandler(pm *pipelineManager.PipelineManager) func(w http.ResponseWriter, r *http.Request) {
+func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var startReq StartLoggingRequest
 		err := json.NewDecoder(r.Body).Decode(&startReq)
@@ -62,7 +61,7 @@ func startLoggingHandler(pm *pipelineManager.PipelineManager) func(w http.Respon
 }
 
 // This gets called when a container using the log driver stops
-func stopLoggingHandler(pm *pipelineManager.PipelineManager) func(w http.ResponseWriter, r *http.Request) {
+func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var stopReq StopLoggingRequest
 		err := json.NewDecoder(r.Body).Decode(&stopReq)
