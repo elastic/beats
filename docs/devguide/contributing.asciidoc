@@ -89,7 +89,7 @@ recommend that you install it.
 [[update-scripts]]
 === Update scripts
 
-The Beats use a variety of scripts based on Python to generate configuration files
+The Beats use a variety of scripts based on Python, make and mage to generate configuration files
 and documentation. The primary command used for this is:
 
 [source,shell]
@@ -108,6 +108,7 @@ These commands have the following dependencies:
 
 * Python >= {python}
 * https://virtualenv.pypa.io/en/latest/[virtualenv] for Python
+* https://github.com/magefile/mage[Mage]
 
 Virtualenv can be installed with the command `easy_install virtualenv` or `pip
 install virtualenv`. More details can be found
