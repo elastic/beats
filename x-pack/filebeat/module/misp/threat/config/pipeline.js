@@ -112,11 +112,11 @@ var threat = (function () {
                 break;
         }
         if (attackPattern == undefined) {
-            evt.Put("error.message", 'Unsupported type: ' + indicator_type)
+            evt.Put("error.message", 'Unsupported type: ' + indicator_type);
         }
         evt.Put("threat.threat_indicator.attack_pattern", attackPattern);
         
-    }
+    };
 
     var dropOldFields = function (evt) {
         evt.Delete("message");
