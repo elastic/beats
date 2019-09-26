@@ -767,7 +767,7 @@ endif::[]
 You can access this metadata from within the Logstash config file to set values
 dynamically based on the contents of the metadata.
 
-For example, the following Logstash configuration file for version 7.x sets
+For example, the following Logstash configuration file tells
 Logstash to use the index reported by {beatname_uc} for indexing events
 into Elasticsearch:
 
