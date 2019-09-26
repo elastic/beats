@@ -1,0 +1,22 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-misp]]
+[role="xpack"]
+
+:modulename: misp
+:has-dashboards: false
+
+== MISP module
+
+beta[]
+
+This is a filebeat module for reading threat intel information from MISP.
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-misp,exported fields>> section.
+
