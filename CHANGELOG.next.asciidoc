@@ -11,6 +11,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Update to Golang 1.12.1. {pull}11330[11330]
+- Update to Golang 1.12.4. {pull}11782[11782]
+- Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
+- Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
+- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
+- Update to Golang 1.12.7. {pull}12931[12931]
+- Remove `in_cluster` configuration parameter for Kuberentes, now in-cluster configuration is used only if no other kubeconfig is specified {pull}13051[13051]
+- Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 
 *Auditbeat*
 
@@ -71,6 +78,33 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Decouple Debug logging from fail_on_error logic for rename, copy, truncate processors {pull}12451[12451]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring cluster. {pull}9260[9260]
+- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}11394[11394]
+- Add `add_observer_metadata` processor. {pull}11394[11394]
+- Add `decode_csv_fields` processor. {pull}11753[11753]
+- Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
+- New `extract_array` processor. {pull}11761[11761]
+- Add number of goroutines to reported metrics. {pull}12135[12135]
+- Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
+- Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
+- Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
+- Add `decode_base64_field` processor for decoding base64 field. {pull}11914[11914]
+- Add support for reading the `network.iana_number` field by default to the community_id processor. {pull}12701[12701]
+- Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
+- Add `decompress_gzip_field` processor. {pull}12733[12733]
+- Add `timestamp` processor for parsing time fields. {pull}12699[12699]
+- Fail with error when autodiscover providers have no defined configs. {pull}13078[13078]
+- Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
+- Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
+- Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
+- add_host_metadata is now GA. {pull}13148[13148]
+- Add an `ignore_missing` configuration option the `drop_fields` processor. {pull}13318[13318]
+- add_host_metadata is no GA. {pull}13148[13148]
+- Add `registered_domain` processor for deriving the registered domain from a given FQDN. {pull}13326[13326]
+- Add support for RFC3339 time zone offsets in JSON output. {pull}13227[13227]
+- Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
+- Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
+- Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
+- Add `providers` setting to `add_cloud_metadata` processor. {pull}13812[13812]
 
 *Auditbeat*
 
