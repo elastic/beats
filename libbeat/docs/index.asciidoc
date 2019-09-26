@@ -1,5 +1,7 @@
 = Beats Platform Reference
 
+:libbeat-dir: {docdir}/../../libbeat
+
 include::./version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
@@ -12,7 +14,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beat_default_index_prefix: {beatname_lc}
 :has_ml_jobs:
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -30,4 +32,4 @@ include::./breaking.asciidoc[]
 
 include::./release.asciidoc[]
 
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+include::{libbeat-dir}/docs/contributing-to-beats.asciidoc[]
