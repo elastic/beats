@@ -1033,7 +1033,7 @@ Request metrics
 *`appsearch.stats.requests.count`*::
 +
 --
-Number of recent completed requests
+Number of recently completed requests
 
 
 type: long
@@ -1084,7 +1084,7 @@ type: long
 
 --
 
-*`appsearch.stats.requests.web.duration.mean.ms`*::
+*`appsearch.stats.requests.web.duration.max.ms`*::
 +
 --
 Max response time in milliseconds

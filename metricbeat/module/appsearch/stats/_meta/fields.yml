@@ -91,7 +91,7 @@
         - name: count
           type: long
           description: >
-            Number of recent completed requests
+            Number of recently completed requests
         - name: api.duration
           type: group
           description: >
@@ -114,7 +114,7 @@
               type: long
               description: >
                 Average response time in milliseconds
-            - name: mean.ms
+            - name: max.ms
               type: long
               description: >
                 Max response time in milliseconds
