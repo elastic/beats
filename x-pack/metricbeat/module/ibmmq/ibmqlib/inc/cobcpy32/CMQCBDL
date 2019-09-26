@@ -1,0 +1,68 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQCBDL                                     **
+      **                                                              **
+      **  DESCRIPTION:    MQCBD Structure -- Callback Data            **
+      **                  Descriptor                                  **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQCBD,     **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  32 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQCBDL                                                      **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQCBD structure
+       10  MQCBD.
+      ** Structure identifier
+       15  MQCBD-STRUCID PIC X(4).
+      ** Structure version number
+       15  MQCBD-VERSION PIC S9(9) BINARY.
+      ** Callback function type
+       15  MQCBD-CALLBACKTYPE PIC S9(9) BINARY.
+      ** Options controlling message consumption
+       15  MQCBD-OPTIONS PIC S9(9) BINARY.
+      ** User data passed to the function
+       15  MQCBD-CALLBACKAREA POINTER.
+      ** Callback function pointer
+       15  MQCBD-CALLBACKFUNCTION POINTER.
+      ** Callback name
+       15  MQCBD-CALLBACKNAME PIC X(128).
+      ** Maximum message length
+       15  MQCBD-MAXMSGLENGTH PIC S9(9) BINARY.
+
+
+      ******************************************************************
+      **  End of CMQCBDL                                              **
+      ******************************************************************

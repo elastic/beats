@@ -1,0 +1,58 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQCMHOV                                    **
+      **                                                              **
+      **  DESCRIPTION:    MQCMHO Structure -- Create Message Handle   **
+      **                  Options                                     **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQCMHO,    **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  32 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQCMHOV                                                     **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQCMHO structure
+       10  MQCMHO.
+      ** Structure identifier
+       15  MQCMHO-STRUCID PIC X(4) VALUE 'CMHO'.
+      ** Structure version number
+       15  MQCMHO-VERSION PIC S9(9) BINARY VALUE 1.
+      ** Options that control the action of MQCRTMH
+       15  MQCMHO-OPTIONS PIC S9(9) BINARY VALUE 0.
+
+
+      ******************************************************************
+      **  End of CMQCMHOV                                             **
+      ******************************************************************

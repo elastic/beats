@@ -1,0 +1,88 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQEPHL                                     **
+      **                                                              **
+      **  DESCRIPTION:    MQEPH Structure -- Embedded PCF header      **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQEPH,     **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  32 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQEPHL                                                      **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQEPH structure
+       10  MQEPH.
+      ** Structure identifier
+       15  MQEPH-STRUCID PIC X(4).
+      ** Structure version number
+       15  MQEPH-VERSION PIC S9(9) BINARY.
+      ** Total length of MQEPH including MQCFH and parameter structures
+      ** that follow
+       15  MQEPH-STRUCLENGTH PIC S9(9) BINARY.
+      ** Numeric encoding of data that follows last PCF parameter
+      ** structure
+       15  MQEPH-ENCODING PIC S9(9) BINARY.
+      ** Character set identifier of data that follows last PCF
+      ** parameter structure
+       15  MQEPH-CODEDCHARSETID PIC S9(9) BINARY.
+      ** Format name of data that follows last PCF parameter structure
+       15  MQEPH-FORMAT PIC X(8).
+      ** Flags
+       15  MQEPH-FLAGS PIC S9(9) BINARY.
+      ** Programmable Command Format Header
+       15  MQEPH-PCFHEADER.
+      ** Structure type
+       20  MQEPH-PCFHEADER-TYPE PIC S9(9) BINARY.
+      ** Structure length
+       20  MQEPH-PCFHEADER-STRUCLENGTH PIC S9(9) BINARY.
+      ** Structure version number
+       20  MQEPH-PCFHEADER-VERSION PIC S9(9) BINARY.
+      ** Command identifier
+       20  MQEPH-PCFHEADER-COMMAND PIC S9(9) BINARY.
+      ** Message sequence number
+       20  MQEPH-PCFHEADER-MSGSEQNUMBER PIC S9(9) BINARY.
+      ** Control options
+       20  MQEPH-PCFHEADER-CONTROL PIC S9(9) BINARY.
+      ** Completion code
+       20  MQEPH-PCFHEADER-COMPCODE PIC S9(9) BINARY.
+      ** Reason code qualifying completion code
+       20  MQEPH-PCFHEADER-REASON PIC S9(9) BINARY.
+      ** Count of parameter structures
+       20  MQEPH-PCFHEADER-PARAMETERCOUNT PIC S9(9) BINARY.
+
+
+      ******************************************************************
+      **  End of CMQEPHL                                              **
+      ******************************************************************

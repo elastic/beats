@@ -1,0 +1,85 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQSCOL                                     **
+      **                                                              **
+      **  DESCRIPTION:    MQSCO Structure -- SSL Configuration        **
+      **                  Options                                     **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQSCO,     **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  64 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQSCOL                                                      **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQSCO structure
+       10  MQSCO.
+      ** Structure identifier
+       15  MQSCO-STRUCID PIC X(4).
+      ** Structure version number
+       15  MQSCO-VERSION PIC S9(9) BINARY.
+      ** Location of SSL key repository
+       15  MQSCO-KEYREPOSITORY PIC X(256).
+      ** Cryptographic hardware configuration string
+       15  MQSCO-CRYPTOHARDWARE PIC X(256).
+      ** Number of MQAIR records present
+       15  MQSCO-AUTHINFORECCOUNT PIC S9(9) BINARY.
+      ** Offset of first MQAIR record from start of MQSCO structure
+       15  MQSCO-AUTHINFORECOFFSET PIC S9(9) BINARY.
+      ** Address of first MQAIR record
+       15  MQSCO-AUTHINFORECPTR POINTER.
+      ** Ver:1 **
+      ** Number of unencrypted bytes sent/received before secret key is
+      ** reset
+       15  MQSCO-KEYRESETCOUNT PIC S9(9) BINARY.
+      ** Using FIPS-certified algorithms
+       15  MQSCO-FIPSREQUIRED PIC S9(9) BINARY.
+      ** Ver:2 **
+      ** Use only Suite B cryptographic algorithms
+       15  MQSCO-ENCRYPTIONPOLICYSUITEB PIC S9(9) BINARY OCCURS 4.
+      ** Ver:3 **
+      ** Certificate validation policy
+       15  MQSCO-CERTIFICATEVALPOLICY PIC S9(9) BINARY.
+      ** Ver:4 **
+      ** SSL/TLS certificate label
+       15  MQSCO-CERTIFICATELABEL PIC X(64).
+      ** Ver:5 **
+      ** Add padding to ensure that the structure ends on the correct
+      ** boundary
+       15  FILLER  PIC S9(9) BINARY VALUE 0.
+
+
+      ******************************************************************
+      **  End of CMQSCOL                                              **
+      ******************************************************************

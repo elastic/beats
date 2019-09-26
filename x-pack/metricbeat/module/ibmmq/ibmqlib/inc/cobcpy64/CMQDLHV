@@ -1,0 +1,83 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQDLHV                                     **
+      **                                                              **
+      **  DESCRIPTION:    MQDLH Structure -- Dead Letter Header       **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQDLH,     **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  64 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQDLHV                                                      **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQDLH structure
+       10  MQDLH.
+      ** Structure identifier
+       15  MQDLH-STRUCID PIC X(4) VALUE 'DLH '.
+      ** Structure version number
+       15  MQDLH-VERSION PIC S9(9) BINARY VALUE 1.
+      ** Reason message arrived on dead-letter (undelivered-message)
+      ** queue
+       15  MQDLH-REASON PIC S9(9) BINARY VALUE 0.
+      ** Name of original destination queue
+       15  MQDLH-DESTQNAME PIC X(48) VALUE SPACES.
+      ** Name of original destination queue manager
+       15  MQDLH-DESTQMGRNAME PIC X(48) VALUE SPACES.
+      ** Numeric encoding of data that follows MQDLH
+       15  MQDLH-ENCODING PIC S9(9) BINARY VALUE 0.
+      ** Character set identifier of data that follows MQDLH
+       15  MQDLH-CODEDCHARSETID PIC S9(9) BINARY VALUE 0.
+      ** Format name of data that follows MQDLH
+       15  MQDLH-FORMAT PIC X(8) VALUE SPACES.
+      ** Type of application that put message on dead-letter
+      ** (undelivered-message) queue
+       15  MQDLH-PUTAPPLTYPE PIC S9(9) BINARY VALUE 0.
+      ** Name of application that put message on dead-letter
+      ** (undelivered-message) queue
+       15  MQDLH-PUTAPPLNAME PIC X(28) VALUE SPACES.
+      ** Date when message was put on dead-letter (undelivered-message)
+      ** queue
+       15  MQDLH-PUTDATE PIC X(8) VALUE SPACES.
+      ** Time when message was put on dead-letter (undelivered-message)
+      ** queue
+       15  MQDLH-PUTTIME PIC X(8) VALUE SPACES.
+      ** Add padding to ensure that the structure ends on the correct
+      ** boundary
+       15  FILLER  PIC S9(9) BINARY VALUE 0.
+
+
+      ******************************************************************
+      **  End of CMQDLHV                                              **
+      ******************************************************************

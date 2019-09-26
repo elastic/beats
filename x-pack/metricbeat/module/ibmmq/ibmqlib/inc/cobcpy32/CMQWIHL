@@ -1,0 +1,74 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQWIHL                                     **
+      **                                                              **
+      **  DESCRIPTION:    MQWIH Structure -- Work Information         **
+      **                  Header                                      **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQWIH,     **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  32 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQWIHL                                                      **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQWIH structure
+       10  MQWIH.
+      ** Structure identifier
+       15  MQWIH-STRUCID PIC X(4).
+      ** Structure version number
+       15  MQWIH-VERSION PIC S9(9) BINARY.
+      ** Length of MQWIH structure
+       15  MQWIH-STRUCLENGTH PIC S9(9) BINARY.
+      ** Numeric encoding of data that follows MQWIH
+       15  MQWIH-ENCODING PIC S9(9) BINARY.
+      ** Character-set identifier of data that follows MQWIH
+       15  MQWIH-CODEDCHARSETID PIC S9(9) BINARY.
+      ** Format name of data that follows MQWIH
+       15  MQWIH-FORMAT PIC X(8).
+      ** Flags
+       15  MQWIH-FLAGS PIC S9(9) BINARY.
+      ** Service name
+       15  MQWIH-SERVICENAME PIC X(32).
+      ** Service step name
+       15  MQWIH-SERVICESTEP PIC X(8).
+      ** Message token
+       15  MQWIH-MSGTOKEN PIC X(16).
+      ** Reserved
+       15  MQWIH-RESERVED PIC X(32).
+
+
+      ******************************************************************
+      **  End of CMQWIHL                                              **
+      ******************************************************************

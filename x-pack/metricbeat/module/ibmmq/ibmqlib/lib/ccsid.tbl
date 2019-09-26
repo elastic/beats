@@ -1,0 +1,557 @@
+#
+#
+# <copyright
+# notice="lm-source-program"
+# pids="5724-H72"
+# years="2014,2018"
+# crc="" >
+# Licensed Materials - Property of IBM
+#
+# 5724-H72
+#
+# (C) Copyright IBM Corp. 2014, 2018 All Rights Reserved.
+#
+# US Government Users Restricted Rights - Use, duplication or
+# disclosure restricted by GSA ADP Schedule Contract with
+# IBM Corp.
+# </copyright>
+#
+# This file contains the CCSID information used by IBM MQ for macOS.
+# You are advised to make a backup copy of this file before making changes.
+#
+# It also defines default encoding, if this is required.
+#
+# Fields are:
+#
+#  Type         : 1=SBCS 2=DBCS 3=Mixed
+#  Encoding     : 1=EBCDIC 2=ASCII 3=ISO  4=UCS-2 5=UTF-8 6=euc 7=GB18030
+#  Base CCSID   : used when converting to/from euc
+#  SBCS Codepage: used when converting to/from ASCII and EBCDIC mixed
+#  DBCS Codepage: used when converting to/from ASCII and EBCDIC mixed
+#  ACRI         : See tables at end of list
+#     for ASCII Mixed SBCS/DBCS:
+#               1=x'81'-x'9F' and x'E0'-X'FC'
+#               2=x'8F'-x'FE'
+#               3=x'81'-x'FC'
+#               4=x'81'-x'BF'
+#               5=x'81'-x'FE'
+#               6=x'8C'-x'FE'
+#     for euc   1= 4 graphic sets widths 1 2 1 2
+#               2= 3 graphic sets widths 1 2 3
+#               3= 2 graphic sets widths 1 2
+#  Codeset      : Used to map the codeset name to CCSID when setting CCSIDs
+#                 when a queue manager is initialised. The first line which matches
+#                 is used.
+#
+#  If you need to create new EBCDIC and ASCII CCSIDs 9999 and 9998 you
+#  can add the following lines with the # deleted.
+#
+#   9999  9999       0     9999     1    1     0    Martian EBCDIC
+#   9998  9998       0     9998     1    2     0    Martian ASCII
+#
+#  If tables for data conversion using these new CCSIDs do not exist on the
+#  platform, you will have to enable default data conversion. See further in
+#  this file for details.
+#
+#  Note: The fact that CCSIDs exist in this table does not
+#        necessarily mean that MQ will be able to convert them.
+#        In order to convert between two CCSIDs then there must
+#        exist tables of type AAAABBBB.TBL where AAAA and BBBB
+#        are the hex representation of the decimal CodePage ids
+#        corresponding to the CCSIDs that conversion is taking
+#        place between.
+#
+#        In an SBCS<->SBCS conversion then there will be 1 table
+#        required for each way. Each will be 256 bytes in size.
+#
+#        In a MIXED<->MIXED conversion then there will be 2 tables
+#        required for each way - 1 for the SBCS<->SBCS part of the
+#        conversion, the other for the DBCS<->DBCS part of the
+#        conversion. The SBCS tables will be 256 bytes in length
+#        but the DBCS tables could be up to about 64K in size.
+#        The exception is conversions involving euc coding where a
+#        single table is used, and the 'base' CCSID is used as a
+#        table name.
+#
+# The CCSIDs are grouped with related CCSIDs eg 37 and 4133
+# together. They are sorted by Language group, encode, with euc then ASCII then EBCDIC.
+# Less common CCSIDs are placed in a separate section near the end.
+# This gives a more balanced search tree which slightly improves performance.
+#
+# NOTICE: Editing of this file is not recommended as it is not the latest file
+#         If you wish to add new CCSIDs then it is recommended you add the new
+#         CCSIDs into ccsid_part2.tbl which can be found in the same location
+#         as this file.
+#
+# CCSID Base  CodePage CodePage  Type Enc   ACRI   Codeset
+#       CCSID   DBCS      SBCS                     name
+# ----- ----- -------- --------  ---- ----  -----  -------
+#
+# Western European, English, International
+    819   819       0      819     1    3     0    US-ASCII
+    819   819       0      819     1    3     0    ISO-8859-1
+    819   819       0      819     1    3     0    ANSI_X3.4-1968
+    923   923       0      923     1    3     0    ISO-8859-15
+   1051  1051       0     1051     1    3     0    IBM-1051
+   1252  1252       0     1252     1    2     0    IBM-1252
+   5348  5348       0     5348     1    2     0    IBM-5348
+    437   437       0      437     1    2     0    IBM-437
+   4533   437       0      437     1    2     0    IBM-437
+   8629   437       0      437     1    2     0    IBM-437
+  12725   437       0      437     1    2     0    IBM-437
+  16821   437       0      437     1    2     0    IBM-437
+  20917   437       0      437     1    2     0    IBM-437
+    850   850       0      850     1    2     0    IBM-850
+   4946   850       0      850     1    2     0    IBM-850
+  33618   850       0      850     1    2     0    IBM-850
+  61697   850       0      850     1    2     0    IBM-850
+  61698   850       0      850     1    2     0    IBM-850
+    858   858       0      858     1    2     0    IBM-858
+     37    37       0       37     1    1     0    IBM-037
+   4133    37       0       37     1    1     0    IBM-037
+   8229    37       0       37     1    1     0    IBM-037
+  12325    37       0       37     1    1     0    IBM-037
+  16421    37       0       37     1    1     0    IBM-037
+  20517    37       0       37     1    1     0    IBM-037
+  24613    37       0       37     1    1     0    IBM-037
+  32805    37       0       37     1    1     0    IBM-037
+   1140  1140       0     1140     1    1     0    IBM-1140
+    285   285       0      285     1    1     0    IBM-285
+   4381   285       0      285     1    1     0    IBM-285
+   1146  1146       0     1146     1    1     0    IBM-1146
+    500   500       0      500     1    1     0    IBM-500
+   4596   500       0      500     1    1     0    IBM-500
+   8692   500       0      500     1    1     0    IBM-500
+  12788   500       0      500     1    1     0    IBM-500
+  16884   500       0      500     1    1     0    IBM-500
+  20980   500       0      500     1    1     0    IBM-500
+  25076   500       0      500     1    1     0    IBM-500
+  29172   500       0      500     1    1     0    IBM-500
+  33268   500       0      500     1    1     0    IBM-500
+  37364   500       0      500     1    1     0    IBM-500
+  41460   500       0      500     1    1     0    IBM-500
+  45556   500       0      500     1    1     0    IBM-500
+  49652   500       0      500     1    1     0    IBM-500
+  53748   500       0      500     1    1     0    IBM-500
+  61696   500       0      500     1    1     0    IBM-500
+  61711   500       0      500     1    1     0    IBM-500
+  61712   500       0      500     1    1     0    IBM-500
+    924   924       0      924     1    1     0    IBM-924
+   1148  1148       0     1148     1    1     0    IBM-1148
+# French
+    297   297       0      297     1    1     0    IBM-297
+   4393   297       0      297     1    1     0    IBM-297
+   8489   297       0      297     1    1     0    IBM-297
+   1147  1147       0     1147     1    1     0    IBM-1147
+# German
+    273   273       0      273     1    1     0    IBM-273
+   4369   273       0     4369     1    1     0    IBM-273
+   1141  1141       0     1141     1    1     0    IBM-1141
+# Spanish
+    284   284       0      284     1    1     0    IBM-284
+   4380   284       0      284     1    1     0    IBM-284
+   8478   284       0      284     1    1     0    IBM-284
+   1145  1145       0     1145     1    1     0    IBM-1145
+# Italian
+    280   280       0      280     1    1     0    IBM-280
+   4376   280       0      280     1    1     0    IBM-280
+   1144  1144       0     1144     1    1     0    IBM-1144
+# Scandinavian
+    277   277       0      277     1    1     0    IBM-277
+   4373   277       0      277     1    1     0    IBM-277
+   1142  1142       0     1142     1    1     0    IBM-1142
+    278   278       0      278     1    1     0    IBM-278
+   4374   278       0      278     1    1     0    IBM-278
+   1143  1143       0     1143     1    1     0    IBM-1143
+    871   871       0      871     1    1     0    IBM-871
+   4967   871       0      871     1    1     0    IBM-871
+   1149  1149       0     1149     1    1     0    IBM-1149
+# Portuguese
+# Japanese
+#  Note the order. CCSID 5050 is the preferred CCSID for eucJP
+   5050  5050       0     5050     3    6     1    EUC-JP
+    954  5050       0     5050     3    6     1    EUC-JP
+   9146  5050       0     5050     3    6     1    EUC-JP
+  13242  5050       0     5050     3    6     1    EUC-JP
+  33722  5050       0     5050     3    6     1    EUC-JP
+    932   932     301      897     3    2     1    IBM-932
+   5028   932     301      897     3    2     1    IBM-932
+   9124   932     301      897     3    2     1    IBM-932
+    941   941     941        0     2    2     0    IBM-941
+    942   942     301     1041     3    2     1    IBM-942
+    943   943     941     1041     3    2     1    PCK
+    943   943     941     1041     3    2     1    SHIFT_JIS
+   1041  1041       0     1041     1    2     0    IBM-1041
+   5137  1041       0     1041     1    2     0    IBM-1041
+    930   930     300      290     3    1     0    IBM-930
+   5026   930     300      290     3    1     0    IBM-930
+   9122   930     300      290     3    1     0    IBM-930
+  13218   930     300      290     3    1     0    IBM-930
+  17314   930     300      290     3    1     0    IBM-930
+  33698   930     300      290     3    1     0    IBM-930
+    939   939     300     1027     3    1     0    IBM-939
+   5035   939     300     1027     3    1     0    IBM-939
+   9131   939     300     1027     3    1     0    IBM-939
+   1390  1390    16684    8482     3    1     0    IBM-1390
+   1399  1399    16684    5123     3    1     0    IBM-1399
+# Korean
+    970   970       0      970     3    6     3    EUC-KR
+   5066   970       0      970     3    6     3    EUC-KR
+    949   949     951     1088     3    2     2    IBM-949
+   5045   949     951     1088     3    2     2    IBM-949
+    951   951     951        0     2    2     0    IBM-951
+   5047   951     951        0     2    2     0    IBM-951
+   1088  1088       0     1088     1    2     0    IBM-1088
+    933   933     834      833     3    1     0    IBM-933
+   5029   933     834      833     3    1     0    IBM-933
+   9125   933     834      833     3    1     0    IBM-933
+  13221   933     834      833     3    1     0    IBM-933
+   1363  1363    1362     1126     3    2     5    IBM-1363
+   1362  1362    1362        0     2    2     0    IBM-1362
+   1364  1364    4930      833     3    1     0    IBM-1364
+# Simplified Chinese
+   1383  1383       0     1383     3    6     3    EUC-CN
+   5479  1383       0     1383     3    6     3    EUC-CN
+   1114  1114       0     1114     1    2     0    IBM-1114
+   1115  1115       0     1115     1    2     0    IBM-1115
+   5211  1115       0     1115     1    2     0    IBM-1115
+   1381  1381    1380     1115     3    2     6    GB2312
+   5477  1381    1380     1115     3    2     6    GB2312
+   1386  1386    1385     1114     3    2     5    GBK
+   5482  1386    1385     1114     3    2     5    GBK
+   1380  1380    1380        0     2    2     0    IBM-1380
+   5476  1380    1380        0     2    2     0    IBM-1380
+   9572  1380    1380        0     2    2     0    IBM-1380
+   1385  1385    1385        0     2    2     0    IBM-1385
+   5481  1385    1385        0     2    2     0    IBM-1385
+    935   935     837      836     3    1     0    IBM-935
+   5031   935     837      836     3    1     0    IBM-935
+   9127   935     837      836     3    1     0    IBM-935
+  13223   935     837      836     3    1     0    IBM-935
+   1388  1388    4933      836     3    1     0    IBM-1388
+   5484  1388    4933      836     3    1     0    IBM-1388
+   4933  4933    4933        0     2    1     0    IBM-4933
+   5488  5488       0     5488     3    7     0    GB18030
+   1392  5488       0     5488     3    7     0    GB18030
+# Traditional Chinese
+    964   964       0      964     3    6     2    EUC-TW
+   5060   964       0      964     3    6     2    EUC-TW
+    947   947     947        0     2    2     0    IBM-947
+    950   950     947     1114     3    2     5    BIG5
+    950   950     947     1114     3    2     5    BIG5-HKSCS
+    950   950     947     1114     3    2     5    BIG5HKSCS
+   5046   950     947     1114     3    2     5    BIG5
+   9142   950     947     1114     3    2     5    BIG5
+  13238   950     947     1114     3    2     5    BIG5
+    937   937     835       37     3    1     0    IBM-937
+   5033   937     835       37     3    1     0    IBM-937
+# Eastern European
+    912   912       0      912     1    3     0    ISO-8859-2
+   1250  1250       0     1250     1    2     0    IBM-1250
+   5346  5346       0     5346     1    2     0    IBM-5346
+    852   852       0      852     1    2     0    IBM-852
+   4948   852       0      852     1    2     0    IBM-852
+    870   870       0      870     1    1     0    IBM-870
+   4966   870       0      870     1    1     0    IBM-870
+   1153  1153       0     1153     1    1     0    IBM-1153
+# Cyrillic
+    915   915       0      915     1    3     0    ISO-8859-5
+   1251  1251       0     1251     1    2     0    CP1251
+   5347  5347       0     5347     1    2     0    IBM-5347
+    855   855       0      855     1    2     0    IBM-855
+   4951   855       0      855     1    2     0    IBM-855
+   9047   855       0      855     1    2     0    IBM-855
+   1131  1131       0     1131     1    2     0    IBM-1131
+    866   866       0      866     1    2     0    IBM-866
+   1025  1025       0     1025     1    1     0    IBM-1025
+    878   878       0      878     1    3     0    KOI8-R
+# Greek
+    813   813       0      813     1    3     0    ISO-8859-7
+   1253  1253       0     1253     1    2     0    IBM-1253
+   5349  5349       0     5349     1    2     0    IBM-5349
+    869   869       0      869     1    2     0    IBM-869
+   4965   869       0      869     1    2     0    IBM-869
+    875   875       0      875     1    1     0    IBM-875
+   4909  4909       0     4909     1    3     0    ISO-8859-7@euro
+   9061  9061       0     9061     1    2     0    IBM-9061
+   4971  4971       0     4971     1    1     0    IBM-4971
+# Arabic
+   1089  1089       0     1089     1    3     0    ISO-8859-6
+   1256  1256       0     1256     1    2     0    IBM-1256
+   5352  5352       0     5352     1    2     0    IBM-5352
+    864   864       0      864     1    2     0    IBM-864
+   4960   864       0      864     1    2     0    IBM-864
+   9056   864       0      864     1    2     0    IBM-864
+  13152   864       0      864     1    2     0    IBM-864
+    420   420       0      420     1    1     0    IBM-420
+   4516   420       0      420     1    1     0    IBM-420
+   8612  8612       0     8612     1    1     0    IBM-8612
+    720   720       0      720     1    2     0    IBM-720
+    425   425       0      425     1    1     0    IBM-425
+# Turkish
+    920   920       0      920     1    3     0    ISO-8859-9
+   1254  1254       0     1254     1    2     0    IBM-1254
+   5350  5350       0     5350     1    2     0    IBM-5350
+    857   857       0      857     1    2     0    IBM-857
+   4953   857       0      857     1    2     0    IBM-857
+   1026  1026       0     1026     1    1     0    IBM-1026
+# Farsi
+   1098  1098       0     1098     1    2     0    IBM-1098
+   1097  1097       0     1097     1    1     0    IBM-1097
+# Hebrew
+    916   916       0      916     1    3     0    ISO-8859-8
+   1255  1255       0     1255     1    2     0    CP1255
+   5351  5351       0     5351     1    2     0    IBM-5351
+    862   862       0      862     1    2     0    IBM-860
+    867   867       0      867     1    2     0    IBM-867
+    424   424       0      424     1    1     0    IBM-424
+   4520   424       0      424     1    1     0    IBM-424
+  12712 12712       0    12712     1    1     0    IBM-12712
+# Baltic rim
+    921   921       0      921     1    3     0    ISO-8859-13
+    922   922       0      922     1    3     0    IBM-922
+   1124  1124       0     1124     1    3     0    IBM-1124
+   1257  1257       0     1257     1    2     0    IBM-1257
+   5353  5353       0     5353     1    2     0    IBM-5353
+   1125  1125       0     1125     1    2     0    IBM-1125
+   1112  1112       0     1112     1    1     0    IBM-1112
+   1122  1122       0     1122     1    1     0    IBM-1122
+   1123  1123       0     1123     1    1     0    IBM-1123
+    775   775       0      775     1    2     0    IBM-775
+   1156  1156       0     1156     1    1     0    IBM-1156
+   1157  1157       0     1157     1    1     0    IBM-1157
+# Urdu
+   1006  1006       0     1006     1    3     0    IBM-1006
+    868   868       0      868     1    2     0    IBM-868
+   4964   868       0      868     1    2     0    IBM-868
+   9060   868       0      868     1    2     0    IBM-868
+    918   918       0      918     1    1     0    IBM-918
+   5014   918       0      918     1    1     0    IBM-918
+# Thai
+    874   874       0      874     1    2     0    TIS-620
+   4970   874       0      874     1    2     0    TIS-620
+   9066   874       0      874     1    2     0    TIS-620
+    838   838       0      838     1    1     0    IBM-838
+   4934   838       0      838     1    1     0    IBM-838
+   9030   838       0      838     1    1     0    IBM-838
+# Vietnamese
+   1129  1129       0     1129     1    3     0    IBM-1129
+   1258  1258       0     1258     1    2     0    IBM-1258
+   5354  5354       0     5354     1    2     0    IBM-5354
+   1130  1130       0     1130     1    1     0    IBM-1130
+# Lao
+   1133  1133       0     1133     1    3     0    IBM-1133
+   1132  1132       0     1132     1    1     0    IBM-1132
+# Hindi
+   1137  1137       0     1137     1    1     0    IBM-1137
+   806    806       0      806     1    2     0    IBM-806
+#
+#
+# LESS COMMON CCSIDs
+#
+#
+# Unicode
+   1200 13488       0    13488     2    4     0    UCS-2
+  13488 13488       0    13488     2    4     0    UCS-2
+  17584 13488       0    13488     2    4     0    UCS-2
+   1208 13488       0    13488     3    5     0    UTF-8
+# Western Europe, International or English
+    367   367       0      367     1    3     0    IBM-367
+  61699   819       0      819     1    3     0    ISO-8859-1
+  61710   819       0      819     1    3     0    ISO-8859-1
+   1013  1013       0     1013     1    3     0    IBM-1013
+   1275  1275       0     1275     1    2     0    IBM-1275
+    853   853       0      853     1    2     0    IBM-853
+   4949   853       0      853     1    2     0    IBM-853
+   1047  1047       0     1047     1    1     0    IBM-1047
+   5143  1047       0     1047     1    1     0    IBM-1047
+    913   913       0      913     1    3     0    ISO-8859-3
+# French
+   1010  1010       0     1010     1    3     0    IBM-1010
+    863   863       0      863     1    2     0    IBM-863
+   4372  4372       0     4372     1    1     0    IBM-4372
+    421   421       0      421     1    1     0    IBM-421
+# German
+   1011  1011       0     1011     1    3     0    IBM-1011
+    286   286       0      286     1    1     0    IBM-286
+# Spanish
+   1014  1014       0     1014     1    3     0    IBM-1014
+   4371  4371       0     4371     1    1     0    IBM-4371
+# Italian
+   1012  1012       0     1012     1    3     0    IBM-1012
+# Scandinavian
+   1017  1017       0     1017     1    3     0    IBM-1017
+   1016  1016       0     1016     1    3     0    IBM-1016
+   1018  1018       0     1018     1    3     0    IBM-1018
+    861   861       0      861     1    2     0    IBM-861
+    865   865       0      865     1    2     0    IBM-865
+# Portuguese
+   1015  1015       0     1015     1    3     0    IBM-1015
+    860   860       0      860     1    2     0    IBM-860
+   4378  4378       0     4378     1    1     0    IBM-4378
+# Benelux
+   1019  1019       0     1019     1    3     0    IBM-1019
+    256   256       0      256     1    1     0    IBM-256
+   4325   256       0      256     1    1     0    IBM-256
+   8448   256       0      256     1    1     0    IBM-256
+  12544   256       0      256     1    1     0    IBM-256
+   4370  4370       0     4370     1    1     0    IBM-4370
+# Japanese
+   1350  1350       0     1350     3    6     1    JISeucJP
+    301   301     301        0     2    2     0    IBM-301
+   4397   301     301        0     2    2     0    IBM-301
+   8493   301     301        0     2    2     0    IBM-301
+    897   897       0      897     1    2     0    IBM-897
+   4993   897       0      897     1    2     0    IBM-897
+   9089   897       0      897     1    2     0    IBM-897
+   1351  1351    1351        0     2    2     0    IBM-1351
+   5039  5039    1351     1041     3    2     1    IBM-5039
+    895   895       0      895     1    3     0    IBM-895
+    290   290       0      290     1    1     0    IBM-290
+   4386   290       0      290     1    1     0    IBM-290
+  33058   290       0      290     1    1     0    IBM-290
+    300   300     300        0     2    1     0    IBM-300
+   4396   300     300        0     2    1     0    IBM-300
+   8492   300     300        0     2    1     0    IBM-300
+  12588   300     300        0     2    1     0    IBM-300
+    931   931     300       37     3    1     0    IBM-931
+  13219   931     300       37     3    1     0    IBM-931
+  33699   931     300       37     3    1     0    IBM-931
+   1027  1027       0     1027     1    1     0    IBM-1027
+   1279  1279       0     1279     1    1     0    IBM-1279
+   5039  5039    1351     1041     3    2     1    IBM-5039
+   5123  5123       0     5123     1    1     0    IBM-5123
+   8482  8482       0     8482     1    1     0    IBM-8482
+  16684 16684   16684        0     2    1     0    IBM-16684
+# Korean
+    891   891       0      891     1    2     0    IBM-891
+    926   926     926        0     2    2     0    IBM-926
+   1040  1040       0     1040     1    2     0    IBM-1040
+    833   833       0      833     1    1     0    IBM-833
+   4929   833       0      833     1    1     0    IBM-833
+   9025   833       0      833     1    1     0    IBM-833
+    834   834     834        0     2    1     0    IBM-834
+   9026   834     834        0     2    1     0    IBM-834
+# Simplified Chinese
+    903   903       0      903     1    2     0    IBM-903
+    928   928     928        0     2    2     0    IBM-928
+    936   936     928      903     3    2     3    IBM-936
+   1042  1042       0     1042     1    2     0    IBM-1042
+    836   836       0      836     1    1     0    IBM-836
+   4932   836       0      836     1    1     0    IBM-836
+   9028   836       0      836     1    1     0    IBM-836
+    837   837     837        0     2    1     0    IBM-837
+# Traditional Chinese
+    904   904       0      904     1    2     0    IBM-904
+   5023   927     927        0     2    2     0    IBM-927
+    927   927     927        0     2    2     0    IBM-927
+    938   938     927      904     3    2     3    IBM-938
+    948   948     927     1043     3    2     3    IBM-948
+   1043  1043       0     1043     1    2     0    IBM-1043
+    835   835     835        0     2    1     0    IBM-835
+   4931   835     835        0     2    1     0    IBM-835
+   1370  1370   21427     5210     3 	2     5	   IBM-1370
+   5210  5210       0     5210     1 	2     0	   IBM-5210
+  21427 21427   21427        0     2 	2     0	   IBM-21427
+   1371  1371    9027     1159     3 	1     0	   IBM-1371
+   1159  1159       0     1159     1 	1     0	   IBM-1159
+   9027  9027    9027        0     2 	1     0	   IBM-9027
+# Eastern European
+   1282  1282       0     1282     1    2     0    IBM-1282
+   1284  1284       0     1284     1    2     0    IBM-1284
+   1285  1285       0     1285     1    2     0    IBM-1285
+   9044  9044       0     9044     1    2     0    IBM-9044
+# Cyrillic
+   1283  1283       0     1283     1    2     0    IBM-1283
+    880   880       0      880     1    1     0    IBM-880
+   4976   880       0      880     1    1     0    IBM-880
+# Greek
+   1280  1280       0     1280     1    2     0    IBM-1280
+    737   737       0      737     1    2     0    IBM-737
+# Arabic
+   1046  1046       0     1046     1    2     0    IBM-1046
+   5142  1046       0     1046     1    2     0    IBM-1046
+   1127  1127       0     1127     1    2     0    IBM-1127
+# Turkish
+   1281  1281       0     1281     1    2     0    IBM-1281
+# Hebrew
+    856   856       0      856     1    2     0    IBM-856
+   4952   856       0      856     1    2     0    IBM-856
+   9048  9048       0     9048     1    2     0    IBM-9048
+    803   803       0      803     1    1     0    IBM-803
+   4899  4899       0     4899     1    1     0    IBM-4899
+# Baltic rim
+    901   901       0      901     1    3     0    IBM-901
+    902   902       0      902     1    3     0    IBM-902
+   9449  9449       0     9449     1    2     0    IBM-9449
+#
+#
+#
+# ACRI tables: Note the base CCSID table above ends with the first
+#              ACRI table: These start with the identifiers,
+#              ##P for the P definitions used for ASCII mixed
+#                  CCSIDs
+#              ##EUC for the EUC definitions used for EUC CCSIDs
+#              ##TCP is reserved for 2022 TCP/IP CCSIDs but is
+#                  not supported on at this time
+#
+#
+#   P definitions start. Definition Number must be in range  1 - 20
+#                        Number of ranges must be in range 1 - 3
+#                        Start and End values are in Hexadecimal 00-FF
+##P
+# Definition  Number     Start End   Start End   Start End
+# Number      of ranges  Value Value Value Value Value Value
+# ----------  ---------  ----- ----- ----- ----- ----- -----
+   1            2          81   9F    E0    FC
+   2            1          8F   FE
+   3            1          81   FC
+   4            1          81   BF
+   5            1          81   FE
+   6            1          8C   FE
+#
+# EUC definitions start. Definition Number must be in range  1 - 10
+#                        Number of graphic sets must be in range 1 - 4
+#                        Width of each set must be in range 1 - 3
+##EUC
+# Definition  Number of      Width   of  each   set
+# Number      Graphic sets
+# ----------  ------------   ----- ----- ----- -----
+   1            4              1     2     1     2
+   2            3              1     2     3
+   3            2              1     2
+#
+#
+# CCSID mapping
+#
+# The working CCSID is determined from the locale codeset.
+# When a queue manager is created the queue manager CCSID is set to the working
+# CCSID. The queue manager CCSID can be modified using the ALTER QMGR mqsc command.
+# However, if you want a permanent change to the working CCSID you can add a line
+# following the ##MSC line which will change the working CCSID from the first one shown to
+# the second one shown. You may want to use this to select a Euro enabled CCSID
+# in place of the pre-Euro enabled CCSID.
+##MSC
+# these lines are examples: remove the first # character on the line to enable it.
+# 819  923  # change 819 to ISO-8859-15 (euro enabled ISO Western European CCSID)
+#
+#
+#
+# DEFAULT DATA CONVERSION
+#
+# You can define default conversion CCSIDs which will be used to convert
+# between ASCII or similar and EBCDIC CCSIDs if no conversion is supported
+# between two CCSIDs. If enabled, the default conversion is used for
+# transmission and message headers and can also be enabled in user data
+# conversion. For more information see the System Administration book.
+#
+# Default conversions are enabled by creating two lines similar to the
+# two following, but removing the # character which indicates a comment.
+#default       0      500     1     1    0
+#default       0      850     1     2    0
+#
+# The first line sets the default for EBCDIC CCSIDs to 500
+# and the second sets the default for ASCII and similar CCSIDs to 850.
+#
+# No blank lines please.
+# Always make sure that this is the last line.

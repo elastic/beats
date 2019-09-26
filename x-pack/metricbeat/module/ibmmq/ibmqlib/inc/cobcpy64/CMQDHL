@@ -1,0 +1,75 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQDHL                                      **
+      **                                                              **
+      **  DESCRIPTION:    MQDH Structure -- Distribution Header       **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQDH,      **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  64 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQDHL                                                       **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQDH structure
+       10  MQDH.
+      ** Structure identifier
+       15  MQDH-STRUCID PIC X(4).
+      ** Structure version number
+       15  MQDH-VERSION PIC S9(9) BINARY.
+      ** Length of MQDH structure plus following MQOR and MQPMR records
+       15  MQDH-STRUCLENGTH PIC S9(9) BINARY.
+      ** Numeric encoding of data that follows the MQOR and MQPMR
+      ** records
+       15  MQDH-ENCODING PIC S9(9) BINARY.
+      ** Character set identifier of data that follows the MQOR and
+      ** MQPMR records
+       15  MQDH-CODEDCHARSETID PIC S9(9) BINARY.
+      ** Format name of data that follows the MQOR and MQPMR records
+       15  MQDH-FORMAT PIC X(8).
+      ** General flags
+       15  MQDH-FLAGS PIC S9(9) BINARY.
+      ** Flags indicating which MQPMR fields are present
+       15  MQDH-PUTMSGRECFIELDS PIC S9(9) BINARY.
+      ** Number of MQOR records present
+       15  MQDH-RECSPRESENT PIC S9(9) BINARY.
+      ** Offset of first MQOR record from start of MQDH
+       15  MQDH-OBJECTRECOFFSET PIC S9(9) BINARY.
+      ** Offset of first MQPMR record from start of MQDH
+       15  MQDH-PUTMSGRECOFFSET PIC S9(9) BINARY.
+
+
+      ******************************************************************
+      **  End of CMQDHL                                               **
+      ******************************************************************

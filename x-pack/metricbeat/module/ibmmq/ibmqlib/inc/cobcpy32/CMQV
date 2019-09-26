@@ -1,0 +1,3162 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQV                                        **
+      **                                                              **
+      **  DESCRIPTION:    Declarations for Main MQI                   **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the functions,           **
+      **                  structures and named constants for the      **
+      **                  main MQI.                                   **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  32 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQV                                                         **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ******************************************************************
+      **  Values Related to MQAIR Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQAIR-STRUC-ID   PIC X(4) VALUE 'AIR '.
+
+      ** Structure Version Number
+       10  MQAIR-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQAIR-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQAIR-CURRENT-VERSION   PIC S9(9) BINARY VALUE 2.
+
+      ** Structure Length
+       10  MQAIR-LENGTH-1   PIC S9(9) BINARY VALUE 320.
+       10  MQAIR-LENGTH-2   PIC S9(9) BINARY VALUE 576.
+       10  MQAIR-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 576.
+
+      ** Authentication Information Type
+       10  MQAIT-ALL   PIC S9(9) BINARY VALUE 0.
+       10  MQAIT-CRL-LDAP   PIC S9(9) BINARY VALUE 1.
+       10  MQAIT-OCSP   PIC S9(9) BINARY VALUE 2.
+       10  MQAIT-IDPW-OS   PIC S9(9) BINARY VALUE 3.
+       10  MQAIT-IDPW-LDAP   PIC S9(9) BINARY VALUE 4.
+
+      ******************************************************************
+      **  Values Related to MQBMHO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQBMHO-STRUC-ID   PIC X(4) VALUE 'BMHO'.
+
+      ** Structure Version Number
+       10  MQBMHO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQBMHO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQBMHO-LENGTH-1   PIC S9(9) BINARY VALUE 12.
+       10  MQBMHO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 12.
+
+      ** Buffer To Message Handle Options
+       10  MQBMHO-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQBMHO-DELETE-PROPERTIES   PIC S9(9) BINARY VALUE 1.
+
+      ******************************************************************
+      **  Values Related to MQBO Structure                         
+      ******************************************************************
+      ** Structure Identifier
+       10  MQBO-STRUC-ID   PIC X(4) VALUE 'BO  '.
+
+      ** Structure Version Number
+       10  MQBO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQBO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQBO-LENGTH-1   PIC S9(9) BINARY VALUE 12.
+       10  MQBO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 12.
+
+      ** Begin Options
+       10  MQBO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQCBC Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQCBC-STRUC-ID   PIC X(4) VALUE 'CBC '.
+
+      ** Structure Version Number
+       10  MQCBC-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQCBC-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQCBC-CURRENT-VERSION   PIC S9(9) BINARY VALUE 2.
+
+      ** Structure Length
+       10  MQCBC-LENGTH-1   PIC S9(9) BINARY VALUE 48.
+       10  MQCBC-LENGTH-2   PIC S9(9) BINARY VALUE 52.
+       10  MQCBC-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 52.
+
+      ** Flags
+       10  MQCBCF-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCBCF-READA-BUFFER-EMPTY   PIC S9(9) BINARY VALUE 1.
+
+      ** Callback type
+       10  MQCBCT-START-CALL   PIC S9(9) BINARY VALUE 1.
+       10  MQCBCT-STOP-CALL   PIC S9(9) BINARY VALUE 2.
+       10  MQCBCT-REGISTER-CALL   PIC S9(9) BINARY VALUE 3.
+       10  MQCBCT-DEREGISTER-CALL   PIC S9(9) BINARY VALUE 4.
+       10  MQCBCT-EVENT-CALL   PIC S9(9) BINARY VALUE 5.
+       10  MQCBCT-MSG-REMOVED   PIC S9(9) BINARY VALUE 6.
+       10  MQCBCT-MSG-NOT-REMOVED   PIC S9(9) BINARY VALUE 7.
+       10  MQCBCT-MC-EVENT-CALL   PIC S9(9) BINARY VALUE 8.
+
+      ** Consumer state
+       10  MQCS-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCS-SUSPENDED-TEMPORARY   PIC S9(9) BINARY VALUE 1.
+       10  MQCS-SUSPENDED-USER-ACTION   PIC S9(9) BINARY VALUE 2.
+       10  MQCS-SUSPENDED   PIC S9(9) BINARY VALUE 3.
+       10  MQCS-STOPPED   PIC S9(9) BINARY VALUE 4.
+
+      ** Reconnect delay
+       10  MQRD-NO-RECONNECT   PIC S9(9) BINARY VALUE -1.
+       10  MQRD-NO-DELAY   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQCBD Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQCBD-STRUC-ID   PIC X(4) VALUE 'CBD '.
+
+      ** Structure Version Number
+       10  MQCBD-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQCBD-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQCBD-LENGTH-1   PIC S9(9) BINARY VALUE 156.
+       10  MQCBD-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 156.
+
+      ** Callback Options
+       10  MQCBDO-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCBDO-START-CALL   PIC S9(9) BINARY VALUE 1.
+       10  MQCBDO-STOP-CALL   PIC S9(9) BINARY VALUE 4.
+       10  MQCBDO-REGISTER-CALL   PIC S9(9) BINARY VALUE 256.
+       10  MQCBDO-DEREGISTER-CALL   PIC S9(9) BINARY VALUE 512.
+       10  MQCBDO-FAIL-IF-QUIESCING   PIC S9(9) BINARY VALUE 8192.
+       10  MQCBDO-EVENT-CALL   PIC S9(9) BINARY VALUE 16384.
+       10  MQCBDO-MC-EVENT-CALL   PIC S9(9) BINARY VALUE 32768.
+
+      ** This is the type of the Callback Function
+       10  MQCBT-MESSAGE-CONSUMER   PIC S9(9) BINARY VALUE 1.
+       10  MQCBT-EVENT-HANDLER   PIC S9(9) BINARY VALUE 2.
+
+      ** Buffer size values
+       10  MQCBD-FULL-MSG-LENGTH   PIC S9(9) BINARY VALUE -1.
+
+      ******************************************************************
+      **  Values Related to MQCHARV Structure                      
+      ******************************************************************
+      ** Variable String Length
+       10  MQVS-NULL-TERMINATED   PIC S9(9) BINARY VALUE -1.
+
+      ******************************************************************
+      **  Values Related to MQCIH Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQCIH-STRUC-ID   PIC X(4) VALUE 'CIH '.
+
+      ** Structure Version Number
+       10  MQCIH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQCIH-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQCIH-CURRENT-VERSION   PIC S9(9) BINARY VALUE 2.
+
+      ** Structure Length
+       10  MQCIH-LENGTH-1   PIC S9(9) BINARY VALUE 164.
+       10  MQCIH-LENGTH-2   PIC S9(9) BINARY VALUE 180.
+       10  MQCIH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 180.
+
+      ** Flags
+       10  MQCIH-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCIH-PASS-EXPIRATION   PIC S9(9) BINARY VALUE 1.
+       10  MQCIH-UNLIMITED-EXPIRATION   PIC S9(9) BINARY VALUE 0.
+       10  MQCIH-REPLY-WITHOUT-NULLS   PIC S9(9) BINARY VALUE 2.
+       10  MQCIH-REPLY-WITH-NULLS   PIC S9(9) BINARY VALUE 0.
+       10  MQCIH-SYNC-ON-RETURN   PIC S9(9) BINARY VALUE 4.
+       10  MQCIH-NO-SYNC-ON-RETURN   PIC S9(9) BINARY VALUE 0.
+
+      ** Return Codes
+       10  MQCRC-OK   PIC S9(9) BINARY VALUE 0.
+       10  MQCRC-CICS-EXEC-ERROR   PIC S9(9) BINARY VALUE 1.
+       10  MQCRC-MQ-API-ERROR   PIC S9(9) BINARY VALUE 2.
+       10  MQCRC-BRIDGE-ERROR   PIC S9(9) BINARY VALUE 3.
+       10  MQCRC-BRIDGE-ABEND   PIC S9(9) BINARY VALUE 4.
+       10  MQCRC-APPLICATION-ABEND   PIC S9(9) BINARY VALUE 5.
+       10  MQCRC-SECURITY-ERROR   PIC S9(9) BINARY VALUE 6.
+       10  MQCRC-PROGRAM-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 7.
+       10  MQCRC-BRIDGE-TIMEOUT   PIC S9(9) BINARY VALUE 8.
+       10  MQCRC-TRANSID-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 9.
+
+      ** Unit-of-Work Controls
+       10  MQCUOWC-ONLY   PIC S9(9) BINARY VALUE 273.
+       10  MQCUOWC-CONTINUE   PIC S9(9) BINARY VALUE 65536.
+       10  MQCUOWC-FIRST   PIC S9(9) BINARY VALUE 17.
+       10  MQCUOWC-MIDDLE   PIC S9(9) BINARY VALUE 16.
+       10  MQCUOWC-LAST   PIC S9(9) BINARY VALUE 272.
+       10  MQCUOWC-COMMIT   PIC S9(9) BINARY VALUE 256.
+       10  MQCUOWC-BACKOUT   PIC S9(9) BINARY VALUE 4352.
+
+      ** Get Wait Interval
+       10  MQCGWI-DEFAULT   PIC S9(9) BINARY VALUE -2.
+
+      ** Link Types
+       10  MQCLT-PROGRAM   PIC S9(9) BINARY VALUE 1.
+       10  MQCLT-TRANSACTION   PIC S9(9) BINARY VALUE 2.
+
+      ** Output Data Length
+       10  MQCODL-AS-INPUT   PIC S9(9) BINARY VALUE -1.
+
+      ** ADS Descriptors
+       10  MQCADSD-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCADSD-SEND   PIC S9(9) BINARY VALUE 1.
+       10  MQCADSD-RECV   PIC S9(9) BINARY VALUE 16.
+       10  MQCADSD-MSGFORMAT   PIC S9(9) BINARY VALUE 256.
+
+      ** Conversational Task Options
+       10  MQCCT-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQCCT-NO   PIC S9(9) BINARY VALUE 0.
+
+      ** Task End Status
+       10  MQCTES-NOSYNC   PIC S9(9) BINARY VALUE 0.
+       10  MQCTES-COMMIT   PIC S9(9) BINARY VALUE 256.
+       10  MQCTES-BACKOUT   PIC S9(9) BINARY VALUE 4352.
+       10  MQCTES-ENDTASK   PIC S9(9) BINARY VALUE 65536.
+
+      ** Facility
+       10  MQCFAC-NONE   PIC X(8) VALUE LOW-VALUES.
+
+      ** Functions
+       10  MQCFUNC-MQCONN   PIC X(4) VALUE 'CONN'.
+       10  MQCFUNC-MQGET   PIC X(4) VALUE 'GET '.
+       10  MQCFUNC-MQINQ   PIC X(4) VALUE 'INQ '.
+       10  MQCFUNC-MQOPEN   PIC X(4) VALUE 'OPEN'.
+       10  MQCFUNC-MQPUT   PIC X(4) VALUE 'PUT '.
+       10  MQCFUNC-MQPUT1   PIC X(4) VALUE 'PUT1'.
+       10  MQCFUNC-NONE   PIC X(4) VALUE SPACES.
+
+      ** Start Codes
+       10  MQCSC-START   PIC X(4) VALUE 'S   '.
+       10  MQCSC-STARTDATA   PIC X(4) VALUE 'SD  '.
+       10  MQCSC-TERMINPUT   PIC X(4) VALUE 'TD  '.
+       10  MQCSC-NONE   PIC X(4) VALUE SPACES.
+
+      ******************************************************************
+      **  Values Related to MQCMHO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQCMHO-STRUC-ID   PIC X(4) VALUE 'CMHO'.
+
+      ** Structure Version Number
+       10  MQCMHO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQCMHO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQCMHO-LENGTH-1   PIC S9(9) BINARY VALUE 12.
+       10  MQCMHO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 12.
+
+      ** Create Message Handle Options
+       10  MQCMHO-DEFAULT-VALIDATION   PIC S9(9) BINARY VALUE 0.
+       10  MQCMHO-NO-VALIDATION   PIC S9(9) BINARY VALUE 1.
+       10  MQCMHO-VALIDATE   PIC S9(9) BINARY VALUE 2.
+       10  MQCMHO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQCTLO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQCTLO-STRUC-ID   PIC X(4) VALUE 'CTLO'.
+
+      ** Structure Version Number
+       10  MQCTLO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQCTLO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQCTLO-LENGTH-1   PIC S9(9) BINARY VALUE 20.
+       10  MQCTLO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 20.
+
+      ** Consumer Control Options
+       10  MQCTLO-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCTLO-THREAD-AFFINITY   PIC S9(9) BINARY VALUE 1.
+       10  MQCTLO-FAIL-IF-QUIESCING   PIC S9(9) BINARY VALUE 8192.
+
+      ******************************************************************
+      **  Values Related to MQSCO Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQSCO-STRUC-ID   PIC X(4) VALUE 'SCO '.
+
+      ** Structure Version Number
+       10  MQSCO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQSCO-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQSCO-VERSION-3   PIC S9(9) BINARY VALUE 3.
+       10  MQSCO-VERSION-4   PIC S9(9) BINARY VALUE 4.
+       10  MQSCO-VERSION-5   PIC S9(9) BINARY VALUE 5.
+       10  MQSCO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 5.
+
+      ** Structure Length
+       10  MQSCO-LENGTH-1   PIC S9(9) BINARY VALUE 532.
+       10  MQSCO-LENGTH-2   PIC S9(9) BINARY VALUE 540.
+       10  MQSCO-LENGTH-3   PIC S9(9) BINARY VALUE 556.
+       10  MQSCO-LENGTH-4   PIC S9(9) BINARY VALUE 560.
+       10  MQSCO-LENGTH-5   PIC S9(9) BINARY VALUE 624.
+       10  MQSCO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 624.
+
+      ** SuiteB Type
+       10  MQ-SUITE-B-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 0.
+       10  MQ-SUITE-B-NONE   PIC S9(9) BINARY VALUE 1.
+       10  MQ-SUITE-B-128-BIT   PIC S9(9) BINARY VALUE 2.
+       10  MQ-SUITE-B-192-BIT   PIC S9(9) BINARY VALUE 4.
+
+      ** Key Reset Count
+       10  MQSCO-RESET-COUNT-DEFAULT   PIC S9(9) BINARY VALUE 0.
+
+      ** Certificate Validation Policy Type
+       10  MQ-CERT-VAL-POLICY-DEFAULT   PIC S9(9) BINARY VALUE 0.
+       10  MQ-CERT-VAL-POLICY-ANY   PIC S9(9) BINARY VALUE 0.
+       10  MQ-CERT-VAL-POLICY-RFC5280   PIC S9(9) BINARY VALUE 1.
+
+      ******************************************************************
+      **  Values Related to MQCSP Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQCSP-STRUC-ID   PIC X(4) VALUE 'CSP '.
+
+      ** Structure Version Number
+       10  MQCSP-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQCSP-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQCSP-LENGTH-1   PIC S9(9) BINARY VALUE 48.
+       10  MQCSP-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 48.
+
+      ** Authentication Types
+       10  MQCSP-AUTH-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCSP-AUTH-USER-ID-AND-PWD   PIC S9(9) BINARY VALUE 1.
+
+      ******************************************************************
+      **  Values Related to MQCNO Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQCNO-STRUC-ID   PIC X(4) VALUE 'CNO '.
+
+      ** Structure Version Number
+       10  MQCNO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQCNO-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQCNO-VERSION-3   PIC S9(9) BINARY VALUE 3.
+       10  MQCNO-VERSION-4   PIC S9(9) BINARY VALUE 4.
+       10  MQCNO-VERSION-5   PIC S9(9) BINARY VALUE 5.
+       10  MQCNO-VERSION-6   PIC S9(9) BINARY VALUE 6.
+       10  MQCNO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 6.
+
+      ** Structure Length
+       10  MQCNO-LENGTH-1   PIC S9(9) BINARY VALUE 12.
+       10  MQCNO-LENGTH-2   PIC S9(9) BINARY VALUE 20.
+       10  MQCNO-LENGTH-3   PIC S9(9) BINARY VALUE 148.
+       10  MQCNO-LENGTH-4   PIC S9(9) BINARY VALUE 156.
+       10  MQCNO-LENGTH-5   PIC S9(9) BINARY VALUE 188.
+       10  MQCNO-LENGTH-6   PIC S9(9) BINARY VALUE 208.
+       10  MQCNO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 208.
+
+      ** Connect Options
+       10  MQCNO-STANDARD-BINDING   PIC S9(9) BINARY VALUE 0.
+       10  MQCNO-FASTPATH-BINDING   PIC S9(9) BINARY VALUE 1.
+       10  MQCNO-SERIALIZE-CONN-TAG-Q-MGR   PIC S9(9) BINARY VALUE 2.
+       10  MQCNO-SERIALIZE-CONN-TAG-QSG   PIC S9(9) BINARY VALUE 4.
+       10  MQCNO-RESTRICT-CONN-TAG-Q-MGR   PIC S9(9) BINARY VALUE 8.
+       10  MQCNO-RESTRICT-CONN-TAG-QSG   PIC S9(9) BINARY VALUE 16.
+       10  MQCNO-HANDLE-SHARE-NONE   PIC S9(9) BINARY VALUE 32.
+       10  MQCNO-HANDLE-SHARE-BLOCK   PIC S9(9) BINARY VALUE 64.
+       10  MQCNO-HANDLE-SHARE-NO-BLOCK   PIC S9(9) BINARY VALUE 128.
+       10  MQCNO-SHARED-BINDING   PIC S9(9) BINARY VALUE 256.
+       10  MQCNO-ISOLATED-BINDING   PIC S9(9) BINARY VALUE 512.
+       10  MQCNO-LOCAL-BINDING   PIC S9(9) BINARY VALUE 1024.
+       10  MQCNO-CLIENT-BINDING   PIC S9(9) BINARY VALUE 2048.
+       10  MQCNO-ACCOUNTING-MQI-ENABLED   PIC S9(9) BINARY VALUE 4096.
+       10  MQCNO-ACCOUNTING-MQI-DISABLED   PIC S9(9) BINARY VALUE 8192.
+       10  MQCNO-ACCOUNTING-Q-ENABLED   PIC S9(9) BINARY VALUE 16384.
+       10  MQCNO-ACCOUNTING-Q-DISABLED   PIC S9(9) BINARY VALUE 32768.
+       10  MQCNO-NO-CONV-SHARING   PIC S9(9) BINARY VALUE 65536.
+       10  MQCNO-ALL-CONVS-SHARE   PIC S9(9) BINARY VALUE 262144.
+       10  MQCNO-CD-FOR-OUTPUT-ONLY   PIC S9(9) BINARY VALUE 524288.
+       10  MQCNO-USE-CD-SELECTION   PIC S9(9) BINARY VALUE 1048576.
+       10  MQCNO-RECONNECT-AS-DEF   PIC S9(9) BINARY VALUE 0.
+       10  MQCNO-RECONNECT   PIC S9(9) BINARY VALUE 16777216.
+       10  MQCNO-RECONNECT-DISABLED   PIC S9(9) BINARY VALUE 33554432.
+       10  MQCNO-RECONNECT-Q-MGR   PIC S9(9) BINARY VALUE 67108864.
+       10  MQCNO-ACTIVITY-TRACE-ENABLED   PIC S9(9) BINARY
+           VALUE 134217728.
+       10  MQCNO-ACTIVITY-TRACE-DISABLED   PIC S9(9) BINARY
+           VALUE 268435456.
+       10  MQCNO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Queue Manager Connection Tag
+       10  MQCT-NONE   PIC X(128) VALUE LOW-VALUES.
+
+      ** Connection Identifier
+       10  MQCONNID-NONE   PIC X(24) VALUE LOW-VALUES.
+
+      ******************************************************************
+      **  Values Related to MQDH Structure                         
+      ******************************************************************
+      ** Structure Identifier
+       10  MQDH-STRUC-ID   PIC X(4) VALUE 'DH  '.
+
+      ** Structure Version Number
+       10  MQDH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQDH-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQDH-LENGTH-1   PIC S9(9) BINARY VALUE 48.
+       10  MQDH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 48.
+
+      ** Flags
+       10  MQDHF-NEW-MSG-IDS   PIC S9(9) BINARY VALUE 1.
+       10  MQDHF-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQDLH Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQDLH-STRUC-ID   PIC X(4) VALUE 'DLH '.
+
+      ** Structure Version Number
+       10  MQDLH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQDLH-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQDLH-LENGTH-1   PIC S9(9) BINARY VALUE 172.
+       10  MQDLH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 172.
+
+      ******************************************************************
+      **  Values Related to MQDMHO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQDMHO-STRUC-ID   PIC X(4) VALUE 'DMHO'.
+
+      ** Structure Version Number
+       10  MQDMHO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQDMHO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQDMHO-LENGTH-1   PIC S9(9) BINARY VALUE 12.
+       10  MQDMHO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 12.
+
+      ** Delete Message Handle Options
+       10  MQDMHO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQDMPO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQDMPO-STRUC-ID   PIC X(4) VALUE 'DMPO'.
+
+      ** Structure Version Number
+       10  MQDMPO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQDMPO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQDMPO-LENGTH-1   PIC S9(9) BINARY VALUE 12.
+       10  MQDMPO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 12.
+
+      ** Delete Message Property Options
+       10  MQDMPO-DEL-FIRST   PIC S9(9) BINARY VALUE 0.
+       10  MQDMPO-DEL-PROP-UNDER-CURSOR   PIC S9(9) BINARY VALUE 1.
+       10  MQDMPO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQGMO Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQGMO-STRUC-ID   PIC X(4) VALUE 'GMO '.
+
+      ** Structure Version Number
+       10  MQGMO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQGMO-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQGMO-VERSION-3   PIC S9(9) BINARY VALUE 3.
+       10  MQGMO-VERSION-4   PIC S9(9) BINARY VALUE 4.
+       10  MQGMO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 4.
+
+      ** Structure Length
+       10  MQGMO-LENGTH-1   PIC S9(9) BINARY VALUE 72.
+       10  MQGMO-LENGTH-2   PIC S9(9) BINARY VALUE 80.
+       10  MQGMO-LENGTH-3   PIC S9(9) BINARY VALUE 100.
+       10  MQGMO-LENGTH-4   PIC S9(9) BINARY VALUE 112.
+       10  MQGMO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 112.
+
+      ** Get Message Options
+       10  MQGMO-WAIT   PIC S9(9) BINARY VALUE 1.
+       10  MQGMO-NO-WAIT   PIC S9(9) BINARY VALUE 0.
+       10  MQGMO-SET-SIGNAL   PIC S9(9) BINARY VALUE 8.
+       10  MQGMO-FAIL-IF-QUIESCING   PIC S9(9) BINARY VALUE 8192.
+       10  MQGMO-SYNCPOINT   PIC S9(9) BINARY VALUE 2.
+       10  MQGMO-SYNCPOINT-IF-PERSISTENT   PIC S9(9) BINARY VALUE 4096.
+       10  MQGMO-NO-SYNCPOINT   PIC S9(9) BINARY VALUE 4.
+       10  MQGMO-MARK-SKIP-BACKOUT   PIC S9(9) BINARY VALUE 128.
+       10  MQGMO-BROWSE-FIRST   PIC S9(9) BINARY VALUE 16.
+       10  MQGMO-BROWSE-NEXT   PIC S9(9) BINARY VALUE 32.
+       10  MQGMO-BROWSE-MSG-UNDER-CURSOR   PIC S9(9) BINARY VALUE 2048.
+       10  MQGMO-MSG-UNDER-CURSOR   PIC S9(9) BINARY VALUE 256.
+       10  MQGMO-LOCK   PIC S9(9) BINARY VALUE 512.
+       10  MQGMO-UNLOCK   PIC S9(9) BINARY VALUE 1024.
+       10  MQGMO-ACCEPT-TRUNCATED-MSG   PIC S9(9) BINARY VALUE 64.
+       10  MQGMO-CONVERT   PIC S9(9) BINARY VALUE 16384.
+       10  MQGMO-LOGICAL-ORDER   PIC S9(9) BINARY VALUE 32768.
+       10  MQGMO-COMPLETE-MSG   PIC S9(9) BINARY VALUE 65536.
+       10  MQGMO-ALL-MSGS-AVAILABLE   PIC S9(9) BINARY VALUE 131072.
+       10  MQGMO-ALL-SEGMENTS-AVAILABLE   PIC S9(9) BINARY VALUE 262144.
+       10  MQGMO-MARK-BROWSE-HANDLE   PIC S9(9) BINARY VALUE 1048576.
+       10  MQGMO-MARK-BROWSE-CO-OP   PIC S9(9) BINARY VALUE 2097152.
+       10  MQGMO-UNMARK-BROWSE-CO-OP   PIC S9(9) BINARY VALUE 4194304.
+       10  MQGMO-UNMARK-BROWSE-HANDLE   PIC S9(9) BINARY VALUE 8388608.
+       10  MQGMO-UNMARKED-BROWSE-MSG   PIC S9(9) BINARY VALUE 16777216.
+       10  MQGMO-PROPERTIES-FORCE-MQRFH2   PIC S9(9) BINARY
+           VALUE 33554432.
+       10  MQGMO-NO-PROPERTIES   PIC S9(9) BINARY VALUE 67108864.
+       10  MQGMO-PROPERTIES-IN-HANDLE   PIC S9(9) BINARY
+           VALUE 134217728.
+       10  MQGMO-PROPERTIES-COMPATIBILITY   PIC S9(9) BINARY
+           VALUE 268435456.
+       10  MQGMO-PROPERTIES-AS-Q-DEF   PIC S9(9) BINARY VALUE 0.
+       10  MQGMO-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQGMO-BROWSE-HANDLE   PIC S9(9) BINARY VALUE 17825808.
+       10  MQGMO-BROWSE-CO-OP   PIC S9(9) BINARY VALUE 18874384.
+
+      ** Wait Interval
+       10  MQWI-UNLIMITED   PIC S9(9) BINARY VALUE -1.
+
+      ** Signal Values
+       10  MQEC-MSG-ARRIVED   PIC S9(9) BINARY VALUE 2.
+       10  MQEC-WAIT-INTERVAL-EXPIRED   PIC S9(9) BINARY VALUE 3.
+       10  MQEC-WAIT-CANCELED   PIC S9(9) BINARY VALUE 4.
+       10  MQEC-Q-MGR-QUIESCING   PIC S9(9) BINARY VALUE 5.
+       10  MQEC-CONNECTION-QUIESCING   PIC S9(9) BINARY VALUE 6.
+
+      ** Match Options
+       10  MQMO-MATCH-MSG-ID   PIC S9(9) BINARY VALUE 1.
+       10  MQMO-MATCH-CORREL-ID   PIC S9(9) BINARY VALUE 2.
+       10  MQMO-MATCH-GROUP-ID   PIC S9(9) BINARY VALUE 4.
+       10  MQMO-MATCH-MSG-SEQ-NUMBER   PIC S9(9) BINARY VALUE 8.
+       10  MQMO-MATCH-OFFSET   PIC S9(9) BINARY VALUE 16.
+       10  MQMO-MATCH-MSG-TOKEN   PIC S9(9) BINARY VALUE 32.
+       10  MQMO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Group Status
+       10  MQGS-NOT-IN-GROUP   PIC X VALUE ' '.
+       10  MQGS-MSG-IN-GROUP   PIC X VALUE 'G'.
+       10  MQGS-LAST-MSG-IN-GROUP   PIC X VALUE 'L'.
+
+      ** Segment Status
+       10  MQSS-NOT-A-SEGMENT   PIC X VALUE ' '.
+       10  MQSS-SEGMENT   PIC X VALUE 'S'.
+       10  MQSS-LAST-SEGMENT   PIC X VALUE 'L'.
+
+      ** Segmentation
+       10  MQSEG-INHIBITED   PIC X VALUE ' '.
+       10  MQSEG-ALLOWED   PIC X VALUE 'A'.
+
+      ** Message Token
+       10  MQMTOK-NONE   PIC X(16) VALUE LOW-VALUES.
+
+      ** Returned Length
+       10  MQRL-UNDEFINED   PIC S9(9) BINARY VALUE -1.
+
+      ******************************************************************
+      **  Values Related to MQIIH Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQIIH-STRUC-ID   PIC X(4) VALUE 'IIH '.
+
+      ** Structure Version Number
+       10  MQIIH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQIIH-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQIIH-LENGTH-1   PIC S9(9) BINARY VALUE 84.
+       10  MQIIH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 84.
+
+      ** Flags
+       10  MQIIH-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQIIH-PASS-EXPIRATION   PIC S9(9) BINARY VALUE 1.
+       10  MQIIH-UNLIMITED-EXPIRATION   PIC S9(9) BINARY VALUE 0.
+       10  MQIIH-REPLY-FORMAT-NONE   PIC S9(9) BINARY VALUE 8.
+       10  MQIIH-IGNORE-PURG   PIC S9(9) BINARY VALUE 16.
+       10  MQIIH-CM0-REQUEST-RESPONSE   PIC S9(9) BINARY VALUE 32.
+
+      ** Authenticator
+       10  MQIAUT-NONE   PIC X(8) VALUE SPACES.
+
+      ** Transaction Instance Identifier
+       10  MQITII-NONE   PIC X(16) VALUE LOW-VALUES.
+
+      ** Transaction States
+       10  MQITS-IN-CONVERSATION   PIC X VALUE 'C'.
+       10  MQITS-NOT-IN-CONVERSATION   PIC X VALUE ' '.
+       10  MQITS-ARCHITECTED   PIC X VALUE 'A'.
+
+      ** Commit Modes
+       10  MQICM-COMMIT-THEN-SEND   PIC X VALUE '0'.
+       10  MQICM-SEND-THEN-COMMIT   PIC X VALUE '1'.
+
+      ** Security Scopes
+       10  MQISS-CHECK   PIC X VALUE 'C'.
+       10  MQISS-FULL   PIC X VALUE 'F'.
+
+      ******************************************************************
+      **  Values Related to MQIMPO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQIMPO-STRUC-ID   PIC X(4) VALUE 'IMPO'.
+
+      ** Structure Version Number
+       10  MQIMPO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQIMPO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQIMPO-LENGTH-1   PIC S9(9) BINARY VALUE 60.
+       10  MQIMPO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 60.
+
+      ** Inquire Message Property Options
+       10  MQIMPO-CONVERT-TYPE   PIC S9(9) BINARY VALUE 2.
+       10  MQIMPO-QUERY-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQIMPO-INQ-FIRST   PIC S9(9) BINARY VALUE 0.
+       10  MQIMPO-INQ-NEXT   PIC S9(9) BINARY VALUE 8.
+       10  MQIMPO-INQ-PROP-UNDER-CURSOR   PIC S9(9) BINARY VALUE 16.
+       10  MQIMPO-CONVERT-VALUE   PIC S9(9) BINARY VALUE 32.
+       10  MQIMPO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQMD Structure                         
+      ******************************************************************
+      ** Structure Identifier
+       10  MQMD-STRUC-ID   PIC X(4) VALUE 'MD  '.
+
+      ** Structure Version Number
+       10  MQMD-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQMD-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQMD-CURRENT-VERSION   PIC S9(9) BINARY VALUE 2.
+
+      ** Structure Length
+       10  MQMD-LENGTH-1   PIC S9(9) BINARY VALUE 324.
+       10  MQMD-LENGTH-2   PIC S9(9) BINARY VALUE 364.
+       10  MQMD-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 364.
+
+      ** Report Options
+       10  MQRO-EXCEPTION   PIC S9(9) BINARY VALUE 16777216.
+       10  MQRO-EXCEPTION-WITH-DATA   PIC S9(9) BINARY VALUE 50331648.
+       10  MQRO-EXCEPTION-WITH-FULL-DATA   PIC S9(9) BINARY
+           VALUE 117440512.
+       10  MQRO-EXPIRATION   PIC S9(9) BINARY VALUE 2097152.
+       10  MQRO-EXPIRATION-WITH-DATA   PIC S9(9) BINARY VALUE 6291456.
+       10  MQRO-EXPIRATION-WITH-FULL-DATA   PIC S9(9) BINARY
+           VALUE 14680064.
+       10  MQRO-COA   PIC S9(9) BINARY VALUE 256.
+       10  MQRO-COA-WITH-DATA   PIC S9(9) BINARY VALUE 768.
+       10  MQRO-COA-WITH-FULL-DATA   PIC S9(9) BINARY VALUE 1792.
+       10  MQRO-COD   PIC S9(9) BINARY VALUE 2048.
+       10  MQRO-COD-WITH-DATA   PIC S9(9) BINARY VALUE 6144.
+       10  MQRO-COD-WITH-FULL-DATA   PIC S9(9) BINARY VALUE 14336.
+       10  MQRO-PAN   PIC S9(9) BINARY VALUE 1.
+       10  MQRO-NAN   PIC S9(9) BINARY VALUE 2.
+       10  MQRO-ACTIVITY   PIC S9(9) BINARY VALUE 4.
+       10  MQRO-NEW-MSG-ID   PIC S9(9) BINARY VALUE 0.
+       10  MQRO-PASS-MSG-ID   PIC S9(9) BINARY VALUE 128.
+       10  MQRO-COPY-MSG-ID-TO-CORREL-ID   PIC S9(9) BINARY VALUE 0.
+       10  MQRO-PASS-CORREL-ID   PIC S9(9) BINARY VALUE 64.
+       10  MQRO-DEAD-LETTER-Q   PIC S9(9) BINARY VALUE 0.
+       10  MQRO-DISCARD-MSG   PIC S9(9) BINARY VALUE 134217728.
+       10  MQRO-PASS-DISCARD-AND-EXPIRY   PIC S9(9) BINARY VALUE 16384.
+       10  MQRO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Report Options Masks
+       10  MQRO-REJECT-UNSUP-MASK   PIC S9(9) BINARY VALUE 270270464.
+       10  MQRO-ACCEPT-UNSUP-MASK   PIC S9(9) BINARY VALUE -270532353.
+       10  MQRO-ACCEPT-UNSUP-IF-XMIT-MASK   PIC S9(9) BINARY
+           VALUE 261888.
+
+      ** Message Types
+       10  MQMT-SYSTEM-FIRST   PIC S9(9) BINARY VALUE 1.
+       10  MQMT-REQUEST   PIC S9(9) BINARY VALUE 1.
+       10  MQMT-REPLY   PIC S9(9) BINARY VALUE 2.
+       10  MQMT-DATAGRAM   PIC S9(9) BINARY VALUE 8.
+       10  MQMT-REPORT   PIC S9(9) BINARY VALUE 4.
+       10  MQMT-MQE-FIELDS-FROM-MQE   PIC S9(9) BINARY VALUE 112.
+       10  MQMT-MQE-FIELDS   PIC S9(9) BINARY VALUE 113.
+       10  MQMT-SYSTEM-LAST   PIC S9(9) BINARY VALUE 65535.
+       10  MQMT-APPL-FIRST   PIC S9(9) BINARY VALUE 65536.
+       10  MQMT-APPL-LAST   PIC S9(9) BINARY VALUE 999999999.
+
+      ** Expiry
+       10  MQEI-UNLIMITED   PIC S9(9) BINARY VALUE -1.
+
+      ** Feedback Values
+       10  MQFB-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQFB-SYSTEM-FIRST   PIC S9(9) BINARY VALUE 1.
+       10  MQFB-QUIT   PIC S9(9) BINARY VALUE 256.
+       10  MQFB-EXPIRATION   PIC S9(9) BINARY VALUE 258.
+       10  MQFB-COA   PIC S9(9) BINARY VALUE 259.
+       10  MQFB-COD   PIC S9(9) BINARY VALUE 260.
+       10  MQFB-CHANNEL-COMPLETED   PIC S9(9) BINARY VALUE 262.
+       10  MQFB-CHANNEL-FAIL-RETRY   PIC S9(9) BINARY VALUE 263.
+       10  MQFB-CHANNEL-FAIL   PIC S9(9) BINARY VALUE 264.
+       10  MQFB-APPL-CANNOT-BE-STARTED   PIC S9(9) BINARY VALUE 265.
+       10  MQFB-TM-ERROR   PIC S9(9) BINARY VALUE 266.
+       10  MQFB-APPL-TYPE-ERROR   PIC S9(9) BINARY VALUE 267.
+       10  MQFB-STOPPED-BY-MSG-EXIT   PIC S9(9) BINARY VALUE 268.
+       10  MQFB-ACTIVITY   PIC S9(9) BINARY VALUE 269.
+       10  MQFB-XMIT-Q-MSG-ERROR   PIC S9(9) BINARY VALUE 271.
+       10  MQFB-PAN   PIC S9(9) BINARY VALUE 275.
+       10  MQFB-NAN   PIC S9(9) BINARY VALUE 276.
+       10  MQFB-STOPPED-BY-CHAD-EXIT   PIC S9(9) BINARY VALUE 277.
+       10  MQFB-STOPPED-BY-PUBSUB-EXIT   PIC S9(9) BINARY VALUE 279.
+       10  MQFB-NOT-A-REPOSITORY-MSG   PIC S9(9) BINARY VALUE 280.
+       10  MQFB-BIND-OPEN-CLUSRCVR-DEL   PIC S9(9) BINARY VALUE 281.
+       10  MQFB-MAX-ACTIVITIES   PIC S9(9) BINARY VALUE 282.
+       10  MQFB-NOT-FORWARDED   PIC S9(9) BINARY VALUE 283.
+       10  MQFB-NOT-DELIVERED   PIC S9(9) BINARY VALUE 284.
+       10  MQFB-UNSUPPORTED-FORWARDING   PIC S9(9) BINARY VALUE 285.
+       10  MQFB-UNSUPPORTED-DELIVERY   PIC S9(9) BINARY VALUE 286.
+       10  MQFB-DATA-LENGTH-ZERO   PIC S9(9) BINARY VALUE 291.
+       10  MQFB-DATA-LENGTH-NEGATIVE   PIC S9(9) BINARY VALUE 292.
+       10  MQFB-DATA-LENGTH-TOO-BIG   PIC S9(9) BINARY VALUE 293.
+       10  MQFB-BUFFER-OVERFLOW   PIC S9(9) BINARY VALUE 294.
+       10  MQFB-LENGTH-OFF-BY-ONE   PIC S9(9) BINARY VALUE 295.
+       10  MQFB-IIH-ERROR   PIC S9(9) BINARY VALUE 296.
+       10  MQFB-NOT-AUTHORIZED-FOR-IMS   PIC S9(9) BINARY VALUE 298.
+       10  MQFB-IMS-ERROR   PIC S9(9) BINARY VALUE 300.
+       10  MQFB-IMS-FIRST   PIC S9(9) BINARY VALUE 301.
+       10  MQFB-IMS-LAST   PIC S9(9) BINARY VALUE 399.
+       10  MQFB-CICS-INTERNAL-ERROR   PIC S9(9) BINARY VALUE 401.
+       10  MQFB-CICS-NOT-AUTHORIZED   PIC S9(9) BINARY VALUE 402.
+       10  MQFB-CICS-BRIDGE-FAILURE   PIC S9(9) BINARY VALUE 403.
+       10  MQFB-CICS-CORREL-ID-ERROR   PIC S9(9) BINARY VALUE 404.
+       10  MQFB-CICS-CCSID-ERROR   PIC S9(9) BINARY VALUE 405.
+       10  MQFB-CICS-ENCODING-ERROR   PIC S9(9) BINARY VALUE 406.
+       10  MQFB-CICS-CIH-ERROR   PIC S9(9) BINARY VALUE 407.
+       10  MQFB-CICS-UOW-ERROR   PIC S9(9) BINARY VALUE 408.
+       10  MQFB-CICS-COMMAREA-ERROR   PIC S9(9) BINARY VALUE 409.
+       10  MQFB-CICS-APPL-NOT-STARTED   PIC S9(9) BINARY VALUE 410.
+       10  MQFB-CICS-APPL-ABENDED   PIC S9(9) BINARY VALUE 411.
+       10  MQFB-CICS-DLQ-ERROR   PIC S9(9) BINARY VALUE 412.
+       10  MQFB-CICS-UOW-BACKED-OUT   PIC S9(9) BINARY VALUE 413.
+       10  MQFB-PUBLICATIONS-ON-REQUEST   PIC S9(9) BINARY VALUE 501.
+       10  MQFB-SUBSCRIBER-IS-PUBLISHER   PIC S9(9) BINARY VALUE 502.
+       10  MQFB-MSG-SCOPE-MISMATCH   PIC S9(9) BINARY VALUE 503.
+       10  MQFB-SELECTOR-MISMATCH   PIC S9(9) BINARY VALUE 504.
+       10  MQFB-NOT-A-GROUPUR-MSG   PIC S9(9) BINARY VALUE 505.
+       10  MQFB-IMS-NACK-1A-REASON-FIRST   PIC S9(9) BINARY VALUE 600.
+       10  MQFB-IMS-NACK-1A-REASON-LAST   PIC S9(9) BINARY VALUE 855.
+       10  MQFB-SYSTEM-LAST   PIC S9(9) BINARY VALUE 65535.
+       10  MQFB-APPL-FIRST   PIC S9(9) BINARY VALUE 65536.
+       10  MQFB-APPL-LAST   PIC S9(9) BINARY VALUE 999999999.
+
+      ** Encoding
+       10  MQENC-NATIVE   PIC S9(9) BINARY VALUE 273.
+
+      ** Encoding Masks
+       10  MQENC-INTEGER-MASK   PIC S9(9) BINARY VALUE 15.
+       10  MQENC-DECIMAL-MASK   PIC S9(9) BINARY VALUE 240.
+       10  MQENC-FLOAT-MASK   PIC S9(9) BINARY VALUE 3840.
+       10  MQENC-RESERVED-MASK   PIC S9(9) BINARY VALUE -4096.
+
+      ** Encodings for Binary Integers
+       10  MQENC-INTEGER-UNDEFINED   PIC S9(9) BINARY VALUE 0.
+       10  MQENC-INTEGER-NORMAL   PIC S9(9) BINARY VALUE 1.
+       10  MQENC-INTEGER-REVERSED   PIC S9(9) BINARY VALUE 2.
+
+      ** Encodings for Packed Decimal Integers
+       10  MQENC-DECIMAL-UNDEFINED   PIC S9(9) BINARY VALUE 0.
+       10  MQENC-DECIMAL-NORMAL   PIC S9(9) BINARY VALUE 16.
+       10  MQENC-DECIMAL-REVERSED   PIC S9(9) BINARY VALUE 32.
+
+      ** Encodings for Floating Point Numbers
+       10  MQENC-FLOAT-UNDEFINED   PIC S9(9) BINARY VALUE 0.
+       10  MQENC-FLOAT-IEEE-NORMAL   PIC S9(9) BINARY VALUE 256.
+       10  MQENC-FLOAT-IEEE-REVERSED   PIC S9(9) BINARY VALUE 512.
+       10  MQENC-FLOAT-S390   PIC S9(9) BINARY VALUE 768.
+       10  MQENC-FLOAT-TNS   PIC S9(9) BINARY VALUE 1024.
+
+      ** Encodings for Multicast
+       10  MQENC-NORMAL   PIC S9(9) BINARY VALUE 273.
+       10  MQENC-REVERSED   PIC S9(9) BINARY VALUE 546.
+       10  MQENC-S390   PIC S9(9) BINARY VALUE 785.
+       10  MQENC-TNS   PIC S9(9) BINARY VALUE 1041.
+       10  MQENC-AS-PUBLISHED   PIC S9(9) BINARY VALUE -1.
+
+      ** Coded Character Set Identifiers
+       10  MQCCSI-UNDEFINED   PIC S9(9) BINARY VALUE 0.
+       10  MQCCSI-DEFAULT   PIC S9(9) BINARY VALUE 0.
+       10  MQCCSI-Q-MGR   PIC S9(9) BINARY VALUE 0.
+       10  MQCCSI-INHERIT   PIC S9(9) BINARY VALUE -2.
+       10  MQCCSI-EMBEDDED   PIC S9(9) BINARY VALUE -1.
+       10  MQCCSI-APPL   PIC S9(9) BINARY VALUE -3.
+       10  MQCCSI-AS-PUBLISHED   PIC S9(9) BINARY VALUE -4.
+
+      ** Formats
+       10  MQFMT-NONE   PIC X(8) VALUE SPACES.
+       10  MQFMT-ADMIN   PIC X(8) VALUE 'MQADMIN '.
+       10  MQFMT-AMQP   PIC X(8) VALUE 'MQAMQP  '.
+       10  MQFMT-CHANNEL-COMPLETED   PIC X(8) VALUE 'MQCHCOM '.
+       10  MQFMT-CICS   PIC X(8) VALUE 'MQCICS  '.
+       10  MQFMT-COMMAND-1   PIC X(8) VALUE 'MQCMD1  '.
+       10  MQFMT-COMMAND-2   PIC X(8) VALUE 'MQCMD2  '.
+       10  MQFMT-DEAD-LETTER-HEADER   PIC X(8) VALUE 'MQDEAD  '.
+       10  MQFMT-DIST-HEADER   PIC X(8) VALUE 'MQHDIST '.
+       10  MQFMT-EMBEDDED-PCF   PIC X(8) VALUE 'MQHEPCF '.
+       10  MQFMT-EVENT   PIC X(8) VALUE 'MQEVENT '.
+       10  MQFMT-IMS   PIC X(8) VALUE 'MQIMS   '.
+       10  MQFMT-IMS-VAR-STRING   PIC X(8) VALUE 'MQIMSVS '.
+       10  MQFMT-MD-EXTENSION   PIC X(8) VALUE 'MQHMDE  '.
+       10  MQFMT-PCF   PIC X(8) VALUE 'MQPCF   '.
+       10  MQFMT-REF-MSG-HEADER   PIC X(8) VALUE 'MQHREF  '.
+       10  MQFMT-RF-HEADER   PIC X(8) VALUE 'MQHRF   '.
+       10  MQFMT-RF-HEADER-1   PIC X(8) VALUE 'MQHRF   '.
+       10  MQFMT-RF-HEADER-2   PIC X(8) VALUE 'MQHRF2  '.
+       10  MQFMT-STRING   PIC X(8) VALUE 'MQSTR   '.
+       10  MQFMT-TRIGGER   PIC X(8) VALUE 'MQTRIG  '.
+       10  MQFMT-WORK-INFO-HEADER   PIC X(8) VALUE 'MQHWIH  '.
+       10  MQFMT-XMIT-Q-HEADER   PIC X(8) VALUE 'MQXMIT  '.
+
+      ** Priority
+       10  MQPRI-PRIORITY-AS-Q-DEF   PIC S9(9) BINARY VALUE -1.
+       10  MQPRI-PRIORITY-AS-PARENT   PIC S9(9) BINARY VALUE -2.
+       10  MQPRI-PRIORITY-AS-PUBLISHED   PIC S9(9) BINARY VALUE -3.
+       10  MQPRI-PRIORITY-AS-TOPIC-DEF   PIC S9(9) BINARY VALUE -1.
+
+      ** Persistence Values
+       10  MQPER-PERSISTENCE-AS-PARENT   PIC S9(9) BINARY VALUE -1.
+       10  MQPER-NOT-PERSISTENT   PIC S9(9) BINARY VALUE 0.
+       10  MQPER-PERSISTENT   PIC S9(9) BINARY VALUE 1.
+       10  MQPER-PERSISTENCE-AS-Q-DEF   PIC S9(9) BINARY VALUE 2.
+       10  MQPER-PERSISTENCE-AS-TOPIC-DEF   PIC S9(9) BINARY VALUE 2.
+
+      ** Put Response Values
+       10  MQPRT-RESPONSE-AS-PARENT   PIC S9(9) BINARY VALUE 0.
+       10  MQPRT-SYNC-RESPONSE   PIC S9(9) BINARY VALUE 1.
+       10  MQPRT-ASYNC-RESPONSE   PIC S9(9) BINARY VALUE 2.
+
+      ** Message Identifier
+       10  MQMI-NONE   PIC X(24) VALUE LOW-VALUES.
+
+      ** Correlation Identifier
+       10  MQCI-NONE   PIC X(24) VALUE LOW-VALUES.
+       10  MQCI-NEW-SESSION   PIC X(24)
+           VALUE X'414D51214E45575F53455353494F4E5F434F5252454C4944'.
+
+      ** Accounting Token
+       10  MQACT-NONE   PIC X(32) VALUE LOW-VALUES.
+
+      ** Accounting Token Types
+       10  MQACTT-UNKNOWN   PIC X VALUE X'00'.
+       10  MQACTT-CICS-LUOW-ID   PIC X VALUE X'01'.
+       10  MQACTT-OS2-DEFAULT   PIC X VALUE X'04'.
+       10  MQACTT-DOS-DEFAULT   PIC X VALUE X'05'.
+       10  MQACTT-UNIX-NUMERIC-ID   PIC X VALUE X'06'.
+       10  MQACTT-OS400-ACCOUNT-TOKEN   PIC X VALUE X'08'.
+       10  MQACTT-WINDOWS-DEFAULT   PIC X VALUE X'09'.
+       10  MQACTT-NT-SECURITY-ID   PIC X VALUE X'0B'.
+       10  MQACTT-AZUREAD-SECURITY-ID   PIC X VALUE X'0C'.
+       10  MQACTT-MS-ACC-AUTH-SECURITY-ID   PIC X VALUE X'0D'.
+       10  MQACTT-USER   PIC X VALUE X'19'.
+
+      ** Put Application Types
+       10  MQAT-UNKNOWN   PIC S9(9) BINARY VALUE -1.
+       10  MQAT-NO-CONTEXT   PIC S9(9) BINARY VALUE 0.
+       10  MQAT-CICS   PIC S9(9) BINARY VALUE 1.
+       10  MQAT-MVS   PIC S9(9) BINARY VALUE 2.
+       10  MQAT-OS390   PIC S9(9) BINARY VALUE 2.
+       10  MQAT-ZOS   PIC S9(9) BINARY VALUE 2.
+       10  MQAT-IMS   PIC S9(9) BINARY VALUE 3.
+       10  MQAT-OS2   PIC S9(9) BINARY VALUE 4.
+       10  MQAT-DOS   PIC S9(9) BINARY VALUE 5.
+       10  MQAT-AIX   PIC S9(9) BINARY VALUE 6.
+       10  MQAT-UNIX   PIC S9(9) BINARY VALUE 6.
+       10  MQAT-QMGR   PIC S9(9) BINARY VALUE 7.
+       10  MQAT-OS400   PIC S9(9) BINARY VALUE 8.
+       10  MQAT-WINDOWS   PIC S9(9) BINARY VALUE 9.
+       10  MQAT-CICS-VSE   PIC S9(9) BINARY VALUE 10.
+       10  MQAT-WINDOWS-NT   PIC S9(9) BINARY VALUE 11.
+       10  MQAT-VMS   PIC S9(9) BINARY VALUE 12.
+       10  MQAT-GUARDIAN   PIC S9(9) BINARY VALUE 13.
+       10  MQAT-NSK   PIC S9(9) BINARY VALUE 13.
+       10  MQAT-VOS   PIC S9(9) BINARY VALUE 14.
+       10  MQAT-OPEN-TP1   PIC S9(9) BINARY VALUE 15.
+       10  MQAT-VM   PIC S9(9) BINARY VALUE 18.
+       10  MQAT-IMS-BRIDGE   PIC S9(9) BINARY VALUE 19.
+       10  MQAT-XCF   PIC S9(9) BINARY VALUE 20.
+       10  MQAT-CICS-BRIDGE   PIC S9(9) BINARY VALUE 21.
+       10  MQAT-NOTES-AGENT   PIC S9(9) BINARY VALUE 22.
+       10  MQAT-TPF   PIC S9(9) BINARY VALUE 23.
+       10  MQAT-USER   PIC S9(9) BINARY VALUE 25.
+       10  MQAT-BROKER   PIC S9(9) BINARY VALUE 26.
+       10  MQAT-QMGR-PUBLISH   PIC S9(9) BINARY VALUE 26.
+       10  MQAT-JAVA   PIC S9(9) BINARY VALUE 28.
+       10  MQAT-DQM   PIC S9(9) BINARY VALUE 29.
+       10  MQAT-CHANNEL-INITIATOR   PIC S9(9) BINARY VALUE 30.
+       10  MQAT-WLM   PIC S9(9) BINARY VALUE 31.
+       10  MQAT-BATCH   PIC S9(9) BINARY VALUE 32.
+       10  MQAT-RRS-BATCH   PIC S9(9) BINARY VALUE 33.
+       10  MQAT-SIB   PIC S9(9) BINARY VALUE 34.
+       10  MQAT-SYSTEM-EXTENSION   PIC S9(9) BINARY VALUE 35.
+       10  MQAT-MCAST-PUBLISH   PIC S9(9) BINARY VALUE 36.
+       10  MQAT-AMQP   PIC S9(9) BINARY VALUE 37.
+       10  MQAT-DEFAULT   PIC S9(9) BINARY VALUE 6.
+       10  MQAT-USER-FIRST   PIC S9(9) BINARY VALUE 65536.
+       10  MQAT-USER-LAST   PIC S9(9) BINARY VALUE 999999999.
+
+      ** Group Identifier
+       10  MQGI-NONE   PIC X(24) VALUE LOW-VALUES.
+
+      ** Message Flags
+       10  MQMF-SEGMENTATION-INHIBITED   PIC S9(9) BINARY VALUE 0.
+       10  MQMF-SEGMENTATION-ALLOWED   PIC S9(9) BINARY VALUE 1.
+       10  MQMF-MSG-IN-GROUP   PIC S9(9) BINARY VALUE 8.
+       10  MQMF-LAST-MSG-IN-GROUP   PIC S9(9) BINARY VALUE 16.
+       10  MQMF-SEGMENT   PIC S9(9) BINARY VALUE 2.
+       10  MQMF-LAST-SEGMENT   PIC S9(9) BINARY VALUE 4.
+       10  MQMF-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Message Flags Masks
+       10  MQMF-REJECT-UNSUP-MASK   PIC S9(9) BINARY VALUE 4095.
+       10  MQMF-ACCEPT-UNSUP-MASK   PIC S9(9) BINARY VALUE -1048576.
+       10  MQMF-ACCEPT-UNSUP-IF-XMIT-MASK   PIC S9(9) BINARY
+           VALUE 1044480.
+
+      ** Original Length
+       10  MQOL-UNDEFINED   PIC S9(9) BINARY VALUE -1.
+
+      ******************************************************************
+      **  Values Related to MQMDE Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQMDE-STRUC-ID   PIC X(4) VALUE 'MDE '.
+
+      ** Structure Version Number
+       10  MQMDE-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQMDE-CURRENT-VERSION   PIC S9(9) BINARY VALUE 2.
+
+      ** Structure Length
+       10  MQMDE-LENGTH-2   PIC S9(9) BINARY VALUE 72.
+       10  MQMDE-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 72.
+
+      ** Flags
+       10  MQMDEF-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQMD1 Structure                        
+      ******************************************************************
+      ** Structure Length
+       10  MQMD1-LENGTH-1   PIC S9(9) BINARY VALUE 324.
+       10  MQMD1-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 324.
+
+      ******************************************************************
+      **  Values Related to MQMD2 Structure                        
+      ******************************************************************
+      ** Structure Length
+       10  MQMD2-LENGTH-1   PIC S9(9) BINARY VALUE 324.
+       10  MQMD2-LENGTH-2   PIC S9(9) BINARY VALUE 364.
+       10  MQMD2-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 364.
+
+      ******************************************************************
+      **  Values Related to MQMHBO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQMHBO-STRUC-ID   PIC X(4) VALUE 'MHBO'.
+
+      ** Structure Version Number
+       10  MQMHBO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQMHBO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQMHBO-LENGTH-1   PIC S9(9) BINARY VALUE 12.
+       10  MQMHBO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 12.
+
+      ** Message Handle To Buffer Options
+       10  MQMHBO-PROPERTIES-IN-MQRFH2   PIC S9(9) BINARY VALUE 1.
+       10  MQMHBO-DELETE-PROPERTIES   PIC S9(9) BINARY VALUE 2.
+       10  MQMHBO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQOD Structure                         
+      ******************************************************************
+      ** Structure Identifier
+       10  MQOD-STRUC-ID   PIC X(4) VALUE 'OD  '.
+
+      ** Structure Version Number
+       10  MQOD-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQOD-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQOD-VERSION-3   PIC S9(9) BINARY VALUE 3.
+       10  MQOD-VERSION-4   PIC S9(9) BINARY VALUE 4.
+       10  MQOD-CURRENT-VERSION   PIC S9(9) BINARY VALUE 4.
+
+      ** Structure Length
+       10  MQOD-LENGTH-1   PIC S9(9) BINARY VALUE 168.
+       10  MQOD-LENGTH-2   PIC S9(9) BINARY VALUE 200.
+       10  MQOD-LENGTH-3   PIC S9(9) BINARY VALUE 336.
+       10  MQOD-LENGTH-4   PIC S9(9) BINARY VALUE 400.
+       10  MQOD-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 400.
+
+      ** Obsolete DB2 Messages options on Inquire Group
+       10  MQOM-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQOM-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** Object Types
+       10  MQOT-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQOT-Q   PIC S9(9) BINARY VALUE 1.
+       10  MQOT-NAMELIST   PIC S9(9) BINARY VALUE 2.
+       10  MQOT-PROCESS   PIC S9(9) BINARY VALUE 3.
+       10  MQOT-STORAGE-CLASS   PIC S9(9) BINARY VALUE 4.
+       10  MQOT-Q-MGR   PIC S9(9) BINARY VALUE 5.
+       10  MQOT-CHANNEL   PIC S9(9) BINARY VALUE 6.
+       10  MQOT-AUTH-INFO   PIC S9(9) BINARY VALUE 7.
+       10  MQOT-TOPIC   PIC S9(9) BINARY VALUE 8.
+       10  MQOT-COMM-INFO   PIC S9(9) BINARY VALUE 9.
+       10  MQOT-CF-STRUC   PIC S9(9) BINARY VALUE 10.
+       10  MQOT-LISTENER   PIC S9(9) BINARY VALUE 11.
+       10  MQOT-SERVICE   PIC S9(9) BINARY VALUE 12.
+       10  MQOT-RESERVED-1   PIC S9(9) BINARY VALUE 999.
+
+      ** Extended Object Types
+       10  MQOT-ALL   PIC S9(9) BINARY VALUE 1001.
+       10  MQOT-ALIAS-Q   PIC S9(9) BINARY VALUE 1002.
+       10  MQOT-MODEL-Q   PIC S9(9) BINARY VALUE 1003.
+       10  MQOT-LOCAL-Q   PIC S9(9) BINARY VALUE 1004.
+       10  MQOT-REMOTE-Q   PIC S9(9) BINARY VALUE 1005.
+       10  MQOT-SENDER-CHANNEL   PIC S9(9) BINARY VALUE 1007.
+       10  MQOT-SERVER-CHANNEL   PIC S9(9) BINARY VALUE 1008.
+       10  MQOT-REQUESTER-CHANNEL   PIC S9(9) BINARY VALUE 1009.
+       10  MQOT-RECEIVER-CHANNEL   PIC S9(9) BINARY VALUE 1010.
+       10  MQOT-CURRENT-CHANNEL   PIC S9(9) BINARY VALUE 1011.
+       10  MQOT-SAVED-CHANNEL   PIC S9(9) BINARY VALUE 1012.
+       10  MQOT-SVRCONN-CHANNEL   PIC S9(9) BINARY VALUE 1013.
+       10  MQOT-CLNTCONN-CHANNEL   PIC S9(9) BINARY VALUE 1014.
+       10  MQOT-SHORT-CHANNEL   PIC S9(9) BINARY VALUE 1015.
+       10  MQOT-CHLAUTH   PIC S9(9) BINARY VALUE 1016.
+       10  MQOT-REMOTE-Q-MGR-NAME   PIC S9(9) BINARY VALUE 1017.
+       10  MQOT-PROT-POLICY   PIC S9(9) BINARY VALUE 1019.
+       10  MQOT-TT-CHANNEL   PIC S9(9) BINARY VALUE 1020.
+       10  MQOT-AMQP-CHANNEL   PIC S9(9) BINARY VALUE 1021.
+       10  MQOT-AUTH-REC   PIC S9(9) BINARY VALUE 1022.
+
+      ******************************************************************
+      **  Values Related to MQPD Structure                         
+      ******************************************************************
+      ** Structure Identifier
+       10  MQPD-STRUC-ID   PIC X(4) VALUE 'PD  '.
+
+      ** Structure Version Number
+       10  MQPD-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQPD-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQPD-LENGTH-1   PIC S9(9) BINARY VALUE 24.
+       10  MQPD-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 24.
+
+      ** Property Descriptor Options
+       10  MQPD-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Property Support Options
+       10  MQPD-SUPPORT-OPTIONAL   PIC S9(9) BINARY VALUE 1.
+       10  MQPD-SUPPORT-REQUIRED   PIC S9(9) BINARY VALUE 1048576.
+       10  MQPD-SUPPORT-REQUIRED-IF-LOCAL   PIC S9(9) BINARY VALUE 1024.
+       10  MQPD-REJECT-UNSUP-MASK   PIC S9(9) BINARY VALUE -1048576.
+       10  MQPD-ACCEPT-UNSUP-IF-XMIT-MASK   PIC S9(9) BINARY
+           VALUE 1047552.
+       10  MQPD-ACCEPT-UNSUP-MASK   PIC S9(9) BINARY VALUE 1023.
+
+      ** Property Context
+       10  MQPD-NO-CONTEXT   PIC S9(9) BINARY VALUE 0.
+       10  MQPD-USER-CONTEXT   PIC S9(9) BINARY VALUE 1.
+
+      ** Property Copy Options
+       10  MQCOPY-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCOPY-ALL   PIC S9(9) BINARY VALUE 1.
+       10  MQCOPY-FORWARD   PIC S9(9) BINARY VALUE 2.
+       10  MQCOPY-PUBLISH   PIC S9(9) BINARY VALUE 4.
+       10  MQCOPY-REPLY   PIC S9(9) BINARY VALUE 8.
+       10  MQCOPY-REPORT   PIC S9(9) BINARY VALUE 16.
+       10  MQCOPY-DEFAULT   PIC S9(9) BINARY VALUE 22.
+
+      ******************************************************************
+      **  Values Related to MQPMO Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQPMO-STRUC-ID   PIC X(4) VALUE 'PMO '.
+
+      ** Structure Version Number
+       10  MQPMO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQPMO-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQPMO-VERSION-3   PIC S9(9) BINARY VALUE 3.
+       10  MQPMO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 3.
+
+      ** Structure Length
+       10  MQPMO-LENGTH-1   PIC S9(9) BINARY VALUE 128.
+       10  MQPMO-LENGTH-2   PIC S9(9) BINARY VALUE 152.
+       10  MQPMO-LENGTH-3   PIC S9(9) BINARY VALUE 176.
+       10  MQPMO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 176.
+
+      ** Put Message Options
+       10  MQPMO-SYNCPOINT   PIC S9(9) BINARY VALUE 2.
+       10  MQPMO-NO-SYNCPOINT   PIC S9(9) BINARY VALUE 4.
+       10  MQPMO-DEFAULT-CONTEXT   PIC S9(9) BINARY VALUE 32.
+       10  MQPMO-NEW-MSG-ID   PIC S9(9) BINARY VALUE 64.
+       10  MQPMO-NEW-CORREL-ID   PIC S9(9) BINARY VALUE 128.
+       10  MQPMO-PASS-IDENTITY-CONTEXT   PIC S9(9) BINARY VALUE 256.
+       10  MQPMO-PASS-ALL-CONTEXT   PIC S9(9) BINARY VALUE 512.
+       10  MQPMO-SET-IDENTITY-CONTEXT   PIC S9(9) BINARY VALUE 1024.
+       10  MQPMO-SET-ALL-CONTEXT   PIC S9(9) BINARY VALUE 2048.
+       10  MQPMO-ALTERNATE-USER-AUTHORITY   PIC S9(9) BINARY VALUE 4096.
+       10  MQPMO-FAIL-IF-QUIESCING   PIC S9(9) BINARY VALUE 8192.
+       10  MQPMO-NO-CONTEXT   PIC S9(9) BINARY VALUE 16384.
+       10  MQPMO-LOGICAL-ORDER   PIC S9(9) BINARY VALUE 32768.
+       10  MQPMO-ASYNC-RESPONSE   PIC S9(9) BINARY VALUE 65536.
+       10  MQPMO-SYNC-RESPONSE   PIC S9(9) BINARY VALUE 131072.
+       10  MQPMO-RESOLVE-LOCAL-Q   PIC S9(9) BINARY VALUE 262144.
+       10  MQPMO-WARN-IF-NO-SUBS-MATCHED   PIC S9(9) BINARY
+           VALUE 524288.
+       10  MQPMO-RETAIN   PIC S9(9) BINARY VALUE 2097152.
+       10  MQPMO-MD-FOR-OUTPUT-ONLY   PIC S9(9) BINARY VALUE 8388608.
+       10  MQPMO-SCOPE-QMGR   PIC S9(9) BINARY VALUE 67108864.
+       10  MQPMO-SUPPRESS-REPLYTO   PIC S9(9) BINARY VALUE 134217728.
+       10  MQPMO-NOT-OWN-SUBS   PIC S9(9) BINARY VALUE 268435456.
+       10  MQPMO-RESPONSE-AS-Q-DEF   PIC S9(9) BINARY VALUE 0.
+       10  MQPMO-RESPONSE-AS-TOPIC-DEF   PIC S9(9) BINARY VALUE 0.
+       10  MQPMO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Put Message Options for publish mask
+       10  MQPMO-PUB-OPTIONS-MASK   PIC S9(9) BINARY VALUE 2097152.
+
+      ** Put Message Record Fields
+       10  MQPMRF-MSG-ID   PIC S9(9) BINARY VALUE 1.
+       10  MQPMRF-CORREL-ID   PIC S9(9) BINARY VALUE 2.
+       10  MQPMRF-GROUP-ID   PIC S9(9) BINARY VALUE 4.
+       10  MQPMRF-FEEDBACK   PIC S9(9) BINARY VALUE 8.
+       10  MQPMRF-ACCOUNTING-TOKEN   PIC S9(9) BINARY VALUE 16.
+       10  MQPMRF-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Action
+       10  MQACTP-NEW   PIC S9(9) BINARY VALUE 0.
+       10  MQACTP-FORWARD   PIC S9(9) BINARY VALUE 1.
+       10  MQACTP-REPLY   PIC S9(9) BINARY VALUE 2.
+       10  MQACTP-REPORT   PIC S9(9) BINARY VALUE 3.
+
+      ******************************************************************
+      **  Values Related to MQRFH Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQRFH-STRUC-ID   PIC X(4) VALUE 'RFH '.
+
+      ** Structure Version Number
+       10  MQRFH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQRFH-VERSION-2   PIC S9(9) BINARY VALUE 2.
+
+      ** Structure Length
+       10  MQRFH-STRUC-LENGTH-FIXED   PIC S9(9) BINARY VALUE 32.
+       10  MQRFH-STRUC-LENGTH-FIXED-2   PIC S9(9) BINARY VALUE 36.
+       10  MQRFH-LENGTH-1   PIC S9(9) BINARY VALUE 32.
+       10  MQRFH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 32.
+
+      ** Flags
+       10  MQRFH-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQRFH-NO-FLAGS   PIC S9(9) BINARY VALUE 0.
+       10  MQRFH-FLAGS-RESTRICTED-MASK   PIC S9(9) BINARY VALUE -65536.
+      ** MQRFH2 flags in the restricted mask are reserved for MQ use:
+
+      ** 0x80000000 - MQRFH_INTERNAL - This flag indicates the RFH2
+      ** header was created by IBM MQ for internal use.
+
+
+      ** Names for Name/Value String
+       10  MQNVS-APPL-TYPE   PIC X(12) VALUE 'OPT_APP_GRP '.
+       10  MQNVS-MSG-TYPE   PIC X(13) VALUE 'OPT_MSG_TYPE '.
+
+      ******************************************************************
+      **  Values Related to MQRFH2 Structure                       
+      ******************************************************************
+      ** Structure Length
+       10  MQRFH2-LENGTH-2   PIC S9(9) BINARY VALUE 36.
+       10  MQRFH2-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 36.
+
+      ******************************************************************
+      **  Values Related to MQRMH Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQRMH-STRUC-ID   PIC X(4) VALUE 'RMH '.
+
+      ** Structure Version Number
+       10  MQRMH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQRMH-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQRMH-LENGTH-1   PIC S9(9) BINARY VALUE 108.
+       10  MQRMH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 108.
+
+      ** Flags
+       10  MQRMHF-LAST   PIC S9(9) BINARY VALUE 1.
+       10  MQRMHF-NOT-LAST   PIC S9(9) BINARY VALUE 0.
+
+      ** Object Instance Identifier
+       10  MQOII-NONE   PIC X(24) VALUE LOW-VALUES.
+
+      ******************************************************************
+      **  Values Related to MQSD Structure                         
+      ******************************************************************
+      ** Structure Identifier
+       10  MQSD-STRUC-ID   PIC X(4) VALUE 'SD  '.
+
+      ** Structure Version Number
+       10  MQSD-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQSD-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQSD-LENGTH-1   PIC S9(9) BINARY VALUE 312.
+       10  MQSD-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 312.
+
+      ** Security Identifier
+       10  MQSID-NONE   PIC X(40) VALUE LOW-VALUES.
+
+      ** Security Identifier Types
+       10  MQSIDT-NONE   PIC X VALUE X'00'.
+       10  MQSIDT-NT-SECURITY-ID   PIC X VALUE X'01'.
+       10  MQSIDT-WAS-SECURITY-ID   PIC X VALUE X'02'.
+
+      ******************************************************************
+      **  Values Related to MQSMPO Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQSMPO-STRUC-ID   PIC X(4) VALUE 'SMPO'.
+
+      ** Structure Version Number
+       10  MQSMPO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQSMPO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQSMPO-LENGTH-1   PIC S9(9) BINARY VALUE 20.
+       10  MQSMPO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 20.
+
+      ** Set Message Property Options
+       10  MQSMPO-SET-FIRST   PIC S9(9) BINARY VALUE 0.
+       10  MQSMPO-SET-PROP-UNDER-CURSOR   PIC S9(9) BINARY VALUE 1.
+       10  MQSMPO-SET-PROP-AFTER-CURSOR   PIC S9(9) BINARY VALUE 2.
+       10  MQSMPO-APPEND-PROPERTY   PIC S9(9) BINARY VALUE 4.
+       10  MQSMPO-SET-PROP-BEFORE-CURSOR   PIC S9(9) BINARY VALUE 8.
+       10  MQSMPO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQSRO Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQSRO-STRUC-ID   PIC X(4) VALUE 'SRO '.
+
+      ** Structure Version Number
+       10  MQSRO-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQSRO-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQSRO-LENGTH-1   PIC S9(9) BINARY VALUE 16.
+       10  MQSRO-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 16.
+
+      ** Subscription Request Options
+       10  MQSRO-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQSRO-FAIL-IF-QUIESCING   PIC S9(9) BINARY VALUE 8192.
+
+      ******************************************************************
+      **  Values Related to MQSTS Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQSTS-STRUC-ID   PIC X(4) VALUE 'STAT'.
+
+      ** Structure Version Number
+       10  MQSTS-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQSTS-VERSION-2   PIC S9(9) BINARY VALUE 2.
+       10  MQSTS-CURRENT-VERSION   PIC S9(9) BINARY VALUE 2.
+
+      ** Structure Length
+       10  MQSTS-LENGTH-1   PIC S9(9) BINARY VALUE 224.
+       10  MQSTS-LENGTH-2   PIC S9(9) BINARY VALUE 272.
+       10  MQSTS-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 272.
+
+      ******************************************************************
+      **  Values Related to MQTM Structure                         
+      ******************************************************************
+      ** Structure Identifier
+       10  MQTM-STRUC-ID   PIC X(4) VALUE 'TM  '.
+
+      ** Structure Version Number
+       10  MQTM-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQTM-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQTM-LENGTH-1   PIC S9(9) BINARY VALUE 684.
+       10  MQTM-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 684.
+
+      ******************************************************************
+      **  Values Related to MQTMC2 Structure                       
+      ******************************************************************
+      ** Structure Identifier
+       10  MQTMC-STRUC-ID   PIC X(4) VALUE 'TMC '.
+
+      ** Structure Length
+       10  MQTMC2-LENGTH-1   PIC S9(9) BINARY VALUE 684.
+       10  MQTMC2-LENGTH-2   PIC S9(9) BINARY VALUE 732.
+       10  MQTMC2-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 732.
+
+      ** Structure Version Number
+       10  MQTMC-VERSION-1   PIC X(4) VALUE '   1'.
+       10  MQTMC-VERSION-2   PIC X(4) VALUE '   2'.
+       10  MQTMC-CURRENT-VERSION   PIC X(4) VALUE '   2'.
+
+      ******************************************************************
+      **  Values Related to MQWIH Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQWIH-STRUC-ID   PIC X(4) VALUE 'WIH '.
+
+      ** Structure Version Number
+       10  MQWIH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQWIH-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQWIH-LENGTH-1   PIC S9(9) BINARY VALUE 120.
+       10  MQWIH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 120.
+
+      ** Flags
+       10  MQWIH-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQXQH Structure                        
+      ******************************************************************
+      ** Structure Identifier
+       10  MQXQH-STRUC-ID   PIC X(4) VALUE 'XQH '.
+
+      ** Structure Version Number
+       10  MQXQH-VERSION-1   PIC S9(9) BINARY VALUE 1.
+       10  MQXQH-CURRENT-VERSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Structure Length
+       10  MQXQH-LENGTH-1   PIC S9(9) BINARY VALUE 428.
+       10  MQXQH-CURRENT-LENGTH   PIC S9(9) BINARY VALUE 428.
+
+      ** 
+
+      ******************************************************************
+      **  Values Related to All Functions                          
+      ******************************************************************
+      ** Connection Handles
+       10  MQHC-DEF-HCONN   PIC S9(9) BINARY VALUE 0.
+       10  MQHC-UNUSABLE-HCONN   PIC S9(9) BINARY VALUE -1.
+       10  MQHC-UNASSOCIATED-HCONN   PIC S9(9) BINARY VALUE -3.
+
+      ** String Lengths
+       10  MQ-OPERATOR-MESSAGE-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-ABEND-CODE-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-ACCOUNTING-TOKEN-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-APPL-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-APPL-IDENTITY-DATA-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-APPL-NAME-LENGTH   PIC S9(9) BINARY VALUE 28.
+       10  MQ-APPL-ORIGIN-DATA-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-APPL-TAG-LENGTH   PIC S9(9) BINARY VALUE 28.
+       10  MQ-ARM-SUFFIX-LENGTH   PIC S9(9) BINARY VALUE 2.
+       10  MQ-ATTENTION-ID-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-AUTH-INFO-CONN-NAME-LENGTH   PIC S9(9) BINARY VALUE 264.
+       10  MQ-AUTH-INFO-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-AUTH-INFO-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-AUTH-INFO-OCSP-URL-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-AUTHENTICATOR-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-AUTO-REORG-CATALOG-LENGTH   PIC S9(9) BINARY VALUE 44.
+       10  MQ-AUTO-REORG-TIME-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-BATCH-INTERFACE-ID-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-BRIDGE-NAME-LENGTH   PIC S9(9) BINARY VALUE 24.
+       10  MQ-CANCEL-CODE-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-CF-STRUC-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-CF-STRUC-NAME-LENGTH   PIC S9(9) BINARY VALUE 12.
+       10  MQ-CHANNEL-DATE-LENGTH   PIC S9(9) BINARY VALUE 12.
+       10  MQ-CHANNEL-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-CHANNEL-NAME-LENGTH   PIC S9(9) BINARY VALUE 20.
+       10  MQ-CHANNEL-TIME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-CHINIT-SERVICE-PARM-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-CICS-FILE-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-AMQP-CLIENT-ID-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-CLIENT-ID-LENGTH   PIC S9(9) BINARY VALUE 23.
+       10  MQ-CLIENT-USER-ID-LENGTH   PIC S9(9) BINARY VALUE 1024.
+       10  MQ-CLUSTER-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-COMM-INFO-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-COMM-INFO-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-CONN-NAME-LENGTH   PIC S9(9) BINARY VALUE 264.
+       10  MQ-CONN-TAG-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-CONNECTION-ID-LENGTH   PIC S9(9) BINARY VALUE 24.
+       10  MQ-CORREL-ID-LENGTH   PIC S9(9) BINARY VALUE 24.
+       10  MQ-CREATION-DATE-LENGTH   PIC S9(9) BINARY VALUE 12.
+       10  MQ-CREATION-TIME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-CSP-PASSWORD-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-DATE-LENGTH   PIC S9(9) BINARY VALUE 12.
+       10  MQ-DISTINGUISHED-NAME-LENGTH   PIC S9(9) BINARY VALUE 1024.
+       10  MQ-DNS-GROUP-NAME-LENGTH   PIC S9(9) BINARY VALUE 18.
+       10  MQ-EXIT-DATA-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-EXIT-INFO-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-EXIT-NAME-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-EXIT-PD-AREA-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-EXIT-USER-AREA-LENGTH   PIC S9(9) BINARY VALUE 16.
+       10  MQ-FACILITY-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-FACILITY-LIKE-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-FORMAT-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-FUNCTION-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-GROUP-ID-LENGTH   PIC S9(9) BINARY VALUE 24.
+       10  MQ-APPL-FUNCTION-NAME-LENGTH   PIC S9(9) BINARY VALUE 10.
+       10  MQ-INSTALLATION-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-INSTALLATION-NAME-LENGTH   PIC S9(9) BINARY VALUE 16.
+       10  MQ-INSTALLATION-PATH-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-JAAS-CONFIG-LENGTH   PIC S9(9) BINARY VALUE 1024.
+       10  MQ-LDAP-PASSWORD-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-LDAP-BASE-DN-LENGTH   PIC S9(9) BINARY VALUE 1024.
+       10  MQ-LDAP-FIELD-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-LDAP-CLASS-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-LISTENER-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-LISTENER-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-LOCAL-ADDRESS-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-LTERM-OVERRIDE-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-LU-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-LUWID-LENGTH   PIC S9(9) BINARY VALUE 16.
+       10  MQ-MAX-EXIT-NAME-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-MAX-MCA-USER-ID-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-MAX-LDAP-MCA-USER-ID-LENGTH   PIC S9(9) BINARY VALUE 1024.
+       10  MQ-MAX-PROPERTY-NAME-LENGTH   PIC S9(9) BINARY VALUE 4095.
+       10  MQ-MAX-USER-ID-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-MCA-JOB-NAME-LENGTH   PIC S9(9) BINARY VALUE 28.
+       10  MQ-MCA-NAME-LENGTH   PIC S9(9) BINARY VALUE 20.
+       10  MQ-MCA-USER-DATA-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-MCA-USER-ID-LENGTH   PIC S9(9) BINARY VALUE 12.
+       10  MQ-LDAP-MCA-USER-ID-LENGTH   PIC S9(9) BINARY VALUE 1024.
+       10  MQ-MFS-MAP-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-MODE-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-MSG-HEADER-LENGTH   PIC S9(9) BINARY VALUE 4000.
+       10  MQ-MSG-ID-LENGTH   PIC S9(9) BINARY VALUE 24.
+       10  MQ-MSG-TOKEN-LENGTH   PIC S9(9) BINARY VALUE 16.
+       10  MQ-NAMELIST-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-NAMELIST-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-OBJECT-INSTANCE-ID-LENGTH   PIC S9(9) BINARY VALUE 24.
+       10  MQ-OBJECT-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-PASS-TICKET-APPL-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-PASSWORD-LENGTH   PIC S9(9) BINARY VALUE 12.
+       10  MQ-PROCESS-APPL-ID-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-PROCESS-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-PROCESS-ENV-DATA-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-PROCESS-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-PROCESS-USER-DATA-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-PROGRAM-NAME-LENGTH   PIC S9(9) BINARY VALUE 20.
+       10  MQ-PUT-APPL-NAME-LENGTH   PIC S9(9) BINARY VALUE 28.
+       10  MQ-PUT-DATE-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-PUT-TIME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-Q-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-Q-MGR-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-Q-MGR-IDENTIFIER-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-Q-MGR-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-Q-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-QSG-NAME-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-REMOTE-SYS-ID-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-SECURITY-ID-LENGTH   PIC S9(9) BINARY VALUE 40.
+       10  MQ-SELECTOR-LENGTH   PIC S9(9) BINARY VALUE 10240.
+       10  MQ-SERVICE-ARGS-LENGTH   PIC S9(9) BINARY VALUE 255.
+       10  MQ-SERVICE-COMMAND-LENGTH   PIC S9(9) BINARY VALUE 255.
+       10  MQ-SERVICE-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-SERVICE-NAME-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-SERVICE-PATH-LENGTH   PIC S9(9) BINARY VALUE 255.
+       10  MQ-SERVICE-STEP-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-SHORT-CONN-NAME-LENGTH   PIC S9(9) BINARY VALUE 20.
+       10  MQ-SHORT-DNAME-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-SSL-CIPHER-SPEC-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-SSL-CIPHER-SUITE-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-SSL-CRYPTO-HARDWARE-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-SSL-HANDSHAKE-STAGE-LENGTH   PIC S9(9) BINARY VALUE 32.
+       10  MQ-SSL-KEY-LIBRARY-LENGTH   PIC S9(9) BINARY VALUE 44.
+       10  MQ-SSL-KEY-MEMBER-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-SSL-KEY-REPOSITORY-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-SSL-PEER-NAME-LENGTH   PIC S9(9) BINARY VALUE 1024.
+       10  MQ-SSL-SHORT-PEER-NAME-LENGTH   PIC S9(9) BINARY VALUE 256.
+       10  MQ-START-CODE-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-STORAGE-CLASS-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-STORAGE-CLASS-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-SUB-IDENTITY-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-SUB-POINT-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-TCP-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-TIME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-TOPIC-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-TOPIC-NAME-LENGTH   PIC S9(9) BINARY VALUE 48.
+       10  MQ-TOPIC-STR-LENGTH   PIC S9(9) BINARY VALUE 10240.
+       10  MQ-TOTAL-EXIT-DATA-LENGTH   PIC S9(9) BINARY VALUE 999.
+       10  MQ-TOTAL-EXIT-NAME-LENGTH   PIC S9(9) BINARY VALUE 999.
+       10  MQ-TP-NAME-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-TPIPE-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-TRAN-INSTANCE-ID-LENGTH   PIC S9(9) BINARY VALUE 16.
+       10  MQ-TRANSACTION-ID-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-TRIGGER-DATA-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-TRIGGER-PROGRAM-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-TRIGGER-TERM-ID-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-TRIGGER-TRANS-ID-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-USER-ID-LENGTH   PIC S9(9) BINARY VALUE 12.
+       10  MQ-VERSION-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-XCF-GROUP-NAME-LENGTH   PIC S9(9) BINARY VALUE 8.
+       10  MQ-XCF-MEMBER-NAME-LENGTH   PIC S9(9) BINARY VALUE 16.
+       10  MQ-SMDS-NAME-LENGTH   PIC S9(9) BINARY VALUE 4.
+       10  MQ-CHLAUTH-DESC-LENGTH   PIC S9(9) BINARY VALUE 64.
+       10  MQ-CUSTOM-LENGTH   PIC S9(9) BINARY VALUE 128.
+       10  MQ-SUITE-B-SIZE   PIC S9(9) BINARY VALUE 4.
+       10  MQ-CERT-LABEL-LENGTH   PIC S9(9) BINARY VALUE 64.
+
+      ** Completion Codes
+       10  MQCC-OK   PIC S9(9) BINARY VALUE 0.
+       10  MQCC-WARNING   PIC S9(9) BINARY VALUE 1.
+       10  MQCC-FAILED   PIC S9(9) BINARY VALUE 2.
+       10  MQCC-UNKNOWN   PIC S9(9) BINARY VALUE -1.
+
+      ** Reason Codes
+       10  MQRC-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQRC-APPL-FIRST   PIC S9(9) BINARY VALUE 900.
+       10  MQRC-APPL-LAST   PIC S9(9) BINARY VALUE 999.
+       10  MQRC-ALIAS-BASE-Q-TYPE-ERROR   PIC S9(9) BINARY VALUE 2001.
+       10  MQRC-ALREADY-CONNECTED   PIC S9(9) BINARY VALUE 2002.
+       10  MQRC-BACKED-OUT   PIC S9(9) BINARY VALUE 2003.
+       10  MQRC-BUFFER-ERROR   PIC S9(9) BINARY VALUE 2004.
+       10  MQRC-BUFFER-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2005.
+       10  MQRC-CHAR-ATTR-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2006.
+       10  MQRC-CHAR-ATTRS-ERROR   PIC S9(9) BINARY VALUE 2007.
+       10  MQRC-CHAR-ATTRS-TOO-SHORT   PIC S9(9) BINARY VALUE 2008.
+       10  MQRC-CONNECTION-BROKEN   PIC S9(9) BINARY VALUE 2009.
+       10  MQRC-DATA-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2010.
+       10  MQRC-DYNAMIC-Q-NAME-ERROR   PIC S9(9) BINARY VALUE 2011.
+       10  MQRC-ENVIRONMENT-ERROR   PIC S9(9) BINARY VALUE 2012.
+       10  MQRC-EXPIRY-ERROR   PIC S9(9) BINARY VALUE 2013.
+       10  MQRC-FEEDBACK-ERROR   PIC S9(9) BINARY VALUE 2014.
+       10  MQRC-GET-INHIBITED   PIC S9(9) BINARY VALUE 2016.
+       10  MQRC-HANDLE-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2017.
+       10  MQRC-HCONN-ERROR   PIC S9(9) BINARY VALUE 2018.
+       10  MQRC-HOBJ-ERROR   PIC S9(9) BINARY VALUE 2019.
+       10  MQRC-INHIBIT-VALUE-ERROR   PIC S9(9) BINARY VALUE 2020.
+       10  MQRC-INT-ATTR-COUNT-ERROR   PIC S9(9) BINARY VALUE 2021.
+       10  MQRC-INT-ATTR-COUNT-TOO-SMALL   PIC S9(9) BINARY VALUE 2022.
+       10  MQRC-INT-ATTRS-ARRAY-ERROR   PIC S9(9) BINARY VALUE 2023.
+       10  MQRC-SYNCPOINT-LIMIT-REACHED   PIC S9(9) BINARY VALUE 2024.
+       10  MQRC-MAX-CONNS-LIMIT-REACHED   PIC S9(9) BINARY VALUE 2025.
+       10  MQRC-MD-ERROR   PIC S9(9) BINARY VALUE 2026.
+       10  MQRC-MISSING-REPLY-TO-Q   PIC S9(9) BINARY VALUE 2027.
+       10  MQRC-MSG-TYPE-ERROR   PIC S9(9) BINARY VALUE 2029.
+       10  MQRC-MSG-TOO-BIG-FOR-Q   PIC S9(9) BINARY VALUE 2030.
+       10  MQRC-MSG-TOO-BIG-FOR-Q-MGR   PIC S9(9) BINARY VALUE 2031.
+       10  MQRC-NO-MSG-AVAILABLE   PIC S9(9) BINARY VALUE 2033.
+       10  MQRC-NO-MSG-UNDER-CURSOR   PIC S9(9) BINARY VALUE 2034.
+       10  MQRC-NOT-AUTHORIZED   PIC S9(9) BINARY VALUE 2035.
+       10  MQRC-NOT-OPEN-FOR-BROWSE   PIC S9(9) BINARY VALUE 2036.
+       10  MQRC-NOT-OPEN-FOR-INPUT   PIC S9(9) BINARY VALUE 2037.
+       10  MQRC-NOT-OPEN-FOR-INQUIRE   PIC S9(9) BINARY VALUE 2038.
+       10  MQRC-NOT-OPEN-FOR-OUTPUT   PIC S9(9) BINARY VALUE 2039.
+       10  MQRC-NOT-OPEN-FOR-SET   PIC S9(9) BINARY VALUE 2040.
+       10  MQRC-OBJECT-CHANGED   PIC S9(9) BINARY VALUE 2041.
+       10  MQRC-OBJECT-IN-USE   PIC S9(9) BINARY VALUE 2042.
+       10  MQRC-OBJECT-TYPE-ERROR   PIC S9(9) BINARY VALUE 2043.
+       10  MQRC-OD-ERROR   PIC S9(9) BINARY VALUE 2044.
+       10  MQRC-OPTION-NOT-VALID-FOR-TYPE   PIC S9(9) BINARY VALUE 2045.
+       10  MQRC-OPTIONS-ERROR   PIC S9(9) BINARY VALUE 2046.
+       10  MQRC-PERSISTENCE-ERROR   PIC S9(9) BINARY VALUE 2047.
+       10  MQRC-PERSISTENT-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2048.
+       10  MQRC-PRIORITY-EXCEEDS-MAXIMUM   PIC S9(9) BINARY VALUE 2049.
+       10  MQRC-PRIORITY-ERROR   PIC S9(9) BINARY VALUE 2050.
+       10  MQRC-PUT-INHIBITED   PIC S9(9) BINARY VALUE 2051.
+       10  MQRC-Q-DELETED   PIC S9(9) BINARY VALUE 2052.
+       10  MQRC-Q-FULL   PIC S9(9) BINARY VALUE 2053.
+       10  MQRC-Q-NOT-EMPTY   PIC S9(9) BINARY VALUE 2055.
+       10  MQRC-Q-SPACE-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2056.
+       10  MQRC-Q-TYPE-ERROR   PIC S9(9) BINARY VALUE 2057.
+       10  MQRC-Q-MGR-NAME-ERROR   PIC S9(9) BINARY VALUE 2058.
+       10  MQRC-Q-MGR-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2059.
+       10  MQRC-REPORT-OPTIONS-ERROR   PIC S9(9) BINARY VALUE 2061.
+       10  MQRC-SECOND-MARK-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2062.
+       10  MQRC-SECURITY-ERROR   PIC S9(9) BINARY VALUE 2063.
+       10  MQRC-SELECTOR-COUNT-ERROR   PIC S9(9) BINARY VALUE 2065.
+       10  MQRC-SELECTOR-LIMIT-EXCEEDED   PIC S9(9) BINARY VALUE 2066.
+       10  MQRC-SELECTOR-ERROR   PIC S9(9) BINARY VALUE 2067.
+       10  MQRC-SELECTOR-NOT-FOR-TYPE   PIC S9(9) BINARY VALUE 2068.
+       10  MQRC-SIGNAL-OUTSTANDING   PIC S9(9) BINARY VALUE 2069.
+       10  MQRC-SIGNAL-REQUEST-ACCEPTED   PIC S9(9) BINARY VALUE 2070.
+       10  MQRC-STORAGE-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2071.
+       10  MQRC-SYNCPOINT-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2072.
+       10  MQRC-TRIGGER-CONTROL-ERROR   PIC S9(9) BINARY VALUE 2075.
+       10  MQRC-TRIGGER-DEPTH-ERROR   PIC S9(9) BINARY VALUE 2076.
+       10  MQRC-TRIGGER-MSG-PRIORITY-ERR   PIC S9(9) BINARY VALUE 2077.
+       10  MQRC-TRIGGER-TYPE-ERROR   PIC S9(9) BINARY VALUE 2078.
+       10  MQRC-TRUNCATED-MSG-ACCEPTED   PIC S9(9) BINARY VALUE 2079.
+       10  MQRC-TRUNCATED-MSG-FAILED   PIC S9(9) BINARY VALUE 2080.
+       10  MQRC-UNKNOWN-ALIAS-BASE-Q   PIC S9(9) BINARY VALUE 2082.
+       10  MQRC-UNKNOWN-OBJECT-NAME   PIC S9(9) BINARY VALUE 2085.
+       10  MQRC-UNKNOWN-OBJECT-Q-MGR   PIC S9(9) BINARY VALUE 2086.
+       10  MQRC-UNKNOWN-REMOTE-Q-MGR   PIC S9(9) BINARY VALUE 2087.
+       10  MQRC-WAIT-INTERVAL-ERROR   PIC S9(9) BINARY VALUE 2090.
+       10  MQRC-XMIT-Q-TYPE-ERROR   PIC S9(9) BINARY VALUE 2091.
+       10  MQRC-XMIT-Q-USAGE-ERROR   PIC S9(9) BINARY VALUE 2092.
+       10  MQRC-NOT-OPEN-FOR-PASS-ALL   PIC S9(9) BINARY VALUE 2093.
+       10  MQRC-NOT-OPEN-FOR-PASS-IDENT   PIC S9(9) BINARY VALUE 2094.
+       10  MQRC-NOT-OPEN-FOR-SET-ALL   PIC S9(9) BINARY VALUE 2095.
+       10  MQRC-NOT-OPEN-FOR-SET-IDENT   PIC S9(9) BINARY VALUE 2096.
+       10  MQRC-CONTEXT-HANDLE-ERROR   PIC S9(9) BINARY VALUE 2097.
+       10  MQRC-CONTEXT-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2098.
+       10  MQRC-SIGNAL1-ERROR   PIC S9(9) BINARY VALUE 2099.
+       10  MQRC-OBJECT-ALREADY-EXISTS   PIC S9(9) BINARY VALUE 2100.
+       10  MQRC-OBJECT-DAMAGED   PIC S9(9) BINARY VALUE 2101.
+       10  MQRC-RESOURCE-PROBLEM   PIC S9(9) BINARY VALUE 2102.
+       10  MQRC-ANOTHER-Q-MGR-CONNECTED   PIC S9(9) BINARY VALUE 2103.
+       10  MQRC-UNKNOWN-REPORT-OPTION   PIC S9(9) BINARY VALUE 2104.
+       10  MQRC-STORAGE-CLASS-ERROR   PIC S9(9) BINARY VALUE 2105.
+       10  MQRC-COD-NOT-VALID-FOR-XCF-Q   PIC S9(9) BINARY VALUE 2106.
+       10  MQRC-XWAIT-CANCELED   PIC S9(9) BINARY VALUE 2107.
+       10  MQRC-XWAIT-ERROR   PIC S9(9) BINARY VALUE 2108.
+       10  MQRC-SUPPRESSED-BY-EXIT   PIC S9(9) BINARY VALUE 2109.
+       10  MQRC-FORMAT-ERROR   PIC S9(9) BINARY VALUE 2110.
+       10  MQRC-SOURCE-CCSID-ERROR   PIC S9(9) BINARY VALUE 2111.
+       10  MQRC-SOURCE-INTEGER-ENC-ERROR   PIC S9(9) BINARY VALUE 2112.
+       10  MQRC-SOURCE-DECIMAL-ENC-ERROR   PIC S9(9) BINARY VALUE 2113.
+       10  MQRC-SOURCE-FLOAT-ENC-ERROR   PIC S9(9) BINARY VALUE 2114.
+       10  MQRC-TARGET-CCSID-ERROR   PIC S9(9) BINARY VALUE 2115.
+       10  MQRC-TARGET-INTEGER-ENC-ERROR   PIC S9(9) BINARY VALUE 2116.
+       10  MQRC-TARGET-DECIMAL-ENC-ERROR   PIC S9(9) BINARY VALUE 2117.
+       10  MQRC-TARGET-FLOAT-ENC-ERROR   PIC S9(9) BINARY VALUE 2118.
+       10  MQRC-NOT-CONVERTED   PIC S9(9) BINARY VALUE 2119.
+       10  MQRC-CONVERTED-MSG-TOO-BIG   PIC S9(9) BINARY VALUE 2120.
+       10  MQRC-TRUNCATED   PIC S9(9) BINARY VALUE 2120.
+       10  MQRC-NO-EXTERNAL-PARTICIPANTS   PIC S9(9) BINARY VALUE 2121.
+       10  MQRC-PARTICIPANT-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2122.
+       10  MQRC-OUTCOME-MIXED   PIC S9(9) BINARY VALUE 2123.
+       10  MQRC-OUTCOME-PENDING   PIC S9(9) BINARY VALUE 2124.
+       10  MQRC-BRIDGE-STARTED   PIC S9(9) BINARY VALUE 2125.
+       10  MQRC-BRIDGE-STOPPED   PIC S9(9) BINARY VALUE 2126.
+       10  MQRC-ADAPTER-STORAGE-SHORTAGE   PIC S9(9) BINARY VALUE 2127.
+       10  MQRC-UOW-IN-PROGRESS   PIC S9(9) BINARY VALUE 2128.
+       10  MQRC-ADAPTER-CONN-LOAD-ERROR   PIC S9(9) BINARY VALUE 2129.
+       10  MQRC-ADAPTER-SERV-LOAD-ERROR   PIC S9(9) BINARY VALUE 2130.
+       10  MQRC-ADAPTER-DEFS-ERROR   PIC S9(9) BINARY VALUE 2131.
+       10  MQRC-ADAPTER-DEFS-LOAD-ERROR   PIC S9(9) BINARY VALUE 2132.
+       10  MQRC-ADAPTER-CONV-LOAD-ERROR   PIC S9(9) BINARY VALUE 2133.
+       10  MQRC-BO-ERROR   PIC S9(9) BINARY VALUE 2134.
+       10  MQRC-DH-ERROR   PIC S9(9) BINARY VALUE 2135.
+       10  MQRC-MULTIPLE-REASONS   PIC S9(9) BINARY VALUE 2136.
+       10  MQRC-OPEN-FAILED   PIC S9(9) BINARY VALUE 2137.
+       10  MQRC-ADAPTER-DISC-LOAD-ERROR   PIC S9(9) BINARY VALUE 2138.
+       10  MQRC-CNO-ERROR   PIC S9(9) BINARY VALUE 2139.
+       10  MQRC-CICS-WAIT-FAILED   PIC S9(9) BINARY VALUE 2140.
+       10  MQRC-DLH-ERROR   PIC S9(9) BINARY VALUE 2141.
+       10  MQRC-HEADER-ERROR   PIC S9(9) BINARY VALUE 2142.
+       10  MQRC-SOURCE-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2143.
+       10  MQRC-TARGET-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2144.
+       10  MQRC-SOURCE-BUFFER-ERROR   PIC S9(9) BINARY VALUE 2145.
+       10  MQRC-TARGET-BUFFER-ERROR   PIC S9(9) BINARY VALUE 2146.
+       10  MQRC-IIH-ERROR   PIC S9(9) BINARY VALUE 2148.
+       10  MQRC-PCF-ERROR   PIC S9(9) BINARY VALUE 2149.
+       10  MQRC-DBCS-ERROR   PIC S9(9) BINARY VALUE 2150.
+       10  MQRC-OBJECT-NAME-ERROR   PIC S9(9) BINARY VALUE 2152.
+       10  MQRC-OBJECT-Q-MGR-NAME-ERROR   PIC S9(9) BINARY VALUE 2153.
+       10  MQRC-RECS-PRESENT-ERROR   PIC S9(9) BINARY VALUE 2154.
+       10  MQRC-OBJECT-RECORDS-ERROR   PIC S9(9) BINARY VALUE 2155.
+       10  MQRC-RESPONSE-RECORDS-ERROR   PIC S9(9) BINARY VALUE 2156.
+       10  MQRC-ASID-MISMATCH   PIC S9(9) BINARY VALUE 2157.
+       10  MQRC-PMO-RECORD-FLAGS-ERROR   PIC S9(9) BINARY VALUE 2158.
+       10  MQRC-PUT-MSG-RECORDS-ERROR   PIC S9(9) BINARY VALUE 2159.
+       10  MQRC-CONN-ID-IN-USE   PIC S9(9) BINARY VALUE 2160.
+       10  MQRC-Q-MGR-QUIESCING   PIC S9(9) BINARY VALUE 2161.
+       10  MQRC-Q-MGR-STOPPING   PIC S9(9) BINARY VALUE 2162.
+       10  MQRC-DUPLICATE-RECOV-COORD   PIC S9(9) BINARY VALUE 2163.
+       10  MQRC-PMO-ERROR   PIC S9(9) BINARY VALUE 2173.
+       10  MQRC-API-EXIT-NOT-FOUND   PIC S9(9) BINARY VALUE 2182.
+       10  MQRC-API-EXIT-LOAD-ERROR   PIC S9(9) BINARY VALUE 2183.
+       10  MQRC-REMOTE-Q-NAME-ERROR   PIC S9(9) BINARY VALUE 2184.
+       10  MQRC-INCONSISTENT-PERSISTENCE   PIC S9(9) BINARY VALUE 2185.
+       10  MQRC-GMO-ERROR   PIC S9(9) BINARY VALUE 2186.
+       10  MQRC-CICS-BRIDGE-RESTRICTION   PIC S9(9) BINARY VALUE 2187.
+       10  MQRC-STOPPED-BY-CLUSTER-EXIT   PIC S9(9) BINARY VALUE 2188.
+       10  MQRC-CLUSTER-RESOLUTION-ERROR   PIC S9(9) BINARY VALUE 2189.
+       10  MQRC-CONVERTED-STRING-TOO-BIG   PIC S9(9) BINARY VALUE 2190.
+       10  MQRC-TMC-ERROR   PIC S9(9) BINARY VALUE 2191.
+       10  MQRC-STORAGE-MEDIUM-FULL   PIC S9(9) BINARY VALUE 2192.
+       10  MQRC-PAGESET-FULL   PIC S9(9) BINARY VALUE 2192.
+       10  MQRC-PAGESET-ERROR   PIC S9(9) BINARY VALUE 2193.
+       10  MQRC-NAME-NOT-VALID-FOR-TYPE   PIC S9(9) BINARY VALUE 2194.
+       10  MQRC-UNEXPECTED-ERROR   PIC S9(9) BINARY VALUE 2195.
+       10  MQRC-UNKNOWN-XMIT-Q   PIC S9(9) BINARY VALUE 2196.
+       10  MQRC-UNKNOWN-DEF-XMIT-Q   PIC S9(9) BINARY VALUE 2197.
+       10  MQRC-DEF-XMIT-Q-TYPE-ERROR   PIC S9(9) BINARY VALUE 2198.
+       10  MQRC-DEF-XMIT-Q-USAGE-ERROR   PIC S9(9) BINARY VALUE 2199.
+       10  MQRC-MSG-MARKED-BROWSE-CO-OP   PIC S9(9) BINARY VALUE 2200.
+       10  MQRC-NAME-IN-USE   PIC S9(9) BINARY VALUE 2201.
+       10  MQRC-CONNECTION-QUIESCING   PIC S9(9) BINARY VALUE 2202.
+       10  MQRC-CONNECTION-STOPPING   PIC S9(9) BINARY VALUE 2203.
+       10  MQRC-ADAPTER-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2204.
+       10  MQRC-MSG-ID-ERROR   PIC S9(9) BINARY VALUE 2206.
+       10  MQRC-CORREL-ID-ERROR   PIC S9(9) BINARY VALUE 2207.
+       10  MQRC-FILE-SYSTEM-ERROR   PIC S9(9) BINARY VALUE 2208.
+       10  MQRC-NO-MSG-LOCKED   PIC S9(9) BINARY VALUE 2209.
+       10  MQRC-SOAP-DOTNET-ERROR   PIC S9(9) BINARY VALUE 2210.
+       10  MQRC-SOAP-AXIS-ERROR   PIC S9(9) BINARY VALUE 2211.
+       10  MQRC-SOAP-URL-ERROR   PIC S9(9) BINARY VALUE 2212.
+       10  MQRC-FILE-NOT-AUDITED   PIC S9(9) BINARY VALUE 2216.
+       10  MQRC-CONNECTION-NOT-AUTHORIZED   PIC S9(9) BINARY VALUE 2217.
+       10  MQRC-MSG-TOO-BIG-FOR-CHANNEL   PIC S9(9) BINARY VALUE 2218.
+       10  MQRC-CALL-IN-PROGRESS   PIC S9(9) BINARY VALUE 2219.
+       10  MQRC-RMH-ERROR   PIC S9(9) BINARY VALUE 2220.
+       10  MQRC-Q-MGR-ACTIVE   PIC S9(9) BINARY VALUE 2222.
+       10  MQRC-Q-MGR-NOT-ACTIVE   PIC S9(9) BINARY VALUE 2223.
+       10  MQRC-Q-DEPTH-HIGH   PIC S9(9) BINARY VALUE 2224.
+       10  MQRC-Q-DEPTH-LOW   PIC S9(9) BINARY VALUE 2225.
+       10  MQRC-Q-SERVICE-INTERVAL-HIGH   PIC S9(9) BINARY VALUE 2226.
+       10  MQRC-Q-SERVICE-INTERVAL-OK   PIC S9(9) BINARY VALUE 2227.
+       10  MQRC-RFH-HEADER-FIELD-ERROR   PIC S9(9) BINARY VALUE 2228.
+       10  MQRC-RAS-PROPERTY-ERROR   PIC S9(9) BINARY VALUE 2229.
+       10  MQRC-UNIT-OF-WORK-NOT-STARTED   PIC S9(9) BINARY VALUE 2232.
+       10  MQRC-CHANNEL-AUTO-DEF-OK   PIC S9(9) BINARY VALUE 2233.
+       10  MQRC-CHANNEL-AUTO-DEF-ERROR   PIC S9(9) BINARY VALUE 2234.
+       10  MQRC-CFH-ERROR   PIC S9(9) BINARY VALUE 2235.
+       10  MQRC-CFIL-ERROR   PIC S9(9) BINARY VALUE 2236.
+       10  MQRC-CFIN-ERROR   PIC S9(9) BINARY VALUE 2237.
+       10  MQRC-CFSL-ERROR   PIC S9(9) BINARY VALUE 2238.
+       10  MQRC-CFST-ERROR   PIC S9(9) BINARY VALUE 2239.
+       10  MQRC-INCOMPLETE-GROUP   PIC S9(9) BINARY VALUE 2241.
+       10  MQRC-INCOMPLETE-MSG   PIC S9(9) BINARY VALUE 2242.
+       10  MQRC-INCONSISTENT-CCSIDS   PIC S9(9) BINARY VALUE 2243.
+       10  MQRC-INCONSISTENT-ENCODINGS   PIC S9(9) BINARY VALUE 2244.
+       10  MQRC-INCONSISTENT-UOW   PIC S9(9) BINARY VALUE 2245.
+       10  MQRC-INVALID-MSG-UNDER-CURSOR   PIC S9(9) BINARY VALUE 2246.
+       10  MQRC-MATCH-OPTIONS-ERROR   PIC S9(9) BINARY VALUE 2247.
+       10  MQRC-MDE-ERROR   PIC S9(9) BINARY VALUE 2248.
+       10  MQRC-MSG-FLAGS-ERROR   PIC S9(9) BINARY VALUE 2249.
+       10  MQRC-MSG-SEQ-NUMBER-ERROR   PIC S9(9) BINARY VALUE 2250.
+       10  MQRC-OFFSET-ERROR   PIC S9(9) BINARY VALUE 2251.
+       10  MQRC-ORIGINAL-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2252.
+       10  MQRC-SEGMENT-LENGTH-ZERO   PIC S9(9) BINARY VALUE 2253.
+       10  MQRC-UOW-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2255.
+       10  MQRC-WRONG-GMO-VERSION   PIC S9(9) BINARY VALUE 2256.
+       10  MQRC-WRONG-MD-VERSION   PIC S9(9) BINARY VALUE 2257.
+       10  MQRC-GROUP-ID-ERROR   PIC S9(9) BINARY VALUE 2258.
+       10  MQRC-INCONSISTENT-BROWSE   PIC S9(9) BINARY VALUE 2259.
+       10  MQRC-XQH-ERROR   PIC S9(9) BINARY VALUE 2260.
+       10  MQRC-SRC-ENV-ERROR   PIC S9(9) BINARY VALUE 2261.
+       10  MQRC-SRC-NAME-ERROR   PIC S9(9) BINARY VALUE 2262.
+       10  MQRC-DEST-ENV-ERROR   PIC S9(9) BINARY VALUE 2263.
+       10  MQRC-DEST-NAME-ERROR   PIC S9(9) BINARY VALUE 2264.
+       10  MQRC-TM-ERROR   PIC S9(9) BINARY VALUE 2265.
+       10  MQRC-CLUSTER-EXIT-ERROR   PIC S9(9) BINARY VALUE 2266.
+       10  MQRC-CLUSTER-EXIT-LOAD-ERROR   PIC S9(9) BINARY VALUE 2267.
+       10  MQRC-CLUSTER-PUT-INHIBITED   PIC S9(9) BINARY VALUE 2268.
+       10  MQRC-CLUSTER-RESOURCE-ERROR   PIC S9(9) BINARY VALUE 2269.
+       10  MQRC-NO-DESTINATIONS-AVAILABLE   PIC S9(9) BINARY VALUE 2270.
+       10  MQRC-CONN-TAG-IN-USE   PIC S9(9) BINARY VALUE 2271.
+       10  MQRC-PARTIALLY-CONVERTED   PIC S9(9) BINARY VALUE 2272.
+       10  MQRC-CONNECTION-ERROR   PIC S9(9) BINARY VALUE 2273.
+       10  MQRC-OPTION-ENVIRONMENT-ERROR   PIC S9(9) BINARY VALUE 2274.
+       10  MQRC-CD-ERROR   PIC S9(9) BINARY VALUE 2277.
+       10  MQRC-CLIENT-CONN-ERROR   PIC S9(9) BINARY VALUE 2278.
+       10  MQRC-CHANNEL-STOPPED-BY-USER   PIC S9(9) BINARY VALUE 2279.
+       10  MQRC-HCONFIG-ERROR   PIC S9(9) BINARY VALUE 2280.
+       10  MQRC-FUNCTION-ERROR   PIC S9(9) BINARY VALUE 2281.
+       10  MQRC-CHANNEL-STARTED   PIC S9(9) BINARY VALUE 2282.
+       10  MQRC-CHANNEL-STOPPED   PIC S9(9) BINARY VALUE 2283.
+       10  MQRC-CHANNEL-CONV-ERROR   PIC S9(9) BINARY VALUE 2284.
+       10  MQRC-SERVICE-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2285.
+       10  MQRC-INITIALIZATION-FAILED   PIC S9(9) BINARY VALUE 2286.
+       10  MQRC-TERMINATION-FAILED   PIC S9(9) BINARY VALUE 2287.
+       10  MQRC-UNKNOWN-Q-NAME   PIC S9(9) BINARY VALUE 2288.
+       10  MQRC-SERVICE-ERROR   PIC S9(9) BINARY VALUE 2289.
+       10  MQRC-Q-ALREADY-EXISTS   PIC S9(9) BINARY VALUE 2290.
+       10  MQRC-USER-ID-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2291.
+       10  MQRC-UNKNOWN-ENTITY   PIC S9(9) BINARY VALUE 2292.
+       10  MQRC-UNKNOWN-AUTH-ENTITY   PIC S9(9) BINARY VALUE 2293.
+       10  MQRC-UNKNOWN-REF-OBJECT   PIC S9(9) BINARY VALUE 2294.
+       10  MQRC-CHANNEL-ACTIVATED   PIC S9(9) BINARY VALUE 2295.
+       10  MQRC-CHANNEL-NOT-ACTIVATED   PIC S9(9) BINARY VALUE 2296.
+       10  MQRC-UOW-CANCELED   PIC S9(9) BINARY VALUE 2297.
+       10  MQRC-FUNCTION-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2298.
+       10  MQRC-SELECTOR-TYPE-ERROR   PIC S9(9) BINARY VALUE 2299.
+       10  MQRC-COMMAND-TYPE-ERROR   PIC S9(9) BINARY VALUE 2300.
+       10  MQRC-MULTIPLE-INSTANCE-ERROR   PIC S9(9) BINARY VALUE 2301.
+       10  MQRC-SYSTEM-ITEM-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2302.
+       10  MQRC-BAG-CONVERSION-ERROR   PIC S9(9) BINARY VALUE 2303.
+       10  MQRC-SELECTOR-OUT-OF-RANGE   PIC S9(9) BINARY VALUE 2304.
+       10  MQRC-SELECTOR-NOT-UNIQUE   PIC S9(9) BINARY VALUE 2305.
+       10  MQRC-INDEX-NOT-PRESENT   PIC S9(9) BINARY VALUE 2306.
+       10  MQRC-STRING-ERROR   PIC S9(9) BINARY VALUE 2307.
+       10  MQRC-ENCODING-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2308.
+       10  MQRC-SELECTOR-NOT-PRESENT   PIC S9(9) BINARY VALUE 2309.
+       10  MQRC-OUT-SELECTOR-ERROR   PIC S9(9) BINARY VALUE 2310.
+       10  MQRC-STRING-TRUNCATED   PIC S9(9) BINARY VALUE 2311.
+       10  MQRC-SELECTOR-WRONG-TYPE   PIC S9(9) BINARY VALUE 2312.
+       10  MQRC-INCONSISTENT-ITEM-TYPE   PIC S9(9) BINARY VALUE 2313.
+       10  MQRC-INDEX-ERROR   PIC S9(9) BINARY VALUE 2314.
+       10  MQRC-SYSTEM-BAG-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2315.
+       10  MQRC-ITEM-COUNT-ERROR   PIC S9(9) BINARY VALUE 2316.
+       10  MQRC-FORMAT-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2317.
+       10  MQRC-SELECTOR-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2318.
+       10  MQRC-ITEM-VALUE-ERROR   PIC S9(9) BINARY VALUE 2319.
+       10  MQRC-HBAG-ERROR   PIC S9(9) BINARY VALUE 2320.
+       10  MQRC-PARAMETER-MISSING   PIC S9(9) BINARY VALUE 2321.
+       10  MQRC-CMD-SERVER-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2322.
+       10  MQRC-STRING-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2323.
+       10  MQRC-INQUIRY-COMMAND-ERROR   PIC S9(9) BINARY VALUE 2324.
+       10  MQRC-NESTED-BAG-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2325.
+       10  MQRC-BAG-WRONG-TYPE   PIC S9(9) BINARY VALUE 2326.
+       10  MQRC-ITEM-TYPE-ERROR   PIC S9(9) BINARY VALUE 2327.
+       10  MQRC-SYSTEM-BAG-NOT-DELETABLE   PIC S9(9) BINARY VALUE 2328.
+       10  MQRC-SYSTEM-ITEM-NOT-DELETABLE   PIC S9(9) BINARY VALUE 2329.
+       10  MQRC-CODED-CHAR-SET-ID-ERROR   PIC S9(9) BINARY VALUE 2330.
+       10  MQRC-MSG-TOKEN-ERROR   PIC S9(9) BINARY VALUE 2331.
+       10  MQRC-MISSING-WIH   PIC S9(9) BINARY VALUE 2332.
+       10  MQRC-WIH-ERROR   PIC S9(9) BINARY VALUE 2333.
+       10  MQRC-RFH-ERROR   PIC S9(9) BINARY VALUE 2334.
+       10  MQRC-RFH-STRING-ERROR   PIC S9(9) BINARY VALUE 2335.
+       10  MQRC-RFH-COMMAND-ERROR   PIC S9(9) BINARY VALUE 2336.
+       10  MQRC-RFH-PARM-ERROR   PIC S9(9) BINARY VALUE 2337.
+       10  MQRC-RFH-DUPLICATE-PARM   PIC S9(9) BINARY VALUE 2338.
+       10  MQRC-RFH-PARM-MISSING   PIC S9(9) BINARY VALUE 2339.
+       10  MQRC-CHAR-CONVERSION-ERROR   PIC S9(9) BINARY VALUE 2340.
+       10  MQRC-UCS2-CONVERSION-ERROR   PIC S9(9) BINARY VALUE 2341.
+       10  MQRC-DB2-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2342.
+       10  MQRC-OBJECT-NOT-UNIQUE   PIC S9(9) BINARY VALUE 2343.
+       10  MQRC-CONN-TAG-NOT-RELEASED   PIC S9(9) BINARY VALUE 2344.
+       10  MQRC-CF-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2345.
+       10  MQRC-CF-STRUC-IN-USE   PIC S9(9) BINARY VALUE 2346.
+       10  MQRC-CF-STRUC-LIST-HDR-IN-USE   PIC S9(9) BINARY VALUE 2347.
+       10  MQRC-CF-STRUC-AUTH-FAILED   PIC S9(9) BINARY VALUE 2348.
+       10  MQRC-CF-STRUC-ERROR   PIC S9(9) BINARY VALUE 2349.
+       10  MQRC-CONN-TAG-NOT-USABLE   PIC S9(9) BINARY VALUE 2350.
+       10  MQRC-GLOBAL-UOW-CONFLICT   PIC S9(9) BINARY VALUE 2351.
+       10  MQRC-LOCAL-UOW-CONFLICT   PIC S9(9) BINARY VALUE 2352.
+       10  MQRC-HANDLE-IN-USE-FOR-UOW   PIC S9(9) BINARY VALUE 2353.
+       10  MQRC-UOW-ENLISTMENT-ERROR   PIC S9(9) BINARY VALUE 2354.
+       10  MQRC-UOW-MIX-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2355.
+       10  MQRC-WXP-ERROR   PIC S9(9) BINARY VALUE 2356.
+       10  MQRC-CURRENT-RECORD-ERROR   PIC S9(9) BINARY VALUE 2357.
+       10  MQRC-NEXT-OFFSET-ERROR   PIC S9(9) BINARY VALUE 2358.
+       10  MQRC-NO-RECORD-AVAILABLE   PIC S9(9) BINARY VALUE 2359.
+       10  MQRC-OBJECT-LEVEL-INCOMPATIBLE   PIC S9(9) BINARY VALUE 2360.
+       10  MQRC-NEXT-RECORD-ERROR   PIC S9(9) BINARY VALUE 2361.
+       10  MQRC-BACKOUT-THRESHOLD-REACHED   PIC S9(9) BINARY VALUE 2362.
+       10  MQRC-MSG-NOT-MATCHED   PIC S9(9) BINARY VALUE 2363.
+       10  MQRC-JMS-FORMAT-ERROR   PIC S9(9) BINARY VALUE 2364.
+       10  MQRC-SEGMENTS-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2365.
+       10  MQRC-WRONG-CF-LEVEL   PIC S9(9) BINARY VALUE 2366.
+       10  MQRC-CONFIG-CREATE-OBJECT   PIC S9(9) BINARY VALUE 2367.
+       10  MQRC-CONFIG-CHANGE-OBJECT   PIC S9(9) BINARY VALUE 2368.
+       10  MQRC-CONFIG-DELETE-OBJECT   PIC S9(9) BINARY VALUE 2369.
+       10  MQRC-CONFIG-REFRESH-OBJECT   PIC S9(9) BINARY VALUE 2370.
+       10  MQRC-CHANNEL-SSL-ERROR   PIC S9(9) BINARY VALUE 2371.
+       10  MQRC-PARTICIPANT-NOT-DEFINED   PIC S9(9) BINARY VALUE 2372.
+       10  MQRC-CF-STRUC-FAILED   PIC S9(9) BINARY VALUE 2373.
+       10  MQRC-API-EXIT-ERROR   PIC S9(9) BINARY VALUE 2374.
+       10  MQRC-API-EXIT-INIT-ERROR   PIC S9(9) BINARY VALUE 2375.
+       10  MQRC-API-EXIT-TERM-ERROR   PIC S9(9) BINARY VALUE 2376.
+       10  MQRC-EXIT-REASON-ERROR   PIC S9(9) BINARY VALUE 2377.
+       10  MQRC-RESERVED-VALUE-ERROR   PIC S9(9) BINARY VALUE 2378.
+       10  MQRC-NO-DATA-AVAILABLE   PIC S9(9) BINARY VALUE 2379.
+       10  MQRC-SCO-ERROR   PIC S9(9) BINARY VALUE 2380.
+       10  MQRC-KEY-REPOSITORY-ERROR   PIC S9(9) BINARY VALUE 2381.
+       10  MQRC-CRYPTO-HARDWARE-ERROR   PIC S9(9) BINARY VALUE 2382.
+       10  MQRC-AUTH-INFO-REC-COUNT-ERROR   PIC S9(9) BINARY VALUE 2383.
+       10  MQRC-AUTH-INFO-REC-ERROR   PIC S9(9) BINARY VALUE 2384.
+       10  MQRC-AIR-ERROR   PIC S9(9) BINARY VALUE 2385.
+       10  MQRC-AUTH-INFO-TYPE-ERROR   PIC S9(9) BINARY VALUE 2386.
+       10  MQRC-AUTH-INFO-CONN-NAME-ERROR   PIC S9(9) BINARY VALUE 2387.
+       10  MQRC-LDAP-USER-NAME-ERROR   PIC S9(9) BINARY VALUE 2388.
+       10  MQRC-LDAP-USER-NAME-LENGTH-ERR   PIC S9(9) BINARY VALUE 2389.
+       10  MQRC-LDAP-PASSWORD-ERROR   PIC S9(9) BINARY VALUE 2390.
+       10  MQRC-SSL-ALREADY-INITIALIZED   PIC S9(9) BINARY VALUE 2391.
+       10  MQRC-SSL-CONFIG-ERROR   PIC S9(9) BINARY VALUE 2392.
+       10  MQRC-SSL-INITIALIZATION-ERROR   PIC S9(9) BINARY VALUE 2393.
+       10  MQRC-Q-INDEX-TYPE-ERROR   PIC S9(9) BINARY VALUE 2394.
+       10  MQRC-CFBS-ERROR   PIC S9(9) BINARY VALUE 2395.
+       10  MQRC-SSL-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2396.
+       10  MQRC-JSSE-ERROR   PIC S9(9) BINARY VALUE 2397.
+       10  MQRC-SSL-PEER-NAME-MISMATCH   PIC S9(9) BINARY VALUE 2398.
+       10  MQRC-SSL-PEER-NAME-ERROR   PIC S9(9) BINARY VALUE 2399.
+       10  MQRC-UNSUPPORTED-CIPHER-SUITE   PIC S9(9) BINARY VALUE 2400.
+       10  MQRC-SSL-CERTIFICATE-REVOKED   PIC S9(9) BINARY VALUE 2401.
+       10  MQRC-SSL-CERT-STORE-ERROR   PIC S9(9) BINARY VALUE 2402.
+       10  MQRC-CLIENT-EXIT-LOAD-ERROR   PIC S9(9) BINARY VALUE 2406.
+       10  MQRC-CLIENT-EXIT-ERROR   PIC S9(9) BINARY VALUE 2407.
+       10  MQRC-UOW-COMMITTED   PIC S9(9) BINARY VALUE 2408.
+       10  MQRC-SSL-KEY-RESET-ERROR   PIC S9(9) BINARY VALUE 2409.
+       10  MQRC-UNKNOWN-COMPONENT-NAME   PIC S9(9) BINARY VALUE 2410.
+       10  MQRC-LOGGER-STATUS   PIC S9(9) BINARY VALUE 2411.
+       10  MQRC-COMMAND-MQSC   PIC S9(9) BINARY VALUE 2412.
+       10  MQRC-COMMAND-PCF   PIC S9(9) BINARY VALUE 2413.
+       10  MQRC-CFIF-ERROR   PIC S9(9) BINARY VALUE 2414.
+       10  MQRC-CFSF-ERROR   PIC S9(9) BINARY VALUE 2415.
+       10  MQRC-CFGR-ERROR   PIC S9(9) BINARY VALUE 2416.
+       10  MQRC-MSG-NOT-ALLOWED-IN-GROUP   PIC S9(9) BINARY VALUE 2417.
+       10  MQRC-FILTER-OPERATOR-ERROR   PIC S9(9) BINARY VALUE 2418.
+       10  MQRC-NESTED-SELECTOR-ERROR   PIC S9(9) BINARY VALUE 2419.
+       10  MQRC-EPH-ERROR   PIC S9(9) BINARY VALUE 2420.
+       10  MQRC-RFH-FORMAT-ERROR   PIC S9(9) BINARY VALUE 2421.
+       10  MQRC-CFBF-ERROR   PIC S9(9) BINARY VALUE 2422.
+       10  MQRC-CLIENT-CHANNEL-CONFLICT   PIC S9(9) BINARY VALUE 2423.
+       10  MQRC-SD-ERROR   PIC S9(9) BINARY VALUE 2424.
+       10  MQRC-TOPIC-STRING-ERROR   PIC S9(9) BINARY VALUE 2425.
+       10  MQRC-STS-ERROR   PIC S9(9) BINARY VALUE 2426.
+       10  MQRC-NO-SUBSCRIPTION   PIC S9(9) BINARY VALUE 2428.
+       10  MQRC-SUBSCRIPTION-IN-USE   PIC S9(9) BINARY VALUE 2429.
+       10  MQRC-STAT-TYPE-ERROR   PIC S9(9) BINARY VALUE 2430.
+       10  MQRC-SUB-USER-DATA-ERROR   PIC S9(9) BINARY VALUE 2431.
+       10  MQRC-SUB-ALREADY-EXISTS   PIC S9(9) BINARY VALUE 2432.
+       10  MQRC-IDENTITY-MISMATCH   PIC S9(9) BINARY VALUE 2434.
+       10  MQRC-ALTER-SUB-ERROR   PIC S9(9) BINARY VALUE 2435.
+       10  MQRC-DURABILITY-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2436.
+       10  MQRC-NO-RETAINED-MSG   PIC S9(9) BINARY VALUE 2437.
+       10  MQRC-SRO-ERROR   PIC S9(9) BINARY VALUE 2438.
+       10  MQRC-SUB-NAME-ERROR   PIC S9(9) BINARY VALUE 2440.
+       10  MQRC-OBJECT-STRING-ERROR   PIC S9(9) BINARY VALUE 2441.
+       10  MQRC-PROPERTY-NAME-ERROR   PIC S9(9) BINARY VALUE 2442.
+       10  MQRC-SEGMENTATION-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2443.
+       10  MQRC-CBD-ERROR   PIC S9(9) BINARY VALUE 2444.
+       10  MQRC-CTLO-ERROR   PIC S9(9) BINARY VALUE 2445.
+       10  MQRC-NO-CALLBACKS-ACTIVE   PIC S9(9) BINARY VALUE 2446.
+       10  MQRC-CALLBACK-NOT-REGISTERED   PIC S9(9) BINARY VALUE 2448.
+       10  MQRC-OPTIONS-CHANGED   PIC S9(9) BINARY VALUE 2457.
+       10  MQRC-READ-AHEAD-MSGS   PIC S9(9) BINARY VALUE 2458.
+       10  MQRC-SELECTOR-SYNTAX-ERROR   PIC S9(9) BINARY VALUE 2459.
+       10  MQRC-HMSG-ERROR   PIC S9(9) BINARY VALUE 2460.
+       10  MQRC-CMHO-ERROR   PIC S9(9) BINARY VALUE 2461.
+       10  MQRC-DMHO-ERROR   PIC S9(9) BINARY VALUE 2462.
+       10  MQRC-SMPO-ERROR   PIC S9(9) BINARY VALUE 2463.
+       10  MQRC-IMPO-ERROR   PIC S9(9) BINARY VALUE 2464.
+       10  MQRC-PROPERTY-NAME-TOO-BIG   PIC S9(9) BINARY VALUE 2465.
+       10  MQRC-PROP-VALUE-NOT-CONVERTED   PIC S9(9) BINARY VALUE 2466.
+       10  MQRC-PROP-TYPE-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2467.
+       10  MQRC-PROPERTY-VALUE-TOO-BIG   PIC S9(9) BINARY VALUE 2469.
+       10  MQRC-PROP-CONV-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2470.
+       10  MQRC-PROPERTY-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2471.
+       10  MQRC-PROP-NUMBER-FORMAT-ERROR   PIC S9(9) BINARY VALUE 2472.
+       10  MQRC-PROPERTY-TYPE-ERROR   PIC S9(9) BINARY VALUE 2473.
+       10  MQRC-PROPERTIES-TOO-BIG   PIC S9(9) BINARY VALUE 2478.
+       10  MQRC-PUT-NOT-RETAINED   PIC S9(9) BINARY VALUE 2479.
+       10  MQRC-ALIAS-TARGTYPE-CHANGED   PIC S9(9) BINARY VALUE 2480.
+       10  MQRC-DMPO-ERROR   PIC S9(9) BINARY VALUE 2481.
+       10  MQRC-PD-ERROR   PIC S9(9) BINARY VALUE 2482.
+       10  MQRC-CALLBACK-TYPE-ERROR   PIC S9(9) BINARY VALUE 2483.
+       10  MQRC-CBD-OPTIONS-ERROR   PIC S9(9) BINARY VALUE 2484.
+       10  MQRC-MAX-MSG-LENGTH-ERROR   PIC S9(9) BINARY VALUE 2485.
+       10  MQRC-CALLBACK-ROUTINE-ERROR   PIC S9(9) BINARY VALUE 2486.
+       10  MQRC-CALLBACK-LINK-ERROR   PIC S9(9) BINARY VALUE 2487.
+       10  MQRC-OPERATION-ERROR   PIC S9(9) BINARY VALUE 2488.
+       10  MQRC-BMHO-ERROR   PIC S9(9) BINARY VALUE 2489.
+       10  MQRC-UNSUPPORTED-PROPERTY   PIC S9(9) BINARY VALUE 2490.
+       10  MQRC-PROP-NAME-NOT-CONVERTED   PIC S9(9) BINARY VALUE 2492.
+       10  MQRC-GET-ENABLED   PIC S9(9) BINARY VALUE 2494.
+       10  MQRC-MODULE-NOT-FOUND   PIC S9(9) BINARY VALUE 2495.
+       10  MQRC-MODULE-INVALID   PIC S9(9) BINARY VALUE 2496.
+       10  MQRC-MODULE-ENTRY-NOT-FOUND   PIC S9(9) BINARY VALUE 2497.
+       10  MQRC-MIXED-CONTENT-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2498.
+       10  MQRC-MSG-HANDLE-IN-USE   PIC S9(9) BINARY VALUE 2499.
+       10  MQRC-HCONN-ASYNC-ACTIVE   PIC S9(9) BINARY VALUE 2500.
+       10  MQRC-MHBO-ERROR   PIC S9(9) BINARY VALUE 2501.
+       10  MQRC-PUBLICATION-FAILURE   PIC S9(9) BINARY VALUE 2502.
+       10  MQRC-SUB-INHIBITED   PIC S9(9) BINARY VALUE 2503.
+       10  MQRC-SELECTOR-ALWAYS-FALSE   PIC S9(9) BINARY VALUE 2504.
+       10  MQRC-XEPO-ERROR   PIC S9(9) BINARY VALUE 2507.
+       10  MQRC-DURABILITY-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2509.
+       10  MQRC-TOPIC-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2510.
+       10  MQRC-SUBLEVEL-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2512.
+       10  MQRC-PROPERTY-NAME-LENGTH-ERR   PIC S9(9) BINARY VALUE 2513.
+       10  MQRC-DUPLICATE-GROUP-SUB   PIC S9(9) BINARY VALUE 2514.
+       10  MQRC-GROUPING-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2515.
+       10  MQRC-SELECTOR-INVALID-FOR-TYPE   PIC S9(9) BINARY VALUE 2516.
+       10  MQRC-HOBJ-QUIESCED   PIC S9(9) BINARY VALUE 2517.
+       10  MQRC-HOBJ-QUIESCED-NO-MSGS   PIC S9(9) BINARY VALUE 2518.
+       10  MQRC-SELECTION-STRING-ERROR   PIC S9(9) BINARY VALUE 2519.
+       10  MQRC-RES-OBJECT-STRING-ERROR   PIC S9(9) BINARY VALUE 2520.
+       10  MQRC-CONNECTION-SUSPENDED   PIC S9(9) BINARY VALUE 2521.
+       10  MQRC-INVALID-DESTINATION   PIC S9(9) BINARY VALUE 2522.
+       10  MQRC-INVALID-SUBSCRIPTION   PIC S9(9) BINARY VALUE 2523.
+       10  MQRC-SELECTOR-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2524.
+       10  MQRC-RETAINED-MSG-Q-ERROR   PIC S9(9) BINARY VALUE 2525.
+       10  MQRC-RETAINED-NOT-DELIVERED   PIC S9(9) BINARY VALUE 2526.
+       10  MQRC-RFH-RESTRICTED-FORMAT-ERR   PIC S9(9) BINARY VALUE 2527.
+       10  MQRC-CONNECTION-STOPPED   PIC S9(9) BINARY VALUE 2528.
+       10  MQRC-ASYNC-UOW-CONFLICT   PIC S9(9) BINARY VALUE 2529.
+       10  MQRC-ASYNC-XA-CONFLICT   PIC S9(9) BINARY VALUE 2530.
+       10  MQRC-PUBSUB-INHIBITED   PIC S9(9) BINARY VALUE 2531.
+       10  MQRC-MSG-HANDLE-COPY-FAILURE   PIC S9(9) BINARY VALUE 2532.
+       10  MQRC-DEST-CLASS-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 2533.
+       10  MQRC-OPERATION-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2534.
+       10  MQRC-ACTION-ERROR   PIC S9(9) BINARY VALUE 2535.
+       10  MQRC-CHANNEL-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2537.
+       10  MQRC-HOST-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2538.
+       10  MQRC-CHANNEL-CONFIG-ERROR   PIC S9(9) BINARY VALUE 2539.
+       10  MQRC-UNKNOWN-CHANNEL-NAME   PIC S9(9) BINARY VALUE 2540.
+       10  MQRC-LOOPING-PUBLICATION   PIC S9(9) BINARY VALUE 2541.
+       10  MQRC-ALREADY-JOINED   PIC S9(9) BINARY VALUE 2542.
+       10  MQRC-STANDBY-Q-MGR   PIC S9(9) BINARY VALUE 2543.
+       10  MQRC-RECONNECTING   PIC S9(9) BINARY VALUE 2544.
+       10  MQRC-RECONNECTED   PIC S9(9) BINARY VALUE 2545.
+       10  MQRC-RECONNECT-QMID-MISMATCH   PIC S9(9) BINARY VALUE 2546.
+       10  MQRC-RECONNECT-INCOMPATIBLE   PIC S9(9) BINARY VALUE 2547.
+       10  MQRC-RECONNECT-FAILED   PIC S9(9) BINARY VALUE 2548.
+       10  MQRC-CALL-INTERRUPTED   PIC S9(9) BINARY VALUE 2549.
+       10  MQRC-NO-SUBS-MATCHED   PIC S9(9) BINARY VALUE 2550.
+       10  MQRC-SELECTION-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2551.
+       10  MQRC-CHANNEL-SSL-WARNING   PIC S9(9) BINARY VALUE 2552.
+       10  MQRC-OCSP-URL-ERROR   PIC S9(9) BINARY VALUE 2553.
+       10  MQRC-CONTENT-ERROR   PIC S9(9) BINARY VALUE 2554.
+       10  MQRC-RECONNECT-Q-MGR-REQD   PIC S9(9) BINARY VALUE 2555.
+       10  MQRC-RECONNECT-TIMED-OUT   PIC S9(9) BINARY VALUE 2556.
+       10  MQRC-PUBLISH-EXIT-ERROR   PIC S9(9) BINARY VALUE 2557.
+       10  MQRC-COMMINFO-ERROR   PIC S9(9) BINARY VALUE 2558.
+       10  MQRC-DEF-SYNCPOINT-INHIBITED   PIC S9(9) BINARY VALUE 2559.
+       10  MQRC-MULTICAST-ONLY   PIC S9(9) BINARY VALUE 2560.
+       10  MQRC-DATA-SET-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2561.
+       10  MQRC-GROUPING-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2562.
+       10  MQRC-GROUP-ADDRESS-ERROR   PIC S9(9) BINARY VALUE 2563.
+       10  MQRC-MULTICAST-CONFIG-ERROR   PIC S9(9) BINARY VALUE 2564.
+       10  MQRC-MULTICAST-INTERFACE-ERROR   PIC S9(9) BINARY VALUE 2565.
+       10  MQRC-MULTICAST-SEND-ERROR   PIC S9(9) BINARY VALUE 2566.
+       10  MQRC-MULTICAST-INTERNAL-ERROR   PIC S9(9) BINARY VALUE 2567.
+       10  MQRC-CONNECTION-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2568.
+       10  MQRC-SYNCPOINT-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2569.
+       10  MQRC-SSL-ALT-PROVIDER-REQUIRED   PIC S9(9) BINARY VALUE 2570.
+       10  MQRC-MCAST-PUB-STATUS   PIC S9(9) BINARY VALUE 2571.
+       10  MQRC-MCAST-SUB-STATUS   PIC S9(9) BINARY VALUE 2572.
+       10  MQRC-PRECONN-EXIT-LOAD-ERROR   PIC S9(9) BINARY VALUE 2573.
+       10  MQRC-PRECONN-EXIT-NOT-FOUND   PIC S9(9) BINARY VALUE 2574.
+       10  MQRC-PRECONN-EXIT-ERROR   PIC S9(9) BINARY VALUE 2575.
+       10  MQRC-CD-ARRAY-ERROR   PIC S9(9) BINARY VALUE 2576.
+       10  MQRC-CHANNEL-BLOCKED   PIC S9(9) BINARY VALUE 2577.
+       10  MQRC-CHANNEL-BLOCKED-WARNING   PIC S9(9) BINARY VALUE 2578.
+       10  MQRC-SUBSCRIPTION-CREATE   PIC S9(9) BINARY VALUE 2579.
+       10  MQRC-SUBSCRIPTION-DELETE   PIC S9(9) BINARY VALUE 2580.
+       10  MQRC-SUBSCRIPTION-CHANGE   PIC S9(9) BINARY VALUE 2581.
+       10  MQRC-SUBSCRIPTION-REFRESH   PIC S9(9) BINARY VALUE 2582.
+       10  MQRC-INSTALLATION-MISMATCH   PIC S9(9) BINARY VALUE 2583.
+       10  MQRC-NOT-PRIVILEGED   PIC S9(9) BINARY VALUE 2584.
+       10  MQRC-PROPERTIES-DISABLED   PIC S9(9) BINARY VALUE 2586.
+       10  MQRC-HMSG-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2587.
+       10  MQRC-EXIT-PROPS-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 2588.
+       10  MQRC-INSTALLATION-MISSING   PIC S9(9) BINARY VALUE 2589.
+       10  MQRC-FASTPATH-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2590.
+       10  MQRC-CIPHER-SPEC-NOT-SUITE-B   PIC S9(9) BINARY VALUE 2591.
+       10  MQRC-SUITE-B-ERROR   PIC S9(9) BINARY VALUE 2592.
+       10  MQRC-CERT-VAL-POLICY-ERROR   PIC S9(9) BINARY VALUE 2593.
+       10  MQRC-PASSWORD-PROTECTION-ERROR   PIC S9(9) BINARY VALUE 2594.
+       10  MQRC-CSP-ERROR   PIC S9(9) BINARY VALUE 2595.
+       10  MQRC-CERT-LABEL-NOT-ALLOWED   PIC S9(9) BINARY VALUE 2596.
+       10  MQRC-ADMIN-TOPIC-STRING-ERROR   PIC S9(9) BINARY VALUE 2598.
+       10  MQRC-AMQP-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 2599.
+       10  MQRC-CCDT-URL-ERROR   PIC S9(9) BINARY VALUE 2600.
+       10  MQRC-REOPEN-EXCL-INPUT-ERROR   PIC S9(9) BINARY VALUE 6100.
+       10  MQRC-REOPEN-INQUIRE-ERROR   PIC S9(9) BINARY VALUE 6101.
+       10  MQRC-REOPEN-SAVED-CONTEXT-ERR   PIC S9(9) BINARY VALUE 6102.
+       10  MQRC-REOPEN-TEMPORARY-Q-ERROR   PIC S9(9) BINARY VALUE 6103.
+       10  MQRC-ATTRIBUTE-LOCKED   PIC S9(9) BINARY VALUE 6104.
+       10  MQRC-CURSOR-NOT-VALID   PIC S9(9) BINARY VALUE 6105.
+       10  MQRC-ENCODING-ERROR   PIC S9(9) BINARY VALUE 6106.
+       10  MQRC-STRUC-ID-ERROR   PIC S9(9) BINARY VALUE 6107.
+       10  MQRC-NULL-POINTER   PIC S9(9) BINARY VALUE 6108.
+       10  MQRC-NO-CONNECTION-REFERENCE   PIC S9(9) BINARY VALUE 6109.
+       10  MQRC-NO-BUFFER   PIC S9(9) BINARY VALUE 6110.
+       10  MQRC-BINARY-DATA-LENGTH-ERROR   PIC S9(9) BINARY VALUE 6111.
+       10  MQRC-BUFFER-NOT-AUTOMATIC   PIC S9(9) BINARY VALUE 6112.
+       10  MQRC-INSUFFICIENT-BUFFER   PIC S9(9) BINARY VALUE 6113.
+       10  MQRC-INSUFFICIENT-DATA   PIC S9(9) BINARY VALUE 6114.
+       10  MQRC-DATA-TRUNCATED   PIC S9(9) BINARY VALUE 6115.
+       10  MQRC-ZERO-LENGTH   PIC S9(9) BINARY VALUE 6116.
+       10  MQRC-NEGATIVE-LENGTH   PIC S9(9) BINARY VALUE 6117.
+       10  MQRC-NEGATIVE-OFFSET   PIC S9(9) BINARY VALUE 6118.
+       10  MQRC-INCONSISTENT-FORMAT   PIC S9(9) BINARY VALUE 6119.
+       10  MQRC-INCONSISTENT-OBJECT-STATE   PIC S9(9) BINARY VALUE 6120.
+       10  MQRC-CONTEXT-OBJECT-NOT-VALID   PIC S9(9) BINARY VALUE 6121.
+       10  MQRC-CONTEXT-OPEN-ERROR   PIC S9(9) BINARY VALUE 6122.
+       10  MQRC-STRUC-LENGTH-ERROR   PIC S9(9) BINARY VALUE 6123.
+       10  MQRC-NOT-CONNECTED   PIC S9(9) BINARY VALUE 6124.
+       10  MQRC-NOT-OPEN   PIC S9(9) BINARY VALUE 6125.
+       10  MQRC-DISTRIBUTION-LIST-EMPTY   PIC S9(9) BINARY VALUE 6126.
+       10  MQRC-INCONSISTENT-OPEN-OPTIONS   PIC S9(9) BINARY VALUE 6127.
+       10  MQRC-WRONG-VERSION   PIC S9(9) BINARY VALUE 6128.
+       10  MQRC-REFERENCE-ERROR   PIC S9(9) BINARY VALUE 6129.
+       10  MQRC-XR-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 6130.
+       10  MQRC-SUB-JOIN-NOT-ALTERABLE   PIC S9(9) BINARY VALUE 29440.
+
+      ******************************************************************
+      **  Values Related to Queue Attributes                       
+      ******************************************************************
+      ** Queue Types
+       10  MQQT-LOCAL   PIC S9(9) BINARY VALUE 1.
+       10  MQQT-MODEL   PIC S9(9) BINARY VALUE 2.
+       10  MQQT-ALIAS   PIC S9(9) BINARY VALUE 3.
+       10  MQQT-REMOTE   PIC S9(9) BINARY VALUE 6.
+       10  MQQT-CLUSTER   PIC S9(9) BINARY VALUE 7.
+
+      ** Cluster Queue Types
+       10  MQCQT-LOCAL-Q   PIC S9(9) BINARY VALUE 1.
+       10  MQCQT-ALIAS-Q   PIC S9(9) BINARY VALUE 2.
+       10  MQCQT-REMOTE-Q   PIC S9(9) BINARY VALUE 3.
+       10  MQCQT-Q-MGR-ALIAS   PIC S9(9) BINARY VALUE 4.
+
+      ** Extended Queue Types
+       10  MQQT-ALL   PIC S9(9) BINARY VALUE 1001.
+
+      ** Queue Definition Types
+       10  MQQDT-PREDEFINED   PIC S9(9) BINARY VALUE 1.
+       10  MQQDT-PERMANENT-DYNAMIC   PIC S9(9) BINARY VALUE 2.
+       10  MQQDT-TEMPORARY-DYNAMIC   PIC S9(9) BINARY VALUE 3.
+       10  MQQDT-SHARED-DYNAMIC   PIC S9(9) BINARY VALUE 4.
+
+      ** Inhibit Get Values
+       10  MQQA-GET-INHIBITED   PIC S9(9) BINARY VALUE 1.
+       10  MQQA-GET-ALLOWED   PIC S9(9) BINARY VALUE 0.
+
+      ** Inhibit Put Values
+       10  MQQA-PUT-INHIBITED   PIC S9(9) BINARY VALUE 1.
+       10  MQQA-PUT-ALLOWED   PIC S9(9) BINARY VALUE 0.
+
+      ** Queue Shareability
+       10  MQQA-SHAREABLE   PIC S9(9) BINARY VALUE 1.
+       10  MQQA-NOT-SHAREABLE   PIC S9(9) BINARY VALUE 0.
+
+      ** Back-Out Hardening
+       10  MQQA-BACKOUT-HARDENED   PIC S9(9) BINARY VALUE 1.
+       10  MQQA-BACKOUT-NOT-HARDENED   PIC S9(9) BINARY VALUE 0.
+
+      ** Message Delivery Sequence
+       10  MQMDS-PRIORITY   PIC S9(9) BINARY VALUE 0.
+       10  MQMDS-FIFO   PIC S9(9) BINARY VALUE 1.
+
+      ** Nonpersistent Message Class
+       10  MQNPM-CLASS-NORMAL   PIC S9(9) BINARY VALUE 0.
+       10  MQNPM-CLASS-HIGH   PIC S9(9) BINARY VALUE 10.
+
+      ** Trigger Controls
+       10  MQTC-OFF   PIC S9(9) BINARY VALUE 0.
+       10  MQTC-ON   PIC S9(9) BINARY VALUE 1.
+
+      ** Trigger Types
+       10  MQTT-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQTT-FIRST   PIC S9(9) BINARY VALUE 1.
+       10  MQTT-EVERY   PIC S9(9) BINARY VALUE 2.
+       10  MQTT-DEPTH   PIC S9(9) BINARY VALUE 3.
+
+      ** Trigger Restart
+       10  MQTRIGGER-RESTART-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQTRIGGER-RESTART-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** Queue Usages
+       10  MQUS-NORMAL   PIC S9(9) BINARY VALUE 0.
+       10  MQUS-TRANSMISSION   PIC S9(9) BINARY VALUE 1.
+
+      ** Distribution Lists
+       10  MQDL-SUPPORTED   PIC S9(9) BINARY VALUE 1.
+       10  MQDL-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 0.
+
+      ** Index Types
+       10  MQIT-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQIT-MSG-ID   PIC S9(9) BINARY VALUE 1.
+       10  MQIT-CORREL-ID   PIC S9(9) BINARY VALUE 2.
+       10  MQIT-MSG-TOKEN   PIC S9(9) BINARY VALUE 4.
+       10  MQIT-GROUP-ID   PIC S9(9) BINARY VALUE 5.
+
+      ** Default Bindings
+       10  MQBND-BIND-ON-OPEN   PIC S9(9) BINARY VALUE 0.
+       10  MQBND-BIND-NOT-FIXED   PIC S9(9) BINARY VALUE 1.
+       10  MQBND-BIND-ON-GROUP   PIC S9(9) BINARY VALUE 2.
+
+      ** Queue Sharing Group Dispositions
+       10  MQQSGD-ALL   PIC S9(9) BINARY VALUE -1.
+       10  MQQSGD-Q-MGR   PIC S9(9) BINARY VALUE 0.
+       10  MQQSGD-COPY   PIC S9(9) BINARY VALUE 1.
+       10  MQQSGD-SHARED   PIC S9(9) BINARY VALUE 2.
+       10  MQQSGD-GROUP   PIC S9(9) BINARY VALUE 3.
+       10  MQQSGD-PRIVATE   PIC S9(9) BINARY VALUE 4.
+       10  MQQSGD-LIVE   PIC S9(9) BINARY VALUE 6.
+
+      ** Reorganization Controls
+       10  MQREORG-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQREORG-ENABLED   PIC S9(9) BINARY VALUE 1.
+
+      ** Read Ahead Values
+       10  MQREADA-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQREADA-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQREADA-DISABLED   PIC S9(9) BINARY VALUE 2.
+       10  MQREADA-INHIBITED   PIC S9(9) BINARY VALUE 3.
+       10  MQREADA-BACKLOG   PIC S9(9) BINARY VALUE 4.
+
+      ** Queue and Channel Property Control Values
+       10  MQPROP-COMPATIBILITY   PIC S9(9) BINARY VALUE 0.
+       10  MQPROP-NONE   PIC S9(9) BINARY VALUE 1.
+       10  MQPROP-ALL   PIC S9(9) BINARY VALUE 2.
+       10  MQPROP-FORCE-MQRFH2   PIC S9(9) BINARY VALUE 3.
+       10  MQPROP-V6COMPAT   PIC S9(9) BINARY VALUE 4.
+
+      ******************************************************************
+      **  Values Related to Namelist Attributes                    
+      ******************************************************************
+      ** Name Count
+       10  MQNC-MAX-NAMELIST-NAME-COUNT   PIC S9(9) BINARY VALUE 256.
+
+      ** Namelist Types
+       10  MQNT-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQNT-Q   PIC S9(9) BINARY VALUE 1.
+       10  MQNT-CLUSTER   PIC S9(9) BINARY VALUE 2.
+       10  MQNT-AUTH-INFO   PIC S9(9) BINARY VALUE 4.
+       10  MQNT-ALL   PIC S9(9) BINARY VALUE 1001.
+
+      ******************************************************************
+      **  Values Related to CF-Structure Attributes                
+      ******************************************************************
+      ** CF Recoverability
+       10  MQCFR-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQCFR-NO   PIC S9(9) BINARY VALUE 0.
+
+      ** CF Automatic Recovery
+       10  MQRECAUTO-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQRECAUTO-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** CF Loss of Connectivity Action
+       10  MQCFCONLOS-TERMINATE   PIC S9(9) BINARY VALUE 0.
+       10  MQCFCONLOS-TOLERATE   PIC S9(9) BINARY VALUE 1.
+       10  MQCFCONLOS-ASQMGR   PIC S9(9) BINARY VALUE 2.
+
+      ******************************************************************
+      **  Values Related to Service Attributes                     
+      ******************************************************************
+      ** Service Types
+       10  MQSVC-TYPE-COMMAND   PIC S9(9) BINARY VALUE 0.
+       10  MQSVC-TYPE-SERVER   PIC S9(9) BINARY VALUE 1.
+
+      ******************************************************************
+      **  Values Related to QueueManager Attributes                
+      ******************************************************************
+      ** Adopt New MCA Checks
+       10  MQADOPT-CHECK-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQADOPT-CHECK-ALL   PIC S9(9) BINARY VALUE 1.
+       10  MQADOPT-CHECK-Q-MGR-NAME   PIC S9(9) BINARY VALUE 2.
+       10  MQADOPT-CHECK-NET-ADDR   PIC S9(9) BINARY VALUE 4.
+       10  MQADOPT-CHECK-CHANNEL-NAME   PIC S9(9) BINARY VALUE 8.
+
+      ** Adopt New MCA Types
+       10  MQADOPT-TYPE-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQADOPT-TYPE-ALL   PIC S9(9) BINARY VALUE 1.
+       10  MQADOPT-TYPE-SVR   PIC S9(9) BINARY VALUE 2.
+       10  MQADOPT-TYPE-SDR   PIC S9(9) BINARY VALUE 4.
+       10  MQADOPT-TYPE-RCVR   PIC S9(9) BINARY VALUE 8.
+       10  MQADOPT-TYPE-CLUSRCVR   PIC S9(9) BINARY VALUE 16.
+
+      ** Autostart
+       10  MQAUTO-START-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQAUTO-START-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** Channel Auto Definition
+       10  MQCHAD-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQCHAD-ENABLED   PIC S9(9) BINARY VALUE 1.
+
+      ** Cluster Workload
+       10  MQCLWL-USEQ-LOCAL   PIC S9(9) BINARY VALUE 0.
+       10  MQCLWL-USEQ-ANY   PIC S9(9) BINARY VALUE 1.
+       10  MQCLWL-USEQ-AS-Q-MGR   PIC S9(9) BINARY VALUE -3.
+
+      ** Command Levels
+       10  MQCMDL-LEVEL-1   PIC S9(9) BINARY VALUE 100.
+       10  MQCMDL-LEVEL-101   PIC S9(9) BINARY VALUE 101.
+       10  MQCMDL-LEVEL-110   PIC S9(9) BINARY VALUE 110.
+       10  MQCMDL-LEVEL-114   PIC S9(9) BINARY VALUE 114.
+       10  MQCMDL-LEVEL-120   PIC S9(9) BINARY VALUE 120.
+       10  MQCMDL-LEVEL-200   PIC S9(9) BINARY VALUE 200.
+       10  MQCMDL-LEVEL-201   PIC S9(9) BINARY VALUE 201.
+       10  MQCMDL-LEVEL-210   PIC S9(9) BINARY VALUE 210.
+       10  MQCMDL-LEVEL-211   PIC S9(9) BINARY VALUE 211.
+       10  MQCMDL-LEVEL-220   PIC S9(9) BINARY VALUE 220.
+       10  MQCMDL-LEVEL-221   PIC S9(9) BINARY VALUE 221.
+       10  MQCMDL-LEVEL-230   PIC S9(9) BINARY VALUE 230.
+       10  MQCMDL-LEVEL-320   PIC S9(9) BINARY VALUE 320.
+       10  MQCMDL-LEVEL-420   PIC S9(9) BINARY VALUE 420.
+       10  MQCMDL-LEVEL-500   PIC S9(9) BINARY VALUE 500.
+       10  MQCMDL-LEVEL-510   PIC S9(9) BINARY VALUE 510.
+       10  MQCMDL-LEVEL-520   PIC S9(9) BINARY VALUE 520.
+       10  MQCMDL-LEVEL-530   PIC S9(9) BINARY VALUE 530.
+       10  MQCMDL-LEVEL-531   PIC S9(9) BINARY VALUE 531.
+       10  MQCMDL-LEVEL-600   PIC S9(9) BINARY VALUE 600.
+       10  MQCMDL-LEVEL-700   PIC S9(9) BINARY VALUE 700.
+       10  MQCMDL-LEVEL-701   PIC S9(9) BINARY VALUE 701.
+       10  MQCMDL-LEVEL-710   PIC S9(9) BINARY VALUE 710.
+       10  MQCMDL-LEVEL-711   PIC S9(9) BINARY VALUE 711.
+       10  MQCMDL-LEVEL-750   PIC S9(9) BINARY VALUE 750.
+       10  MQCMDL-LEVEL-800   PIC S9(9) BINARY VALUE 800.
+       10  MQCMDL-LEVEL-801   PIC S9(9) BINARY VALUE 801.
+       10  MQCMDL-LEVEL-802   PIC S9(9) BINARY VALUE 802.
+       10  MQCMDL-LEVEL-900   PIC S9(9) BINARY VALUE 900.
+       10  MQCMDL-LEVEL-901   PIC S9(9) BINARY VALUE 901.
+       10  MQCMDL-LEVEL-902   PIC S9(9) BINARY VALUE 902.
+       10  MQCMDL-LEVEL-903   PIC S9(9) BINARY VALUE 903.
+       10  MQCMDL-LEVEL-904   PIC S9(9) BINARY VALUE 904.
+       10  MQCMDL-LEVEL-905   PIC S9(9) BINARY VALUE 905.
+       10  MQCMDL-LEVEL-910   PIC S9(9) BINARY VALUE 910.
+       10  MQCMDL-LEVEL-911   PIC S9(9) BINARY VALUE 911.
+       10  MQCMDL-CURRENT-LEVEL   PIC S9(9) BINARY VALUE 911.
+
+      ** Command Server Options
+       10  MQCSRV-CONVERT-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQCSRV-CONVERT-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQCSRV-DLQ-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQCSRV-DLQ-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** DNS WLM
+       10  MQDNSWLM-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQDNSWLM-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** Expiration Scan Interval
+       10  MQEXPI-OFF   PIC S9(9) BINARY VALUE 0.
+
+      ** Intra-Group Queuing
+       10  MQIGQ-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQIGQ-ENABLED   PIC S9(9) BINARY VALUE 1.
+
+      ** Intra-Group Queuing Put Authority
+       10  MQIGQPA-DEFAULT   PIC S9(9) BINARY VALUE 1.
+       10  MQIGQPA-CONTEXT   PIC S9(9) BINARY VALUE 2.
+       10  MQIGQPA-ONLY-IGQ   PIC S9(9) BINARY VALUE 3.
+       10  MQIGQPA-ALTERNATE-OR-IGQ   PIC S9(9) BINARY VALUE 4.
+
+      ** IP Address Versions
+       10  MQIPADDR-IPV4   PIC S9(9) BINARY VALUE 0.
+       10  MQIPADDR-IPV6   PIC S9(9) BINARY VALUE 1.
+
+      ** Message Mark-Browse Interval
+       10  MQMMBI-UNLIMITED   PIC S9(9) BINARY VALUE -1.
+
+      ** Monitoring Values
+       10  MQMON-NOT-AVAILABLE   PIC S9(9) BINARY VALUE -1.
+       10  MQMON-NONE   PIC S9(9) BINARY VALUE -1.
+       10  MQMON-Q-MGR   PIC S9(9) BINARY VALUE -3.
+       10  MQMON-OFF   PIC S9(9) BINARY VALUE 0.
+       10  MQMON-ON   PIC S9(9) BINARY VALUE 1.
+       10  MQMON-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQMON-ENABLED   PIC S9(9) BINARY VALUE 1.
+       10  MQMON-LOW   PIC S9(9) BINARY VALUE 17.
+       10  MQMON-MEDIUM   PIC S9(9) BINARY VALUE 33.
+       10  MQMON-HIGH   PIC S9(9) BINARY VALUE 65.
+
+      ** Application Function Types
+       10  MQFUN-TYPE-UNKNOWN   PIC S9(9) BINARY VALUE 0.
+       10  MQFUN-TYPE-JVM   PIC S9(9) BINARY VALUE 1.
+       10  MQFUN-TYPE-PROGRAM   PIC S9(9) BINARY VALUE 2.
+       10  MQFUN-TYPE-PROCEDURE   PIC S9(9) BINARY VALUE 3.
+       10  MQFUN-TYPE-USERDEF   PIC S9(9) BINARY VALUE 4.
+       10  MQFUN-TYPE-COMMAND   PIC S9(9) BINARY VALUE 5.
+
+      ** Application Activity Trace Detail
+       10  MQACTV-DETAIL-LOW   PIC S9(9) BINARY VALUE 1.
+       10  MQACTV-DETAIL-MEDIUM   PIC S9(9) BINARY VALUE 2.
+       10  MQACTV-DETAIL-HIGH   PIC S9(9) BINARY VALUE 3.
+
+      ** Platforms
+       10  MQPL-MVS   PIC S9(9) BINARY VALUE 1.
+       10  MQPL-OS390   PIC S9(9) BINARY VALUE 1.
+       10  MQPL-ZOS   PIC S9(9) BINARY VALUE 1.
+       10  MQPL-OS2   PIC S9(9) BINARY VALUE 2.
+       10  MQPL-AIX   PIC S9(9) BINARY VALUE 3.
+       10  MQPL-UNIX   PIC S9(9) BINARY VALUE 3.
+       10  MQPL-OS400   PIC S9(9) BINARY VALUE 4.
+       10  MQPL-WINDOWS   PIC S9(9) BINARY VALUE 5.
+       10  MQPL-WINDOWS-NT   PIC S9(9) BINARY VALUE 11.
+       10  MQPL-VMS   PIC S9(9) BINARY VALUE 12.
+       10  MQPL-NSK   PIC S9(9) BINARY VALUE 13.
+       10  MQPL-NSS   PIC S9(9) BINARY VALUE 13.
+       10  MQPL-OPEN-TP1   PIC S9(9) BINARY VALUE 15.
+       10  MQPL-VM   PIC S9(9) BINARY VALUE 18.
+       10  MQPL-TPF   PIC S9(9) BINARY VALUE 23.
+       10  MQPL-VSE   PIC S9(9) BINARY VALUE 27.
+       10  MQPL-APPLIANCE   PIC S9(9) BINARY VALUE 28.
+
+      ** Maximum Properties Length
+       10  MQPROP-UNRESTRICTED-LENGTH   PIC S9(9) BINARY VALUE -1.
+
+      ** Pub/Sub Mode
+       10  MQPSM-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQPSM-COMPAT   PIC S9(9) BINARY VALUE 1.
+       10  MQPSM-ENABLED   PIC S9(9) BINARY VALUE 2.
+
+      ** Pub/Sub clusters
+       10  MQPSCLUS-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQPSCLUS-ENABLED   PIC S9(9) BINARY VALUE 1.
+
+      ** Control Options
+       10  MQQMOPT-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQQMOPT-ENABLED   PIC S9(9) BINARY VALUE 1.
+       10  MQQMOPT-REPLY   PIC S9(9) BINARY VALUE 2.
+
+      ** Receive Timeout Types
+       10  MQRCVTIME-MULTIPLY   PIC S9(9) BINARY VALUE 0.
+       10  MQRCVTIME-ADD   PIC S9(9) BINARY VALUE 1.
+       10  MQRCVTIME-EQUAL   PIC S9(9) BINARY VALUE 2.
+
+      ** Recording Options
+       10  MQRECORDING-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQRECORDING-Q   PIC S9(9) BINARY VALUE 1.
+       10  MQRECORDING-MSG   PIC S9(9) BINARY VALUE 2.
+
+      ** Security Case
+       10  MQSCYC-UPPER   PIC S9(9) BINARY VALUE 0.
+       10  MQSCYC-MIXED   PIC S9(9) BINARY VALUE 1.
+
+      ** Shared Queue Queue Manager Name
+       10  MQSQQM-USE   PIC S9(9) BINARY VALUE 0.
+       10  MQSQQM-IGNORE   PIC S9(9) BINARY VALUE 1.
+
+      ** SSL FIPS Requirements
+       10  MQSSL-FIPS-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQSSL-FIPS-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** Syncpoint Availability
+       10  MQSP-AVAILABLE   PIC S9(9) BINARY VALUE 1.
+       10  MQSP-NOT-AVAILABLE   PIC S9(9) BINARY VALUE 0.
+
+      ** Service Controls
+       10  MQSVC-CONTROL-Q-MGR   PIC S9(9) BINARY VALUE 0.
+       10  MQSVC-CONTROL-Q-MGR-START   PIC S9(9) BINARY VALUE 1.
+       10  MQSVC-CONTROL-MANUAL   PIC S9(9) BINARY VALUE 2.
+
+      ** Service Status
+       10  MQSVC-STATUS-STOPPED   PIC S9(9) BINARY VALUE 0.
+       10  MQSVC-STATUS-STARTING   PIC S9(9) BINARY VALUE 1.
+       10  MQSVC-STATUS-RUNNING   PIC S9(9) BINARY VALUE 2.
+       10  MQSVC-STATUS-STOPPING   PIC S9(9) BINARY VALUE 3.
+       10  MQSVC-STATUS-RETRYING   PIC S9(9) BINARY VALUE 4.
+
+      ** TCP Keepalive
+       10  MQTCPKEEP-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQTCPKEEP-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** TCP Stack Types
+       10  MQTCPSTACK-SINGLE   PIC S9(9) BINARY VALUE 0.
+       10  MQTCPSTACK-MULTIPLE   PIC S9(9) BINARY VALUE 1.
+
+      ** Channel Initiator Trace Autostart
+       10  MQTRAXSTR-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQTRAXSTR-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** Capability
+       10  MQCAP-NOT-SUPPORTED   PIC S9(9) BINARY VALUE 0.
+       10  MQCAP-SUPPORTED   PIC S9(9) BINARY VALUE 1.
+       10  MQCAP-EXPIRED   PIC S9(9) BINARY VALUE 2.
+
+      ** Media Image Scheduling
+       10  MQMEDIMGSCHED-MANUAL   PIC S9(9) BINARY VALUE 0.
+       10  MQMEDIMGSCHED-AUTO   PIC S9(9) BINARY VALUE 1.
+
+      ** Automatic Media Image Interval
+       10  MQMEDIMGINTVL-OFF   PIC S9(9) BINARY VALUE 0.
+
+      ** Automatic Media Image Log Length
+       10  MQMEDIMGLOGLN-OFF   PIC S9(9) BINARY VALUE 0.
+
+      ** Media Image Recoverability
+       10  MQIMGRCOV-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQIMGRCOV-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQIMGRCOV-AS-Q-MGR   PIC S9(9) BINARY VALUE 2.
+
+      ******************************************************************
+      **  Values Related to Topic Attributes                       
+      ******************************************************************
+      ** Persistent/Non-persistent Message Delivery
+       10  MQDLV-AS-PARENT   PIC S9(9) BINARY VALUE 0.
+       10  MQDLV-ALL   PIC S9(9) BINARY VALUE 1.
+       10  MQDLV-ALL-DUR   PIC S9(9) BINARY VALUE 2.
+       10  MQDLV-ALL-AVAIL   PIC S9(9) BINARY VALUE 3.
+
+      ** Master administration
+       10  MQMASTER-NO   PIC S9(9) BINARY VALUE 0.
+       10  MQMASTER-YES   PIC S9(9) BINARY VALUE 1.
+
+      ** Publish scope
+       10  MQSCOPE-ALL   PIC S9(9) BINARY VALUE 0.
+       10  MQSCOPE-AS-PARENT   PIC S9(9) BINARY VALUE 1.
+       10  MQSCOPE-QMGR   PIC S9(9) BINARY VALUE 4.
+
+      ** Durable subscriptions
+       10  MQSUB-DURABLE-AS-PARENT   PIC S9(9) BINARY VALUE 0.
+       10  MQSUB-DURABLE-ALLOWED   PIC S9(9) BINARY VALUE 1.
+       10  MQSUB-DURABLE-INHIBITED   PIC S9(9) BINARY VALUE 2.
+
+      ** Wildcards
+       10  MQTA-BLOCK   PIC S9(9) BINARY VALUE 1.
+       10  MQTA-PASSTHRU   PIC S9(9) BINARY VALUE 2.
+
+      ** Subscriptions Allowed
+       10  MQTA-SUB-AS-PARENT   PIC S9(9) BINARY VALUE 0.
+       10  MQTA-SUB-INHIBITED   PIC S9(9) BINARY VALUE 1.
+       10  MQTA-SUB-ALLOWED   PIC S9(9) BINARY VALUE 2.
+
+      ** Proxy Sub Propagation
+       10  MQTA-PROXY-SUB-FORCE   PIC S9(9) BINARY VALUE 1.
+       10  MQTA-PROXY-SUB-FIRSTUSE   PIC S9(9) BINARY VALUE 2.
+
+      ** Publications Allowed
+       10  MQTA-PUB-AS-PARENT   PIC S9(9) BINARY VALUE 0.
+       10  MQTA-PUB-INHIBITED   PIC S9(9) BINARY VALUE 1.
+       10  MQTA-PUB-ALLOWED   PIC S9(9) BINARY VALUE 2.
+
+      ** Topic Type
+       10  MQTOPT-LOCAL   PIC S9(9) BINARY VALUE 0.
+       10  MQTOPT-CLUSTER   PIC S9(9) BINARY VALUE 1.
+       10  MQTOPT-ALL   PIC S9(9) BINARY VALUE 2.
+
+      ** Multicast
+       10  MQMC-AS-PARENT   PIC S9(9) BINARY VALUE 0.
+       10  MQMC-ENABLED   PIC S9(9) BINARY VALUE 1.
+       10  MQMC-DISABLED   PIC S9(9) BINARY VALUE 2.
+       10  MQMC-ONLY   PIC S9(9) BINARY VALUE 3.
+
+      ** CommInfo Type
+       10  MQCIT-MULTICAST   PIC S9(9) BINARY VALUE 1.
+
+      ******************************************************************
+      **  Values Related to Subscription Attributes                
+      ******************************************************************
+      ** Destination Class
+       10  MQDC-MANAGED   PIC S9(9) BINARY VALUE 1.
+       10  MQDC-PROVIDED   PIC S9(9) BINARY VALUE 2.
+
+      ** Pub/Sub Message Properties
+       10  MQPSPROP-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQPSPROP-COMPAT   PIC S9(9) BINARY VALUE 1.
+       10  MQPSPROP-RFH2   PIC S9(9) BINARY VALUE 2.
+       10  MQPSPROP-MSGPROP   PIC S9(9) BINARY VALUE 3.
+
+      ** Request Only
+       10  MQRU-PUBLISH-ON-REQUEST   PIC S9(9) BINARY VALUE 1.
+       10  MQRU-PUBLISH-ALL   PIC S9(9) BINARY VALUE 2.
+
+      ** Durable Subscriptions
+       10  MQSUB-DURABLE-ALL   PIC S9(9) BINARY VALUE -1.
+       10  MQSUB-DURABLE-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQSUB-DURABLE-NO   PIC S9(9) BINARY VALUE 2.
+
+      ** Subscription Scope
+       10  MQTSCOPE-QMGR   PIC S9(9) BINARY VALUE 1.
+       10  MQTSCOPE-ALL   PIC S9(9) BINARY VALUE 2.
+
+      ** Variable User ID
+       10  MQVU-FIXED-USER   PIC S9(9) BINARY VALUE 1.
+       10  MQVU-ANY-USER   PIC S9(9) BINARY VALUE 2.
+
+      ** Wildcard Schema
+       10  MQWS-DEFAULT   PIC S9(9) BINARY VALUE 0.
+       10  MQWS-CHAR   PIC S9(9) BINARY VALUE 1.
+       10  MQWS-TOPIC   PIC S9(9) BINARY VALUE 2.
+
+      ******************************************************************
+      **  Values Related to Channel Authentication Configuration   
+      **        Attributes                                         
+      ******************************************************************
+      ** User Source Options
+       10  MQUSRC-MAP   PIC S9(9) BINARY VALUE 0.
+       10  MQUSRC-NOACCESS   PIC S9(9) BINARY VALUE 1.
+       10  MQUSRC-CHANNEL   PIC S9(9) BINARY VALUE 2.
+
+      ** Warn Options
+       10  MQWARN-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQWARN-NO   PIC S9(9) BINARY VALUE 0.
+
+      ** DSBlock Options
+       10  MQDSB-DEFAULT   PIC S9(9) BINARY VALUE 0.
+       10  MQDSB-8K   PIC S9(9) BINARY VALUE 1.
+       10  MQDSB-16K   PIC S9(9) BINARY VALUE 2.
+       10  MQDSB-32K   PIC S9(9) BINARY VALUE 3.
+       10  MQDSB-64K   PIC S9(9) BINARY VALUE 4.
+       10  MQDSB-128K   PIC S9(9) BINARY VALUE 5.
+       10  MQDSB-256K   PIC S9(9) BINARY VALUE 6.
+       10  MQDSB-512K   PIC S9(9) BINARY VALUE 7.
+       10  MQDSB-1024K   PIC S9(9) BINARY VALUE 8.
+       10  MQDSB-1M   PIC S9(9) BINARY VALUE 8.
+
+      ** DSExpand Options
+       10  MQDSE-DEFAULT   PIC S9(9) BINARY VALUE 0.
+       10  MQDSE-YES   PIC S9(9) BINARY VALUE 1.
+       10  MQDSE-NO   PIC S9(9) BINARY VALUE 2.
+
+      ** OffldUse Options
+       10  MQCFOFFLD-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCFOFFLD-SMDS   PIC S9(9) BINARY VALUE 1.
+       10  MQCFOFFLD-DB2   PIC S9(9) BINARY VALUE 2.
+       10  MQCFOFFLD-BOTH   PIC S9(9) BINARY VALUE 3.
+
+      ** Use Dead Letter Queue Options
+       10  MQUSEDLQ-AS-PARENT   PIC S9(9) BINARY VALUE 0.
+       10  MQUSEDLQ-NO   PIC S9(9) BINARY VALUE 1.
+       10  MQUSEDLQ-YES   PIC S9(9) BINARY VALUE 2.
+
+      ******************************************************************
+      **  Values Related to MQCLOSE Function                       
+      ******************************************************************
+      ** Object Handle
+       10  MQHO-UNUSABLE-HOBJ   PIC S9(9) BINARY VALUE -1.
+       10  MQHO-NONE   PIC S9(9) BINARY VALUE 0.
+
+      ** Close Options
+       10  MQCO-IMMEDIATE   PIC S9(9) BINARY VALUE 0.
+       10  MQCO-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQCO-DELETE   PIC S9(9) BINARY VALUE 1.
+       10  MQCO-DELETE-PURGE   PIC S9(9) BINARY VALUE 2.
+       10  MQCO-KEEP-SUB   PIC S9(9) BINARY VALUE 4.
+       10  MQCO-REMOVE-SUB   PIC S9(9) BINARY VALUE 8.
+       10  MQCO-QUIESCE   PIC S9(9) BINARY VALUE 32.
+
+      ******************************************************************
+      **  Values Related to MQCTL and MQCB Functions               
+      ******************************************************************
+      ** Operation codes for MQCTL
+       10  MQOP-START   PIC S9(9) BINARY VALUE 1.
+       10  MQOP-START-WAIT   PIC S9(9) BINARY VALUE 2.
+       10  MQOP-STOP   PIC S9(9) BINARY VALUE 4.
+
+      ** Operation codes for MQCB
+       10  MQOP-REGISTER   PIC S9(9) BINARY VALUE 256.
+       10  MQOP-DEREGISTER   PIC S9(9) BINARY VALUE 512.
+
+      ** Operation codes for MQCTL and MQCB
+       10  MQOP-SUSPEND   PIC S9(9) BINARY VALUE 65536.
+       10  MQOP-RESUME   PIC S9(9) BINARY VALUE 131072.
+
+      ******************************************************************
+      **  Values Related to MQDLTMH Function                       
+      ******************************************************************
+      ** Message handle
+       10  MQHM-UNUSABLE-HMSG   PIC S9(18) BINARY VALUE -1.
+       10  MQHM-NONE   PIC S9(18) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQINQ Function                         
+      ******************************************************************
+      ** Byte Attribute Selectors
+       10  MQBA-FIRST   PIC S9(9) BINARY VALUE 6001.
+       10  MQBA-LAST   PIC S9(9) BINARY VALUE 8000.
+
+      ** Character Attribute Selectors
+       10  MQCA-ADMIN-TOPIC-NAME   PIC S9(9) BINARY VALUE 2105.
+       10  MQCA-ALTERATION-DATE   PIC S9(9) BINARY VALUE 2027.
+       10  MQCA-ALTERATION-TIME   PIC S9(9) BINARY VALUE 2028.
+       10  MQCA-AMQP-SSL-CIPHER-SUITES   PIC S9(9) BINARY VALUE 2137.
+       10  MQCA-AMQP-VERSION   PIC S9(9) BINARY VALUE 2136.
+       10  MQCA-APPL-ID   PIC S9(9) BINARY VALUE 2001.
+       10  MQCA-AUTH-INFO-CONN-NAME   PIC S9(9) BINARY VALUE 2053.
+       10  MQCA-AUTH-INFO-DESC   PIC S9(9) BINARY VALUE 2046.
+       10  MQCA-AUTH-INFO-NAME   PIC S9(9) BINARY VALUE 2045.
+       10  MQCA-AUTH-INFO-OCSP-URL   PIC S9(9) BINARY VALUE 2109.
+       10  MQCA-AUTO-REORG-CATALOG   PIC S9(9) BINARY VALUE 2091.
+       10  MQCA-AUTO-REORG-START-TIME   PIC S9(9) BINARY VALUE 2090.
+       10  MQCA-BACKOUT-REQ-Q-NAME   PIC S9(9) BINARY VALUE 2019.
+       10  MQCA-BASE-OBJECT-NAME   PIC S9(9) BINARY VALUE 2002.
+       10  MQCA-BASE-Q-NAME   PIC S9(9) BINARY VALUE 2002.
+       10  MQCA-BATCH-INTERFACE-ID   PIC S9(9) BINARY VALUE 2068.
+       10  MQCA-CERT-LABEL   PIC S9(9) BINARY VALUE 2121.
+       10  MQCA-CF-STRUC-DESC   PIC S9(9) BINARY VALUE 2052.
+       10  MQCA-CF-STRUC-NAME   PIC S9(9) BINARY VALUE 2039.
+       10  MQCA-CHANNEL-AUTO-DEF-EXIT   PIC S9(9) BINARY VALUE 2026.
+       10  MQCA-CHILD   PIC S9(9) BINARY VALUE 2101.
+       10  MQCA-CHINIT-SERVICE-PARM   PIC S9(9) BINARY VALUE 2076.
+       10  MQCA-CHLAUTH-DESC   PIC S9(9) BINARY VALUE 2118.
+       10  MQCA-CICS-FILE-NAME   PIC S9(9) BINARY VALUE 2060.
+       10  MQCA-CLUSTER-DATE   PIC S9(9) BINARY VALUE 2037.
+       10  MQCA-CLUSTER-NAME   PIC S9(9) BINARY VALUE 2029.
+       10  MQCA-CLUSTER-NAMELIST   PIC S9(9) BINARY VALUE 2030.
+       10  MQCA-CLUSTER-Q-MGR-NAME   PIC S9(9) BINARY VALUE 2031.
+       10  MQCA-CLUSTER-TIME   PIC S9(9) BINARY VALUE 2038.
+       10  MQCA-CLUSTER-WORKLOAD-DATA   PIC S9(9) BINARY VALUE 2034.
+       10  MQCA-CLUSTER-WORKLOAD-EXIT   PIC S9(9) BINARY VALUE 2033.
+       10  MQCA-CLUS-CHL-NAME   PIC S9(9) BINARY VALUE 2124.
+       10  MQCA-COMMAND-INPUT-Q-NAME   PIC S9(9) BINARY VALUE 2003.
+       10  MQCA-COMMAND-REPLY-Q-NAME   PIC S9(9) BINARY VALUE 2067.
+       10  MQCA-COMM-INFO-DESC   PIC S9(9) BINARY VALUE 2111.
+       10  MQCA-COMM-INFO-NAME   PIC S9(9) BINARY VALUE 2110.
+       10  MQCA-CONN-AUTH   PIC S9(9) BINARY VALUE 2125.
+       10  MQCA-CREATION-DATE   PIC S9(9) BINARY VALUE 2004.
+       10  MQCA-CREATION-TIME   PIC S9(9) BINARY VALUE 2005.
+       10  MQCA-CUSTOM   PIC S9(9) BINARY VALUE 2119.
+       10  MQCA-DEAD-LETTER-Q-NAME   PIC S9(9) BINARY VALUE 2006.
+       10  MQCA-DEF-XMIT-Q-NAME   PIC S9(9) BINARY VALUE 2025.
+       10  MQCA-DNS-GROUP   PIC S9(9) BINARY VALUE 2071.
+       10  MQCA-ENV-DATA   PIC S9(9) BINARY VALUE 2007.
+       10  MQCA-FIRST   PIC S9(9) BINARY VALUE 2001.
+       10  MQCA-IGQ-USER-ID   PIC S9(9) BINARY VALUE 2041.
+       10  MQCA-INITIATION-Q-NAME   PIC S9(9) BINARY VALUE 2008.
+       10  MQCA-INSTALLATION-DESC   PIC S9(9) BINARY VALUE 2115.
+       10  MQCA-INSTALLATION-NAME   PIC S9(9) BINARY VALUE 2116.
+       10  MQCA-INSTALLATION-PATH   PIC S9(9) BINARY VALUE 2117.
+       10  MQCA-LAST   PIC S9(9) BINARY VALUE 4000.
+       10  MQCA-LAST-USED   PIC S9(9) BINARY VALUE 2137.
+       10  MQCA-LDAP-BASE-DN-GROUPS   PIC S9(9) BINARY VALUE 2132.
+       10  MQCA-LDAP-BASE-DN-USERS   PIC S9(9) BINARY VALUE 2126.
+       10  MQCA-LDAP-FIND-GROUP-FIELD   PIC S9(9) BINARY VALUE 2135.
+       10  MQCA-LDAP-GROUP-ATTR-FIELD   PIC S9(9) BINARY VALUE 2134.
+       10  MQCA-LDAP-GROUP-OBJECT-CLASS   PIC S9(9) BINARY VALUE 2133.
+       10  MQCA-LDAP-PASSWORD   PIC S9(9) BINARY VALUE 2048.
+       10  MQCA-LDAP-SHORT-USER-FIELD   PIC S9(9) BINARY VALUE 2127.
+       10  MQCA-LDAP-USER-ATTR-FIELD   PIC S9(9) BINARY VALUE 2129.
+       10  MQCA-LDAP-USER-NAME   PIC S9(9) BINARY VALUE 2047.
+       10  MQCA-LDAP-USER-OBJECT-CLASS   PIC S9(9) BINARY VALUE 2128.
+       10  MQCA-LU62-ARM-SUFFIX   PIC S9(9) BINARY VALUE 2074.
+       10  MQCA-LU-GROUP-NAME   PIC S9(9) BINARY VALUE 2072.
+       10  MQCA-LU-NAME   PIC S9(9) BINARY VALUE 2073.
+       10  MQCA-MODEL-DURABLE-Q   PIC S9(9) BINARY VALUE 2096.
+       10  MQCA-MODEL-NON-DURABLE-Q   PIC S9(9) BINARY VALUE 2097.
+       10  MQCA-MONITOR-Q-NAME   PIC S9(9) BINARY VALUE 2066.
+       10  MQCA-NAMELIST-DESC   PIC S9(9) BINARY VALUE 2009.
+       10  MQCA-NAMELIST-NAME   PIC S9(9) BINARY VALUE 2010.
+       10  MQCA-NAMES   PIC S9(9) BINARY VALUE 2020.
+       10  MQCA-PARENT   PIC S9(9) BINARY VALUE 2102.
+       10  MQCA-PASS-TICKET-APPL   PIC S9(9) BINARY VALUE 2086.
+       10  MQCA-POLICY-NAME   PIC S9(9) BINARY VALUE 2112.
+       10  MQCA-PROCESS-DESC   PIC S9(9) BINARY VALUE 2011.
+       10  MQCA-PROCESS-NAME   PIC S9(9) BINARY VALUE 2012.
+       10  MQCA-QSG-CERT-LABEL   PIC S9(9) BINARY VALUE 2131.
+       10  MQCA-QSG-NAME   PIC S9(9) BINARY VALUE 2040.
+       10  MQCA-Q-DESC   PIC S9(9) BINARY VALUE 2013.
+       10  MQCA-Q-MGR-DESC   PIC S9(9) BINARY VALUE 2014.
+       10  MQCA-Q-MGR-IDENTIFIER   PIC S9(9) BINARY VALUE 2032.
+       10  MQCA-Q-MGR-NAME   PIC S9(9) BINARY VALUE 2015.
+       10  MQCA-Q-NAME   PIC S9(9) BINARY VALUE 2016.
+       10  MQCA-RECIPIENT-DN   PIC S9(9) BINARY VALUE 2114.
+       10  MQCA-REMOTE-Q-MGR-NAME   PIC S9(9) BINARY VALUE 2017.
+       10  MQCA-REMOTE-Q-NAME   PIC S9(9) BINARY VALUE 2018.
+       10  MQCA-REPOSITORY-NAME   PIC S9(9) BINARY VALUE 2035.
+       10  MQCA-REPOSITORY-NAMELIST   PIC S9(9) BINARY VALUE 2036.
+       10  MQCA-RESUME-DATE   PIC S9(9) BINARY VALUE 2098.
+       10  MQCA-RESUME-TIME   PIC S9(9) BINARY VALUE 2099.
+       10  MQCA-SERVICE-DESC   PIC S9(9) BINARY VALUE 2078.
+       10  MQCA-SERVICE-NAME   PIC S9(9) BINARY VALUE 2077.
+       10  MQCA-SERVICE-START-ARGS   PIC S9(9) BINARY VALUE 2080.
+       10  MQCA-SERVICE-START-COMMAND   PIC S9(9) BINARY VALUE 2079.
+       10  MQCA-SERVICE-STOP-ARGS   PIC S9(9) BINARY VALUE 2082.
+       10  MQCA-SERVICE-STOP-COMMAND   PIC S9(9) BINARY VALUE 2081.
+       10  MQCA-SIGNER-DN   PIC S9(9) BINARY VALUE 2113.
+       10  MQCA-SSL-CERT-ISSUER-NAME   PIC S9(9) BINARY VALUE 2130.
+       10  MQCA-SSL-CRL-NAMELIST   PIC S9(9) BINARY VALUE 2050.
+       10  MQCA-SSL-CRYPTO-HARDWARE   PIC S9(9) BINARY VALUE 2051.
+       10  MQCA-SSL-KEY-LIBRARY   PIC S9(9) BINARY VALUE 2069.
+       10  MQCA-SSL-KEY-MEMBER   PIC S9(9) BINARY VALUE 2070.
+       10  MQCA-SSL-KEY-REPOSITORY   PIC S9(9) BINARY VALUE 2049.
+       10  MQCA-STDERR-DESTINATION   PIC S9(9) BINARY VALUE 2084.
+       10  MQCA-STDOUT-DESTINATION   PIC S9(9) BINARY VALUE 2083.
+       10  MQCA-STORAGE-CLASS   PIC S9(9) BINARY VALUE 2022.
+       10  MQCA-STORAGE-CLASS-DESC   PIC S9(9) BINARY VALUE 2042.
+       10  MQCA-SYSTEM-LOG-Q-NAME   PIC S9(9) BINARY VALUE 2065.
+       10  MQCA-TCP-NAME   PIC S9(9) BINARY VALUE 2075.
+       10  MQCA-TOPIC-DESC   PIC S9(9) BINARY VALUE 2093.
+       10  MQCA-TOPIC-NAME   PIC S9(9) BINARY VALUE 2092.
+       10  MQCA-TOPIC-STRING   PIC S9(9) BINARY VALUE 2094.
+       10  MQCA-TOPIC-STRING-FILTER   PIC S9(9) BINARY VALUE 2108.
+       10  MQCA-TPIPE-NAME   PIC S9(9) BINARY VALUE 2085.
+       10  MQCA-TRIGGER-CHANNEL-NAME   PIC S9(9) BINARY VALUE 2064.
+       10  MQCA-TRIGGER-DATA   PIC S9(9) BINARY VALUE 2023.
+       10  MQCA-TRIGGER-PROGRAM-NAME   PIC S9(9) BINARY VALUE 2062.
+       10  MQCA-TRIGGER-TERM-ID   PIC S9(9) BINARY VALUE 2063.
+       10  MQCA-TRIGGER-TRANS-ID   PIC S9(9) BINARY VALUE 2061.
+       10  MQCA-USER-DATA   PIC S9(9) BINARY VALUE 2021.
+       10  MQCA-USER-LIST   PIC S9(9) BINARY VALUE 4000.
+       10  MQCA-VERSION   PIC S9(9) BINARY VALUE 2120.
+       10  MQCA-XCF-GROUP-NAME   PIC S9(9) BINARY VALUE 2043.
+       10  MQCA-XCF-MEMBER-NAME   PIC S9(9) BINARY VALUE 2044.
+       10  MQCA-XMIT-Q-NAME   PIC S9(9) BINARY VALUE 2024.
+       10  MQCA-XR-SSL-CIPHER-SUITES   PIC S9(9) BINARY VALUE 2123.
+       10  MQCA-XR-VERSION   PIC S9(9) BINARY VALUE 2122.
+
+      ** Integer Attribute Selectors
+       10  MQIA-ACCOUNTING-CONN-OVERRIDE   PIC S9(9) BINARY VALUE 136.
+       10  MQIA-ACCOUNTING-INTERVAL   PIC S9(9) BINARY VALUE 135.
+       10  MQIA-ACCOUNTING-MQI   PIC S9(9) BINARY VALUE 133.
+       10  MQIA-ACCOUNTING-Q   PIC S9(9) BINARY VALUE 134.
+       10  MQIA-ACTIVE-CHANNELS   PIC S9(9) BINARY VALUE 100.
+       10  MQIA-ACTIVITY-CONN-OVERRIDE   PIC S9(9) BINARY VALUE 239.
+       10  MQIA-ACTIVITY-RECORDING   PIC S9(9) BINARY VALUE 138.
+       10  MQIA-ACTIVITY-TRACE   PIC S9(9) BINARY VALUE 240.
+       10  MQIA-ADOPTNEWMCA-CHECK   PIC S9(9) BINARY VALUE 102.
+       10  MQIA-ADOPTNEWMCA-INTERVAL   PIC S9(9) BINARY VALUE 104.
+       10  MQIA-ADOPTNEWMCA-TYPE   PIC S9(9) BINARY VALUE 103.
+       10  MQIA-ADOPT-CONTEXT   PIC S9(9) BINARY VALUE 260.
+       10  MQIA-ADVANCED-CAPABILITY   PIC S9(9) BINARY VALUE 273.
+       10  MQIA-AMQP-CAPABILITY   PIC S9(9) BINARY VALUE 265.
+       10  MQIA-APPL-TYPE   PIC S9(9) BINARY VALUE 1.
+       10  MQIA-ARCHIVE   PIC S9(9) BINARY VALUE 60.
+       10  MQIA-AUTHENTICATION-FAIL-DELAY   PIC S9(9) BINARY VALUE 259.
+       10  MQIA-AUTHENTICATION-METHOD   PIC S9(9) BINARY VALUE 266.
+       10  MQIA-AUTHORITY-EVENT   PIC S9(9) BINARY VALUE 47.
+       10  MQIA-AUTH-INFO-TYPE   PIC S9(9) BINARY VALUE 66.
+       10  MQIA-AUTO-REORGANIZATION   PIC S9(9) BINARY VALUE 173.
+       10  MQIA-AUTO-REORG-INTERVAL   PIC S9(9) BINARY VALUE 174.
+       10  MQIA-BACKOUT-THRESHOLD   PIC S9(9) BINARY VALUE 22.
+       10  MQIA-BASE-TYPE   PIC S9(9) BINARY VALUE 193.
+       10  MQIA-BATCH-INTERFACE-AUTO   PIC S9(9) BINARY VALUE 86.
+       10  MQIA-BRIDGE-EVENT   PIC S9(9) BINARY VALUE 74.
+       10  MQIA-CERT-VAL-POLICY   PIC S9(9) BINARY VALUE 252.
+       10  MQIA-CF-CFCONLOS   PIC S9(9) BINARY VALUE 246.
+       10  MQIA-CF-LEVEL   PIC S9(9) BINARY VALUE 70.
+       10  MQIA-CF-OFFLDUSE   PIC S9(9) BINARY VALUE 229.
+       10  MQIA-CF-OFFLOAD   PIC S9(9) BINARY VALUE 224.
+       10  MQIA-CF-OFFLOAD-THRESHOLD1   PIC S9(9) BINARY VALUE 225.
+       10  MQIA-CF-OFFLOAD-THRESHOLD2   PIC S9(9) BINARY VALUE 226.
+       10  MQIA-CF-OFFLOAD-THRESHOLD3   PIC S9(9) BINARY VALUE 227.
+       10  MQIA-CF-RECAUTO   PIC S9(9) BINARY VALUE 244.
+       10  MQIA-CF-RECOVER   PIC S9(9) BINARY VALUE 71.
+       10  MQIA-CF-SMDS-BUFFERS   PIC S9(9) BINARY VALUE 228.
+       10  MQIA-CHANNEL-AUTO-DEF   PIC S9(9) BINARY VALUE 55.
+       10  MQIA-CHANNEL-AUTO-DEF-EVENT   PIC S9(9) BINARY VALUE 56.
+       10  MQIA-CHANNEL-EVENT   PIC S9(9) BINARY VALUE 73.
+       10  MQIA-CHECK-CLIENT-BINDING   PIC S9(9) BINARY VALUE 258.
+       10  MQIA-CHECK-LOCAL-BINDING   PIC S9(9) BINARY VALUE 257.
+       10  MQIA-CHINIT-ADAPTERS   PIC S9(9) BINARY VALUE 101.
+       10  MQIA-CHINIT-CONTROL   PIC S9(9) BINARY VALUE 119.
+       10  MQIA-CHINIT-DISPATCHERS   PIC S9(9) BINARY VALUE 105.
+       10  MQIA-CHINIT-TRACE-AUTO-START   PIC S9(9) BINARY VALUE 117.
+       10  MQIA-CHINIT-TRACE-TABLE-SIZE   PIC S9(9) BINARY VALUE 118.
+       10  MQIA-CHLAUTH-RECORDS   PIC S9(9) BINARY VALUE 248.
+       10  MQIA-CLUSTER-OBJECT-STATE   PIC S9(9) BINARY VALUE 256.
+       10  MQIA-CLUSTER-PUB-ROUTE   PIC S9(9) BINARY VALUE 255.
+       10  MQIA-CLUSTER-Q-TYPE   PIC S9(9) BINARY VALUE 59.
+       10  MQIA-CLUSTER-WORKLOAD-LENGTH   PIC S9(9) BINARY VALUE 58.
+       10  MQIA-CLWL-MRU-CHANNELS   PIC S9(9) BINARY VALUE 97.
+       10  MQIA-CLWL-Q-PRIORITY   PIC S9(9) BINARY VALUE 96.
+       10  MQIA-CLWL-Q-RANK   PIC S9(9) BINARY VALUE 95.
+       10  MQIA-CLWL-USEQ   PIC S9(9) BINARY VALUE 98.
+       10  MQIA-CMD-SERVER-AUTO   PIC S9(9) BINARY VALUE 87.
+       10  MQIA-CMD-SERVER-CONTROL   PIC S9(9) BINARY VALUE 120.
+       10  MQIA-CMD-SERVER-CONVERT-MSG   PIC S9(9) BINARY VALUE 88.
+       10  MQIA-CMD-SERVER-DLQ-MSG   PIC S9(9) BINARY VALUE 89.
+       10  MQIA-CODED-CHAR-SET-ID   PIC S9(9) BINARY VALUE 2.
+       10  MQIA-COMMAND-EVENT   PIC S9(9) BINARY VALUE 99.
+       10  MQIA-COMMAND-LEVEL   PIC S9(9) BINARY VALUE 31.
+       10  MQIA-COMM-EVENT   PIC S9(9) BINARY VALUE 232.
+       10  MQIA-COMM-INFO-TYPE   PIC S9(9) BINARY VALUE 223.
+       10  MQIA-CONFIGURATION-EVENT   PIC S9(9) BINARY VALUE 51.
+       10  MQIA-CPI-LEVEL   PIC S9(9) BINARY VALUE 27.
+       10  MQIA-CURRENT-Q-DEPTH   PIC S9(9) BINARY VALUE 3.
+       10  MQIA-DEFINITION-TYPE   PIC S9(9) BINARY VALUE 7.
+       10  MQIA-DEF-BIND   PIC S9(9) BINARY VALUE 61.
+       10  MQIA-DEF-CLUSTER-XMIT-Q-TYPE   PIC S9(9) BINARY VALUE 250.
+       10  MQIA-DEF-INPUT-OPEN-OPTION   PIC S9(9) BINARY VALUE 4.
+       10  MQIA-DEF-PERSISTENCE   PIC S9(9) BINARY VALUE 5.
+       10  MQIA-DEF-PRIORITY   PIC S9(9) BINARY VALUE 6.
+       10  MQIA-DEF-PUT-RESPONSE-TYPE   PIC S9(9) BINARY VALUE 184.
+       10  MQIA-DEF-READ-AHEAD   PIC S9(9) BINARY VALUE 188.
+       10  MQIA-DISPLAY-TYPE   PIC S9(9) BINARY VALUE 262.
+       10  MQIA-DIST-LISTS   PIC S9(9) BINARY VALUE 34.
+       10  MQIA-DNS-WLM   PIC S9(9) BINARY VALUE 106.
+       10  MQIA-DURABLE-SUB   PIC S9(9) BINARY VALUE 175.
+       10  MQIA-ENCRYPTION-ALGORITHM   PIC S9(9) BINARY VALUE 237.
+       10  MQIA-EXPIRY-INTERVAL   PIC S9(9) BINARY VALUE 39.
+       10  MQIA-FIRST   PIC S9(9) BINARY VALUE 1.
+       10  MQIA-GROUP-UR   PIC S9(9) BINARY VALUE 221.
+       10  MQIA-HARDEN-GET-BACKOUT   PIC S9(9) BINARY VALUE 8.
+       10  MQIA-HIGH-Q-DEPTH   PIC S9(9) BINARY VALUE 36.
+       10  MQIA-IGQ-PUT-AUTHORITY   PIC S9(9) BINARY VALUE 65.
+       10  MQIA-INDEX-TYPE   PIC S9(9) BINARY VALUE 57.
+       10  MQIA-INHIBIT-EVENT   PIC S9(9) BINARY VALUE 48.
+       10  MQIA-INHIBIT-GET   PIC S9(9) BINARY VALUE 9.
+       10  MQIA-INHIBIT-PUB   PIC S9(9) BINARY VALUE 181.
+       10  MQIA-INHIBIT-PUT   PIC S9(9) BINARY VALUE 10.
+       10  MQIA-INHIBIT-SUB   PIC S9(9) BINARY VALUE 182.
+       10  MQIA-INTRA-GROUP-QUEUING   PIC S9(9) BINARY VALUE 64.
+       10  MQIA-IP-ADDRESS-VERSION   PIC S9(9) BINARY VALUE 93.
+       10  MQIA-KEY-REUSE-COUNT   PIC S9(9) BINARY VALUE 267.
+       10  MQIA-LAST   PIC S9(9) BINARY VALUE 2000.
+       10  MQIA-LAST-USED   PIC S9(9) BINARY VALUE 273.
+       10  MQIA-LDAP-AUTHORMD   PIC S9(9) BINARY VALUE 263.
+       10  MQIA-LDAP-NESTGRP   PIC S9(9) BINARY VALUE 264.
+       10  MQIA-LDAP-SECURE-COMM   PIC S9(9) BINARY VALUE 261.
+       10  MQIA-LISTENER-PORT-NUMBER   PIC S9(9) BINARY VALUE 85.
+       10  MQIA-LISTENER-TIMER   PIC S9(9) BINARY VALUE 107.
+       10  MQIA-LOCAL-EVENT   PIC S9(9) BINARY VALUE 49.
+       10  MQIA-LOGGER-EVENT   PIC S9(9) BINARY VALUE 94.
+       10  MQIA-LU62-CHANNELS   PIC S9(9) BINARY VALUE 108.
+       10  MQIA-MASTER-ADMIN   PIC S9(9) BINARY VALUE 186.
+       10  MQIA-MAX-CHANNELS   PIC S9(9) BINARY VALUE 109.
+       10  MQIA-MAX-CLIENTS   PIC S9(9) BINARY VALUE 172.
+       10  MQIA-MAX-GLOBAL-LOCKS   PIC S9(9) BINARY VALUE 83.
+       10  MQIA-MAX-HANDLES   PIC S9(9) BINARY VALUE 11.
+       10  MQIA-MAX-LOCAL-LOCKS   PIC S9(9) BINARY VALUE 84.
+       10  MQIA-MAX-MSG-LENGTH   PIC S9(9) BINARY VALUE 13.
+       10  MQIA-MAX-OPEN-Q   PIC S9(9) BINARY VALUE 80.
+       10  MQIA-MAX-PRIORITY   PIC S9(9) BINARY VALUE 14.
+       10  MQIA-MAX-PROPERTIES-LENGTH   PIC S9(9) BINARY VALUE 192.
+       10  MQIA-MAX-Q-DEPTH   PIC S9(9) BINARY VALUE 15.
+       10  MQIA-MAX-Q-TRIGGERS   PIC S9(9) BINARY VALUE 90.
+       10  MQIA-MAX-RECOVERY-TASKS   PIC S9(9) BINARY VALUE 171.
+       10  MQIA-MAX-RESPONSES   PIC S9(9) BINARY VALUE 230.
+       10  MQIA-MAX-UNCOMMITTED-MSGS   PIC S9(9) BINARY VALUE 33.
+       10  MQIA-MCAST-BRIDGE   PIC S9(9) BINARY VALUE 233.
+       10  MQIA-MEDIA-IMAGE-INTERVAL   PIC S9(9) BINARY VALUE 269.
+       10  MQIA-MEDIA-IMAGE-LOG-LENGTH   PIC S9(9) BINARY VALUE 270.
+       10  MQIA-MEDIA-IMAGE-RECOVER-OBJ   PIC S9(9) BINARY VALUE 271.
+       10  MQIA-MEDIA-IMAGE-RECOVER-Q   PIC S9(9) BINARY VALUE 272.
+       10  MQIA-MEDIA-IMAGE-SCHEDULING   PIC S9(9) BINARY VALUE 268.
+       10  MQIA-MONITORING-AUTO-CLUSSDR   PIC S9(9) BINARY VALUE 124.
+       10  MQIA-MONITORING-CHANNEL   PIC S9(9) BINARY VALUE 122.
+       10  MQIA-MONITORING-Q   PIC S9(9) BINARY VALUE 123.
+       10  MQIA-MONITOR-INTERVAL   PIC S9(9) BINARY VALUE 81.
+       10  MQIA-MSG-DELIVERY-SEQUENCE   PIC S9(9) BINARY VALUE 16.
+       10  MQIA-MSG-DEQ-COUNT   PIC S9(9) BINARY VALUE 38.
+       10  MQIA-MSG-ENQ-COUNT   PIC S9(9) BINARY VALUE 37.
+       10  MQIA-MSG-MARK-BROWSE-INTERVAL   PIC S9(9) BINARY VALUE 68.
+       10  MQIA-MULTICAST   PIC S9(9) BINARY VALUE 176.
+       10  MQIA-NAMELIST-TYPE   PIC S9(9) BINARY VALUE 72.
+       10  MQIA-NAME-COUNT   PIC S9(9) BINARY VALUE 19.
+       10  MQIA-NPM-CLASS   PIC S9(9) BINARY VALUE 78.
+       10  MQIA-NPM-DELIVERY   PIC S9(9) BINARY VALUE 196.
+       10  MQIA-OPEN-INPUT-COUNT   PIC S9(9) BINARY VALUE 17.
+       10  MQIA-OPEN-OUTPUT-COUNT   PIC S9(9) BINARY VALUE 18.
+       10  MQIA-OUTBOUND-PORT-MAX   PIC S9(9) BINARY VALUE 140.
+       10  MQIA-OUTBOUND-PORT-MIN   PIC S9(9) BINARY VALUE 110.
+       10  MQIA-PAGESET-ID   PIC S9(9) BINARY VALUE 62.
+       10  MQIA-PERFORMANCE-EVENT   PIC S9(9) BINARY VALUE 53.
+       10  MQIA-PLATFORM   PIC S9(9) BINARY VALUE 32.
+       10  MQIA-PM-DELIVERY   PIC S9(9) BINARY VALUE 195.
+       10  MQIA-POLICY-VERSION   PIC S9(9) BINARY VALUE 238.
+       10  MQIA-PROPERTY-CONTROL   PIC S9(9) BINARY VALUE 190.
+       10  MQIA-PROT-POLICY-CAPABILITY   PIC S9(9) BINARY VALUE 251.
+       10  MQIA-PROXY-SUB   PIC S9(9) BINARY VALUE 199.
+       10  MQIA-PUBSUB-CLUSTER   PIC S9(9) BINARY VALUE 249.
+       10  MQIA-PUBSUB-MAXMSG-RETRY-COUNT   PIC S9(9) BINARY VALUE 206.
+       10  MQIA-PUBSUB-MODE   PIC S9(9) BINARY VALUE 187.
+       10  MQIA-PUBSUB-NP-MSG   PIC S9(9) BINARY VALUE 203.
+       10  MQIA-PUBSUB-NP-RESP   PIC S9(9) BINARY VALUE 205.
+       10  MQIA-PUBSUB-SYNC-PT   PIC S9(9) BINARY VALUE 207.
+       10  MQIA-PUB-COUNT   PIC S9(9) BINARY VALUE 215.
+       10  MQIA-PUB-SCOPE   PIC S9(9) BINARY VALUE 219.
+       10  MQIA-QMGR-CFCONLOS   PIC S9(9) BINARY VALUE 245.
+       10  MQIA-QMOPT-CONS-COMMS-MSGS   PIC S9(9) BINARY VALUE 155.
+       10  MQIA-QMOPT-CONS-CRITICAL-MSGS   PIC S9(9) BINARY VALUE 154.
+       10  MQIA-QMOPT-CONS-ERROR-MSGS   PIC S9(9) BINARY VALUE 153.
+       10  MQIA-QMOPT-CONS-INFO-MSGS   PIC S9(9) BINARY VALUE 151.
+       10  MQIA-QMOPT-CONS-REORG-MSGS   PIC S9(9) BINARY VALUE 156.
+       10  MQIA-QMOPT-CONS-SYSTEM-MSGS   PIC S9(9) BINARY VALUE 157.
+       10  MQIA-QMOPT-CONS-WARNING-MSGS   PIC S9(9) BINARY VALUE 152.
+       10  MQIA-QMOPT-CSMT-ON-ERROR   PIC S9(9) BINARY VALUE 150.
+       10  MQIA-QMOPT-INTERNAL-DUMP   PIC S9(9) BINARY VALUE 170.
+       10  MQIA-QMOPT-LOG-COMMS-MSGS   PIC S9(9) BINARY VALUE 162.
+       10  MQIA-QMOPT-LOG-CRITICAL-MSGS   PIC S9(9) BINARY VALUE 161.
+       10  MQIA-QMOPT-LOG-ERROR-MSGS   PIC S9(9) BINARY VALUE 160.
+       10  MQIA-QMOPT-LOG-INFO-MSGS   PIC S9(9) BINARY VALUE 158.
+       10  MQIA-QMOPT-LOG-REORG-MSGS   PIC S9(9) BINARY VALUE 163.
+       10  MQIA-QMOPT-LOG-SYSTEM-MSGS   PIC S9(9) BINARY VALUE 164.
+       10  MQIA-QMOPT-LOG-WARNING-MSGS   PIC S9(9) BINARY VALUE 159.
+       10  MQIA-QMOPT-TRACE-COMMS   PIC S9(9) BINARY VALUE 166.
+       10  MQIA-QMOPT-TRACE-CONVERSION   PIC S9(9) BINARY VALUE 168.
+       10  MQIA-QMOPT-TRACE-MQI-CALLS   PIC S9(9) BINARY VALUE 165.
+       10  MQIA-QMOPT-TRACE-REORG   PIC S9(9) BINARY VALUE 167.
+       10  MQIA-QMOPT-TRACE-SYSTEM   PIC S9(9) BINARY VALUE 169.
+       10  MQIA-QSG-DISP   PIC S9(9) BINARY VALUE 63.
+       10  MQIA-Q-DEPTH-HIGH-EVENT   PIC S9(9) BINARY VALUE 43.
+       10  MQIA-Q-DEPTH-HIGH-LIMIT   PIC S9(9) BINARY VALUE 40.
+       10  MQIA-Q-DEPTH-LOW-EVENT   PIC S9(9) BINARY VALUE 44.
+       10  MQIA-Q-DEPTH-LOW-LIMIT   PIC S9(9) BINARY VALUE 41.
+       10  MQIA-Q-DEPTH-MAX-EVENT   PIC S9(9) BINARY VALUE 42.
+       10  MQIA-Q-SERVICE-INTERVAL   PIC S9(9) BINARY VALUE 54.
+       10  MQIA-Q-SERVICE-INTERVAL-EVENT   PIC S9(9) BINARY VALUE 46.
+       10  MQIA-Q-TYPE   PIC S9(9) BINARY VALUE 20.
+       10  MQIA-Q-USERS   PIC S9(9) BINARY VALUE 82.
+       10  MQIA-READ-AHEAD   PIC S9(9) BINARY VALUE 189.
+       10  MQIA-RECEIVE-TIMEOUT   PIC S9(9) BINARY VALUE 111.
+       10  MQIA-RECEIVE-TIMEOUT-MIN   PIC S9(9) BINARY VALUE 113.
+       10  MQIA-RECEIVE-TIMEOUT-TYPE   PIC S9(9) BINARY VALUE 112.
+       10  MQIA-REMOTE-EVENT   PIC S9(9) BINARY VALUE 50.
+       10  MQIA-RESPONSE-RESTART-POINT   PIC S9(9) BINARY VALUE 231.
+       10  MQIA-RETENTION-INTERVAL   PIC S9(9) BINARY VALUE 21.
+       10  MQIA-REVERSE-DNS-LOOKUP   PIC S9(9) BINARY VALUE 254.
+       10  MQIA-SCOPE   PIC S9(9) BINARY VALUE 45.
+       10  MQIA-SECURITY-CASE   PIC S9(9) BINARY VALUE 141.
+       10  MQIA-SERVICE-CONTROL   PIC S9(9) BINARY VALUE 139.
+       10  MQIA-SERVICE-TYPE   PIC S9(9) BINARY VALUE 121.
+       10  MQIA-SHAREABILITY   PIC S9(9) BINARY VALUE 23.
+       10  MQIA-SHARED-Q-Q-MGR-NAME   PIC S9(9) BINARY VALUE 77.
+       10  MQIA-SIGNATURE-ALGORITHM   PIC S9(9) BINARY VALUE 236.
+       10  MQIA-SSL-EVENT   PIC S9(9) BINARY VALUE 75.
+       10  MQIA-SSL-FIPS-REQUIRED   PIC S9(9) BINARY VALUE 92.
+       10  MQIA-SSL-RESET-COUNT   PIC S9(9) BINARY VALUE 76.
+       10  MQIA-SSL-TASKS   PIC S9(9) BINARY VALUE 69.
+       10  MQIA-START-STOP-EVENT   PIC S9(9) BINARY VALUE 52.
+       10  MQIA-STATISTICS-AUTO-CLUSSDR   PIC S9(9) BINARY VALUE 130.
+       10  MQIA-STATISTICS-CHANNEL   PIC S9(9) BINARY VALUE 129.
+       10  MQIA-STATISTICS-INTERVAL   PIC S9(9) BINARY VALUE 131.
+       10  MQIA-STATISTICS-MQI   PIC S9(9) BINARY VALUE 127.
+       10  MQIA-STATISTICS-Q   PIC S9(9) BINARY VALUE 128.
+       10  MQIA-SUB-CONFIGURATION-EVENT   PIC S9(9) BINARY VALUE 242.
+       10  MQIA-SUB-COUNT   PIC S9(9) BINARY VALUE 204.
+       10  MQIA-SUB-SCOPE   PIC S9(9) BINARY VALUE 218.
+       10  MQIA-SUITE-B-STRENGTH   PIC S9(9) BINARY VALUE 247.
+       10  MQIA-SYNCPOINT   PIC S9(9) BINARY VALUE 30.
+       10  MQIA-TCP-CHANNELS   PIC S9(9) BINARY VALUE 114.
+       10  MQIA-TCP-KEEP-ALIVE   PIC S9(9) BINARY VALUE 115.
+       10  MQIA-TCP-STACK-TYPE   PIC S9(9) BINARY VALUE 116.
+       10  MQIA-TIME-SINCE-RESET   PIC S9(9) BINARY VALUE 35.
+       10  MQIA-TOLERATE-UNPROTECTED   PIC S9(9) BINARY VALUE 235.
+       10  MQIA-TOPIC-DEF-PERSISTENCE   PIC S9(9) BINARY VALUE 185.
+       10  MQIA-TOPIC-NODE-COUNT   PIC S9(9) BINARY VALUE 253.
+       10  MQIA-TOPIC-TYPE   PIC S9(9) BINARY VALUE 208.
+       10  MQIA-TRACE-ROUTE-RECORDING   PIC S9(9) BINARY VALUE 137.
+       10  MQIA-TREE-LIFE-TIME   PIC S9(9) BINARY VALUE 183.
+       10  MQIA-TRIGGER-CONTROL   PIC S9(9) BINARY VALUE 24.
+       10  MQIA-TRIGGER-DEPTH   PIC S9(9) BINARY VALUE 29.
+       10  MQIA-TRIGGER-INTERVAL   PIC S9(9) BINARY VALUE 25.
+       10  MQIA-TRIGGER-MSG-PRIORITY   PIC S9(9) BINARY VALUE 26.
+       10  MQIA-TRIGGER-RESTART   PIC S9(9) BINARY VALUE 91.
+       10  MQIA-TRIGGER-TYPE   PIC S9(9) BINARY VALUE 28.
+       10  MQIA-UR-DISP   PIC S9(9) BINARY VALUE 222.
+       10  MQIA-USAGE   PIC S9(9) BINARY VALUE 12.
+       10  MQIA-USER-LIST   PIC S9(9) BINARY VALUE 2000.
+       10  MQIA-USE-DEAD-LETTER-Q   PIC S9(9) BINARY VALUE 234.
+       10  MQIA-WILDCARD-OPERATION   PIC S9(9) BINARY VALUE 216.
+       10  MQIA-XR-CAPABILITY   PIC S9(9) BINARY VALUE 243.
+
+      ** Integer Attribute Values
+       10  MQIAV-NOT-APPLICABLE   PIC S9(9) BINARY VALUE -1.
+       10  MQIAV-UNDEFINED   PIC S9(9) BINARY VALUE -2.
+
+      ** CommInfo Bridge
+       10  MQMCB-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQMCB-ENABLED   PIC S9(9) BINARY VALUE 1.
+
+      ** Key reuse count
+       10  MQKEY-REUSE-DISABLED   PIC S9(9) BINARY VALUE 0.
+       10  MQKEY-REUSE-UNLIMITED   PIC S9(9) BINARY VALUE -1.
+
+      ** Group Attribute Selectors
+       10  MQGA-FIRST   PIC S9(9) BINARY VALUE 8001.
+       10  MQGA-LAST   PIC S9(9) BINARY VALUE 9000.
+
+      ******************************************************************
+      **  Values Related to MQOPEN Function                        
+      ******************************************************************
+      ** Open Options
+       10  MQOO-BIND-AS-Q-DEF   PIC S9(9) BINARY VALUE 0.
+       10  MQOO-READ-AHEAD-AS-Q-DEF   PIC S9(9) BINARY VALUE 0.
+       10  MQOO-INPUT-AS-Q-DEF   PIC S9(9) BINARY VALUE 1.
+       10  MQOO-INPUT-SHARED   PIC S9(9) BINARY VALUE 2.
+       10  MQOO-INPUT-EXCLUSIVE   PIC S9(9) BINARY VALUE 4.
+       10  MQOO-BROWSE   PIC S9(9) BINARY VALUE 8.
+       10  MQOO-OUTPUT   PIC S9(9) BINARY VALUE 16.
+       10  MQOO-INQUIRE   PIC S9(9) BINARY VALUE 32.
+       10  MQOO-SET   PIC S9(9) BINARY VALUE 64.
+       10  MQOO-SAVE-ALL-CONTEXT   PIC S9(9) BINARY VALUE 128.
+       10  MQOO-PASS-IDENTITY-CONTEXT   PIC S9(9) BINARY VALUE 256.
+       10  MQOO-PASS-ALL-CONTEXT   PIC S9(9) BINARY VALUE 512.
+       10  MQOO-SET-IDENTITY-CONTEXT   PIC S9(9) BINARY VALUE 1024.
+       10  MQOO-SET-ALL-CONTEXT   PIC S9(9) BINARY VALUE 2048.
+       10  MQOO-ALTERNATE-USER-AUTHORITY   PIC S9(9) BINARY VALUE 4096.
+       10  MQOO-FAIL-IF-QUIESCING   PIC S9(9) BINARY VALUE 8192.
+       10  MQOO-BIND-ON-OPEN   PIC S9(9) BINARY VALUE 16384.
+       10  MQOO-BIND-ON-GROUP   PIC S9(9) BINARY VALUE 4194304.
+       10  MQOO-BIND-NOT-FIXED   PIC S9(9) BINARY VALUE 32768.
+       10  MQOO-CO-OP   PIC S9(9) BINARY VALUE 131072.
+       10  MQOO-NO-READ-AHEAD   PIC S9(9) BINARY VALUE 524288.
+       10  MQOO-READ-AHEAD   PIC S9(9) BINARY VALUE 1048576.
+       10  MQOO-NO-MULTICAST   PIC S9(9) BINARY VALUE 2097152.
+       10  MQOO-RESOLVE-LOCAL-Q   PIC S9(9) BINARY VALUE 262144.
+       10  MQOO-RESOLVE-LOCAL-TOPIC   PIC S9(9) BINARY VALUE 262144.
+
+      ** Following used in C++ only
+       10  MQOO-RESOLVE-NAMES   PIC S9(9) BINARY VALUE 65536.
+
+      ******************************************************************
+      **  Values Related to MQSETMP Function                       
+      ******************************************************************
+      ** Property data types
+       10  MQTYPE-AS-SET   PIC S9(9) BINARY VALUE 0.
+       10  MQTYPE-NULL   PIC S9(9) BINARY VALUE 2.
+       10  MQTYPE-BOOLEAN   PIC S9(9) BINARY VALUE 4.
+       10  MQTYPE-BYTE-STRING   PIC S9(9) BINARY VALUE 8.
+       10  MQTYPE-INT8   PIC S9(9) BINARY VALUE 16.
+       10  MQTYPE-INT16   PIC S9(9) BINARY VALUE 32.
+       10  MQTYPE-INT32   PIC S9(9) BINARY VALUE 64.
+       10  MQTYPE-LONG   PIC S9(9) BINARY VALUE 64.
+       10  MQTYPE-INT64   PIC S9(9) BINARY VALUE 128.
+       10  MQTYPE-FLOAT32   PIC S9(9) BINARY VALUE 256.
+       10  MQTYPE-FLOAT64   PIC S9(9) BINARY VALUE 512.
+       10  MQTYPE-STRING   PIC S9(9) BINARY VALUE 1024.
+
+      ** Property value lengths
+       10  MQVL-NULL-TERMINATED   PIC S9(9) BINARY VALUE -1.
+       10  MQVL-EMPTY-STRING   PIC S9(9) BINARY VALUE 0.
+
+      ******************************************************************
+      **  Values Related to MQSTAT Function                        
+      ******************************************************************
+      ** Stat Options
+       10  MQSTAT-TYPE-ASYNC-ERROR   PIC S9(9) BINARY VALUE 0.
+       10  MQSTAT-TYPE-RECONNECTION   PIC S9(9) BINARY VALUE 1.
+       10  MQSTAT-TYPE-RECONNECTION-ERROR   PIC S9(9) BINARY VALUE 2.
+
+      ******************************************************************
+      **  Values Related to MQSUB Function                         
+      ******************************************************************
+      ** Subscribe Options
+       10  MQSO-NONE   PIC S9(9) BINARY VALUE 0.
+       10  MQSO-NON-DURABLE   PIC S9(9) BINARY VALUE 0.
+       10  MQSO-READ-AHEAD-AS-Q-DEF   PIC S9(9) BINARY VALUE 0.
+       10  MQSO-ALTER   PIC S9(9) BINARY VALUE 1.
+       10  MQSO-CREATE   PIC S9(9) BINARY VALUE 2.
+       10  MQSO-RESUME   PIC S9(9) BINARY VALUE 4.
+       10  MQSO-DURABLE   PIC S9(9) BINARY VALUE 8.
+       10  MQSO-GROUP-SUB   PIC S9(9) BINARY VALUE 16.
+       10  MQSO-MANAGED   PIC S9(9) BINARY VALUE 32.
+       10  MQSO-SET-IDENTITY-CONTEXT   PIC S9(9) BINARY VALUE 64.
+       10  MQSO-NO-MULTICAST   PIC S9(9) BINARY VALUE 128.
+       10  MQSO-FIXED-USERID   PIC S9(9) BINARY VALUE 256.
+       10  MQSO-ANY-USERID   PIC S9(9) BINARY VALUE 512.
+       10  MQSO-PUBLICATIONS-ON-REQUEST   PIC S9(9) BINARY VALUE 2048.
+       10  MQSO-NEW-PUBLICATIONS-ONLY   PIC S9(9) BINARY VALUE 4096.
+       10  MQSO-FAIL-IF-QUIESCING   PIC S9(9) BINARY VALUE 8192.
+       10  MQSO-ALTERNATE-USER-AUTHORITY   PIC S9(9) BINARY
+           VALUE 262144.
+       10  MQSO-WILDCARD-CHAR   PIC S9(9) BINARY VALUE 1048576.
+       10  MQSO-WILDCARD-TOPIC   PIC S9(9) BINARY VALUE 2097152.
+       10  MQSO-SET-CORREL-ID   PIC S9(9) BINARY VALUE 4194304.
+       10  MQSO-SCOPE-QMGR   PIC S9(9) BINARY VALUE 67108864.
+       10  MQSO-NO-READ-AHEAD   PIC S9(9) BINARY VALUE 134217728.
+       10  MQSO-READ-AHEAD   PIC S9(9) BINARY VALUE 268435456.
+
+      ******************************************************************
+      **  Values Related to MQSUBRQ Function                       
+      ******************************************************************
+      ** Action
+       10  MQSR-ACTION-PUBLICATION   PIC S9(9) BINARY VALUE 1.
+
+      ** 
+
+      ******************************************************************
+      **  Constants for MQ Extended Reach                          
+      ******************************************************************
+      ** General Constants
+       10  MQ-MQTT-MAX-KEEP-ALIVE   PIC S9(9) BINARY VALUE 65536.
+       10  MQ-SSL-KEY-PASSPHRASE-LENGTH   PIC S9(9) BINARY VALUE 1024.
+
+
+
+      ******************************************************************
+      **  End of CMQV                                                 **
+      ******************************************************************

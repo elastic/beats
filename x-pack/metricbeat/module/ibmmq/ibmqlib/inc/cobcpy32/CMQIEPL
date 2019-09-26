@@ -1,0 +1,121 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQIEPL                                     **
+      **                                                              **
+      **  DESCRIPTION:    MQIEP Structure -- Interface Entry Points   **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQIEP,     **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  32 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQIEPL                                                      **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQIEP structure
+       10  MQIEP.
+      ** Structure identifier
+       15  MQIEP-STRUCID PIC X(4).
+      ** Structure version number
+       15  MQIEP-VERSION PIC S9(9) BINARY.
+      ** Length of MQIEP structure
+       15  MQIEP-STRUCLENGTH PIC S9(9) BINARY.
+      ** Flags containing information about the interface entry points
+       15  MQIEP-FLAGS PIC S9(9) BINARY.
+      ** Reserved
+       15  MQIEP-RESERVED POINTER.
+      ** MQBACK entry point
+       15  MQIEP-MQBACK-CALL POINTER.
+      ** MQBEGIN entry point
+       15  MQIEP-MQBEGIN-CALL POINTER.
+      ** MQBUFMH entry point
+       15  MQIEP-MQBUFMH-CALL POINTER.
+      ** MQCB entry point
+       15  MQIEP-MQCB-CALL POINTER.
+      ** MQCLOSE entry point
+       15  MQIEP-MQCLOSE-CALL POINTER.
+      ** MQCMIT entry point
+       15  MQIEP-MQCMIT-CALL POINTER.
+      ** MQCONN entry point
+       15  MQIEP-MQCONN-CALL POINTER.
+      ** MQCONNX entry point
+       15  MQIEP-MQCONNX-CALL POINTER.
+      ** MQCRTMH entry point
+       15  MQIEP-MQCRTMH-CALL POINTER.
+      ** MQCTL entry point
+       15  MQIEP-MQCTL-CALL POINTER.
+      ** MQDISC entry point
+       15  MQIEP-MQDISC-CALL POINTER.
+      ** MQDLTMH entry point
+       15  MQIEP-MQDLTMH-CALL POINTER.
+      ** MQDLTMP entry point
+       15  MQIEP-MQDLTMP-CALL POINTER.
+      ** MQGET entry point
+       15  MQIEP-MQGET-CALL POINTER.
+      ** MQINQ entry point
+       15  MQIEP-MQINQ-CALL POINTER.
+      ** MQINQMP entry point
+       15  MQIEP-MQINQMP-CALL POINTER.
+      ** MQMHBUF entry point
+       15  MQIEP-MQMHBUF-CALL POINTER.
+      ** MQOPEN entry point
+       15  MQIEP-MQOPEN-CALL POINTER.
+      ** MQPUT entry point
+       15  MQIEP-MQPUT-CALL POINTER.
+      ** MQPUT1 entry point
+       15  MQIEP-MQPUT1-CALL POINTER.
+      ** MQSET entry point
+       15  MQIEP-MQSET-CALL POINTER.
+      ** MQSETMP entry point
+       15  MQIEP-MQSETMP-CALL POINTER.
+      ** MQSTAT entry point
+       15  MQIEP-MQSTAT-CALL POINTER.
+      ** MQSUB entry point
+       15  MQIEP-MQSUB-CALL POINTER.
+      ** MQSUBRQ entry point
+       15  MQIEP-MQSUBRQ-CALL POINTER.
+      ** MQXCLWLN entry point
+       15  MQIEP-MQXCLWLN-CALL POINTER.
+      ** MQXCNVC entry point
+       15  MQIEP-MQXCNVC-CALL POINTER.
+      ** MQXDX entry point
+       15  MQIEP-MQXDX-CALL POINTER.
+      ** MQXEP entry point
+       15  MQIEP-MQXEP-CALL POINTER.
+      ** MQZEP entry point
+       15  MQIEP-MQZEP-CALL POINTER.
+
+
+      ******************************************************************
+      **  End of CMQIEPL                                              **
+      ******************************************************************

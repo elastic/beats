@@ -1,0 +1,144 @@
+      ******************************************************************
+      **                                                              **
+      **                      IBM MQ for Generic                      **
+      **                                                              **
+      **  FILE NAME:      CMQSDV                                      **
+      **                                                              **
+      **  DESCRIPTION:    MQSD Structure -- Subscription Descriptor   **
+      **                                                              **
+      ******************************************************************
+      **  <copyright                                                  **
+      **  notice="lm-source-program"                                  **
+      **  pids="5724-H72,5655-R36,5724-L26"                           **
+      **  years="1993,2018"                                           **
+      **  crc="1616507131" >                                          **
+      **  Licensed Materials - Property of IBM                        **
+      **                                                              **
+      **  5724-H72                                                    **
+      **                                                              **
+      **  (C) Copyright IBM Corp. 1993, 2018 All Rights Reserved.     **
+      **                                                              **
+      **  US Government Users Restricted Rights - Use, duplication or **
+      **  disclosure restricted by GSA ADP Schedule Contract with     **
+      **  IBM Corp.                                                   **
+      **  </copyright>                                                **
+      ******************************************************************
+      **                                                              **
+      **  FUNCTION:       This file declares the structure MQSD,      **
+      **                  which is used by the main MQI.              **
+      **                                                              **
+      **  PROCESSOR:      COBOL                                       **
+      **                                                              **
+      ******************************************************************
+
+      ******************************************************************
+      ** <BEGIN_BUILDINFO>                                            **
+      ** Generated on:  05/02/19 11:08                                **
+      ** Build Level:   p911-L190205                                  **
+      ** Build Type:    Production                                    **
+      ** Pointer Size:  64 Bit                                        **
+      ** Source File:                                                 **
+      ** CMQSDV                                                       **
+      ** <END_BUILDINFO>                                              **
+      ******************************************************************
+
+      ** MQSD structure
+       10  MQSD.
+      ** Structure identifier
+       15  MQSD-STRUCID PIC X(4) VALUE 'SD  '.
+      ** Structure version number
+       15  MQSD-VERSION PIC S9(9) BINARY VALUE 1.
+      ** Options associated with subscribing
+       15  MQSD-OPTIONS PIC S9(9) BINARY VALUE 0.
+      ** Object name
+       15  MQSD-OBJECTNAME PIC X(48) VALUE SPACES.
+      ** Alternate user identifier
+       15  MQSD-ALTERNATEUSERID PIC X(12) VALUE SPACES.
+      ** Alternate security identifier
+       15  MQSD-ALTERNATESECURITYID PIC X(40) VALUE LOW-VALUES.
+      ** Expiry of Subscription
+       15  MQSD-SUBEXPIRY PIC S9(9) BINARY VALUE -1.
+      ** Add padding to ensure that pointers start on correct
+      ** boundaries
+       15  FILLER  PIC S9(9) BINARY VALUE 0.
+      ** Object long name
+       15  MQSD-OBJECTSTRING.
+      ** Address of variable length string
+       20  MQSD-OBJECTSTRING-VSPTR POINTER VALUE NULL.
+      ** Offset of variable length string
+       20  MQSD-OBJECTSTRING-VSOFFSET PIC S9(9) BINARY VALUE 0.
+      ** Size of buffer
+       20  MQSD-OBJECTSTRING-VSBUFSIZE PIC S9(9) BINARY VALUE 0.
+      ** Length of variable length string
+       20  MQSD-OBJECTSTRING-VSLENGTH PIC S9(9) BINARY VALUE 0.
+      ** CCSID of variable length string
+       20  MQSD-OBJECTSTRING-VSCCSID PIC S9(9) BINARY VALUE -3.
+      ** Subscription name
+       15  MQSD-SUBNAME.
+      ** Address of variable length string
+       20  MQSD-SUBNAME-VSPTR POINTER VALUE NULL.
+      ** Offset of variable length string
+       20  MQSD-SUBNAME-VSOFFSET PIC S9(9) BINARY VALUE 0.
+      ** Size of buffer
+       20  MQSD-SUBNAME-VSBUFSIZE PIC S9(9) BINARY VALUE 0.
+      ** Length of variable length string
+       20  MQSD-SUBNAME-VSLENGTH PIC S9(9) BINARY VALUE 0.
+      ** CCSID of variable length string
+       20  MQSD-SUBNAME-VSCCSID PIC S9(9) BINARY VALUE -3.
+      ** Subscription user data
+       15  MQSD-SUBUSERDATA.
+      ** Address of variable length string
+       20  MQSD-SUBUSERDATA-VSPTR POINTER VALUE NULL.
+      ** Offset of variable length string
+       20  MQSD-SUBUSERDATA-VSOFFSET PIC S9(9) BINARY VALUE 0.
+      ** Size of buffer
+       20  MQSD-SUBUSERDATA-VSBUFSIZE PIC S9(9) BINARY VALUE 0.
+      ** Length of variable length string
+       20  MQSD-SUBUSERDATA-VSLENGTH PIC S9(9) BINARY VALUE 0.
+      ** CCSID of variable length string
+       20  MQSD-SUBUSERDATA-VSCCSID PIC S9(9) BINARY VALUE -3.
+      ** Correlation Id related to this subscription
+       15  MQSD-SUBCORRELID PIC X(24) VALUE LOW-VALUES.
+      ** Priority set in publications
+       15  MQSD-PUBPRIORITY PIC S9(9) BINARY VALUE -3.
+      ** Accounting Token set in publications
+       15  MQSD-PUBACCOUNTINGTOKEN PIC X(32) VALUE LOW-VALUES.
+      ** Appl Identity Data set in publications
+       15  MQSD-PUBAPPLIDENTITYDATA PIC X(32) VALUE SPACES.
+      ** Add padding to ensure that pointers start on correct
+      ** boundaries
+       15  FILLER  PIC S9(9) BINARY VALUE 0.
+      ** Message selector structure
+       15  MQSD-SELECTIONSTRING.
+      ** Address of variable length string
+       20  MQSD-SELECTIONSTRING-VSPTR POINTER VALUE NULL.
+      ** Offset of variable length string
+       20  MQSD-SELECTIONSTRING-VSOFFSET PIC S9(9) BINARY VALUE 0.
+      ** Size of buffer
+       20  MQSD-SELECTIONSTRING-VSBUFSIZE PIC S9(9) BINARY VALUE 0.
+      ** Length of variable length string
+       20  MQSD-SELECTIONSTRING-VSLENGTH PIC S9(9) BINARY VALUE 0.
+      ** CCSID of variable length string
+       20  MQSD-SELECTIONSTRING-VSCCSID PIC S9(9) BINARY VALUE -3.
+      ** Subscription level
+       15  MQSD-SUBLEVEL PIC S9(9) BINARY VALUE 1.
+      ** Add padding to ensure that pointers start on correct
+      ** boundaries
+       15  FILLER  PIC S9(9) BINARY VALUE 0.
+      ** Resolved long object name
+       15  MQSD-RESOBJECTSTRING.
+      ** Address of variable length string
+       20  MQSD-RESOBJECTSTRING-VSPTR POINTER VALUE NULL.
+      ** Offset of variable length string
+       20  MQSD-RESOBJECTSTRING-VSOFFSET PIC S9(9) BINARY VALUE 0.
+      ** Size of buffer
+       20  MQSD-RESOBJECTSTRING-VSBUFSIZE PIC S9(9) BINARY VALUE 0.
+      ** Length of variable length string
+       20  MQSD-RESOBJECTSTRING-VSLENGTH PIC S9(9) BINARY VALUE 0.
+      ** CCSID of variable length string
+       20  MQSD-RESOBJECTSTRING-VSCCSID PIC S9(9) BINARY VALUE -3.
+
+
+      ******************************************************************
+      **  End of CMQSDV                                               **
+      ******************************************************************
