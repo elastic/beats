@@ -184,7 +184,7 @@ func createEvents(eventType string, qmgrName string, responseObj map[string]*Res
 
 func mergeEventsWithResponseObj(events []beat.Event, responseObj map[string]*Response) []beat.Event {
 
-	for id, _ := range responseObj {
+	for id := range responseObj {
 		for _, event := range events {
 			if id == event.Fields["targetObject"] {
 				for key, value := range responseObj[id].Values {

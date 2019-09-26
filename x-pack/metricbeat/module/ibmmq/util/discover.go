@@ -402,25 +402,24 @@ func discoverQueues(monitoredQueues string) error {
 			cfh, offset := ibmmq.ReadPCFHeader(buf)
 			if cfh.CompCode != ibmmq.MQCC_OK {
 				return fmt.Errorf("PCF command failed with CC %d RC %d", cfh.CompCode, cfh.Reason)
-			} else {
-				parmAvail := true
-				bytesRead := 0
-				for parmAvail && cfh.CompCode != ibmmq.MQCC_FAILED {
-					elem, bytesRead = ibmmq.ReadPCFParameter(buf[offset:])
-					offset += bytesRead
-					// Have we now reached the end of the message
-					if offset >= datalen {
-						parmAvail = false
-					}
+			}
+			parmAvail := true
+			bytesRead := 0
+			for parmAvail && cfh.CompCode != ibmmq.MQCC_FAILED {
+				elem, bytesRead = ibmmq.ReadPCFParameter(buf[offset:])
+				offset += bytesRead
+				// Have we now reached the end of the message
+				if offset >= datalen {
+					parmAvail = false
+				}
 
-					switch elem.Parameter {
-					case ibmmq.MQCACF_Q_NAMES:
-						if len(elem.String) == 0 {
-							return fmt.Errorf("No queues matching '%s' exist", pattern)
-						}
-						for i := 0; i < len(elem.String); i++ {
-							qList = append(qList, strings.TrimSpace(elem.String[i]))
-						}
+				switch elem.Parameter {
+				case ibmmq.MQCACF_Q_NAMES:
+					if len(elem.String) == 0 {
+						return fmt.Errorf("No queues matching '%s' exist", pattern)
+					}
+					for i := 0; i < len(elem.String); i++ {
+						qList = append(qList, strings.TrimSpace(elem.String[i]))
 					}
 				}
 			}
