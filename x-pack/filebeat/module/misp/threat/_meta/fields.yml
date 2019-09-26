@@ -421,7 +421,7 @@
     type: keyword
     description: >
       The attack_pattern for this indicator is a STIX Pattern 
-      as specified in STIX™ Version 2.0 Part 5 - STIX Patterning. 
+      as specified in STIX Version 2.0 Part 5 - STIX Patterning. 
     example: >
       [source.ip = '198.51.100.1/32']
 
