@@ -44,58 +44,58 @@
       description: Default transmission queue name.
     - name: mqca_installation_desc
       type: string
-      description:
+      description: The installation description for this queue manager.
     - name: mqca_installation_name
       type: string
-      description:
+      description: The installation name for this queue manager.
     - name: mqca_installation_path
       type: string
-      description:
+      description: The installation path for this queue manager.
     - name: mqca_parent
       type: string
-      description:
+      description: The name of the hierarchically connected queue manager nominated as the parent of this queue manager.
     - name: mqca_q_mgr_desc
       type: string
-      description:
+      description: Queue manager description
     - name: mqca_q_mgr_identifier
       type: string
-      description:
+      description: The unique identifier of the queue manager.
     - name: mqca_repository_name
       type: string
-      description:
+      description: The name of a cluster for which this queue manager is to provide a repository service.
     - name: mqca_repository_namelist
       type: string
-      description:
+      description: The name of a list of clusters for which this queue manager is to provide a repository service.
     - name: mqca_ssl_crl_namelist
       type: string
-      description:
+      description: The SSL certificate revocation location namelist
     - name: mqca_ssl_crypto_hardware
       type: string
-      description:
+      description: Parameters to configure the SSL cryptographic hardware
     - name: mqca_ssl_key_repository
       type: string
-      description:
+      description: Location and name of the SSL key repository
     - name: mqca_version
       type: string
-      description:
+      description: The version of the IBM MQ code.
     - name: mqcacf_archive_log_extent_name
       type: string
       description:
     - name: mqcacf_current_log_extent_name
       type: string
-      description:
+      description: The name of the log extent that was being written to at the time of the Inquire command. If the queue manager is using circular logging, this parameter is blank.
     - name: mqcacf_log_path
       type: string
-      description:
+      description: This parameter identifies the directory where log files are created by the queue manager.
     - name: mqcacf_media_log_extent_name
       type: string
       description:
     - name: mqcacf_q_mgr_start_date
       type: string
-      description:
+      description: Date when this queue manager was started (in the form yyyy-mm-dd).
     - name: mqcacf_q_mgr_start_time
       type: string
-      description:
+      description: Time when this queue manager was started (in the form hh:mm:ss).
     - name: mqcacf_restart_log_extent_name
       type: string
       description:
@@ -164,13 +164,13 @@
       description:
     - name: mqia_command_event
       type: long
-      description:
+      description: Controls whether command events are generated.
     - name: mqia_command_level
       type: long
-      description:
+      description: Command level supported by queue manager.
     - name: mqia_configuration_event
       type: long
-      description:
+      description: Controls whether configuration events are generated.
     - name: mqia_def_cluster_xmit_q_type
       type: long
       description: The DefClusterXmitQueueType attribute controls which transmission queue is selected by default by cluster-sender channels to get messages from, to send the messages to cluster-receiver channels.
@@ -206,16 +206,16 @@
       description: Maximum number of uncommitted messages within a unit of work.
     - name: mqia_media_image_interval
       type: long
-      description: Controls whether local error events are generated.
+      description:
     - name: mqia_media_image_log_length
       type: long
-      description: Controls whether local error events are generated.
+      description:
     - name: mqia_media_image_recover_obj
       type: long
-      description: Controls whether local error events are generated.
+      description:
     - name: mqia_media_image_recover_q
       type: long
-      description: Controls whether local error events are generated.
+      description:
     - name: mqia_media_image_recover_q
       type: long
       description:
@@ -224,7 +224,7 @@
       description:
     - name: mqia_monitoring_channel
       type: long
-      description:
+      description: Default setting for online monitoring for channels.
     - name: mqia_monitoring_q
       type: long
       description:
@@ -239,7 +239,7 @@
       description: Platform on which the queue manager resides.
     - name: mqia_prot_policy_capability
       type: long
-      description:
+      description: If the IBM MQ AMS component is installed for the version of IBM MQ that the queue manager is running under.
     - name: mqia_pubsub_cluster
       type: long
       description: Controls whether the queue manager participates in publish/subscribe clustering.
@@ -272,7 +272,7 @@
       description: Controls whether only FIPS-certified algorithms are to be used if cryptography is executed in IBM MQ itself.
     - name: mqia_ssl_reset_count
       type: long
-      description:
+      description: The number of unencrypted bytes that initiating SSL channel MCAs send or receive before renegotiating the secret key.
     - name: mqia_start_stop_event
       type: long
       description: Controls whether start and stop events are generated.
@@ -281,7 +281,7 @@
       description:
     - name: mqia_statistics_channel
       type: long
-      description:
+      description: Specifies whether statistics data is to be collected for channels.
     - name: mqia_statistics_interval
       type: long
       description: The time interval, in seconds, at which statistics monitoring data is written to the monitoring queue.
@@ -329,7 +329,7 @@
       description:
     - name: mqiacf_connection_count
       type: long
-      description:
+      description: The current number of connections to the queue manager.
     - name: mqiacf_ldap_connection_status
       type: long
       description:
