@@ -138,7 +138,7 @@ func TestIngest(t *testing.T) {
 	}
 
 	params := map[string]string{"refresh": "true"}
-	_, resp, err = client.Ingest(index, "test", pipeline, "1", params, obj{
+	_, resp, err = client.Ingest(index, "", pipeline, "1", params, obj{
 		"testfield": "TEST",
 	})
 	if err != nil {
@@ -149,7 +149,7 @@ func TestIngest(t *testing.T) {
 	}
 
 	// get _source field from indexed document
-	_, docBody, err := client.apiCall("GET", index, "test", "1/_source", "", nil, nil)
+	_, docBody, err := client.apiCall("GET", index, "", "1/_source", "", nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
