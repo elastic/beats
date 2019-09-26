@@ -3,3 +3,99 @@
   description: >
     Fields for azure Activity logs.
   fields:
+    - name: identity
+      type: group
+      description: >
+        The canonical user ID of the owner of the source bucket.
+      fields:
+        - name: claims.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Claims
+        - name: authorization
+          type: group
+          description: >
+            Node allocatable pods
+          fields:
+            - name: evidence
+              type: group
+              description: >
+                Node allocatable pods
+              fields:
+                - name: roleAssignmentScope
+                  type: keyword
+                  description: >
+                    Role assignment scope
+                - name: roleDefinitionId
+                  type: keyword
+                  description: >
+                    Role definition ID
+                - name: role
+                  type: keyword
+                  description: >
+                    Role
+                - name: roleAssignmentId
+                  type: keyword
+                  description: >
+                    Role assignment ID
+                - name: principalId
+                  type: keyword
+                  description: >
+                    Principal ID
+                - name: principalType
+                  type: keyword
+                  description: >
+                    Principal type
+        - name: scope
+          type: keyword
+          description: >
+            Scope
+        - name: action
+          type: keyword
+          description: >
+            Action
+    - name: correlationId
+      type: keyword
+      description: >
+        Correlation ID
+    - name: resultType
+      type: keyword
+      description: >
+        Result Type
+    - name: callerIpAddress
+      type: keyword
+      description: >
+        Caller Ip address
+    - name: resourceID
+      type: keyword
+      description: >
+        Resource ID
+    - name: level
+      type: keyword
+      description: >
+        Level
+    - name: operationName
+      type: keyword
+      description: >
+        Operation name
+    - name: resultSignature
+      type: keyword
+      description: >
+        Result signature
+    - name: properties.*
+      type: object
+      object_type: keyword
+      object_type_mapping_type: "*"
+      description: >
+        Properties
+    - name: location
+      type: keyword
+      description: >
+        Location
+    - name: category
+      type: keyword
+      description: >
+        Category
+

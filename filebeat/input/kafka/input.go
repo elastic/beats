@@ -19,6 +19,7 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -46,7 +47,7 @@ func init() {
 
 // Input contains the input and its config
 type kafkaInput struct {
-	config          KafkaInputConfig
+	config          kafkaInputConfig
 	saramaConfig    *sarama.Config
 	context         input.Context
 	outlet          channel.Outleter
@@ -104,9 +105,11 @@ func NewInput(
 func (input *kafkaInput) runConsumerGroup(
 	context context.Context, consumerGroup sarama.ConsumerGroup,
 ) {
+
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
+		logType: input.config.AzureLogs,
 	}
 
 	input.saramaWaitGroup.Add(1)
@@ -234,6 +237,7 @@ type groupHandler struct {
 	version kafka.Version
 	session sarama.ConsumerGroupSession
 	outlet  channel.Outleter
+	logType string
 }
 
 // The metadata attached to incoming events so they can be ACKed once they've
@@ -247,7 +251,7 @@ func (h *groupHandler) createEvent(
 	sess sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
-) beat.Event {
+) []beat.Event {
 	timestamp := time.Now()
 	kafkaFields := common.MapStr{
 		"topic":     claim.Topic(),
@@ -266,19 +270,27 @@ func (h *groupHandler) createEvent(
 	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
 		kafkaFields["headers"] = arrayForKafkaHeaders(message.Headers)
 	}
-	event := beat.Event{
-		Timestamp: timestamp,
-		Fields: common.MapStr{
-			"message": string(message.Value),
-			"kafka":   kafkaFields,
-		},
-		Private: eventMeta{
-			handler: h,
-			message: message,
-		},
-	}
 
-	return event
+	// if azure input, then a check for the message is done regarding the list of events
+
+	var events []beat.Event
+	messages := h.parseMultipleMessages(message.Value)
+	for _, msg := range messages {
+		event := beat.Event{
+			Timestamp: timestamp,
+			Fields: common.MapStr{
+				"message": msg,
+				"kafka":   kafkaFields,
+			},
+			Private: eventMeta{
+				handler: h,
+				message: message,
+			},
+		}
+		events = append(events, event)
+
+	}
+	return events
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -307,8 +319,36 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 
 func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		event := h.createEvent(sess, claim, msg)
-		h.outlet.OnEvent(event)
+		events := h.createEvent(sess, claim, msg)
+		for _, event := range events {
+			h.outlet.OnEvent(event)
+		}
+	}
+	return nil
+}
+
+func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
+	var messages []string
+	// check if logType has been set
+	switch h.logType {
+	// if no log type has been set then the original message should be returned
+	case "":
+	default:
+		return []string{string(bMessage)}
+	case ActivityLogs:
+		// if the fileset is activity logs a filtering of the messages should be done as the eventhub can return different types of messages
+		var obj AzureActivityLogs
+		err := json.Unmarshal(bMessage, &obj)
+		if err != nil {
+			return nil
+		}
+		for _, ms := range obj.Records {
+			js, err := json.Marshal(ms)
+			if err == nil {
+				messages = append(messages, string(js))
+			}
+		}
+		return messages
 	}
 	return nil
 }

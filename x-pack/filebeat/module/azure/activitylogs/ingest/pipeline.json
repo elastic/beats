@@ -1,12 +1,29 @@
 {
   "description": "Pipeline for parsing azure activity logs.",
   "processors": [
-    {
-      "remove": {
-        "field":"message",
-        "ignore_missing": true
+      {
+          "date": {
+              "field": "time",
+              "target_field": "@timestamp",
+              "ignore_failure": false,
+              "formats": [
+                  "ISO8601"
+              ]
+          }
+      },
+      {
+          "rename": {
+              "field": "resourceId",
+              "target_field": "resourceID",
+              "ignore_missing": true
+          }
+      },
+      {
+          "remove": {
+              "field": ["message", "time"],
+              "ignore_missing": true
+          }
       }
-    }
   ],
   "on_failure": [
   {
