@@ -29,8 +29,6 @@ const (
 func init() {
 	common.RegisterCheckDeps(Update)
 
-	setEnvs()
-
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
 }
@@ -39,17 +37,6 @@ func init() {
 // to having common testing targets.
 var Aliases = map[string]interface{}{
 	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
-}
-
-func setEnvs() {
-	wd, _ := os.Getwd()
-	mqInstallationPath := fmt.Sprintf("%v/module/ibmmq/ibmqlib", wd)
-
-	lib64 := fmt.Sprintf("-L%v/lib64 -Wl,-rpath,%v/lib64", mqInstallationPath, mqInstallationPath)
-	inc := fmt.Sprintf("-I%v/inc", mqInstallationPath)
-	os.Setenv("CGO_LDFLAGS", lib64)
-	os.Setenv("CGO_CFLAGS", inc)
-	os.Setenv("CGO_LDFLAGS_ALLOW", "-Wl,-rpath.*")
 }
 
 // Build builds the Beat binary.
