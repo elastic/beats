@@ -11,7 +11,7 @@
 
 
 // These attributes are used to resolve short descriptions
-tag::attributes[]
+// tag::attributes[]
 
 :global-flags: Also see <<global-flags,Global flags>>.
 
@@ -54,7 +54,7 @@ endif::[]
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
 
-end::attributes[]
+// end::attributes[]
 
 [[command-line-options]]
 === {beatname_uc} command reference
