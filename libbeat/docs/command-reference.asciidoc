@@ -11,6 +11,7 @@
 
 
 // These attributes are used to resolve short descriptions
+// tag::attributes[]
 
 :global-flags: Also see <<global-flags,Global flags>>.
 
@@ -52,6 +53,8 @@ endif::[]
 :update-command-short-desc: Updates the specified function
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
+
+// end::attributes[]
 
 [[command-line-options]]
 === {beatname_uc} command reference
@@ -634,7 +637,7 @@ endif::[]
 If index lifecycle management is enabled it also ensures that the defined ILM policy
 and write alias are connected to the indices matching the index template.
 The ILM policy takes care of the lifecycle of an index, when to do a rollover,
-when to move an index from the hot phase to the next phase etc.
+when to move an index from the hot phase to the next phase, etc.
 
 ifndef::no_dashboards[]
 * The {kib} dashboards make it easier for you to visualize {beatname_uc} data
@@ -646,11 +649,12 @@ ifdef::has_ml_jobs[]
 necessary to analyze data for anomalies.
 endif::[]
 
-Use this command if you want to set up the environment without actually running
+This command sets up the environment without actually running
 {beatname_uc} and ingesting data.
 
 *SYNOPSIS*
 
+// tag::setup-command-tag[]
 ["source","sh",subs="attributes"]
 ----
 {beatname_lc} setup [FLAGS]
@@ -691,6 +695,11 @@ endif::[]
 Sets up components related to Elasticsearch index management including
 template, ILM policy, and write alias (if supported and configured).
 
+ifdef::apm-server[]
+*`--pipelines`*::
+Registers the <<configuring-ingest-node,pipeline>> definitions set in `ingest/pipeline/definition.json`.
+endif::apm-server[]
+
 *`--template`*::
 deprecated:[7.2]
 Sets up the index template only.
@@ -729,6 +738,8 @@ ifndef::no_dashboards[]
 {beatname_lc} setup --index-management
 -----
 endif::no_dashboards[]
+
+ifndef::apm-server[]
 ifdef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
@@ -736,8 +747,18 @@ ifdef::no_dashboards[]
 {beatname_lc} setup --index-management
 -----
 endif::no_dashboards[]
+endif::apm-server[]
+
+ifdef::apm-server[]
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} setup --index-management
+{beatname_lc} setup --pipelines
+-----
+endif::apm-server[]
 
 endif::[]
+// end::setup-command-tag[]
 
 [[test-command]]
 ==== `test` command
