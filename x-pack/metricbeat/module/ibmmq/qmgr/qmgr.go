@@ -5,6 +5,8 @@
 package qmgr
 
 import (
+	"fmt"
+	"github.com/elastic/beats/libbeat/logp"
 	"os"
 	"plugin"
 	"encoding/json"
@@ -26,17 +28,6 @@ var (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	p, err := plugin.Open(os.Getenv("IBM_LIBRARY_PATH"))
-	if err != nil {
-		return
-	}
-
-	collectQmgrMetricset, err := p.Lookup("CollectQmgrMetricset")
-	if err != nil {
-		panic(err)
-	}
-	CollectQmgrMetricset = collectQmgrMetricset.(func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error))
-
 	mb.Registry.MustAddMetricSet("ibmmq", "qmgr", New)
 }
 
@@ -54,6 +45,20 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The ibmmq qmgr metricset is experimental.")
+
+	p, err := plugin.Open(os.Getenv("IBM_LIBRARY_PATH"))
+	if err != nil {
+		msg := fmt.Sprintf("Could not load IBM_LIBRARY_PATH: %v", err)
+		logp.Debug("ibm_module", msg)
+		return nil, err
+	}
+
+	collectQmgrMetricset, err := p.Lookup("CollectQmgrMetricset")
+	if err != nil {
+		panic(err)
+	}
+	CollectQmgrMetricset = collectQmgrMetricset.(func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error))
+
 
 	config := ibmmq.DefaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
