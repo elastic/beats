@@ -24,3 +24,20 @@ go build  (or mage build)
 ./metricbeat modules enable ibmmq
 ./metricbeat -e -d "*"
 ```
+
+=== How to use module on Linux
+First download the IBM client library. This is a dynamically loaded library:
+```
+https://github.com/ChrsMark/ibm_client_plugin/raw/master/ibmqlib_linux.so
+```
+Then set the IBM_LIBRARY_PATH variable to point to the downloaded file:
+```
+export IBM_LIBRARY_PATH=~/Downloads/ibmqlib_darwin.so
+```
+Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
+from IBM MQ:
+```
+go build  (or mage build)
+./metricbeat modules enable ibmmq
+./metricbeat -e -d "*"
+```
