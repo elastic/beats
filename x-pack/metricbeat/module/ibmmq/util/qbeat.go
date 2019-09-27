@@ -23,6 +23,7 @@ type RequestObject struct {
 	}
 }
 
+// ConnectionConfig contains the configuration to connect to MQ
 type ConnectionConfig ibmmq.ConnectionConfig
 
 var (

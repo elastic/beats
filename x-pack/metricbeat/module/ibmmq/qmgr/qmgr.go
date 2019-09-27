@@ -17,6 +17,7 @@ import (
 )
 
 var (
+	// CollectQmgrMetricset collects Metrics from IBM MQ server using the dynamically loaded plugin.
 	CollectQmgrMetricset func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error)
 )
 
