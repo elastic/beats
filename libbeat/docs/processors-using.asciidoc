@@ -995,7 +995,7 @@ The `decompress_gzip_field` processor has the following configuration settings:
 `ignore_missing`:: (Optional) If set to true, no error is logged in case a key
 which should be base64 decoded is missing. Default is `false`.
 
-`fail_on_error`:: (Optional) If set to true, in case of an error the base6 4decode
+`fail_on_error`:: (Optional) If set to true, in case of an error the base64 decode
 of fields is stopped and the original event is returned. If set to false, decoding
 continues also if an error happened during decoding. Default is `true`.
 
