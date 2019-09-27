@@ -5,12 +5,14 @@
 package util
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/metricbeat/module/ibmmq"
 )
 
 //RequestObject contains the object for requesting data at IBM MQ
@@ -21,36 +23,7 @@ type RequestObject struct {
 	}
 }
 
-//Config contains all configuration objects
-type Config struct {
-	QueueManager       string           `config:"bindingQueueManager"`
-	RemoteQueueManager []string         `config:"targetQueueManager"`
-	QMgrStat           bool             `config:"queueManagerStatus"`
-	PubSub             bool             `config:"pubSub"`
-	ConnectionConfig   ConnectionConfig `config:"cc"`
-}
-
-//ConnectionConfig contains the configuration to connect to MQ
-type ConnectionConfig struct {
-	ClientMode bool   `config:"clientMode"`
-	MqServer   string `config:"mqServer"`
-	UserID     string `config:"user"`
-	Password   string `config:"password"`
-}
-
-var (
-	//DefaultConfig contains the default configuration for this module
-	DefaultConfig = Config{
-		PubSub:             false,
-		QMgrStat:           true,
-		RemoteQueueManager: []string{""},
-		ConnectionConfig: ConnectionConfig{
-			ClientMode: false,
-			UserID:     "",
-			Password:   "",
-		},
-	}
-)
+type ConnectionConfig ibmmq.ConnectionConfig
 
 var (
 	first      = true
@@ -220,12 +193,19 @@ func generateConnectedObjectsField(events []beat.Event) []beat.Event {
 	return events
 }
 
+func unPackInterfaceToConnectionConfig(data []byte) ConnectionConfig{
+	var connectionConfig ConnectionConfig
+	json.Unmarshal(data, &connectionConfig)
+	return connectionConfig
+}
+
 //CollectQmgrMetricset is responsible for collecting data from Queue Manager
-func CollectQmgrMetricset(eventType string, qmgrName string, cc ConnectionConfig) ([]beat.Event, error) {
+func CollectQmgrMetricset(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error) {
 	//Collect queue statistics
 	var err error
 	var events []beat.Event
 
+	cc := unPackInterfaceToConnectionConfig(ccPacked)
 	err = connectLegacyMode(qmgrName, cc)
 	if err != nil {
 		logp.Err("error establishing connection: %v", err)

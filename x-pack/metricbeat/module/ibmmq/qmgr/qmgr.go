@@ -5,9 +5,19 @@
 package qmgr
 
 import (
+	"os"
+	"plugin"
+	"encoding/json"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/ibmmq/util"
+	"github.com/elastic/beats/x-pack/metricbeat/module/ibmmq"
+)
+
+var (
+	CollectQmgrMetricset func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error)
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -15,6 +25,17 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
+	p, err := plugin.Open(os.Getenv("IBM_LIBRARY_PATH"))
+	if err != nil {
+		return
+	}
+
+	collectQmgrMetricset, err := p.Lookup("CollectQmgrMetricset")
+	if err != nil {
+		panic(err)
+	}
+	CollectQmgrMetricset = collectQmgrMetricset.(func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error))
+
 	mb.Registry.MustAddMetricSet("ibmmq", "qmgr", New)
 }
 
@@ -25,7 +46,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	queueManager     string
-	connectionConfig util.ConnectionConfig
+	connectionConfig ibmmq.ConnectionConfig
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -33,7 +54,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The ibmmq qmgr metricset is experimental.")
 
-	config := util.DefaultConfig
+	config := ibmmq.DefaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -50,7 +71,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
-	events, _ := util.CollectQmgrMetricset("QueueManager", m.queueManager, m.connectionConfig)
+	configData, err := json.Marshal(m.connectionConfig)
+	if err!=nil {
+		panic(err)
+	}
+	events, _ := CollectQmgrMetricset("QueueManager", m.queueManager, configData)
 
 	for _, beatEvent := range events {
 		var mbEvent mb.Event
