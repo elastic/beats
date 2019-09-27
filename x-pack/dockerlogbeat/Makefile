@@ -10,10 +10,9 @@ all: build install
 
 .PHONY: build
 build: clean
-	-mkdir vendor/github.com/elastic/beats
-	git archive --remote ${GOPATH}/src/github.com/elastic/beats/ HEAD | tar -x --exclude=x-pack -C vendor/github.com/elastic/beats
-	docker build --target builder -t rootfsimage-build .
-	docker build --target final -t rootfsimage .
+	cd ../.. ; \
+	docker build --target builder -t rootfsimage-build -f x-pack/dockerlogbeat/Dockerfile . ; \
+	docker build --target final -t rootfsimage -f x-pack/dockerlogbeat/Dockerfile . 
 	mkdir rootfs
 	docker create --name ${CONTAINER_NAME} rootfsimage true
 	docker export ${CONTAINER_NAME} | tar -x -C rootfs; \
@@ -29,5 +28,6 @@ install:
 .PHONY: clean
 clean:
 	rm -rf rootfs
+	rm -rf vendor/github.com/elastic/beats
 	-docker plugin disable ${DOCKER_PLUGIN}
 	-docker plugin rm ${DOCKER_PLUGIN}
