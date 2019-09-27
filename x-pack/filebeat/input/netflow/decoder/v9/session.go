@@ -14,22 +14,28 @@ import (
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
 )
 
+// SessionKey is the key used to lookup sessions: exporter address + port
+// + source ID.
 type SessionKey struct {
 	Addr     string
 	SourceID uint32
 }
 
+// MakeSessionKey returns a session key.
 func MakeSessionKey(addr net.Addr, sourceID uint32) SessionKey {
 	return SessionKey{addr.String(), sourceID}
 }
 
+// TemplateKey is the type of key used to lookup templates.
 type TemplateKey uint16
 
+// TemplateWrapper wraps a template with an expiration flag.
 type TemplateWrapper struct {
 	Template *template.Template
 	Delete   atomic.Bool
 }
 
+// SessionState holds the state for a single session (observation domain).
 type SessionState struct {
 	mutex        sync.RWMutex
 	Templates    map[TemplateKey]*TemplateWrapper
@@ -38,6 +44,7 @@ type SessionState struct {
 	Delete       atomic.Bool
 }
 
+// NewSession creates a new session.
 func NewSession(logger *log.Logger) *SessionState {
 	return &SessionState{
 		logger:    logger,
@@ -45,6 +52,7 @@ func NewSession(logger *log.Logger) *SessionState {
 	}
 }
 
+// AddTemplate adds the passed template.
 func (s *SessionState) AddTemplate(t *template.Template) {
 	s.logger.Printf("state %p addTemplate %d %p", s, t.ID, t)
 	s.mutex.Lock()
@@ -52,6 +60,7 @@ func (s *SessionState) AddTemplate(t *template.Template) {
 	s.Templates[TemplateKey(t.ID)] = &TemplateWrapper{Template: t}
 }
 
+// GetTemplate returns a template by ID.
 func (s *SessionState) GetTemplate(id uint16) (template *template.Template) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -63,6 +72,8 @@ func (s *SessionState) GetTemplate(id uint16) (template *template.Template) {
 	return template
 }
 
+// ExpireTemplates will remove those templates that have not been used
+// since the last call to ExpireTemplates.
 func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 	var toDelete []TemplateKey
 	s.mutex.RLock()
@@ -88,6 +99,8 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 	return total - removed, removed
 }
 
+// CheckReset returns if the session must be reset after the receipt of the
+// given sequence number.
 func (s *SessionState) CheckReset(seqNum uint32) (reset bool) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -98,12 +111,14 @@ func (s *SessionState) CheckReset(seqNum uint32) (reset bool) {
 	return
 }
 
+// SessionMap manages all the sessions for a collector.
 type SessionMap struct {
 	mutex    sync.RWMutex
 	Sessions map[SessionKey]*SessionState
 	logger   *log.Logger
 }
 
+// NewSessionMap returns a new SessionMap.
 func NewSessionMap(logger *log.Logger) SessionMap {
 	return SessionMap{
 		logger:   logger,
@@ -111,6 +126,8 @@ func NewSessionMap(logger *log.Logger) SessionMap {
 	}
 }
 
+// GetOrCreate looks up the given session key and returns an existing session
+// or creates a new one.
 func (m *SessionMap) GetOrCreate(key SessionKey) *SessionState {
 	m.mutex.RLock()
 	session, found := m.Sessions[key]
@@ -156,6 +173,8 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 	return total - removedSession, removedSession, aliveTemplates, removedTemplates
 }
 
+// CleanupLoop will expire the sessions that have been inactive for the given
+// interval.
 func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}) {
 	t := time.NewTicker(interval)
 	defer t.Stop()
