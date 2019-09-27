@@ -529,9 +529,9 @@ network. This option is useful only for testing {beatname_uc}.
 endif::[]
 
 *`-N, --N`*:: Disables publishing for testing purposes.
-ifndef::only-elasticsearch[]
+ifndef::no_file_output[]
 This option disables all outputs except the <<file-output,File output>>.
-endif::only-elasticsearch[]
+endif::[]
 
 ifeval::["{beatname_lc}"=="packetbeat"]
 *`-O, --O`*::
