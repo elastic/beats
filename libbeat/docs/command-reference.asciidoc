@@ -529,9 +529,9 @@ network. This option is useful only for testing {beatname_uc}.
 endif::[]
 
 *`-N, --N`*:: Disables publishing for testing purposes.
-ifndef::only-elasticsearch[]
+ifndef::no_file_output[]
 This option disables all outputs except the <<file-output,File output>>.
-endif::only-elasticsearch[]
+endif::[]
 
 ifeval::["{beatname_lc}"=="packetbeat"]
 *`-O, --O`*::
@@ -654,7 +654,7 @@ This command sets up the environment without actually running
 
 *SYNOPSIS*
 
-tag::setup-command-tag[]
+// tag::setup-command-tag[]
 ["source","sh",subs="attributes"]
 ----
 {beatname_lc} setup [FLAGS]
@@ -758,7 +758,7 @@ ifdef::apm-server[]
 endif::apm-server[]
 
 endif::[]
-end::setup-command-tag[]
+// end::setup-command-tag[]
 
 [[test-command]]
 ==== `test` command

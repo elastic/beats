@@ -1,6 +1,6 @@
 = Functionbeat Reference
 
-:libbeat-dir: ../../../libbeat
+:libbeat-dir: {docdir}/../../../libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
 
@@ -16,7 +16,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_ml_jobs: no
 :libbeat-docs: Beats Platform Reference
 :cloudformation-ref: https://aws.amazon.com/cloudformation/[AWS CloudFormation]
-:only-elasticsearch:
+:no_file_output:
 :has_xpack:
 :serverless:
 :mac_os:
