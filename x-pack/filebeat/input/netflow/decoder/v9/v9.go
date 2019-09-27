@@ -45,7 +45,7 @@ func New(config config.Config) protocol.Protocol {
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {
 	return &NetflowV9Protocol{
 		decoder:     decoder,
-		Session:     NewSessionMap(),
+		Session:     NewSessionMap(logger),
 		logger:      logger,
 		timeout:     config.ExpirationTimeout(),
 		detectReset: config.SequenceResetEnabled(),
@@ -59,7 +59,7 @@ func (*NetflowV9Protocol) Version() uint16 {
 func (p *NetflowV9Protocol) Start() error {
 	p.done = make(chan struct{})
 	if p.timeout != time.Duration(0) {
-		go p.Session.CleanupLoop(p.timeout, p.done, p.logger)
+		go p.Session.CleanupLoop(p.timeout, p.done)
 	}
 	return nil
 }
@@ -82,6 +82,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	session := p.Session.GetOrCreate(MakeSessionKey(source))
 	remote := source.String()
 
+	p.logger.Printf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
 	if p.detectReset && session.CheckReset(header.SequenceNo) {
 		p.logger.Printf("Session %s reset (sequence=%d last=%d)", remote, header.SequenceNo, session.lastSequence)
 	}
@@ -124,6 +125,7 @@ func (p *NetflowV9Protocol) parseSet(
 		if template := session.GetTemplate(sourceID, setID); template != nil {
 			return template.Apply(buf, 0)
 		}
+		p.logger.Printf("No template for ID %d:%d", sourceID, setID)
 		return nil, nil
 	}
 
@@ -134,6 +136,7 @@ func (p *NetflowV9Protocol) parseSet(
 	}
 	for _, template := range templates {
 		session.AddTemplate(sourceID, template)
+		p.logger.Printf("add template %d:%d", sourceID, template.ID)
 	}
 	return flows, nil
 }

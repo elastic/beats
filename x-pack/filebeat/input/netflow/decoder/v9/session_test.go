@@ -17,14 +17,15 @@ import (
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/test"
 )
 
+var logger = log.New(ioutil.Discard, "", 0)
+
 func makeSessionKey(t testing.TB, ipPortPair string) SessionKey {
 	return MakeSessionKey(test.MakeAddress(t, ipPortPair))
 }
 
 func TestSessionMap_GetOrCreate(t *testing.T) {
-
 	t.Run("consistent behavior", func(t *testing.T) {
-		sm := NewSessionMap()
+		sm := NewSessionMap(logger)
 
 		// Session is created
 		s1 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1234"))
@@ -52,7 +53,7 @@ func TestSessionMap_GetOrCreate(t *testing.T) {
 	})
 	t.Run("parallel", func(t *testing.T) {
 		// Goroutines should observe the same session when created in parallel
-		sm := NewSessionMap()
+		sm := NewSessionMap(logger)
 		key := makeSessionKey(t, "127.0.0.1:9995")
 		const N = 8
 		const Iters = 200
@@ -95,15 +96,16 @@ func testTemplate(id uint16) *template.Template {
 
 func TestSessionState(t *testing.T) {
 	sourceID := uint32(1234)
+	logger := log.New(ioutil.Discard, "", 0)
 	t.Run("create and get", func(t *testing.T) {
-		s := NewSession()
+		s := NewSession(logger)
 		t1 := testTemplate(1)
 		s.AddTemplate(sourceID, t1)
 		t2 := s.GetTemplate(sourceID, 1)
 		assert.True(t, t1 == t2)
 	})
 	t.Run("update", func(t *testing.T) {
-		s := NewSession()
+		s := NewSession(logger)
 		t1 := testTemplate(1)
 		s.AddTemplate(sourceID, t1)
 
@@ -126,7 +128,7 @@ func TestSessionState(t *testing.T) {
 }
 
 func TestSessionMap_Cleanup(t *testing.T) {
-	sm := NewSessionMap()
+	sm := NewSessionMap(logger)
 
 	// Session is created
 	k1 := makeSessionKey(t, "127.0.0.1:1234")
@@ -173,12 +175,12 @@ func TestSessionMap_Cleanup(t *testing.T) {
 
 func TestSessionMap_CleanupLoop(t *testing.T) {
 	timeout := time.Millisecond * 100
-	sm := NewSessionMap()
+	sm := NewSessionMap(log.New(ioutil.Discard, "", 0))
 	key := makeSessionKey(t, "127.0.0.1:1")
 	s := sm.GetOrCreate(key)
 
 	done := make(chan struct{})
-	go sm.CleanupLoop(timeout, done, log.New(ioutil.Discard, "", 0))
+	go sm.CleanupLoop(timeout, done)
 
 	for found := true; found; {
 		sm.mutex.RLock()
@@ -195,7 +197,7 @@ func TestSessionMap_CleanupLoop(t *testing.T) {
 
 func TestTemplateExpiration(t *testing.T) {
 	var sourceID uint32 = 1234
-	s := NewSession()
+	s := NewSession(logger)
 	assert.Nil(t, s.GetTemplate(sourceID, 256))
 	assert.Nil(t, s.GetTemplate(sourceID, 257))
 	s.AddTemplate(sourceID, testTemplate(256))

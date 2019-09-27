@@ -34,17 +34,20 @@ type SessionState struct {
 	mutex        sync.RWMutex
 	Templates    map[TemplateKey]*TemplateWrapper
 	lastSequence uint32
+	logger       *log.Logger
 	Delete       atomic.Bool
 }
 
-func NewSession() *SessionState {
+func NewSession(logger *log.Logger) *SessionState {
 	return &SessionState{
+		logger:    logger,
 		Templates: make(map[TemplateKey]*TemplateWrapper),
 	}
 }
 
 func (s *SessionState) AddTemplate(sourceId uint32, t *template.Template) {
 	key := TemplateKey{sourceId, t.ID}
+	s.logger.Printf("state %p addTemplate %v %p", s, key, t)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	s.Templates[key] = &TemplateWrapper{Template: t}
@@ -77,6 +80,7 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 		total = len(s.Templates)
 		for _, id := range toDelete {
 			if template, found := s.Templates[id]; found && template.Delete.Load() {
+				s.logger.Printf("expired template %v", id)
 				delete(s.Templates, id)
 				removed++
 			}
@@ -99,10 +103,12 @@ func (s *SessionState) CheckReset(seqNum uint32) (reset bool) {
 type SessionMap struct {
 	mutex    sync.RWMutex
 	Sessions map[SessionKey]*SessionState
+	logger   *log.Logger
 }
 
-func NewSessionMap() SessionMap {
+func NewSessionMap(logger *log.Logger) SessionMap {
 	return SessionMap{
+		logger:   logger,
 		Sessions: make(map[SessionKey]*SessionState),
 	}
 }
@@ -117,7 +123,7 @@ func (m *SessionMap) GetOrCreate(key SessionKey) *SessionState {
 	if !found {
 		m.mutex.Lock()
 		if session, found = m.Sessions[key]; !found {
-			session = NewSession()
+			session = NewSession(m.logger)
 			m.Sessions[key] = session
 		}
 		m.mutex.Unlock()
@@ -152,7 +158,7 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 	return total - removedSession, removedSession, aliveTemplates, removedTemplates
 }
 
-func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}, logger *log.Logger) {
+func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}) {
 	t := time.NewTicker(interval)
 	defer t.Stop()
 	for {
@@ -164,7 +170,7 @@ func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}, l
 			aliveS, removedS, aliveT, removedT := m.cleanup()
 			m.cleanup()
 			if removedS > 0 || removedT > 0 {
-				logger.Printf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
+				m.logger.Printf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
 			}
 		}
 	}
