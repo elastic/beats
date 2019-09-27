@@ -10,20 +10,20 @@
 //// Make sure this content appears below a level 2 heading.
 //////////////////////////////////////////////////////////////////////////
 
+// tag::shared-outputconfig[]
+
 [[configuring-output]]
 == Configure the output
 
-ifdef::only-elasticsearch[]
-You configure {beatname_uc} to write to Elasticsearch by setting options
-in the `output.elasticsearch` section of the +{beatname_lc}.yml+ config file
-endif::[]
-
-ifndef::only-elasticsearch[]
 You configure {beatname_uc} to write to a specific output by setting options
 in the Outputs section of the +{beatname_lc}.yml+ config file. Only a single
 output may be defined.
 
-The following topics describe how to configure each supported output:
+The following topics describe how to configure each supported output. If you've
+secured the {stack}, also read <<securing-{beatname_lc}>> for more about
+security-related configuration options.
+
+// end::shared-outputconfig[]
 
 * <<elasticsearch-output>>
 * <<logstash-output>>
@@ -35,20 +35,11 @@ endif::[]
 * <<console-output>>
 * <<configure-cloud-id>>
 
-If you've secured the {stack}, also read <<securing-{beatname_lc}>> for more about
-security-related configuration options.
-
-endif::[]
-
 ifdef::beat-specific-output-config[]
 include::{beat-specific-output-config}[]
 endif::[]
 
 include::outputs/output-elasticsearch.asciidoc[]
-
-//begin outer exclude for ls, kafka, redis, file, and console
-
-ifndef::only-elasticsearch[]
 
 include::outputs/output-logstash.asciidoc[]
 
@@ -60,16 +51,6 @@ include::outputs/output-file.asciidoc[]
 
 include::outputs/output-console.asciidoc[]
 
-//end outer exclude for ls, kafka, redis, file, and console
-endif::[]
-
 include::outputs/output-cloud.asciidoc[]
 
-//begin exclude for output codec
-ifndef::only-elasticsearch[]
-
 include::outputs/change-output-codec.asciidoc[]
-
-//end exclude for output codec
-endif::[]
-
