@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -124,11 +125,11 @@ func (l *ESLoader) templateExists(templateName string) bool {
 	if l.client == nil {
 		return false
 	}
-	status, _, _ := l.client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
-	if status != http.StatusOK {
-		return false
+	status, body, _ := l.client.Request("GET", "/_cat/templates/"+templateName, "", nil, nil)
+	if status == http.StatusOK && strings.Contains(string(body), templateName) {
+		return true
 	}
-	return true
+	return false
 }
 
 // Load reads the template from the config, creates the template body and prints it to the configured file.
