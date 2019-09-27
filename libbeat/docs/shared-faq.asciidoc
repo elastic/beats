@@ -32,7 +32,7 @@ paths in single quotation marks (see <<wrap-paths-in-quotes>>).
 
 Also see the general advice under <<yaml-tips>>.
 
-ifndef::only-elasticsearch[]
+ifndef::no_logstash_output[]
 [[connection-problem]]
 === {ls} connection doesn't work
 
@@ -52,9 +52,9 @@ telnet <hostname or IP> 5044
 input plugin for {ls}] is installed and configured. Note that Beats will not
 connect to the Lumberjack input plugin. To learn how to install and update
 plugins, see {logstash-ref}/working-with-plugins.html[Working with plugins].
-endif::only-elasticsearch[]
+endif::[]
 
-ifndef::only-elasticsearch[]
+ifndef::no_logstash_output[]
 [[metadata-missing]]
 === @metadata is missing in {ls}
 
@@ -63,9 +63,9 @@ queue (for example, Redis or Kafka), the `@metadata` field will not be available
 
 TIP: To preserve `@metadata` fields, use the {ls} mutate filter with the rename setting to rename the fields to
 non-internal fields.
-endif::only-elasticsearch[]
+endif::[]
 
-ifndef::only-elasticsearch[]
+ifndef::no_logstash_output[]
 [[diff-logstash-beats]]
 === Not sure whether to use {ls} or Beats
 
@@ -77,9 +77,9 @@ and transforming data from a variety of sources.
 
 For more information, see the https://www.elastic.co/guide/en/logstash/current/introduction.html[{ls} Introduction] and
 the https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html[Beats Overview].
-endif::only-elasticsearch[]
+endif::[]
 
-ifndef::only-elasticsearch[]
+ifndef::no_logstash_output[]
 [[ssl-client-fails]]
 === SSL client fails to connect to {ls}
 
@@ -138,7 +138,7 @@ This is not a SSL problem. Make sure that {ls} is running and that there is no f
 
 A firewall is refusing the connection. Check if a firewall is blocking the traffic on the client, the network, or the
 destination host.
-endif::only-elasticsearch[]
+endif::no_logstash_output[]
 
 [[monitoring-shows-fewer-than-expected-beats]]
 === Monitoring UI shows fewer Beats than expected

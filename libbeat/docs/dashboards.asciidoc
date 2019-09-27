@@ -36,10 +36,10 @@ for your system. The command shown here loads the dashboards from the {beatname_
 package. For more options, such as loading customized dashboards, see
 {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards] in
 the _Beats Developer Guide_.
-ifndef::only-elasticsearch[]
+ifndef::no_logstash_output[]
 If you've configured the Logstash output, see
 <<load-dashboards-logstash>>.
-endif::only-elasticsearch[]
+endif::[]
 
 ifdef::requires-sudo[]
 include::../../libbeat/docs/shared-note-sudo.asciidoc[]
@@ -105,7 +105,7 @@ PS > .{backslash}{beatname_lc}.exe setup --dashboards
 ----------------------------------------------------------------------
 endif::win_os[]
 
-ifndef::only-elasticsearch[]
+ifndef::no_logstash_output[]
 [[load-dashboards-logstash]]
 ==== Set up dashboards for Logstash output
 
@@ -208,5 +208,5 @@ PS > .{backslash}{beatname_lc}.exe setup -e `
 ----
 endif::win_os[]
 
-endif::only-elasticsearch[]
+endif::no_logstash_output[]
 

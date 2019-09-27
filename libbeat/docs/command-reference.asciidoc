@@ -529,7 +529,7 @@ network. This option is useful only for testing {beatname_uc}.
 endif::[]
 
 *`-N, --N`*:: Disables publishing for testing purposes.
-ifndef::no-file-output[]
+ifndef::no_file_output[]
 This option disables all outputs except the <<file-output,File output>>.
 endif::[]
 
