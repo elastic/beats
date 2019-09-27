@@ -1,5 +1,5 @@
 //begin inner exclude for redis
-ifndef::no-redis-output[]
+ifndef::no-output-redis[]
 [[redis-output]]
 === Configure the Redis output
 

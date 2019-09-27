@@ -49,7 +49,7 @@ monitoring:
 --------------------
 +
 If you
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 configured a different output, such as {ls} or you
 endif::[]
 want to send {beatname_uc} monitoring events to a separate {es} cluster

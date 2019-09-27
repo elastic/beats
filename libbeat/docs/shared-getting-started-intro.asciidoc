@@ -4,7 +4,7 @@ related products:
 
 * {es} for storing and indexing the data.
 * {kib} for the UI.
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 * {ls} (optional) for parsing and enhancing the data.
 endif::[]
 

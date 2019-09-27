@@ -36,7 +36,7 @@ for your system. The command shown here loads the dashboards from the {beatname_
 package. For more options, such as loading customized dashboards, see
 {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards] in
 the _Beats Developer Guide_.
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 If you've configured the Logstash output, see
 <<load-dashboards-logstash>>.
 endif::[]
@@ -105,7 +105,7 @@ PS > .{backslash}{beatname_lc}.exe setup --dashboards
 ----------------------------------------------------------------------
 endif::win_os[]
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 [[load-dashboards-logstash]]
 ==== Set up dashboards for Logstash output
 
@@ -208,5 +208,5 @@ PS > .{backslash}{beatname_lc}.exe setup -e `
 ----
 endif::win_os[]
 
-endif::no_logstash_output[]
+endif::no-output-logstash[]
 

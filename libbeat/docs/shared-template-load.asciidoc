@@ -10,7 +10,7 @@
 //// This content must be embedded underneath a level 3 heading.
 //////////////////////////////////////////////////////////////////////////
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is not Elasticsearch, you must
 <<load-template-manually,load the template manually>>. 
@@ -110,7 +110,7 @@ To load the template manually, run the <<setup-command,`setup`>> command. A
 connection to Elasticsearch is required.  If another output is enabled, you need
 to temporarily disable that output and enable Elasticsearch by using the `-E`
 option.
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 The examples here assume that Logstash output is enabled.
 endif::[]
 You can omit the `-E` flags if Elasticsearch output is already enabled.
@@ -130,11 +130,11 @@ ifdef::win_only[]
 To load the template:
 endif::win_only[]
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 :disable_logstash: {sp}-E output.logstash.enabled=false
 endif::[]
 
-ifdef::no_logstash_output[]
+ifdef::no-output-logstash[]
 :disable_logstash:
 endif::[]
 

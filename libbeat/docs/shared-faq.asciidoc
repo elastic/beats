@@ -32,7 +32,7 @@ paths in single quotation marks (see <<wrap-paths-in-quotes>>).
 
 Also see the general advice under <<yaml-tips>>.
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 [[connection-problem]]
 === {ls} connection doesn't work
 
@@ -54,7 +54,7 @@ connect to the Lumberjack input plugin. To learn how to install and update
 plugins, see {logstash-ref}/working-with-plugins.html[Working with plugins].
 endif::[]
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 [[metadata-missing]]
 === @metadata is missing in {ls}
 
@@ -65,7 +65,7 @@ TIP: To preserve `@metadata` fields, use the {ls} mutate filter with the rename 
 non-internal fields.
 endif::[]
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 [[diff-logstash-beats]]
 === Not sure whether to use {ls} or Beats
 
@@ -79,7 +79,7 @@ For more information, see the https://www.elastic.co/guide/en/logstash/current/i
 the https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html[Beats Overview].
 endif::[]
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 [[ssl-client-fails]]
 === SSL client fails to connect to {ls}
 
@@ -138,7 +138,7 @@ This is not a SSL problem. Make sure that {ls} is running and that there is no f
 
 A firewall is refusing the connection. Check if a firewall is blocking the traffic on the client, the network, or the
 destination host.
-endif::no_logstash_output[]
+endif::no-output-logstash[]
 
 [[monitoring-shows-fewer-than-expected-beats]]
 === Monitoring UI shows fewer Beats than expected

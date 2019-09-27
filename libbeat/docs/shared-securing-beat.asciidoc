@@ -12,7 +12,7 @@ ifdef::apm-server[]
 * <<secure-communication-agents>>
 endif::[]
 * <<securing-communication-elasticsearch>>
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 * <<configuring-ssl-logstash>>
 endif::[]
 * <<securing-beats>>
@@ -39,7 +39,7 @@ include::./https.asciidoc[]
 
 //sets block macro for shared-ssl-logstash-config.asciidoc included in next section
 
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 [[configuring-ssl-logstash]]
 == Secure communication with Logstash
 

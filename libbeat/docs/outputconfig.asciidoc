@@ -28,7 +28,7 @@ security-related configuration options.
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
-ifndef::no-redis-output[]
+ifndef::no-output-redis[]
 * <<redis-output>>
 endif::[]
 * <<file-output>>

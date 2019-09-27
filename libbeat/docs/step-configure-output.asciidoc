@@ -1,5 +1,5 @@
 ifndef::has_module_steps[]
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 . Configure the output. {beatname_uc} supports a variety of
 <<configuring-output,outputs>>, but typically you'll either send events directly
 to {es}, or to {ls} for additional processing.
@@ -8,7 +8,7 @@ To send output directly to {es} (without using {ls}), set the location of the
 {es} installation:
 +
 endif::[]
-ifdef::no_logstash_output[]
+ifdef::no-output-logstash[]
 . Configure the {es} output by setting the location of the {es} installation:
 +
 endif::[]
@@ -32,12 +32,12 @@ output.elasticsearch:
 ----------------------------------------------------------------------
 ifndef::has_module_steps[]
 +
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 To send output to {ls}, 
 <<logstash-output,Configure the {ls} output>> instead. For all other
 outputs, see <<configuring-output>>.
 endif::[]
-ifdef::only-elasticsearch[]
-{es} is currently the only output supported by {beatname_uc}.
+ifdef::no-output-logstash[]
+For more information, see <<configuring-output>>.
 endif::[]
 endif::has_module_steps[]

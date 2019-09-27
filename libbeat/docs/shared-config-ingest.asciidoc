@@ -15,7 +15,7 @@
 When you use Elasticsearch for output, you can configure {beatname_uc} to use
 {ref}/ingest.html[ingest node] to pre-process documents before the actual
 indexing takes place in Elasticsearch.
-ifndef::no_logstash_output[]
+ifndef::no-output-logstash[]
 Ingest node is a convenient processing option when you want to do some extra
 processing on your data, but you do not require the full power of Logstash.
 endif::[]
