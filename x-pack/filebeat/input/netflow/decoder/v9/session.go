@@ -14,16 +14,16 @@ import (
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
 )
 
-type SessionKey string
-
-func MakeSessionKey(addr net.Addr) SessionKey {
-	return SessionKey(addr.String())
+type SessionKey struct {
+	Addr     string
+	SourceID uint32
 }
 
-type TemplateKey struct {
-	SourceID   uint32
-	TemplateID uint16
+func MakeSessionKey(addr net.Addr, sourceID uint32) SessionKey {
+	return SessionKey{addr.String(), sourceID}
 }
+
+type TemplateKey uint16
 
 type TemplateWrapper struct {
 	Template *template.Template
@@ -45,19 +45,17 @@ func NewSession(logger *log.Logger) *SessionState {
 	}
 }
 
-func (s *SessionState) AddTemplate(sourceId uint32, t *template.Template) {
-	key := TemplateKey{sourceId, t.ID}
-	s.logger.Printf("state %p addTemplate %v %p", s, key, t)
+func (s *SessionState) AddTemplate(t *template.Template) {
+	s.logger.Printf("state %p addTemplate %d %p", s, t.ID, t)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	s.Templates[key] = &TemplateWrapper{Template: t}
+	s.Templates[TemplateKey(t.ID)] = &TemplateWrapper{Template: t}
 }
 
-func (s *SessionState) GetTemplate(sourceId uint32, id uint16) (template *template.Template) {
-	key := TemplateKey{sourceId, id}
+func (s *SessionState) GetTemplate(id uint16) (template *template.Template) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	wrapper, found := s.Templates[key]
+	wrapper, found := s.Templates[TemplateKey(id)]
 	if found {
 		template = wrapper.Template
 		wrapper.Delete.Store(false)

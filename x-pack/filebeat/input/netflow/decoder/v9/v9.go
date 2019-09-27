@@ -79,7 +79,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	}
 	buf = payload
 
-	session := p.Session.GetOrCreate(MakeSessionKey(source))
+	session := p.Session.GetOrCreate(MakeSessionKey(source, header.SourceID))
 	remote := source.String()
 
 	p.logger.Printf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
@@ -99,7 +99,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 		body := bytes.NewBuffer(buf.Next(set.BodyLength()))
 		p.logger.Printf("FlowSet ID %d length %d", set.SetID, set.BodyLength())
 
-		f, err := p.parseSet(set.SetID, session, header.SourceID, body)
+		f, err := p.parseSet(set.SetID, session, body)
 		if err != nil {
 			p.logger.Printf("Error parsing set %d: %v", set.SetID, err)
 			return nil, errors.Wrapf(err, "error parsing set")
@@ -117,15 +117,14 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 func (p *NetflowV9Protocol) parseSet(
 	setID uint16,
 	session *SessionState,
-	sourceID uint32,
 	buf *bytes.Buffer) (flows []record.Record, err error) {
 
 	if setID >= 256 {
 		// Flow of Options record, lookup template and generate flows
-		if template := session.GetTemplate(sourceID, setID); template != nil {
+		if template := session.GetTemplate(setID); template != nil {
 			return template.Apply(buf, 0)
 		}
-		p.logger.Printf("No template for ID %d:%d", sourceID, setID)
+		p.logger.Printf("No template for ID %d", setID)
 		return nil, nil
 	}
 
@@ -135,8 +134,7 @@ func (p *NetflowV9Protocol) parseSet(
 		return nil, err
 	}
 	for _, template := range templates {
-		session.AddTemplate(sourceID, template)
-		p.logger.Printf("add template %d:%d", sourceID, template.ID)
+		session.AddTemplate(template)
 	}
 	return flows, nil
 }

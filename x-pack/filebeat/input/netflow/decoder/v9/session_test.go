@@ -19,8 +19,8 @@ import (
 
 var logger = log.New(ioutil.Discard, "", 0)
 
-func makeSessionKey(t testing.TB, ipPortPair string) SessionKey {
-	return MakeSessionKey(test.MakeAddress(t, ipPortPair))
+func makeSessionKey(t testing.TB, ipPortPair string, domain uint32) SessionKey {
+	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain)
 }
 
 func TestSessionMap_GetOrCreate(t *testing.T) {
@@ -28,33 +28,39 @@ func TestSessionMap_GetOrCreate(t *testing.T) {
 		sm := NewSessionMap(logger)
 
 		// Session is created
-		s1 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1234"))
+		s1 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1234", 42))
 		assert.NotNil(t, s1)
 
 		// Get a different Session
-		s2 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1235"))
+		s2 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1235", 42))
 		assert.NotNil(t, s1)
 		assert.False(t, s1 == s2)
 
 		// Get a different Session for diff IP same port
-		s3 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.2:1234"))
+		s3 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.2:1234", 42))
 		assert.NotNil(t, s3)
 		assert.False(t, s1 == s3 || s2 == s3)
 
 		// Get a different Session for same IP diff port
-		s4 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1236"))
+		s4 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1236", 42))
 		assert.NotNil(t, s4)
 		assert.False(t, s1 == s4 || s2 == s4 || s3 == s4)
 
 		// Get same Session for same params
-		s1b := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1234"))
+		s1b := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1234", 42))
 		assert.NotNil(t, s1b)
 		assert.True(t, s1 == s1b)
+
+		// Get diff Session same source different observation domain
+		s2b := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1235", 43))
+		assert.NotNil(t, s2b)
+		assert.False(t, s2 == s2b)
+
 	})
 	t.Run("parallel", func(t *testing.T) {
 		// Goroutines should observe the same session when created in parallel
 		sm := NewSessionMap(logger)
-		key := makeSessionKey(t, "127.0.0.1:9995")
+		key := makeSessionKey(t, "127.0.0.1:9995", 42)
 		const N = 8
 		const Iters = 200
 		C := make(chan *SessionState, N*Iters)
@@ -95,33 +101,32 @@ func testTemplate(id uint16) *template.Template {
 }
 
 func TestSessionState(t *testing.T) {
-	sourceID := uint32(1234)
 	logger := log.New(ioutil.Discard, "", 0)
 	t.Run("create and get", func(t *testing.T) {
 		s := NewSession(logger)
 		t1 := testTemplate(1)
-		s.AddTemplate(sourceID, t1)
-		t2 := s.GetTemplate(sourceID, 1)
+		s.AddTemplate(t1)
+		t2 := s.GetTemplate(1)
 		assert.True(t, t1 == t2)
 	})
 	t.Run("update", func(t *testing.T) {
 		s := NewSession(logger)
 		t1 := testTemplate(1)
-		s.AddTemplate(sourceID, t1)
+		s.AddTemplate(t1)
 
 		t2 := testTemplate(2)
-		s.AddTemplate(sourceID, t2)
+		s.AddTemplate(t2)
 
-		t1c := s.GetTemplate(sourceID, 1)
+		t1c := s.GetTemplate(1)
 		assert.True(t, t1 == t1c)
 
-		t2c := s.GetTemplate(sourceID, 2)
+		t2c := s.GetTemplate(2)
 		assert.True(t, t2 == t2c)
 
 		t1b := testTemplate(1)
-		s.AddTemplate(sourceID, t1b)
+		s.AddTemplate(t1b)
 
-		t1c = s.GetTemplate(sourceID, 1)
+		t1c = s.GetTemplate(1)
 		assert.False(t, t1 == t1c)
 		assert.True(t, t1b == t1b)
 	})
@@ -131,7 +136,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 	sm := NewSessionMap(logger)
 
 	// Session is created
-	k1 := makeSessionKey(t, "127.0.0.1:1234")
+	k1 := makeSessionKey(t, "127.0.0.1:1234", 1)
 	s1 := sm.GetOrCreate(k1)
 	assert.NotNil(t, s1)
 
@@ -141,7 +146,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 	assert.Len(t, sm.Sessions, 1)
 
 	// Add new session
-	k2 := makeSessionKey(t, "127.0.0.1:1235")
+	k2 := makeSessionKey(t, "127.0.0.1:1234", 2)
 	s2 := sm.GetOrCreate(k2)
 	assert.NotNil(t, s2)
 	assert.Len(t, sm.Sessions, 2)
@@ -176,7 +181,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 func TestSessionMap_CleanupLoop(t *testing.T) {
 	timeout := time.Millisecond * 100
 	sm := NewSessionMap(log.New(ioutil.Discard, "", 0))
-	key := makeSessionKey(t, "127.0.0.1:1")
+	key := makeSessionKey(t, "127.0.0.1:1", 42)
 	s := sm.GetOrCreate(key)
 
 	done := make(chan struct{})
@@ -196,27 +201,26 @@ func TestSessionMap_CleanupLoop(t *testing.T) {
 }
 
 func TestTemplateExpiration(t *testing.T) {
-	var sourceID uint32 = 1234
 	s := NewSession(logger)
-	assert.Nil(t, s.GetTemplate(sourceID, 256))
-	assert.Nil(t, s.GetTemplate(sourceID, 257))
-	s.AddTemplate(sourceID, testTemplate(256))
-	s.AddTemplate(sourceID, testTemplate(257))
+	assert.Nil(t, s.GetTemplate(256))
+	assert.Nil(t, s.GetTemplate(257))
+	s.AddTemplate(testTemplate(256))
+	s.AddTemplate(testTemplate(257))
 
 	s.ExpireTemplates()
 
-	assert.NotNil(t, s.GetTemplate(sourceID, 256))
-	_, found := s.Templates[TemplateKey{sourceID, 257}]
+	assert.NotNil(t, s.GetTemplate(256))
+	_, found := s.Templates[TemplateKey(257)]
 	assert.True(t, found)
 
 	s.ExpireTemplates()
 
-	_, found = s.Templates[TemplateKey{sourceID, 256}]
+	_, found = s.Templates[TemplateKey(256)]
 	assert.True(t, found)
 
-	assert.Nil(t, s.GetTemplate(sourceID, 257))
+	assert.Nil(t, s.GetTemplate(257))
 
 	s.ExpireTemplates()
 
-	assert.Nil(t, s.GetTemplate(sourceID, 256))
+	assert.Nil(t, s.GetTemplate(256))
 }
