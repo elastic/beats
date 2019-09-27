@@ -168,7 +168,6 @@ func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}) {
 
 		case <-t.C:
 			aliveS, removedS, aliveT, removedT := m.cleanup()
-			m.cleanup()
 			if removedS > 0 || removedT > 0 {
 				m.logger.Printf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
 			}
