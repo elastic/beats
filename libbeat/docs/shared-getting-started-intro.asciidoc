@@ -4,9 +4,9 @@ related products:
 
 * {es} for storing and indexing the data.
 * {kib} for the UI.
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 * {ls} (optional) for parsing and enhancing the data.
-endif::only-elasticsearch[]
+endif::[]
 
 See {stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}]
 for more information about installing these products.
