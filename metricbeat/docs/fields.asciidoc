@@ -3345,7 +3345,7 @@ Number of current reads per second
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: scaled_float
 
@@ -3397,7 +3397,7 @@ Number of current writes per second
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: scaled_float
 
@@ -3449,7 +3449,7 @@ Number of current operations per second
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: scaled_float
 
@@ -3897,14 +3897,7 @@ Network metrics.
 --
 type: keyword
 
-<<<<<<< HEAD
 Network interface name.
-=======
-deprecated:[6.4]
-
-Number of current reads per second
-
->>>>>>> 9fcc834c4... [7.2][DOCS] Fix markup issues for asciidoctor migration (#13760)
 
 
 --
@@ -3953,14 +3946,7 @@ Total errors on incoming packets.
 --
 type: long
 
-<<<<<<< HEAD
 Total number of incoming packets.
-=======
-deprecated:[6.4]
-
-Number of current writes per second
-
->>>>>>> 9fcc834c4... [7.2][DOCS] Fix markup issues for asciidoctor migration (#13760)
 
 
 --
@@ -4009,14 +3995,7 @@ Total errors on outgoing packets.
 --
 type: long
 
-<<<<<<< HEAD
 Total number of outgoing packets.
-=======
-deprecated:[6.4]
-
-Number of reads and writes per second
-
->>>>>>> 9fcc834c4... [7.2][DOCS] Fix markup issues for asciidoctor migration (#13760)
 
 
 --
