@@ -43,7 +43,7 @@ a list of configurations.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-co.elastic.metrics/raw: "[{"enabled\":true,\"metricsets\":[\"default\"],\"module\":\"mockmoduledefaults\",\"period\":\"1m\",\"timeout\":\"3s\"}]"
+co.elastic.metrics/raw: "[{\"enabled\":true,\"metricsets\":[\"default\"],\"module\":\"mockmoduledefaults\",\"period\":\"1m\",\"timeout\":\"3s\"}]"
 -------------------------------------------------------------------------------------
 
 [float]
