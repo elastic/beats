@@ -12,7 +12,7 @@ Before deploying {beatname_uc}, you need to configure one or more functions and
 specify details about the services that will trigger the functions.
 
 You configure the functions in the the +{beatname_lc}.yml+ configuration file.
-When you're done, you can <<{beatname_lc}-deploying,deploy the functions>>
+When you're done, you can <<deploy-to-cloud-provider,deploy the functions>>
 to your serverless environment.
 
 The following example configures two functions: `cloudwatch` and `sqs`. The
