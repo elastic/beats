@@ -180,6 +180,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-socket_summary,socket_summary>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
+|<<metricbeat-module-tomcat,Tomcat>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.4+| .4+|  |<<metricbeat-metricset-tomcat-cache,cache>> beta[]  
+|<<metricbeat-metricset-tomcat-memory,memory>> beta[]  
+|<<metricbeat-metricset-tomcat-requests,requests>> beta[]  
+|<<metricbeat-metricset-tomcat-threading,threading>> beta[]  
 |<<metricbeat-module-traefik,traefik>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-traefik-health,health>>   
 |<<metricbeat-module-uwsgi,uwsgi>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -240,6 +245,7 @@ include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/statsd.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/uwsgi.asciidoc[]
 include::modules/vsphere.asciidoc[]

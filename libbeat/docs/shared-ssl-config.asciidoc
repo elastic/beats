@@ -31,7 +31,7 @@ output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
 output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
 ----
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 Also see <<configuring-ssl-logstash>>.
 endif::[]
 
