@@ -12,13 +12,13 @@ ifdef::apm-server[]
 * <<secure-communication-agents>>
 endif::[]
 * <<securing-communication-elasticsearch>>
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 * <<configuring-ssl-logstash>>
-endif::only-elasticsearch[]
+endif::[]
 * <<securing-beats>>
-ifndef::only-elasticsearch[]
+ifndef::serverless[]
 * <<linux-seccomp>>
-endif::only-elasticsearch[]
+endif::[]
 
 ifdef::beat-specific-security[]
 include::{beat-specific-security}[]
@@ -39,15 +39,15 @@ include::./https.asciidoc[]
 
 //sets block macro for shared-ssl-logstash-config.asciidoc included in next section
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 [[configuring-ssl-logstash]]
 == Secure communication with Logstash
 
 include::./shared-ssl-logstash-config.asciidoc[]
-endif::only-elasticsearch[]
+endif::[]
 
 include::./security/securing-beats.asciidoc[]
 
-ifndef::only-elasticsearch[]
+ifndef::serverless[]
 include::./security/linux-seccomp.asciidoc[]
-endif::only-elasticsearch[]
+endif::[]
