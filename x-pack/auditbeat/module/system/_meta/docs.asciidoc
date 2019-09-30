@@ -73,10 +73,6 @@ datasets - esp. `process` and `socket` - a shorter period is recommended.
 *`state.period`*:: The frequency at which the datasets send full state information.
 This option can be overridden per dataset using `{dataset}.state.period`.
 
-*`socket.include_localhost`*:: If the `socket` dataset is configured and this
-option is set to `true`, Auditbeat will include sockets that have localhost
-as either their source and/or destination IP. Defaults to `false`.
-
 *`user.detect_password_changes`*:: If the `user` dataset is configured and
 this option is set to `true`, Auditbeat will read password information in `/etc/passwd`
 and `/etc/shadow` to detect password changes. A hash will be kept locally in

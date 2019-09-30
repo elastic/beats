@@ -93,6 +93,19 @@ class Test(AuditbeatXPackTest):
         self.with_runner(TCP4TestCase(),
                          extra_conf={'socket.enable_ipv6': False})
 
+    def test_dns_enrichment(self):
+        """
+        test DNS enrichment
+        """
+        self.with_runner(DNSTestCase())
+
+    def test_no_dns_enrichment(self):
+        """
+        test DNS enrichment disabled
+        """
+        self.with_runner(
+            DNSTestCase(enabled=False), extra_conf={'socket.dns.enabled': False})
+
     def with_runner(self, test, extra_conf=dict()):
         enable_ipv6_loopback()
         conf = {
@@ -457,14 +470,123 @@ class MultiUDP4TestCase:
         ])
 
 
-def socket_ipv4(type, proto):
+class DNSTestCase:
+    def __init__(self, enabled=True):
+        self.dns_enabled = enabled
+
+    def run(self):
+        req = "\x74\xba\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07elastic" \
+              "\x02co\x00\x00\x01\x00\x01"
+        resp = "\x74\xba\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00\x07elastic" \
+               "\x02co\x00\x00\x01\x00\x01\xc0\x0c\x00\x01\x00\x01\x00\x00" \
+               "\x00\x9c\x00\x04"  # Append IPv4 ip here
+
+        dns_cli, self.dns_client_addr = socket_ipv4(socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        dns_srv, self.dns_server_addr = socket_ipv4(socket.SOCK_DGRAM, socket.IPPROTO_UDP, port=53)
+        client, self.client_addr = socket_ipv4(socket.SOCK_STREAM, socket.IPPROTO_TCP)
+        server, self.server_addr = socket_ipv4(socket.SOCK_STREAM, socket.IPPROTO_TCP)
+        dns_cli.sendto(req, self.dns_server_addr)
+        msg, _ = dns_srv.recvfrom(64)
+        dns_srv.sendto(resp + ipv4_str_to_raw(self.server_addr[0]), self.dns_client_addr)
+        msg, _ = dns_cli.recvfrom(64)
+        dns_cli.close()
+        dns_srv.close()
+        server.listen(8)
+        client.connect(self.server_addr)
+        accepted, _ = server.accept()
+        client.send("GET / HTTP/1.1\r\nHost: elastic.co\r\n\r\n")
+        accepted.recv(64)
+        accepted.send("HTTP/1.1 404 Not Found\r\n\r\n")
+        client.recv(64)
+        accepted.close()
+        client.close()
+        server.close()
+
+    def expected(self):
+        expected_events = [
+            {
+                "agent.type": "auditbeat",
+                "client.bytes": Comparison(operator.gt, 30),
+                "client.ip": self.dns_client_addr[0],
+                "client.packets": 1,
+                "client.port": self.dns_client_addr[1],
+                "destination.bytes": Comparison(operator.gt, 30),
+                "destination.ip": self.dns_server_addr[0],
+                "destination.packets": 1,
+                "destination.port": self.dns_server_addr[1],
+                "event.action": "network_flow",
+                "event.category": "network_traffic",
+                "event.dataset": "socket",
+                "event.kind": "event",
+                "event.module": "system",
+                "network.bytes": Comparison(operator.gt, 60),
+                "network.direction": "inbound",
+                "network.packets": 2,
+                "network.transport": "udp",
+                "network.type": "ipv4",
+                "process.pid": os.getpid(),
+                "server.bytes": Comparison(operator.gt, 30),
+                "server.ip": self.dns_server_addr[0],
+                "server.packets": 1,
+                "server.port": self.dns_server_addr[1],
+                "source.bytes": Comparison(operator.gt, 30),
+                "source.ip": self.dns_client_addr[0],
+                "source.packets": 1,
+                "source.port": self.dns_client_addr[1],
+                "user.id": str(os.getuid()),
+            }, {
+                "agent.type": "auditbeat",
+                "client.bytes":  Comparison(operator.gt, 80),
+                "client.ip": self.client_addr[0],
+                "client.packets": Comparison(operator.gt, 2),
+                "client.port": self.client_addr[1],
+                "destination.bytes": Comparison(operator.gt, 80),
+                "destination.domain": "elastic.co",
+                "destination.ip": self.server_addr[0],
+                "destination.packets": Comparison(operator.gt, 2),
+                "destination.port": self.server_addr[1],
+                "event.action": "network_flow",
+                "event.category": "network_traffic",
+                "event.dataset": "socket",
+                "event.kind": "event",
+                "event.module": "system",
+                "network.direction": "inbound",
+                "network.packets": Comparison(operator.gt, 5),
+                "network.transport": "tcp",
+                "network.type": "ipv4",
+                "process.pid": os.getpid(),
+                "server.bytes": Comparison(operator.gt, 80),
+                "server.domain": "elastic.co",
+                "server.ip": self.server_addr[0],
+                "server.packets": Comparison(operator.gt, 2),
+                "server.port": self.server_addr[1],
+                "service.type": "system",
+                "source.bytes":  Comparison(operator.gt, 80),
+                "source.ip": self.client_addr[0],
+                "source.packets": Comparison(operator.gt, 2),
+                "source.port": self.client_addr[1],
+            },
+        ]
+        if not self.dns_enabled:
+            for ev in expected_events:
+                for k in filter(lambda x: x.endswith('.domain'), ev.keys()):
+                    ev[k] = None
+
+        return HasEvent(expected_events)
+
+
+def socket_ipv4(type, proto, port=0):
     sock = socket.socket(socket.AF_INET, type, proto)
-    sock.bind((random_address_ipv4(), 0))
+    sock.bind((random_address_ipv4(), port))
     return sock, sock.getsockname()
 
 
 def random_address_ipv4():
     return '127.{}.{}.{}'.format(random.randint(0, 255), random.randint(0, 255), random.randint(1, 254))
+
+
+def ipv4_str_to_raw(ip):
+    return ''.join(map(lambda x: chr(int(x)), ip.split('.')))
 
 
 def socket_ipv6(type, proto):
@@ -510,7 +632,7 @@ class HasEvent:
         expected = self.expected
         for (iexp, exp) in enumerate(expected):
             for (idoc, doc) in enumerate(documents):
-                if all(k in doc and (doc[k] == v or callable(v) and v(doc[k]))
+                if all((k in doc and (doc[k] == v or callable(v) and v(doc[k]))) or (v is None and k not in doc)
                        for k, v in exp.items()):
                     break
             else:

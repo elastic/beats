@@ -8,38 +8,19 @@ package socket
 
 import (
 	"encoding/binary"
-	"errors"
+	"fmt"
 	"net"
 	"testing"
 	"time"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
-
-type testReporter struct {
-	received []mb.Event
-	errors   []error
-}
-
-func (t *testReporter) Event(event mb.Event) bool {
-	t.received = append(t.received, event)
-	return true
-}
-
-func (t *testReporter) Error(err error) bool {
-	t.errors = append(t.errors, err)
-	return true
-}
-
-func (t *testReporter) Done() <-chan struct{} {
-	// Unused
-	return nil
-}
 
 type logWrapper testing.T
 
@@ -108,9 +89,11 @@ func TestTCPConnWithProcess(t *testing.T) {
 		},
 		&doExit{Meta: meta(1234, 1234, 18)},
 	}
-	feedEvents(evs, st, t)
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
 	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
+	flows, err := getFlows(st.DoneFlows(), all, dontResolveDNS)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,19 +160,30 @@ func ipv4(ip string) uint32 {
 	return tracing.MachineEndian.Uint32(netIP)
 }
 
-func feedEvents(evs []event, st *state, t *testing.T) {
+func feedEvents(evs []event, st *state, t *testing.T) error {
 	for idx, ev := range evs {
 		t.Logf("Delivering event %d: %s", idx, ev.String())
 		// TODO: err
-		ev.Update(st)
+		if err := ev.Update(st); err != nil {
+			return errors.Wrapf(err, "error feeding event '%s'", ev.String())
+		}
 	}
+	return nil
 }
 
 func all(*flow) bool {
 	return true
 }
 
-func getFlows(list linkedList, filter func(*flow) bool) (evs []beat.Event, err error) {
+type noDNSResolution struct{}
+
+func (noDNSResolution) ResolveIP(pid uint32, ip net.IP) (domain string, found bool) {
+	return "", false
+}
+
+var dontResolveDNS dnsResolver = noDNSResolution{}
+
+func getFlows(list linkedList, filter func(*flow) bool, resolver dnsResolver) (evs []beat.Event, err error) {
 	var errs multierror.Errors
 	for elem := list.get(); elem != nil; elem = list.get() {
 		flow, ok := elem.(*flow)
@@ -200,7 +194,7 @@ func getFlows(list linkedList, filter func(*flow) bool) (evs []beat.Event, err e
 		if !filter(flow) {
 			continue
 		}
-		ev, err := flow.toEvent(true)
+		ev, err := flow.toEvent(true, resolver)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -261,4 +255,153 @@ func copyCString(dst []byte, src []byte) {
 	} else {
 		dst[len(dst)-1] = 0
 	}
+}
+
+func TestDNSTracker(t *testing.T) {
+	const infiniteExpiration = time.Hour * 3
+	const PID = 777
+	local1 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55555}
+	local2 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55556}
+	trV4 := dns.Transaction{
+		TXID:      1234,
+		Client:    local1,
+		Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+		Domain:    "example.net",
+		Addresses: []net.IP{net.ParseIP("192.0.2.12"), net.ParseIP("192.0.2.13")},
+	}
+	trV6 := dns.Transaction{
+		TXID:      1235,
+		Client:    local2,
+		Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+		Domain:    "example.com",
+		Addresses: []net.IP{net.ParseIP("2001:db8::1111"), net.ParseIP("2001:db8::2222")},
+	}
+	t.Run("transaction before register", func(t *testing.T) {
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		tracker.RegisterEndpoint(local1, PID)
+		tracker.RegisterEndpoint(local2, PID)
+		for idx, test := range []struct {
+			found      bool
+			pid        uint32
+			ip, domain string
+		}{
+			{true, PID, "192.0.2.12", "example.net"},
+			{true, PID, "192.0.2.13", "example.net"},
+			{true, PID, "2001:db8::1111", "example.com"},
+			{true, PID, "2001:db8::2222", "example.com"},
+			{false, PID + 1, "192.0.2.12", ""},
+			{false, PID + 1, "2001:db8::2222", ""},
+			{false, PID, "192.168.0.2", ""},
+			{false, PID, "2001:db8::3333", ""},
+		} {
+			msg := fmt.Sprintf("test entry #%d", idx)
+			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
+			assert.Equal(t, test.found, found, msg)
+			assert.Equal(t, test.domain, domain, msg)
+		}
+	})
+	t.Run("transaction after register", func(t *testing.T) {
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.RegisterEndpoint(local1, PID)
+		tracker.RegisterEndpoint(local2, PID)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		for idx, test := range []struct {
+			found      bool
+			pid        uint32
+			ip, domain string
+		}{
+			{true, PID, "192.0.2.12", "example.net"},
+			{true, PID, "192.0.2.13", "example.net"},
+			{true, PID, "2001:db8::1111", "example.com"},
+			{true, PID, "2001:db8::2222", "example.com"},
+			{false, PID + 1, "192.0.2.12", ""},
+			{false, PID + 1, "2001:db8::2222", ""},
+			{false, PID, "192.168.0.2", ""},
+			{false, PID, "2001:db8::3333", ""},
+		} {
+			msg := fmt.Sprintf("test entry #%d", idx)
+			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
+			assert.Equal(t, test.found, found, msg)
+			assert.Equal(t, test.domain, domain, msg)
+		}
+	})
+	t.Run("unknown local endpoint", func(t *testing.T) {
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.RegisterEndpoint(local1, PID)
+		// tracker.RegisterEndpoint(local2, PID)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		for idx, test := range []struct {
+			found      bool
+			pid        uint32
+			ip, domain string
+		}{
+			{true, PID, "192.0.2.12", "example.net"},
+			{true, PID, "192.0.2.13", "example.net"},
+			{false, PID, "2001:db8::1111", ""},
+			{false, PID, "2001:db8::2222", ""},
+			{false, PID + 1, "192.0.2.12", ""},
+			{false, PID + 1, "2001:db8::2222", ""},
+			{false, PID, "192.168.0.2", ""},
+			{false, PID, "2001:db8::3333", ""},
+		} {
+			msg := fmt.Sprintf("test entry #%d", idx)
+			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
+			assert.Equal(t, test.found, found, msg)
+			assert.Equal(t, test.domain, domain, msg)
+		}
+	})
+	t.Run("expiration", func(t *testing.T) {
+		tracker := newDNSTracker(time.Millisecond)
+		tracker.RegisterEndpoint(local1, PID)
+		tracker.AddTransaction(trV4)
+		tracker.RegisterEndpoint(local2, PID)
+		tracker.AddTransaction(trV6)
+		time.Sleep(time.Millisecond * 2)
+		for idx, test := range []struct {
+			found      bool
+			pid        uint32
+			ip, domain string
+		}{
+			{false, PID, "192.0.2.12", ""},
+			{false, PID, "192.0.2.13", ""},
+			{false, PID, "2001:db8::1111", ""},
+			{false, PID, "2001:db8::2222", ""},
+		} {
+			msg := fmt.Sprintf("test entry #%d", idx)
+			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
+			assert.Equal(t, test.found, found, msg)
+			assert.Equal(t, test.domain, domain, msg)
+		}
+	})
+	t.Run("same IP different domains", func(t *testing.T) {
+		trV4alt := dns.Transaction{
+			TXID:      1234,
+			Client:    local2,
+			Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+			Domain:    "example.com",
+			Addresses: []net.IP{net.ParseIP("192.0.2.12"), net.ParseIP("192.0.2.13")},
+		}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV4alt)
+		tracker.RegisterEndpoint(local1, PID)
+		tracker.RegisterEndpoint(local2, PID+1)
+		for idx, test := range []struct {
+			found      bool
+			pid        uint32
+			ip, domain string
+		}{
+			{true, PID, "192.0.2.12", "example.net"},
+			{true, PID + 1, "192.0.2.12", "example.com"},
+		} {
+			msg := fmt.Sprintf("test entry #%d", idx)
+			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
+			assert.Equal(t, test.found, found, msg)
+			assert.Equal(t, test.domain, domain, msg)
+		}
+	})
 }

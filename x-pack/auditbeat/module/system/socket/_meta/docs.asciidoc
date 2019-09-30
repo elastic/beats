@@ -13,6 +13,7 @@ and https://www.elastic.co/guide/en/ecs/current/ecs-user.html[user] information.
 and memory usage.
 - Works on stock kernels without the need of custom modules, external libraries
 or development headers.
+- Correlates IP addresses with DNS requests.
 
 This dataset does not analyze application-layer protocols nor provide any other
 advanced features present in Packetbeat:
@@ -156,3 +157,19 @@ between the kernel clock and the dataset's reference clock.
 - `socket.guess_timeout` (default: 15s)
 
 The maximum time an individual guess is allowed to run.
+
+- `socket.dns.enabled` (default: true)
+
+If DNS traffic must be monitored to enrich network flows with DNS information.
+
+- `socket.dns.type` (default: af_packet)
+
+The method used to monitor DNS traffic. Currently, only `af_packet` is supported.
+
+- `socket.dns.af_packet.interface` (default: any)
+
+The network interface where DNS will be monitored.
+
+- `socket.dns.af_packet.snaplen` (default: 1024)
+
+Maximum number of bytes to copy for each captured packet.
