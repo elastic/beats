@@ -107,14 +107,23 @@ func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error
 	return
 }
 
-// StringInSlice checks if a string is already exists in list
-func StringInSlice(str string, list []string) bool {
-	for _, v := range list {
+//// StringInSlice checks if a string is already exists in list
+//func StringInSlice(str string, list []string) bool {
+//	for _, v := range list {
+//		if v == str {
+//			return true
+//		}
+//	}
+//	return false
+//}
+
+func StringInSlice(str string, list []string) (bool, int) {
+	for idx, v := range list {
 		if v == str {
-			return true
+			return true, idx
 		}
 	}
-	return false
+	return false, -1
 }
 
 // InitEvent initialize mb.Event with basic information like service.name, cloud.provider
