@@ -73,14 +73,12 @@ func eventMapping(input []byte) (common.MapStr, error) {
 		return nil, err
 	}
 
-	var queues map[string]interface{}
-	var ok bool
-	queues, ok = data["queues"].(map[string]interface{})
+	queues, ok := data["queues"].(map[string]interface{})
 	if !ok {
 		return nil, errors.New("queues is not a map")
 	}
-	var failed []interface{}
-	failed, ok = queues["failed"].([]interface{})
+
+	failed, ok := queues["failed"].([]interface{})
 	if !ok {
 		return nil, errors.New("queues.failed is not an array of maps")
 	}
