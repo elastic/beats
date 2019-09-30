@@ -26,13 +26,15 @@ go build  (or mage build)
 ```
 
 === How to use module on Linux
-First download the IBM client library. This is a dynamically loaded library:
+First download the IBM client library and build it. This is a dynamically loaded library:
 ```
-https://github.com/ChrsMark/ibm_client_plugin/raw/master/ibmqlib_linux.so
+git clone https://github.com/ChrsMark/ibm_client_plugin
 ```
-Then set the IBM_LIBRARY_PATH variable to point to the downloaded file:
+Then follow the steps in this repo to build the library.
+
+After the library has been built successfully set the IBM_LIBRARY_PATH variable to point to the shared file:
 ```
-export IBM_LIBRARY_PATH=~/Downloads/ibmqlib_darwin.so
+export IBM_LIBRARY_PATH=~/ibmqlib_darwin.so
 ```
 Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
 from IBM MQ:
