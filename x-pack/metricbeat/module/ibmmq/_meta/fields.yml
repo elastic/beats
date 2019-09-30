@@ -4,6 +4,7 @@
     experimental[]
 
     ibmmq module
+  release: beta
   fields:
     - name: ibmmq
       type: group
