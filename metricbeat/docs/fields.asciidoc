@@ -37,6 +37,7 @@ grouped in the following categories:
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
+* <<exported-fields-ibmmq>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
@@ -13604,6 +13605,1078 @@ json metricset
 
 server
 
+
+[[exported-fields-ibmmq]]
+== ibmmq fields
+
+experimental[]
+ibmmq module
+
+
+
+[float]
+=== ibmmq
+
+`ibmmq` contains statistics that were read from IBM MQ
+
+
+
+[float]
+=== qmgr
+
+Contains statistics related to Queue Manager
+
+
+*`ibmmq.qmgr.mqca_alteration_date`*::
++
+--
+The date, in the form yyyy-mm-dd, on which the information was last altered.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_alteration_time`*::
++
+--
+The time, in the form hh.mm.ss, at which the information was last altered.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_cert_label`*::
++
+--
+Certificate label for this queue manager to use. The label identifies which personal certificate in the key repository has been selected.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_channel_auto_def_exit`*::
++
+--
+Channel auto-definition exit name.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_cluster_workload_data`*::
++
+--
+Data passed to the cluster workload exit.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_cluster_workload_exit`*::
++
+--
+Name of the cluster workload exit.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_command_input_q_name`*::
++
+--
+Command input queue name.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_conn_auth`*::
++
+--
+Name of the authentication information object that is used to provide the location of user ID and password authentication.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_creation_date`*::
++
+--
+Queue creation date, in the form yyyy-mm-dd
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_creation_time`*::
++
+--
+Creation time, in the form hh.mm.ss
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_custom`*::
++
+--
+Custom attribute for new features.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_dead_letter_q_name`*::
++
+--
+Dead letter (undelivered message) queue name.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_def_xmit_q_name`*::
++
+--
+Default transmission queue name.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_installation_desc`*::
++
+--
+The installation description for this queue manager.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_installation_name`*::
++
+--
+The installation name for this queue manager.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_installation_path`*::
++
+--
+The installation path for this queue manager.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_parent`*::
++
+--
+The name of the hierarchically connected queue manager nominated as the parent of this queue manager.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_q_mgr_desc`*::
++
+--
+Queue manager description
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_q_mgr_identifier`*::
++
+--
+The unique identifier of the queue manager.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_repository_name`*::
++
+--
+The name of a cluster for which this queue manager is to provide a repository service.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_repository_namelist`*::
++
+--
+The name of a list of clusters for which this queue manager is to provide a repository service.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_ssl_crl_namelist`*::
++
+--
+The SSL certificate revocation location namelist
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_ssl_crypto_hardware`*::
++
+--
+Parameters to configure the SSL cryptographic hardware
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_ssl_key_repository`*::
++
+--
+Location and name of the SSL key repository
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqca_version`*::
++
+--
+The version of the IBM MQ code.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqcacf_archive_log_extent_name`*::
++
+--
+None
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqcacf_current_log_extent_name`*::
++
+--
+The name of the log extent that was being written to at the time of the Inquire command. If the queue manager is using circular logging, this parameter is blank.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqcacf_log_path`*::
++
+--
+This parameter identifies the directory where log files are created by the queue manager.
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqcacf_media_log_extent_name`*::
++
+--
+None
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqcacf_q_mgr_start_date`*::
++
+--
+Date when this queue manager was started (in the form yyyy-mm-dd).
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqcacf_q_mgr_start_time`*::
++
+--
+Time when this queue manager was started (in the form hh:mm:ss).
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqcacf_restart_log_extent_name`*::
++
+--
+None
+
+type: text
+
+--
+
+*`ibmmq.qmgr.mqia_accounting_conn_override`*::
++
+--
+Specifies whether applications can override the settings of the QueueAccounting and MQIAccounting queue manager parameters.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_accounting_interval`*::
++
+--
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_accounting_mqi`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_accounting_q`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_activity_conn_override`*::
++
+--
+Specifies whether applications can override the setting of the ACTVTRC value in the queue manager attribute.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_activity_recording`*::
++
+--
+Whether activity reports can be generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_activity_trace`*::
++
+--
+Whether activity reports can be generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_advanced_capability`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_amqp_capability`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_authority_event`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_cert_val_policy`*::
++
+--
+Specifies which SSL/TLS certificate validation policy is used to validate digital certificates received from remote partner systems
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_channel_auto_def`*::
++
+--
+Controls whether receiver and server-connection channels can be auto-defined.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_channel_auto_def_event`*::
++
+--
+Controls whether channel auto-definition events are generated, when a receiver, server-connection, or cluster-sender channel is auto-defined.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_channel_event`*::
++
+--
+Controls whether channel events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_chinit_control`*::
++
+--
+Start the channel initiator during queue manager start.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_chlauth_records`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_cluster_workload_length`*::
++
+--
+Cluster workload length.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_clwl_mru_channels`*::
++
+--
+Cluster workload most recently used (MRU) channels.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_clwl_useq`*::
++
+--
+Use of remote queue. Specifies whether a cluster queue manager is to use remote puts to other queues defined in other queue managers within the cluster during workload management.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_cmd_server_control`*::
++
+--
+Start the command server during queue manager start.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_coded_char_set_id`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_command_event`*::
++
+--
+Controls whether command events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_command_level`*::
++
+--
+Command level supported by queue manager.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_configuration_event`*::
++
+--
+Controls whether configuration events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_def_cluster_xmit_q_type`*::
++
+--
+The DefClusterXmitQueueType attribute controls which transmission queue is selected by default by cluster-sender channels to get messages from, to send the messages to cluster-receiver channels.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_dist_lists`*::
++
+--
+Distribution list support
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_inhibit_event`*::
++
+--
+Controls whether inhibit.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_ip_address_version`*::
++
+--
+IP address version selector
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_local_event`*::
++
+--
+Controls whether local error events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_logger_event`*::
++
+--
+Controls whether recovery log events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_max_handles`*::
++
+--
+Maximum number of handles.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_max_msg_length`*::
++
+--
+Maximum message length.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_max_priority`*::
++
+--
+Maximum priority.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_max_properties_length`*::
++
+--
+Maximum properties length.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_max_uncommitted_msgs`*::
++
+--
+Maximum number of uncommitted messages within a unit of work.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_media_image_interval`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_media_image_log_length`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_media_image_recover_obj`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_media_image_recover_q`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_media_image_recover_q`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_monitoring_auto_clussdr`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_monitoring_channel`*::
++
+--
+Default setting for online monitoring for channels.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_monitoring_q`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_msg_mark_browse_interval`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_performance_event`*::
++
+--
+Controls whether performance-related events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_platform`*::
++
+--
+Platform on which the queue manager resides.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_prot_policy_capability`*::
++
+--
+If the IBM MQ AMS component is installed for the version of IBM MQ that the queue manager is running under.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_pubsub_cluster`*::
++
+--
+Controls whether the queue manager participates in publish/subscribe clustering.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_pubsub_maxmsg_retry_count`*::
++
+--
+The number of attempts to reprocess a failed command message under sync point.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_pubsub_mode`*::
++
+--
+Specifies whether the publish/subscribe engine and the queued publish/subscribe interface are running.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_pubsub_np_msg`*::
++
+--
+Specifies whether to discard or keep an undelivered input message.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_pubsub_np_resp`*::
++
+--
+Controls the behavior of undelivered response messages.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_pubsub_sync_pt`*::
++
+--
+Specifies whether only persistent messages or all messages are processed under sync point.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_remote_event`*::
++
+--
+Controls whether remote error events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_reverse_dns_lookup`*::
++
+--
+Whether reverse lookup of the host name from a Domain Name Server is carried out.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_ssl_event`*::
++
+--
+Controls whether SSL events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_ssl_fips_required`*::
++
+--
+Controls whether only FIPS-certified algorithms are to be used if cryptography is executed in IBM MQ itself.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_ssl_reset_count`*::
++
+--
+The number of unencrypted bytes that initiating SSL channel MCAs send or receive before renegotiating the secret key.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_start_stop_event`*::
++
+--
+Controls whether start and stop events are generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_statistics_auto_clussdr`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_statistics_channel`*::
++
+--
+Specifies whether statistics data is to be collected for channels.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_statistics_interval`*::
++
+--
+The time interval, in seconds, at which statistics monitoring data is written to the monitoring queue.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_statistics_mqi`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_statistics_q`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_suite_b_strength_0`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_suite_b_strength_1`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_suite_b_strength_2`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_suite_b_strength_3`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_syncpoint`*::
++
+--
+Sync point availability.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_trace_route_recording`*::
++
+--
+Specifies whether trace-route information can be recorded and a reply message generated.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_tree_life_time`*::
++
+--
+The lifetime in seconds of non-administrative topics.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_trigger_interval`*::
++
+--
+Trigger interval.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqia_xr_capability`*::
++
+--
+Specifies whether the IBM MQ Telemetry capability and commands are supported by the queue manager.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_archive_log_size`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_chinit_status`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_cmd_server_status`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_connection_count`*::
++
+--
+The current number of connections to the queue manager.
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_ldap_connection_status`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_log_in_use`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_log_utilization`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_media_log_size`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_permit_standby`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_q_mgr_status`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_restart_log_size`*::
++
+--
+None
+
+type: integer
+
+--
+
+*`ibmmq.qmgr.mqiacf_reusable_log_size`*::
++
+--
+None
+
+type: integer
+
+--
 
 [[exported-fields-jolokia]]
 == Jolokia fields

@@ -15,8 +15,6 @@ import (
 	"os"
 
 	"github.com/elastic/beats/x-pack/metricbeat/cmd"
-	//_ "github.com/elastic/beats/x-pack/metricbeat/module/ibmmq"
-	//_ "github.com/elastic/beats/x-pack/metricbeat/module/ibmmq/qmgr"
 )
 
 func main() {

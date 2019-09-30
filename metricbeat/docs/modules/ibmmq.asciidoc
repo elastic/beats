@@ -1,0 +1,95 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-ibmmq]]
+[role="xpack"]
+== ibmmq module
+
+beta[]
+
+This is the IBM MQ metricbeat module. This module uses PCF messages to collect metrics and status information from different IBM MQ objects.
+With IBM MQ > v9 its also possible to collect data using the subscribe mode.
+
+At the moment this is collecting data from Queue Manager.
+
+[float]
+=== Compability
+
+This module is tested with IBM MQ v9.1.0 but older version will work as well. The subscribe mode only works with IBM MQ > v9.
+
+=== How to use module on Linux
+First download the IBM client library and build it. This is a dynamically loaded library:
+```
+git clone https://github.com/ChrsMark/ibm_client_plugin
+```
+Then follow the steps in this repo to build the library.
+
+After the library has been built successfully set the IBM_LIBRARY_PATH variable to point to the shared file:
+```
+export IBM_LIBRARY_PATH=~/ibmqlib_darwin.so
+```
+Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
+from IBM MQ:
+```
+go build  (or mage build)
+./metricbeat modules enable ibmmq
+./metricbeat -e -d "*"
+```
+
+=== How to use module on Darwin (for development only)
+First download the IBM client library. This is a dynamically loaded library:
+```
+wget https://github.com/ChrsMark/ibm_client_plugin/raw/master/ibmqlib_darwin.so
+```
+Then set the IBM_LIBRARY_PATH variable to point to the downloaded file:
+```
+export IBM_LIBRARY_PATH=~/Downloads/ibmqlib_darwin.so
+```
+Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
+from IBM MQ:
+```
+go build  (or mage build)
+./metricbeat modules enable ibmmq
+./metricbeat -e -d "*"
+```
+
+
+[float]
+=== Example configuration
+
+The ibmmq module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: ibmmq
+  metricsets: ["qmgr"]
+  period: 10s
+  hosts: ["localhost"]
+  enabled: true
+
+  ##Connection config
+  #Where mqserver need to look like "CHANNEL/TCP/server-address (port)":
+  ##CHANNEL is the server-connection channel name.
+  ##server-address is the TCP/IP host name of the server.
+  ##port is the TCP/IP port number the server is listening on.
+
+  #bindingQueueManager: QM1
+  #cc:
+  #  clientMode: true
+  #  mqServer: "DEV.ADMIN.SVRCONN/TCP/127.0.0.1(1414)"
+  #  user: "admin"
+  #  password: "passw0rd"
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-ibmmq-qmgr,qmgr>>
+
+include::ibmmq/qmgr.asciidoc[]
+
