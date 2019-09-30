@@ -125,11 +125,10 @@ func (l *ESLoader) templateExists(templateName string) bool {
 	if l.client == nil {
 		return false
 	}
+
 	status, body, _ := l.client.Request("GET", "/_cat/templates/"+templateName, "", nil, nil)
-	if status == http.StatusOK && strings.Contains(string(body), templateName) {
-		return true
-	}
-	return false
+
+	return status == http.StatusOK && strings.Contains(string(body), templateName)
 }
 
 // Load reads the template from the config, creates the template body and prints it to the configured file.
