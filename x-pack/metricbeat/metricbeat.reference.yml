@@ -419,26 +419,18 @@ metricbeat.modules:
   hosts: ["localhost"]
   enabled: true
 
-  #client_id: metricbeat
-  #retries: 3
-  #backoff: 250ms
+  ##Connection config
+  #Where mqserver need to look like "CHANNEL/TCP/server-address (port)":
+  ##CHANNEL is the server-connection channel name.
+  ##server-address is the TCP/IP host name of the server.
+  ##port is the TCP/IP port number the server is listening on.
 
-  # List of Topics to query metadata for. If empty, all topics will be queried.
-  #topics: []
-
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
-
-  # SASL authentication
-  #username: ""
-  #password: ""
+  #bindingQueueManager: QM1
+  #cc:
+  #  clientMode: true
+  #  mqServer: "DEV.ADMIN.SVRCONN/TCP/127.0.0.1(1414)"
+  #  user: "admin"
+  #  password: "passw0rd"
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia

@@ -17,19 +17,19 @@ func TestData(t *testing.T) {
 	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	r := compose.EnsureUp(t, "ibmmq")
 
-	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
 
 	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
+func getConfig() map[string]interface{} {
 	cc := map[sting]interface{}{
 		"clientMode": "true",
-		"mqServer": "DEV.ADMIN.SVRCONN/TCP/127.0.0.1(1414)",
-		"user": "admin",
-		"password": "passw0rd",
+		"mqServer":   "DEV.ADMIN.SVRCONN/TCP/127.0.0.1(1414)",
+		"user":       "admin",
+		"password":   "passw0rd",
 	}
 	return map[string]interface{}{
 		"module":              "ibmmq",

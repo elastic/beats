@@ -7,5 +7,16 @@
   period: 10s
 
   hosts: ["localhost"]
-  #username: guest
-  #password: guest
+
+  ##Connection config
+  #Where mqserver need to look like "CHANNEL/TCP/server-address (port)":
+  ##CHANNEL is the server-connection channel name.
+  ##server-address is the TCP/IP host name of the server.
+  ##port is the TCP/IP port number the server is listening on.
+
+  #bindingQueueManager: QM1
+  #cc:
+  #  clientMode: true
+  #  mqServer: "DEV.ADMIN.SVRCONN/TCP/127.0.0.1(1414)"
+  #  user: "admin"
+  #  password: "passw0rd"

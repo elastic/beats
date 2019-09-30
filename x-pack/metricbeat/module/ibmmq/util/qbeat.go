@@ -194,7 +194,7 @@ func generateConnectedObjectsField(events []beat.Event) []beat.Event {
 	return events
 }
 
-func unPackInterfaceToConnectionConfig(data []byte) ConnectionConfig{
+func unPackInterfaceToConnectionConfig(data []byte) ConnectionConfig {
 	var connectionConfig ConnectionConfig
 	json.Unmarshal(data, &connectionConfig)
 	return connectionConfig

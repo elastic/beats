@@ -5,11 +5,12 @@
 package qmgr
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/libbeat/logp"
 	"os"
 	"plugin"
-	"encoding/json"
+
+	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -59,7 +60,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	CollectQmgrMetricset = collectQmgrMetricset.(func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error))
 
-
 	config := ibmmq.DefaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 	configData, err := json.Marshal(m.connectionConfig)
-	if err!=nil {
+	if err != nil {
 		panic(err)
 	}
 	events, _ := CollectQmgrMetricset("QueueManager", m.queueManager, configData)

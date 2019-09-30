@@ -4,353 +4,353 @@
   release: beta
   fields:
     - name: mqca_alteration_date
-      type: string
+      type: text
       description: The date, in the form yyyy-mm-dd, on which the information was last altered.
     - name: mqca_alteration_time
-      type: string
+      type: text
       description: The time, in the form hh.mm.ss, at which the information was last altered.
     - name: mqca_cert_label
-      type: string
+      type: text
       description: Certificate label for this queue manager to use. The label identifies which personal certificate in the key repository has been selected.
     - name: mqca_channel_auto_def_exit
-      type: string
+      type: text
       description: Channel auto-definition exit name.
     - name: mqca_cluster_workload_data
-      type: string
+      type: text
       description: Data passed to the cluster workload exit.
     - name: mqca_cluster_workload_exit
-      type: string
+      type: text
       description: Name of the cluster workload exit.
     - name: mqca_command_input_q_name
-      type: string
+      type: text
       description: Command input queue name.
     - name: mqca_conn_auth
-      type: string
+      type: text
       description: Name of the authentication information object that is used to provide the location of user ID and password authentication.
     - name: mqca_creation_date
-      type: string
+      type: text
       description: Queue creation date, in the form yyyy-mm-dd
     - name: mqca_creation_time
-      type: string
+      type: text
       description: Creation time, in the form hh.mm.ss
     - name: mqca_custom
-      type: string
+      type: text
       description: Custom attribute for new features.
     - name: mqca_dead_letter_q_name
-      type: string
+      type: text
       description: Dead letter (undelivered message) queue name.
     - name: mqca_def_xmit_q_name
-      type: string
+      type: text
       description: Default transmission queue name.
     - name: mqca_installation_desc
-      type: string
+      type: text
       description: The installation description for this queue manager.
     - name: mqca_installation_name
-      type: string
+      type: text
       description: The installation name for this queue manager.
     - name: mqca_installation_path
-      type: string
+      type: text
       description: The installation path for this queue manager.
     - name: mqca_parent
-      type: string
+      type: text
       description: The name of the hierarchically connected queue manager nominated as the parent of this queue manager.
     - name: mqca_q_mgr_desc
-      type: string
+      type: text
       description: Queue manager description
     - name: mqca_q_mgr_identifier
-      type: string
+      type: text
       description: The unique identifier of the queue manager.
     - name: mqca_repository_name
-      type: string
+      type: text
       description: The name of a cluster for which this queue manager is to provide a repository service.
     - name: mqca_repository_namelist
-      type: string
+      type: text
       description: The name of a list of clusters for which this queue manager is to provide a repository service.
     - name: mqca_ssl_crl_namelist
-      type: string
+      type: text
       description: The SSL certificate revocation location namelist
     - name: mqca_ssl_crypto_hardware
-      type: string
+      type: text
       description: Parameters to configure the SSL cryptographic hardware
     - name: mqca_ssl_key_repository
-      type: string
+      type: text
       description: Location and name of the SSL key repository
     - name: mqca_version
-      type: string
+      type: text
       description: The version of the IBM MQ code.
     - name: mqcacf_archive_log_extent_name
-      type: string
+      type: text
       description:
     - name: mqcacf_current_log_extent_name
-      type: string
+      type: text
       description: The name of the log extent that was being written to at the time of the Inquire command. If the queue manager is using circular logging, this parameter is blank.
     - name: mqcacf_log_path
-      type: string
+      type: text
       description: This parameter identifies the directory where log files are created by the queue manager.
     - name: mqcacf_media_log_extent_name
-      type: string
+      type: text
       description:
     - name: mqcacf_q_mgr_start_date
-      type: string
+      type: text
       description: Date when this queue manager was started (in the form yyyy-mm-dd).
     - name: mqcacf_q_mgr_start_time
-      type: string
+      type: text
       description: Time when this queue manager was started (in the form hh:mm:ss).
     - name: mqcacf_restart_log_extent_name
-      type: string
+      type: text
       description:
     - name: mqia_accounting_conn_override
-      type: long
+      type: integer
       description: Specifies whether applications can override the settings of the QueueAccounting and MQIAccounting queue manager parameters.
     - name: mqia_accounting_interval
-      type: long
+      type: integer
       decsription: The time interval, in seconds, at which intermediate accounting records are written.
     - name: mqia_accounting_mqi
-      type: long
+      type: integer
       description:
     - name: mqia_accounting_q
-      type: long
+      type: integer
       description:
     - name: mqia_activity_conn_override
-      type: long
+      type: integer
       description: Specifies whether applications can override the setting of the ACTVTRC value in the queue manager attribute.
     - name: mqia_activity_recording
-      type: long
+      type: integer
       description: Whether activity reports can be generated.
     - name: mqia_activity_trace
-      type: long
+      type: integer
       description: Whether activity reports can be generated.
     - name: mqia_advanced_capability
-      type: long
+      type: integer
       description:
     - name: mqia_amqp_capability
-      type: long
+      type: integer
       description:
     - name: mqia_authority_event
-      type: long
+      type: integer
       description:
     - name: mqia_cert_val_policy
-      type: long
+      type: integer
       description: Specifies which SSL/TLS certificate validation policy is used to validate digital certificates received from remote partner systems
     - name: mqia_channel_auto_def
-      type: long
+      type: integer
       description: Controls whether receiver and server-connection channels can be auto-defined.
     - name: mqia_channel_auto_def_event
-      type: long
+      type: integer
       description: Controls whether channel auto-definition events are generated, when a receiver, server-connection, or cluster-sender channel is auto-defined.
     - name: mqia_channel_event
-      type: long
+      type: integer
       description: Controls whether channel events are generated.
     - name: mqia_chinit_control
-      type: long
+      type: integer
       description: Start the channel initiator during queue manager start.
     - name: mqia_chlauth_records
-      type: long
+      type: integer
       description:
     - name: mqia_cluster_workload_length
-      type: long
+      type: integer
       description: Cluster workload length.
     - name: mqia_clwl_mru_channels
-      type: long
+      type: integer
       description: Cluster workload most recently used (MRU) channels.
     - name: mqia_clwl_useq
-      type: long
+      type: integer
       description: Use of remote queue. Specifies whether a cluster queue manager is to use remote puts to other queues defined in other queue managers within the cluster during workload management.
     - name: mqia_cmd_server_control
-      type: long
+      type: integer
       description: Start the command server during queue manager start.
     - name: mqia_coded_char_set_id
-      type: long
+      type: integer
       description:
     - name: mqia_command_event
-      type: long
+      type: integer
       description: Controls whether command events are generated.
     - name: mqia_command_level
-      type: long
+      type: integer
       description: Command level supported by queue manager.
     - name: mqia_configuration_event
-      type: long
+      type: integer
       description: Controls whether configuration events are generated.
     - name: mqia_def_cluster_xmit_q_type
-      type: long
+      type: integer
       description: The DefClusterXmitQueueType attribute controls which transmission queue is selected by default by cluster-sender channels to get messages from, to send the messages to cluster-receiver channels.
     - name: mqia_dist_lists
-      type: long
+      type: integer
       description: Distribution list support
     - name: mqia_inhibit_event
-      type: long
+      type: integer
       description: Controls whether inhibit.
     - name: mqia_ip_address_version
-      type: long
+      type: integer
       description: IP address version selector
     - name: mqia_local_event
-      type: long
+      type: integer
       description: Controls whether local error events are generated.
     - name: mqia_logger_event
-      type: long
+      type: integer
       description: Controls whether recovery log events are generated.
     - name: mqia_max_handles
-      type: long
+      type: integer
       description: Maximum number of handles.
     - name: mqia_max_msg_length
-      type: long
+      type: integer
       description: Maximum message length.
     - name: mqia_max_priority
-      type: long
+      type: integer
       description: Maximum priority.
     - name: mqia_max_properties_length
-      type: long
+      type: integer
       description: Maximum properties length.
     - name: mqia_max_uncommitted_msgs
-      type: long
+      type: integer
       description: Maximum number of uncommitted messages within a unit of work.
     - name: mqia_media_image_interval
-      type: long
+      type: integer
       description:
     - name: mqia_media_image_log_length
-      type: long
+      type: integer
       description:
     - name: mqia_media_image_recover_obj
-      type: long
+      type: integer
       description:
     - name: mqia_media_image_recover_q
-      type: long
+      type: integer
       description:
     - name: mqia_media_image_recover_q
-      type: long
+      type: integer
       description:
     - name: mqia_monitoring_auto_clussdr
-      type: long
+      type: integer
       description:
     - name: mqia_monitoring_channel
-      type: long
+      type: integer
       description: Default setting for online monitoring for channels.
     - name: mqia_monitoring_q
-      type: long
+      type: integer
       description:
     - name: mqia_msg_mark_browse_interval
-      type: long
+      type: integer
       description:
     - name: mqia_performance_event
-      type: long
+      type: integer
       description: Controls whether performance-related events are generated.
     - name: mqia_platform
-      type: long
+      type: integer
       description: Platform on which the queue manager resides.
     - name: mqia_prot_policy_capability
-      type: long
+      type: integer
       description: If the IBM MQ AMS component is installed for the version of IBM MQ that the queue manager is running under.
     - name: mqia_pubsub_cluster
-      type: long
+      type: integer
       description: Controls whether the queue manager participates in publish/subscribe clustering.
     - name: mqia_pubsub_maxmsg_retry_count
-      type: long
+      type: integer
       description: The number of attempts to reprocess a failed command message under sync point.
     - name: mqia_pubsub_mode
-      type: long
+      type: integer
       description: Specifies whether the publish/subscribe engine and the queued publish/subscribe interface are running.
     - name: mqia_pubsub_np_msg
-      type: long
+      type: integer
       description: Specifies whether to discard or keep an undelivered input message.
     - name: mqia_pubsub_np_resp
-      type: long
+      type: integer
       description: Controls the behavior of undelivered response messages.
     - name: mqia_pubsub_sync_pt
-      type: long
+      type: integer
       description: Specifies whether only persistent messages or all messages are processed under sync point.
     - name: mqia_remote_event
-      type: long
+      type: integer
       description: Controls whether remote error events are generated.
     - name: mqia_reverse_dns_lookup
-      type: long
+      type: integer
       description: Whether reverse lookup of the host name from a Domain Name Server is carried out.
     - name: mqia_ssl_event
-      type: long
+      type: integer
       description: Controls whether SSL events are generated.
     - name: mqia_ssl_fips_required
-      type: long
+      type: integer
       description: Controls whether only FIPS-certified algorithms are to be used if cryptography is executed in IBM MQ itself.
     - name: mqia_ssl_reset_count
-      type: long
+      type: integer
       description: The number of unencrypted bytes that initiating SSL channel MCAs send or receive before renegotiating the secret key.
     - name: mqia_start_stop_event
-      type: long
+      type: integer
       description: Controls whether start and stop events are generated.
     - name: mqia_statistics_auto_clussdr
-      type: long
+      type: integer
       description:
     - name: mqia_statistics_channel
-      type: long
+      type: integer
       description: Specifies whether statistics data is to be collected for channels.
     - name: mqia_statistics_interval
-      type: long
+      type: integer
       description: The time interval, in seconds, at which statistics monitoring data is written to the monitoring queue.
     - name: mqia_statistics_mqi
-      type: long
+      type: integer
       description:
     - name: mqia_statistics_q
-      type: long
+      type: integer
       description:
     - name: mqia_suite_b_strength_0
-      type: long
+      type: integer
       description:
     - name: mqia_suite_b_strength_1
-      type: long
+      type: integer
       description:
     - name: mqia_suite_b_strength_2
-      type: long
+      type: integer
       description:
     - name: mqia_suite_b_strength_3
-      type: long
+      type: integer
       description:
     - name: mqia_syncpoint
-      type: long
+      type: integer
       description: Sync point availability.
     - name: mqia_trace_route_recording
-      type: long
+      type: integer
       description: Specifies whether trace-route information can be recorded and a reply message generated.
     - name: mqia_tree_life_time
-      type: long
+      type: integer
       description: The lifetime in seconds of non-administrative topics.
     - name: mqia_trigger_interval
-      type: long
+      type: integer
       description: Trigger interval.
     - name: mqia_xr_capability
-      type: long
+      type: integer
       description: Specifies whether the IBM MQ Telemetry capability and commands are supported by the queue manager.
     - name: mqiacf_archive_log_size
-      type: long
+      type: integer
       description:
     - name: mqiacf_chinit_status
-      type: long
+      type: integer
       description:
     - name: mqiacf_cmd_server_status
-      type: long
+      type: integer
       description:
     - name: mqiacf_connection_count
-      type: long
+      type: integer
       description: The current number of connections to the queue manager.
     - name: mqiacf_ldap_connection_status
-      type: long
+      type: integer
       description:
     - name: mqiacf_log_in_use
-      type: long
+      type: integer
       description:
     - name: mqiacf_log_utilization
-      type: long
+      type: integer
       description:
     - name: mqiacf_media_log_size
-      type: long
+      type: integer
       description:
     - name: mqiacf_permit_standby
-      type: long
+      type: integer
       description:
     - name: mqiacf_q_mgr_status
-      type: long
+      type: integer
       description:
     - name: mqiacf_restart_log_size
-      type: long
+      type: integer
       description:
     - name: mqiacf_reusable_log_size
-      type: long
+      type: integer
       description:
