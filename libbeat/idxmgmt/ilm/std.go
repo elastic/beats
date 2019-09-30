@@ -102,16 +102,20 @@ func (m *stdManager) Enabled() (bool, error) {
 }
 
 func (m *stdManager) EnsureAlias() error {
-	b, err := m.client.HasAlias(m.alias.Name)
-	if err != nil {
-		return err
-	}
-	if b {
+	if !m.checkExists {
 		return nil
-	}
+	} else {
+		b, err := m.client.HasAlias(m.alias.Name)
+		if err != nil {
+			return err
+		}
+		if b {
+			return nil
+		}
 
-	// This always assume it's a date pattern by sourrounding it by <...>
-	return m.client.CreateAlias(m.alias)
+		// This always assume it's a date pattern by sourrounding it by <...>
+		return m.client.CreateAlias(m.alias)
+	}
 }
 
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
