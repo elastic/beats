@@ -82,7 +82,7 @@
       This field defines the Campaign's primary goal, objective, desired outcome, or intended effect.
 
 - name: course_of_action
-  title: Cause of Action
+  title: Course of Action
   short: Fields that let you store information about course of action.
   description: >
     A Course of Action is an action taken either to prevent an attack 
