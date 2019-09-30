@@ -8,23 +8,6 @@ At the moment this is collecting data from Queue Manager.
 
 This module is tested with IBM MQ v9.1.0 but older version will work as well. The subscribe mode only works with IBM MQ > v9.
 
-=== How to use module on Darwin
-First download the IBM client library. This is a dynamically loaded library:
-```
-wget https://github.com/ChrsMark/ibm_client_plugin/raw/master/ibmqlib_darwin.so
-```
-Then set the IBM_LIBRARY_PATH variable to point to the downloaded file:
-```
-export IBM_LIBRARY_PATH=~/Downloads/ibmqlib_darwin.so
-```
-Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
-from IBM MQ:
-```
-go build  (or mage build)
-./metricbeat modules enable ibmmq
-./metricbeat -e -d "*"
-```
-
 === How to use module on Linux
 First download the IBM client library and build it. This is a dynamically loaded library:
 ```
@@ -35,6 +18,23 @@ Then follow the steps in this repo to build the library.
 After the library has been built successfully set the IBM_LIBRARY_PATH variable to point to the shared file:
 ```
 export IBM_LIBRARY_PATH=~/ibmqlib_darwin.so
+```
+Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
+from IBM MQ:
+```
+go build  (or mage build)
+./metricbeat modules enable ibmmq
+./metricbeat -e -d "*"
+```
+
+=== How to use module on Darwin (for development only)
+First download the IBM client library. This is a dynamically loaded library:
+```
+wget https://github.com/ChrsMark/ibm_client_plugin/raw/master/ibmqlib_darwin.so
+```
+Then set the IBM_LIBRARY_PATH variable to point to the downloaded file:
+```
+export IBM_LIBRARY_PATH=~/Downloads/ibmqlib_darwin.so
 ```
 Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
 from IBM MQ:
