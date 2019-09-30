@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Fixed early expiration of templates (Netflow v9 and IPFIX). {pull}13821[13821]
+- Fixed bad handling of sequence numbers when multiple observation domains were exported by a single device (Netflow V9 and IPFIX). {pull}13821[13821]
 
 *Heartbeat*
 
