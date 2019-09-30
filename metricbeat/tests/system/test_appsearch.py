@@ -3,7 +3,7 @@ import unittest
 
 
 class Test(metricbeat.BaseTest):
-    COMPOSE_SERVICES = ['elasticsearch', 'appsearch']
+    COMPOSE_SERVICES = ['appsearch']
     COMPOSE_TIMEOUT = 600
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -11,7 +11,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "appsearch",
             "metricsets": ["stats"],
-            "hosts": ["localhost:3002"],
+            "hosts": [self.compose_host(service="appsearch")],
             "period": "5s"
         }])
         proc = self.start_beat()

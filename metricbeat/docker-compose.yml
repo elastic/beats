@@ -28,7 +28,7 @@ services:
       - "elasticsearch.host=http://elasticsearch:9200"
       - "allow_es_settings_modification=true"
     ports:
-      - 3002:3002
+      - 3002
 
   metricbeat:
     build: ./module/beat/_meta
