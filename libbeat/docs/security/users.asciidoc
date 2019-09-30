@@ -185,34 +185,28 @@ endif::serverless[]
 [[privileges-to-publish-events]]
 ==== Grant privileges and roles needed for publishing
 
-Users who publish events to {es} need to create and read from {beatname_uc}
+Users who publish events to {es} need to create and write to {beatname_uc}
 indices. To minimize the privileges required by the writer role, you can use the
-<<privileges-to-setup-beats,setup role>> to pre-load dependencies. Then turn off
-setup options in the  {beatname_uc} config file before running {beatname_uc} to
-publish events. For example:
+<<privileges-to-setup-beats,setup role>> to pre-load dependencies.
 
 ifndef::no_ilm[]
 [source,yaml]
-----
-setup.template.enabled: false
-setup.ilm.check_exists: false
-setup.ilm.overwrite: false <1>
-----
-<1> Omit `ilm.check_exists` and `ilm.overwrite` if ILM is disabled.
-endif::no_ilm[]
+When using ILM, turn off the ILM setup check in the {beatname_uc} config file before
+running {beatname_uc} to publish events:
 
-ifdef::no_ilm[]
-[source,yaml]
 ----
-setup.template.enabled: false
+setup.ilm.check_exists: false
 ----
 endif::no_ilm[]
 
 To grant the required privileges:
 
 . Create a *writer role*, called something like +{beat_default_index_prefix}_writer+, that has
-the following privileges (this list assumes the setup options shown earlier are
-set to `false`):
+the following privileges:
+
+NOTE: Only the `monitor` cluster privilege and the `create` index privilege on
++{beat_default_index_prefix}-*+ indices are needed in every configuration.
+
 +
 [options="header"]
 |====
@@ -220,36 +214,39 @@ set to `false`):
 
 ifndef::apm-server[]
 |`monitor`
-|Send monitoring info
+|Retrieve cluster details (e.g. version)
 endif::apm-server[]
 
-ifndef::no_ilm[]
-|`read_ilm`
-|Read the ILM policy when connecting to clusters that support ILM
-endif::no_ilm[]
+|`create` on +{beat_default_index_prefix}-*+ indices
+|Index events into {es}
 
 ifeval::["{beatname_lc}"=="filebeat"]
-|`manage_pipeline`
-|Load ingest pipelines used by modules
+|`cluster:admin/ingest/pipeline/get`
+|Check for ingest pipelines used by modules. Not needed when not using modules.
 endif::[]
 
 ifndef::no_ilm[]
-|`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
-|Check for alias when connecting to clusters that support ILM
+|`read_ilm`
+|(Optional) Read the ILM policy when connecting to clusters that support ILM. Not needed when
+`setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
-|`index` on +{beat_default_index_prefix}-*+ indices
-|Index events into {es}
+ifndef::no_ilm[]
+|`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
+|(Optional) Check for alias when connecting to clusters that support ILM. Not needed when
+`setup.ilm.check_exists` is `false`.
+endif::no_ilm[]
 
 |`create_index` on +{beat_default_index_prefix}-*+ indices
-|Create daily indices when connecting to clusters that do not support ILM
+|(Optional) Create daily indices when connecting to clusters that do not support ILM. Not needed when
+using ILM.
 |====
 ifndef::apm-server[]
 +
 Omit any privileges that aren't relevant in your environment.
 endif::apm-server[]
 
-. Assign the *writer role* to users who will index events into {es}. 
+. Assign the *writer role* to users who will index events into {es}.
 
 [[kibana-user-privileges]]
 ==== Grant privileges and roles needed to read {beatname_uc} data
