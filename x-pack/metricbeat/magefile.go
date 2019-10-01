@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
+	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
@@ -47,7 +49,16 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	if d, ok := deps[devtools.Platform.Name]; ok {
+		mg.Deps(d)
+	}
+	params := devtools.DefaultGolangCrossBuildArgs()
+	params.Env = map[string]string{
+		//"CGO_LDFLAGS": "-Wl,-rpath.*",
+		"CGO_CFLAGS": "-I/opt/mqm/inc/",
+		"CGO_LDFLAGS_ALLOW": "-Wl,-rpath.*",
+	}
+	return devtools.GolangCrossBuild(params)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -241,6 +252,40 @@ func packageLightModules() error {
 		default:
 			return fmt.Errorf("unhandled package type: %v", pkgType)
 		}
+	}
+	return nil
+}
+
+// -----------------------------------------------------------------------------
+// - Install the IBM redistributable client package
+var (
+	deps = map[string]func() error{
+		"linux/amd64": installIBMCLinuxAMD64,
+	}
+)
+
+func installIBMCLinuxAMD64() error {
+	URL := "https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist"
+	RDTAR := "IBM-MQC-Redist-LinuxX64.tar.gz"
+	VRMF := "9.1.3.0"
+
+	// Create the directory for IBM Client
+	err := sh.RunV("mkdir", "/opt/mqm")
+	if err != nil {
+		return errors.Wrap(err, "error while adding IBM C client")
+	}
+
+	pkgURL := fmt.Sprintf("%v/%v-%v", URL, VRMF, RDTAR)
+	name := fmt.Sprintf("/opt/mqm/%v-%v", VRMF, RDTAR)
+	// curl to get the IBM tar with the IBM C Client
+	err = sh.RunV("curl", "-o", name, "-LO", pkgURL)
+	if err != nil {
+		return errors.Wrap(err, "error while adding IBM C client")
+	}
+	// Untar the IBM client
+	err = sh.RunV("tar", "-zxvf", name, "-C", "/opt/mqm/")
+	if err != nil {
+		return errors.Wrap(err, "error while adding IBM C client")
 	}
 	return nil
 }
