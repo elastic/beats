@@ -12,7 +12,7 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
-This is a filebeat module for reading threat intel information from MISP.
+This is a filebeat module for reading threat intel information from MISP. It uses the httpjson input.
 
 [float]
 === Fields
