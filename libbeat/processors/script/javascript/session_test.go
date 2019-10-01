@@ -215,7 +215,8 @@ func TestSessionParallel(t *testing.T) {
 						"host": common.MapStr{"name": "computer"},
 					},
 				}
-				p.Run(evt)
+				_, err := p.Run(evt)
+				assert.NoError(t, err)
 			}
 		}()
 	}
