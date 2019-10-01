@@ -99,9 +99,6 @@ func main() {
 	// Build import paths.
 	var imports []string
 	for _, dir := range dirs {
-		if strings.Contains(dir, "metricbeat/module/ibmmq") {
-			continue
-		}
 		// Skip packages without an init() function because that cannot register
 		// anything as a side-effect of being imported (e.g. filebeat/input/file).
 		var foundInitMethod bool
