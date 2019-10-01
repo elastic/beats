@@ -1,2 +1,72 @@
 This is the azure module.
 
+The Azure Monitor feature collects and aggregates logs and metrics from a variety of sources into a common data platform where it can be used for analysis, visualization, and alerting.
+
+
+The azure monitor metrics are numerical values that describe some aspect of a system at a particular point in time. They are collected at regular intervals and are identified with a timestamp, a name, a value, and one or more defining labels.
+This is the list of supported metrics.
+
+The azure module will periodically retrieve the azure monitor metrics using the Azure REST APIs as MetricList.
+Additional azure API calls will be executed in order to retrieve information regarding the resources targeted by the user.
+
+The azure module mericsets are `monitor`,  `compute_vm` and `compute_vm_scaleset`
+
+[float]
+=== Module-specific configuration notes
+
+All the tasks executed against the Azure Monitor  REST API will use the Azure Resource Manager authentication model.
+Therefore, all requests must be authenticated with Azure Active Directory (Azure AD).
+One approach to authenticate the client application is to create an Azure AD service principal and retrieve the authentication (JWT) token.
+For a more detailed walk-through, have a look at using Azure PowerShell to create a service principal to access resources. It is also possible to create a service principal via the Azure portal.
+
+Required credentials for the `azure` module:
+
+`client_id` - Unique identifier for the application (also known as Application Id)
+
+`client_secret` - The client/application secret/key
+
+`subscription_id` - Unique identifier for the azure subscription
+
+`tenant_id` - The unique identifier of the Azure Active Directory instance
+
+Users can use the azure credentials keys if configured `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+
+
+The `aws` module requires AWS credentials configuration in order to make AWS API calls.
+Users can either use `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and/or
+`AWS_SESSION_TOKEN`, or use shared AWS credentials file.
+
+
+[float]
+== Metricsets
+
+[float]
+=== `monitor`
+This metricset allows users to retrieve metrics from specified resources. Added filters can apply here as the interval of retrieving these metrics, metric names,
+aggregation list, namespaces and metric dimensions.
+
+[float]
+=== `compute_vm`
+This metricset will collect metrics from the virtual machines, these metrics will have a timegrain every 5 minutes,
+so the `period` for `compute_vm` metricset  should be `300s` or multiples of `300s`.
+
+[float]
+=== `compute_vm_scaleset`
+This metricset will collect metrics from the virtual machine scalesets, these metrics will have a timegrain every 5 minutes,
+so the `period` for `compute_vm_scaleset` metricset  should be `300s` or multiples of `300s`.
+
+
+[float]
+== `To keep in mind`
+
+Costs:
+
+Metric queries  -  1,000,000 standard API calls per month(FREE UNITS INCLUDED)	and pricing €0.009/1,000 standard API calls.
+
+Metric queries are charged based on the number of standard API calls. A standard API call is a call that analyses 1,440 data points (1,440 is also the total number of data points that can be stored per metric per day). If an API call analyses more than 1,440 data points, then it will count as multiple standard API calls. If an API call analyses less than 1,440 data points, it will count as less than one API call. The number of standard API calls is calculated every day as the total number of data points analysed per day divided by 1,440.
+
+A clear scenario is provided in the link: A scenario tracking five metrics with one-minute granularity from 100 VMs a day will result in 720,000 data points, which translates to (720,000/1,440) 500 standard API calls per day
+
+We can  provide this information in the documentation and also a info/warning log message when starting the azure monitor metricset.
+
+Authentication - we are handling authentication on our side (creating/renewing the authentication token), so we advise users to use dedicated credentials for metricbeat only.
