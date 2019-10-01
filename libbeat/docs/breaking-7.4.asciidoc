@@ -13,7 +13,7 @@ migrate Beats to version 7.4. {see-relnotes}
 [float]
 ==== Golang version update
 
-The Beats platform has been updated to use Golang 1.12.7.
+The Beats platform has been updated to use Golang 1.12.9.
 
 [float]
 ==== {auditbeat} `system` module changes
