@@ -188,13 +188,12 @@ func TestSessionTimeout(t *testing.T) {
 }
 
 func TestSessionParallel(t *testing.T) {
-	const runawayLoop = `
+	const script = `
 		evt.Put("host.name", "workstation");			
     `
 
 	p, err := NewFromConfig(Config{
-		Source:         header + runawayLoop + footer,
-		Timeout:        500 * time.Millisecond,
+		Source:         header + script + footer,
 		TagOnException: "_js_exception",
 	}, nil)
 	if err != nil {
