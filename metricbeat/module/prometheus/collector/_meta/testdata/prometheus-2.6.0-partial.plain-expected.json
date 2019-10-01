@@ -11,6 +11,7 @@
         },
         "prometheus": {
             "labels": {
+                "instance": "127.0.0.1:58017",
                 "quantile": "0.25"
             },
             "metrics": {
@@ -34,10 +35,13 @@
         },
         "prometheus": {
             "labels": {
-                "quantile": "0"
+                "dialer_name": "alertmanager",
+                "instance": "127.0.0.1:58017"
             },
             "metrics": {
-                "go_gc_duration_seconds": 0.000038386
+                "net_conntrack_dialer_conn_attempted_total": 0,
+                "net_conntrack_dialer_conn_closed_total": 0,
+                "net_conntrack_dialer_conn_established_total": 0
             }
         },
         "service": {
@@ -57,7 +61,8 @@
         },
         "prometheus": {
             "labels": {
-                "quantile": "1"
+                "instance": "127.0.0.1:58017",
+                "quantile": "0.75"
             },
             "metrics": {
                 "go_gc_duration_seconds": 0.004392391
@@ -80,7 +85,32 @@
         },
         "prometheus": {
             "labels": {
-                "dialer_name": "prometheus"
+                "instance": "127.0.0.1:58017",
+                "version": "go1.11.3"
+            },
+            "metrics": {
+                "go_info": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "dialer_name": "prometheus",
+                "instance": "127.0.0.1:58017"
             },
             "metrics": {
                 "net_conntrack_dialer_conn_attempted_total": 1,
@@ -105,7 +135,8 @@
         },
         "prometheus": {
             "labels": {
-                "dialer_name": "default"
+                "dialer_name": "default",
+                "instance": "127.0.0.1:58017"
             },
             "metrics": {
                 "net_conntrack_dialer_conn_attempted_total": 0,
@@ -130,10 +161,11 @@
         },
         "prometheus": {
             "labels": {
-                "quantile": "0.75"
+                "instance": "127.0.0.1:58017",
+                "quantile": "0"
             },
             "metrics": {
-                "go_gc_duration_seconds": 0.004392391
+                "go_gc_duration_seconds": 0.000038386
             }
         },
         "service": {
@@ -153,54 +185,7 @@
         },
         "prometheus": {
             "labels": {
-                "dialer_name": "alertmanager"
-            },
-            "metrics": {
-                "net_conntrack_dialer_conn_attempted_total": 0,
-                "net_conntrack_dialer_conn_closed_total": 0,
-                "net_conntrack_dialer_conn_established_total": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "quantile": "0.5"
-            },
-            "metrics": {
-                "go_gc_duration_seconds": 0.000060618
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
+                "instance": "127.0.0.1:58017",
                 "listener_name": "http"
             },
             "metrics": {
@@ -225,10 +210,11 @@
         },
         "prometheus": {
             "labels": {
-                "version": "go1.11.3"
+                "instance": "127.0.0.1:58017",
+                "quantile": "0.5"
             },
             "metrics": {
-                "go_info": 1
+                "go_gc_duration_seconds": 0.000060618
             }
         },
         "service": {
@@ -247,6 +233,33 @@
             "period": 10000
         },
         "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:58017",
+                "quantile": "1"
+            },
+            "metrics": {
+                "go_gc_duration_seconds": 0.004392391
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:58017"
+            },
             "metrics": {
                 "go_gc_duration_seconds_count": 4,
                 "go_gc_duration_seconds_sum": 0.004534198,

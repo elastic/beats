@@ -11,6 +11,7 @@
         },
         "prometheus": {
             "labels": {
+                "instance": "127.0.0.1:58011",
                 "listener_name": "http"
             },
             "metrics": {
