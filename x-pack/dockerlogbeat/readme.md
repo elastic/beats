@@ -4,7 +4,7 @@
 This code is a working alpha for a [docker logging plugin](https://docs.docker.com/engine/extend/plugins_logging/). With the proper config, it can send logs to elasticsearch.
 ## Build and install
 
-To build and install, just run `make all`
+To build and install, just run `mage create`
 
 
 ## Running

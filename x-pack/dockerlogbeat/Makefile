@@ -11,14 +11,12 @@ all: build install
 .PHONY: build
 build: clean
 	cd ../.. ; \
-	docker build --target builder -t rootfsimage-build -f x-pack/dockerlogbeat/Dockerfile . ; \
+	docker build --target builder -t rootfsimage-build -f x-pack/dockerlogbeat/Dockerfile . || exit 1 ; \
 	docker build --target final -t rootfsimage -f x-pack/dockerlogbeat/Dockerfile . 
 	mkdir rootfs
 	docker create --name ${CONTAINER_NAME} rootfsimage true
 	docker export ${CONTAINER_NAME} | tar -x -C rootfs; \
 	docker rm -vf ${CONTAINER_NAME}
-	docker rmi rootfsimage
-	docker rmi rootfsimage-build
 
 .PHONY: install
 install:
@@ -27,7 +25,8 @@ install:
 
 .PHONY: clean
 clean:
+	-docker rmi rootfsimage
+	-docker rmi rootfsimage-build
 	rm -rf rootfs
-	rm -rf vendor/github.com/elastic/beats
 	-docker plugin disable ${DOCKER_PLUGIN}
 	-docker plugin rm ${DOCKER_PLUGIN}
