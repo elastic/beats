@@ -18,6 +18,8 @@
 package javascript
 
 import (
+	"context"
+	"sync"
 	"testing"
 	"time"
 
@@ -183,4 +185,41 @@ func TestSessionTimeout(t *testing.T) {
 	evt.PutValue("stop", true)
 	_, err = p.Run(evt)
 	assert.NoError(t, err)
+}
+
+func TestSessionParallel(t *testing.T) {
+	const runawayLoop = `
+		evt.Put("host.name", "workstation");			
+    `
+
+	p, err := NewFromConfig(Config{
+		Source:         header + runawayLoop + footer,
+		Timeout:        500 * time.Millisecond,
+		TagOnException: "_js_exception",
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const goroutines = 10
+	ctx, cancel := context.WithCancel(context.Background())
+	var wg sync.WaitGroup
+
+	wg.Add(goroutines)
+	for i := 0; i < goroutines; i++ {
+		go func() {
+			defer wg.Done()
+			for ctx.Err() == nil {
+				evt := &beat.Event{
+					Fields: common.MapStr{
+						"host": common.MapStr{"name": "computer"},
+					},
+				}
+				p.Run(evt)
+			}
+		}()
+	}
+
+	time.AfterFunc(time.Second, cancel)
+	wg.Wait()
 }
