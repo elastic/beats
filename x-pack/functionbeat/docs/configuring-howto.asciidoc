@@ -41,8 +41,6 @@ include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 :allplatforms!:
 
 [role="xpack"]
-include::{libbeat-dir}/docs/outputs/output-logstash.asciidoc[tag=shared-logstash-config]
-
 include::{libbeat-dir}/docs/outputconfig.asciidoc[tag=shared-outputconfig]
 
 * <<elasticsearch-output>>
