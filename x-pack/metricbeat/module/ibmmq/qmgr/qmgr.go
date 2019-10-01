@@ -2,27 +2,18 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build ibm
+
 package qmgr
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"plugin"
 
-	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/ibmmq"
+	"github.com/elastic/beats/x-pack/metricbeat/module/ibmmq/util"
 )
 
-var (
-	// CollectQmgrMetricset collects Metrics from IBM MQ server using the dynamically loaded plugin.
-	CollectQmgrMetricset func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error)
-)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -39,7 +30,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	queueManager     string
-	connectionConfig ibmmq.ConnectionConfig
+	connectionConfig util.ConnectionConfig
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -47,20 +38,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The ibmmq qmgr metricset is experimental.")
 
-	p, err := plugin.Open(os.Getenv("IBM_LIBRARY_PATH"))
-	if err != nil {
-		msg := fmt.Sprintf("Could not load IBM_LIBRARY_PATH: %v", err)
-		logp.Debug("ibm_module", msg)
-		return nil, err
-	}
-
-	collectQmgrMetricset, err := p.Lookup("CollectQmgrMetricset")
-	if err != nil {
-		panic(err)
-	}
-	CollectQmgrMetricset = collectQmgrMetricset.(func(eventType string, qmgrName string, ccPacked []byte) ([]beat.Event, error))
-
-	config := ibmmq.DefaultConfig
+	config := util.DefaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -77,11 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
-	configData, err := json.Marshal(m.connectionConfig)
-	if err != nil {
-		panic(err)
-	}
-	events, _ := CollectQmgrMetricset("QueueManager", m.queueManager, configData)
+	events, _ := util.CollectQmgrMetricset("QueueManager", m.queueManager, m.connectionConfig)
 
 	for _, beatEvent := range events {
 		var mbEvent mb.Event
