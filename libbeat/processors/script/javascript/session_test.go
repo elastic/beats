@@ -202,8 +202,9 @@ func TestSessionParallel(t *testing.T) {
 
 	const goroutines = 10
 	ctx, cancel := context.WithCancel(context.Background())
-	var wg sync.WaitGroup
+	defer cancel()
 
+	var wg sync.WaitGroup
 	wg.Add(goroutines)
 	for i := 0; i < goroutines; i++ {
 		go func() {
