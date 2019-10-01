@@ -5,8 +5,10 @@
 package compute_vm
 
 import (
+	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/pkg/errors"
+	"strings"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
@@ -32,8 +34,14 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		if len(*metricDefinitions.Value) == 0 {
 			return nil, errors.Errorf("no metric definitions were found for resource %s and namespace %s.", *resource.ID, *namespace.Properties.MetricNamespaceName)
 		}
+		var filteredMetricDefinitions []insights.MetricDefinition
+		for _, metricDefinition := range *metricDefinitions.Value {
+			if (metricDefinition.Name.LocalizedValue != nil && !strings.Contains(*metricDefinition.Name.LocalizedValue, "(Deprecated)")) || metricDefinition.Name.LocalizedValue == nil {
+				filteredMetricDefinitions = append(filteredMetricDefinitions, metricDefinition)
+			}
+		}
 		// map azure metric definitions to client metrics
-		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, *metricDefinitions.Value, resource, *namespace.Properties.MetricNamespaceName, nil, azure.DefaultTimeGrain)...)
+		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, filteredMetricDefinitions, resource, *namespace.Properties.MetricNamespaceName, nil, azure.DefaultTimeGrain)...)
 	}
 	return metrics, nil
 }
