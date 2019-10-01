@@ -94,8 +94,8 @@ class HaproxyTest(metricbeat.BaseTest):
 
 
 class Haproxy_1_6_Test(HaproxyTest):
-    COMPOSE_SERVICES = ['haproxy_1_6']
+    COMPOSE_ENV = {'HAPROXY_VERSION': '1.6'}
 
 
 class Haproxy_1_7_Test(HaproxyTest):
-    COMPOSE_SERVICES = ['haproxy_1_7']
+    COMPOSE_ENV = {'HAPROXY_VERSION': '1.7'}

@@ -13,12 +13,20 @@ services:
 
   # Modules
   cockroachdb:
-    build: ./module/cockroachdb/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-cockroachdb:${COCKROACHDB_VERSION:-19.1.1}-1
+    build:
+      context: ./module/cockroachdb/_meta
+      args:
+        COCKROACHDB_VERSION: ${COCKROACHDB_VERSION:-19.1.1}
     ports:
       - 8080
 
   coredns:
-    build: ./module/coredns/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-coredns:${COREDNS_VERSION:-1.5.0}-1
+    build:
+      context: ./module/coredns/_meta
+      args:
+        COREDNS_VERSION: ${COREDNS_VERSION:-1.5.0}
     ports:
       - 9153
 
@@ -30,13 +38,21 @@ services:
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
-    build: ../../metricbeat/module/kibana/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.3.0}-1
+    build:
+      context: ../../metricbeat/module/kibana/_meta
+      args:
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.3.0}
     depends_on:
       - elasticsearch
     ports:
       - 5601
 
   mssql:
-    build: ./module/mssql/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-mssql:${MSSQL_VERSION:-2017-GA}-1
+    build:
+      context: ./module/mssql/_meta
+      args:
+        MSSQL_VERSION: ${MSSQL_VERSION:-2017-GA}
     ports:
       - 1433
