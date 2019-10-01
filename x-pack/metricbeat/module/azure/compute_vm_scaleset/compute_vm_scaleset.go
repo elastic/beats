@@ -47,6 +47,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
+
+	// validate config resource options entered, no resource queries allowed
+	for _, resource := range config.Resources {
+		if resource.Query != "" {
+			return nil, errors.New("error initializing the monitor client: module azure - compute_vm_scaleset metricset. No queries allowed, please select one of the allowed options")
+		}
+	}
+
+	// if no options are entered we will retrieve all the vm's from the entire subscription
 	if len(config.Resources) == 0 {
 		config.Resources = []azure.ResourceConfig{
 			{
@@ -55,9 +64,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 	for index := range config.Resources {
+		// add the default vm scaleset type if groups are defined
 		if len(config.Resources[index].Group) > 0 {
 			config.Resources[index].Type = defaultVMScalesetNamespace
 		}
+		// add the default metrics for each resource option
 		config.Resources[index].Metrics = []azure.MetricConfig{
 			{
 				Name:      []string{"*"},

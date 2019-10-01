@@ -42,6 +42,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
+	// validate config resource options entered, no resource queries allowed
+	for _, resource := range config.Resources {
+		if resource.Query != "" {
+			return nil, errors.New("error initializing the monitor client: module azure - compute_vm metricset. No queries allowed, please select one of the allowed options")
+		}
+	}
+	// if no options are entered we will retrieve all the vm's from the entire subscription
 	if len(config.Resources) == 0 {
 		config.Resources = []azure.ResourceConfig{
 			{
