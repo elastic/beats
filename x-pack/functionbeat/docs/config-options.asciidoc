@@ -82,7 +82,6 @@ will appear in the Lambda console on AWS.
 The type of service to monitor. For this release, the supported types
 are:
 
-[horizontal]
 `cloudwatch_logs`:: Collects events from CloudWatch logs.
 `sqs`:: Collects data from Amazon Simple Queue Service (SQS).
 `kinesis`:: Collects data from a Kinesis stream.
@@ -130,45 +129,6 @@ your serverless environment. The default is unreserved.
 The maximum amount of memory to allocate for this function. Specify a value that
 is a factor of 64. There is a hard limit of 3008 MiB for each function. The
 default is 128 MiB.
-
-[float]
-[id-"{beatname-lc}-role"]
-==== `role`
-
-//REVIEWERS: I think it's kind of odd to show examples here when we don't show
-//them for other settings, but I don't think this belongs in the main example
-//above. WDYT? Same question applies to the entry for virtual_private_cloud.
-
-The custom execution role to use for the deployed function. For example:
-
-[source,yaml]
-----
-    role: arn:aws:iam::123456789012:role/MyFunction
-----
-
-Make sure the custom role has the permissions required to run the function. For
-more information, see <<iam-permissions>>.
-
-If `role` is not specified, the function uses the default role and policy
-created during deployment.
-
-[float]
-[id-"{beatname-lc}-virtual_private_cloud"]
-
-==== `virtual_private_cloud`
-
-Specifies additional settings required to connect to private resources in an
-Amazon Virtual Private Cloud (VPC). For example:
-
-[source,yaml]
-----
-    virtual_private_cloud:
-      security_group_ids:
-        - mySecurityGroup
-        - anotherSecurityGroup
-      subnet_ids:
-        - myUniqueID
-----
 
 [float]
 [id="{beatname_lc}-dead-letter-config"]
