@@ -88,7 +88,7 @@ var threat = (function () {
             case "domain":
                 attackPattern = '[' + 'dns.question.name = ' + '"' + v + '"' + ' OR url.domain = ' + '"' + v + '"' + ']';
                 evt.Put("dns.question.name", v);
-                evt.Put("url.domain", v)
+                evt.Put("url.domain", v);
                 break;
             case "domain|ip":
                 arr = v.split("|");
@@ -98,7 +98,7 @@ var threat = (function () {
                     attackPattern = '[' + '(' + 'dns.question.name = ' + '"' + domain + '"' + ' OR url.domain = ' + '"' + domain + '"' + ')' +
                         ' AND ' + '(' + 'source.ip = ' + '"' + ip + '"' + ' OR destination.ip = ' + '"' + ip + '"' + ')' + ']';
                     evt.Put("dns.question.name", domain);
-                    evt.Put("url.domain", domain)
+                    evt.Put("url.domain", domain);
                     evt.Put("source.ip", ip);
                     evt.Put("destination.ip", ip);
                 }
