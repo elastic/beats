@@ -400,6 +400,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `job` label by default when using Prometheus collector. {pull}13878[13878]
 - Add `state_resourcequota` metricset for Kubernetes module. {pull}13693[13693]
 
+- Add tags filter in ec2 metricset. {pull}13872[13872] {issue}13145[13145]
+
 *Packetbeat*
 
 - Update DNS protocol plugin to produce events with ECS fields for DNS. {issue}13320[13320] {pull}13354[13354]
