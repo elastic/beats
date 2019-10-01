@@ -15,9 +15,6 @@ migrate Beats to version 7.4. {see-relnotes}
 
 The Beats platform has been updated to use Golang 1.12.7.
 
-// REVIEWERS: Is the above statement correct (taken from the relnotes)? The 
-// libbeat/docs/version.asciidoc file has the golang version set to 1.12.9.
-
 [float]
 ==== {auditbeat} `system` module changes
 
@@ -37,11 +34,5 @@ changed:
 |`log.original`            |`event.original`
 |`cisco.asa.list_id`       |`cisco.asa.rule_name`
 |====
-
-
-//REVIEWERS: Do we want to mention the functionbeat deployment/pkg changes here?
-//sounds like there's been some discussion and maybe it's more of a feature
-//than a breaking change. WDYT? 
-
 
 // end::notable-breaking-changes[]
