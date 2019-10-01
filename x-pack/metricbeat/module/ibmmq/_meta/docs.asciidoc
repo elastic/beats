@@ -17,7 +17,7 @@ Then follow the steps in this repo to build the library.
 
 After the library has been built successfully set the IBM_LIBRARY_PATH variable to point to the shared file:
 ```
-export IBM_LIBRARY_PATH=~/ibmqlib_darwin.so
+export IBM_LIBRARY_PATH=~/ibmqlib_linux.so
 ```
 Then you are ready to go. You can build and execute Metricbeat and enable the module to collect metrics data
 from IBM MQ:
