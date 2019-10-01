@@ -45,7 +45,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	Tags []Tag `config:"tags"`
+	Tags []Tag `config:"tags_filter"`
 }
 
 // Tag holds a configuration specific for ec2 metricset.
@@ -63,16 +63,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	config := struct {
-		Tags []Tag
+		Tags []Tag `config:"tags_filter"`
 	}{}
 
 	err = base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
-
-	fmt.Println("config = ", config)
-	fmt.Println("config.Tags = ", config.Tags)
 
 	// Check if period is set to be multiple of 60s or 300s
 	remainder300 := int(metricSet.Period.Seconds()) % 300
@@ -199,6 +196,38 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 			if exists {
 				labels := strings.Split(*output.Label, labelSeperator)
 				instanceID := labels[instanceIDIdx]
+
+				// Add tags
+				tags := instanceOutput[instanceID].Tags
+				var tagKeys []string
+				var tagValues []string
+				for _, tag := range tags {
+					tagKeys = append(tagKeys, *tag.Key)
+					tagValues = append(tagValues, *tag.Value)
+				}
+
+				if m.Tags == nil {
+					for _, tag := range tags {
+						events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+					}
+				} else {
+					// check with each tag filter
+					// If tag filter doesn't exist in tagKeys/tagValues, then do not
+					// store tags for this instance into event.
+					for filterIdx, tagFilter := range m.Tags {
+						if exists, idx := aws.StringInSlice(tagFilter.Name, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+							continue NextOutput
+						}
+
+						// If code runs here, means tag filters are all matched.
+						if filterIdx == len(m.Tags)-1 {
+							for _, tag := range tags {
+								events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+							}
+						}
+					}
+				}
+
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
 				if err != nil {
 					return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
@@ -239,49 +268,6 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				privateIP := instanceOutput[instanceID].PrivateIpAddress
 				if privateIP != nil {
 					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
-				}
-
-				// Add tags
-				tags := instanceOutput[instanceID].Tags
-				fmt.Println("instanceID = ", instanceID)
-				var tagKeys []string
-				var tagValues []string
-				for _, tag := range tags {
-					tagKeys = append(tagKeys, *tag.Key)
-					tagValues = append(tagValues, *tag.Value)
-				}
-
-				m.Tags = []Tag{
-					{
-						Name:  "Name",
-						Value: "ECS Instance - DockerRegistryECSStack",
-					},
-					{
-						Name:  "aws:cloudformation:logical-id",
-						Value: "EcsInstanceAsg",
-					},
-				}
-
-				if m.Tags == nil {
-					for _, tag := range tags {
-						events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
-					}
-				} else {
-					// check with each tag filter
-					// If tag filter doesn't exist in tagKeys/tagValues, then do not
-					// store tags for this instance into event.
-					for filterIdx, tagFilter := range m.Tags {
-						if exists, idx := aws.StringInSlice(tagFilter.Name, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
-							continue NextOutput
-						}
-						fmt.Println("filter passed instanceID = ", instanceID)
-						// If code runs here, means tag filters are all matched.
-						if filterIdx == len(m.Tags)-1 {
-							for _, tag := range tags {
-								events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
-							}
-						}
-					}
 				}
 			}
 		}
