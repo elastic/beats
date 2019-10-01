@@ -132,7 +132,7 @@ is a factor of 64. There is a hard limit of 3008 MiB for each function. The
 default is 128 MiB.
 
 [float]
-[id-"{beatname-lc}-role"]
+[id="{beatname-lc}-role"]
 ==== `role`
 
 //REVIEWERS: I think it's kind of odd to show examples here when we don't show
@@ -153,7 +153,7 @@ If `role` is not specified, the function uses the default role and policy
 created during deployment.
 
 [float]
-[id-"{beatname-lc}-virtual_private_cloud"]
+[id="{beatname-lc}-virtual_private_cloud"]
 
 ==== `virtual_private_cloud`
 
