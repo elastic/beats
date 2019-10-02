@@ -1051,7 +1051,7 @@ var security = (function () {
         if (!code) {
             return;
         }
-        var eventActionDescription=eventActionTypes[code];
+        var eventActionDescription = eventActionTypes[code];
         evt.Put("event.action",eventActionDescription)
     }
 
