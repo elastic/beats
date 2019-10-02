@@ -139,6 +139,8 @@ class Test(BaseTest):
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
 
+        # Use a fixed timezone so results don't vary depending on the environment
+        # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed
         local_env = os.environ.copy()
         local_env["TZ"] = 'Etc/GMT+2'
 
