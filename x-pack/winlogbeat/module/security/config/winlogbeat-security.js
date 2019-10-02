@@ -1052,7 +1052,7 @@ var security = (function () {
             return;
         }
         var eventActionDescription = eventActionTypes[code];
-        evt.Put("event.action",eventActionDescription)
+        evt.Put("event.action", eventActionDescription);
     }
 
     var addLogonType = function(evt) {
