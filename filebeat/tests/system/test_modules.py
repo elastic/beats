@@ -140,7 +140,7 @@ class Test(BaseTest):
         output.write(" ".join(cmd) + "\n")
 
         local_env = os.environ.copy()
-        local_env["TZ"] = 'Etc/UTC'
+        local_env["TZ"] = 'Etc/GMT+2'
 
         subprocess.Popen(cmd,
                          env=local_env,
