@@ -39,26 +39,25 @@ func TestFetchUsage(t *testing.T) {
 			w.Write([]byte("{ \"version\": { \"number\": \"7.5.0\" }}"))
 
 		case "/api/stats":
+			excludeUsage := r.FormValue("exclude_usage")
+
 			// Make GET /api/stats return 503 for first call, 200 for subsequent calls
 			switch numStatsRequests {
 			case 0: // first call
-				excludeUsage := r.FormValue("exclude_usage")
 				assert.Equal(t, "false", excludeUsage)
-
 				w.WriteHeader(503)
 
 			case 1: // second call
-				excludeUsage := r.FormValue("exclude_usage")
+				// Make sure exclude_usage is still false since first call failed
 				assert.Equal(t, "false", excludeUsage)
-
 				w.WriteHeader(200)
 
 			case 2: // third call
-				excludeUsage := r.FormValue("exclude_usage")
+				// Make sure exclude_usage is now true since second call succeeded
 				assert.Equal(t, "true", excludeUsage)
-
 				w.WriteHeader(200)
 			}
+
 			numStatsRequests++
 		}
 	}))
