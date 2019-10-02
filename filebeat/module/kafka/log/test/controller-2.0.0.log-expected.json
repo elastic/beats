@@ -1,9 +1,9 @@
 [
     {
-        "@timestamp": "2018-10-31T15:03:32.474Z",
+        "@timestamp": "2018-10-31T15:03:32.474-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -14,10 +14,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:03:32.474Z",
+        "@timestamp": "2018-10-31T15:03:32.474-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -28,10 +28,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:03:32.474Z",
+        "@timestamp": "2018-10-31T15:03:32.474-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -42,10 +42,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:03:32.475Z",
+        "@timestamp": "2018-10-31T15:03:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -56,10 +56,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:03:32.475Z",
+        "@timestamp": "2018-10-31T15:03:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -70,10 +70,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:03:32.475Z",
+        "@timestamp": "2018-10-31T15:03:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -84,10 +84,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:03:32.475Z",
+        "@timestamp": "2018-10-31T15:03:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -98,10 +98,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:03:32.475Z",
+        "@timestamp": "2018-10-31T15:03:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -112,10 +112,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -126,10 +126,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -140,10 +140,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -154,10 +154,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -168,10 +168,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -182,10 +182,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -196,10 +196,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -210,10 +210,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:08:32.475Z",
+        "@timestamp": "2018-10-31T15:08:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -224,10 +224,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:09:30.306Z",
+        "@timestamp": "2018-10-31T15:09:30.306-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -238,10 +238,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:09:30.307Z",
+        "@timestamp": "2018-10-31T15:09:30.307-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -252,10 +252,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:09:30.396Z",
+        "@timestamp": "2018-10-31T15:09:30.396-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.RequestSendThread",
@@ -266,10 +266,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:09:30.397Z",
+        "@timestamp": "2018-10-31T15:09:30.397-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.RequestSendThread",
@@ -280,10 +280,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:09:30.396Z",
+        "@timestamp": "2018-10-31T15:09:30.396-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.RequestSendThread",
@@ -294,10 +294,10 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2018-10-31T15:13:32.475Z",
+        "@timestamp": "2018-10-31T15:13:32.475-02:00",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",

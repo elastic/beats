@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2012-04-10T04:39:56.000Z",
+        "@timestamp": "2012-04-10T02:39:56.000-02:00",
         "client.bytes": 78,
         "client.ip": "192.168.0.2",
         "client.packets": 0,
@@ -26,11 +26,11 @@
         "event.category": "network_traffic",
         "event.dataset": "panw.panos",
         "event.duration": 0,
-        "event.end": "2012-04-10T04:39:56.000Z",
+        "event.end": "2012-04-10T02:39:56.000-02:00",
         "event.module": "panw",
         "event.outcome": "allow",
-        "event.start": "2012-04-10T04:39:56.000Z",
-        "event.timezone": "+00:00",
+        "event.start": "2012-04-10T02:39:56.000-02:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,

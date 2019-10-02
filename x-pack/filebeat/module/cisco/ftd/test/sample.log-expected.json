@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2013-04-15T09:36:50.000Z",
+        "@timestamp": "2013-04-15T07:36:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_dmz",
@@ -14,7 +14,7 @@
         "event.original": "%FTD-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -29,7 +29,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-15T09:36:50.000Z",
+        "@timestamp": "2013-04-15T07:36:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_dmz",
@@ -43,7 +43,7 @@
         "event.original": "%FTD-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 type 3, code 0, by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -58,7 +58,7 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T13:34:34.000Z",
+        "@timestamp": "2014-04-15T11:34:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -73,7 +73,7 @@
         "event.original": "%FTD-session-5-106100: access-list acl_in permitted tcp inside/10.1.2.16(2241) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -88,7 +88,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-24T16:00:28.000Z",
+        "@timestamp": "2013-04-24T14:00:28.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "inside",
@@ -102,7 +102,7 @@
         "event.original": "%FTD-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.0.2.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]",
         "event.outcome": "deny",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
         "input.type": "log",
@@ -118,7 +118,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-24T16:00:27.000Z",
+        "@timestamp": "2013-04-24T14:00:27.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "inside",
@@ -132,7 +132,7 @@
         "event.original": "%FTD-6-106100: access-list inside permitted udp inside/172.29.2.3(1065) -> outside/192.0.2.57(53) hit-cnt 144 300-second interval [0xe982c7a4, 0x0]",
         "event.outcome": "allow",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
         "input.type": "log",
@@ -148,7 +148,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -156,7 +156,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4952 to outside:192.0.2.130/12834",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -167,7 +167,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -175,7 +175,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42.130/12834)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -186,7 +186,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -194,7 +194,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic UDP translation from outside:10.123.1.35/52925 to outside:192.0.2.130/25882",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -205,7 +205,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -213,7 +213,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302015: Built outbound UDP connection 89743275 for outside:192.0.2.222/53 (192.0.2.43/53) to outside:10.123.1.35/52925 (10.123.1.35/25882)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -224,7 +224,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -232,7 +232,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4953 to outside:192.0.2.130/45392",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -243,7 +243,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -251,7 +251,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 89743276 for outside:192.0.2.1/80 (192.0.2.1/80) to outside:10.123.3.42/4953 (10.123.3.130/45392)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -262,7 +262,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.connection_id": "89743275",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -273,12 +273,12 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 5025000000000,
-        "event.end": "2013-04-29T12:59:50.000Z",
+        "event.end": "2013-04-29T10:59:50.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 89743275 for outside:192.0.2.222/53 to inside:10.123.1.35/52925 duration 1:23:45 bytes 140",
         "event.severity": 6,
         "event.start": "2013-04-29T11:36:05.000Z",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -294,7 +294,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.connection_id": "666",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.destination_username": "user2",
@@ -307,12 +307,12 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 36000000000000,
-        "event.end": "2013-04-29T12:59:50.000Z",
+        "event.end": "2013-04-29T10:59:50.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 666 for outside:192.0.2.222/53 user1 to inside:10.123.1.35/52925 user2 duration 10:00:00 bytes 9999999",
         "event.severity": 6,
         "event.start": "2013-04-29T02:59:50.000Z",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -328,7 +328,7 @@
         ]
     },
     {
-        "@timestamp": "2011-06-04T21:59:52.000Z",
+        "@timestamp": "2011-06-04T19:59:52.000-02:00",
         "cisco.ftd.icmp_code": 17233,
         "cisco.ftd.mapped_source_ip": "192.168.132.46",
         "cisco.ftd.message_id": "302021",
@@ -339,7 +339,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302021: Teardown ICMP connection for faddr 172.24.177.29/0 gaddr 192.168.132.46/17233 laddr 192.168.132.46/17233",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "FJSG2NRFW01",
         "input.type": "log",
@@ -354,7 +354,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -362,7 +362,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-305011: Built dynamic TCP translation from inside:192.168.3.42/4954 to outside:192.0.0.130/10879",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -373,7 +373,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000Z",
+        "@timestamp": "2013-04-29T10:59:50.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -381,7 +381,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 89743277 for outside:192.0.0.17/80 (192.0.0.17/80) to inside:192.168.3.42/4954 (10.0.0.130/10879)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -392,7 +392,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:33.000Z",
+        "@timestamp": "2013-04-30T07:22:33.000-02:00",
         "cisco.ftd.message_id": "106007",
         "destination.ip": "10.1.2.60",
         "destination.port": 53,
@@ -403,7 +403,7 @@
         "event.original": "%FTD-2-106007: Deny inbound UDP from 192.0.0.66/12981 to 10.1.2.60/53 due to DNS Query",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
@@ -420,7 +420,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:38.000Z",
+        "@timestamp": "2013-04-30T07:22:38.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -434,7 +434,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2006) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -449,7 +449,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:38.000Z",
+        "@timestamp": "2013-04-30T07:22:38.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -463,7 +463,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49734) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -478,7 +478,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:39.000Z",
+        "@timestamp": "2013-04-30T07:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -492,7 +492,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49735) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -507,7 +507,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:39.000Z",
+        "@timestamp": "2013-04-30T07:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -521,7 +521,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49736) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -536,7 +536,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:39.000Z",
+        "@timestamp": "2013-04-30T07:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -550,7 +550,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49737) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -565,7 +565,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:40.000Z",
+        "@timestamp": "2013-04-30T07:22:40.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -579,7 +579,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49738) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -594,7 +594,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:41.000Z",
+        "@timestamp": "2013-04-30T07:22:41.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -608,7 +608,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49746) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -623,7 +623,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:47.000Z",
+        "@timestamp": "2013-04-30T07:22:47.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -637,7 +637,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2007) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -652,7 +652,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:48.000Z",
+        "@timestamp": "2013-04-30T07:22:48.000-02:00",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -666,7 +666,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.13(43013) -> dmz/192.168.33.31(25) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -681,7 +681,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:56.000Z",
+        "@timestamp": "2013-04-30T07:22:56.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -695,7 +695,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2008) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -710,7 +710,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:02.000Z",
+        "@timestamp": "2013-04-30T07:23:02.000-02:00",
         "cisco.ftd.message_id": "106006",
         "cisco.ftd.source_interface": "inside",
         "destination.ip": "10.1.2.42",
@@ -722,7 +722,7 @@
         "event.original": "%FTD-2-106006: Deny inbound UDP from 192.0.2.66/137 to 10.1.2.42/137 on interface inside",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
@@ -738,7 +738,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:03.000Z",
+        "@timestamp": "2013-04-30T07:23:03.000-02:00",
         "cisco.ftd.message_id": "106007",
         "destination.ip": "10.1.5.60",
         "destination.port": 53,
@@ -749,7 +749,7 @@
         "event.original": "%FTD-2-106007: Deny inbound UDP from 192.0.2.66/12981 to 10.1.5.60/53 due to DNS Query",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
@@ -766,7 +766,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:06.000Z",
+        "@timestamp": "2013-04-30T07:23:06.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -780,7 +780,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2009) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -795,7 +795,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:08.000Z",
+        "@timestamp": "2013-04-30T07:23:08.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -809,7 +809,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.46(49776) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -824,7 +824,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:15.000Z",
+        "@timestamp": "2013-04-30T07:23:15.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -838,7 +838,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2010) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -853,7 +853,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:24.000Z",
+        "@timestamp": "2013-04-30T07:23:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -867,7 +867,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2011) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "deny",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -882,7 +882,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:34.000Z",
+        "@timestamp": "2013-04-30T07:23:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -896,7 +896,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2012) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "deny",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -911,7 +911,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:40.000Z",
+        "@timestamp": "2013-04-30T07:23:40.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_out",
@@ -925,7 +925,7 @@
         "event.original": "%FTD-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -940,7 +940,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:41.000Z",
+        "@timestamp": "2013-04-30T07:23:41.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_out",
@@ -954,7 +954,7 @@
         "event.original": "%FTD-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -969,7 +969,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:43.000Z",
+        "@timestamp": "2013-04-30T07:23:43.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -983,7 +983,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.46(49840) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -998,7 +998,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:43.000Z",
+        "@timestamp": "2013-04-30T07:23:43.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1012,7 +1012,7 @@
         "event.original": "%FTD-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.16(2013) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -1027,7 +1027,7 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T13:34:34.000Z",
+        "@timestamp": "2018-04-15T11:34:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1042,7 +1042,7 @@
         "event.original": "%FTD-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -1057,7 +1057,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:24.000Z",
+        "@timestamp": "2018-12-11T06:01:24.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1065,7 +1065,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80 (10.0.13.13/80)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1077,7 +1077,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:24.000Z",
+        "@timestamp": "2018-12-11T06:01:24.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1085,7 +1085,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80port> (10.0.13.13/80)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1097,7 +1097,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:24.000Z",
+        "@timestamp": "2018-12-11T06:01:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
@@ -1111,7 +1111,7 @@
         "event.original": "%FTD-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1127,7 +1127,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:24.000Z",
+        "@timestamp": "2018-12-11T06:01:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
@@ -1141,7 +1141,7 @@
         "event.original": "%FTD-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1157,7 +1157,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:31.000Z",
+        "@timestamp": "2018-12-11T06:01:31.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1165,7 +1165,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1177,7 +1177,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:31.000Z",
+        "@timestamp": "2018-12-11T06:01:31.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1185,7 +1185,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1197,7 +1197,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:31.000Z",
+        "@timestamp": "2018-12-11T06:01:31.000-02:00",
         "cisco.ftd.connection_id": "447236",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -1208,12 +1208,12 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-12-11T08:01:31.000Z",
+        "event.end": "2018-12-11T06:01:31.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447236 for outside:192.0.2.222/1234 to dmz:192.168.1.34/5678 duration 0:00:00 bytes 14804 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-11T08:01:31.000Z",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1230,7 +1230,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000Z",
+        "@timestamp": "2018-12-11T06:01:38.000-02:00",
         "cisco.ftd.connection_id": "447234",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -1241,12 +1241,12 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
-        "event.end": "2018-12-11T08:01:38.000Z",
+        "event.end": "2018-12-11T06:01:38.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-11T08:00:30.000Z",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1263,7 +1263,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000Z",
+        "@timestamp": "2018-12-11T06:01:38.000-02:00",
         "cisco.ftd.connection_id": "447234",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -1274,12 +1274,12 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
-        "event.end": "2018-12-11T08:01:38.000Z",
+        "event.end": "2018-12-11T06:01:38.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-11T08:00:30.000Z",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1296,7 +1296,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000Z",
+        "@timestamp": "2018-12-11T06:01:38.000-02:00",
         "cisco.ftd.message_id": "106015",
         "cisco.ftd.source_interface": "outside",
         "destination.ip": "192.168.1.34",
@@ -1308,7 +1308,7 @@
         "event.original": "%FTD-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
         "event.outcome": "deny",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1324,7 +1324,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000Z",
+        "@timestamp": "2018-12-11T06:01:38.000-02:00",
         "cisco.ftd.message_id": "106015",
         "cisco.ftd.source_interface": "outside",
         "destination.ip": "192.168.1.34",
@@ -1336,7 +1336,7 @@
         "event.original": "%FTD-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
         "event.outcome": "deny",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1352,7 +1352,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:39.000Z",
+        "@timestamp": "2018-12-11T06:01:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
@@ -1366,7 +1366,7 @@
         "event.original": "%FTD-4-106023: Deny udp src dmz:192.168.1.34/5679 dst outside:192.0.0.12/5000 by access-group \"dmz\" [0x123a465e, 0x8c20f21]",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1382,7 +1382,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:53.000Z",
+        "@timestamp": "2018-12-11T06:01:53.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1390,7 +1390,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1402,7 +1402,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:53.000Z",
+        "@timestamp": "2018-12-11T06:01:53.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1410,7 +1410,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1422,7 +1422,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:53.000Z",
+        "@timestamp": "2018-12-11T06:01:53.000-02:00",
         "cisco.ftd.connection_id": "447237",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -1433,12 +1433,12 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 86399000000000,
-        "event.end": "2018-12-11T08:01:53.000Z",
+        "event.end": "2018-12-11T06:01:53.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447237 for outside:192.0.2.222/1234 to dmz:10.10.10.10/1235 duration 23:59:59 bytes 11420 TCP FINs",
         "event.severity": 6,
         "event.start": "2018-12-10T08:01:54.000Z",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
@@ -1455,7 +1455,7 @@
         ]
     },
     {
-        "@timestamp": "2012-08-15T23:30:09.000Z",
+        "@timestamp": "2012-08-15T21:30:09.000-02:00",
         "cisco.ftd.connection_id": "40",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1466,12 +1466,12 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 122000000000,
-        "event.end": "2012-08-15T23:30:09.000Z",
+        "event.end": "2012-08-15T21:30:09.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 40 for outside:10.44.4.4/500 to inside:10.44.2.2/500 duration 0:02:02 bytes 1416",
         "event.severity": 6,
         "event.start": "2012-08-15T23:28:07.000Z",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
@@ -1487,7 +1487,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:50:53.000Z",
+        "@timestamp": "2014-09-12T04:50:53.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.88.99.47",
@@ -1498,7 +1498,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1511,7 +1511,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:01.000Z",
+        "@timestamp": "2014-09-12T04:51:01.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.88.99.57",
@@ -1522,7 +1522,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1535,7 +1535,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:05.000Z",
+        "@timestamp": "2014-09-12T04:51:05.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.88.99.47",
@@ -1546,7 +1546,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1559,7 +1559,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:05.000Z",
+        "@timestamp": "2014-09-12T04:51:05.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.88.99.47",
@@ -1570,7 +1570,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1583,7 +1583,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:06.000Z",
+        "@timestamp": "2014-09-12T04:51:06.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.88.99.57",
@@ -1594,7 +1594,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1607,7 +1607,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:17.000Z",
+        "@timestamp": "2014-09-12T04:51:17.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.88.99.57",
@@ -1618,7 +1618,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1631,7 +1631,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:52:48.000Z",
+        "@timestamp": "2014-09-12T04:52:48.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.168.1.255",
@@ -1642,7 +1642,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1655,7 +1655,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:53:00.000Z",
+        "@timestamp": "2014-09-12T04:53:00.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.ip": "192.168.1.255",
@@ -1666,7 +1666,7 @@
         "event.original": "%FTD-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1679,7 +1679,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:53:01.000Z",
+        "@timestamp": "2014-09-12T04:53:01.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "PERMIT_IN",
@@ -1693,7 +1693,7 @@
         "event.original": "%FTD-4-106023: Deny tcp src outside:192.0.2.95/24069 dst inside:10.32.112.125/25 by access-group \"PERMIT_IN\" [0x0, 0x0]\"",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1709,7 +1709,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:53:02.000Z",
+        "@timestamp": "2014-09-12T04:53:02.000-02:00",
         "cisco.ftd.icmp_code": 3,
         "cisco.ftd.icmp_type": 3,
         "cisco.ftd.message_id": "313001",
@@ -1721,7 +1721,7 @@
         "event.original": "%FTD-3-313001: Denied ICMP type=3, code=3 from 10.2.3.5 on interface Outside",
         "event.outcome": "deny",
         "event.severity": 3,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
@@ -1736,7 +1736,7 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:13.000Z",
+        "@timestamp": "2015-01-14T11:16:13.000-02:00",
         "cisco.ftd.icmp_type": 0,
         "cisco.ftd.message_id": "313004",
         "cisco.ftd.source_interface": "inside",
@@ -1748,7 +1748,7 @@
         "event.original": "%FTD-4-313004: Denied ICMP type=0, from laddr 172.16.30.2 on interface inside to 172.16.1.10: no matching session",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -1762,7 +1762,7 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:14.000Z",
+        "@timestamp": "2015-01-14T11:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.mapped_destination_ip": "192.88.99.129",
         "cisco.ftd.mapped_destination_port": 80,
@@ -1781,7 +1781,7 @@
         "event.original": "%FTD-4-338002: Dynamic Filter permitted black listed TCP traffic from inside:10.1.1.45/6798 (192.88.99.1/7890) to outside:192.88.99.129/80 (192.88.99.129/80), destination 192.88.99.129 resolved from dynamic list: bad.example.com",
         "event.outcome": "allow",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -1799,7 +1799,7 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:14.000Z",
+        "@timestamp": "2015-01-14T11:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outsidet",
         "cisco.ftd.mapped_destination_ip": "192.0.2.225",
         "cisco.ftd.mapped_destination_port": 80,
@@ -1821,7 +1821,7 @@
         "event.original": "%FTD-4-338004: Dynamic Filter monitored blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.225/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
         "event.outcome": "monitored",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -1838,7 +1838,7 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:14.000Z",
+        "@timestamp": "2015-01-14T11:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outsidet",
         "cisco.ftd.mapped_destination_ip": "192.0.2.223",
         "cisco.ftd.mapped_destination_port": 8080,
@@ -1860,7 +1860,7 @@
         "event.original": "%FTD-4-338008: Dynamic Filter dropped blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.223/8080), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
@@ -1877,7 +1877,7 @@
         ]
     },
     {
-        "@timestamp": "2009-11-16T14:12:35.000Z",
+        "@timestamp": "2009-11-16T12:12:35.000-02:00",
         "cisco.ftd.message_id": "304001",
         "destination.ip": "192.0.2.1",
         "event.action": "firewall-rule",
@@ -1887,7 +1887,7 @@
         "event.original": "%FTD-5-304001: 10.30.30.30 Accessed URL 192.0.2.1:/app",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -1900,7 +1900,7 @@
         "url.original": "/app"
     },
     {
-        "@timestamp": "2009-11-16T14:12:36.000Z",
+        "@timestamp": "2009-11-16T12:12:36.000-02:00",
         "cisco.ftd.message_id": "304001",
         "destination.ip": "192.0.2.32",
         "event.action": "firewall-rule",
@@ -1910,7 +1910,7 @@
         "event.original": "%FTD-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://example.com",
         "event.outcome": "allow",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
@@ -1923,7 +1923,7 @@
         "url.original": "http://example.com"
     },
     {
-        "@timestamp": "2009-11-16T14:12:37.000Z",
+        "@timestamp": "2009-11-16T12:12:37.000-02:00",
         "cisco.ftd.message_id": "304002",
         "cisco.ftd.source_interface": "inside",
         "destination.ip": "192.0.0.19",
@@ -1934,7 +1934,7 @@
         "event.original": "%FTD-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside",
         "event.outcome": "deny",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
