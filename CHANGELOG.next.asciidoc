@@ -103,7 +103,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
 - Fix case insensitive regular expressions not working correctly. {pull}13250[13250]
 - Disable `add_kubernetes_metadata` if no matchers found. {pull}13709[13709]
+- Better wording for xpack beats when the _xpack endpoint is not reachable. {pull}13771[13771]
 - Recover from panics in the javascript process and log details about the failure to aid in future debugging. {pull}13690[13690]
+- Make the script processor concurrency-safe. {issue}13690[13690] {pull}13857[13857]
 
 *Auditbeat*
 
@@ -318,6 +320,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Parse query steps in PostgreSQL slowlogs. {issue}13496[13496] {pull}13701[13701]
 - Add support to set the document id in the json reader. {pull}5844[5844]
 - Add input httpjson. {issue}13545[13545] {pull}13546[13546]
+- Filebeat Netflow input: Remove beta label. {pull}13858[13858]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -384,6 +387,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `docker.cpu.*.norm.pct` metrics for `cpu` metricset of Docker Metricbeat module. {pull}13695[13695]
 - Add `instance` label by default when using Prometheus collector. {pull}13737[13737]
 - Add Apache Tomcat module {pull}13491[13491]
+- Add `job` label by default when using Prometheus collector. {pull}13878[13878]
 
 
 *Packetbeat*
