@@ -89,6 +89,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				if exists, _ := promEvent.labels.HasKey("instance"); !exists {
 					promEvent.labels.Put("instance", m.Host())
 				}
+				// Add default job label if not already there
+				if exists, _ := promEvent.labels.HasKey("job"); !exists {
+					promEvent.labels.Put("job", m.Module().Name())
+				}
 				// Add labels
 				if len(promEvent.labels) > 0 {
 					eventList[labelsHash]["labels"] = promEvent.labels
