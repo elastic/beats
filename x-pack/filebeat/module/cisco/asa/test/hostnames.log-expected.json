@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-10-10T10:21:36.000Z",
+        "@timestamp": "2019-10-10T08:21:36.000-02:00",
         "cisco.asa.icmp_code": 0,
         "cisco.asa.mapped_source_ip": "10.0.55.66",
         "cisco.asa.message_id": "302021",
@@ -11,7 +11,7 @@
         "event.module": "cisco",
         "event.original": "%ASA-6-302021: Teardown ICMP connection for faddr target.destination.hostname.local/10005 gaddr 10.0.55.66/0 laddr Prod-host.name.addr/0",
         "event.severity": 6,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "asa",
         "host.hostname": "localhost",
         "input.type": "log",

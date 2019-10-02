@@ -4,7 +4,7 @@
         "event.dataset": "logstash.slowlog",
         "event.duration": 5026401704,
         "event.module": "logstash",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
