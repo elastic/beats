@@ -425,13 +425,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - `docker` input is deprecated in favour `container`. {pull}12162[12162]
 - `postgresql.log.timestamp` field is deprecated in favour of `@timestamp`. {pull}12338[12338]
-- `kubernetes.container.id` field for `state_container` is deprecated in favour of ECS `container.id` and `container.runtime`. {pull}13884[13884]
 
 *Heartbeat*
 
 *Journalbeat*
 
 *Metricbeat*
+
+- `kubernetes.container.id` field for `state_container` is deprecated in favour of ECS `container.id` and `container.runtime`. {pull}13884[13884]
 
 *Packetbeat*
 
