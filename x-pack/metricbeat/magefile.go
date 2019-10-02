@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -54,16 +55,16 @@ func GolangCrossBuild() error {
 	}
 	params := devtools.DefaultGolangCrossBuildArgs()
 	params.Env = map[string]string{
-		//"CGO_LDFLAGS": "-Wl,-rpath.*",
 		"CGO_CFLAGS": "-I/opt/mqm/inc/",
 		"CGO_LDFLAGS_ALLOW": "-Wl,-rpath.*",
 	}
+	params.ExtraFlags = append(params.ExtraFlags, "-tags='ibm'")
 	return devtools.GolangCrossBuild(params)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return devtools.CrossBuild(devtools.ImageSelector(selectImage))
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -73,7 +74,7 @@ func BuildGoDaemon() error {
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
+	return devtools.CrossBuildGoDaemon(devtools.ImageSelector(selectImage))
 }
 
 // Package packages the Beat for distribution.
@@ -256,6 +257,30 @@ func packageLightModules() error {
 	return nil
 }
 
+func selectImage(platform string) (string, error) {
+	tagSuffix := "main"
+
+	switch {
+	case strings.HasPrefix(platform, "linux/arm"):
+		tagSuffix = "arm"
+	case strings.HasPrefix(platform, "linux/mips"):
+		tagSuffix = "mips"
+	case strings.HasPrefix(platform, "linux/ppc"):
+		tagSuffix = "ppc"
+	case platform == "linux/s390x":
+		tagSuffix = "s390x"
+	case strings.HasPrefix(platform, "linux"):
+		tagSuffix = "main-debian8"
+	}
+
+	goVersion, err := devtools.GoVersion()
+	if err != nil {
+		return "", err
+	}
+
+	return devtools.BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
+}
+
 // -----------------------------------------------------------------------------
 // - Install the IBM redistributable client package
 var (
@@ -270,7 +295,7 @@ func installIBMCLinuxAMD64() error {
 	VRMF := "9.1.3.0"
 
 	// Create the directory for IBM Client
-	err := sh.RunV("mkdir", "/opt/mqm")
+	err := sh.Run("mkdir", "/opt/mqm")
 	if err != nil {
 		return errors.Wrap(err, "error while adding IBM C client")
 	}
@@ -278,12 +303,12 @@ func installIBMCLinuxAMD64() error {
 	pkgURL := fmt.Sprintf("%v/%v-%v", URL, VRMF, RDTAR)
 	name := fmt.Sprintf("/opt/mqm/%v-%v", VRMF, RDTAR)
 	// curl to get the IBM tar with the IBM C Client
-	err = sh.RunV("curl", "-o", name, "-LO", pkgURL)
+	err = sh.Run("curl", "-o", name, "-LO", pkgURL)
 	if err != nil {
 		return errors.Wrap(err, "error while adding IBM C client")
 	}
 	// Untar the IBM client
-	err = sh.RunV("tar", "-zxvf", name, "-C", "/opt/mqm/")
+	err = sh.Run("tar", "-zxvf", name, "-C", "/opt/mqm/")
 	if err != nil {
 		return errors.Wrap(err, "error while adding IBM C client")
 	}
