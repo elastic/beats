@@ -8,6 +8,8 @@ package include
 
 import (
 	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/appsearch"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/appsearch/stats"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws/cloudwatch"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws/ec2"

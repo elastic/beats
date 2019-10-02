@@ -1,8 +1,9 @@
+from xpack_metricbeat import XPackTest
 import metricbeat
 import unittest
 
 
-class Test(metricbeat.BaseTest):
+class Test(XPackTest):
     COMPOSE_SERVICES = ['appsearch']
     COMPOSE_TIMEOUT = 600
 
@@ -14,7 +15,7 @@ class Test(metricbeat.BaseTest):
             "hosts": [self.compose_host(service="appsearch")],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc = self.start_beat(home=self.beat_path)
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
