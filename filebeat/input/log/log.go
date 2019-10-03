@@ -148,6 +148,7 @@ func (f *Log) errorChecks(err error) error {
 	if f.config.CloseRenamed {
 		// Check if the file can still be found under the same path
 		if !file.IsSameFile(f.fs.Name(), info) {
+			logp.Debug("harvester", "close_renamed is enabled and file %s has been renamed", f.fs.Name())
 			return ErrRenamed
 		}
 	}
@@ -155,6 +156,7 @@ func (f *Log) errorChecks(err error) error {
 	if f.config.CloseRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
 		if f.fs.Removed() {
+			logp.Debug("harvester", "close_removed is enabled and file %s has been removed", f.fs.Name())
 			return ErrRemoved
 		}
 	}
