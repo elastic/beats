@@ -141,6 +141,19 @@ func (f *Log) checkFileErrors() error {
 		return statErr
 	}
 
+	// check if file was truncated
+	if info.Size() < f.offset {
+		logp.Debug("harvester",
+			"File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.fs.Name())
+		return ErrFileTruncate
+	}
+
+	// Check file wasn't read for longer then CloseInactive
+	age := time.Since(f.lastTimeRead)
+	if age > f.config.CloseInactive {
+		return ErrInactive
+	}
+
 	if f.config.CloseRenamed {
 		// Check if the file can still be found under the same path
 		if !file.IsSameFile(f.fs.Name(), info) {
@@ -155,19 +168,6 @@ func (f *Log) checkFileErrors() error {
 			logp.Debug("harvester", "close_removed is enabled and file %s has been removed", f.fs.Name())
 			return ErrRemoved
 		}
-	}
-
-	// check if file was truncated
-	if info.Size() < f.offset {
-		logp.Debug("harvester",
-			"File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.fs.Name())
-		return ErrFileTruncate
-	}
-
-	// Check file wasn't read for longer then CloseInactive
-	age := time.Since(f.lastTimeRead)
-	if age > f.config.CloseInactive {
-		return ErrInactive
 	}
 
 	return nil
