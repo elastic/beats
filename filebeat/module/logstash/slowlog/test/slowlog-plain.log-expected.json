@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2017-10-30T07:57:58.243-02:00",
+        "@timestamp": "2017-10-30T09:57:58.243-02:00",
         "event.dataset": "logstash.slowlog",
         "event.duration": 3027675106,
         "event.module": "logstash",
