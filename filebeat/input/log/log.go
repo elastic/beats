@@ -111,13 +111,15 @@ func (f *Log) errorChecks(err error) error {
 		return err
 	}
 
+	// At this point we have hit EOF!
+
 	// Stdin is not continuable
 	if !f.fs.Continuable() {
 		logp.Debug("harvester", "Source is not continuable: %s", f.fs.Name())
 		return err
 	}
 
-	if err == io.EOF && f.config.CloseEOF {
+	if f.config.CloseEOF {
 		return err
 	}
 
