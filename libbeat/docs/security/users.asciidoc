@@ -190,10 +190,10 @@ indices. To minimize the privileges required by the writer role, you can use the
 <<privileges-to-setup-beats,setup role>> to pre-load dependencies.
 
 ifndef::no_ilm[]
-[source,yaml]
 When using ILM, turn off the ILM setup check in the {beatname_uc} config file before
 running {beatname_uc} to publish events:
 
+[source,yaml]
 ----
 setup.ilm.check_exists: false
 ----
@@ -204,10 +204,10 @@ To grant the required privileges:
 . Create a *writer role*, called something like +{beat_default_index_prefix}_writer+,
 that has the following privileges:
 
++
 NOTE: Only the `monitor` cluster privilege and the `create` index privilege on
 +{beat_default_index_prefix}-*+ indices are required in every configuration.
 
-+
 [options="header"]
 |====
 |Privileges | Why needed?
