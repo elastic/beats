@@ -38,7 +38,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host())
+	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	if err != nil {
@@ -69,7 +69,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host())
+	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	if err != nil {
