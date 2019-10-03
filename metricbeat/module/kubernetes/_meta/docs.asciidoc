@@ -14,7 +14,7 @@ example configuration on how to do it.
 The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
 
 [float]
-=== Compability
+=== Compatibility
 
 The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
 

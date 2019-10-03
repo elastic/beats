@@ -1,13 +1,13 @@
 [
     {
-        "@timestamp": "2019-10-10T07:25:12.000Z",
+        "@timestamp": "2019-10-10T05:25:12.000-02:00",
         "destination.ip": "10.4.0.5",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "event.outcome": "deny",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,

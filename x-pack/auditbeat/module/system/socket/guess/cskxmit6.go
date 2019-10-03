@@ -41,7 +41,7 @@ func init() {
 
 type guessInet6CskXmit struct {
 	ctx                    Context
-	loopback               ipv6loopback
+	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
 	client, server         int
 	sock                   uintptr
@@ -67,6 +67,11 @@ func (g *guessInet6CskXmit) Requires() []string {
 		"RET",
 		"P1",
 	}
+}
+
+// Condition allows this probe to run only when IPv6 is enabled.
+func (g *guessInet6CskXmit) Condition(ctx Context) (bool, error) {
+	return isIPv6Enabled(ctx.Vars)
 }
 
 // Probes returns 2 probes:
@@ -99,7 +104,7 @@ func (g *guessInet6CskXmit) Probes() ([]helper.ProbeDef, error) {
 func (g *guessInet6CskXmit) Prepare(ctx Context) (err error) {
 	g.ctx = ctx
 	g.acceptedFd = -1
-	g.loopback, err = newIPv6Loopback()
+	g.loopback, err = helper.NewIPv6Loopback()
 	if err != nil {
 		return errors.Wrap(err, "detect IPv6 loopback failed")
 	}
@@ -108,11 +113,11 @@ func (g *guessInet6CskXmit) Prepare(ctx Context) (err error) {
 			g.loopback.Cleanup()
 		}
 	}()
-	clientIP, err := g.loopback.addRandomAddress()
+	clientIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
 		return errors.Wrap(err, "failed adding first device address")
 	}
-	serverIP, err := g.loopback.addRandomAddress()
+	serverIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
 		return errors.Wrap(err, "failed adding second device address")
 	}

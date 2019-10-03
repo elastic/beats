@@ -1,11 +1,11 @@
 [
     {
-        "@timestamp": "2019-08-14T13:56:30.000Z",
+        "@timestamp": "2019-08-14T11:56:30.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=AuditLog, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "platformSettingEdit.cgi",
         "input.type": "log",
@@ -18,12 +18,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:57:19.000Z",
+        "@timestamp": "2019-08-14T11:57:19.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=Banner, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "platformSettingEdit.cgi",
         "input.type": "log",
@@ -36,12 +36,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:57:26.000Z",
+        "@timestamp": "2019-08-14T11:57:26.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/ChangeReconciliation.cgi, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "ChangeReconciliation.cgi",
         "input.type": "log",
@@ -54,12 +54,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:57:34.000Z",
+        "@timestamp": "2019-08-14T11:57:34.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=IntrusionPolicyPrefs, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "platformSettingEdit.cgi",
         "input.type": "log",
@@ -72,12 +72,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:57:43.000Z",
+        "@timestamp": "2019-08-14T11:57:43.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /admin/lights_out_mgmt.cgi, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -90,12 +90,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:58:02.000Z",
+        "@timestamp": "2019-08-14T11:58:02.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Cloud Services, View url filtering settings\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -108,12 +108,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:58:02.000Z",
+        "@timestamp": "2019-08-14T11:58:02.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Cloud Services, View amp settings\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -126,12 +126,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:58:20.000Z",
+        "@timestamp": "2019-08-14T11:58:20.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Monitoring > Syslog, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -144,12 +144,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:58:41.000Z",
+        "@timestamp": "2019-08-14T11:58:41.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -162,12 +162,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:58:47.000Z",
+        "@timestamp": "2019-08-14T11:58:47.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management > NGFW Interfaces, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -180,12 +180,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:58:52.000Z",
+        "@timestamp": "2019-08-14T11:58:52.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management > NGFW Device Summary, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -198,12 +198,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:58:54.000Z",
+        "@timestamp": "2019-08-14T11:58:54.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Device Management > NGFW Device Summary, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -216,12 +216,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:59:10.000Z",
+        "@timestamp": "2019-08-14T11:59:10.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -234,12 +234,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T13:59:15.000Z",
+        "@timestamp": "2019-08-14T11:59:15.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -252,12 +252,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:00:37.000Z",
+        "@timestamp": "2019-08-14T12:00:37.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Save Policy ftd-policy\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -270,12 +270,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:00:37.000Z",
+        "@timestamp": "2019-08-14T12:00:37.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Modified: Syslog\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -288,12 +288,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:00:37.000Z",
+        "@timestamp": "2019-08-14T12:00:37.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -306,12 +306,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:12.000Z",
+        "@timestamp": "2019-08-14T12:01:12.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Save Policy ftd-policy\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -324,12 +324,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:12.000Z",
+        "@timestamp": "2019-08-14T12:01:12.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Modified: Syslog\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -342,12 +342,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:13.000Z",
+        "@timestamp": "2019-08-14T12:01:13.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Platform Settings Editor, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -360,12 +360,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:20.000Z",
+        "@timestamp": "2019-08-14T12:01:20.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -378,12 +378,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:31.000Z",
+        "@timestamp": "2019-08-14T12:01:31.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "ActionQueueScrape.pl",
         "input.type": "log",
@@ -396,12 +396,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:31.000Z",
+        "@timestamp": "2019-08-14T12:01:31.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@localhost, Task Queue, Successful task completion : Pre-deploy Global Configuration Generation\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "ActionQueueScrape.pl",
         "input.type": "log",
@@ -414,12 +414,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:35.000Z",
+        "@timestamp": "2019-08-14T12:01:35.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "ActionQueueScrape.pl",
         "input.type": "log",
@@ -432,12 +432,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:36.000Z",
+        "@timestamp": "2019-08-14T12:01:36.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@localhost, Task Queue, Successful task completion : Pre-deploy Device Configuration for siem-ftd\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "ActionQueueScrape.pl",
         "input.type": "log",
@@ -450,12 +450,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:55.000Z",
+        "@timestamp": "2019-08-14T12:01:55.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -468,12 +468,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:56.000Z",
+        "@timestamp": "2019-08-14T12:01:56.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@localhost, Task Queue, Policy Deployment to siem-ftd - SUCCESS\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -486,12 +486,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:01:57.000Z",
+        "@timestamp": "2019-08-14T12:01:57.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: csm_processes@Default User IP, Login, Login Success\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "sfdccsm",
         "input.type": "log",
@@ -504,12 +504,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:02:03.000Z",
+        "@timestamp": "2019-08-14T12:02:03.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Monitoring > Syslog, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -522,12 +522,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:02:11.000Z",
+        "@timestamp": "2019-08-14T12:02:11.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Monitoring > Audit, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "index.cgi",
         "input.type": "log",
@@ -540,12 +540,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:02:19.000Z",
+        "@timestamp": "2019-08-14T12:02:19.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "debug",
@@ -558,12 +558,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:02:31.000Z",
+        "@timestamp": "2019-08-14T12:02:31.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, System > Configuration > Configuration > /platinum/platformSettingEdit.cgi?type=AuditLog, Page View\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "platformSettingEdit.cgi",
         "input.type": "log",
@@ -576,12 +576,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:02:38.000Z",
+        "@timestamp": "2019-08-14T12:02:38.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Local System Configuration, Save Local System Configuration\u0000x0a\u0000x00",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "platformSettingEdit.cgi",
         "input.type": "log",
@@ -594,12 +594,12 @@
         ]
     },
     {
-        "@timestamp": "2019-08-14T14:02:38.000Z",
+        "@timestamp": "2019-08-14T12:02:38.000-02:00",
         "event.dataset": "cisco.ftd",
         "event.module": "cisco",
         "event.original": "siem-management: admin@10.0.255.31, Devices > Platform Settings > Audit Log Settings >  Modified: Send Audit Log to Syslog enabled > Disabled",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "platformSettingEdit.cgi",
         "input.type": "log",
