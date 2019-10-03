@@ -47,7 +47,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch", "kibana")
 
-	config := mtest.GetConfig("status")
+	config := mtest.GetConfig("status", false)
 	f := mbtest.NewReportingMetricSetV2(t, config)
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {

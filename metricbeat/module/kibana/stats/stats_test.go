@@ -63,7 +63,7 @@ func TestFetchUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("stats", kib.URL, true)
+	config := mtest.GetConfig("stats", true)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
