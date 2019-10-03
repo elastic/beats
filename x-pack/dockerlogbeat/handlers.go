@@ -70,11 +70,15 @@ func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respons
 			return
 		}
 		pm.Logger.Infof(" Got stop request object %#v\n", stopReq)
-		err = pm.CloseClientWithFile(stopReq.File)
-		if err != nil {
-			http.Error(w, errors.Wrap(err, "error stopping client").Error(), http.StatusBadRequest)
-			return
-		}
+		// Run the stop async, since nothing 'depends' on it,
+		// and we can break people's docker automation if this times out.
+		go func() {
+			err = pm.CloseClientWithFile(stopReq.File)
+			if err != nil {
+				pm.Logger.Infof(" Got stop request error %#v\n", err)
+			}
+		}()
+
 		respondOK(w)
 	} // end func
 }

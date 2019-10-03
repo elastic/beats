@@ -86,12 +86,13 @@ func Clean() error {
 	sh.RunV("docker", "rmi", "rootfsimage")
 	sh.RunV("docker", "rmi", "rootfsimage-build")
 	sh.Rm("rootfs")
-	sh.RunV("docker", "plugin", "disable", dockerPlugin)
-	sh.RunV("docker", "plugin", "rm", dockerPlugin)
+	sh.RunV("docker", "plugin", "disable", "-f", dockerPlugin)
+	sh.RunV("docker", "plugin", "rm", "-f", dockerPlugin)
 
 	return nil
 }
 
+// Install installs the beat
 func Install() error {
 	err := sh.RunV("docker", "plugin", "create", dockerPlugin, ".")
 	if err != nil {

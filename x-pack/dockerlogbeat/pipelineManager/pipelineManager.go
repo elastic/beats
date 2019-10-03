@@ -65,13 +65,20 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 	// deincrement the ref count
 	hash := cl.pipelineHash
 	pm.pipelines[hash].refCount--
-	if pm.pipelines[hash].refCount <= 0 {
-		pm.Logger.Infof("Pipeline closing")
+
+	pm.Logger.Infof("Closing Client first from pipelineManager")
+	err := cl.Close()
+	if err != nil {
+		return errors.Wrap(err, "error closing client")
+	}
+
+	if pm.pipelines[hash].refCount < 1 {
+		pm.Logger.Infof("Pipeline  closing")
 		pm.pipelines[hash].pipeline.Close()
 		delete(pm.pipelines, hash)
 	}
-	pm.Logger.Infof("Closing Client from pipelineManager")
-	return cl.Close()
+
+	return nil
 }
 
 // AddNewPipeline adds a new pipeline with the config to the map
