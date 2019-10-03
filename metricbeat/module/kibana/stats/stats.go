@@ -150,21 +150,31 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 }
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
+
+	var content []byte
+	var err error
+
 	// Collect usage stats only once every usageCollectionPeriod
 	if m.isUsageExcludable {
 		origURI := m.statsHTTP.GetURI()
 		defer m.statsHTTP.SetURI(origURI)
 
 		shouldCollectUsage := m.shouldCollectUsage(now)
+		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
+
+		content, err = m.statsHTTP.FetchContent()
+		if err != nil {
+			return err
+		}
+
 		if shouldCollectUsage {
 			m.usageLastCollectedOn = now
 		}
-		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
-	}
-
-	content, err := m.statsHTTP.FetchContent()
-	if err != nil {
-		return err
+	} else {
+		content, err = m.statsHTTP.FetchContent()
+		if err != nil {
+			return err
+		}
 	}
 
 	if m.XPackEnabled {

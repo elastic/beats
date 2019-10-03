@@ -43,10 +43,15 @@ func GetEnvPort() string {
 }
 
 // GetConfig returns config for kibana module
-func GetConfig(metricset string) map[string]interface{} {
-	return map[string]interface{}{
+func GetConfig(metricset string, xpackEnabled bool) map[string]interface{} {
+	config := map[string]interface{}{
 		"module":     "kibana",
 		"metricsets": []string{metricset},
 		"hosts":      []string{net.JoinHostPort(GetEnvHost(), GetEnvPort())},
 	}
+	if xpackEnabled {
+		config["xpack.enabled"] = true
+	}
+
+	return config
 }
