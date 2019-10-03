@@ -65,14 +65,14 @@ func TestFetchUsage(t *testing.T) {
 
 	config := mtest.GetConfig("stats", true)
 
-	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	f := mbtest.NewReportingMetricSetV2(t, config)
 
 	// First fetch
-	mbtest.ReportingFetchV2Error(f)
+	mbtest.ReportingFetchV2(f)
 
 	// Second fetch
-	mbtest.ReportingFetchV2Error(f)
+	mbtest.ReportingFetchV2(f)
 
 	// Third fetch
-	mbtest.ReportingFetchV2Error(f)
+	mbtest.ReportingFetchV2(f)
 }
