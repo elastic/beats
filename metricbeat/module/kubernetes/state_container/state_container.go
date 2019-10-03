@@ -140,11 +140,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// empty string
 			cID := (containerID).(string)
 			split := strings.Index(cID, "://")
-			rootFields = common.MapStr{
-				"container": common.MapStr{
-					"runtime": cID[:split],
-					"id":      cID[split+3:],
-				}}
+			if split != -1 {
+				rootFields = common.MapStr{
+					"container": common.MapStr{
+						"runtime": cID[:split],
+						"id":      cID[split+3:],
+					}}
+			}
 		}
 
 		var moduleFieldsMapStr common.MapStr
