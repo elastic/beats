@@ -22,6 +22,8 @@ package stats
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,6 +65,7 @@ func TestFetchUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
+	os.Setenv("KIBANA_PORT", strings.Split(kib.URL, ":")[2])
 	config := mtest.GetConfig("stats", true)
 
 	f := mbtest.NewReportingMetricSetV2(t, config)
