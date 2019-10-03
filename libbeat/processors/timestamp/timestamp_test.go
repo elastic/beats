@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -204,6 +205,7 @@ func TestTimezone(t *testing.T) {
 	cases := map[string]struct {
 		Timezone string
 		Expected time.Time
+		Error    bool
 	}{
 		"no timezone": {
 			Expected: expected,
@@ -253,6 +255,19 @@ func TestTimezone(t *testing.T) {
 			Timezone: "-04",
 			Expected: expected.Add(4 * time.Hour),
 		},
+
+		"unsupported UTC representation": {
+			Timezone: "Z",
+			Error:    true,
+		},
+		"non-existing location": {
+			Timezone: "Kalimdor/Orgrimmar",
+			Error:    true,
+		},
+		"incomplete offset": {
+			Timezone: "-400",
+			Error:    true,
+		},
 	}
 
 	for title, c := range cases {
@@ -263,9 +278,11 @@ func TestTimezone(t *testing.T) {
 			config.Layouts = append(config.Layouts, time.ANSIC)
 
 			processor, err := newFromConfig(config)
-			if err != nil {
-				t.Fatal(err)
+			if c.Error {
+				require.Error(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			originalTimestamp := expected.Format(time.ANSIC)
 			t.Logf("Original timestamp: %+v", originalTimestamp)
