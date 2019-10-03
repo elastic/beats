@@ -265,6 +265,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
 - Add `providers` setting to `add_cloud_metadata` processor. {pull}13812[13812]
 - Use less restrictive API to check if template exists. {pull}13847[13847]
+- Do not check for alias when setup.ilm.check_exists is false. {pull}13848[13848]
 
 *Auditbeat*
 

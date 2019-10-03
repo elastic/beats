@@ -102,6 +102,10 @@ func (m *stdManager) Enabled() (bool, error) {
 }
 
 func (m *stdManager) EnsureAlias() error {
+	if !m.checkExists {
+		return nil
+	}
+
 	b, err := m.client.HasAlias(m.alias.Name)
 	if err != nil {
 		return err
