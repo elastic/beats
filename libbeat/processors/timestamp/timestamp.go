@@ -57,7 +57,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newFromConfig(c config) (*processor, error) {
-	loc, err := tz.LoadLocation(c.Timezone)
+	loc, err := loadLocation(c.Timezone)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load timezone")
 	}
@@ -82,6 +82,20 @@ func newFromConfig(c config) (*processor, error) {
 	}
 
 	return p, nil
+}
+
+func loadLocation(timezone string) (*time.Location, error) {
+	timezoneFormats := []string{"-07", "-0700", "-07:00"}
+	for _, format := range timezoneFormats {
+		t, err := time.Parse(format, timezone)
+		if err == nil {
+			name, offset := t.Zone()
+			return time.FixedZone(name, offset), nil
+		}
+	}
+
+	// Rest of location formats
+	return tz.LoadLocation(timezone)
 }
 
 func (p *processor) String() string {
