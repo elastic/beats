@@ -73,6 +73,11 @@ func (f *Log) Read(buf []byte) (int, error) {
 		default:
 		}
 
+		err := f.checkFileErrors()
+		if err != nil {
+			return totalN, err
+		}
+
 		n, err := f.fs.Read(buf)
 		if n > 0 {
 			f.offset += int64(n)
@@ -123,6 +128,10 @@ func (f *Log) errorChecks(err error) error {
 		return err
 	}
 
+	return nil
+}
+
+func (f *Log) checkFileErrors() error {
 	// Refetch fileinfo to check if the file was truncated or disappeared.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
@@ -130,19 +139,6 @@ func (f *Log) errorChecks(err error) error {
 	if statErr != nil {
 		logp.Err("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
 		return statErr
-	}
-
-	// check if file was truncated
-	if info.Size() < f.offset {
-		logp.Debug("harvester",
-			"File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.fs.Name())
-		return ErrFileTruncate
-	}
-
-	// Check file wasn't read for longer then CloseInactive
-	age := time.Since(f.lastTimeRead)
-	if age > f.config.CloseInactive {
-		return ErrInactive
 	}
 
 	if f.config.CloseRenamed {
@@ -159,6 +155,19 @@ func (f *Log) errorChecks(err error) error {
 			logp.Debug("harvester", "close_removed is enabled and file %s has been removed", f.fs.Name())
 			return ErrRemoved
 		}
+	}
+
+	// check if file was truncated
+	if info.Size() < f.offset {
+		logp.Debug("harvester",
+			"File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.fs.Name())
+		return ErrFileTruncate
+	}
+
+	// Check file wasn't read for longer then CloseInactive
+	age := time.Since(f.lastTimeRead)
+	if age > f.config.CloseInactive {
+		return ErrInactive
 	}
 
 	return nil
