@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -36,9 +38,10 @@ type retryer struct {
 
 	consumer *eventConsumer
 
-	sig chan retryerSignal
-	out workQueue
-	in  retryQueue
+	sig        chan retryerSignal
+	out        workQueue
+	in         retryQueue
+	doneWaiter *sync.WaitGroup
 }
 
 type retryQueue chan batchEvent
@@ -75,13 +78,14 @@ func newRetryer(
 	c *eventConsumer,
 ) *retryer {
 	r := &retryer{
-		logger:   log,
-		observer: observer,
-		done:     make(chan struct{}),
-		sig:      make(chan retryerSignal, 3),
-		in:       retryQueue(make(chan batchEvent, 3)),
-		out:      out,
-		consumer: c,
+		logger:     log,
+		observer:   observer,
+		done:       make(chan struct{}),
+		sig:        make(chan retryerSignal, 3),
+		in:         retryQueue(make(chan batchEvent, 3)),
+		out:        out,
+		consumer:   c,
+		doneWaiter: new(sync.WaitGroup),
 	}
 	go r.loop()
 	return r
@@ -89,6 +93,8 @@ func newRetryer(
 
 func (r *retryer) close() {
 	close(r.done)
+	//Block until loop() is properly closed
+	r.doneWaiter.Wait()
 }
 
 func (r *retryer) sigOutputAdded() {
@@ -126,10 +132,12 @@ func (r *retryer) loop() {
 
 		log = r.logger
 	)
+	r.doneWaiter.Add(1)
 
 	for {
 		select {
 		case <-r.done:
+			r.doneWaiter.Done()
 			return
 
 		case evt := <-r.in:
