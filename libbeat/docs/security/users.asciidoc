@@ -201,11 +201,11 @@ endif::no_ilm[]
 
 To grant the required privileges:
 
-. Create a *writer role*, called something like +{beat_default_index_prefix}_writer+, that has
-the following privileges:
+. Create a *writer role*, called something like +{beat_default_index_prefix}_writer+,
+that has the following privileges:
 
 NOTE: Only the `monitor` cluster privilege and the `create` index privilege on
-+{beat_default_index_prefix}-*+ indices are needed in every configuration.
++{beat_default_index_prefix}-*+ indices are required in every configuration.
 
 +
 [options="header"]
@@ -227,19 +227,19 @@ endif::[]
 
 ifndef::no_ilm[]
 |`read_ilm`
-|(Optional) Read the ILM policy when connecting to clusters that support ILM. Not needed when
-`setup.ilm.check_exists` is `false`.
+|(Optional) Read the ILM policy when connecting to clusters that support ILM.
+Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
 ifndef::no_ilm[]
 |`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
-|(Optional) Check for alias when connecting to clusters that support ILM. Not needed when
-`setup.ilm.check_exists` is `false`.
+|(Optional) Check for alias when connecting to clusters that support ILM.
+Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
 |`create_index` on +{beat_default_index_prefix}-*+ indices
-|(Optional) Create daily indices when connecting to clusters that do not support ILM. Not needed when
-using ILM.
+|(Optional) Create daily indices when connecting to clusters that do not support ILM.
+Not needed when using ILM.
 |====
 ifndef::apm-server[]
 +
