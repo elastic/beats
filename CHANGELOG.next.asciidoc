@@ -41,6 +41,31 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
+- Fix queue.spool.write.flush.events config type. {pull}12080[12080]
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+- Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
+- Fixed Beat ID being reported by GET / API. {pull}12180[12180]
+- Fixed setting bulk max size in kafka output. {pull}12254[12254]
+- Add host.os.codename to fields.yml. {pull}12261[12261]
+- Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
+  processor (or by any code utilizing `PutValue()` on a `beat.Event`).
+- Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
+- Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
+- Fixed `json.add_error_key` property setting for delivering error messages from beat events  {pull}11298[11298]
+- Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
+- ILM: Use GET instead of HEAD when checking for alias to expose detailed error message. {pull}12886[12886]
+- Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
+- Fix unexpected stops on docker autodiscover when a container is restarted before `cleanup_timeout`. {issue}12962[12962] {pull}13127[13127]
+- Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
+- Fix some incorrect types and formats in field.yml files. {pull}13188[13188]
+- Load DLLs only from Windows system directory. {pull}13234[13234] {pull}13384[13384]
+- Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
+- Fix case insensitive regular expressions not working correctly. {pull}13250[13250]
+- Disable `add_kubernetes_metadata` if no matchers found. {pull}13709[13709]
+- Better wording for xpack beats when the _xpack endpoint is not reachable. {pull}13771[13771]
+- Recover from panics in the javascript process and log details about the failure to aid in future debugging. {pull}13690[13690]
+- Make the script processor concurrency-safe. {issue}13690[13690] {pull}13857[13857]
+- Kubernetes watcher at `add_kubernetes_metadata` fails with StatefulSets {pull}13905[13905]
 
 *Auditbeat*
 
