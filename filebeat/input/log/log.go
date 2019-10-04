@@ -73,7 +73,7 @@ func (f *Log) Read(buf []byte) (int, error) {
 		default:
 		}
 
-		err := f.checkFileErrors()
+		err := f.checkFileDisappearedErrors()
 		if err != nil {
 			return totalN, err
 		}
@@ -154,7 +154,8 @@ func (f *Log) errorChecks(err error) error {
 	return nil
 }
 
-func (f *Log) checkFileErrors() error {
+// checkFileDisappearedErrors checks if the log file has been removed or renamed (rotated).
+func (f *Log) checkFileDisappearedErrors() error {
 	// No point doing a stat call on the file if configuration options are
 	// not enabled
 	if !f.config.CloseRenamed && !f.config.CloseRemoved {
