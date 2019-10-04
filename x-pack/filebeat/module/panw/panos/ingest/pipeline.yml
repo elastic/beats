@@ -10,14 +10,12 @@ processors:
  - date:
      if: "ctx.event.timezone == null"
      field: "_temp_.generated_time"
-     target_field: "@timestamp"
      formats:
        - "yyyy/MM/dd HH:mm:ss"
      on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
      if: "ctx.event.timezone != null"
      field: "_temp_.generated_time"
-     target_field: "@timestamp"
      formats:
        - "yyyy/MM/dd HH:mm:ss"
      timezone: "{{ event.timezone }}"
