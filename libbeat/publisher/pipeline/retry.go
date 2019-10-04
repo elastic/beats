@@ -41,7 +41,7 @@ type retryer struct {
 	sig        chan retryerSignal
 	out        workQueue
 	in         retryQueue
-	doneWaiter *sync.WaitGroup
+	doneWaiter sync.WaitGroup
 }
 
 type retryQueue chan batchEvent
@@ -85,8 +85,9 @@ func newRetryer(
 		in:         retryQueue(make(chan batchEvent, 3)),
 		out:        out,
 		consumer:   c,
-		doneWaiter: new(sync.WaitGroup),
+		doneWaiter: sync.WaitGroup{},
 	}
+	r.doneWaiter.Add(1)
 	go r.loop()
 	return r
 }
@@ -121,6 +122,7 @@ func (r *retryer) cancelled(b *Batch) {
 }
 
 func (r *retryer) loop() {
+	defer r.doneWaiter.Done()
 	var (
 		out             workQueue
 		consumerBlocked bool
@@ -132,12 +134,11 @@ func (r *retryer) loop() {
 
 		log = r.logger
 	)
-	r.doneWaiter.Add(1)
 
 	for {
 		select {
 		case <-r.done:
-			r.doneWaiter.Done()
+
 			return
 
 		case evt := <-r.in:
