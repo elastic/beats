@@ -268,55 +268,55 @@ func MapStrUnion(dict1 MapStr, dict2 MapStr) MapStr {
 // MergeFields merges the top-level keys and values in each source map (it does
 // not perform a deep merge). If the same key exists in both, the value in
 // fields takes precedence. If underRoot is true then the contents of the fields
-// MapStr is merged with the value of the 'fields' key in ms.
+// MapStr is merged with the value of the 'fields' key in target.
 //
 // An error is returned if underRoot is true and the value of ms.fields is not a
 // MapStr.
-func MergeFields(ms, fields MapStr, underRoot bool) error {
-	if ms == nil || len(fields) == 0 {
+func MergeFields(target, from MapStr, underRoot bool) error {
+	if target == nil || len(from) == 0 {
 		return nil
 	}
 
-	destMap, err := mergeFieldsGetDestMap(ms, fields, underRoot)
+	destMap, err := mergeFieldsGetDestMap(target, from, underRoot)
 	if err != nil {
 		return err
 	}
 
 	// Add fields and override.
-	for k, v := range fields {
+	for k, v := range from {
 		destMap[k] = v
 	}
 
 	return nil
 }
 
-// MergeFieldsDeep recursively merges the keys and values from fields into ms, either
+// MergeFieldsDeep recursively merges the keys and values from `from` into `target`, either
 // into ms itself (if underRoot == true) or into ms["fields"] (if underRoot == false). If
-// the same key exists in fields and the destination map, the value in fields takes precedence.
+// the same key exists in `from` and the destination map, the value in fields takes precedence.
 //
 // An error is returned if underRoot is true and the value of ms["fields"] is not a
 // MapStr.
-func MergeFieldsDeep(ms, fields MapStr, underRoot bool) error {
-	if ms == nil || len(fields) == 0 {
+func MergeFieldsDeep(target, from MapStr, underRoot bool) error {
+	if target == nil || len(from) == 0 {
 		return nil
 	}
 
-	destMap, err := mergeFieldsGetDestMap(ms, fields, underRoot)
+	destMap, err := mergeFieldsGetDestMap(target, from, underRoot)
 	if err != nil {
 		return err
 	}
 
-	destMap.DeepUpdate(fields)
+	destMap.DeepUpdate(from)
 	return nil
 }
 
-func mergeFieldsGetDestMap(ms, fields MapStr, underRoot bool) (MapStr, error) {
-	destMap := ms
+func mergeFieldsGetDestMap(target, from MapStr, underRoot bool) (MapStr, error) {
+	destMap := target
 	if !underRoot {
-		f, ok := ms[FieldsKey]
+		f, ok := target[FieldsKey]
 		if !ok {
-			destMap = make(MapStr, len(fields))
-			ms[FieldsKey] = destMap
+			destMap = make(MapStr, len(from))
+			target[FieldsKey] = destMap
 		} else {
 			// Use existing 'fields' value.
 			var err error
