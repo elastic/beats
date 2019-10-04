@@ -203,11 +203,10 @@ To grant the required privileges:
 
 . Create a *writer role*, called something like +{beat_default_index_prefix}_writer+,
 that has the following privileges:
-
 +
 NOTE: Only the `monitor` cluster privilege and the `create` index privilege on
 +{beat_default_index_prefix}-*+ indices are required in every configuration.
-
++
 [options="header"]
 |====
 |Privileges | Why needed?
@@ -217,23 +216,23 @@ ifndef::apm-server[]
 |Retrieve cluster details (e.g. version)
 endif::apm-server[]
 
-|`create` on +{beat_default_index_prefix}-*+ indices
-|Index events into {es}
-
-ifeval::["{beatname_lc}"=="filebeat"]
-|`cluster:admin/ingest/pipeline/get`
-|Check for ingest pipelines used by modules. Not needed when not using modules.
-endif::[]
-
 ifndef::no_ilm[]
 |`read_ilm`
-|(Optional) Read the ILM policy when connecting to clusters that support ILM.
+| Read the ILM policy when connecting to clusters that support ILM.
 Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
+ifeval::["{beatname_lc}"=="filebeat"]
+|`cluster:admin/ingest/pipeline/get`
+|Check for ingest pipelines used by modules. Needed when using modules.
+endif::[]
+
+|`create` on +{beat_default_index_prefix}-*+ indices
+|Index events into {es}
+
 ifndef::no_ilm[]
 |`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
-|(Optional) Check for alias when connecting to clusters that support ILM.
+|Check for alias when connecting to clusters that support ILM.
 Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
