@@ -57,8 +57,9 @@ type builder struct {
 	// global pipeline processors
 	processors *group
 
-	drop       bool // disabled is set if outputs have been disabled via CLI
-	alwaysCopy bool
+	drop           bool // disabled is set if outputs have been disabled via CLI
+	alwaysCopy     bool
+	emitNullValues bool // whether to emit null values in events or not
 }
 
 type modifier interface {
@@ -102,6 +103,7 @@ func MakeDefaultSupport(
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
 			TimeSeries           bool                    `config:"timeseries.enabled"`
+			EmitNullValues       bool                    `config:"emit_null_values"`
 		}{}
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
@@ -112,7 +114,7 @@ func MakeDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries)
+		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries, cfg.EmitNullValues)
 	}
 }
 
@@ -165,13 +167,15 @@ func newBuilder(
 	modifiers []modifier,
 	skipNormalize bool,
 	timeSeries bool,
+	emitNullValues bool,
 ) (*builder, error) {
 	b := &builder{
-		skipNormalize: skipNormalize,
-		modifiers:     modifiers,
-		log:           log,
-		info:          info,
-		timeSeries:    timeSeries,
+		skipNormalize:  skipNormalize,
+		modifiers:      modifiers,
+		log:            log,
+		info:           info,
+		timeSeries:     timeSeries,
+		emitNullValues: emitNullValues,
 	}
 
 	hasProcessors := processors != nil && len(processors.List) > 0
@@ -266,7 +270,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	if !b.skipNormalize {
 		// setup 1: generalize/normalize output (P)
-		processors.add(generalizeProcessor)
+		processors.add(newGeneralizeProcessor(b.emitNullValues))
 	}
 
 	// setup 2: add Meta from client config (C)
