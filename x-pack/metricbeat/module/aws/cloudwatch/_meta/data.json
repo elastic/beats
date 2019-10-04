@@ -3,101 +3,58 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "DBInstanceIdentifier": "test1"
+                "DatabaseClass": "db.t2.micro"
             },
             "namespace": "AWS/RDS"
         },
         "metrics": {
-            "ActiveTransactions": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "AuroraBinlogReplicaLag": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "AuroraReplicaLag": {
-                "avg": 17.945199999999996,
-                "count": 5,
-                "max": 20.299,
-                "min": 9.026,
-                "sum": 89.72599999999998
-            },
             "BinLogDiskUsage": {
-                "avg": 0,
+                "avg": 3109.2,
                 "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
+                "max": 3518,
+                "min": 3007,
+                "sum": 15546
             },
-            "BlockedTransactions": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "BufferCacheHitRatio": {
+            "BurstBalance": {
                 "avg": 100,
-                "count": 5,
+                "count": 1,
                 "max": 100,
                 "min": 100,
-                "sum": 500
+                "sum": 100
+            },
+            "CPUCreditBalance": {
+                "avg": 144,
+                "count": 1,
+                "max": 144,
+                "min": 144,
+                "sum": 144
+            },
+            "CPUCreditUsage": {
+                "avg": 0.059921,
+                "max": 0.059921,
+                "min": 0.059921,
+                "sum": 0.059921
+            },
+            "CPUSurplusCreditBalance": {
+                "avg": 0,
+                "count": 1,
+                "max": 0,
+                "min": 0,
+                "sum": 0
+            },
+            "CPUSurplusCreditsCharged": {
+                "avg": 0,
+                "count": 1,
+                "max": 0,
+                "min": 0,
+                "sum": 0
             },
             "CPUUtilization": {
-                "avg": 3,
+                "avg": 1.229508196720359,
                 "count": 5,
-                "max": 3,
-                "min": 3,
-                "sum": 15
-            },
-            "CommitLatency": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "CommitThroughput": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "DDLLatency": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "DDLThroughput": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "DMLLatency": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "DMLThroughput": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
+                "max": 1.66666666666667,
+                "min": 0.999999999997575,
+                "sum": 6.147540983601795
             },
             "DatabaseConnections": {
                 "avg": 0,
@@ -106,136 +63,95 @@
                 "min": 0,
                 "sum": 0
             },
-            "Deadlocks": {
-                "avg": 0,
+            "DiskQueueDepth": {
+                "avg": 0.0002666653337629704,
                 "count": 5,
-                "max": 0,
+                "max": 0.0007999733342221926,
                 "min": 0,
-                "sum": 0
+                "sum": 0.001333326668814852
             },
-            "DeleteLatency": {
-                "avg": 0,
+            "FreeStorageSpace": {
+                "avg": 20402474188.8,
                 "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "DeleteThroughput": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "EngineUptime": {
-                "avg": 2888753,
-                "count": 5,
-                "max": 2888873,
-                "min": 2888633,
-                "sum": 14443765
-            },
-            "FreeLocalStorage": {
-                "avg": 32949542912,
-                "count": 5,
-                "max": 32949567488,
-                "min": 32949518336,
-                "sum": 164747714560
+                "max": 20402475008,
+                "min": 20402470912,
+                "sum": 102012370944
             },
             "FreeableMemory": {
-                "avg": 4717250969.6,
+                "avg": 460385484.8,
                 "count": 5,
-                "max": 4717965312,
-                "min": 4716732416,
-                "sum": 23586254848
-            },
-            "InsertLatency": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "InsertThroughput": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "LoginFailures": {
-                "avg": 0,
-                "max": 0,
-                "min": 0,
-                "sum": 0
+                "max": 460492800,
+                "min": 460238848,
+                "sum": 2301927424
             },
             "NetworkReceiveThroughput": {
-                "avg": 0.6999860014776844,
+                "avg": 488.6774390824785,
                 "count": 5,
-                "max": 0.700023334111137,
-                "min": 0.6999416715273727,
-                "sum": 3.499930007388422
-            },
-            "NetworkThroughput": {
-                "avg": 1.3999720029553688,
-                "count": 5,
-                "max": 1.400046668222274,
-                "min": 1.3998833430547455,
-                "sum": 6.999860014776844
+                "max": 614.8064198930018,
+                "min": 440.9387136023468,
+                "sum": 2443.3871954123924
             },
             "NetworkTransmitThroughput": {
-                "avg": 0.6999860014776844,
+                "avg": 2629.716953080241,
                 "count": 5,
-                "max": 0.700023334111137,
-                "min": 0.6999416715273727,
-                "sum": 3.499930007388422
+                "max": 2771.060439377271,
+                "min": 2426.08797106522,
+                "sum": 13148.584765401207
             },
-            "Queries": {
-                "avg": 6.169305601785825,
+            "ReadIOPS": {
+                "avg": 0.23334111137037902,
                 "count": 5,
-                "max": 6.380462125376914,
-                "min": 6.031523876170482,
-                "sum": 30.846528008929127
+                "max": 1.1667055568518951,
+                "min": 0,
+                "sum": 1.1667055568518951
             },
-            "ResultSetCacheHitRatio": {
+            "ReadLatency": {
                 "avg": 0,
                 "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
-            "SelectLatency": {
-                "avg": 0.2314997785623484,
+            "ReadThroughput": {
+                "avg": 136.52878237392088,
                 "count": 5,
-                "max": 0.2420805369127517,
-                "min": 0.2227225806451613,
-                "sum": 1.157498892811742
-            },
-            "SelectThroughput": {
-                "avg": 2.529737853689286,
-                "count": 5,
-                "max": 2.600086669555652,
-                "min": 2.4822990420658058,
-                "sum": 12.648689268446429
-            },
-            "UpdateLatency": {
-                "avg": 0,
-                "count": 5,
-                "max": 0,
+                "max": 682.6439118696044,
                 "min": 0,
-                "sum": 0
+                "sum": 682.6439118696044
             },
-            "UpdateThroughput": {
-                "avg": 0,
+            "SwapUsage": {
+                "avg": 638976,
                 "count": 5,
-                "max": 0,
+                "max": 638976,
+                "min": 638976,
+                "sum": 3194880
+            },
+            "WriteIOPS": {
+                "avg": 0.3600156685816308,
+                "count": 5,
+                "max": 0.8833627787592919,
                 "min": 0,
-                "sum": 0
+                "sum": 1.800078342908154
+            },
+            "WriteLatency": {
+                "avg": 0.0005464870341466086,
+                "count": 5,
+                "max": 0.0015238095238095239,
+                "min": 0,
+                "sum": 0.0027324351707330432
+            },
+            "WriteThroughput": {
+                "avg": 3863.9343018441605,
+                "count": 5,
+                "max": 8055.198160061332,
+                "min": 0,
+                "sum": 19319.671509220803
             }
         }
     },
     "cloud": {
         "provider": "aws",
-        "region": "us-east-2"
+        "region": "ap-southeast-1"
     },
     "event": {
         "dataset": "aws.cloudwatch",
@@ -243,7 +159,8 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "cloudwatch"
+        "name": "cloudwatch",
+        "period": 10000
     },
     "service": {
         "type": "aws"

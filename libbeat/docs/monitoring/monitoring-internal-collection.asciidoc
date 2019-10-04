@@ -49,9 +49,9 @@ monitoring:
 --------------------
 +
 If you
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 configured a different output, such as {ls} or you
-endif::only-elasticsearch[]
+endif::[]
 want to send {beatname_uc} monitoring events to a separate {es} cluster
 (referred to as the _monitoring cluster_), you must specify additional
 configuration options. For example:

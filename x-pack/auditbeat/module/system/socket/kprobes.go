@@ -132,7 +132,8 @@ func WithFilterPort(portnum uint16) ProbeTransform {
 	}
 }
 
-var installKProbes = []helper.ProbeDef{
+// KProbes shared with IPv4 and IPv6.
+var sharedKProbes = []helper.ProbeDef{
 
 	/***************************************************************************
 	 * RUNNING PROCESSES
@@ -250,37 +251,6 @@ var installKProbes = []helper.ProbeDef{
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpConnectResult) }),
 	},
 
-	// Return of accept(). Local side is usually zero so not fetched. Needs
-	// further I/O to populate source.Good for marking a connection as inbound.
-	//
-	//  " <- accept(sock=0xffff9f1ddc5eb780, raddr=10.0.2.15, rport=22) "
-	{
-		Probe: tracing.Probe{
-			Type:    tracing.TypeKRetProbe,
-			Name:    "inet_csk_accept_ret",
-			Address: "inet_csk_accept",
-			Fetchargs: "sock={{.RET}} laddr=+{{.INET_SOCK_LADDR}}({{.RET}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.RET}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.RET}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.RET}}):u16 " +
-				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}}",
-			Filter: "family=={{.AF_INET}} || family=={{.AF_INET6}}",
-		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpAcceptResult) }),
-	},
-
-	// Data is sent via TCP (IPv4, IPv6?).
-	// Good for (payload) data counters and getting full sock src and dest.
-	// Not valid for packet counters, sock behaves as a stream.
-	//
-	//  " tcp_sendmsg(sock=0xffff9f1ddd216040, len=517, 10.0.2.15:55310 -> 151.101.66.217:443) "
-	{
-		Probe: tracing.Probe{
-			Name:    "tcp_sendmsg_in",
-			Address: "tcp_sendmsg",
-			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
-				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}}",
-		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall) }),
-	},
-
 	// IPv4 packet is sent. Acceptable as a packet counter,
 	// But the actual data sent might span multiple packets if TSO is in use.
 	//
@@ -335,6 +305,59 @@ var installKProbes = []helper.ProbeDef{
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpQueueRcvSkb) }),
 	},
 
+	/***************************************************************************
+	 * Clock Sync
+	 **************************************************************************/
+
+	/* This probe is used as a clock synchronization signal
+	 */
+	{
+		Probe: tracing.Probe{
+			Name:      "clock_sync_probe",
+			Address:   "{{.SYS_UNAME}}",
+			Fetchargs: "magic=+0({{.SYS_P1}}):u64 timestamp=+8({{.SYS_P1}}):u64",
+			Filter:    fmt.Sprintf("magic==0x%x", clockSyncMagic),
+		},
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(clockSyncCall) }),
+	},
+}
+
+// KProbes used only when IPv6 is disabled.
+var ipv4OnlyKProbes = []helper.ProbeDef{
+	// Return of accept(). Local side is usually zero so not fetched. Needs
+	// further I/O to populate source.Good for marking a connection as inbound.
+	//
+	//  " <- accept(sock=0xffff9f1ddc5eb780, raddr=10.0.2.15, rport=22) "
+	{
+		Probe: tracing.Probe{
+			Type:    tracing.TypeKRetProbe,
+			Name:    "inet_csk_accept_ret4",
+			Address: "inet_csk_accept",
+			Fetchargs: "sock={{.RET}} laddr=+{{.INET_SOCK_LADDR}}({{.RET}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.RET}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.RET}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.RET}}):u16 " +
+				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16",
+			Filter: "family=={{.AF_INET}}",
+		},
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpAcceptResult4) }),
+	},
+
+	// Data is sent via TCP.
+	// Good for (payload) data counters and getting full sock src and dest.
+	// Not valid for packet counters, sock behaves as a stream.
+	//
+	//  " tcp_sendmsg(sock=0xffff9f1ddd216040, len=517, 10.0.2.15:55310 -> 151.101.66.217:443) "
+	{
+		Probe: tracing.Probe{
+			Name:    "tcp_sendmsg_in4",
+			Address: "tcp_sendmsg",
+			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
+				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16",
+		},
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall4) }),
+	},
+}
+
+// KProbes used when IPv6 is enabled.
+var ipv6KProbes = []helper.ProbeDef{
 	/***************************************************************************
 	 * IPv6
 	 **************************************************************************/
@@ -446,18 +469,54 @@ var installKProbes = []helper.ProbeDef{
 	},
 
 	/***************************************************************************
-	 * Clock Sync
+	 * Dual IPv4 / IPv6 calls
 	 **************************************************************************/
 
-	/* This probe is used as a clock synchronization signal
-	 */
+	// Data is sent via TCP (IPv4 or IPv6).
+	// Good for (payload) data counters and getting full sock src and dest.
+	// Not valid for packet counters, sock behaves as a stream.
+	//
+	//  " tcp_sendmsg(sock=0xffff9f1ddd216040, len=517, 10.0.2.15:55310 -> 151.101.66.217:443) "
 	{
 		Probe: tracing.Probe{
-			Name:      "clock_sync_probe",
-			Address:   "{{.SYS_UNAME}}",
-			Fetchargs: "magic=+0({{.SYS_P1}}):u64 timestamp=+8({{.SYS_P1}}):u64",
-			Filter:    fmt.Sprintf("magic==0x%x", clockSyncMagic),
+			Name:    "tcp_sendmsg_in",
+			Address: "tcp_sendmsg",
+			Fetchargs: "sock={{.TCP_SENDMSG_SOCK}} size={{.TCP_SENDMSG_LEN}} laddr=+{{.INET_SOCK_LADDR}}({{.TCP_SENDMSG_SOCK}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.TCP_SENDMSG_SOCK}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.TCP_SENDMSG_SOCK}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.TCP_SENDMSG_SOCK}}):u16 " +
+				"family=+{{.INET_SOCK_AF}}({{.TCP_SENDMSG_SOCK}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.TCP_SENDMSG_SOCK}}){{.INET_SOCK_V6_TERM}}",
 		},
-		Decoder: helper.NewStructDecoder(func() interface{} { return new(clockSyncCall) }),
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgCall) }),
 	},
+
+	// Return of accept(). Local side is usually zero so not fetched. Needs
+	// further I/O to populate source.Good for marking a connection as inbound.
+	//
+	//  " <- accept(sock=0xffff9f1ddc5eb780, raddr=10.0.2.15, rport=22) "
+	{
+		Probe: tracing.Probe{
+			Type:    tracing.TypeKRetProbe,
+			Name:    "inet_csk_accept_ret",
+			Address: "inet_csk_accept",
+			Fetchargs: "sock={{.RET}} laddr=+{{.INET_SOCK_LADDR}}({{.RET}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.RET}}):u16 raddr=+{{.INET_SOCK_RADDR}}({{.RET}}):u32 rport=+{{.INET_SOCK_RPORT}}({{.RET}}):u16 " +
+				"family=+{{.INET_SOCK_AF}}({{.RET}}):u16 laddr6a={{.INET_SOCK_V6_LADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} laddr6b={{.INET_SOCK_V6_LADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6a={{.INET_SOCK_V6_RADDR_A}}({{.RET}}){{.INET_SOCK_V6_TERM}} raddr6b={{.INET_SOCK_V6_RADDR_B}}({{.RET}}){{.INET_SOCK_V6_TERM}}",
+			Filter: "family=={{.AF_INET}} || family=={{.AF_INET6}}",
+		},
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpAcceptResult) }),
+	},
+}
+
+func getKProbes(hasIPv6 bool) (list []helper.ProbeDef) {
+	list = append(list, sharedKProbes...)
+	if hasIPv6 {
+		list = append(list, ipv6KProbes...)
+	} else {
+		list = append(list, ipv4OnlyKProbes...)
+	}
+	return list
+}
+
+func getAllKProbes() (list []helper.ProbeDef) {
+	list = append(list, sharedKProbes...)
+	list = append(list, ipv6KProbes...)
+	list = append(list, ipv4OnlyKProbes...)
+	return list
 }

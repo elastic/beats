@@ -63,7 +63,7 @@ TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration t
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
 STRESS_TEST_OPTIONS?=-timeout=20m -race -v
-GOX_OS?=linux darwin windows openbsd ## @Building List of all OS to be supported by "make crosscompile".
+GOX_OS?=linux darwin windows freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
 GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
 # XXX: Should be switched back to `snapshot` once the Elasticsearch
@@ -125,17 +125,15 @@ check: check-headers mage ## @build Checks project and source code if everything
 	@mage check
 
 .PHONY: $(.OVER)check-headers
-$(.OVER)check-headers:
+$(.OVER)check-headers: mage
 ifndef CHECK_HEADERS_DISABLED
-	@go get -u github.com/elastic/go-licenser
-	@go-licenser -d -license ${LICENSE}
+	@mage checkLicenseHeaders
 endif
 
 .PHONY: $(.OVER)add-headers
-$(.OVER)add-headers:
+$(.OVER)add-headers: mage
 ifndef CHECK_HEADERS_DISABLED
-	@go get github.com/elastic/go-licenser
-	@go-licenser -license ${LICENSE}
+	@mage addLicenseHeaders
 endif
 
 .PHONY: fmt

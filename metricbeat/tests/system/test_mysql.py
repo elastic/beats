@@ -47,24 +47,42 @@ class Test(metricbeat.BaseTest):
 
 
 class TestMysql80(Test):
-    COMPOSE_SERVICES = ['mysql_8_0']
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mysql',
+        'MYSQL_VERSION': '8.0.13',
+    }
 
 
 class TestPercona57(Test):
-    COMPOSE_SERVICES = ['percona_5_7']
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'percona',
+        'MYSQL_VERSION': '5.7.24',
+    }
 
 
 class TestPercona80(Test):
-    COMPOSE_SERVICES = ['percona_8_0']
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'percona',
+        'MYSQL_VERSION': '8.0.13-4',
+    }
 
 
 class TestMariadb102(Test):
-    COMPOSE_SERVICES = ['mariadb_10_2']
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mariadb',
+        'MYSQL_VERSION': '10.2.23',
+    }
 
 
 class TestMariadb103(Test):
-    COMPOSE_SERVICES = ['mariadb_10_3']
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mariadb',
+        'MYSQL_VERSION': '10.3.14',
+    }
 
 
 class TestMariadb104(Test):
-    COMPOSE_SERVICES = ['mariadb_10_4']
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mariadb',
+        'MYSQL_VERSION': '10.4.4',
+    }

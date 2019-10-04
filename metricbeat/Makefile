@@ -6,7 +6,7 @@ TEST_ENVIRONMENT?=true
 ES_BEATS?=..
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
-GOX_OS=linux windows
+GOX_OS=netbsd linux windows
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
 DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14-)
@@ -34,7 +34,7 @@ configs: python-env
 	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@rm -rf modules.d
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/script/modules_collector.py --beat ${BEAT_NAME} --docs_branch=$(DOCS_BRANCH)
+	mage config
 	@chmod go-w modules.d/*
 	@# Enable system by default:
 	@if [ -f modules.d/system.yml.disabled ]; then mv modules.d/system.yml.disabled modules.d/system.yml; fi
