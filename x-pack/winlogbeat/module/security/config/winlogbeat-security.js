@@ -1053,9 +1053,9 @@ var security = (function () {
         }
         var eventActionDescription = eventActionTypes[code];
         if (eventActionDescription) {
-          evt.Put("event.action", eventActionDescription);
+            evt.Put("event.action", eventActionDescription);
         }
-    }
+    };
 
     var addLogonType = function(evt) {
         var code = evt.Get("winlog.event_data.LogonType");
@@ -1101,7 +1101,6 @@ var security = (function () {
         evt.Put("winlog.logon.failure.sub_status", descriptiveFailureStatus);
     };
 
- 
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
@@ -1112,7 +1111,7 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-    
+
     var copyTargetUserLogonId  = new processor.Chain()
         .Convert({
             fields: [
@@ -1121,7 +1120,6 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-
 
     var copySubjectUser  = new processor.Chain()
         .Convert({
@@ -1133,7 +1131,7 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-    
+
     var copyOldTargetUser  = new processor.Chain()
         .Convert({
             fields: [
@@ -1151,7 +1149,6 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-
 
     var renameCommonAuthFields = new processor.Chain()
         .Convert({
@@ -1236,7 +1233,7 @@ var security = (function () {
         })
         .Add(addActionDesc)
         .Build();
-    
+
     var userMgmtEvts = new processor.Chain()
         .Add(copyTargetUser)
         .Add(copySubjectUserLogonId)
@@ -1248,7 +1245,7 @@ var security = (function () {
         .Add(copyOldTargetUser)
         .Add(copySubjectUserLogonId)
         .Add(addActionDesc)
-        .Build();    
+        .Build();
 
     return {
         // 4624 - An account was successfully logged on.
@@ -1256,7 +1253,7 @@ var security = (function () {
 
         // 4625 - An account failed to log on.
         4625: event4625.Run,
-        
+
         // 4634 - An account was logged off.
         4634: logoff.Run,
 
@@ -1271,33 +1268,33 @@ var security = (function () {
 
         // 4720 - A user account was created
         4720: userMgmtEvts.Run,
-				
+
         // 4722 - A user account was enabled
         4722: userMgmtEvts.Run,
-				
+
         // 4723 - An attempt was made to change an account's password
         4723: userMgmtEvts.Run,
-				
+
         // 4724 - An attempt was made to reset an account's password
         4724: userMgmtEvts.Run,
-				
+
         // 4725 - A user account was disabled.
         4725: userMgmtEvts.Run,
-				
+
         // 4726 - An user account was deleted.
         4726: userMgmtEvts.Run,
-				
+
         // 4738 - An user account was changed.
         4738: userMgmtEvts.Run,
-				
+
         // 4767 - A user account was unlocked.
         4767: userMgmtEvts.Run,
-        
+
         // 4740 - An account was locked out
         4740: userMgmtEvts.Run,
-        
+
         // 4781 - The name of an account was changed.
-        4781: userRenamed.Run,	
+        4781: userRenamed.Run,
 
         process: function(evt) {
             var event_id = evt.Get("winlog.event_id");
