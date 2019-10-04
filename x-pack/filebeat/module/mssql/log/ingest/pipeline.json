@@ -12,17 +12,19 @@
         },
         {
             "date": {
+                "if": "ctx.event.timezone == null",
                 "field": "date",
                 "target_field": "@timestamp",
                 "formats": ["yyyy-MM-dd HH:mm:ss.SS"],
-                "ignore_failure": true
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
         },
         {
             "date": {
                 "if": "ctx.event.timezone != null",
-                "field": "@timestamp",
-                "formats": ["ISO8601"],
+                "field": "date",
+                "target_field": "@timestamp",
+                "formats": ["yyyy-MM-dd HH:mm:ss.SS"],
                 "timezone": "{{ event.timezone }}",
                 "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
