@@ -48,6 +48,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fixed early expiration of templates (Netflow v9 and IPFIX). {pull}13821[13821]
 - Fixed bad handling of sequence numbers when multiple observation domains were exported by a single device (Netflow V9 and IPFIX). {pull}13821[13821]
+- Fix conditions and error checking of date processors in ingest pipelines that use `event.timezone` to parse dates. {pull}13883[13883]
+- Fix timezone parsing of logstash module ingest pipelines. {pull}13890[13890]
+- cisco asa and ftd filesets: Fix parsing of message 106001. {issue}13891[13891] {pull}13903[13903]
 
 *Heartbeat*
 
