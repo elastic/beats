@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/pkg/errors"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // containerConfig is the common.Config unpacking type
@@ -162,7 +163,13 @@ func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Log
 		Name:     name,
 		Hostname: "dockerbeat.test",
 	}
-	cfg, err := common.NewConfigFrom(logOptsConfig)
+
+	newCfg, err := parseCfgKeys(logOptsConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "error parsing config keys")
+	}
+
+	cfg, err := common.NewConfigFrom(newCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -207,4 +214,20 @@ func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Log
 	}
 
 	return pipeline, nil
+}
+
+// parseCfgKeys helpfully parses the values in the map, so users can specify yml structures.
+func parseCfgKeys(cfg map[string]string) (map[string]interface{}, error) {
+
+	outMap := make(map[string]interface{})
+
+	for cfgKey, strVal := range cfg {
+		var parsed interface{}
+		if err := yaml.Unmarshal([]byte(strVal), &parsed); err != nil {
+			return nil, err
+		}
+		outMap[cfgKey] = parsed
+	}
+
+	return outMap, nil
 }

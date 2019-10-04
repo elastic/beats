@@ -36,11 +36,6 @@ func Build() error {
 		return errors.Wrap(err, "error changing directory")
 	}
 
-	// err = sh.RunV("docker", "build", "--target", "builder", "-t", "rootfsimage-build", "-f", "x-pack/dockerlogbeat/Dockerfile", ".")
-	// if err != nil {
-	// 	return errors.Wrap(err, "error rooting rootfsimage-build")
-	// }
-
 	err = sh.RunV("docker", "build", "--target", "final", "-t", "rootfsimage", "-f", "x-pack/dockerlogbeat/Dockerfile", ".")
 	if err != nil {
 		return errors.Wrap(err, "error building final container image")
@@ -72,6 +67,7 @@ func Clean() error {
 	sh.RunV("docker", "rm", "-vf", containerName)
 	sh.RunV("docker", "rmi", "rootfsimage")
 	sh.Rm("temproot.tar")
+	sh.Rm("rootfs")
 	sh.RunV("docker", "plugin", "disable", "-f", dockerPlugin)
 	sh.RunV("docker", "plugin", "rm", "-f", dockerPlugin)
 
