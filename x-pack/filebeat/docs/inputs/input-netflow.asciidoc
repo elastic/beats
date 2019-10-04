@@ -73,7 +73,7 @@ NetFlow/IPFIX fields with vendor extensions and to override existing fields.
 The expected format is the same as used by Logstash's NetFlow codec
 {logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-ipfix_definitions[ipfix_definitions]
 and {logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-netflow_definitions[netflow_definitions].
-{beatname} will detect which of the two formats is used.
+{beatname_uc} will detect which of the two formats is used.
 
 NetFlow format example:
 ["source","yaml",subs="attributes"]
