@@ -6,11 +6,23 @@
   activitylogs:
     enabled: true
     var:
-      eventhubs_namespace: ""
-      topics: ["insights-operational-logs"]
+      namespace: ""
+      eventhub: ["insights-operational-logs"]
       consumer_group: "$Default"
       connection_string: ""
 
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+ # auditlogs:
+ #   enabled: true
+ #   var:
+ #     namespace: ""
+ #     eventhub: ["insights-logs-auditlogs"]
+ #     consumer_group: "$Default"
+ #     connection_string: ""
+
+ # signinlogs:
+ #   enabled: true
+ #   var:
+ #     namespace: ""
+ #     eventhub: ["insights-logs-signinlogs"]
+ #     consumer_group: "$Default"
+ #     connection_string: ""

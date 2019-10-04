@@ -3,6 +3,8 @@
 
 == azure module
 
+beta[]
+
 This is the azure module.
 
 include::../include/what-happens.asciidoc[]
