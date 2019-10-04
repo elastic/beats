@@ -186,6 +186,16 @@ jobs:
         - TRAVIS_K8S_VERSION=v1.15.0
         - TRAVIS_MINIKUBE_VERSION=v1.3.1
       stage: test
+      addons:
+        apt:
+          update: true
+          packages:
+            - python-virtualenv
+            - libpcap-dev
+            - xsltproc
+            - libxml2-utils
+            - librpm-dev
+
     # TODO include 1.11 once minikube supports it
     #- os: linux
     #  install: deploy/kubernetes/.travis/setup.sh
