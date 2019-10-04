@@ -32,10 +32,22 @@ import (
 
 const defaultNode = "localhost"
 
+func getKubeConfigEnvironmentVariable() string {
+	envKubeConfig := os.Getenv("KUBECONFIG")
+	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
+		return envKubeConfig
+	}
+	return ""
+}
+
 // GetKubernetesClient returns a kubernetes client. If inCluster is true, it returns an
 // in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
 // it parses the config file to get the config required to build a client.
 func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
+	if kubeconfig == "" {
+		kubeconfig = getKubeConfigEnvironmentVariable()
+	}
+	logp.Debug("edooo", kubeconfig)
 	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
@@ -49,9 +61,13 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	return client, nil
 }
 
-// IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not.
+// IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not,
+// taking into consideration the existence of KUBECONFIG variable
 func IsInCluster(kubeconfig string) bool {
 	if kubeconfig == "" {
+		if getKubeConfigEnvironmentVariable() != "" {
+			return false
+		}
 		return true
 	}
 
