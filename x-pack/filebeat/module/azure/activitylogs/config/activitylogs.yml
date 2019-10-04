@@ -1,4 +1,4 @@
-type: azure
+type: kafka
 hosts: {{ .namespace }}
 topics: {{ .eventhub }}
 group_id: {{ .consumer_group }}

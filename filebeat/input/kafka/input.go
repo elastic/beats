@@ -63,7 +63,7 @@ func NewInput(
 	inputContext input.Context,
 ) (input.Input, error) {
 
-	config := DefaultConfig()
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading kafka input config")
 	}
@@ -86,7 +86,7 @@ func NewInput(
 		return nil, err
 	}
 
-	saramaConfig, err := NewSaramaConfig(config)
+	saramaConfig, err := newSaramaConfig(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initializing Sarama config")
 	}

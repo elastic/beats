@@ -2,7 +2,7 @@ module_version: 1.0
 
 var:
   - name: input
-    default: azure
+    default: kafka
   - name: topics
     default: "insights-operational-logs"
   - name: consumer_group

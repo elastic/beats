@@ -1,5 +1,5 @@
 :modulename: azure
-:has-dashboards: true
+:has-dashboards: false
 
 == azure module
 

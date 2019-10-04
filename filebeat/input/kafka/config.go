@@ -104,7 +104,7 @@ var (
 
 // The default config for the kafka input. When in doubt, default values
 // were chosen to match sarama's defaults.
-func DefaultConfig() kafkaInputConfig {
+func defaultConfig() kafkaInputConfig {
 	return kafkaInputConfig{
 		Version:        kafka.Version("1.0.0"),
 		InitialOffset:  initialOffsetOldest,
@@ -144,7 +144,7 @@ func (c *kafkaInputConfig) Validate() error {
 	return nil
 }
 
-func NewSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
+func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k := sarama.NewConfig()
 
 	version, ok := config.Version.Get()
