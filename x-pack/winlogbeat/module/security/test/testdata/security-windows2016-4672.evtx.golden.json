@@ -34,6 +34,7 @@
           "SeDelegateSessionUserImpersonatePrivilege"
         ],
         "SubjectDomainName": "VAGRANT-2016",
+        "SubjectLogonId": "0x76a087",
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1766348727-1038078804-3833492317-1000"
       },

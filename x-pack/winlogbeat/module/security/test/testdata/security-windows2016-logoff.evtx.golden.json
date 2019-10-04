@@ -23,6 +23,7 @@
       "event_data": {
         "LogonType": "3",
         "TargetDomainName": "WIN-41OB2LO92CR",
+        "TargetLogonId": "0x767a77",
         "TargetUserName": "audittest",
         "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-1000"
       },
@@ -71,6 +72,7 @@
       "event_data": {
         "LogonType": "3",
         "TargetDomainName": "WIN-41OB2LO92CR",
+        "TargetLogonId": "0x104a4a6",
         "TargetUserName": "Administrator",
         "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
       },

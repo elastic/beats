@@ -43,6 +43,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
@@ -113,6 +114,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
@@ -186,6 +188,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x1008e",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
@@ -256,6 +259,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
@@ -326,6 +330,7 @@
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x129f1",
         "TargetUserName": "ANONYMOUS LOGON",
         "TargetUserSid": "S-1-5-7",
         "TransmittedServices": "-"
@@ -396,6 +401,7 @@
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
         "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x28d31",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
@@ -466,6 +472,7 @@
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
         "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x29f0f",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
@@ -536,6 +543,7 @@
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
         "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x2a362",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
@@ -609,6 +617,7 @@
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
         "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x324f8",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
@@ -679,6 +688,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "Window Manager",
+        "TargetLogonId": "0x33444",
         "TargetUserName": "DWM-2",
         "TargetUserSid": "S-1-5-90-2",
         "TransmittedServices": "-"
@@ -752,6 +762,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetLogonId": "0x3444f",
         "TargetUserName": "vagrant",
         "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
@@ -822,6 +833,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "Window Manager",
+        "TargetLogonId": "0x357fd",
         "TargetUserName": "DWM-3",
         "TargetUserSid": "S-1-5-90-3",
         "TransmittedServices": "-"
@@ -892,6 +904,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
@@ -962,6 +975,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
@@ -1032,6 +1046,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
@@ -1102,6 +1117,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
@@ -1172,6 +1188,7 @@
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "NT AUTHORITY",
+        "TargetLogonId": "0x3e7",
         "TargetUserName": "SYSTEM",
         "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"

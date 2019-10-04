@@ -25,6 +25,7 @@
       "computer_name": "WIN-41OB2LO92CR",
       "event_data": {
         "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
         "SubjectUserName": "WIN-41OB2LO92CR$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "WIN-41OB2LO92CR",
