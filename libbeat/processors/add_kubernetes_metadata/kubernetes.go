@@ -95,11 +95,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen, err := kubernetes.NewMetaGenerator(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	processor := &kubernetesAnnotator{
 		cache:               newCache(config.CleanupTimeout),
 		kubernetesAvailable: false,
@@ -113,6 +108,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
 		}
 		return processor, nil
+	}
+
+	metaGen, err := kubernetes.NewMetaGenerator(cfg, client)
+	if err != nil {
+		return nil, err
 	}
 
 	if !isKubernetesAvailable(client) {

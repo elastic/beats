@@ -73,7 +73,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, errWrap(err)
 	}
 
-	metagen, err := kubernetes.NewMetaGenerator(c)
+	metagen, err := kubernetes.NewMetaGenerator(c, client)
 	if err != nil {
 		return nil, errWrap(err)
 	}

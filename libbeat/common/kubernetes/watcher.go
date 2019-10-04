@@ -55,6 +55,9 @@ type Watcher interface {
 
 	// AddEventHandler add event handlers for corresponding event type watched
 	AddEventHandler(ResourceEventHandler)
+
+	// GetWatcherClient return the k8s client that is binded to the watcher
+	GetWatcherClient() kubernetes.Interface
 }
 
 // WatchOptions controls watch behaviors
@@ -87,6 +90,11 @@ func tweakOptions(options *metav1.ListOptions, opt WatchOptions) {
 	if opt.Node != "" {
 		options.FieldSelector = "spec.nodeName=" + opt.Node
 	}
+}
+
+// GetWatcherClient returns the k8s client that is binded to the watcher
+func (w *watcher) GetWatcherClient() kubernetes.Interface {
+	return w.client
 }
 
 // NewWatcher initializes the watcher client to provide a events handler for

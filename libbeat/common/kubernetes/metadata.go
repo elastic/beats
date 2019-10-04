@@ -18,9 +18,15 @@
 package kubernetes
 
 import (
+	"fmt"
 	"strings"
 
+	"k8s.io/client-go/kubernetes"
+
+	"github.com/elastic/beats/libbeat/logp"
+
 	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
@@ -49,22 +55,24 @@ type MetaGeneratorConfig struct {
 
 	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
 	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
+	k8sClient              kubernetes.Interface
 }
 
 type metaGenerator = MetaGeneratorConfig
 
 // DefaultMetaGeneratorConfig initializes and returns a new MetaGeneratorConfig with default values
-func DefaultMetaGeneratorConfig() MetaGeneratorConfig {
+func DefaultMetaGeneratorConfig(client kubernetes.Interface) MetaGeneratorConfig {
 	return MetaGeneratorConfig{
 		IncludeCreatorMetadata: true,
 		LabelsDedot:            true,
 		AnnotationsDedot:       true,
+		k8sClient:              client,
 	}
 }
 
 // NewMetaGenerator initializes and returns a new kubernetes metadata generator
-func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
-	generator := DefaultMetaGeneratorConfig()
+func NewMetaGenerator(cfg *common.Config, client kubernetes.Interface) (MetaGenerator, error) {
+	generator := DefaultMetaGeneratorConfig(client)
 
 	err := cfg.Unpack(&generator)
 	return &generator, err
@@ -102,9 +110,27 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	}
 
 	annotationsMap := generateMapSubset(accessor.GetAnnotations(), g.IncludeAnnotations, g.AnnotationsDedot)
-	meta := common.MapStr{}
+	metadata := common.MapStr{}
 	if accessor.GetNamespace() != "" {
-		meta["namespace"] = accessor.GetNamespace()
+		namespase := accessor.GetNamespace()
+
+		ns, err := g.k8sClient.CoreV1().Namespaces().Get(namespase, metav1.GetOptions{})
+		if err != nil {
+			logp.Error(err)
+		}
+
+		namespaceaccessor, err := meta.Accessor(ns)
+
+		if err != nil {
+			return nil
+		}
+		namespacelabels := namespaceaccessor.GetLabels()
+
+		metadata["namespace"] = accessor.GetNamespace()
+		for label, val := range namespacelabels {
+			metakey := fmt.Sprintf("namespace_%v", label)
+			metadata[metakey] = val
+		}
 	}
 
 	// Add controller metadata if present
@@ -116,27 +142,26 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 				case "Deployment",
 					"ReplicaSet",
 					"StatefulSet":
-					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
+					safemapstr.Put(metadata, strings.ToLower(ref.Kind)+".name", ref.Name)
 				}
 			}
 		}
 	}
 
 	if len(labelMap) != 0 {
-		meta["labels"] = labelMap
+		metadata["labels"] = labelMap
 	}
 
 	if len(annotationsMap) != 0 {
-		meta["annotations"] = annotationsMap
+		metadata["annotations"] = annotationsMap
 	}
 
-	return meta
+	return metadata
 }
 
 // PodMetadata generates metadata for the given pod taking to account certain filters
 func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	podMeta := g.ResourceMetadata(pod)
-
 	safemapstr.Put(podMeta, "pod.uid", string(pod.GetObjectMeta().GetUID()))
 	safemapstr.Put(podMeta, "pod.name", pod.GetObjectMeta().GetName())
 	safemapstr.Put(podMeta, "node.name", pod.Spec.NodeName)
