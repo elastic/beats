@@ -209,33 +209,39 @@ NOTE: The `monitor` cluster privilege and the `create` index privilege on
 +
 [options="header"]
 |====
-|Privileges | Why needed?
+|Type | Privilege | Purpose
 
 ifndef::apm-server[]
+|Cluster
 |`monitor`
-|Retrieve cluster details (e.g. version)
+|Retrieve cluster details (e.g. version) 
 endif::apm-server[]
 
 ifndef::no_ilm[]
+|Cluster
 |`read_ilm`
 | Read the ILM policy when connecting to clusters that support ILM.
 Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
+|Cluster
 |`cluster:admin/ingest/pipeline/get`
 |Check for ingest pipelines used by modules. Needed when using modules.
 endif::[]
 
+|Index
 |`create` on +{beat_default_index_prefix}-*+ indices
 |Write events into {es}
 
 ifndef::no_ilm[]
+|Index
 |`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
 |Check for alias when connecting to clusters that support ILM.
 Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
+|Index
 |`create_index` on +{beat_default_index_prefix}-*+ indices
 |Create daily indices when connecting to clusters that do not support ILM.
 Not needed when using ILM.
