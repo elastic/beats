@@ -128,10 +128,6 @@ func (f *Log) errorChecks(err error) error {
 		return err
 	}
 
-	return nil
-}
-
-func (f *Log) checkFileErrors() error {
 	// Refetch fileinfo to check if the file was truncated or disappeared.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
@@ -152,6 +148,19 @@ func (f *Log) checkFileErrors() error {
 	age := time.Since(f.lastTimeRead)
 	if age > f.config.CloseInactive {
 		return ErrInactive
+	}
+
+	return nil
+}
+
+func (f *Log) checkFileErrors() error {
+	// Refetch fileinfo to check if the file was truncated or disappeared.
+	// Errors if the file was removed/rotated after reading and before
+	// calling the stat function
+	info, statErr := f.fs.Stat()
+	if statErr != nil {
+		logp.Err("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
+		return statErr
 	}
 
 	if f.config.CloseRenamed {
