@@ -22,7 +22,7 @@
         ]
     },
     {
-        "@timestamp": "2019-01-01T01:02:12.000Z",
+        "@timestamp": "2018-12-31T23:02:12.000-02:00",
         "cisco.asa.message_id": "106001",
         "cisco.asa.source_interface": "eth0",
         "destination.ip": "192.168.33.12",
@@ -34,7 +34,7 @@
         "event.original": "%ASA-2-106001: Inbound TCP connection denied from 10.13.12.11/45321 to 192.168.33.12/443 flags URG+SYN+RST on interface eth0",
         "event.outcome": "deny",
         "event.severity": 2,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "asa",
         "host.hostname": "beats",
         "input.type": "log",
