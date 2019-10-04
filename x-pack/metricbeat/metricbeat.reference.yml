@@ -845,6 +845,13 @@ metricbeat.modules:
   enabled: false
   #ttl: "30s"
 
+#-------------------------------- Tomcat Module --------------------------------
+- module: tomcat
+  metricsets: ['threading', 'cache', 'memory', 'requests']
+  period: 10s
+  hosts: ['localhost:8080']
+  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+
 #------------------------------- Traefik Module -------------------------------
 - module: traefik
   metricsets: ["health"]

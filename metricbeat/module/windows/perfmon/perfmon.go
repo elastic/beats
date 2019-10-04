@@ -80,7 +80,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization of reader failed")
 	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		reader:        reader,
@@ -90,6 +89,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches events and reports them upstream
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	// refresh performance counter list
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
+	if m.reader.executed {
+		err := m.reader.RefreshCounterPaths()
+		if err != nil {
+			return errors.Wrap(err, "failed retrieving counters")
+		}
+	}
 	events, err := m.reader.Read()
 	if err != nil {
 		return errors.Wrap(err, "failed reading counters")
@@ -101,7 +110,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
-
 	return nil
 }
 

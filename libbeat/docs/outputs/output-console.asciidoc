@@ -1,0 +1,47 @@
+[[console-output]]
+=== Configure the Console output
+
+++++
+<titleabbrev>Console</titleabbrev>
+++++
+
+The Console output writes events in JSON format to stdout.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.console:
+  pretty: true
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+You can specify the following options in the `console` section of the +{beatname_lc}.yml+ config file:
+
+===== `pretty`
+
+If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
+
+===== `codec`
+
+Output codec configuration. If the `codec` section is missing, events will be json encoded using the `pretty` option.
+
+See <<configuration-output-codec>> for more information.
+
+
+===== `enabled`
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
+===== `bulk_max_size`
+
+The maximum number of events to buffer internally during publishing. The default is 2048.
+
+Specifying a larger batch size may add some latency and buffering during publishing. However, for Console output, this
+setting does not affect how events are published.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
