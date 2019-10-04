@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Better wording for xpack beats when the _xpack endpoint is not reachable. {pull}13771[13771]
 - Recover from panics in the javascript process and log details about the failure to aid in future debugging. {pull}13690[13690]
 - Make the script processor concurrency-safe. {issue}13690[13690] {pull}13857[13857]
+- Kubernetes watcher at `add_kubernetes_metadata` fails with StatefulSets {pull}13905[13905]
 
 *Auditbeat*
 
