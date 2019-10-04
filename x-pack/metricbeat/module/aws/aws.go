@@ -138,7 +138,9 @@ func InitEvent(regionName string) mb.Event {
 	return event
 }
 
-func CheckTagFiltersExist(tagFilters []Tag, tags interface{}) bool {
+// CheckTagFiltersExist compare tags filter with a set of tags to see if tags
+// filter is a subset of tags
+func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
 	var tagKeys []string
 	var tagValues []string
 
@@ -148,7 +150,7 @@ func CheckTagFiltersExist(tagFilters []Tag, tags interface{}) bool {
 			tagValues = append(tagValues, *tag.Value)
 		}
 
-		for _, tagFilter := range tagFilters {
+		for _, tagFilter := range tagsFilter {
 			if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
 				return false
 			}
@@ -159,7 +161,7 @@ func CheckTagFiltersExist(tagFilters []Tag, tags interface{}) bool {
 			tagValues = append(tagValues, *tag.Value)
 		}
 
-		for _, tagFilter := range tagFilters {
+		for _, tagFilter := range tagsFilter {
 			if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
 				return false
 			}
