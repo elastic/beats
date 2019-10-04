@@ -8,6 +8,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
@@ -31,6 +33,12 @@ type MetricSet struct {
 	RegionsList []string
 	Period      time.Duration
 	AwsConfig   *awssdk.Config
+}
+
+// Tag holds a configuration specific for ec2 and cloudwatch metricset.
+type Tag struct {
+	Key   string `config:"key"`
+	Value string `config:"value"`
 }
 
 // ModuleName is the name of this module.
@@ -107,7 +115,7 @@ func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error
 	return
 }
 
-// StringInSlice checks if a string is already exists in list
+// StringInSlice checks if a string is already exists in list and its location
 func StringInSlice(str string, list []string) (bool, int) {
 	for idx, v := range list {
 		if v == str {
@@ -128,4 +136,34 @@ func InitEvent(regionName string) mb.Event {
 		event.RootFields.Put("cloud.region", regionName)
 	}
 	return event
+}
+
+func CheckTagFiltersExist(tagFilters []Tag, tags interface{}) bool {
+	var tagKeys []string
+	var tagValues []string
+
+	if tagsResource, ok := tags.([]resourcegroupstaggingapi.Tag); ok {
+		for _, tag := range tagsResource {
+			tagKeys = append(tagKeys, *tag.Key)
+			tagValues = append(tagValues, *tag.Value)
+		}
+
+		for _, tagFilter := range tagFilters {
+			if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+				return false
+			}
+		}
+	} else if tagsEC2, ok := tags.([]ec2.Tag); ok {
+		for _, tag := range tagsEC2 {
+			tagKeys = append(tagKeys, *tag.Key)
+			tagValues = append(tagValues, *tag.Value)
+		}
+
+		for _, tagFilter := range tagFilters {
+			if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+				return false
+			}
+		}
+	}
+	return true
 }
