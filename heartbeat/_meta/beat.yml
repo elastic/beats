@@ -37,4 +37,6 @@ heartbeat.monitors:
 setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
+  index.sort.field: ["monitor.id", "@timestamp"]
+  index.sort.order: ["asc", "desc"]
   #_source.enabled: false
