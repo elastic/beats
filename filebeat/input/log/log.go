@@ -154,6 +154,12 @@ func (f *Log) errorChecks(err error) error {
 }
 
 func (f *Log) checkFileErrors() error {
+	// No point doing a stat call on the file if configuration options are
+	// not enabled
+	if !f.config.CloseRenamed && !f.config.CloseRemoved {
+		return nil
+	}
+
 	// Refetch fileinfo to check if the file was truncated or disappeared.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
