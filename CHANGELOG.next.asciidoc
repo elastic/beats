@@ -329,6 +329,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to set the document id in the json reader. {pull}5844[5844]
 - Add input httpjson. {issue}13545[13545] {pull}13546[13546]
 - Filebeat Netflow input: Remove beta label. {pull}13858[13858]
+- Remove `event.timezone` from events that don't need it in some modules that support log formats with and without timezones. {pull}13918[13918]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
