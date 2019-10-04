@@ -71,8 +71,7 @@ func Clean() error {
 
 	sh.RunV("docker", "rm", "-vf", containerName)
 	sh.RunV("docker", "rmi", "rootfsimage")
-	sh.RunV("docker", "rmi", "rootfsimage-build")
-	sh.Rm("rootfs")
+	sh.Rm("temproot.tar")
 	sh.RunV("docker", "plugin", "disable", "-f", dockerPlugin)
 	sh.RunV("docker", "plugin", "rm", "-f", dockerPlugin)
 
