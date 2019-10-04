@@ -9,8 +9,6 @@
 <titleabbrev>NetFlow</titleabbrev>
 ++++
 
-beta[]
-
 Use the `netflow` input to read NetFlow and IPFIX exported flows
 and options records over UDP.
 

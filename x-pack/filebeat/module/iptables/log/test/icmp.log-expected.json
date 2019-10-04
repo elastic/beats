@@ -1,11 +1,11 @@
 [
     {
-        "@timestamp": "2019-01-08T03:37:09.000Z",
+        "@timestamp": "2019-01-08T01:37:09.000-02:00",
         "destination.ip": "192.0.2.83",
         "destination.mac": "90:10:28:5f:62:24",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
