@@ -1,0 +1,5 @@
+- name: auditlogs
+  type: group
+  description: >
+    Fields for azure audit logs.
+  fields:

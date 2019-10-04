@@ -1,3 +1,3 @@
 dashboards:
-- id: Filebeat-azure-activitylogs-Dashboard
-  file: Filebeat-azure-activitylogs.json
+- id: Filebeat-azure-auditlogs-Dashboard
+  file: Filebeat-azure-audit.json

@@ -16,7 +16,6 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
 * <<exported-fields-azure>>
-* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
@@ -1262,10 +1261,228 @@ azure Module
 Fields for azure Activity logs.
 
 
-[[exported-fields-azure]]
-== Decode azure processor fields fields
 
-Common Event Format (azure) data.
+[float]
+=== identity
+
+The canonical user ID of the owner of the source bucket.
+
+
+
+*`azure.activitylogs.identity.claims.*`*::
++
+--
+Claims
+
+
+type: object
+
+--
+
+[float]
+=== authorization
+
+Node allocatable pods
+
+
+
+[float]
+=== evidence
+
+Node allocatable pods
+
+
+
+*`azure.activitylogs.identity.authorization.evidence.roleAssignmentScope`*::
++
+--
+Role assignment scope
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.roleDefinitionId`*::
++
+--
+Role definition ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.role`*::
++
+--
+Role
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.roleAssignmentId`*::
++
+--
+Role assignment ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.principalId`*::
++
+--
+Principal ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.principalType`*::
++
+--
+Principal type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.scope`*::
++
+--
+Scope
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.action`*::
++
+--
+Action
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.correlationId`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.resultType`*::
++
+--
+Result Type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.callerIpAddress`*::
++
+--
+Caller Ip address
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.resourceID`*::
++
+--
+Resource ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.level`*::
++
+--
+Level
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.operationName`*::
++
+--
+Operation name
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.resultSignature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.properties.*`*::
++
+--
+Properties
+
+
+type: object
+
+--
+
+*`azure.activitylogs.location`*::
++
+--
+Location
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.category`*::
++
+--
+Category
+
+
+type: keyword
+
+--
+
+[float]
+=== auditlogs
+
+Fields for azure audit logs.
+
+
+[float]
+=== signinlogs
+
+Fields for azure audit logs.
 
 
 [[exported-fields-beat-common]]

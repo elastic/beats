@@ -1,0 +1,5 @@
+- name: signinlogs
+  type: group
+  description: >
+    Fields for azure audit logs.
+  fields:

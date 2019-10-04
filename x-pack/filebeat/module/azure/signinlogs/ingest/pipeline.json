@@ -1,0 +1,43 @@
+{
+  "description": "Pipeline for parsing azure signin logs.",
+  "processors": [
+      {
+          "date": {
+              "field": "time",
+              "target_field": "@timestamp",
+              "ignore_failure": false,
+              "formats": [
+                  "ISO8601"
+              ]
+          }
+      },
+      {
+          "rename": {
+              "field": "resourceId",
+              "target_field": "resourceID",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "identity",
+              "target_field": "specification",
+              "ignore_missing": true
+          }
+      },
+      {
+          "remove": {
+              "field": ["message", "time"],
+              "ignore_missing": true
+          }
+      }
+  ],
+  "on_failure": [
+  {
+    "set": {
+      "field": "error.message",
+      "value": "{{ _ingest.on_failure_message }}"
+    }
+  }
+  ]
+}

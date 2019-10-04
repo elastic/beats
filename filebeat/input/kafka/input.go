@@ -335,9 +335,39 @@ func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 	case "":
 	default:
 		return []string{string(bMessage)}
+	case AuditLogs:
+		// if the fileset is audit logs a filtering of the messages should be done as the eventhub can return different types of messages
+		var obj AzureAuditLogs
+		test := string(bMessage)
+		_ = test
+		err := json.Unmarshal(bMessage, &obj)
+		if err != nil {
+			return nil
+		}
+		for _, ms := range obj.Records {
+			js, err := json.Marshal(ms)
+			if err == nil {
+				messages = append(messages, string(js))
+			}
+		}
+		return messages
 	case ActivityLogs:
 		// if the fileset is activity logs a filtering of the messages should be done as the eventhub can return different types of messages
 		var obj AzureActivityLogs
+		err := json.Unmarshal(bMessage, &obj)
+		if err != nil {
+			return nil
+		}
+		for _, ms := range obj.Records {
+			js, err := json.Marshal(ms)
+			if err == nil {
+				messages = append(messages, string(js))
+			}
+		}
+		return messages
+	case SigninLogs:
+		// if the fileset is signin logs a filtering of the messages should be done as the eventhub can return different types of messages
+		var obj AzureSigninLogs
 		err := json.Unmarshal(bMessage, &obj)
 		if err != nil {
 			return nil
