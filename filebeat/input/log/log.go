@@ -109,7 +109,8 @@ func (f *Log) Read(buf []byte) (int, error) {
 	}
 }
 
-// errorChecks checks how the given error should be handled based on the config options
+// errorChecks determines the cause for EOF errors, and how the EOF event should be handled
+// based on the config options.
 func (f *Log) errorChecks(err error) error {
 	if err != io.EOF {
 		logp.Err("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
@@ -128,7 +129,7 @@ func (f *Log) errorChecks(err error) error {
 		return err
 	}
 
-	// Refetch fileinfo to check if the file was truncated or disappeared.
+	// Refetch fileinfo to check if the file was truncated.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
 	info, statErr := f.fs.Stat()
@@ -160,7 +161,7 @@ func (f *Log) checkFileErrors() error {
 		return nil
 	}
 
-	// Refetch fileinfo to check if the file was truncated or disappeared.
+	// Refetch fileinfo to check if the file was renamed or removed.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
 	info, statErr := f.fs.Stat()
