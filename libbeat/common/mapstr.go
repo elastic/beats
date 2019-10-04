@@ -277,28 +277,57 @@ func MergeFields(ms, fields MapStr, underRoot bool) error {
 		return nil
 	}
 
-	fieldsMS := ms
-	if !underRoot {
-		f, ok := ms[FieldsKey]
-		if !ok {
-			fieldsMS = make(MapStr, len(fields))
-			ms[FieldsKey] = fieldsMS
-		} else {
-			// Use existing 'fields' value.
-			var err error
-			fieldsMS, err = toMapStr(f)
-			if err != nil {
-				return err
-			}
-		}
+	destMap, err := mergeFieldsGetDestMap(ms, fields, underRoot)
+	if err != nil {
+		return err
 	}
 
 	// Add fields and override.
 	for k, v := range fields {
-		fieldsMS[k] = v
+		destMap[k] = v
 	}
 
 	return nil
+}
+
+// MergeFieldsDeep recursively merges the keys and values from fields into ms, either
+// into ms itself (if underRoot == true) or into ms["fields"] (if underRoot == false). If
+// the same key exists in fields and the destination map, the value in fields takes precedence.
+//
+// An error is returned if underRoot is true and the value of ms["fields"] is not a
+// MapStr.
+func MergeFieldsDeep(ms, fields MapStr, underRoot bool) error {
+	if ms == nil || len(fields) == 0 {
+		return nil
+	}
+
+	destMap, err := mergeFieldsGetDestMap(ms, fields, underRoot)
+	if err != nil {
+		return err
+	}
+
+	destMap.DeepUpdate(fields)
+	return nil
+}
+
+func mergeFieldsGetDestMap(ms, fields MapStr, underRoot bool) (MapStr, error) {
+	destMap := ms
+	if !underRoot {
+		f, ok := ms[FieldsKey]
+		if !ok {
+			destMap = make(MapStr, len(fields))
+			ms[FieldsKey] = destMap
+		} else {
+			// Use existing 'fields' value.
+			var err error
+			destMap, err = toMapStr(f)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return destMap, nil
 }
 
 // AddTags appends a tag to the tags field of ms. If the tags field does not
