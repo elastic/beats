@@ -124,6 +124,8 @@ func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {
 	htmlDir := CWD("build/html_docs", params.name)
 	buildDocsScript := filepath.Join(cloneDir, "build_docs")
 	args := []string{
+		"--asciidoctor",
+		"--respect_edit_url_overrides",
 		"--chunk=1",
 		"--doc", params.indexFile,
 		"--out", htmlDir,
