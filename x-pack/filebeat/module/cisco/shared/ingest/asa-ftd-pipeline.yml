@@ -960,6 +960,9 @@ processors:
  - lowercase:
      field: "file.type"
      ignore_failure: true
+ - lowercase:
+     field: "network.direction"
+     ignore_failure: true
 
 #
 # Populate network.iana_number from network.transport. Also does reverse
