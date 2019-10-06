@@ -8,11 +8,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -122,6 +121,7 @@ func StringInSlice(str string, list []string) (bool, int) {
 			return true, idx
 		}
 	}
+	// If this string doesn't exist in given list, then return location to be -1
 	return false, -1
 }
 
@@ -144,27 +144,24 @@ func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
 	var tagKeys []string
 	var tagValues []string
 
-	if tagsResource, ok := tags.([]resourcegroupstaggingapi.Tag); ok {
+	switch tags.(type) {
+	case []resourcegroupstaggingapi.Tag:
+		tagsResource := tags.([]resourcegroupstaggingapi.Tag)
 		for _, tag := range tagsResource {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
-
-		for _, tagFilter := range tagsFilter {
-			if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
-				return false
-			}
-		}
-	} else if tagsEC2, ok := tags.([]ec2.Tag); ok {
+	case []ec2.Tag:
+		tagsEC2 := tags.([]ec2.Tag)
 		for _, tag := range tagsEC2 {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
+	}
 
-		for _, tagFilter := range tagsFilter {
-			if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
-				return false
-			}
+	for _, tagFilter := range tagsFilter {
+		if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+			return false
 		}
 	}
 	return true

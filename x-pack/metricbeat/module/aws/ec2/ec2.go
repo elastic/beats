@@ -45,7 +45,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	Tags []aws.Tag `config:"tags_filter"`
+	TagsFilter []aws.Tag `config:"tags_filter"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -76,8 +76,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet: metricSet,
-		Tags:      config.Tags,
+		MetricSet:  metricSet,
+		TagsFilter: config.Tags,
 	}, nil
 }
 
@@ -192,11 +192,11 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 				// Add tags
 				tags := instanceOutput[instanceID].Tags
-				if m.Tags != nil {
+				if m.TagsFilter != nil {
 					// Check with each tag filter
 					// If tag filter doesn't exist in tagKeys/tagValues,
 					// then do not report this event/instance.
-					if exists := aws.CheckTagFiltersExist(m.Tags, tags); !exists {
+					if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
 						continue
 					}
 				}
@@ -209,6 +209,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				if err != nil {
 					return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
 				}
+
 				events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
 				events[instanceID].RootFields.Put("cloud.machine.type", machineType)
 				events[instanceID].RootFields.Put("cloud.availability_zone", *instanceOutput[instanceID].Placement.AvailabilityZone)
