@@ -56,7 +56,7 @@ endif::no_ilm[]
 ifdef::has_ml_jobs[]
 |Cluster
 |`manage_ml`
-|Set up machine learning job configurations
+|Set up Machine Learning job configurations
 endif::has_ml_jobs[]
 
 |Index
@@ -66,7 +66,7 @@ endif::has_ml_jobs[]
 ifdef::has_ml_jobs[]
 |Index
 |`read` on +{beat_default_index_prefix}-*+ indices
-|Read {beatname_uc} indices in order to set up machine learning jobs
+|Read {beatname_uc} indices in order to set up Machine Learning jobs
 endif::has_ml_jobs[]
 |====
 +
