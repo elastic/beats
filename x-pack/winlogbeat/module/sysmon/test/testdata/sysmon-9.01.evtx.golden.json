@@ -4,7 +4,8 @@
     "event": {
       "code": 16,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -37,7 +38,8 @@
     "event": {
       "code": 4,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -77,6 +79,7 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_start"
     },
     "hash": {
@@ -148,6 +151,7 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_start"
     },
     "hash": {
@@ -222,6 +226,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_end"
     },
     "log": {
@@ -263,6 +268,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_end"
     },
     "log": {
@@ -304,6 +310,7 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_start"
     },
     "hash": {
@@ -380,7 +387,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -438,7 +446,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -497,7 +506,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -556,7 +566,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -615,7 +626,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -678,7 +690,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -739,7 +752,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -798,7 +812,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -856,7 +871,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -917,7 +933,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -978,7 +995,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -1036,7 +1054,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -1094,7 +1113,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -1156,7 +1176,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -1218,7 +1239,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -1280,7 +1302,8 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "log": {
       "level": "information"
@@ -1340,6 +1363,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_end"
     },
     "log": {
@@ -1381,6 +1405,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_end"
     },
     "log": {
@@ -1420,7 +1445,8 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp"
@@ -1466,7 +1492,8 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp"
@@ -1512,7 +1539,8 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp"
@@ -1558,7 +1586,8 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp"
@@ -1606,6 +1635,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
       "type": "process_end"
     },
     "log": {
@@ -1645,7 +1675,8 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp"
@@ -1691,7 +1722,8 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp"

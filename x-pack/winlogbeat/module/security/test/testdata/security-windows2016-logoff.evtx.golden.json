@@ -5,7 +5,8 @@
       "action": "Logoff",
       "code": 4634,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"
@@ -54,7 +55,8 @@
       "action": "Logoff",
       "code": 4634,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"
