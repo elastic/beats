@@ -5,6 +5,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/docker/go-plugins-helpers/sdk"
 	"github.com/elastic/beats/libbeat/common"
 	logpcfg "github.com/elastic/beats/libbeat/logp/configure"
@@ -37,12 +40,14 @@ func main() {
 
 	logcfg, err := genNewMonitoringConfig()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "error starting config: %s", err)
+		os.Exit(1)
 	}
 
 	err = logpcfg.Logging("dockerbeat", logcfg)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "error starting log handler: %s", err)
+		os.Exit(1)
 	}
 
 	pipelines := pipelinemanager.NewPipelineManager(logcfg)
@@ -54,6 +59,7 @@ func main() {
 
 	err = sdkHandler.ServeUnix("hellologdriver", 0)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "Error in socket handler: %s", err)
+		os.Exit(1)
 	}
 }
