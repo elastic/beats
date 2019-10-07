@@ -57,9 +57,9 @@ type builder struct {
 	// global pipeline processors
 	processors *group
 
-	drop           bool // disabled is set if outputs have been disabled via CLI
-	alwaysCopy     bool
-	emitNullValues bool // whether to emit null values in events or not
+	drop       bool // disabled is set if outputs have been disabled via CLI
+	alwaysCopy bool
+	keepNull   bool // whether to keep null values in events or not
 }
 
 type modifier interface {
@@ -103,7 +103,7 @@ func MakeDefaultSupport(
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
 			TimeSeries           bool                    `config:"timeseries.enabled"`
-			EmitNullValues       bool                    `config:"emit_null_values"`
+			KeepNull             bool                    `config:"keep_null"`
 		}{}
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
@@ -114,7 +114,7 @@ func MakeDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries, cfg.EmitNullValues)
+		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries, cfg.KeepNull)
 	}
 }
 
@@ -167,15 +167,15 @@ func newBuilder(
 	modifiers []modifier,
 	skipNormalize bool,
 	timeSeries bool,
-	emitNullValues bool,
+	keepNull bool,
 ) (*builder, error) {
 	b := &builder{
-		skipNormalize:  skipNormalize,
-		modifiers:      modifiers,
-		log:            log,
-		info:           info,
-		timeSeries:     timeSeries,
-		emitNullValues: emitNullValues,
+		skipNormalize: skipNormalize,
+		modifiers:     modifiers,
+		log:           log,
+		info:          info,
+		timeSeries:    timeSeries,
+		keepNull:      keepNull,
 	}
 
 	hasProcessors := processors != nil && len(processors.List) > 0
@@ -270,7 +270,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	if !b.skipNormalize {
 		// setup 1: generalize/normalize output (P)
-		processors.add(newGeneralizeProcessor(b.emitNullValues))
+		processors.add(newGeneralizeProcessor(b.keepNull))
 	}
 
 	// setup 2: add Meta from client config (C)

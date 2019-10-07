@@ -46,13 +46,13 @@ type EventConverter interface {
 
 // GenericEventConverter is used to normalize MapStr objects for publishing
 type GenericEventConverter struct {
-	emitNullValues bool
+	keepNull bool
 }
 
 // NewGenericEventConverter creates an EventConverter with the given configuration options
-func NewGenericEventConverter(emitNullValues bool) *GenericEventConverter {
+func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 	return &GenericEventConverter{
-		emitNullValues: emitNullValues,
+		keepNull: keepNull,
 	}
 }
 
@@ -84,7 +84,7 @@ func (e *GenericEventConverter) normalizeMap(m MapStr, keys ...string) (MapStr, 
 		}
 
 		// Drop nil values from maps.
-		if !e.emitNullValues && v == nil {
+		if !e.keepNull && v == nil {
 			if logp.IsDebug(eventDebugSelector) {
 				eventDebugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
 			}
