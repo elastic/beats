@@ -19,6 +19,7 @@ package javascript
 
 import (
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/dop251/goja"
@@ -80,17 +81,7 @@ type session struct {
 	tagOnException string
 }
 
-func newSession(
-	name string,
-	src []byte,
-	conf Config,
-) (*session, error) {
-	// Validate processor source code.
-	p, err := goja.Compile(name, string(src), true)
-	if err != nil {
-		return nil, err
-	}
-
+func newSession(p *goja.Program, conf Config, test bool) (*session, error) {
 	// Setup JS runtime.
 	s := &session{
 		vm:             goja.New(),
@@ -112,7 +103,7 @@ func newSession(
 	// Register constructor for 'new Event' to enable test() to create events.
 	s.vm.Set("Event", newBeatEventV0Constructor(s))
 
-	_, err = s.vm.RunProgram(p)
+	_, err := s.vm.RunProgram(p)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +118,10 @@ func newSession(
 		}
 	}
 
-	if err = s.executeTestFunction(); err != nil {
-		return nil, err
+	if test {
+		if err = s.executeTestFunction(); err != nil {
+			return nil, err
+		}
 	}
 
 	return s, nil
@@ -253,4 +246,36 @@ func init() {
 			},
 		)
 	})
+}
+
+type sessionPool struct {
+	pool *sync.Pool
+}
+
+func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
+	s, err := newSession(p, c, true)
+	if err != nil {
+		return nil, err
+	}
+
+	pool := &sync.Pool{
+		New: func() interface{} {
+			s, _ := newSession(p, c, false)
+			return s
+		},
+	}
+	pool.Put(s)
+
+	return &sessionPool{pool}, nil
+}
+
+func (p *sessionPool) Get() *session {
+	s, _ := p.pool.Get().(*session)
+	return s
+}
+
+func (p *sessionPool) Put(s *session) {
+	if s != nil {
+		p.pool.Put(s)
+	}
 }
