@@ -1810,6 +1810,11 @@ setup.kibana:
   #username: "elastic"
   #password: "changeme"
 
+  # Space
+  # Define which Kibana Space the dashboards should be loaded into
+  # Default is "Default"
+  #space.id: "Default"
+
   # Optional HTTP path
   #path: ""
 
