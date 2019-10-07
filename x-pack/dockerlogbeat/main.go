@@ -34,20 +34,23 @@ func genNewMonitoringConfig() (*common.Config, error) {
 	return cfg, nil
 }
 
+func fatal(format string, vs ...interface{}) {
+	fmt.Fprintf(os.Stderr, format, vs...)
+	os.Exit(1)
+}
+
 func main() {
 	service.BeforeRun()
 	defer service.Cleanup()
 
 	logcfg, err := genNewMonitoringConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error starting config: %s", err)
-		os.Exit(1)
+		fatal("error starting config: %s", err)
 	}
 
 	err = logpcfg.Logging("dockerbeat", logcfg)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error starting log handler: %s", err)
-		os.Exit(1)
+		fatal("error starting log handler: %s", err)
 	}
 
 	pipelines := pipelinemanager.NewPipelineManager(logcfg)
@@ -57,9 +60,8 @@ func main() {
 	sdkHandler.HandleFunc("/LogDriver.StartLogging", startLoggingHandler(pipelines))
 	sdkHandler.HandleFunc("/LogDriver.StopLogging", stopLoggingHandler(pipelines))
 
-	err = sdkHandler.ServeUnix("hellologdriver", 0)
+	err = sdkHandler.ServeUnix("beatSocket", 0)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error in socket handler: %s", err)
-		os.Exit(1)
+		fatal("Error in socket handler: %s", err)
 	}
 }

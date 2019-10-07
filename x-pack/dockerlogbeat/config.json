@@ -7,7 +7,7 @@
     },
     "interface": {
       "types": ["docker.logdriver/1.0"],
-      "socket": "hellologdriver.sock"
+      "socket": "beatSocket.sock"
     },
     "env":[
       {
