@@ -388,7 +388,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 
 			recorder := &testBulkRecorder{}
 
-			encoded := bulkEncodePublishRequest(recorder, index, pipeline, test.docType, events)
+			encoded := bulkEncodePublishRequest(common.Version{Major: 7, Minor: 5}, recorder, index, pipeline, test.docType, events)
 			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
 			assert.False(t, recorder.inAction, "incomplete bulk")
 
