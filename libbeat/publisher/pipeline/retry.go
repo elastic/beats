@@ -138,9 +138,7 @@ func (r *retryer) loop() {
 	for {
 		select {
 		case <-r.done:
-
 			return
-
 		case evt := <-r.in:
 			var (
 				countFailed  int
