@@ -396,6 +396,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `docker.cpu.*.norm.pct` metrics for `cpu` metricset of Docker Metricbeat module. {pull}13695[13695]
 - Add `instance` label by default when using Prometheus collector. {pull}13737[13737]
 - Add Apache Tomcat module {pull}13491[13491]
+- Add ECS `container.id` and `container.runtime` to kubernetes `state_container` metricset. {pull}13884[13884]
 - Add `job` label by default when using Prometheus collector. {pull}13878[13878]
 - Add `state_resourcequota` metricset for Kubernetes module. {pull}13693[13693]
 
@@ -439,6 +440,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 *Metricbeat*
+
+- `kubernetes.container.id` field for `state_container` is deprecated in favour of ECS `container.id` and `container.runtime`. {pull}13884[13884]
 
 *Packetbeat*
 
