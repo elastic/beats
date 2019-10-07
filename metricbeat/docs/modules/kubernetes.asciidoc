@@ -92,6 +92,7 @@ metricbeat.modules:
     - state_pod
     - state_container
     - state_cronjob
+    - state_resourcequota
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -179,6 +180,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>
 
+* <<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>>
+
 * <<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>
 
 * <<metricbeat-metricset-kubernetes-system,system>>
@@ -212,6 +215,8 @@ include::kubernetes/state_node.asciidoc[]
 include::kubernetes/state_pod.asciidoc[]
 
 include::kubernetes/state_replicaset.asciidoc[]
+
+include::kubernetes/state_resourcequota.asciidoc[]
 
 include::kubernetes/state_statefulset.asciidoc[]
 
