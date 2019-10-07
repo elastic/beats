@@ -140,6 +140,7 @@ users who need to monitor {beatname_uc}:
 [options="header"]
 |====
 |Role | Purpose
+
 |`kibana_user`
 |Use {kib}
 
@@ -171,18 +172,21 @@ information.
 [options="header"]
 |====
 |Role | Purpose
+
 |`remote_monitoring_collector`
 |Collect monitoring metrics from {beatname_uc}
+
 |`remote_monitoring_agent`
 |Send monitoring data to the monitoring cluster
 |====
 
 . Assign the following role to users who will view the monitoring data in
 {kib}:
-
++
 [options="header"]
 |====
 |Role | Purpose
+
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
@@ -280,6 +284,7 @@ the following privilege:
 |====
 |Type | Privilege | Purpose
 
+|Index
 |`read` on +{beat_default_index_prefix}-*+ indices
 |Read data indexed by {beatname_uc}
 |====
@@ -314,6 +319,7 @@ data:
 
 |`kibana_user` and `apm_user`
 |Use the APM UI
+
 |`admin`
 |Read and update APM Agent configuration via Kibana
 |====
