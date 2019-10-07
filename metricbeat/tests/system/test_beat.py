@@ -40,7 +40,7 @@ class Test(metricbeat.BaseTest):
         # it's cluster UUID in the process. Otherwise, the monitoring Metricbeat instance will
         # show errors in its log about not being able to determine the Elasticsearch cluster UUID
         # to be associated with the monitored Metricbeat instance.
-        self.wait_until(cond: self.mb_index_exists, max_timeout: 60)
+        self.wait_until(cond=self.mb_index_exists, max_timeout=60)
 
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
