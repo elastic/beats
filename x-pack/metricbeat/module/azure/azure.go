@@ -112,7 +112,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right metricset
+// FetchValues methods implements the data gathering and data conversion to the right metricset
 func (m *MetricSet) FetchValues(fn mapMetric, report mb.ReporterV2) error {
 	err := m.Client.InitResources(fn, report)
 	if err != nil {
