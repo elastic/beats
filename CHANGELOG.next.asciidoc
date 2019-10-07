@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Recover from panics in the javascript process and log details about the failure to aid in future debugging. {pull}13690[13690]
+- Make the script processor concurrency-safe. {issue}13690[13690] {pull}13857[13857]
 
 *Auditbeat*
 
@@ -49,6 +50,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fixed early expiration of templates (Netflow v9 and IPFIX). {pull}13821[13821]
 - Fixed bad handling of sequence numbers when multiple observation domains were exported by a single device (Netflow V9 and IPFIX). {pull}13821[13821]
+- cisco asa and ftd filesets: Fix parsing of message 106001. {issue}13891[13891] {pull}13903[13903]
 
 *Heartbeat*
 
