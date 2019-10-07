@@ -60,7 +60,7 @@ Using different metricsets requires different set of privileges
 
 * `dbstats` requires
 ** https://docs.mongodb.com/manual/reference/privilege-actions/#listDatabases[`listDatabases` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
-** for each of the databases, also need https://docs.mongodb.com/manual/reference/privilege-action/#dbStats[`dbStats` action] on the https://docs.mongodb.com/manual/reference/resource-document/#database-and-or-collection-resource[`database` resource]
+** for each of the databases, also need https://docs.mongodb.com/manual/reference/privilege-actions/#dbStats[`dbStats` action] on the https://docs.mongodb.com/manual/reference/resource-document/#database-and-or-collection-resource[`database` resource]
 
 * `status` requires
 ** https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
