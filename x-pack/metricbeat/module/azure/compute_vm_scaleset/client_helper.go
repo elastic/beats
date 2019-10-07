@@ -58,7 +58,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		vmdim = customVMDimension
 	}
 	for _, metricName := range supportedMetricNames {
-		if (metricName.Name.LocalizedValue != nil && !strings.Contains(*metricName.Name.LocalizedValue, "(Deprecated)")) || metricName.Name.LocalizedValue == nil {
+		if metricName.Name.LocalizedValue == nil || !strings.Contains(*metricName.Name.LocalizedValue, "(Deprecated)") {
 			if metricName.Dimensions == nil || len(*metricName.Dimensions) == 0 {
 				groupedMetrics[noDimension] = append(groupedMetrics[noDimension], metricName)
 			} else if containsDimension(vmdim, *metricName.Dimensions) {

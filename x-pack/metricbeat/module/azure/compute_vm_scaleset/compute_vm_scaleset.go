@@ -7,9 +7,6 @@ package compute_vm_scaleset
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 )
@@ -27,8 +24,7 @@ func init() {
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
-	mb.BaseMetricSet
-	client *azure.Client
+	*azure.MetricSet
 }
 
 const (
@@ -41,35 +37,25 @@ var memoryMetrics = []string{"Memory\\Commit Limit", "Memory\\Committed Bytes", 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The azure compute_vm_scaleset metricset is beta.")
-	var config azure.Config
-	err := base.Module().UnpackConfig(&config)
+	ms, err := azure.NewMetricSet(base)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+		return nil, err
 	}
-
-	// validate config resource options entered, no resource queries allowed
-	for _, resource := range config.Resources {
-		if resource.Query != "" {
-			return nil, errors.New("error initializing the monitor client: module azure - compute_vm_scaleset metricset. No queries allowed, please select one of the allowed options")
-		}
-	}
-
 	// if no options are entered we will retrieve all the vm's from the entire subscription
-	if len(config.Resources) == 0 {
-		config.Resources = []azure.ResourceConfig{
+	if len(ms.Client.Config.Resources) == 0 {
+		ms.Client.Config.Resources = []azure.ResourceConfig{
 			{
 				Query: fmt.Sprintf("resourceType eq '%s'", defaultVMScalesetNamespace),
 			},
 		}
 	}
-	for index := range config.Resources {
+	for index := range ms.Client.Config.Resources {
 		// add the default vm scaleset type if groups are defined
-		if len(config.Resources[index].Group) > 0 {
-			config.Resources[index].Type = defaultVMScalesetNamespace
+		if len(ms.Client.Config.Resources[index].Group) > 0 {
+			ms.Client.Config.Resources[index].Type = defaultVMScalesetNamespace
 		}
 		// add the default metrics for each resource option
-		config.Resources[index].Metrics = []azure.MetricConfig{
+		ms.Client.Config.Resources[index].Metrics = []azure.MetricConfig{
 			{
 				Name:      []string{"*"},
 				Namespace: defaultVMScalesetNamespace,
@@ -80,13 +66,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			},
 		}
 	}
-	monitorClient, err := azure.NewClient(config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error initializing the monitor client: module azure - compute_vm_scaleset metricset")
-	}
 	return &MetricSet{
-		BaseMetricSet: base,
-		client:        monitorClient,
+		MetricSet: ms,
 	}, nil
 }
 
@@ -94,14 +75,5 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := m.client.InitResources(mapMetric, report)
-	if err != nil {
-		return err
-	}
-	// retrieve metrics
-	err = m.client.GetMetricValues(report)
-	if err != nil {
-		return err
-	}
-	return azure.EventsMapping(report, m.client.Resources.Metrics, m.BaseMetricSet.Name())
+	return m.FetchValues(mapMetric, report)
 }

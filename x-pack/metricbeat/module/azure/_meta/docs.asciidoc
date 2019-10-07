@@ -16,7 +16,9 @@ The azure module mericsets are `monitor`,  `compute_vm` and `compute_vm_scaleset
 All the tasks executed against the Azure Monitor REST API will use the Azure Resource Manager authentication model.
 Therefore, all requests must be authenticated with Azure Active Directory (Azure AD).
 One approach to authenticate the client application is to create an Azure AD service principal and retrieve the authentication (JWT) token.
-For a more detailed walk-through, have a look at using Azure PowerShell to create a service principal to access resources. It is also possible to create a service principal via the Azure portal.
+For a more detailed walk-through, have a look at using Azure PowerShell to create a service principal to access resources https://docs.microsoft.com/en-us/powershell/azure/create-azure-service-principal-azureps?view=azps-2.7.0.
+ It is also possible to create a service principal via the Azure portal https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal.
+Users will have to make sure the roles assigned to the application contain at least reading permissions to the monitor data, more on the roles here https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles.
 
 Required credentials for the `azure` module:
 

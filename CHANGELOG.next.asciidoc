@@ -386,8 +386,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for NATS version 2. {pull}13601[13601]
 - Add `docker.cpu.*.norm.pct` metrics for `cpu` metricset of Docker Metricbeat module. {pull}13695[13695]
 - Add `instance` label by default when using Prometheus collector. {pull}13737[13737]
-- Add azure module. {pull}13196[13196]
-- Add small improvements in the azure module (validation, doc update). {pull}13859[13859]
+- Add azure module. {pull}13196[13196] {pull}13859[13859]
 - Add Apache Tomcat module {pull}13491[13491]
 
 

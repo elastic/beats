@@ -37,7 +37,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		}
 		var filteredMetricDefinitions []insights.MetricDefinition
 		for _, metricDefinition := range *metricDefinitions.Value {
-			if (metricDefinition.Name.LocalizedValue != nil && !strings.Contains(*metricDefinition.Name.LocalizedValue, "(Deprecated)")) || metricDefinition.Name.LocalizedValue == nil {
+			if metricDefinition.Name.LocalizedValue == nil || !strings.Contains(*metricDefinition.Name.LocalizedValue, "(Deprecated)") {
 				filteredMetricDefinitions = append(filteredMetricDefinitions, metricDefinition)
 			}
 		}
