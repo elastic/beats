@@ -41,25 +41,30 @@ the following privileges:
 +
 [options="header"]
 |====
-|Privileges | Why needed?
+|Type | Privilege | Purpose
 
+|Cluster
 |`monitor`
-|Send monitoring data to the cluster
+|Retrieve cluster details (e.g. version)
 
 ifndef::no_ilm[]
+|Cluster
 |`manage_ilm`
 |Set up and manage index lifecycle management (ILM) policy
 endif::no_ilm[]
 
 ifdef::has_ml_jobs[]
+|Cluster
 |`manage_ml`
 |Set up machine learning job configurations
 endif::has_ml_jobs[]
 
+|Index
 |`manage` on +{beat_default_index_prefix}-*+ indices
 |Set up aliases used by ILM
  
 ifdef::has_ml_jobs[]
+|Index
 |`read` on +{beat_default_index_prefix}-*+ indices
 |Read {beatname_uc} indices in order to set up machine learning jobs
 endif::has_ml_jobs[]
@@ -76,7 +81,7 @@ need to set up {beatname_uc}:
 +
 [options="header"]
 |====
-|Roles | Why needed?
+|Role | Purpose
 
 |`kibana_user`
 |Load dependencies, such as example dashboards, if available, into {kib}
@@ -122,21 +127,22 @@ If you don't use the +{beat_default_index_prefix}_system+ user:
 +
 [options="header"]
 |====
-|Privileges | Why needed?
+|Type | Privilege | Purpose
 
+|Cluster
 |`monitor`
-|Send monitoring info
-
-|`kibana_user`
-|Use {kib}
+|Retrieve cluster details (e.g. version)
 |====
 
-. Assign the *monitoring role*, along with the following built-in role, to
+. Assign the *monitoring role*, along with the following built-in roles, to
 users who need to monitor {beatname_uc}: 
 +
 [options="header"]
 |====
-|Role | Why needed?
+|Role | Purpose
+|`kibana_user`
+|Use {kib}
+
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
@@ -164,7 +170,7 @@ information.
 +
 [options="header"]
 |====
-|Role | Why needed?
+|Role | Purpose
 |`remote_monitoring_collector`
 |Collect monitoring metrics from {beatname_uc}
 |`remote_monitoring_agent`
@@ -176,7 +182,7 @@ information.
 
 [options="header"]
 |====
-|Role | Why needed?
+|Role | Purpose
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
@@ -209,40 +215,40 @@ NOTE: The `monitor` cluster privilege and the `create` privilege on
 +
 [options="header"]
 |====
-|Privilege | Type | Purpose
+|Type | Privilege | Purpose
 
 ifndef::apm-server[]
+|Cluster
 |`monitor`
-|cluster
 |Retrieve cluster details (e.g. version) 
 endif::apm-server[]
 
 ifndef::no_ilm[]
+|Cluster
 |`read_ilm`
-|cluster
 | Read the ILM policy when connecting to clusters that support ILM.
 Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
+|Cluster
 |`cluster:admin/ingest/pipeline/get`
-|cluster
 |Check for ingest pipelines used by modules. Needed when using modules.
 endif::[]
 
+|Index
 |`create` on +{beat_default_index_prefix}-*+ indices
-|index
 |Write events into {es}
 
 ifndef::no_ilm[]
+|Index
 |`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
-|index
 |Check for alias when connecting to clusters that support ILM.
 Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
+|Index
 |`create_index` on +{beat_default_index_prefix}-*+ indices
-|index
 |Create daily indices when connecting to clusters that do not support ILM.
 Not needed when using ILM.
 |====
@@ -272,7 +278,7 @@ the following privilege:
 +
 [options="header"]
 |====
-|Privilege | Why needed?
+|Type | Privilege | Purpose
 
 |`read` on +{beat_default_index_prefix}-*+ indices
 |Read data indexed by {beatname_uc}
@@ -283,7 +289,7 @@ users who need to read {beatname_uc} data:
 +
 [options="header"]
 |====
-|Roles | Why needed?
+|Role | Purpose
 
 |`kibana_user` or `kibana_dashboard_only_user`
 |Use {kib}. `kibana_dashboard_only_user` grants read-only access to dashboards.
@@ -304,7 +310,7 @@ data:
 +
 [options="header"]
 |====
-|Roles | Why needed?
+|Role | Purpose
 
 |`kibana_user` and `apm_user`
 |Use the APM UI
