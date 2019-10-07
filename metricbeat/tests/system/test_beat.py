@@ -3,6 +3,7 @@ import metricbeat
 import unittest
 import time
 from parameterized import parameterized
+from elasticsearch import Elasticsearch
 
 
 class Test(metricbeat.BaseTest):
@@ -39,9 +40,13 @@ class Test(metricbeat.BaseTest):
         # it's cluster UUID in the process. Otherwise, the monitoring Metricbeat instance will
         # show errors in its log about not being able to determine the Elasticsearch cluster UUID
         # to be associated with the monitored Metricbeat instance.
-        time.sleep(30)
+        self.wait_until(cond: self.mb_index_exists, max_timeout: 60)
 
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
+
+    def mb_index_exists(self):
+        es = Elasticsearch([self.get_elasticsearch_url()])
+        return len(es.cat.indices(index='metricbeat-*', h='index')) > 0
