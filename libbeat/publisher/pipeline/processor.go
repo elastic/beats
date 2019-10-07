@@ -95,7 +95,7 @@ func newProcessorPipeline(
 	fields := config.Fields.Clone()
 	fields.DeepUpdate(global.fields.Clone())
 	if em := config.EventMetadata; len(em.Fields) > 0 {
-		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
+		common.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 	}
 
 	if len(fields) > 0 {

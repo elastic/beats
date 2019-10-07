@@ -426,7 +426,7 @@ func makePipelineProcessors(
 
 	if em := annotations.Event; len(em.Fields) > 0 {
 		fields := common.MapStr{}
-		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
+		common.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 		p.fields = fields
 	}
 
