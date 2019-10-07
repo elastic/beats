@@ -1,20 +1,33 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-kafka]]
 == Kafka module
 
-beta[]
-
 This is the Kafka module.
 
 The default metricsets are `consumergroup` and `partition`.
 
-[float]
-=== Compability
+If authorization is configured in the Kafka cluster, the following ACLs are
+required for the Metricbeat user:
 
-This module is tested with Kafka 0.10.2.1, 1.1.0 and 2.0.0.
+* READ Topic, for the topics to be monitored
+* DESCRIBE Group, for the groups to be monitored
+
+For example, if the `stats` user is being used for Metricbeat, to monitor all
+topics and all consumer groups, ACLS can be granted with the following commands:
+
+[source,shell]
+-----
+kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Read --topic '*'
+kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Describe --group '*'
+-----
+
+[float]
+=== Compatibility
+
+This module is tested with Kafka 0.10.2.1, 1.1.0 and 2.1.1.
 
 
 [float]

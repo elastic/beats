@@ -35,13 +35,12 @@ func TestCreateEvent(t *testing.T) {
 	message := []byte(hello)
 	mt := inputsource.NetworkMetadata{RemoteAddr: addr}
 
-	data := createEvent(message, mt)
-	event := data.GetEvent()
+	event := createEvent(message, mt)
 
 	m, err := event.GetValue("message")
 	assert.NoError(t, err)
 	assert.Equal(t, string(message), m)
 
-	from, _ := event.GetValue("source")
+	from, _ := event.GetValue("log.source.address")
 	assert.Equal(t, ip, from)
 }

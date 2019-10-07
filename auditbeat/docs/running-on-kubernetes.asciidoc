@@ -25,7 +25,7 @@ To get the manifests just run:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/kubernetes/{beatname_lc}-kubernetes.yaml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/{beatname_lc}-kubernetes.yaml
 ------------------------------------------------
 
 [WARNING]

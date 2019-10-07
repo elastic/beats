@@ -1,0 +1,386 @@
+###################### Functionbeat Configuration Example #######################
+
+# This file is an example configuration file highlighting only the most common
+# options. The functionbeat.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/functionbeat/index.html
+#
+
+#============================  Provider ===============================
+# Configure functions to run on AWS Lambda, currently we assume that the credentials
+# are present in the environment to correctly create the function when using the CLI.
+#
+# Configure which S3 endpoint should we use.
+functionbeat.provider.aws.endpoint: "s3.amazonaws.com"
+# Configure which S3 bucket we should upload the lambda artifact.
+functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
+
+functionbeat.provider.aws.functions:
+  # Define the list of function availables, each function required to have a unique name.
+  # Create a function that accepts events coming from cloudwatchlogs.
+  - name: cloudwatch
+    enabled: false
+    type: cloudwatch_logs
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for cloudwatch logs"
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # List of cloudwatch log group registered to that function.
+    triggers:
+      - log_group_name: /aws/lambda/functionbeat-cloudwatch_logs
+        filter_pattern: mylog_
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"
+
+  # Create a function that accepts events from SQS queues.
+  - name: sqs
+    enabled: false
+    type: sqs
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for SQS events"
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # List of SQS queues.
+    triggers:
+        # Arn for the SQS queue.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+    # Define custom processors for this function.
+    #processors:
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+    #
+
+  # Create a function that accepts events from Kinesis streams.
+  - name: kinesis
+    enabled: false
+    type: kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Kinesis events"
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  This example extracts the raw data from events.
+    #  - decode_base64_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decompress_gzip_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
+
+  # Create a function that accepts Cloudwatch logs from Kinesis streams.
+  - name: cloudwatch-logs-kinesis
+    enabled: false
+    type: cloudwatch_logs_kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Cloudwatch logs in Kinesis events"
+
+    # Set base64_encoded if your data is base64 encoded.
+    #base64_encoded: false
+
+    # Set compressed if your data is compressed with gzip.
+    #compressed: true
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  #index.codec: best_compression
+  #_source.enabled: false
+
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
+
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here or by using the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
+
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
+
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using Functionbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
+#================================ Outputs =====================================
+
+# Configure what output to use when sending the data collected by the beat.
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+
+#----------------------------- Logstash output --------------------------------
+#output.logstash:
+  # The Logstash hosts
+  #hosts: ["localhost:5044"]
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+#================================ Processors =====================================
+
+# Configure processors to enhance or manipulate events generated by the beat.
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+#================================ Logging =====================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]
+
+#============================== X-Pack Monitoring ===============================
+# functionbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
+
+# Set to true to enable the monitoring reporter.
+#monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Functionbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
+
+# Uncomment to send the metrics to Elasticsearch. Most settings from the
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
+
+#================================= Migration ==================================
+
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: true

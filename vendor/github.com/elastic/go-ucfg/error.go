@@ -61,6 +61,8 @@ type criticalError struct {
 var (
 	ErrMissing = errors.New("missing field")
 
+	ErrNoParse = errors.New("parsing dynamic configs is disabled")
+
 	ErrCyclicReference = errors.New("cyclic reference detected")
 
 	ErrDuplicateValidator = errors.New("validator already registered")
@@ -257,6 +259,11 @@ func raiseUnsupportedInputType(ctx context, meta *Meta, v reflect.Value) Error {
 		v.Type(), v)
 
 	return raiseCritical(reason, messagePath(reason, meta, message, ctx.path(".")))
+}
+
+func raiseNoParse(ctx context, meta *Meta) Error {
+	reason := ErrNoParse
+	return raisePathErr(reason, meta, "", ctx.path("."))
 }
 
 func raiseNil(reason error) Error {

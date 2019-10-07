@@ -53,6 +53,7 @@
                 "ignore_failure": true
             }
         },
+
         {
             "date": {
                 "field": "auditd.log.epoch",
@@ -69,9 +70,10 @@
                 "ignore_failure": true
             }
         },
+
         {
             "convert": {
-                "field" : "auditd.log.sequence",
+                "field": "auditd.log.sequence",
                 "type": "integer",
                 "ignore_missing": true
             }
@@ -79,14 +81,90 @@
         {
             "script": {
                 "lang": "painless",
-                "inline": "    String trimQuotes(def v) {\n        if (v.startsWith(\"'\") || v.startsWith('\"')) {\n          v = v.substring(1, v.length());\n        }\n        if (v.endsWith(\"'\") || v.endsWith('\"')) {\n          v = v.substring(0, v.length()-1);\n        }  \n        return v;\n    }\n    \n    boolean isHexAscii(String v) {\n      def len = v.length();\n      if (len == 0 || len % 2 != 0) {\n        return false; \n      }\n  \n      for (int i = 0 ; i < len ; i++) {\n        if (Character.digit(v.charAt(i), 16) == -1) {\n          return false;\n        }\n      }\n\n      return true;\n    }\n    \n    String convertHexToString(String hex) {\n\t    StringBuilder sb = new StringBuilder();\n\n      for (int i=0; i < hex.length() - 1; i+=2) {\n          String output = hex.substring(i, (i + 2));\n          int decimal = Integer.parseInt(output, 16);\n          sb.append((char)decimal);\n      }\n\n      return sb.toString();\n    }\n    \n    def possibleHexKeys = ['exe', 'cmd'];\n    \n    def audit = ctx.auditd.get(\"log\");\n    Iterator entries = audit.entrySet().iterator();\n    while (entries.hasNext()) {\n      def e = entries.next();\n      def k = e.getKey();\n      def v = e.getValue(); \n\n      // Remove entries whose value is ?\n      if (v == \"?\" || v == \"(null)\" || v == \"\") {\n        entries.remove();\n        continue;\n      }\n      \n      // Convert hex values to ASCII.\n      if (possibleHexKeys.contains(k) && isHexAscii(v)) {\n        v = convertHexToString(v);\n        audit.put(k, v);\n      }\n      \n      // Trim quotes.\n      if (v instanceof String) {\n        v = trimQuotes(v);\n        audit.put(k, v);\n      }\n      \n      // Convert arch.\n      if (k == \"arch\" && v == \"c000003e\") {\n        audit.put(k, \"x86_64\");\n      }\n    }"
+                "source": "    String trimQuotes(def singleQuote, def doubleQuote, def v) {\n        if (v.startsWith(singleQuote) || v.startsWith(doubleQuote)) {\n          v = v.substring(1, v.length());\n        }\n        if (v.endsWith(singleQuote) || v.endsWith(doubleQuote)) {\n          v = v.substring(0, v.length()-1);\n        }  \n        return v;\n    }\n    \n    boolean isHexAscii(String v) {\n      def len = v.length();\n      if (len == 0 || len % 2 != 0) {\n        return false; \n      }\n  \n      for (int i = 0 ; i < len ; i++) {\n        if (Character.digit(v.charAt(i), 16) == -1) {\n          return false;\n        }\n      }\n\n      return true;\n    }\n    \n    String convertHexToString(String hex) {\n\t    StringBuilder sb = new StringBuilder();\n\n      for (int i=0; i < hex.length() - 1; i+=2) {\n          String output = hex.substring(i, (i + 2));\n          int decimal = Integer.parseInt(output, 16);\n          sb.append((char)decimal);\n      }\n\n      return sb.toString();\n    }\n    \n    def possibleHexKeys = ['exe', 'cmd'];\n    \n    def audit = ctx.auditd.get(\"log\");\n    Iterator entries = audit.entrySet().iterator();\n    while (entries.hasNext()) {\n      def e = entries.next();\n      def k = e.getKey();\n      def v = e.getValue(); \n\n      // Remove entries whose value is ?\n      if (v == \"?\" || v == \"(null)\" || v == \"\") {\n        entries.remove();\n        continue;\n      }\n      \n      // Convert hex values to ASCII.\n      if (possibleHexKeys.contains(k) && isHexAscii(v)) {\n        v = convertHexToString(v);\n        audit.put(k, v);\n      }\n      \n      // Trim quotes.\n      if (v instanceof String) {\n        v = trimQuotes(params.single_quote, params.double_quote, v);\n        audit.put(k, v);\n      }\n      \n      // Convert arch.\n      if (k == \"arch\" && v == \"c000003e\") {\n        audit.put(k, \"x86_64\");\n      }\n    }",
+                "params": {
+                    "single_quote": "'",
+                    "double_quote": "\""
+                }
+            }
+        },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.arch", "target_field": "host.architecture" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.acct", "target_field": "user.name" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.uid", "target_field": "user.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.gid", "target_field": "user.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.agid", "target_field": "user.audit.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.auid", "target_field": "user.audit.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.fsgid", "target_field": "user.filesystem.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.fsuid", "target_field": "user.filesystem.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.egid", "target_field": "user.effective.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.euid", "target_field": "user.effective.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.sgid", "target_field": "user.saved.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.suid", "target_field": "user.saved.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ogid", "target_field": "user.owner.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ouid", "target_field": "user.owner.id" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.comm", "target_field": "process.name" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.exe", "target_field": "process.executable" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.pid", "target_field": "process.pid" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ppid", "target_field": "process.ppid" } },
+        { "convert": { "ignore_missing": true, "field": "process.pid", "type": "long" } },
+        { "convert": { "ignore_missing": true, "field": "process.ppid", "type": "long" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.cmd", "target_field": "process.args" } },
+        { "split": { "ignore_failure": true, "field": "process.args", "separator": "\\s+" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.terminal", "target_field": "user.terminal" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.msg", "target_field": "message" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.res", "target_field": "event.outcome" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.record_type", "target_field": "event.action" } },
+        { "lowercase": { "ignore_failure": true, "field": "event.action" } },
+
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.src",  "target_field": "source.address" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.dst", "target_field": "destination.address" } },
+
+        {
+            "grok": {
+                "field": "source.address",
+                "patterns": [ "^%{IP:source.ip}$" ],
+                "ignore_failure": true
             }
         },
         {
             "geoip": {
-                "field": "auditd.log.addr",
-                "target_field": "auditd.log.geoip",
+                "field": "source.ip",
+                "target_field": "source.geo",
                 "ignore_failure": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
+                "ignore_missing": true
             }
         }
     ],

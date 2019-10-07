@@ -1,0 +1,2235 @@
+# The ECS migration file contains the information about all the Beats fields which are migrated to ECS in 7.0.
+# The goal of the file is to potentially have scripts on top of this information to convert visualisations and templates
+# based on this information in an automated way and to keep track of all changes which were applied.
+#
+# The format of the file is as following:
+#
+# - from: source-field-in-6.x
+#   to: target-filed-in-ECS
+#   # Alias field is useful for fields where many-1 mapping from new to old are needed
+#   alias: true-if-alias-is-required-in-7
+#   # Alias6 field is useful for fields where there is a 1-1 mapping from old to new. If absent, defaults to false.
+#   alias6: true-if-alias-is-required-in-6
+#   # Copy to is useful for fields where multiple fields map to the same ECS field
+#   copy_to: true-if-field-should-be-copied-to-target-in-6x
+#   # Beat name this applies to, if not beat is set, applies to all Beats
+#   beat: filebeat
+
+## Libbeat
+- from: beat.name
+  to: host.name
+  alias6: true
+  alias: true
+
+- from: beat.hostname
+  to: agent.hostname
+  alias6: true
+  alias: true
+
+- from: beat.version
+  to: agent.version
+  alias6: true
+  alias: true
+
+- from: beat.timezone
+  to: event.timezone
+  alias6: true
+  alias: true
+
+# Processor fields
+
+# Docker processor
+- from: docker.container.id
+  to: container.id
+  alias: true
+  alias6: true
+
+- from: docker.container.image
+  to: container.image.name
+  alias6: true
+  alias: true
+
+- from: docker.container.name
+  to: container.name
+  alias6: true
+  alias: true
+
+- from: docker.container.labels  # TODO: How to map these?
+  to: container.labels
+  alias6: false
+  alias: true
+
+# Cloud
+- from: meta.cloud.provider
+  to: cloud.provider
+  alias: true
+  alias6: true
+
+- from: meta.cloud.instance_id
+  to: cloud.instance.id
+  alias: true
+  alias6: true
+
+- from: meta.cloud.instance_name
+  to: cloud.instance.name
+  alias: true
+  alias6: true
+
+- from: meta.cloud.machine_type
+  to: cloud.machine.type
+  alias: true
+  alias6: true
+
+- from: meta.cloud.availability_zone
+  to: cloud.availability_zone
+  alias: true
+  alias6: true
+
+- from: meta.cloud.project_id
+  to: cloud.project.id
+  alias: true
+  alias6: true
+
+- from: meta.cloud.region
+  to: cloud.region
+  alias: true
+  alias6: true
+
+# process processor
+- from: process.exe
+  to: process.executable
+  alias: true
+
+## Filebeat
+- from: offset
+  to: log.offset
+  alias6: true
+  alias: true
+  beat: filebeat
+
+- from: fileset.module
+  to: event.module
+  alias6: true
+  alias: true
+  beat: filebeat
+
+- from: source
+  to:
+  - log.file.path
+  - log.source.address
+  alias: false
+  beat: filebeat
+
+# Filebeat modules
+
+# Auditd module
+
+- from: auditd.log.acct
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.ppid
+  to: process.ppid
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.res
+  to: event.outcome
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.record_type
+  to: event.action
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.arch
+  to: host.architecture
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.gid
+  to: user.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.uid
+  to: user.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.agid
+  to: user.audit.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.auid
+  to: user.audit.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.fsgid
+  to: user.filesystem.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.egid
+  to: user.effective.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.euid
+  to: user.effective.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.sgid
+  to: user.saved.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.suid
+  to: user.saved.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.ogid
+  to: user.owner.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.ouid
+  to: user.owner.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.terminal
+  to: user.terminal
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.comm
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.cmd
+  to: process.args
+  alias: false
+  beat: filebeat
+  comment: Was a cmdline string, whereas args is an array of keywords.
+
+- from: auditd.log.exe
+  to: process.executable
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.msg
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.src
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.dst
+  to: destination.address
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+# Suricata module
+
+- from: source_ecs.ip
+  to: source.ip
+  alias: true
+  beat: filebeat
+
+- from: source_ecs.port
+  to: source.port
+  alias: true
+  beat: filebeat
+
+- from: source_ecs.geo.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: source_ecs.geo.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: source_ecs.geo.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: source_ecs.geo.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: source_ecs.geo.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: source_ecs.geo.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.alert.action
+  to: event.outcome
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.alert.severity
+  to: event.severity
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.app_proto
+  to: network.protocol
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.dest_ip
+  to: destination.ip
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.dest_port
+  to: destination.port
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.fileinfo.filename
+  to: file.path
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.fileinfo.size
+  to: file.size
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.start
+  to: event.start
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.bytes_toclient
+  to: destination.bytes
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.bytes_toserver
+  to: source.bytes
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.pkts_toclient
+  to: destination.packets
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.pkts_toserver
+  to: source.packets
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.hostname
+  to: url.domain
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.http_method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.http_refer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.http_user_agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.length
+  to: http.response.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.status
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.proto
+  to: network.transport
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.src_ip
+  to: source.ip
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.src_port
+  to: source.port
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.timestamp
+  to: '@timestamp'
+  alias: true
+  beat: filebeat
+
+- from: event.type
+  to: suricata.eve.event_type
+  alias: false
+  beat: auditbeat
+  comment: event.type is reserved for future use by ECS.
+
+## System module
+
+- from: system.syslog.hostname
+  to: host.hostname
+  alias: true
+  beat: filebeat
+
+- from: system.syslog.program
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: system.syslog.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: system.syslog.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: system.auth.hostname
+  to: host.hostname
+  alias: true
+  beat: filebeat
+
+- from: system.auth.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: system.auth.program
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.timestamp
+  to: '@timestamp'
+  alias: true
+  beat: filebeat
+
+- from: system.auth.user
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: system.auth.groupadd.gid
+  to: group.id
+  alias: true
+  beat: filebeat
+
+- from: system.auth.groupadd.name
+  to: group.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.useradd.gid
+  to: group.id
+  alias: true
+  beat: filebeat
+
+- from: system.auth.useradd.uid
+  to: user.id
+  alias: true
+  beat: filebeat
+
+- from: system.auth.useradd.name
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.program
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.ip
+  to: source.ip
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.port
+  to: source.port
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.ssh.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+## Apache module
+
+- from: apache2.access.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.user_name
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.http_version
+  to: http.version
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.response_code
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.referrer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.user_agent.original
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+
+### Error fileset
+- from: apache2.error.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.client
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.tid
+  to: process.thread.id
+  alias: true
+  beat: filebeat
+
+## Elasticsearch module
+
+- from: elasticsearch.audit.origin_address
+  to: source.ip
+  alias: true
+  beat: filebeat
+
+- from: elasticsearch.audit.principal
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: elasticsearch.audit.request_body
+  to: http.request.body.content
+  alias: true
+  beat: filebeat
+
+- from: elasticsearch.audit.uri
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: elasticsearch.slowlog.took_millis
+  to: event.duration
+  alias: false
+  scale: 1000000
+  beat: filebeat
+
+## IIS module
+
+- from: iis.access.server_ip
+  to: destination.address
+  alias: true
+  beat: filebeat
+
+- from: iis.access.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: iis.access.url
+  to: url.path
+  alias: true
+  beat: filebeat
+
+- from: iis.access.query_string
+  to: url.query
+  alias: true
+  beat: filebeat
+
+- from: iis.access.port
+  to: destination.port
+  alias: true
+  beat: filebeat
+
+- from: iis.access.user_name
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: iis.access.hostname
+  to: destination.domain
+  alias: true
+  beat: filebeat
+
+- from: iis.access.user_agent.original
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: iis.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+
+- from: iis.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: iis.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: iis.access.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: iis.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: iis.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: iis.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+- from: iis.access.method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: iis.access.response_code
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: iis.access.referrer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: iis.error.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: iis.error.remote_port
+  to: source.port
+  alias: true
+  beat: filebeat
+
+- from: iis.error.server_ip
+  to: destination.address
+  alias: true
+  beat: filebeat
+
+- from: iis.error.server_port
+  to: destination.port
+  alias: true
+  beat: filebeat
+
+- from: iis.error.http_version
+  to: http.version
+  alias: true
+  beat: filebeat
+
+- from: iis.access.body_received.bytes
+  to: http.request.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: iis.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: iis.access.request_time_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
+  beat: filebeat
+
+- from: iis.error.method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: iis.error.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: iis.error.response_code
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: iis.error.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: iis.error.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: iis.error.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: iis.error.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: iis.error.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: iis.error.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+## HAProxy module
+
+- from: haproxy.total_waiting_time_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
+  beat: filebeat
+
+- from: haproxy.http.request.time_active_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
+  beat: filebeat
+
+- from: haproxy.client.ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: haproxy.client.port
+  to: source.port
+  alias: true
+  beat: filebeat
+
+- from: haproxy.process_name
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: haproxy.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: haproxy.destination.ip
+  to: destination.ip
+  alias: true
+  beat: filebeat
+
+- from: haproxy.destination.port
+  to: destination.port
+  alias: true
+  beat: filebeat
+
+- from: haproxy.http.response.status_code
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: haproxy.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: haproxy.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: haproxy.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: haproxy.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: haproxy.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: haproxy.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+## Kafka module
+
+- from: kafka.log.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: kafka.log.message
+  to: message
+  alias: true
+  beat: filebeat
+
+## Kibana module
+
+- from: http.response.content_length
+  to: http.response.body.bytes
+  alias: true
+  alias6: true
+  beat: filebeat
+  comment: >
+    Very general name that was only used by the Kibana module.
+
+- from: http.response.elapsed_time
+  to: event.duration
+  alias: false
+  alias6: false
+  scale: 1000000
+  beat: filebeat
+  comment: >
+    Very general name that was only used by the Kibana module.
+
+- from: kibana.log.meta.req.headers.referer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: kibana.log.meta.req.referer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: kibana.log.meta.req.headers.user-agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: kibana.log.meta.req.remoteAddress
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: kibana.log.meta.req.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: kibana.log.meta.meta.statusCode
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: kibana.log.meta.method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+## Logstash module
+
+- from: logstash.log.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: logstash.log.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: logstash.slowlog.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: logstash.slowlog.took_in_nanos
+  to: event.duration
+  alias: true
+  beat: filebeat
+
+## MongoDB module
+
+- from: mongodb.log.severity
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: mongodb.log.message
+  to: message
+  alias: true
+  beat: filebeat
+
+## MySQL module
+
+- from: mysql.error.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: mysql.error.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: mysql.error.thread_id
+  to: mysql.thread_id
+  alias: true
+  beat: filebeat
+
+- from: mysql.slowlog.ip
+  to: source.ip
+  alias: true
+  beat: filebeat
+
+- from: mysql.slowlog.host
+  to: source.domain
+  alias: true
+  beat: filebeat
+
+- from: mysql.slowlog.user
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: mysql.slowlog.id
+  to: mysql.thread_id
+  alias: true
+  beat: filebeat
+
+- from: mysql.slowlog.query_time.sec
+  to: event.duration
+  alias: false
+  scale: 1000000000
+  beat: filebeat
+
+## NGINX module
+
+- from: nginx.access.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.user_name
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.response_code
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.referrer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.http_version
+  to: http.version
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+
+- from: nginx.error.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: nginx.error.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: nginx.error.tid
+  to: process.thread.id
+  alias: true
+  beat: filebeat
+
+- from: nginx.error.message
+  to: message
+  alias: true
+  beat: filebeat
+
+## PostgreSQL module
+
+- from: postgresql.log.duration
+  to: event.duration
+  alias: false
+  scale: 1000000
+  beat: filebeat
+
+- from: postgresql.log.timezone
+  to: event.timezone
+  alias: true
+  beat: filebeat
+
+- from: postgresql.log.thread_id
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: postgresql.log.user
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: postgresql.log.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: postgresql.log.message
+  to: message
+  alias: true
+  beat: filebeat
+
+## Redis module
+
+- from: redis.log.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: redis.log.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: redis.log.message
+  to: message
+  alias: true
+  beat: filebeat
+
+## Icinga module
+
+- from: icinga.debug.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: icinga.debug.severity
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: icinga.main.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: icinga.main.severity
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: icinga.startup.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: icinga.startup.severity
+  to: log.level
+  alias: true
+  beat: filebeat
+
+## Traefik module
+
+- from: traefik.access.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.user_name
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.user_agent.original
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+- from: traefik.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: traefik.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: traefik.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: traefik.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+
+- from: traefik.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.response_code
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.referrer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.http_version
+  to: http.version
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: traefik.access.duration
+  to: event.duration
+  alias: false
+  scale: 1000000
+  beat: filebeat
+
+# Filebeat Redis Input
+
+- from: read_timestamp
+  to: event.created
+  alias: false
+  beat: filebeat
+
+# Auditbeat
+
+## From Auditbeat's auditd module.
+- from: auditd.messages
+  to: event.original
+  alias: true
+  beat: auditbeat
+
+- from: auditd.warnings
+  to: error.message
+  alias: true
+  beat: auditbeat
+
+- from: source.hostname
+  to: source.domain
+  alias: true
+  beat: auditbeat
+
+- from: process.exe
+  to: process.executable
+  alias: true
+  beat: auditbeat
+
+- from: process.cwd
+  to: process.working_directory
+  alias: true
+  beat: auditbeat
+
+- from: user.auid
+  to: user.audit.id
+  alias: true
+  beat: auditbeat
+
+- from: user.uid
+  to: user.id
+  alias: true
+  beat: auditbeat
+
+- from: user.euid
+  to: user.effective.id
+  alias: true
+  beat: auditbeat
+
+- from: user.fsuid
+  to: user.filesystem.id
+  alias: true
+  beat: auditbeat
+
+- from: user.suid
+  to: user.saved.id
+  alias: true
+  beat: auditbeat
+
+- from: user.gid
+  to: user.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.egid
+  to: user.effective.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.sgid
+  to: user.saved.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.fsgid
+  to: user.filesystem.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.auid
+  to: user.audit.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.uid
+  to: user.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.euid
+  to: user.effective.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.fsuid
+  to: user.filesystem.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.suid
+  to: user.saved.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.gid
+  to: user.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.egid
+  to: user.effective.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.sgid
+  to: user.saved.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.fsgid
+  to: user.filesystem.group.name
+  alias: true
+  beat: auditbeat
+
+- from: event.type
+  to: auditd.message_type
+  alias: false
+  beat: auditbeat
+  comment: event.type is reserved for future use by ECS.
+
+# Metricbeat
+
+## Metricbeat base fields
+- from: metricset.module
+  to: event.module
+  alias: true
+  beat: metricbeat
+
+- from: metricset.rrt
+  to: event.duration
+  alias: false
+  comment: Unit changed, old field will stay around if needed
+  breaking: true
+  beat: metricbeat
+
+- from: metricset.host
+  to: service.address
+  alias: true
+  beat: metricbeat
+
+- from: metricset.namespace
+  to: event.dataset
+  alias: false
+  comment: No alias mapping as field did not always exist
+  beat: metricbeat
+
+## Modules
+
+### HAProxy
+
+- from: haproxy.stat.process_id
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: haproxy.info.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+### Mongodb
+
+- from: mongodb.status.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: mongodb.status.process
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+### Rabbitmq
+
+- from: rabbitmq.connection.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+
+### Redis
+
+- from: php_fpm.status.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.request_method
+  to: http.request.method
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.request_uri
+  to: url.original
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.content_length
+  to: http.response.body.bytes
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.user
+  to: http.response.user.name
+  alias: true
+  beat: metricbeat
+
+### Redis
+
+- from: redis.info.server.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: redis.info.server.process_id
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: redis.info.server.os
+  to: os.full
+  alias: true
+  beat: metricbeat
+
+### HTTP
+- from: http.request.body
+  to: http.request.body.content
+  alias: false
+  beat: metricbeat
+
+### System
+
+- from: system.process.name
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.ppid
+  to: process.ppid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pgid
+  to: process.pgid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.cwd
+  to: process.working_directory
+  alias: true
+  beat: metricbeat
+
+- from: system.process.username
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.direction
+  to: network.direction
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.family
+  to: network.type
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.command
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.exe
+  to: process.executable
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.user.id
+  to: user.id
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.user.name
+  to: user.full_name
+  alias: true
+  beat: metricbeat
+
+### Kibana
+
+- from: kibana.stats.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.transport_address
+  to: service.address
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.version.number
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+### Logstash
+
+- from: logstash.node.host
+  to: service.hostname
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.jvm.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+### Zookeeper
+
+- from: zookeeper.mntr.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+# Packetbeat
+
+## Shared
+- from: bytes_in
+  to: source.bytes
+  alias: true
+  beat: packetbeat
+
+- from: bytes_out
+  to: destination.bytes
+  alias: true
+  beat: packetbeat
+
+- from: notes
+  to: error.message
+  alias: true
+  beat: packetbeat
+
+- from: responsetime
+  to: event.duration
+  alias: false
+  scale: 1000000
+  comment: The units changed so no alias was added.
+  beat: packetbeat
+
+- from: transport
+  to: network.transport
+  alias: true
+  beat: packetbeat
+
+- from: real_ip
+  to: network.forwarded_ip
+  alias: true
+  beat: packetbeat
+
+## Flows
+- from: flow_id
+  to: flow.id
+  alias: true
+  beat: packetbeat
+
+- from: final
+  to: flow.final
+  alias: true
+  beat: packetbeat
+
+- from: start_time
+  to: event.start
+  alias: true
+  beat: packetbeat
+
+- from: last_time
+  to: event.end
+  alias: true
+  beat: packetbeat
+
+- from: source.stats.net_bytes_total
+  to: source.bytes
+  alias: true
+  beat: packetbeat
+
+- from: source.stats.net_packets_total
+  to: source.packets
+  alias: true
+  beat: packetbeat
+
+- from: dest.stats.net_bytes_total
+  to: destination.bytes
+  alias: true
+  beat: packetbeat
+
+- from: dest.stats.net_packets_total
+  to: destination.packets
+  alias: true
+  beat: packetbeat
+
+## HTTP
+- from: http.request.body
+  to: http.request.body.content
+  alias: false
+  beat: packetbeat
+
+- from: http.response.body
+  to: http.response.body.content
+  alias: false
+  beat: packetbeat
+
+- from: http.response.code
+  to: http.response.status_code
+  alias: true
+  beat: packetbeat
+
+- from: http.response.phrase
+  to: http.response.status_phrase
+  alias: true
+  beat: packetbeat
+
+- from: http.request.params
+  to: url.query
+  alias: true
+  beat: packetbeat
+
+- from: method
+  to: http.request.method
+  alias: false
+  comment: Field is used by serveral protocols.
+  beat: packetbeat
+
+- from: path
+  to: url.path
+  alias: false
+  beat: packetbeat
+
+- from: real_ip
+  to: network.forwarded_ip
+  alias: false
+  comment: Field is used by serveral protocols.
+  beat: packetbeat
+
+## MySQL
+- from: mysql.iserror
+  to: status
+  alias: false
+  comment: >
+    Status reflects whether or not an error occured. Its values are either
+    OK or Error.
+  beat: packetbeat
+
+## NFS
+- from: rpc.time
+  to: event.duration
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+  beat: packetbeat
+
+- from: rpc.call_size
+  to: source.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+  beat: packetbeat
+
+- from: rpc.reply_size
+  to: destination.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+  beat: packetbeat
+
+## Cassandra
+- from: no_request
+  to: cassandra.no_request
+  alias: true
+  beat: packetbeat
+
+# Heartbeat
+
+- from: monitor.scheme
+  to: url.scheme
+  alias: true
+  beat: heartbeat
+
+- from: monitor.host
+  to: url.domain
+  alias: true
+  beat: heartbeat
+
+- from: resolve.host
+  to: url.domain
+  alias: true
+  beat: heartbeat
+
+- from: http.url
+  to: url.full
+  alias: true
+  beat: heartbeat
+
+- from: tcp.port
+  to: url.port
+  alias: true
+  beat: heartbeat
+
+# Journalbeat
+- from: host.name
+  to: host.hostname
+  alias: false
+  beat: journalbeat
+  comment: This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
+  # This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
+  rename: false
+
+- from: read_timestamp
+  to: event.created
+  alias: true
+  beat: journalbeat
+
+## Winlogbeat
+
+# Alias to ECS fields
+
+- from: xml
+  to: event.original
+  alias: true
+  beat: winlogbeat
+
+- from: level
+  to: log.level
+  alias: true
+  beat: winlogbeat
+
+# Move fields to winlog.* section, to reduce chances of top level field name conflicts.
+
+# renames to match Windows Event Log naming
+
+- from: type
+  to: winlog.api
+  alias: true
+  beat: winlogbeat
+  rename: false
+
+- from: log_name
+  to: winlog.channel
+  alias: true
+  beat: winlogbeat
+
+- from: record_number
+  to: winlog.record_id
+  alias: true
+  beat: winlogbeat
+
+- from: process_id
+  to: winlog.process.pid
+  alias: true
+  beat: winlogbeat
+
+- from: source_name
+  to: winlog.provider_name
+  alias: true
+  beat: winlogbeat
+
+- from: thread_id
+  to: winlog.process.thread.id
+  alias: true
+  beat: winlogbeat
+
+# Fields moved without adjusting the name
+
+- from: activity_id
+  to: winlog.activity_id
+  alias: true
+  beat: winlogbeat
+
+- from: computer_name
+  to: winlog.computer_name
+  alias: true
+  beat: winlogbeat
+
+- from: event_id
+  to: winlog.event_id
+  alias: true
+  beat: winlogbeat
+
+- from: keywords
+  to: winlog.keywords
+  alias: true
+  beat: winlogbeat
+
+- from: message_error
+  to: error.message
+  alias: true
+  beat: winlogbeat
+
+- from: related_activity_id
+  to: winlog.related_activity_id
+  alias: true
+  beat: winlogbeat
+
+- from: opcode
+  to: winlog.opcode
+  alias: true
+  beat: winlogbeat
+
+- from: provider_guid
+  to: winlog.provider_guid
+  alias: true
+  beat: winlogbeat
+
+- from: task
+  to: winlog.task
+  alias: true
+  beat: winlogbeat
+
+- from: user.identifier
+  to: winlog.user.identifier
+  alias: true
+  beat: winlogbeat
+
+- from: user.domain
+  to: winlog.user.domain
+  alias: true
+  beat: winlogbeat
+
+- from: user.type
+  to: winlog.user.type
+  alias: true
+  beat: winlogbeat
+
+- from: version
+  to: winlog.version
+  alias: true
+  beat: winlogbeat
+  rename: false

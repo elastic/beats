@@ -64,6 +64,12 @@ type Keystore interface {
 	Save() error
 }
 
+// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
+type Packager interface {
+	Package() ([]byte, error)
+	ConfiguredPath() string
+}
+
 // Factory Create the right keystore with the configured options.
 func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 	config := defaultConfig
@@ -118,16 +124,5 @@ func ResolverWrap(keystore Keystore) func(string) (string, error) {
 
 		logp.Debug("keystore", "accessing key '%s' from the keystore", keyName)
 		return string(v), nil
-	}
-}
-
-// ConfigOpts returns ucfg config options with a resolver linked to the current keystore.
-// TODO: Refactor to allow insert into the config option array without having to redefine everything
-func ConfigOpts(keystore Keystore) []ucfg.Option {
-	return []ucfg.Option{
-		ucfg.PathSep("."),
-		ucfg.Resolve(ResolverWrap(keystore)),
-		ucfg.ResolveEnv,
-		ucfg.VarExp,
 	}
 }

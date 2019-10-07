@@ -1,0 +1,74 @@
+[id="configuring-howto-{beatname_lc}"]
+= Configuring {beatname_uc}
+
+[partintro]
+--
+
+Before modifying configuration settings, make sure you've completed the
+<<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
+This section describes some common use cases for changing configuration options.
+
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+
+The following topics describe how to configure {beatname_uc}:
+
+* <<configuration-{beatname_lc}-options>>
+* <<configuration-general-options>>
+* <<configuring-internal-queue>>
+* <<configuring-output>>
+* <<ilm>>
+* <<configuration-ssl>>
+* <<filtering-and-enhancing-data>>
+* <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
+* <<configuration-path>>
+* <<setup-kibana-endpoint>>
+* <<configuration-template>>
+* <<configuration-logging>>
+* <<using-environ-vars>>
+* <<yaml-tips>>
+* <<regexp-support>>
+* <<http-endpoint>>
+* <<{beatname_lc}-reference-yml>>
+
+--
+
+include::./config-options.asciidoc[]
+
+include::./general-options.asciidoc[]
+
+include::{libbeat-dir}/docs/queueconfig.asciidoc[]
+
+include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
+
+include::./filtering.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-geoip.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
+
+include::{libbeat-dir}/docs/setup-config.asciidoc[]
+
+include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
+
+:standalone:
+include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
+:standalone!:
+
+:standalone:
+include::{libbeat-dir}/docs/yaml.asciidoc[]
+:standalone!:
+
+include::{libbeat-dir}/docs/regexp.asciidoc[]
+
+include::{libbeat-dir}/docs/http-endpoint.asciidoc[]
+
+include::{libbeat-dir}/docs/reference-yml.asciidoc[]

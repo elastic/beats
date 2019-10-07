@@ -1,11 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-windows]]
 == Windows module
-
-beta[]
 
 This is the Windows module. It collects metrics from Windows systems,
 by default metricset `service` is enabled.
@@ -24,7 +22,8 @@ metricbeat.modules:
   metricsets: ["perfmon"]
   enabled: true
   period: 10s
-  perfmon.ignore_non_existent_counters: true
+  perfmon.ignore_non_existent_counters: false
+  perfmon.group_measurements_by_instance: false
   perfmon.counters:
   #  - instance_label: processor.name
   #    instance_name: total

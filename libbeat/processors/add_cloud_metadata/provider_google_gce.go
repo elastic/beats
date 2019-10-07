@@ -18,36 +18,64 @@
 package add_cloud_metadata
 
 import (
+	"path"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
 // Google GCE Metadata Service
-func newGceMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
-	gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
-	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-	gceSchema := func(m map[string]interface{}) common.MapStr {
-		out := common.MapStr{}
+var gceMetadataFetcher = provider{
+	Name: "google-gce",
 
-		if instance, ok := m["instance"].(map[string]interface{}); ok {
-			s.Schema{
-				"instance_id":       c.StrFromNum("id"),
-				"instance_name":     c.Str("name"),
-				"machine_type":      c.Str("machineType"),
-				"availability_zone": c.Str("zone"),
-			}.ApplyTo(out, instance)
+	Local: true,
+
+	Create: func(provider string, config *common.Config) (metadataFetcher, error) {
+		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
+		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
+		gceSchema := func(m map[string]interface{}) common.MapStr {
+			out := common.MapStr{}
+
+			trimLeadingPath := func(key string) {
+				v, err := out.GetValue(key)
+				if err != nil {
+					return
+				}
+				p, ok := v.(string)
+				if !ok {
+					return
+				}
+				out.Put(key, path.Base(p))
+			}
+
+			if instance, ok := m["instance"].(map[string]interface{}); ok {
+				s.Schema{
+					"instance": s.Object{
+						"id":   c.StrFromNum("id"),
+						"name": c.Str("name"),
+					},
+					"machine": s.Object{
+						"type": c.Str("machineType"),
+					},
+					"availability_zone": c.Str("zone"),
+				}.ApplyTo(out, instance)
+				trimLeadingPath("machine.type")
+				trimLeadingPath("availability_zone")
+			}
+
+			if project, ok := m["project"].(map[string]interface{}); ok {
+				s.Schema{
+					"project": s.Object{
+						"id": c.Str("projectId"),
+					},
+				}.ApplyTo(out, project)
+			}
+
+			return out
 		}
 
-		if project, ok := m["project"].(map[string]interface{}); ok {
-			s.Schema{
-				"project_id": c.Str("projectId"),
-			}.ApplyTo(out, project)
-		}
-
-		return out
-	}
-
-	fetcher, err := newMetadataFetcher(config, "gce", gceHeaders, metadataHost, gceSchema, gceMetadataURI)
-	return fetcher, err
+		fetcher, err := newMetadataFetcher(config, provider, gceHeaders, metadataHost, gceSchema, gceMetadataURI)
+		return fetcher, err
+	},
 }

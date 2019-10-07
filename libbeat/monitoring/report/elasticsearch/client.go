@@ -20,6 +20,9 @@ package elasticsearch
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -32,21 +35,29 @@ import (
 type publishClient struct {
 	es     *esout.Client
 	params map[string]string
+	format report.Format
 }
 
 func newPublishClient(
 	es *esout.Client,
 	params map[string]string,
-) *publishClient {
+	format report.Format,
+) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
 		params: params,
+		format: format,
 	}
-	return p
+	return p, nil
 }
 
 func (c *publishClient) Connect() error {
 	debugf("Monitoring client: connect.")
+
+	err := c.es.Connect()
+	if err != nil {
+		return errors.Wrap(err, "cannot connect underlying Elasticsearch client")
+	}
 
 	params := map[string]string{
 		"filter_path": "features.monitoring.enabled",
@@ -77,6 +88,7 @@ func (c *publishClient) Connect() error {
 	}
 
 	debugf("XPack monitoring is enabled")
+
 	return nil
 }
 
@@ -90,11 +102,16 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 	var reason error
 	for _, event := range events {
 
-		// Extract time
+		// Extract type
 		t, err := event.Content.Meta.GetValue("type")
 		if err != nil {
 			logp.Err("Type not available in monitoring reported. Please report this error: %s", err)
 			continue
+		}
+
+		typ, ok := t.(string)
+		if !ok {
+			logp.Err("monitoring type is not a string")
 		}
 
 		var params = map[string]string{}
@@ -113,22 +130,13 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			}
 		}
 
-		action := common.MapStr{
-			"index": common.MapStr{
-				"_type":    t,
-				"_index":   "",
-				"_routing": nil,
-			},
+		switch c.format {
+		case report.FormatXPackMonitoringBulk:
+			err = c.publishXPackBulk(params, event, typ)
+		case report.FormatBulk:
+			err = c.publishBulk(event, typ)
 		}
-		document := report.Event{
-			Timestamp: event.Content.Timestamp,
-			Fields:    event.Content.Fields,
-		}
-		bulk := [2]interface{}{action, document}
 
-		// Currently one request per event is sent. Reason is that each event can contain different
-		// interval params and X-Pack requires to send the interval param.
-		_, err = c.es.BulkWith("_xpack", "monitoring", params, nil, bulk[:])
 		if err != nil {
 			failed = append(failed, event)
 			reason = err
@@ -149,4 +157,76 @@ func (c *publishClient) Test(d testing.Driver) {
 
 func (c *publishClient) String() string {
 	return "publish(" + c.es.String() + ")"
+}
+
+func (c *publishClient) publishXPackBulk(params map[string]string, event publisher.Event, typ string) error {
+	meta := common.MapStr{
+		"_index":   "",
+		"_routing": nil,
+		"_type":    typ,
+	}
+	bulk := [2]interface{}{
+		common.MapStr{"index": meta},
+		report.Event{
+			Timestamp: event.Content.Timestamp,
+			Fields:    event.Content.Fields,
+		},
+	}
+
+	// Currently one request per event is sent. Reason is that each event can contain different
+	// interval params and X-Pack requires to send the interval param.
+	_, err := c.es.SendMonitoringBulk(params, bulk[:])
+	return err
+}
+
+func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
+	meta := common.MapStr{
+		"_index":   getMonitoringIndexName(),
+		"_routing": nil,
+	}
+
+	if c.es.GetVersion().Major < 7 {
+		meta["_type"] = "doc"
+	}
+
+	action := common.MapStr{
+		"index": meta,
+	}
+
+	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
+
+	fields := common.MapStr{
+		"type": typ,
+		typ:    event.Content.Fields,
+	}
+
+	interval, err := event.Content.Meta.GetValue("interval_ms")
+	if err != nil {
+		return errors.Wrap(err, "could not determine interval_ms field")
+	}
+	fields.Put("interval_ms", interval)
+
+	clusterUUID, err := event.Content.Meta.GetValue("cluster_uuid")
+	if err != nil && err != common.ErrKeyNotFound {
+		return errors.Wrap(err, "could not determine cluster_uuid field")
+	}
+	fields.Put("cluster_uuid", clusterUUID)
+
+	document := report.Event{
+		Timestamp: event.Content.Timestamp,
+		Fields:    fields,
+	}
+	bulk := [2]interface{}{action, document}
+
+	// Currently one request per event is sent. Reason is that each event can contain different
+	// interval params and X-Pack requires to send the interval param.
+	// FIXME: index name (first param below)
+	_, err = c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
+	return err
+}
+
+func getMonitoringIndexName() string {
+	version := 7
+	date := time.Now().Format("2006.01.02")
+	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }

@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/mock"
 )
 
-var RootCmd = cmd.GenRootCmd(mock.Name, mock.Version, mock.New)
+var RootCmd = cmd.GenRootCmdWithSettings(mock.New, mock.Settings)
 
 func main() {
 	if err := RootCmd.Execute(); err != nil {

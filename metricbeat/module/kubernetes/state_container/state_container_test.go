@@ -23,10 +23,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
 )
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSetEventsFetcher(t, "kubernetes", "state_container",
+	ptest.TestMetricSet(t, "kubernetes", "state_container",
 		ptest.TestCases{
 			{
 				MetricsFile:  "../_meta/test/kube-state-metrics",
@@ -38,4 +41,8 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 	)
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "state_container")
 }

@@ -84,7 +84,7 @@ func TestProcessor(t *testing.T) {
 				return
 			}
 
-			processor, err := newProcessor(c)
+			processor, err := NewProcessor(c)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -113,7 +113,7 @@ func TestFieldDoesntExist(t *testing.T) {
 		return
 	}
 
-	processor, err := newProcessor(c)
+	processor, err := NewProcessor(c)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -163,7 +163,7 @@ func TestFieldAlreadyExist(t *testing.T) {
 				return
 			}
 
-			processor, err := newProcessor(c)
+			processor, err := NewProcessor(c)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -175,4 +175,60 @@ func TestFieldAlreadyExist(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestErrorFlagging(t *testing.T) {
+	t.Run("when the parsing fails add a flag", func(t *testing.T) {
+		c, err := common.NewConfigFrom(map[string]interface{}{
+			"tokenizer": "%{ok} - %{notvalid}",
+		})
+
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		processor, err := NewProcessor(c)
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		e := beat.Event{Fields: common.MapStr{"message": "hello world"}}
+		event, err := processor.Run(&e)
+
+		if !assert.Error(t, err) {
+			return
+		}
+
+		flags, err := event.GetValue(beat.FlagField)
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		assert.Contains(t, flags, flagParsingError)
+	})
+
+	t.Run("when the parsing is succesful do not add a flag", func(t *testing.T) {
+		c, err := common.NewConfigFrom(map[string]interface{}{
+			"tokenizer": "%{ok} %{valid}",
+		})
+
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		processor, err := NewProcessor(c)
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		e := beat.Event{Fields: common.MapStr{"message": "hello world"}}
+		event, err := processor.Run(&e)
+
+		if !assert.NoError(t, err) {
+			return
+		}
+
+		_, err = event.GetValue(beat.FlagField)
+		assert.Error(t, err)
+	})
 }

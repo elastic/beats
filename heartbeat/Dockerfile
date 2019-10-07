@@ -1,4 +1,4 @@
-FROM golang:1.10.3
+FROM golang:1.12.10
 MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
 RUN set -x && \
@@ -9,7 +9,7 @@ RUN set -x && \
 
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
-RUN pip install --upgrade docker-compose==1.21.0
+RUN pip install --upgrade docker-compose==1.23.2
 
 # Setup work environment
 ENV HEARTBEAT_PATH /go/src/github.com/elastic/beats/heartbeat

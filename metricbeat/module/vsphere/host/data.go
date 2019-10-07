@@ -24,8 +24,8 @@ import (
 )
 
 func eventMapping(hs mo.HostSystem) common.MapStr {
-	totalCpu := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-	freeCpu := int64(totalCpu) - int64(hs.Summary.QuickStats.OverallCpuUsage)
+	totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
+	freeCPU := int64(totalCPU) - int64(hs.Summary.QuickStats.OverallCpuUsage)
 	usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
 	freeMemory := int64(hs.Summary.Hardware.MemorySize) - usedMemory
 
@@ -36,10 +36,10 @@ func eventMapping(hs mo.HostSystem) common.MapStr {
 				"mhz": hs.Summary.QuickStats.OverallCpuUsage,
 			},
 			"total": common.MapStr{
-				"mhz": totalCpu,
+				"mhz": totalCPU,
 			},
 			"free": common.MapStr{
-				"mhz": freeCpu,
+				"mhz": freeCPU,
 			},
 		},
 		"memory": common.MapStr{

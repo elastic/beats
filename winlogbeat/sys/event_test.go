@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -166,6 +167,15 @@ func TestXML(t *testing.T) {
 			fmt.Println(string(json))
 		}
 	}
+}
+
+// Tests that control characters other than CR and LF are escaped
+// when the event is decoded.
+func TestInvalidXML(t *testing.T) {
+	evXML := strings.Replace(allXML, "%1", "\t&#xD;\n\x1b", -1)
+	ev, err := UnmarshalEventXML([]byte(evXML))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "Creating WSMan shell on server with ResourceUri: \t\r\n\\u001b", ev.Message)
 }
 
 func BenchmarkXMLUnmarshal(b *testing.B) {

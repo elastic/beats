@@ -1,0 +1,20 @@
+module_version: "1.0"
+
+var:
+  - name: netflow_host
+    default: localhost
+  - name: netflow_port
+    default: 2055
+  - name: max_message_size
+    default: 10KiB
+  - name: expiration_timeout
+    default: 30m
+  - name: queue_size
+    default: 8192
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/netflow.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

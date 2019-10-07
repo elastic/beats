@@ -1,0 +1,15 @@
+# Time: 131112 17:03:32
+# User@Host: root[root] @ localhost []
+# Thread_id: 2  Schema: dbt3sf1  QC_hit: No
+# Query_time: 5.524103  Lock_time: 0.000337  Rows_sent: 1  Rows_examined: 65633
+#
+# explain: id   select_type     table   type    possible_keys   key     key_len ref     rows    Extra
+# explain: 1    SIMPLE  nation  ref     PRIMARY,n_name  n_name  26      const   1       Using where; Using index
+# explain: 1    SIMPLE  customer        ref     PRIMARY,i_c_nationkey   i_c_nationkey   5       dbt3sf1.nation.n_nationkey      3145    Using index
+# explain: 1    SIMPLE  orders  ref     i_o_custkey     i_o_custkey     5       dbt3sf1.customer.c_custkey      7       Using index
+#
+SET timestamp=1384261412;
+select count(*) from customer, orders, nation
+  where c_custkey=o_custkey
+    and c_nationkey=n_nationkey
+    and n_name='GERMANY';

@@ -170,15 +170,15 @@ audit ruleset.
 
 *`include_raw_message`*:: This boolean setting causes {beatname_uc} to
 include each of the raw messages that contributed to the event in the document
-as a field called `messages`. The default value is false. This setting is
+as a field called `event.original`. The default value is false. This setting is
 primarily used for development and debugging purposes.
 
 *`include_warnings`*:: This boolean setting causes {beatname_uc} to
 include as warnings any issues that were encountered while parsing the raw
-messages. The default value is false. When this setting is enabled the raw
-messages will be included in the event regardless of the
-`include_raw_message` config setting. This setting is primarily used for
-development and debugging purposes.
+messages. The messages are written to the `error.message` field. The default
+value is false. When this setting is enabled the raw messages will be included
+in the event regardless of the `include_raw_message` config setting. This
+setting is primarily used for development and debugging purposes.
 
 *`audit_rules`*:: A string containing the audit rules that should be
 installed to the kernel. There should be one rule per line. Comments can be

@@ -110,7 +110,7 @@ def get_parser():
     parser.add_argument("--github_name", help="Github name")
     parser.add_argument("--beat_path", help="Beat path")
     parser.add_argument("--full_name", help="Full name")
-    parser.add_argument("--type", help="Beat type", default="beat")
+    parser.add_argument("--type", help="Beat type", default="beat", choices=["beat", "metricbeat"])
 
     return parser
 

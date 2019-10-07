@@ -86,14 +86,12 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Kibana Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Kibana Stats API response")
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failure to apply stats schema"))
+		return errors.Wrap(err, "failure to apply stats schema")
 	}
 
 	var event mb.Event
@@ -103,20 +101,56 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
 	if !ok {
-		return elastic.ReportErrorForMissingField("cluster_uuid", elastic.Kibana, r)
+		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
+		r.Event(event)
+		return event.Error
 	}
 	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
 	if !ok {
-		return elastic.ReportErrorForMissingField("process", elastic.Kibana, r)
+		event.Error = elastic.MakeErrorForMissingField("process", elastic.Kibana)
+		r.Event(event)
+		return event.Error
 	}
 	pid, ok := process["pid"].(float64)
 	if !ok {
-		return elastic.ReportErrorForMissingField("process.pid", elastic.Kibana, r)
+		event.Error = elastic.MakeErrorForMissingField("process.pid", elastic.Kibana)
+		r.Event(event)
+		return event.Error
 	}
 	event.RootFields.Put("process.pid", int(pid))
+
+	// Set service ID
+	uuid, err := dataFields.GetValue("uuid")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.id", uuid)
+	dataFields.Delete("uuid")
+
+	// Set service version
+	version, err := dataFields.GetValue("version")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.version", version)
+	dataFields.Delete("version")
+
+	// Set service address
+	serviceAddress, err := dataFields.GetValue("transport_address")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.address", serviceAddress)
+	dataFields.Delete("transport_address")
 
 	event.MetricSetFields = dataFields
 

@@ -10,7 +10,7 @@ quickly, see {stack-gs}/get-started-elastic-stack.html[Getting started with the
 ==============
 You can skip having to install {es} and {kib} by using our
 https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service] on
-Elastic Cloud. The {es} Service is available on both AWS and GCP.
+Elastic Cloud. The {es} Service is available on AWS, GCP, and Azure.
 https://www.elastic.co/cloud/elasticsearch-service/signup[Try out the {es}
 Service for free].
 ==============
@@ -19,8 +19,14 @@ After installing the {stack}, see the {beats} getting started guides:
 
 * {auditbeat-ref}/auditbeat-getting-started.html[Auditbeat]
 * {filebeat-ref}/filebeat-getting-started.html[Filebeat]
+* {functionbeat-ref}/functionbeat-getting-started.html[Functionbeat]
 * {heartbeat-ref}/heartbeat-getting-started.html[Heartbeat]
+* {journalbeat-ref}/journalbeat-getting-started.html[Journalbeat]
 * {metricbeat-ref}/metricbeat-getting-started.html[Metricbeat]
 * {packetbeat-ref}/packetbeat-getting-started.html[Packetbeat]
 * {winlogbeat-ref}/winlogbeat-getting-started.html[Winlogbeat]
 
+If you're planning to use the
+{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
+{infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}, also see the
+{infra-guide}/index.html[Infrastructure Monitoring Guide].

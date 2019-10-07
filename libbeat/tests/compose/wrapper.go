@@ -18,17 +18,24 @@
 package compose
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -39,6 +46,18 @@ const (
 type wrapperDriver struct {
 	Name  string
 	Files []string
+
+	Environment []string
+
+	client *client.Client
+}
+
+func newWrapperDriver() (*wrapperDriver, error) {
+	c, err := client.NewEnvClient()
+	if err != nil {
+		return nil, err
+	}
+	return &wrapperDriver{client: c}, nil
 }
 
 type wrapperContainer struct {
@@ -57,17 +76,82 @@ func (c *wrapperContainer) Running() bool {
 	return c.info.State == "running"
 }
 
+var statusOldRe = regexp.MustCompile(`(\d+) (minute|hour)s?`)
+
 func (c *wrapperContainer) Old() bool {
-	return strings.Contains(c.info.Status, "minute")
+	match := statusOldRe.FindStringSubmatch(c.info.Status)
+	if len(match) < 3 {
+		return false
+	}
+	n, _ := strconv.Atoi(match[1])
+	unit := match[2]
+	switch unit {
+	case "minute":
+		return n > 3
+	default:
+		return true
+	}
+}
+
+// privateHost returns the address of the container, it should be reachable
+// from the host if docker is being run natively. To be used when the tests
+// are run from another container in the same network. It also works when
+// running from the hoist network if the docker daemon runs natively.
+func (c *wrapperContainer) privateHost(port int) string {
+	var ip string
+	for _, net := range c.info.NetworkSettings.Networks {
+		if len(net.IPAddress) > 0 {
+			ip = net.IPAddress
+			break
+		}
+	}
+	if len(ip) == 0 {
+		return ""
+	}
+
+	for _, info := range c.info.Ports {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+			return net.JoinHostPort(ip, strconv.Itoa(int(info.PrivatePort)))
+		}
+	}
+	return ""
+}
+
+// exposedHost returns the exposed address in the host, can be used when the
+// test is run from the host network. Recommended when using docker machines.
+func (c *wrapperContainer) exposedHost(port int) string {
+	for _, info := range c.info.Ports {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+			return net.JoinHostPort("localhost", strconv.Itoa(int(info.PublicPort)))
+		}
+	}
+	return ""
+}
+
+func (c *wrapperContainer) Host() string {
+	return c.HostForPort(0)
+}
+
+func (c *wrapperContainer) HostForPort(port int) string {
+	if runtime.GOOS == "linux" {
+		return c.privateHost(port)
+	}
+	// We can use `exposedHost()` in all platforms when we can use host
+	// network in the metricbeat container
+	return c.exposedHost(port)
 }
 
 func (d *wrapperDriver) LockFile() string {
 	return d.Files[0] + ".lock"
 }
 
+func (d *wrapperDriver) Close() error {
+	return errors.Wrap(d.client.Close(), "failed to close wrapper driver")
+}
+
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
 	var args []string
-	args = append(args, "--project-name", d.Name)
+	args = append(args, "--no-ansi", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
@@ -76,6 +160,9 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 	cmd := exec.CommandContext(ctx, "docker-compose", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	if len(d.Environment) > 0 {
+		cmd.Env = append(os.Environ(), d.Environment...)
+	}
 	return cmd
 }
 
@@ -96,7 +183,78 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
-	return d.cmd(ctx, "up", args...).Run()
+	// Try to pull the image before building it
+	var stderr bytes.Buffer
+	pull := d.cmd(ctx, "pull", "--ignore-pull-failures", service)
+	pull.Stdout = nil
+	pull.Stderr = &stderr
+	if err := pull.Run(); err != nil {
+		return errors.Wrapf(err, "failed to pull images using docker-compose: %s", stderr.String())
+	}
+
+	err := d.cmd(ctx, "up", args...).Run()
+	if err != nil {
+		return err
+	}
+	if opts.SetupAdvertisedHostEnvFile {
+		return d.setupAdvertisedHost(ctx, service)
+	}
+	return nil
+}
+
+func writeToContainer(ctx context.Context, cli *client.Client, id, filename, content string) error {
+	var buf bytes.Buffer
+	tw := tar.NewWriter(&buf)
+	now := time.Now()
+	err := tw.WriteHeader(&tar.Header{
+		Typeflag:   tar.TypeReg,
+		Name:       filepath.Base(filename),
+		Mode:       0100644,
+		Size:       int64(len(content)),
+		ModTime:    now,
+		AccessTime: now,
+		ChangeTime: now,
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to write tar header")
+	}
+	if _, err := tw.Write([]byte(content)); err != nil {
+		return errors.Wrap(err, "failed to write tar file")
+	}
+	if err := tw.Close(); err != nil {
+		return errors.Wrap(err, "failed to close tar")
+	}
+
+	opts := types.CopyToContainerOptions{}
+	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
+	if err != nil {
+		return errors.Wrapf(err, "failed to copy environment to container %s", id)
+	}
+	return nil
+}
+
+// setupAdvertisedHost adds a file to a container with its address, this can
+// be used in services that need to configure an address to be advertised to
+// clients.
+func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string) error {
+	containers, err := d.containers(ctx, Filter{State: AnyState}, service)
+	if err != nil {
+		return errors.Wrap(err, "setupAdvertisedHost")
+	}
+	if len(containers) == 0 {
+		return errors.Errorf("no containers for service %s", service)
+	}
+
+	for _, c := range containers {
+		w := &wrapperContainer{info: c}
+		content := fmt.Sprintf("SERVICE_HOST=%s", w.Host())
+
+		err := writeToContainer(ctx, d.client, c.ID, "/run/compose_env", content)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {
@@ -140,11 +298,6 @@ func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, fi
 }
 
 func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]types.Container, error) {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to start docker client")
-	}
-
 	var serviceFilters []filters.Args
 	if len(filter) == 0 {
 		f := makeFilter(d.Name, "", projectFilter)
@@ -156,19 +309,42 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 		}
 	}
 
+	serviceNames, err := d.serviceNames(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get container list")
+	}
+
 	var containers []types.Container
 	for _, f := range serviceFilters {
-		c, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		list, err := d.client.ContainerList(ctx, types.ContainerListOptions{
 			All:     true,
 			Filters: f,
 		})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to get container list")
 		}
-		containers = append(containers, c...)
+		for _, container := range list {
+			serviceName, ok := container.Labels[labelComposeService]
+			if !ok || !contains(serviceNames, serviceName) {
+				// Service is not defined in current docker compose file, ignore it
+				continue
+			}
+			containers = append(containers, container)
+		}
 	}
 
 	return containers, nil
+}
+
+func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
+	var stdout bytes.Buffer
+	cmd := d.cmd(ctx, "config", "--services")
+	cmd.Stdout = &stdout
+	err := cmd.Run()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get list of service names")
+	}
+	return strings.Fields(stdout.String()), nil
 }
 
 func makeFilter(project, service string, projectFilter Filter) filters.Args {

@@ -18,6 +18,7 @@
 package module
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -64,6 +65,8 @@ type metricSetWrapper struct {
 	mb.MetricSet
 	module *Wrapper // Parent Module.
 	stats  *stats   // stats for this MetricSet.
+
+	periodic bool // Set to true if this metricset is a periodic fetcher
 }
 
 // stats bundles common metricset stats.
@@ -191,9 +194,11 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
+	case mb.PushMetricSetV2WithContext:
+		ms.Run(&channelContext{done}, reporter.V2())
 	case mb.EventFetcher, mb.EventsFetcher,
-		mb.ReportingMetricSet, mb.ReportingMetricSetV2:
-		msw.startPeriodicFetching(reporter)
+		mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
 		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
@@ -204,9 +209,12 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 // startPeriodicFetching performs an immediate fetch for the MetricSet then it
 // begins a continuous timer scheduled loop to fetch data. To stop the loop the
 // done channel should be closed.
-func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
+func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter reporter) {
+	// Indicate that it has been started as periodic fetcher
+	msw.periodic = true
+
 	// Fetch immediately.
-	msw.fetch(reporter)
+	msw.fetch(ctx, reporter)
 
 	// Start timer for future fetches.
 	t := time.NewTicker(msw.Module().Config().Period)
@@ -216,7 +224,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 		case <-reporter.V2().Done():
 			return
 		case <-t.C:
-			msw.fetch(reporter)
+			msw.fetch(ctx, reporter)
 		}
 	}
 }
@@ -224,7 +232,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 // fetch invokes the appropriate Fetch method for the MetricSet and publishes
 // the result using the publisher client. This method will recover from panics
 // and log a stack track if one occurs.
-func (msw *metricSetWrapper) fetch(reporter reporter) {
+func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
 	case mb.EventFetcher:
 		msw.singleEventFetch(fetcher, reporter)
@@ -236,6 +244,20 @@ func (msw *metricSetWrapper) fetch(reporter reporter) {
 	case mb.ReportingMetricSetV2:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V2())
+	case mb.ReportingMetricSetV2Error:
+		reporter.StartFetchTimer()
+		err := fetcher.Fetch(reporter.V2())
+		if err != nil {
+			reporter.V2().Error(err)
+			logp.Info("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		}
+	case mb.ReportingMetricSetV2WithContext:
+		reporter.StartFetchTimer()
+		err := fetcher.Fetch(ctx, reporter.V2())
+		if err != nil {
+			reporter.V2().Error(err)
+			logp.Info("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
@@ -306,6 +328,23 @@ func (r *eventReporter) V1() mb.PushReporter {
 }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
 
+// channelContext implements context.Context by wrapping a channel
+type channelContext struct {
+	done <-chan struct{}
+}
+
+func (r *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (r *channelContext) Done() <-chan struct{}       { return r.done }
+func (r *channelContext) Err() error {
+	select {
+	case <-r.done:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+func (r *channelContext) Value(key interface{}) interface{} { return nil }
+
 // reporterV1 wraps V2 to provide a v1 interface.
 type reporterV1 struct {
 	v2     mb.PushReporterV2
@@ -332,6 +371,9 @@ func (r reporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}
 func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
 		event.Took = time.Since(r.start)
+	}
+	if r.msw.periodic {
+		event.Period = r.msw.Module().Config().Period
 	}
 
 	if event.Timestamp.IsZero() {

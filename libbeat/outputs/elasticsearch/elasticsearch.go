@@ -20,6 +20,7 @@ package elasticsearch
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"sync"
 
 	"github.com/gofrs/uuid"
@@ -54,23 +55,48 @@ var (
 // Callbacks must not depend on the result of a previous one,
 // because the ordering is not fixed.
 type callbacksRegistry struct {
-	callbacks map[uuid.UUID]connectCallback
+	callbacks map[uuid.UUID]ConnectCallback
 	mutex     sync.Mutex
 }
 
 // XXX: it would be fantastic to do this without a package global
 var connectCallbackRegistry = newCallbacksRegistry()
 
+// NOTE(ph): We need to refactor this, right now this is the only way to ensure that every calls
+// to an ES cluster executes a callback.
+var globalCallbackRegistry = newCallbacksRegistry()
+
+// RegisterGlobalCallback register a global callbacks.
+func RegisterGlobalCallback(callback ConnectCallback) (uuid.UUID, error) {
+	globalCallbackRegistry.mutex.Lock()
+	defer globalCallbackRegistry.mutex.Unlock()
+
+	// find the next unique key
+	var key uuid.UUID
+	var err error
+	exists := true
+	for exists {
+		key, err = uuid.NewV4()
+		if err != nil {
+			return uuid.Nil, err
+		}
+		_, exists = globalCallbackRegistry.callbacks[key]
+	}
+
+	globalCallbackRegistry.callbacks[key] = callback
+	return key, nil
+}
+
 func newCallbacksRegistry() callbacksRegistry {
 	return callbacksRegistry{
-		callbacks: make(map[uuid.UUID]connectCallback),
+		callbacks: make(map[uuid.UUID]ConnectCallback),
 	}
 }
 
 // RegisterConnectCallback registers a callback for the elasticsearch output
 // The callback is called each time the client connects to elasticsearch.
 // It returns the key of the newly added callback, so it can be deregistered later.
-func RegisterConnectCallback(callback connectCallback) (uuid.UUID, error) {
+func RegisterConnectCallback(callback ConnectCallback) (uuid.UUID, error) {
 	connectCallbackRegistry.mutex.Lock()
 	defer connectCallbackRegistry.mutex.Unlock()
 
@@ -99,7 +125,17 @@ func DeregisterConnectCallback(key uuid.UUID) {
 	delete(connectCallbackRegistry.callbacks, key)
 }
 
+// DeregisterGlobalCallback deregisters a callback for the elasticsearch output
+// specified by its key. If a callback does not exist, nothing happens.
+func DeregisterGlobalCallback(key uuid.UUID) {
+	globalCallbackRegistry.mutex.Lock()
+	defer globalCallbackRegistry.mutex.Unlock()
+
+	delete(globalCallbackRegistry.callbacks, key)
+}
+
 func makeES(
+	im outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
@@ -108,9 +144,9 @@ func makeES(
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
-	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
-		cfg.SetString("index", -1, pattern)
+	index, pipeline, err := buildSelectors(im, beat, cfg)
+	if err != nil {
+		return outputs.Fail(err)
 	}
 
 	config := defaultConfig
@@ -123,42 +159,20 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	index, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "index",
-		MultiKey:         "indices",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "pipeline",
-		MultiKey:         "pipelines",
-		EnableSingleOnly: true,
-		FailEmpty:        false,
-	})
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
-	var pipeline *outil.Selector
-	if !pipelineSel.IsEmpty() {
-		pipeline = &pipelineSel
-	}
-
-	proxyURL, err := parseProxyURL(config.ProxyURL)
-	if err != nil {
-		return outputs.Fail(err)
-	}
-	if proxyURL != nil {
-		logp.Info("Using proxy URL: %s", proxyURL)
+	var proxyURL *url.URL
+	if !config.ProxyDisable {
+		proxyURL, err := parseProxyURL(config.ProxyURL)
+		if err != nil {
+			return outputs.Fail(err)
+		}
+		if proxyURL != nil {
+			logp.Info("Using proxy URL: %s", proxyURL)
+		}
 	}
 
 	params := config.Params
@@ -180,6 +194,7 @@ func makeES(
 			Index:            index,
 			Pipeline:         pipeline,
 			Proxy:            proxyURL,
+			ProxyDisable:     config.ProxyDisable,
 			TLS:              tlsConfig,
 			Username:         config.Username,
 			Password:         config.Password,
@@ -199,6 +214,33 @@ func makeES(
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+}
+
+func buildSelectors(
+	im outputs.IndexManager,
+	beat beat.Info,
+	cfg *common.Config,
+) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
+	index, err = im.BuildSelector(cfg)
+	if err != nil {
+		return index, pipeline, err
+	}
+
+	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "pipeline",
+		MultiKey:         "pipelines",
+		EnableSingleOnly: true,
+		FailEmpty:        false,
+	})
+	if err != nil {
+		return index, pipeline, err
+	}
+
+	if !pipelineSel.IsEmpty() {
+		pipeline = &pipelineSel
+	}
+
+	return index, pipeline, err
 }
 
 // NewConnectedClient creates a new Elasticsearch client based on the given config.
@@ -246,12 +288,15 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		return nil, err
 	}
 
-	proxyURL, err := parseProxyURL(config.ProxyURL)
-	if err != nil {
-		return nil, err
-	}
-	if proxyURL != nil {
-		logp.Info("Using proxy URL: %s", proxyURL)
+	var proxyURL *url.URL
+	if !config.ProxyDisable {
+		proxyURL, err := parseProxyURL(config.ProxyURL)
+		if err != nil {
+			return nil, err
+		}
+		if proxyURL != nil {
+			logp.Info("Using proxy URL: %s", proxyURL)
+		}
 	}
 
 	params := config.Params
@@ -270,6 +315,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		client, err := NewClient(ClientSettings{
 			URL:              esURL,
 			Proxy:            proxyURL,
+			ProxyDisable:     config.ProxyDisable,
 			TLS:              tlsConfig,
 			Username:         config.Username,
 			Password:         config.Password,

@@ -57,8 +57,8 @@
             },
             "name": "test",
             "node": {
-                "host": "172.18.0.4:3000",
-                "name": "BB9040012AC4202"
+                "host": "172.26.0.2:3000",
+                "name": "BB902001AAC4202"
             },
             "objects": {
                 "master": 0,
@@ -67,14 +67,16 @@
             "stop_writes": false
         }
     },
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "aerospike.namespace",
+        "duration": 115000,
+        "module": "aerospike"
     },
     "metricset": {
-        "host": "aerospike:3000",
-        "module": "aerospike",
-        "name": "namespace",
-        "rtt": 115
+        "name": "namespace"
+    },
+    "service": {
+        "address": "172.26.0.2:3000",
+        "type": "aerospike"
     }
 }

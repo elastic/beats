@@ -24,8 +24,17 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
+// FileLoader is used by NewFlagFiles to define customer file loading functions
+// for different file extensions.
 type FileLoader func(name string, opts ...ucfg.Option) (*ucfg.Config, error)
 
+// NewFlagFiles create a new flag, that will load external configurations file
+// when being used. Configurations loaded from multiple files will be merged
+// into one common Config object.  If cfg is not nil, then the loaded
+// configurations will be merged into cfg.
+// The extensions parameter define custom file loaders for different file
+// extensions. If extensions contains an entry with key "", then this loader
+// will be used as default fallback.
 func NewFlagFiles(
 	cfg *ucfg.Config,
 	extensions map[string]FileLoader,

@@ -21,12 +21,11 @@ import (
 	"bytes"
 	stdjson "encoding/json"
 
-	"github.com/elastic/go-structform/gotype"
-	"github.com/elastic/go-structform/json"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/go-structform/gotype"
+	"github.com/elastic/go-structform/json"
 )
 
 // Encoder for serializing a beat.Event to json.
@@ -35,17 +34,20 @@ type Encoder struct {
 	folder *gotype.Iterator
 
 	version string
-	config  config
+	config  Config
 }
 
-type config struct {
+// Config is used to pass encoding parameters to New.
+type Config struct {
 	Pretty     bool
 	EscapeHTML bool
+	LocalTime  bool
 }
 
-var defaultConfig = config{
+var defaultConfig = Config{
 	Pretty:     false,
-	EscapeHTML: true,
+	EscapeHTML: false,
+	LocalTime:  false,
 }
 
 func init() {
@@ -57,16 +59,13 @@ func init() {
 			}
 		}
 
-		return New(config.Pretty, config.EscapeHTML, info.Version), nil
+		return New(info.Version, config), nil
 	})
 }
 
 // New creates a new json Encoder.
-func New(pretty, escapeHTML bool, version string) *Encoder {
-	e := &Encoder{version: version, config: config{
-		Pretty:     pretty,
-		EscapeHTML: escapeHTML,
-	}}
+func New(version string, config Config) *Encoder {
+	e := &Encoder{version: version, config: config}
 	e.reset()
 	return e
 }
@@ -80,7 +79,7 @@ func (e *Encoder) reset() {
 	// create new encoder with custom time.Time encoding
 	e.folder, err = gotype.NewIterator(visitor,
 		gotype.Folders(
-			codec.MakeTimestampEncoder(),
+			codec.MakeUTCOrLocalTimestampEncoder(e.config.LocalTime),
 			codec.MakeBCTimestampEncoder(),
 		),
 	)

@@ -1,6 +1,8 @@
-import yaml
-import os
 import argparse
+from collections import OrderedDict
+import os
+
+import yaml
 
 
 def document_fields(output, section, sections, path):
@@ -11,11 +13,15 @@ def document_fields(output, section, sections, path):
         output.write("{}\n".format(section["prefix"]))
 
     # Intermediate level titles
-    if "description" in section and "prefix" not in section and "anchor" not in section:
+    if ("description" in section and "prefix" not in section and
+            "anchor" not in section):
         output.write("[float]\n")
 
     if "description" in section:
-        output.write("== {} fields\n\n".format(section["name"]))
+        if "anchor" in section:
+            output.write("== {} fields\n\n".format(section["name"]))
+        else:
+            output.write("=== {}\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
@@ -39,16 +45,18 @@ def document_fields(output, section, sections, path):
             document_field(output, field, newpath)
 
 
-def document_field(output, field, path):
+def document_field(output, field, field_path):
 
-    if "path" not in field:
-        field["path"] = path
+    if "field_path" not in field:
+        field["field_path"] = field_path
 
-    output.write("*`{}`*::\n+\n--\n".format(field["path"]))
+    output.write("*`{}`*::\n+\n--\n".format(field["field_path"]))
 
     if "deprecated" in field:
-        output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
+        output.write("\ndeprecated:[{}]\n\n".format(field["deprecated"]))
 
+    if "description" in field:
+        output.write("{}\n\n".format(field["description"]))
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
     if "example" in field:
@@ -57,22 +65,23 @@ def document_field(output, field, path):
         output.write("format: {}\n\n".format(field["format"]))
     if "required" in field:
         output.write("required: {}\n\n".format(field["required"]))
-
-    if "description" in field:
-        output.write("{}\n\n".format(field["description"]))
+    if "path" in field:
+        output.write("alias to: {}\n\n".format(field["path"]))
 
     if "index" in field:
         if not field["index"]:
             output.write("{}\n\n".format("Field is not indexed."))
 
-    if "enable" in field:
-        if not field["enable"]:
+    if "enabled" in field:
+        if not field["enabled"]:
             output.write("{}\n\n".format("Object is not enabled."))
+
+    output.write("--\n\n")
 
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
-            document_field(output, subfield, path + "." + subfield["name"])
-    output.write("--\n\n")
+            document_field(output, subfield, field_path + "." +
+                           subfield["name"])
 
 
 def fields_to_asciidoc(input, output, beat):
@@ -81,7 +90,7 @@ def fields_to_asciidoc(input, output, beat):
 
     output.write("""
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -101,6 +110,22 @@ grouped in the following categories:
     if docs is None:
         print("fields.yml file is empty. fields.asciidoc cannot be generated.")
         return
+
+    # deduplicate fields, last one wins
+    for section in docs:
+        if not section.get("fields"):
+            continue
+        fields = OrderedDict()
+        for field in section["fields"]:
+            name = field["name"]
+            if name in fields:
+                assert field["type"] == (fields[name]["type"],
+                                         'field "{}" redefined with different type "{}"'.format(
+                    name, field["type"]))
+                fields[name].update(field)
+            else:
+                fields[name] = field
+        section["fields"] = list(fields.values())
 
     # Create sections from available fields
     sections = {}
@@ -126,23 +151,24 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Generates the documentation for a Beat.")
-    parser.add_argument("path", help="Path to the beat folder")
+    parser.add_argument("fields", help="Path to fields.yml")
     parser.add_argument("beattitle", help="The beat title")
-    parser.add_argument("es_beats", help="The path to the general beats folder")
+    parser.add_argument("es_beats",
+                        help="The path to the general beats folder")
+    parser.add_argument("--output_path", default="", dest="output_path",
+                        help="Output path, if different from path")
 
     args = parser.parse_args()
 
-    beat_path = args.path
-    beat_title = args.beattitle
+    fields_yml = args.fields
+    beat_title = args.beattitle.title()
     es_beats = args.es_beats
-
-    fields_yml = beat_path + "/fields.yml"
 
     # Read fields.yml
     with open(fields_yml) as f:
         fields = f.read()
 
-    output = open(beat_path + "/docs/fields.asciidoc", 'w')
+    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w')
 
     try:
         fields_to_asciidoc(fields, output, beat_title)

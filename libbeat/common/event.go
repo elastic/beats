@@ -26,9 +26,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 const eventDebugSelector = "event"
@@ -170,8 +170,29 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 	case bool, []bool:
 	case int, int8, int16, int32, int64:
 	case []int, []int8, []int16, []int32, []int64:
-	case uint, uint8, uint16, uint32, uint64:
-	case []uint, []uint8, []uint16, []uint32, []uint64:
+	case uint, uint8, uint16, uint32:
+	case uint64:
+		return value.(uint64) &^ (1 << 63), nil
+	case []uint, []uint8, []uint16, []uint32:
+	case []uint64:
+		arr := value.([]uint64)
+		mask := false
+		for _, v := range arr {
+			if v >= (1 << 63) {
+				mask = true
+				break
+			}
+		}
+		if !mask {
+			return value, nil
+		}
+
+		tmp := make([]uint64, len(arr))
+		for i, v := range arr {
+			tmp[i] = v &^ (1 << 63)
+		}
+		return tmp, nil
+
 	case float64:
 		return Float(value.(float64)), nil
 	case float32:
@@ -200,7 +221,7 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			return v.Int(), nil
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			return v.Uint(), nil
+			return v.Uint() &^ (1 << 63), nil
 		case reflect.Float32, reflect.Float64:
 			return Float(v.Float()), nil
 		case reflect.Complex64, reflect.Complex128:

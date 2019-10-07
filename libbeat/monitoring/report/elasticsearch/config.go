@@ -20,6 +20,8 @@ package elasticsearch
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/monitoring/report"
+
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 )
 
@@ -43,6 +45,8 @@ type config struct {
 	BufferSize       int               `config:"buffer_size"`
 	Tags             []string          `config:"tags"`
 	Backoff          backoff           `config:"backoff"`
+	Format           report.Format     `config:"_format"`
+	ClusterUUID      string            `config:"cluster_uuid"`
 }
 
 type backoff struct {

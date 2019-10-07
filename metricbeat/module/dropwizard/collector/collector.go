@@ -21,8 +21,6 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -65,7 +63,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The dropwizard collector metricset is beta")
 	config := struct {
 		Namespace string `config:"namespace" validate:"required"`
 	}{}
@@ -88,10 +85,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	body, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	dw := map[string]interface{}{}
 
@@ -100,17 +97,20 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	err = d.Decode(&dw)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	eventList := eventMapping(dw)
 
 	// Converts hash list to slice
-	events := []common.MapStr{}
 	for _, event := range eventList {
-		event[mb.NamespaceKey] = m.namespace
-		events = append(events, event)
+		if reported := reporter.Event(mb.Event{
+			MetricSetFields: event,
+			Namespace:       "dropwizard." + m.namespace,
+		}); !reported {
+			m.Logger().Debug("event not reported", event)
+		}
 	}
 
-	return events, err
+	return nil
 }

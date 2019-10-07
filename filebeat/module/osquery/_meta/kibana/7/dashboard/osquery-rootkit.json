@@ -1,0 +1,387 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Info OSSEC rootkit [Filebeat Osquery] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "fontSize": 12, 
+                        "markdown": "This dashboard shows data collected by the ossec-rootkit pack from osquery."
+                    }, 
+                    "title": "Info OSSEC rootkit [Filebeat Osquery] ECS", 
+                    "type": "markdown"
+                }
+            }, 
+            "id": "6ec10290-f4aa-11e7-8647-534bb4c21040-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-08T19:30:49.785Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
+                "title": "Number of rootkits found [Filebeat Osquery] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Rootkits", 
+                                "field": "osquery.result.name"
+                            }, 
+                            "schema": "metric", 
+                            "type": "cardinality"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": false, 
+                        "addTooltip": true, 
+                        "metric": {
+                            "colorSchema": "Green to Red", 
+                            "colorsRange": [
+                                {
+                                    "from": 0, 
+                                    "to": 10000
+                                }
+                            ], 
+                            "invertColors": false, 
+                            "labels": {
+                                "show": true
+                            }, 
+                            "metricColorMode": "None", 
+                            "percentageMode": false, 
+                            "style": {
+                                "bgColor": false, 
+                                "bgFill": "#000", 
+                                "fontSize": 40, 
+                                "labelColor": false, 
+                                "subText": ""
+                            }, 
+                            "useRanges": false
+                        }, 
+                        "type": "metric"
+                    }, 
+                    "title": "Number of rootkits found [Filebeat Osquery] ECS", 
+                    "type": "metric"
+                }
+            }, 
+            "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-08T19:40:05.060Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
+                "title": "Number of hosts infected [Filebeat Osquery] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Hosts", 
+                                "field": "agent.hostname"
+                            }, 
+                            "schema": "metric", 
+                            "type": "cardinality"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": false, 
+                        "addTooltip": true, 
+                        "metric": {
+                            "colorSchema": "Green to Red", 
+                            "colorsRange": [
+                                {
+                                    "from": 0, 
+                                    "to": 10000
+                                }
+                            ], 
+                            "invertColors": false, 
+                            "labels": {
+                                "show": true
+                            }, 
+                            "metricColorMode": "None", 
+                            "percentageMode": false, 
+                            "style": {
+                                "bgColor": false, 
+                                "bgFill": "#000", 
+                                "fontSize": 40, 
+                                "labelColor": false, 
+                                "subText": ""
+                            }, 
+                            "useRanges": false
+                        }, 
+                        "type": "metric"
+                    }, 
+                    "title": "Number of hosts infected [Filebeat Osquery] ECS", 
+                    "type": "metric"
+                }
+            }, 
+            "id": "ab587180-f4a9-11e7-8647-534bb4c21040-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-08T19:39:45.085Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Navigation [Filebeat Osquery] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "fontSize": 10, 
+                        "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs)"
+                    }, 
+                    "title": "Navigation [Filebeat Osquery] ECS", 
+                    "type": "markdown"
+                }
+            }, 
+            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-08T19:41:10.264Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "osquery.result.name", 
+                    "osquery.result.columns.path", 
+                    "agent.hostname"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "query", 
+                                    "negate": false, 
+                                    "type": "custom", 
+                                    "value": "{\"prefix\":{\"osquery.result.name\":\"pack_ossec-rootkit\"}}"
+                                }, 
+                                "query": {
+                                    "prefix": {
+                                        "osquery.result.name": "pack_ossec-rootkit"
+                                    }
+                                }
+                            }, 
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "event.module", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "osquery", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "osquery"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "event.module": {
+                                            "query": "osquery", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }, 
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "fileset.name", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "result", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "result"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "fileset.name": {
+                                            "query": "result", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "filebeat-*", 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "OSSEC Rootkits [Filebeat Osquery] ECS", 
+                "version": 1
+            }, 
+            "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
+            "type": "search", 
+            "updated_at": "2018-01-08T19:38:24.483Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "This dashboard shows data collected by the OSSEC rootkit pack from osquery", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false, 
+                    "hidePanelTitles": false, 
+                    "useMargins": true
+                }, 
+                "panelsJSON": [
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "1", 
+                            "w": 4, 
+                            "x": 8, 
+                            "y": 1
+                        }, 
+                        "id": "6ec10290-f4aa-11e7-8647-534bb4c21040-ecs", 
+                        "panelIndex": "1", 
+                        "type": "visualization", 
+                        "version": "6.1.0-SNAPSHOT"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "2", 
+                            "w": 4, 
+                            "x": 4, 
+                            "y": 1
+                        }, 
+                        "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040-ecs", 
+                        "panelIndex": "2", 
+                        "type": "visualization", 
+                        "version": "6.1.0-SNAPSHOT"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "3", 
+                            "w": 4, 
+                            "x": 0, 
+                            "y": 1
+                        }, 
+                        "id": "ab587180-f4a9-11e7-8647-534bb4c21040-ecs", 
+                        "panelIndex": "3", 
+                        "type": "visualization", 
+                        "version": "6.1.0-SNAPSHOT"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 1, 
+                            "i": "4", 
+                            "w": 12, 
+                            "x": 0, 
+                            "y": 0
+                        }, 
+                        "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
+                        "panelIndex": "4", 
+                        "type": "visualization", 
+                        "version": "6.1.0-SNAPSHOT"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 4, 
+                            "i": "5", 
+                            "w": 12, 
+                            "x": 0, 
+                            "y": 3
+                        }, 
+                        "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
+                        "panelIndex": "5", 
+                        "type": "search", 
+                        "version": "6.1.0-SNAPSHOT"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Filebeat Osquery] OSSEC rootkit pack ECS", 
+                "uiStateJSON": {}, 
+                "version": 1
+            }, 
+            "id": "c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs", 
+            "type": "dashboard", 
+            "updated_at": "2018-01-08T19:40:16.304Z", 
+            "version": 6
+        }
+    ], 
+    "version": "6.1.0-SNAPSHOT"
+}

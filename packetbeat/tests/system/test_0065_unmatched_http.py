@@ -1,4 +1,4 @@
-from packetbeat import BaseTest
+from packetbeat import (BaseTest, TRANS_REQUIRED_FIELDS)
 
 
 def check_event(event, expected):
@@ -22,19 +22,22 @@ class Test(BaseTest):
         )
         self.run_packetbeat(pcap="http_unmatched.pcap",
                             debug_selectors=["http", "httpdetailed"])
-        objs = self.read_output()
+
+        # Due to the unmatched response this has event.end and not event.start.
+        fields = [v for v in TRANS_REQUIRED_FIELDS if v != 'event.start'] + ['event.end']
+        objs = self.read_output(required_fields=fields)
 
         assert len(objs) == 2
 
         check_event(objs[0], {
             "type": "http",
             "status": "Error",
-            "http.response.code": 404,
-            "notes": ["Unmatched response"]})
+            "http.response.status_code": 404,
+            "error.message": "Unmatched response"})
 
         check_event(objs[1], {
             "type": "http",
-            "http.response.code": 200,
+            "http.response.status_code": 200,
             "http.request.headers": {"content-length": 0},
             "status": "OK"})
 
@@ -57,4 +60,4 @@ class Test(BaseTest):
             "type": "http",
             "status": "Error",
             "query": "GET /something",
-            "notes": ["Unmatched request"]})
+            "error.message": "Unmatched request"})

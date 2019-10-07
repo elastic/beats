@@ -140,7 +140,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(config)
+	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,14 +151,18 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":          "gce",
-				"instance_id":       "3910564293633576924",
-				"instance_name":     "test-gce-dev",
-				"machine_type":      "projects/111111111111/machineTypes/f1-micro",
-				"availability_zone": "projects/111111111111/zones/us-east1-b",
-				"project_id":        "test-dev",
+		"cloud": common.MapStr{
+			"provider": "gcp",
+			"instance": common.MapStr{
+				"id":   "3910564293633576924",
+				"name": "test-gce-dev",
+			},
+			"machine": common.MapStr{
+				"type": "f1-micro",
+			},
+			"availability_zone": "us-east1-b",
+			"project": common.MapStr{
+				"id": "test-dev",
 			},
 		},
 	}

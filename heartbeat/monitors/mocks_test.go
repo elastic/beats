@@ -19,13 +19,23 @@ package monitors
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 	"testing"
 
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
+
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/go-lookslike"
+
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/hbtest"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 type MockBeatClient struct {
@@ -88,22 +98,58 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	return c, nil
 }
 
-func createMockJob(name string, cfg *common.Config) ([]Job, error) {
-	j := MakeSimpleJob(JobSettings{}, func() (common.MapStr, error) {
-		return common.MapStr{
-			"foo": "bar",
-		}, nil
+func mockEventMonitorValidator(id string) validator.Validator {
+	var idMatcher isdef.IsDef
+	if id == "" {
+		idMatcher = isdef.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
+	} else {
+		idMatcher = isdef.IsEqual(id)
+	}
+	return lookslike.Strict(lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"monitor": map[string]interface{}{
+				"id":          idMatcher,
+				"name":        "",
+				"type":        "test",
+				"duration.us": isdef.IsDuration,
+				"status":      "up",
+				"check_group": isdef.IsString,
+			},
+		}),
+		hbtest.SummaryChecks(1, 0),
+		lookslike.MustCompile(mockEventCustomFields()),
+	))
+}
+
+func mockEventCustomFields() map[string]interface{} {
+	return common.MapStr{"foo": "bar"}
+}
+
+func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
+	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
+		eventext.MergeEventFields(event, mockEventCustomFields())
+		return nil
 	})
 
-	return []Job{j}, nil
+	return []jobs.Job{j}, nil
 }
 
 func mockPluginBuilder() pluginBuilder {
-	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]Job, error) {
+	reg := monitoring.NewRegistry()
+
+	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]jobs.Job, int, error) {
+		// Declare a real config block with a required attr so we can see what happens when it doesn't work
+		unpacked := struct {
+			URLs []string `config:"urls" validate:"required"`
+		}{}
+		err := config.Unpack(&unpacked)
+		if err != nil {
+			return nil, 0, err
+		}
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
-		return j, err
-	}}
+		return j, 1, err
+	}, newPluginCountersRecorder("test", reg)}
 }
 
 func mockPluginsReg() *pluginsReg {
@@ -112,12 +158,50 @@ func mockPluginsReg() *pluginsReg {
 	return reg
 }
 
-func mockPluginConf(t *testing.T, schedule string, url string) *common.Config {
-	conf, err := common.NewConfigFrom(map[string]interface{}{
+func mockPluginConf(t *testing.T, id string, schedule string, url string) *common.Config {
+	confMap := map[string]interface{}{
 		"type":     "test",
 		"urls":     []string{url},
 		"schedule": schedule,
-	})
+	}
+
+	if id != "" {
+		confMap["id"] = id
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}
+
+// mockBadPluginConf returns a conf with an invalid plugin config.
+// This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
+func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
+	confMap := map[string]interface{}{
+		"type":        "test",
+		"notanoption": []string{"foo"},
+		"schedule":    schedule,
+	}
+
+	if id != "" {
+		confMap["id"] = id
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}
+
+// mockInvalidPlugin conf returns a config that invalid at the basic level of
+// what's expected in heartbeat, i.e. no type.
+func mockInvalidPluginConf(t *testing.T) *common.Config {
+	confMap := map[string]interface{}{
+		"hoeutnheou": "oueanthoue",
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf

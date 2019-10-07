@@ -4,7 +4,10 @@ from filebeat import BaseTest
 import os
 import codecs
 import time
+import base64
 import io
+import re
+import unittest
 from parameterized import parameterized
 
 """
@@ -14,6 +17,7 @@ Test Harvesters
 
 class Test(BaseTest):
 
+    @unittest.skip('flaky test https://github.com/elastic/beats/issues/12037')
     def test_close_renamed(self):
         """
         Checks that a file is closed when its renamed / rotated
@@ -75,6 +79,7 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 2
 
+    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/9214')
     def test_close_removed(self):
         """
         Checks that a file is closed if removed
@@ -788,12 +793,12 @@ class Test(BaseTest):
 
         logfile = self.working_dir + "/log/test.log"
 
-        with io.open(logfile, 'w', encoding="utf-16") as file:
+        with io.open(logfile, 'w', encoding="utf-16le") as file:
             file.write(u'hello world1')
             file.write(u"\n")
-        with io.open(logfile, 'a', encoding="utf-16") as file:
+        with io.open(logfile, 'a', encoding="utf-16le") as file:
             file.write(u"\U00012345=Ra")
-        with io.open(logfile, 'a', encoding="utf-16") as file:
+        with io.open(logfile, 'a', encoding="utf-16le") as file:
             file.write(u"\n")
             file.write(u"hello world2")
             file.write(u"\n")
@@ -818,3 +823,37 @@ class Test(BaseTest):
 
         output = self.read_output_json()
         assert output[2]["message"] == "hello world2"
+
+    def test_debug_reader(self):
+        """
+        Test that you can enable a debug reader.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        logfile = self.working_dir + "/log/test.log"
+
+        file = open(logfile, 'w', 0)
+        file.write("hello world1")
+        file.write("\n")
+        file.write("\x00\x00\x00\x00")
+        file.write("\n")
+        file.write("hello world2")
+        file.write("\n")
+        file.write("\x00\x00\x00\x00")
+        file.write("Hello World\n")
+        # Write some more data to hit the 16k min buffer size.
+        # Make it web safe.
+        file.write(base64.b64encode(os.urandom(16 * 1024)))
+        file.close()
+
+        filebeat = self.start_beat()
+
+        # 13 on unix, 14 on windows.
+        self.wait_until(lambda: self.log_contains(re.compile(
+            'Matching null byte found at offset (13|14)')), max_timeout=5)
+
+        filebeat.check_kill_and_wait()

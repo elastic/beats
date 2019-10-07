@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "action": "user_added",
+        "dataset": "user",
+        "kind": "event",
+        "module": "system"
+    },
+    "message": "New user elastic (UID: 1001, Groups: elastic,docker)",
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "audit": {
+            "user": {
+                "dir": "/home/elastic",
+                "gid": "1001",
+                "group": [
+                    {
+                        "gid": "1001",
+                        "name": "elastic"
+                    },
+                    {
+                        "gid": "1002",
+                        "name": "docker"
+                    }
+                ],
+                "name": "elastic",
+                "shell": "/bin/bash",
+                "uid": "1001"
+            }
+        }
+    },
+    "user": {
+        "entity_id": "FgDfgeDptvvfdX+L",
+        "id": "1001",
+        "name": "elastic"
+    }
+}

@@ -1,0 +1,10 @@
+{{ template "header" . }}
+winlogbeat.event_logs:
+  - name: Application
+    ignore_older: 72h
+
+  - name: System
+
+  - name: Security
+
+{{if not .Reference}}{{ template "elasticsearch_settings" . }}{{end}}

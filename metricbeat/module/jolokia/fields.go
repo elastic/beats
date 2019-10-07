@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "jolokia", Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "jolokia", asset.ModuleFieldsPri, AssetJolokia); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
-	return "eJxsj0FOBCEQRfec4oe1cwEWHsArGGMIVDPl0BShaoxze4NNTC/mLz/8l1cX3OgR8CVVbhwdYGyVAvzb0XgHZNI0uBtLC3h1ALBesUu+V3KAXmXYZ5K2cQnYYtXZDqoUlQLKRCuZcSsa8O5Vq3+Bv5p1/+GAjalmDX/wC1rc6Sw1Y48+QUPufTVPvI6sIZI0i9wUO9ngpKCfLkoZ3xz/P8VCzdb4bHGYnC/4DQAA//8Yw1wH"
+// AssetJolokia returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/jolokia.
+func AssetJolokia() string {
+	return "eJx8kFFOwzAQRP99ipG/6QX8wQG4AkLISjbptrbX8m5RensUkoARqPM5uzN6mhOudA+4SJIrRwcYW6IA/7I53gEj6dC4GksJeHYAsF+RZbwlcoCepdn7IGXiOWCKSVe3UaKoFDCv1UpmXGYNePWqyT/Bn82qf3PAxJRGDV/lJ5SYqYdaZfe6FjW51d35h2vTHsQgxSIXRSZrPChoqaI04oPj91Ocqdge7ik2km2dvHTtf0EewvyMdcnLQULWffxe6dDB8hkAAP//TGJ6CQ=="
 }

@@ -7,6 +7,7 @@ import argparse
 import json
 import csv
 import re
+import pdb
 import copy
 
 
@@ -87,6 +88,8 @@ def gather_dependencies(vendor_dirs, overrides=None):
 
 # Allow to skip files that could match the `LICENSE` pattern but does not have any license information.
 SKIP_FILES = [
+    # AWS lambda go defines that some part of the code is APLv2 and other on a MIT Modified license.
+    "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
 ]
 
 
@@ -100,6 +103,8 @@ def get_licenses(folder):
             licenses.append(filename)
         elif filename.startswith("APLv2"):  # gorhill/cronexpr
             licenses.append(filename)
+        elif filename in ("COPYING",):  # BurntSushi/toml
+            licenses.append(filename)
     return licenses
 
 
@@ -109,10 +114,14 @@ def has_license(folder):
 
     There are two cases accepted:
         * The folder contains a LICENSE
+        * The parent folder contains a LICENSE
         * The folder only contains subdirectories AND all these
           subdirectories contain a LICENSE
     """
+
     if len(get_licenses(folder)) > 0:
+        return True, ""
+    elif len(get_licenses(os.path.join(folder, os.pardir))) > 0:  # For go.opencensus.io.
         return True, ""
 
     for subdir in os.listdir(folder):
@@ -219,8 +228,10 @@ def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=Non
 
 
 APACHE2_LICENSE_TITLES = [
+    "Apache License 2.0",
     "Apache License Version 2.0",
     "Apache License, Version 2.0",
+    "licensed under the Apache 2.0 license",  # github.com/zmap/zcrypto
     re.sub(r"\s+", " ", """Apache License
     ==============
 
@@ -299,6 +310,10 @@ MPL_LICENSE_TITLES = [
     "Mozilla Public License, version 2.0"
 ]
 
+UNIVERSAL_PERMISSIVE_LICENSE_TITLES = [
+    "The Universal Permissive License (UPL), Version 1.0"
+]
+
 
 # return SPDX identifiers from https://spdx.org/licenses/
 def detect_license_summary(content):
@@ -323,6 +338,8 @@ def detect_license_summary(content):
         return "CC-BY-SA-4.0"
     if any(sentence in content[0:3000] for sentence in LGPL_3_LICENSE_TITLE):
         return "LGPL-3.0"
+    if any(sentence in content[0:1500] for sentence in UNIVERSAL_PERMISSIVE_LICENSE_TITLES):
+        return "UPL-1.0"
 
     return "UNKNOWN"
 
@@ -334,6 +351,7 @@ ACCEPTED_LICENSES = [
     "BSD-3-Clause",
     "BSD-2-Clause",
     "MPL-2.0",
+    "UPL-1.0",
 ]
 SKIP_NOTICE = []
 

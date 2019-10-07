@@ -19,11 +19,9 @@ package kafka
 
 import (
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/Shopify/sarama"
-	gometrics "github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -41,9 +39,6 @@ const (
 	defaultMaxWaitRetry = 60 * time.Second
 )
 
-var kafkaMetricsOnce sync.Once
-var kafkaMetricsRegistryInstance gometrics.Registry
-
 var debugf = logp.MakeDebug("kafka")
 
 var (
@@ -54,30 +49,19 @@ var (
 func init() {
 	sarama.Logger = kafkaLogger{}
 
-	reg := gometrics.NewPrefixedRegistry("libbeat.kafka.")
-
-	// Note: registers /debug/metrics handler for displaying all expvar counters
-	// TODO: enable
-	//exp.Exp(reg)
-
-	kafkaMetricsRegistryInstance = reg
-
 	outputs.RegisterType("kafka", makeKafka)
 }
 
-func kafkaMetricsRegistry() gometrics.Registry {
-	return kafkaMetricsRegistryInstance
-}
-
 func makeKafka(
+	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
 ) (outputs.Group, error) {
 	debugf("initialize kafka output")
 
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
+	config, err := readConfig(cfg)
+	if err != nil {
 		return outputs.Fail(err)
 	}
 
@@ -91,7 +75,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(&config)
+	libCfg, err := newSaramaConfig(config)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -106,7 +90,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.Beat, config.Key, topic, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, codec, libCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}

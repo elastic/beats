@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kibana"
 )
@@ -51,27 +52,37 @@ var (
 	}
 )
 
-type OverallMetrics struct {
-	Metrics map[string][][]uint64
-}
-
 func eventMapping(r mb.ReporterV2, content []byte) error {
+	var event mb.Event
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", kibana.ModuleName)
+
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Kibana Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Kibana Status API response")
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failure to apply stats schema"))
+		return errors.Wrap(err, "failure to apply status schema")
 	}
 
-	var event mb.Event
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", kibana.ModuleName)
+	// Set service ID
+	uuid, err := dataFields.GetValue("uuid")
+	if err != nil {
+		return elastic.MakeErrorForMissingField("uuid", elastic.Kibana)
+	}
+	event.RootFields.Put("service.id", uuid)
+	dataFields.Delete("uuid")
+
+	// Set service version
+	version, err := dataFields.GetValue("version.number")
+	if err != nil {
+		return elastic.MakeErrorForMissingField("version.number", elastic.Kibana)
+	}
+	event.RootFields.Put("service.version", version)
+	dataFields.Delete("version")
 
 	event.MetricSetFields = dataFields
 

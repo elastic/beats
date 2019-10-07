@@ -20,7 +20,6 @@ package server
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/helper/server/http"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -48,8 +47,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The http server metricset is beta")
-
 	config := defaultHttpServerConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -68,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Run method provides the Graphite server with a reporter with which events can be reported.
+// Run method provides the module with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	m.server.Start()

@@ -2,33 +2,24 @@
 [[securing-beats]]
 == Configure {beatname_uc} to use {security}
 
+[subs="attributes"]
 ++++
 <titleabbrev>Use {security}</titleabbrev>
 ++++
 
 If you want {beatname_uc} to connect to a cluster that has
-{securitydoc}/elasticsearch-security.html[{security}] enabled, there are extra
+{stack-ov}/elasticsearch-security.html[{security}] enabled, there are extra
 configuration steps:
+
+. <<feature-roles>>.
++
+You can use role-based access control to grant {beatname_uc} users access to
+secured resources. 
 
 . <<beats-basic-auth>>.
 +
-ifeval::["{beatname_lc}"=="filebeat"]
-To send data to a secured cluster through the `elasticsearch` output,
-{beatname_uc} needs to authenticate as a user who can manage index templates,
-monitor the cluster, create indices, read and write to the indices
-it creates, and manage ingest pipelines. 
-endif::[]
-ifeval::["{beatname_lc}"!="filebeat"]
-To send data to a secured cluster through the `elasticsearch` output,
-{beatname_uc} needs to authenticate as a user who can manage index templates,
-monitor the cluster, create indices, and read and write to the indices
-it creates. 
-endif::[]
-
-. <<beats-user-access>>.
-+
-To search the indexed {beatname_uc} data and visualize it in {kib}, users need
-access to the indices {beatname_uc} creates.
+To interact with a secured cluster, {beatname_uc} must either provide basic
+authentication credentials or present a client certificate.
 
 . <<beats-tls>>.
 +
@@ -44,40 +35,9 @@ password, set it up now.
 For more information about {security}, see
 {xpack-ref}/elasticsearch-security.html[Securing the {stack}].
 
-[float]
-=== {beatname_uc} features that require authorization
-
-After securing {beatname_uc}, make sure your users have the roles (or associated
-privileges) required to use these {beatname_uc} features. You must create the
-++{beat_default_index_prefix}_writer++ and
-++{beat_default_index_prefix}_reader++ roles (see <<beats-basic-auth>> and
-<<beats-user-access>>).
-ifdef::has_ml_jobs[]
-The `machine_learning_admin` and `kibana_user` roles are {xpack-ref}/built-in-roles.html[built-in].
-endif::[]
-ifndef::has_ml_jobs[]
-The `kibana_user` role is {xpack-ref}/built-in-roles.html[built-in].
-endif::[]
-
-[options="header"]
-|=======
-|Feature | Role
-|Send data to a secured cluster   | ++{beat_default_index_prefix}_writer++
-ifeval::["{beatname_lc}"=="filebeat"]
-|Run Filebeat modules | ++{beat_default_index_prefix}_writer++
-endif::[]
-|Load index templates | ++{beat_default_index_prefix}_writer++ and `kibana_user`
-|Load {beatname_uc} dashboards into {kib} | ++{beat_default_index_prefix}_writer++ and `kibana_user`
-ifdef::has_ml_jobs[]
-|Load machine learning jobs | `machine_learning_admin`
-endif::[]
-|Read indices created by {beatname_uc} | ++{beat_default_index_prefix}_reader++ 
-|View {beatname_uc} dashboards in {kib} | `kibana_user`
-|=======
+include::users.asciidoc[]
 
 include::basic-auth.asciidoc[]
-
-include::user-access.asciidoc[]
 
 include::tls.asciidoc[]
 

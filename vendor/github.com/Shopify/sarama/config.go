@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/rcrowley/go-metrics"
+	"golang.org/x/net/proxy"
 )
 
 const defaultClientID = "sarama"
@@ -54,13 +55,31 @@ type Config struct {
 			// Whether or not to use SASL authentication when connecting to the broker
 			// (defaults to false).
 			Enable bool
+			// SASLMechanism is the name of the enabled SASL mechanism.
+			// Possible values: OAUTHBEARER, PLAIN (defaults to PLAIN).
+			Mechanism SASLMechanism
+			// Version is the SASL Protocol Version to use
+			// Kafka > 1.x should use V1, except on Azure EventHub which use V0
+			Version int16
 			// Whether or not to send the Kafka SASL handshake first if enabled
 			// (defaults to true). You should only set this to false if you're using
 			// a non-Kafka SASL proxy.
 			Handshake bool
-			//username and password for SASL/PLAIN authentication
+			//username and password for SASL/PLAIN  or SASL/SCRAM authentication
 			User     string
 			Password string
+			// authz id used for SASL/SCRAM authentication
+			SCRAMAuthzID string
+			// SCRAMClientGeneratorFunc is a generator of a user provided implementation of a SCRAM
+			// client used to perform the SCRAM exchange with the server.
+			SCRAMClientGeneratorFunc func() SCRAMClient
+			// TokenProvider is a user-defined callback for generating
+			// access tokens for SASL/OAUTHBEARER auth. See the
+			// AccessTokenProvider interface docs for proper implementation
+			// guidelines.
+			TokenProvider AccessTokenProvider
+
+			GSSAPI GSSAPIConfig
 		}
 
 		// KeepAlive specifies the keep-alive period for an active network connection.
@@ -72,6 +91,14 @@ type Config struct {
 		// network being dialed.
 		// If nil, a local address is automatically chosen.
 		LocalAddr net.Addr
+
+		Proxy struct {
+			// Whether or not to use proxy when connecting to the broker
+			// (defaults to false).
+			Enable bool
+			// The proxy dialer to use enabled (defaults to nil).
+			Dialer proxy.Dialer
+		}
 	}
 
 	// Metadata is the namespace for metadata management properties used by the
@@ -84,6 +111,10 @@ type Config struct {
 			// How long to wait for leader election to occur before retrying
 			// (default 250ms). Similar to the JVM's `retry.backoff.ms`.
 			Backoff time.Duration
+			// Called to compute backoff time dynamically. Useful for implementing
+			// more sophisticated backoff strategies. This takes precedence over
+			// `Backoff` if set.
+			BackoffFunc func(retries, maxRetries int) time.Duration
 		}
 		// How frequently to refresh the cluster metadata in the background.
 		// Defaults to 10 minutes. Set to 0 to disable. Similar to
@@ -95,6 +126,13 @@ type Config struct {
 		// and usually more convenient, but can take up a substantial amount of
 		// memory if you have many topics and partitions. Defaults to true.
 		Full bool
+
+		// How long to wait for a successful metadata response.
+		// Disabled by default which means a metadata request against an unreachable
+		// cluster (all brokers are unreachable or unresponsive) can take up to
+		// `Net.[Dial|Read]Timeout * BrokerCount * (Metadata.Retry.Max + 1) + Metadata.Retry.Backoff * Metadata.Retry.Max`
+		// to fail.
+		Timeout time.Duration
 	}
 
 	// Producer is the namespace for configuration related to producing messages,
@@ -124,6 +162,9 @@ type Config struct {
 		// (defaults to hashing the message key). Similar to the `partitioner.class`
 		// setting for the JVM producer.
 		Partitioner PartitionerConstructor
+		// If enabled, the producer will ensure that exactly one copy of each message is
+		// written.
+		Idempotent bool
 
 		// Return specifies what channels will be populated. If they are set to true,
 		// you must read from the respective channels to prevent deadlock. If,
@@ -168,23 +209,72 @@ type Config struct {
 			// (default 100ms). Similar to the `retry.backoff.ms` setting of the
 			// JVM producer.
 			Backoff time.Duration
+			// Called to compute backoff time dynamically. Useful for implementing
+			// more sophisticated backoff strategies. This takes precedence over
+			// `Backoff` if set.
+			BackoffFunc func(retries, maxRetries int) time.Duration
 		}
 	}
 
 	// Consumer is the namespace for configuration related to consuming messages,
 	// used by the Consumer.
-	//
-	// Note that Sarama's Consumer type does not currently support automatic
-	// consumer-group rebalancing and offset tracking.  For Zookeeper-based
-	// tracking (Kafka 0.8.2 and earlier), the https://github.com/wvanbergen/kafka
-	// library builds on Sarama to add this support. For Kafka-based tracking
-	// (Kafka 0.9 and later), the https://github.com/bsm/sarama-cluster library
-	// builds on Sarama to add this support.
 	Consumer struct {
+
+		// Group is the namespace for configuring consumer group.
+		Group struct {
+			Session struct {
+				// The timeout used to detect consumer failures when using Kafka's group management facility.
+				// The consumer sends periodic heartbeats to indicate its liveness to the broker.
+				// If no heartbeats are received by the broker before the expiration of this session timeout,
+				// then the broker will remove this consumer from the group and initiate a rebalance.
+				// Note that the value must be in the allowable range as configured in the broker configuration
+				// by `group.min.session.timeout.ms` and `group.max.session.timeout.ms` (default 10s)
+				Timeout time.Duration
+			}
+			Heartbeat struct {
+				// The expected time between heartbeats to the consumer coordinator when using Kafka's group
+				// management facilities. Heartbeats are used to ensure that the consumer's session stays active and
+				// to facilitate rebalancing when new consumers join or leave the group.
+				// The value must be set lower than Consumer.Group.Session.Timeout, but typically should be set no
+				// higher than 1/3 of that value.
+				// It can be adjusted even lower to control the expected time for normal rebalances (default 3s)
+				Interval time.Duration
+			}
+			Rebalance struct {
+				// Strategy for allocating topic partitions to members (default BalanceStrategyRange)
+				Strategy BalanceStrategy
+				// The maximum allowed time for each worker to join the group once a rebalance has begun.
+				// This is basically a limit on the amount of time needed for all tasks to flush any pending
+				// data and commit offsets. If the timeout is exceeded, then the worker will be removed from
+				// the group, which will cause offset commit failures (default 60s).
+				Timeout time.Duration
+
+				Retry struct {
+					// When a new consumer joins a consumer group the set of consumers attempt to "rebalance"
+					// the load to assign partitions to each consumer. If the set of consumers changes while
+					// this assignment is taking place the rebalance will fail and retry. This setting controls
+					// the maximum number of attempts before giving up (default 4).
+					Max int
+					// Backoff time between retries during rebalance (default 2s)
+					Backoff time.Duration
+				}
+			}
+			Member struct {
+				// Custom metadata to include when joining the group. The user data for all joined members
+				// can be retrieved by sending a DescribeGroupRequest to the broker that is the
+				// coordinator for the group.
+				UserData []byte
+			}
+		}
+
 		Retry struct {
 			// How long to wait after a failing to read from a partition before
 			// trying again (default 2s).
 			Backoff time.Duration
+			// Called to compute backoff time dynamically. Useful for implementing
+			// more sophisticated backoff strategies. This takes precedence over
+			// `Backoff` if set.
+			BackoffFunc func(retries int) time.Duration
 		}
 
 		// Fetch is the namespace for controlling how many bytes are retrieved by any
@@ -269,6 +359,11 @@ type Config struct {
 				Max int
 			}
 		}
+
+		// IsolationLevel support 2 mode:
+		// 	- use `ReadUncommitted` (default) to consume and return all messages in message channel
+		//	- use `ReadCommitted` to hide messages that are part of an aborted transaction
+		IsolationLevel IsolationLevel
 	}
 
 	// A user-provided string sent with every request to the brokers for logging,
@@ -306,6 +401,7 @@ func NewConfig() *Config {
 	c.Net.ReadTimeout = 30 * time.Second
 	c.Net.WriteTimeout = 30 * time.Second
 	c.Net.SASL.Handshake = true
+	c.Net.SASL.Version = SASLHandshakeV0
 
 	c.Metadata.Retry.Max = 3
 	c.Metadata.Retry.Backoff = 250 * time.Millisecond
@@ -331,6 +427,13 @@ func NewConfig() *Config {
 	c.Consumer.Offsets.Initial = OffsetNewest
 	c.Consumer.Offsets.Retry.Max = 3
 
+	c.Consumer.Group.Session.Timeout = 10 * time.Second
+	c.Consumer.Group.Heartbeat.Interval = 3 * time.Second
+	c.Consumer.Group.Rebalance.Strategy = BalanceStrategyRange
+	c.Consumer.Group.Rebalance.Timeout = 60 * time.Second
+	c.Consumer.Group.Rebalance.Retry.Max = 4
+	c.Consumer.Group.Rebalance.Retry.Backoff = 2 * time.Second
+
 	c.ClientID = defaultClientID
 	c.ChannelBufferSize = 256
 	c.Version = MinVersion
@@ -343,10 +446,10 @@ func NewConfig() *Config {
 // ConfigurationError if the specified values don't make sense.
 func (c *Config) Validate() error {
 	// some configuration values should be warned on but not fail completely, do those first
-	if c.Net.TLS.Enable == false && c.Net.TLS.Config != nil {
+	if !c.Net.TLS.Enable && c.Net.TLS.Config != nil {
 		Logger.Println("Net.TLS is disabled but a non-nil configuration was provided.")
 	}
-	if c.Net.SASL.Enable == false {
+	if !c.Net.SASL.Enable {
 		if c.Net.SASL.User != "" {
 			Logger.Println("Net.SASL is disabled but a non-empty username was provided.")
 		}
@@ -378,6 +481,15 @@ func (c *Config) Validate() error {
 	if c.Consumer.Offsets.Retention%time.Millisecond != 0 {
 		Logger.Println("Consumer.Offsets.Retention only supports millisecond precision; nanoseconds will be truncated.")
 	}
+	if c.Consumer.Group.Session.Timeout%time.Millisecond != 0 {
+		Logger.Println("Consumer.Group.Session.Timeout only supports millisecond precision; nanoseconds will be truncated.")
+	}
+	if c.Consumer.Group.Heartbeat.Interval%time.Millisecond != 0 {
+		Logger.Println("Consumer.Group.Heartbeat.Interval only supports millisecond precision; nanoseconds will be truncated.")
+	}
+	if c.Consumer.Group.Rebalance.Timeout%time.Millisecond != 0 {
+		Logger.Println("Consumer.Group.Rebalance.Timeout only supports millisecond precision; nanoseconds will be truncated.")
+	}
 	if c.ClientID == defaultClientID {
 		Logger.Println("ClientID is the default of 'sarama', you should consider setting it to something application-specific.")
 	}
@@ -394,10 +506,65 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Net.WriteTimeout must be > 0")
 	case c.Net.KeepAlive < 0:
 		return ConfigurationError("Net.KeepAlive must be >= 0")
-	case c.Net.SASL.Enable == true && c.Net.SASL.User == "":
-		return ConfigurationError("Net.SASL.User must not be empty when SASL is enabled")
-	case c.Net.SASL.Enable == true && c.Net.SASL.Password == "":
-		return ConfigurationError("Net.SASL.Password must not be empty when SASL is enabled")
+	case c.Net.SASL.Enable:
+		if c.Net.SASL.Mechanism == "" {
+			c.Net.SASL.Mechanism = SASLTypePlaintext
+		}
+
+		switch c.Net.SASL.Mechanism {
+		case SASLTypePlaintext:
+			if c.Net.SASL.User == "" {
+				return ConfigurationError("Net.SASL.User must not be empty when SASL is enabled")
+			}
+			if c.Net.SASL.Password == "" {
+				return ConfigurationError("Net.SASL.Password must not be empty when SASL is enabled")
+			}
+		case SASLTypeOAuth:
+			if c.Net.SASL.TokenProvider == nil {
+				return ConfigurationError("An AccessTokenProvider instance must be provided to Net.SASL.TokenProvider")
+			}
+		case SASLTypeSCRAMSHA256, SASLTypeSCRAMSHA512:
+			if c.Net.SASL.User == "" {
+				return ConfigurationError("Net.SASL.User must not be empty when SASL is enabled")
+			}
+			if c.Net.SASL.Password == "" {
+				return ConfigurationError("Net.SASL.Password must not be empty when SASL is enabled")
+			}
+			if c.Net.SASL.SCRAMClientGeneratorFunc == nil {
+				return ConfigurationError("A SCRAMClientGeneratorFunc function must be provided to Net.SASL.SCRAMClientGeneratorFunc")
+			}
+		case SASLTypeGSSAPI:
+			if c.Net.SASL.GSSAPI.ServiceName == "" {
+				return ConfigurationError("Net.SASL.GSSAPI.ServiceName must not be empty when GSS-API mechanism is used")
+			}
+
+			if c.Net.SASL.GSSAPI.AuthType == KRB5_USER_AUTH {
+				if c.Net.SASL.GSSAPI.Password == "" {
+					return ConfigurationError("Net.SASL.GSSAPI.Password must not be empty when GSS-API " +
+						"mechanism is used and Net.SASL.GSSAPI.AuthType = KRB5_USER_AUTH")
+				}
+			} else if c.Net.SASL.GSSAPI.AuthType == KRB5_KEYTAB_AUTH {
+				if c.Net.SASL.GSSAPI.KeyTabPath == "" {
+					return ConfigurationError("Net.SASL.GSSAPI.KeyTabPath must not be empty when GSS-API mechanism is used" +
+						" and  Net.SASL.GSSAPI.AuthType = KRB5_KEYTAB_AUTH")
+				}
+			} else {
+				return ConfigurationError("Net.SASL.GSSAPI.AuthType is invalid. Possible values are KRB5_USER_AUTH and KRB5_KEYTAB_AUTH")
+			}
+			if c.Net.SASL.GSSAPI.KerberosConfigPath == "" {
+				return ConfigurationError("Net.SASL.GSSAPI.KerberosConfigPath must not be empty when GSS-API mechanism is used")
+			}
+			if c.Net.SASL.GSSAPI.Username == "" {
+				return ConfigurationError("Net.SASL.GSSAPI.Username must not be empty when GSS-API mechanism is used")
+			}
+			if c.Net.SASL.GSSAPI.Realm == "" {
+				return ConfigurationError("Net.SASL.GSSAPI.Realm must not be empty when GSS-API mechanism is used")
+			}
+		default:
+			msg := fmt.Sprintf("The SASL mechanism configuration is invalid. Possible values are `%s`, `%s`, `%s`, `%s` and `%s`",
+				SASLTypeOAuth, SASLTypePlaintext, SASLTypeSCRAMSHA256, SASLTypeSCRAMSHA512, SASLTypeGSSAPI)
+			return ConfigurationError(msg)
+		}
 	}
 
 	// validate the Admin values
@@ -454,6 +621,21 @@ func (c *Config) Validate() error {
 		}
 	}
 
+	if c.Producer.Idempotent {
+		if !c.Version.IsAtLeast(V0_11_0_0) {
+			return ConfigurationError("Idempotent producer requires Version >= V0_11_0_0")
+		}
+		if c.Producer.Retry.Max == 0 {
+			return ConfigurationError("Idempotent producer requires Producer.Retry.Max >= 1")
+		}
+		if c.Producer.RequiredAcks != WaitForAll {
+			return ConfigurationError("Idempotent producer requires Producer.RequiredAcks to be WaitForAll")
+		}
+		if c.Net.MaxOpenRequests > 1 {
+			return ConfigurationError("Idempotent producer requires Net.MaxOpenRequests to be 1")
+		}
+	}
+
 	// validate the Consumer values
 	switch {
 	case c.Consumer.Fetch.Min <= 0:
@@ -474,6 +656,31 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Consumer.Offsets.Initial must be OffsetOldest or OffsetNewest")
 	case c.Consumer.Offsets.Retry.Max < 0:
 		return ConfigurationError("Consumer.Offsets.Retry.Max must be >= 0")
+	case c.Consumer.IsolationLevel != ReadUncommitted && c.Consumer.IsolationLevel != ReadCommitted:
+		return ConfigurationError("Consumer.IsolationLevel must be ReadUncommitted or ReadCommitted")
+	}
+
+	// validate IsolationLevel
+	if c.Consumer.IsolationLevel == ReadCommitted && !c.Version.IsAtLeast(V0_11_0_0) {
+		return ConfigurationError("ReadCommitted requires Version >= V0_11_0_0")
+	}
+
+	// validate the Consumer Group values
+	switch {
+	case c.Consumer.Group.Session.Timeout <= 2*time.Millisecond:
+		return ConfigurationError("Consumer.Group.Session.Timeout must be >= 2ms")
+	case c.Consumer.Group.Heartbeat.Interval < 1*time.Millisecond:
+		return ConfigurationError("Consumer.Group.Heartbeat.Interval must be >= 1ms")
+	case c.Consumer.Group.Heartbeat.Interval >= c.Consumer.Group.Session.Timeout:
+		return ConfigurationError("Consumer.Group.Heartbeat.Interval must be < Consumer.Group.Session.Timeout")
+	case c.Consumer.Group.Rebalance.Strategy == nil:
+		return ConfigurationError("Consumer.Group.Rebalance.Strategy must not be empty")
+	case c.Consumer.Group.Rebalance.Timeout <= time.Millisecond:
+		return ConfigurationError("Consumer.Group.Rebalance.Timeout must be >= 1ms")
+	case c.Consumer.Group.Rebalance.Retry.Max < 0:
+		return ConfigurationError("Consumer.Group.Rebalance.Retry.Max must be >= 0")
+	case c.Consumer.Group.Rebalance.Retry.Backoff < 0:
+		return ConfigurationError("Consumer.Group.Rebalance.Retry.Backoff must be >= 0")
 	}
 
 	// validate misc shared values

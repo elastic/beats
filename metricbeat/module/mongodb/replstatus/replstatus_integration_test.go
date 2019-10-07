@@ -34,20 +34,22 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "mongodb")
+	service := compose.EnsureUp(t, "mongodb")
 
-	err := initiateReplicaSet(t)
+	err := initiateReplicaSet(t, service.Host())
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 
 	// Check event fields
 	oplog := event["oplog"].(common.MapStr)
@@ -73,25 +75,24 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "mongodb")
+	service := compose.EnsureUp(t, "mongodb")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mongodb",
 		"metricsets": []string{"replstatus"},
-		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
+		"hosts":      []string{host},
 	}
 }
 
-func initiateReplicaSet(t *testing.T) error {
-	url := getConfig()["hosts"].([]string)[0]
+func initiateReplicaSet(t *testing.T, host string) error {
+	url := host
 
 	dialInfo, err := mgo.ParseURL(url)
 	if err != nil {

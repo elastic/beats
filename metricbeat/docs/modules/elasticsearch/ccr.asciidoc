@@ -1,11 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-elasticsearch-ccr]]
 === Elasticsearch ccr metricset
-
-beta[]
 
 include::../../../module/elasticsearch/ccr/_meta/docs.asciidoc[]
 

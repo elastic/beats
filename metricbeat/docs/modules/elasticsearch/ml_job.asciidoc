@@ -1,11 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-elasticsearch-ml_job]]
 === Elasticsearch ml_job metricset
-
-beta[]
 
 include::../../../module/elasticsearch/ml_job/_meta/docs.asciidoc[]
 

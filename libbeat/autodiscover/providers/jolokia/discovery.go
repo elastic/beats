@@ -24,6 +24,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -72,15 +73,19 @@ var messageSchema = s.Schema{
 
 // Event is a Jolokia Discovery event
 type Event struct {
-	Type    string
-	Message common.MapStr
+	ProviderUUID uuid.UUID
+	Type         string
+	AgentID      string
+	Message      common.MapStr
 }
 
 // BusEvent converts a Jolokia Discovery event to a autodiscover bus event
 func (e *Event) BusEvent() bus.Event {
 	event := bus.Event{
-		e.Type:    true,
-		"jolokia": e.Message,
+		e.Type:     true,
+		"provider": e.ProviderUUID,
+		"id":       e.AgentID,
+		"jolokia":  e.Message,
 		"meta": common.MapStr{
 			"jolokia": e.Message,
 		},
@@ -93,12 +98,15 @@ func (e *Event) BusEvent() bus.Event {
 type Instance struct {
 	LastSeen      time.Time
 	LastInterface *InterfaceConfig
+	AgentID       string
 	Message       common.MapStr
 }
 
 // Discovery controls the Jolokia Discovery probes
 type Discovery struct {
 	sync.Mutex
+
+	ProviderUUID uuid.UUID
 
 	Interfaces []InterfaceConfig
 
@@ -192,7 +200,7 @@ var queryMessage = []byte(`{"type":"query"}`)
 func (d *Discovery) sendProbe(config InterfaceConfig) {
 	interfaces, err := d.interfaces(config.Name)
 	if err != nil {
-		logp.Err("failed to get interfaces: ", err)
+		logp.Err("failed to get interfaces: %+v", err)
 		return
 	}
 
@@ -281,9 +289,9 @@ func (d *Discovery) update(config InterfaceConfig, message common.MapStr) {
 	defer d.Unlock()
 	i, found := d.instances[agentID]
 	if !found {
-		i = &Instance{Message: message}
+		i = &Instance{Message: message, AgentID: agentID}
 		d.instances[agentID] = i
-		d.events <- Event{"start", message}
+		d.events <- Event{d.ProviderUUID, "start", agentID, message}
 	}
 	i.LastSeen = time.Now()
 	i.LastInterface = &config
@@ -295,7 +303,7 @@ func (d *Discovery) checkStopped() {
 
 	for id, i := range d.instances {
 		if time.Since(i.LastSeen) > i.LastInterface.GracePeriod {
-			d.events <- Event{"stop", i.Message}
+			d.events <- Event{d.ProviderUUID, "stop", i.AgentID, i.Message}
 			delete(d.instances, id)
 		}
 	}

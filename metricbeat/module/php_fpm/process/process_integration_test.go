@@ -20,44 +20,34 @@
 package process
 
 import (
-	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "phpfpm")
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
+func TestFetch(t *testing.T) {
+	service := compose.EnsureUp(t, "phpfpm")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
 	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("php_fpm", "process").Fields.StringToPrint())
+
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "php_fpm",
 		"metricsets": []string{"process"},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":      []string{host},
 	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("PHPFPM_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("PHPFPM_PORT")
-
-	if len(port) == 0 {
-		port = "81"
-	}
-	return port
 }

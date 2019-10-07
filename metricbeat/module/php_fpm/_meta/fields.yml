@@ -1,11 +1,9 @@
 - key: php_fpm
   title: "PHP_FPM"
   description: >
-    beta[]
-
     PHP-FPM server status metrics collected from PHP-FPM.
   short_config: false
-  release: beta
+  release: ga
   settings: ["ssl", "http"]
   fields:
     - name: php_fpm
@@ -18,7 +16,6 @@
           type: group
           description: >
             `pool` contains the metrics that were obtained from the PHP-FPM process pool.
-          release: beta
           fields:
             - name: name
               type: keyword

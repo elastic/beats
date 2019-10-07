@@ -21,14 +21,17 @@ import (
 	"testing"
 	"time"
 
-	v1 "github.com/ericchiang/k8s/apis/core/v1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -145,6 +148,7 @@ func TestGenerateHints(t *testing.T) {
 
 	p := Provider{
 		config: cfg,
+		logger: logp.NewLogger("kubernetes"),
 	}
 	for _, test := range tests {
 		assert.Equal(t, p.generateHints(test.event), test.result)
@@ -156,8 +160,15 @@ func TestEmitEvent(t *testing.T) {
 	namespace := "default"
 	podIP := "127.0.0.1"
 	containerID := "docker://foobar"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	containerImage := "elastic/filebeat:6.3.0"
 	node := "node"
+	cid := "005f3b90-4b9d-12f8-acf0-31020a840133.filebeat"
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	tests := []struct {
 		Message  string
 		Flag     string
@@ -167,35 +178,38 @@ func TestEmitEvent(t *testing.T) {
 		{
 			Message: "Test common pod start",
 			Flag:    "start",
-			Pod: &v1.Pod{
-				Metadata: &metav1.ObjectMeta{
-					Name:        &name,
-					Namespace:   &namespace,
+			Pod: &kubernetes.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: &v1.PodStatus{
-					PodIP: &podIP,
-					ContainerStatuses: []*kubernetes.PodContainerStatus{
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name:        &name,
-							ContainerID: &containerID,
+							Name:        name,
+							ContainerID: containerID,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &node,
-					Containers: []*kubernetes.Container{
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
 						{
-							Image: &containerImage,
-							Name:  &name,
+							Image: containerImage,
+							Name:  name,
 						},
 					},
 				},
 			},
 			Expected: bus.Event{
-				"start": true,
-				"host":  "127.0.0.1",
+				"start":    true,
+				"host":     "127.0.0.1",
+				"id":       cid,
+				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "foobar",
@@ -205,6 +219,7 @@ func TestEmitEvent(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "filebeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
 					"node": common.MapStr{
 						"name": "node",
@@ -216,78 +231,252 @@ func TestEmitEvent(t *testing.T) {
 					"kubernetes": common.MapStr{
 						"namespace": "default",
 						"container": common.MapStr{
-							"name": "filebeat",
+							"name":  "filebeat",
+							"image": "elastic/filebeat:6.3.0",
 						}, "pod": common.MapStr{
 							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 						}, "node": common.MapStr{
 							"name": "node",
 						},
 					},
 				},
+				"config": []*common.Config{},
 			},
 		},
 		{
 			Message: "Test pod without host",
 			Flag:    "start",
 			Pod: &v1.Pod{
-				Metadata: &metav1.ObjectMeta{
-					Name:        &name,
-					Namespace:   &namespace,
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: &v1.PodStatus{
-					ContainerStatuses: []*kubernetes.PodContainerStatus{
+				Status: v1.PodStatus{
+					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name:        &name,
-							ContainerID: &containerID,
+							Name:        name,
+							ContainerID: containerID,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &node,
-					Containers: []*kubernetes.Container{
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
 						{
-							Image: &containerImage,
-							Name:  &name,
+							Image: containerImage,
+							Name:  name,
 						},
 					},
 				},
 			},
 			Expected: nil,
 		},
+		{
+			Message: "Test pod without container id",
+			Flag:    "start",
+			Pod: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name: name,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+						},
+					},
+				},
+			},
+			Expected: nil,
+		},
+		{
+			Message: "Test stop pod without host",
+			Flag:    "stop",
+			Pod: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				Status: v1.PodStatus{
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name: name,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"stop":     true,
+				"host":     "",
+				"id":       cid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"id":      "",
+						"name":    "filebeat",
+						"image":   "elastic/filebeat:6.3.0",
+						"runtime": "",
+					},
+					"pod": common.MapStr{
+						"name": "filebeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+					},
+					"node": common.MapStr{
+						"name": "node",
+					},
+					"namespace":   "default",
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": "default",
+						"container": common.MapStr{
+							"name":  "filebeat",
+							"image": "elastic/filebeat:6.3.0",
+						}, "pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						}, "node": common.MapStr{
+							"name": "node",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+		{
+			Message: "Test stop pod without container id",
+			Flag:    "stop",
+			Pod: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name: name,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"stop":     true,
+				"host":     "127.0.0.1",
+				"id":       cid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"id":      "",
+						"name":    "filebeat",
+						"image":   "elastic/filebeat:6.3.0",
+						"runtime": "",
+					},
+					"pod": common.MapStr{
+						"name": "filebeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+					},
+					"node": common.MapStr{
+						"name": "node",
+					},
+					"namespace":   "default",
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": "default",
+						"container": common.MapStr{
+							"name":  "filebeat",
+							"image": "elastic/filebeat:6.3.0",
+						}, "pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						}, "node": common.MapStr{
+							"name": "node",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
 	}
 
 	for _, test := range tests {
-		mapper, err := template.NewConfigMapper(nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		p := &Provider{
-			config:    defaultConfig(),
-			bus:       bus.New("test"),
-			metagen:   metaGen,
-			templates: mapper,
-		}
-
-		listener := p.bus.Subscribe()
-
-		p.emit(test.Pod, test.Flag)
-
-		select {
-		case event := <-listener.Events():
-			assert.Equal(t, test.Expected, event)
-		case <-time.After(2 * time.Second):
-			if test.Expected != nil {
-				t.Fatal("Timeout while waiting for event")
+		t.Run(test.Message, func(t *testing.T) {
+			mapper, err := template.NewConfigMapper(nil)
+			if err != nil {
+				t.Fatal(err)
 			}
-		}
+
+			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			p := &Provider{
+				config:    defaultConfig(),
+				bus:       bus.New("test"),
+				metagen:   metaGen,
+				templates: mapper,
+				uuid:      UUID,
+				logger:    logp.NewLogger("kubernetes"),
+			}
+
+			listener := p.bus.Subscribe()
+
+			p.emit(test.Pod, test.Flag)
+
+			select {
+			case event := <-listener.Events():
+				assert.Equal(t, test.Expected, event, test.Message)
+			case <-time.After(2 * time.Second):
+				if test.Expected != nil {
+					t.Fatal("Timeout while waiting for event")
+				}
+			}
+		})
 	}
 }
 

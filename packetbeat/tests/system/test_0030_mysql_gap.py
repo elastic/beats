@@ -25,6 +25,4 @@ class Test(BaseTest):
         assert o["method"] == "SELECT"
         assert o["mysql.num_rows"] > 1
 
-        print(o["notes"])
-        assert len(o["notes"]) == 1
-        assert o["notes"][0] == "Packet loss while capturing the response"
+        assert o["error.message"] == "Packet loss while capturing the response"

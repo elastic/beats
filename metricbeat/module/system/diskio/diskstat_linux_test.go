@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build !integration
 // +build linux
 
 package diskio
@@ -22,10 +23,10 @@ package diskio
 import (
 	"testing"
 
-	sigar "github.com/elastic/gosigar"
-
 	"github.com/shirou/gopsutil/disk"
 	"github.com/stretchr/testify/assert"
+
+	sigar "github.com/elastic/gosigar"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/system"
@@ -50,14 +51,9 @@ func TestDataNameFilter(t *testing.T) {
 		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
 	}
 
-	f := mbtest.NewEventsFetcher(t, conf)
-
-	if err := mbtest.WriteEvents(f, t); err != nil {
-		t.Fatal("write", err)
-	}
-
-	data, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
 	assert.Equal(t, 3, len(data))
 }
 
@@ -74,14 +70,9 @@ func TestDataEmptyFilter(t *testing.T) {
 		"metricsets": []string{"diskio"},
 	}
 
-	f := mbtest.NewEventsFetcher(t, conf)
-
-	if err := mbtest.WriteEvents(f, t); err != nil {
-		t.Fatal("write", err)
-	}
-
-	data, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
 	assert.Equal(t, 10, len(data))
 }
 
@@ -113,8 +104,8 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 		AvgReadAwaitTime:  1.2,
 		AvgWriteAwaitTime: 1,
 	}
-
-	got, err := stat.CalIOStatistics(counter)
+	var got DiskIOMetric
+	err := stat.CalIOStatistics(&got, counter)
 	if err != nil {
 		t.Fatal(err)
 	}

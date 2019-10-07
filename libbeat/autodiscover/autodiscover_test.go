@@ -23,12 +23,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/tests/resources"
 )
 
 type mockRunner struct {
@@ -134,10 +136,13 @@ func TestNilAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscover(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -173,7 +178,9 @@ func TestAutodiscover(t *testing.T) {
 
 	// Test start event
 	eventBus.Publish(bus.Event{
-		"start": true,
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
 		"meta": common.MapStr{
 			"foo": "bar",
 		},
@@ -182,14 +189,16 @@ func TestAutodiscover(t *testing.T) {
 
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 1)
-	assert.Equal(t, len(autodiscover.configs), 1)
+	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 
 	// Test update
 	eventBus.Publish(bus.Event{
-		"start": true,
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
 		"meta": common.MapStr{
 			"foo": "baz",
 		},
@@ -198,20 +207,24 @@ func TestAutodiscover(t *testing.T) {
 
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 1)
-	assert.Equal(t, len(autodiscover.configs), 1)
+	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "baz") // meta is updated
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 
 	// Test stop/start
 	eventBus.Publish(bus.Event{
-		"stop": true,
+		"id":       "foo",
+		"provider": "mock",
+		"stop":     true,
 		"meta": common.MapStr{
 			"foo": "baz",
 		},
 	})
 	eventBus.Publish(bus.Event{
-		"start": true,
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
 		"meta": common.MapStr{
 			"foo": "baz",
 		},
@@ -220,7 +233,7 @@ func TestAutodiscover(t *testing.T) {
 
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs), 1)
+	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
 	assert.True(t, runners[0].stopped)
 	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
 	assert.True(t, runners[1].started)
@@ -228,7 +241,9 @@ func TestAutodiscover(t *testing.T) {
 
 	// Test stop event
 	eventBus.Publish(bus.Event{
-		"stop": true,
+		"id":       "foo",
+		"provider": "mock",
+		"stop":     true,
 		"meta": common.MapStr{
 			"foo": "baz",
 		},
@@ -237,18 +252,21 @@ func TestAutodiscover(t *testing.T) {
 
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs), 0)
+	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
 	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
 	assert.True(t, runners[1].started)
 	assert.True(t, runners[1].stopped)
 }
 
 func TestAutodiscoverHash(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -287,7 +305,9 @@ func TestAutodiscoverHash(t *testing.T) {
 
 	// Test start event
 	eventBus.Publish(bus.Event{
-		"start": true,
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
 		"meta": common.MapStr{
 			"foo": "bar",
 		},
@@ -296,7 +316,7 @@ func TestAutodiscoverHash(t *testing.T) {
 
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs), 2)
+	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
 	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
@@ -306,10 +326,13 @@ func TestAutodiscoverHash(t *testing.T) {
 }
 
 func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -348,7 +371,9 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 
 	// Test start event
 	eventBus.Publish(bus.Event{
-		"start": true,
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
 		"meta": common.MapStr{
 			"foo": "bar",
 		},
@@ -356,7 +381,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 
 	// As only the second config is valid, total runners will be 1
 	wait(t, func() bool { return len(adapter.Runners()) == 1 })
-	assert.Equal(t, 1, len(autodiscover.configs))
+	assert.Equal(t, 1, len(autodiscover.configs["mock:foo"]))
 }
 
 func wait(t *testing.T, test func() bool) {

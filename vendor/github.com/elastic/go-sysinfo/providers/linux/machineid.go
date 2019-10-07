@@ -27,11 +27,37 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
+var (
+	// Possible (current and historic) locations of the machine-id file.
+	// These will be searched in order.
+	machineIDFiles = []string{"/etc/machine-id", "/var/lib/dbus/machine-id", "/var/db/dbus/machine-id"}
+)
+
 func MachineID() (string, error) {
-	id, err := ioutil.ReadFile("/etc/machine-id")
+	var contents []byte
+	var err error
+
+	for _, file := range machineIDFiles {
+		contents, err = ioutil.ReadFile(file)
+		if err != nil {
+			if os.IsNotExist(err) {
+				// Try next location
+				continue
+			}
+
+			// Return with error on any other error
+			return "", errors.Wrapf(err, "failed to read %v", file)
+		}
+
+		// Found it
+		break
+	}
+
 	if os.IsNotExist(err) {
+		// None of the locations existed
 		return "", types.ErrNotImplemented
 	}
-	id = bytes.TrimSpace(id)
-	return string(id), errors.Wrap(err, "failed to read machine-id")
+
+	contents = bytes.TrimSpace(contents)
+	return string(contents), nil
 }

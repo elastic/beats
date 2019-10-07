@@ -42,7 +42,7 @@ type message struct {
 
 	isRequest    bool
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	//Request Info
@@ -55,6 +55,9 @@ type message struct {
 	// Http Headers
 	contentLength int
 	contentType   common.NetString
+	host          common.NetString
+	referer       common.NetString
+	userAgent     common.NetString
 	encodings     []string
 	isChunked     bool
 	headers       map[string]common.NetString
@@ -70,7 +73,9 @@ type message struct {
 	saveBody bool
 	body     []byte
 
-	notes []string
+	notes          []string
+	packetLossReq  bool
+	packetLossResp bool
 
 	next *message
 }
@@ -78,6 +83,13 @@ type message struct {
 type version struct {
 	major uint8
 	minor uint8
+}
+
+func (v version) String() string {
+	if v.major == 1 && v.minor == 1 {
+		return "1.1"
+	}
+	return fmt.Sprintf("%d.%d", v.major, v.minor)
 }
 
 type parser struct {
@@ -107,6 +119,9 @@ var (
 	nameTransferEncoding = []byte("transfer-encoding")
 	nameContentEncoding  = []byte("content-encoding")
 	nameConnection       = []byte("connection")
+	nameHost             = []byte("host")
+	nameReferer          = []byte("referer")
+	nameUserAgent        = []byte("user-agent")
 )
 
 func newParser(config *parserConfig) *parser {
@@ -379,7 +394,6 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 					// transfer-encoding.
 					m.encodings = append(m.encodings, encodings...)
 				}
-
 			} else if bytes.Equal(headerName, nameContentEncoding) {
 				encodings := parseCommaSeparatedList(headerVal)
 				// Append at the beginning of m.encodings, as Content-Encoding
@@ -387,11 +401,16 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 				m.encodings = append(encodings, m.encodings...)
 			} else if bytes.Equal(headerName, nameConnection) {
 				m.connection = headerVal
-			}
-			if len(config.realIPHeader) > 0 && bytes.Equal(headerName, []byte(config.realIPHeader)) {
+			} else if len(config.realIPHeader) > 0 && bytes.Equal(headerName, []byte(config.realIPHeader)) {
 				if ips := bytes.SplitN(headerVal, []byte{','}, 2); len(ips) > 0 {
 					m.realIP = trim(ips[0])
 				}
+			} else if bytes.Equal(headerName, nameHost) {
+				m.host = headerVal
+			} else if bytes.Equal(headerName, nameReferer) {
+				m.referer = headerVal
+			} else if bytes.Equal(headerName, nameUserAgent) {
+				m.userAgent = headerVal
 			}
 
 			if config.sendHeaders {

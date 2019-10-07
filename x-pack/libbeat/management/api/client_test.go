@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *Client) {
@@ -19,7 +21,7 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 
 	server := httptest.NewServer(mux)
 
-	config, err := ConfigFromURL(server.URL)
+	config, err := ConfigFromURL(server.URL, common.NewConfig())
 	if err != nil {
 		t.Fatal(err)
 	}

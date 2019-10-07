@@ -22,7 +22,6 @@ package partition
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -37,25 +36,29 @@ import (
 )
 
 const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
+	kafkaSASLProducerUsername = "producer"
+	kafkaSASLProducerPassword = "producer-secret"
+	kafkaSASLUsername         = "stats"
+	kafkaSASLPassword         = "test-secret"
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(120*time.Second),
+		compose.UpWithAdvertisedHostEnvFile,
+	)
 
-	generateKafkaData(t, "metricbeat-generate-data")
+	generateKafkaData(t, service.Host(), "metricbeat-generate-data")
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), ""))
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
 func TestTopic(t *testing.T) {
-
-	compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka")
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 
@@ -63,15 +66,15 @@ func TestTopic(t *testing.T) {
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic
-	generateKafkaData(t, testTopic)
+	generateKafkaData(t, service.Host(), testTopic)
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic))
-	dataBefore, err := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), testTopic))
+	dataBefore, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}
 	if len(dataBefore) == 0 {
-		t.Errorf("No offsets fetched from topic (before): %v", testTopic)
+		t.Fatalf("No offsets fetched from topic (before): %v", testTopic)
 	}
 	t.Logf("before: %v", dataBefore)
 
@@ -79,15 +82,15 @@ func TestTopic(t *testing.T) {
 	var i int64 = 0
 	// Create n messages
 	for ; i < n; i++ {
-		generateKafkaData(t, testTopic)
+		generateKafkaData(t, service.Host(), testTopic)
 	}
 
-	dataAfter, err := mbtest.ReportingFetchV2(f)
+	dataAfter, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}
 	if len(dataAfter) == 0 {
-		t.Errorf("No offsets fetched from topic (after): %v", testTopic)
+		t.Fatalf("No offsets fetched from topic (after): %v", testTopic)
 	}
 	t.Logf("after: %v", dataAfter)
 
@@ -118,7 +121,7 @@ func TestTopic(t *testing.T) {
 	assert.True(t, offsetBefore+n == offsetAfter)
 }
 
-func generateKafkaData(t *testing.T, topic string) {
+func generateKafkaData(t *testing.T, host string, topic string) {
 	t.Logf("Send Kafka Event to topic: %v", topic)
 
 	config := sarama.NewConfig()
@@ -128,7 +131,10 @@ func generateKafkaData(t *testing.T, topic string) {
 	config.Producer.Retry.Backoff = 500 * time.Millisecond
 	config.Metadata.Retry.Max = 20
 	config.Metadata.Retry.Backoff = 500 * time.Millisecond
-	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
+	config.Net.SASL.Enable = true
+	config.Net.SASL.User = kafkaSASLProducerUsername
+	config.Net.SASL.Password = kafkaSASLProducerPassword
+	client, err := sarama.NewClient([]string{host}, config)
 	if err != nil {
 		t.Errorf("%s", err)
 		t.FailNow()
@@ -156,7 +162,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	}
 }
 
-func getConfig(topic string) map[string]interface{} {
+func getConfig(host string, topic string) map[string]interface{} {
 	var topics []string
 	if topic != "" {
 		topics = []string{topic}
@@ -165,25 +171,9 @@ func getConfig(topic string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
-		"hosts":      []string{getTestKafkaHost()},
+		"hosts":      []string{host},
 		"topics":     topics,
+		"username":   kafkaSASLUsername,
+		"password":   kafkaSASLPassword,
 	}
-}
-
-func getTestKafkaHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("KAFKA_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }

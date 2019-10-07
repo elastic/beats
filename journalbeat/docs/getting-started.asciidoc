@@ -1,0 +1,220 @@
+[id="{beatname_lc}-getting-started"]
+== Getting started with {beatname_uc}
+
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+
+* <<{beatname_lc}-installation>>
+* <<{beatname_lc}-configuration>>
+* <<{beatname_lc}-template>>
+* <<{beatname_lc}-starting>>
+* <<view-kibana-dashboards>>
+* <<setup-repositories>>
+
+[id="{beatname_lc}-installation"]
+=== Step 1: Install {beatname_uc}
+
+include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
+
+[[deb]]
+*deb:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-amd64.deb
+sudo dpkg -i {beatname_lc}-{version}-amd64.deb
+------------------------------------------------
+
+endif::[]
+
+[[rpm]]
+*rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-x86_64.rpm
+sudo rpm -vi {beatname_lc}-{version}-x86_64.rpm
+------------------------------------------------
+
+endif::[]
+
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
+
+endif::[]
+
+[id="{beatname_lc}-configuration"]
+=== Step 2: Configure {beatname_uc}
+
+Before running {beatname_uc}, you can specify the location of the systemd
+journal files and configure how you want the files to be read. If you accept the
+default configuration, {beatname_uc} reads from the local journal.
+
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+
+Here is a sample of the +{beatname_lc}+ section of the +{beatname_lc}.yml+ file.
+{beatname_uc} uses predefined default values for most configuration options.
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+journalbeat.inputs:
+- paths: ["/path/to/journal/directory"]
+  seek: head
+----------------------------------------------------------------------
+
+To configure {beatname_uc}:
+
+. Specify a list of paths to your systemd journal files. Each path can be a
+directory path (to collect events from all journals in a directory), or a file
+path. For example:
++
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths:
+  - "/dev/log"
+  - "/var/log/messages/my-journal-file.journal"
+----
++
+If no paths are specified, {beatname_uc} reads from the default journal.
+
+. Set the <<seek,`seek`>> option to control the position where
+{beatname_uc} starts reading the journal. The available options are `head`,
+`tail`, and `cursor`. The default is `cursor`, which means that on first read,
+{beatname_uc} starts reading at the beginning of the file, but continues reading
+at the last known position after a reload or restart. For more detail about
+the settings, see the reference docs for the
+<<seek,`seek` option>>. 
+
+. (Optional) Set the <<include-matches,`include_matches`>> option
+to filter entries in journald before collecting any log events. This reduces the
+number of events that {beatname_uc} needs to process. For example, to fetch only
+Redis events from a Docker container tagged as `redis`, use: 
++
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- paths: []
+  include_matches:
+    - "CONTAINER_TAG=redis"
+    - "_COMM=redis"
+----
+
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+
+include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
+
+
+[id="{beatname_lc}-template"]
+=== Step 3: Load the index template in {es}
+
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+
+[id="{beatname_lc}-starting"]
+=== Step 5: Start {beatname_uc}
+
+Start {beatname_uc} by issuing the appropriate command for your platform. If you
+are accessing a secured {es} cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
+
+NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can't
+specify command line flags (see <<command-line-options>>). To specify flags,
+start {beatname_uc} in the foreground.
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo service {beatname_lc} start
+----------------------------------------------------------------------
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo chown root {beatname_lc}.yml <1>
+sudo ./{beatname_lc} -e
+----------------------------------------------------------------------
+<1> You'll be running {beatname_uc} as root, so you need to change ownership
+of the configuration file, or run {beatname_uc} with `--strict.perms=false`
+specified. See
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_.
+
+{beatname_uc} is now ready to send journal events to the defined output.
+
+[[view-kibana-dashboards]]
+=== Step 6: Explore your data in {kib}
+
+To start exploring your data, go to the Discover application in {kib}. From
+there, you can submit search queries, filter the search results, and view
+document data.
+
+To learn how to build visualizations and dashboards to view your data, see the
+_{kibana-ref}/index.html[{kib} User Guide]_.
+
+[role="xpack"]
+==== Want to tail logs in real time?
+
+Use the {infra-guide}/logs-ui-overview.html[Logs UI] in {kib}. The UI shows logs
+from `filebeat-*` indices by default. To show {beatname_uc} indices, configure
+the source to include `journalbeat-*`. You can do this in the Logs UI when you
+configure the source, or you can modify the {kib} configuration. For example:
+
+[source,yaml]
+----
+xpack.infra:
+ sources:
+   default:
+     logAlias: "filebeat-*,journalbeat-*"
+----

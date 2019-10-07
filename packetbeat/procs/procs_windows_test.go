@@ -22,6 +22,7 @@ package procs
 import (
 	"encoding/hex"
 	"fmt"
+	"net"
 	"testing"
 	"unsafe"
 
@@ -51,7 +52,7 @@ func TestParseTableRaw(t *testing.T) {
 			"01000000" +
 				"77777777AAAAAAAA12340000BBBBBBBBFFFF0000CCCCCCCC",
 			[]portProcMapping{
-				{port: 0x1234, pid: 0xCCCCCCCC},
+				{endpoint: endpoint{address: "170.170.170.170", port: 0x1234}, pid: 0xCCCCCCCC},
 			}, false},
 		{"Two entries (IPv6)", IPv6,
 			"02000000" +
@@ -71,16 +72,16 @@ func TestParseTableRaw(t *testing.T) {
 				"FFFF0000" + // pid
 				"",
 			[]portProcMapping{
-				{port: 0xABCD, pid: 1},
-				{port: 0, pid: 0xffff},
+				{endpoint: endpoint{address: "1111:2222:3333:4444:5555:6666:7777:8888", port: 0xABCD}, pid: 1},
+				{endpoint: endpoint{address: "aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa", port: 0}, pid: 0xffff},
 			}, false},
 	} {
 		msg := fmt.Sprintf("Test case #%d: %s", idx+1, testCase.name)
 		table, err := hex.DecodeString(testCase.raw)
 		assert.NoError(t, err, msg)
 		var result []portProcMapping
-		callback := func(port uint16, pid int) {
-			result = append(result, portProcMapping{port: port, pid: pid})
+		callback := func(ip net.IP, port uint16, pid int) {
+			result = append(result, portProcMapping{endpoint: endpoint{ip.String(), port}, pid: pid})
 		}
 		err = parseTable(table, testCase.factory(callback))
 		if testCase.mustErr {

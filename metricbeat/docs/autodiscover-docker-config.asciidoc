@@ -5,6 +5,7 @@ Metricbeat supports templates for modules:
 metricbeat.autodiscover:
   providers:
     - type: docker
+      labels.dedot: true
       templates:
         - condition:
             contains:
@@ -16,3 +17,5 @@ metricbeat.autodiscover:
 -------------------------------------------------------------------------------------
 
 This configuration launches a `redis` module for all containers running an image with `redis` in the name.
+`labels.dedot` defaults to be `true` for docker autodiscover, which means dots in docker labels are replaced with '_' by default.
+

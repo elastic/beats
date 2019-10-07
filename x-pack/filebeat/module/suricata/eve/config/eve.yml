@@ -1,0 +1,189 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+processors:
+  - rename:
+      fields:
+        - {from: message, to: event.original}
+  - decode_json_fields:
+      fields: [event.original]
+      target: suricata.eve
+  - convert:
+      ignore_missing: true
+      ignore_failure: true
+      mode: rename
+      fields:
+        - {from: suricata.eve.src_ip, to: source.address}
+        - {from: suricata.eve.src_port, to: source.port, type: long}
+        - {from: suricata.eve.dest_ip, to: destination.address}
+        - {from: suricata.eve.dest_port, to: destination.port, type: long}
+        - {from: suricata.eve.proto, to: network.transport}
+  - convert:
+      ignore_missing: true
+      ignore_failure: true
+      mode: copy
+      fields:
+        - {from: source.address, to: source.ip, type: ip}
+        - {from: destination.address, to: destination.ip, type: ip}
+        - {from: '@timestamp', to: event.created}
+  - timestamp:
+      field: suricata.eve.timestamp
+      layouts:
+        - '2006-01-02T15:04:05.999999999Z0700' # ISO8601
+  - drop_fields:
+      fields:
+        - suricata.eve.timestamp
+{{ if .community_id }}
+  - community_id:
+{{ end }}
+  - if:
+      equals.suricata.eve.event_type: dns
+    then:
+      - convert:
+          ignore_missing: true
+          ignore_failure: true
+          mode: copy
+          fields:
+            - {from: suricata.eve.dns.id, to: dns.id, type: string}
+            - {from: suricata.eve.dns.rcode, to: dns.response_code}
+            - {from: suricata.eve.dns.type, to: dns.type}
+      - convert:
+          when.equals.dns.type: query
+          ignore_missing: true
+          ignore_failure: true
+          mode: copy
+          fields:
+            - {from: suricata.eve.dns.rrname, to: dns.question.name}
+            - {from: suricata.eve.dns.rrtype, to: dns.question.type}
+      # Handle the version=1 EVE DNS answer format. Each JSON event contains
+      # a single resource record from the DNS response.
+      - script:
+          when.and:
+            - equals.dns.type: answer
+            - not.has_fields: [suricata.eve.dns.version]
+          id: suricata_dns_answers_v1
+          lang: javascript
+          source: >
+            function process(evt) {
+                var name = evt.Get("suricata.eve.dns.rrname");
+                var data = evt.Get("suricata.eve.dns.rdata");
+                var type = evt.Get("suricata.eve.dns.rrtype");
+                var ttl = evt.Get("suricata.eve.dns.ttl");
+
+                var answer = {};
+                if (name) {
+                    answer.name = name;
+                }
+                if (data) {
+                    answer.data = data;
+                }
+                if (type) {
+                    answer.type = type;
+                }
+                if (ttl) {
+                    answer.ttl = ttl;
+                }
+
+                if (Object.keys(answer).length === 0) {
+                    return;
+                }
+                evt.Put("dns.answers", [answer]);
+            }
+      # Handle the version=2 EVE DNS answer format.
+      - if:
+          and:
+            - equals.dns.type: answer
+            - equals.suricata.eve.dns.version: 2
+        then:
+          - convert:
+              ignore_missing: true
+              ignore_failure: true
+              mode: copy
+              fields:
+                - {from: suricata.eve.dns.rrname, to: dns.question.name}
+                - {from: suricata.eve.dns.rrtype, to: dns.question.type}
+          - script:
+              id: suricata_dns_answers_v2
+              lang: javascript
+              source: >
+                function transformDetailedAnswers(evt) {
+                    var answers = evt.Get("suricata.eve.dns.answers");
+                    if (!answers) {
+                        return;
+                    }
+                    evt.Delete("suricata.eve.dns.answers");
+
+                    var resolvedIps = [];
+                    for (var i = 0; i < answers.length; i++) {
+                        var answer = answers[i];
+
+                        // Rename properties.
+                        var name = answer["rrname"];
+                        delete answer["rrname"];
+                        var type = answer["rrtype"];
+                        delete answer["rrtype"];
+                        var data = answer["rdata"];
+                        delete answer["rdata"];
+
+                        answer["name"] = name;
+                        answer["type"] = type;
+                        answer["data"] = data;
+
+                        // Append IP addresses to dns.resolved_ip.
+                        if (type === "A" || type === "AAAA") {
+                            resolvedIps.push(data);
+                        }
+                    }
+                    evt.Put("dns.answers", answers);
+                    if (resolvedIps.length > 0) {
+                        evt.Put("dns.resolved_ip", resolvedIps);
+                    }
+                }
+
+                function addDnsHeaderFlags(evt) {
+                    var flag = evt.Get("suricata.eve.dns.aa");
+                    if (flag === true) {
+                        evt.AppendTo("dns.header_flags", "AA");
+                    }
+
+                    flag = evt.Get("suricata.eve.dns.tc");
+                    if (flag === true) {
+                        evt.AppendTo("dns.header_flags", "TC");
+                    }
+
+                    flag = evt.Get("suricata.eve.dns.rd");
+                    if (flag === true) {
+                        evt.AppendTo("dns.header_flags", "RD");
+                    }
+
+                    flag = evt.Get("suricata.eve.dns.ra");
+                    if (flag === true) {
+                        evt.AppendTo("dns.header_flags", "RA");
+                    }
+                }
+
+                function process(evt) {
+                    transformDetailedAnswers(evt);
+                    addDnsHeaderFlags(evt);
+                }
+      - registered_domain:
+          ignore_missing: true
+          ignore_failure: true
+          field: dns.question.name
+          target_field: dns.question.registered_domain
+      - drop_fields:
+          ignore_missing: true
+          fields:
+            - suricata.eve.dns.aa
+            - suricata.eve.dns.tc
+            - suricata.eve.dns.rd
+            - suricata.eve.dns.ra
+            - suricata.eve.dns.qr
+            - suricata.eve.dns.version
+            - suricata.eve.dns.flags
+            - suricata.eve.dns.grouped

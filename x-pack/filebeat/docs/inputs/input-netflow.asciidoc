@@ -1,0 +1,113 @@
+[role="xpack"]
+
+:type: netflow
+
+[id="{beatname_lc}-input-{type}"]
+=== NetFlow input
+
+++++
+<titleabbrev>NetFlow</titleabbrev>
+++++
+
+Use the `netflow` input to read NetFlow and IPFIX exported flows
+and options records over UDP.
+
+This input supports NetFlow versions 1, 5, 6, 7, 8 and 9, as well as
+IPFIX. For NetFlow versions older than 9, fields are mapped automatically
+to NetFlow v9.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: netflow
+  max_message_size: 10KiB
+  host: "0.0.0.0:2055"
+  protocols: [ v5, v9, ipfix ]
+  expiration_timeout: 30m
+  queue_size: 8192
+  custom_definitions:
+  - path/to/fields.yml
+----
+
+
+==== Configuration options
+
+The `netflow` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+include::../../../../filebeat/docs/inputs/input-common-udp-options.asciidoc[]
+
+[float]
+[[protocols]]
+==== `protocols`
+
+List of enabled protocols.
+Valid values are `v1`, `v5`, `v6`, `v7`, `v8`, `v9` and `ipfix`.
+
+[float]
+[[expiration_timeout]]
+==== `expiration_timeout`
+
+The time before an idle session or unused template is expired.
+Only applicable to v9 and IPFIX protocols. A value of zero disables expiration.
+
+[float]
+[[queue_size]]
+==== `queue_size`
+
+The maximum number of packets that can be queued for processing.
+Use this setting to avoid packet-loss when dealing with occasional bursts
+of traffic.
+
+[float]
+[[custom_definitions]]
+==== `custom_definitions`
+
+A list of paths to field definitions YAML files. These allow to update the
+NetFlow/IPFIX fields with vendor extensions and to override existing fields.
+
+The expected format is the same as used by Logstash's NetFlow codec
+{logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-ipfix_definitions[ipfix_definitions]
+and {logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-netflow_definitions[netflow_definitions].
+{beatname_uc} will detect which of the two formats is used.
+
+NetFlow format example:
+["source","yaml",subs="attributes"]
+id:
+- default length in bytes
+- :name
+id:
+- :uintN or :intN: or :ip4_addr or :ip6_addr or :mac_addr or :string
+- :name
+id:
+- :skip
+
+
+Where `id` is the numeric field ID.
+
+The IPFIX format similar, but grouped by Private Enterprise Number (PEN):
+["source","yaml",subs="attributes"]
+pen1:
+  id:
+  - :uintN or :ip4_addr or :ip6_addr or :mac_addr or :string
+  - :name
+  id:
+  - :skip
+pen2:
+  id:
+  - :octetarray
+  - :name
+
+Note that fields are shared between NetFlow V9 and IPFIX. Changes to
+IPFIX PEN zero are equivalent to changes to NetFlow fields.
+
+[WARNING]
+Overriding the names and/or types of standard fields can prevent
+mapping of ECS fields to function properly.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

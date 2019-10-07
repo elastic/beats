@@ -19,44 +19,9 @@ package util
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestTimeout(t *testing.T) {
-	// Mock monotonic time:
-	fakeTimeCh := make(chan int64)
-	go func() {
-		fakeTime := time.Now().Unix()
-		for {
-			fakeTime++
-			fakeTimeCh <- fakeTime
-		}
-	}()
-
-	now = func() time.Time {
-		return time.Unix(<-fakeTimeCh, 0)
-	}
-
-	// Blocking sleep:
-	sleepCh := make(chan struct{})
-	sleep = func(time.Duration) {
-		<-sleepCh
-	}
-
-	test := newValueMap(1 * time.Second)
-
-	test.Set("foo", 3.14)
-
-	// Let cleanup do its job
-	sleepCh <- struct{}{}
-	sleepCh <- struct{}{}
-	sleepCh <- struct{}{}
-
-	// Check it expired
-	assert.Equal(t, 0.0, test.Get("foo"))
-}
 
 func TestValueMap(t *testing.T) {
 	test := newValueMap(defaultTimeout)
@@ -82,5 +47,5 @@ func TestGetWithDefault(t *testing.T) {
 }
 
 func TestContainerUID(t *testing.T) {
-	assert.Equal(t, "a-b-c", ContainerUID("a", "b", "c"))
+	assert.Equal(t, "a/b/c", ContainerUID("a", "b", "c"))
 }

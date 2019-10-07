@@ -23,27 +23,32 @@ import (
 )
 
 // UserCache is a cache of UID to username.
-type UserCache map[int]string
+type UserCache map[int]*user.User
 
 // NewUserCache returns a new UserCache.
 func NewUserCache() UserCache {
-	return map[int]string{0: "root"}
+	root := &user.User{
+		Uid:      "0",
+		Gid:      "0",
+		Username: "root",
+		Name:     "root",
+	}
+	return map[int]*user.User{0: root}
 }
 
 // LookupUID looks up a UID and returns the username associated with it. If
 // no username could be found an empty string is returned. The value will be
 // cached forever.
-func (c UserCache) LookupUID(uid int) string {
-	if username, found := c[uid]; found {
-		return username
+func (c UserCache) LookupUID(uid int) *user.User {
+	if user, found := c[uid]; found {
+		return user
 	}
 
 	// Cache the value (even on error).
-	username, err := user.LookupId(strconv.Itoa(uid))
+	u, err := user.LookupId(strconv.Itoa(uid))
 	if err != nil {
-		c[uid] = ""
-		return ""
+		u = &user.User{Uid: strconv.Itoa(uid)}
 	}
-	c[uid] = username.Name
-	return username.Name
+	c[uid] = u
+	return u
 }

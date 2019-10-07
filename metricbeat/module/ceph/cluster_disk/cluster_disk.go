@@ -18,8 +18,6 @@
 package cluster_disk
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -50,8 +48,6 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The ceph cluster_disk metricset is beta")
-
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
@@ -64,12 +60,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
-
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return eventMapping(content), nil
+	event, err := eventMapping(content)
+	if err != nil {
+		return err
+	}
+
+	if reported := reporter.Event(mb.Event{MetricSetFields: event}); !reported {
+		m.Logger().Debug("error reporting event")
+	}
+
+	return nil
 }

@@ -26,18 +26,23 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-
-	if err := mbtest.WriteEvents(f, t); err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
+	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
 func TestFetch(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	data, err := f.Fetch()
-	assert.NoError(t, err)
-	assert.Equal(t, 8, len(data))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "raid").Fields.StringToPrint())
 }
 
 func getConfig() map[string]interface{} {

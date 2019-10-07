@@ -18,17 +18,13 @@
 package bgwriter
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
-
-	// Register postgresql database/sql driver
-	_ "github.com/lib/pq"
 )
 
 // init registers the MetricSet with the central registry.
@@ -42,30 +38,35 @@ func init() {
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
+	*postgresql.MetricSet
 }
 
 // New create a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{BaseMetricSet: base}, nil
-}
-
-// Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-	db, err := sql.Open("postgres", m.HostData().URI)
+	ms, err := postgresql.NewMetricSet(base)
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	return &MetricSet{MetricSet: ms}, nil
+}
 
-	results, err := postgresql.QueryStats(db, "SELECT * FROM pg_stat_bgwriter")
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	ctx := context.Background()
+	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_bgwriter")
 	if err != nil {
-		return nil, errors.Wrap(err, "QueryStats")
+		return errors.Wrap(err, "error in QueryStats")
 	}
 	if len(results) == 0 {
-		return nil, fmt.Errorf("No results from the pg_stat_bgwriter query")
+		return fmt.Errorf("No results from the pg_stat_bgwriter query")
 	}
 
 	data, _ := schema.Apply(results[0])
-	return data, nil
+	reporter.Event(mb.Event{
+		MetricSetFields: data,
+	})
+
+	return nil
 }

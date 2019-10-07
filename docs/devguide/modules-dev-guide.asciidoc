@@ -229,6 +229,24 @@ This example selects the ingest pipeline file based on the value of the
 resolve to `ingest/with_plugins.json` (assuming the variable value isn't
 overridden at runtime.)
 
+In 6.6 and later, you can specify multiple ingest pipelines.
+
+[source,yaml]
+----
+ingest_pipeline:
+  - ingest/main.json
+  - ingest/plain_logs.json
+  - ingest/json_logs.json
+----
+
+When multiple ingest pipelines are specified the first one in the list is
+considered to be the entry point pipeline.
+
+One reason for using multiple pipelines might be to send all logs harvested
+by this fileset to the entry point pipeline and have it delegate different parts of
+the processing to other pipelines. You can read details about setting
+this up in <<ingest-json-entry-point-pipeline, the `ingest/*.json` section>>.
+
 [float]
 ==== config/*.yml
 
@@ -256,7 +274,7 @@ used to construct the `paths` list for the input `paths` option.
 Any template files that you add to the `config/` folder need to generate a valid
 Filebeat input configuration in YAML format. The options accepted by the
 input configuration are documented in the
-{filebeat}/configuration-filebeat-options.html[Filebeat Inputs] section of
+{filebeat-ref}/configuration-filebeat-options.html[Filebeat Inputs] section of
 the Filebeat documentation.
 
 The template files use the templating language defined by the
@@ -286,12 +304,12 @@ variables to dynamically switch between configurations.
 ==== ingest/*.json
 
 The `ingest/` folder contains Elasticsearch
-{elasticsearch}/ingest.html[Ingest Node] pipeline configurations. The Ingest
+{ref}/ingest.html[Ingest Node] pipeline configurations. The Ingest
 Node pipelines are responsible for parsing the log lines and doing other
 manipulations on the data.
 
-The files in this folder are JSON documents representing
-{elasticsearch}/pipeline.html[pipeline definitions]. Just like with the `config/`
+The files in this folder are JSON or YAML documents representing
+{ref}/pipeline.html[pipeline definitions]. Just like with the `config/`
 folder, you can define multiple pipelines, but a single one is loaded at runtime
 based on the information from `manifest.yml`.
 
@@ -312,11 +330,23 @@ The generator creates a JSON object similar to this one:
 }
 ----
 
+Alternatively, you can use YAML formatted pipelines, which uses a simpler syntax:
+
+[source,yaml]
+----
+description: "Pipeline for parsing {module} {fileset} logs"
+processors:
+on_failure:
+ - set:
+     field: error.message
+     value: "{{ _ingest.on_failure_message }}"
+----
+
 From here, you would typically add processors to the `processors` array to do
 the actual parsing. For details on how to use ingest node processors, see the
-{elasticsearch}/ingest-processors.html[ingest node documentation]. In
+{ref}/ingest-processors.html[ingest node documentation]. In
 particular, you will likely find the
-{elasticsearch}/grok-processor.html[Grok processor] to be useful for parsing.
+{ref}/grok-processor.html[Grok processor] to be useful for parsing.
 Here is an example for parsing the Nginx access logs.
 
 [source,json]
@@ -336,8 +366,65 @@ Note that you should follow the convention of naming of fields prefixed with the
 module and fileset name: `{module}.{fileset}.field`, e.g.
 `nginx.access.remote_ip`. Also, please review our <<event-conventions>>.
 
+[[ingest-json-entry-point-pipeline]]
+In 6.6 and later, ingest pipelines can use the
+{ref}/conditionals-with-multiple-pipelines.html[`pipeline` processor] to delegate
+parts of the processings to other pipelines.
+
+This can be useful if you want a fileset to ingest the same _logical_ information
+presented in different formats, e.g. csv vs. json versions of the same log files.
+Imagine an entry point ingest pipeline that detects the format of a log entry and then conditionally
+delegates further processing of that log entry, depending on the format, to another
+pipeline.
+
+["source","json",subs="callouts"]
+----
+{
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "^%{CHAR:first_char}"
+        ],
+        "pattern_definitions": {
+          "CHAR": "."
+        }
+      }
+    },
+    {
+      "pipeline": {
+        "if": "ctx.first_char == '{'",
+        "name": "{< IngestPipeline "json-log-processing-pipeline" >}" <1>
+      }
+    },
+    {
+      "pipeline": {
+        "if": "ctx.first_char != '{'",
+        "name": "{< IngestPipeline "plain-log-processing-pipeline" >}"
+      }
+    }
+  ]
+}
+----
+<1>  Use the `IngestPipeline` template function to resolve the name. This function converts the
+specified name into the fully qualified pipeline ID that is stored in Elasticsearch.
+
+In order for the above pipeline to work, Filebeat must load the entry point pipeline
+as well as any sub-pipelines into Elasticsearch. You can tell Filebeat to do
+so by specifying all the necessary pipelines for the fileset in its `manifest.yml`
+file. The first pipeline in the list is considered to be the entry point pipeline.
+
+[source,yaml]
+----
+ingest_pipeline:
+  - ingest/main.json
+  - ingest/plain_logs.yml
+  - ingest/json_logs.json
+----
+
 While developing the pipeline definition, we recommend making use of the
-{elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
+{ref}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
 and quick iteration.
 
 By default Filebeat does not update Ingest pipelines if already loaded. If you

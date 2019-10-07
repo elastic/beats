@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -80,7 +81,8 @@ var (
 			"size_in_bytes": c.Int("size_in_bytes"),
 		}),
 		"refresh": c.Dict("refresh", s.Schema{
-			"total_time_in_millis": c.Int("total_time_in_millis"),
+			"external_total_time_in_millis": c.Int("external_total_time_in_millis", s.Optional),
+			"total_time_in_millis":          c.Int("total_time_in_millis"),
 		}),
 	}
 
@@ -96,31 +98,28 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	var indicesStruct IndicesStruct
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
-		m.Log.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
 	}
 
 	clusterStateMetrics := []string{"metadata", "routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
-		err = errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
-		m.Log.Error(err)
-		return err
+		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
 	}
 
+	var errs multierror.Errors
 	for name, index := range indicesStruct.Indices {
 		event := mb.Event{}
 		indexStats, err := xpackSchema.Apply(index)
 		if err != nil {
-			m.Log.Error(errors.Wrap(err, "failure applying index stats schema"))
+			errs = append(errs, errors.Wrap(err, "failure applying index stats schema"))
 			continue
 		}
 		indexStats["index"] = name
 
 		err = addClusterStateFields(name, indexStats, clusterState)
 		if err != nil {
-			m.Log.Error(errors.Wrap(err, "failure adding cluster state fields"))
+			errs = append(errs, errors.Wrap(err, "failure adding cluster state fields"))
 			continue
 		}
 
@@ -136,7 +135,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		r.Event(event)
 	}
 
-	return nil
+	return errs.Err()
 }
 
 // Fields added here are based on same fields being added by internal collection in

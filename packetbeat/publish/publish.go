@@ -18,12 +18,15 @@
 package publish
 
 import (
-	"errors"
+	"net"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/packetbeat/pb"
 )
 
 type TransactionPublisher struct {
@@ -35,7 +38,7 @@ type TransactionPublisher struct {
 
 type transProcessor struct {
 	ignoreOutgoing bool
-	localIPs       []string
+	localIPs       []net.IP // TODO: Periodically update this list.
 	name           string
 }
 
@@ -47,9 +50,15 @@ func NewTransactionPublisher(
 	ignoreOutgoing bool,
 	canDrop bool,
 ) (*TransactionPublisher, error) {
-	localIPs, err := common.LocalIPAddrsAsStrings(false)
+	addrs, err := common.LocalIPAddrs()
 	if err != nil {
 		return nil, err
+	}
+	var localIPs []net.IP
+	for _, addr := range addrs {
+		if !addr.IsLoopback() {
+			localIPs = append(localIPs, addr)
+		}
 	}
 
 	p := &TransactionPublisher{
@@ -88,8 +97,10 @@ func (p *TransactionPublisher) CreateReporter(
 	}
 
 	clientConfig := beat.ClientConfig{
-		EventMetadata: meta.Event,
-		Processor:     processors,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: meta.Event,
+			Processor:     processors,
+		},
 	}
 	if p.canDrop {
 		clientConfig.PublishMode = beat.DropIfFull
@@ -133,8 +144,17 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, nil
 	}
 
-	if !p.normalizeTransAddr(event.Fields) {
-		return nil, nil
+	fields, err := MarshalPacketbeatFields(event, p.localIPs)
+	if err != nil {
+		return nil, err
+	}
+
+	if fields != nil {
+		if p.ignoreOutgoing && fields.Network.Direction == "outbound" {
+			debugf("Ignore outbound transaction on: %s -> %s",
+				fields.Source.IP, fields.Destination.IP)
+			return nil, nil
+		}
 	}
 
 	return event, nil
@@ -167,83 +187,22 @@ func validateEvent(event *beat.Event) error {
 	return nil
 }
 
-func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
-	debugf("normalize address for: %v", event)
+// MarshalPacketbeatFields marshals data contained in the _packetbeat field
+// into the event and removes the _packetbeat key.
+func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP) (*pb.Fields, error) {
+	defer delete(event.Fields, pb.FieldsKey)
 
-	var srcServer, dstServer string
-	src, ok := event["src"].(*common.Endpoint)
-	debugf("has src: %v", ok)
-	if ok {
-		// check if it's outgoing transaction (as client)
-		isOutgoing := p.IsPublisherIP(src.IP)
-		if isOutgoing {
-			if p.ignoreOutgoing {
-				// duplicated transaction -> ignore it
-				debugf("Ignore duplicated transaction on: %s -> %s", srcServer, dstServer)
-				return false
-			}
-
-			//outgoing transaction
-			event["direction"] = "out"
-		}
-
-		event["client_ip"] = src.IP
-		event["client_port"] = src.Port
-		event["client_proc"] = src.Proc
-		if len(src.Cmdline) > 0 {
-			event["client_cmdline"] = src.Cmdline
-		}
-		if _, exists := event["client_server"]; !exists {
-			event["client_server"] = p.GetServerName(src.IP)
-		}
-		delete(event, "src")
+	fields, err := pb.GetFields(event.Fields)
+	if err != nil || fields == nil {
+		return nil, err
 	}
 
-	dst, ok := event["dst"].(*common.Endpoint)
-	debugf("has dst: %v", ok)
-	if ok {
-		event["ip"] = dst.IP
-		event["port"] = dst.Port
-		event["proc"] = dst.Proc
-		if len(dst.Cmdline) > 0 {
-			event["cmdline"] = dst.Cmdline
-		}
-		if _, exists := event["server"]; !exists {
-			event["server"] = p.GetServerName(dst.IP)
-		}
-		delete(event, "dst")
-
-		//check if it's incoming transaction (as server)
-		if p.IsPublisherIP(dst.IP) {
-			// incoming transaction
-			event["direction"] = "in"
-		}
-
+	if err = fields.ComputeValues(localIPs); err != nil {
+		return nil, err
 	}
 
-	return true
-}
-
-func (p *transProcessor) IsPublisherIP(ip string) bool {
-	for _, myip := range p.localIPs {
-		if myip == ip {
-			return true
-		}
+	if err = fields.MarshalMapStr(event.Fields); err != nil {
+		return nil, err
 	}
-	return false
-}
-
-func (p *transProcessor) GetServerName(ip string) string {
-	// in case the IP is localhost, return current shipper name
-	islocal, err := common.IsLoopback(ip)
-	if err != nil {
-		logp.Err("Parsing IP %s fails with: %s", ip, err)
-		return ""
-	}
-
-	if islocal {
-		return p.name
-	}
-
-	return ""
+	return fields, nil
 }

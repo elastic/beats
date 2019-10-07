@@ -3,6 +3,7 @@
   type: group
   description: >
     Summary metrics of open sockets in the host system
+  release: ga
   fields:
     - name: all
       type: group
@@ -22,11 +23,20 @@
       description: >
         All TCP connections
       fields:
+        - name: memory
+          type: integer
+          format: bytes
+          description: >
+            Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
         - name: all
           type: group
           description: >
             All TCP connections
           fields:
+            - name: orphan
+              type: integer
+              description: >
+                A count of all orphaned tcp sockets. Only available on Linux.
             - name: count
               type: integer
               description: >
@@ -35,11 +45,28 @@
               type: integer
               description: >
                 All TCP listening ports
+            - name: established
+              type: integer
+              description: >
+                Number of established TCP connections
+            - name: close_wait
+              type: integer
+              description: >
+                Number of TCP connections in _close_wait_ state
+            - name: time_wait
+              type: integer
+              description: >
+                Number of TCP connections in _time_wait_ state
     - name: udp
       type: group
       description: >
         All UDP connections
       fields:
+        - name: memory
+          type: integer
+          format: bytes
+          description: >
+            Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
         - name: all
           type: group
           description: >
@@ -48,6 +75,7 @@
             - name: count
               type: integer
               description: >
-                All open TCP connections
+                All open UDP connections
+
 
 

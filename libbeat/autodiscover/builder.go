@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Builder provides an interface by which configs can be built from provider metadata
@@ -58,7 +57,7 @@ func (r *registry) AddBuilder(name string, builder BuilderConstructor) error {
 	}
 
 	r.builders[name] = builder
-	logp.Debug(debugK, "Builder registered: %s", name)
+	r.logger.Debugf("Builder registered: %s", name)
 	return nil
 }
 
@@ -89,7 +88,7 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 
 // GetConfig creates configs for all builders initialized.
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
-	var configs []*common.Config
+	configs := []*common.Config{}
 
 	for _, builder := range b {
 		if config := builder.CreateConfig(event); config != nil {
@@ -100,21 +99,18 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	return configs
 }
 
-// NewBuilders instances the given list of builders. If hintsEnabled is true it will
-// just enable the hints builder
-func NewBuilders(bConfigs []*common.Config, hintsEnabled bool) (Builders, error) {
+// NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
+// for simplified mode (single 'hints' builder)
+func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, error) {
 	var builders Builders
-	if hintsEnabled {
+	if hintsCfg.Enabled() {
 		if len(bConfigs) > 0 {
 			return nil, errors.New("hints.enabled is incompatible with manually defining builders")
 		}
 
-		hints, err := common.NewConfigFrom(map[string]string{"type": "hints"})
-		if err != nil {
-			return nil, err
-		}
-
-		bConfigs = append(bConfigs, hints)
+		// pass rest of hints settings to the builder
+		hintsCfg.SetString("type", -1, "hints")
+		bConfigs = append(bConfigs, hintsCfg)
 	}
 
 	for _, bcfg := range bConfigs {

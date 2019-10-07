@@ -119,19 +119,23 @@ func (m *Matcher) Unpack(s string) error {
 	return nil
 }
 
-func (m *Matcher) MatchAnyString(strs []string) bool {
+// MatchAnyString succeeds if any string in the given array contains a match.
+func (m *Matcher) MatchAnyString(strs interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
-func (m *Matcher) MatchAllStrings(strs []string) bool {
+// MatchAllStrings succeeds if all strings in the given array contain a match.
+func (m *Matcher) MatchAllStrings(strs interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
-func (m *ExactMatcher) MatchAnyString(strs []string) bool {
+// MatchAnyString succeeds if any string in the given array is an exact match.
+func (m *ExactMatcher) MatchAnyString(strs interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
-func (m *ExactMatcher) MatchAllStrings(strs []string) bool {
+// MatchAllStrings succeeds if all strings in the given array are an exact match.
+func (m *ExactMatcher) MatchAllStrings(strs interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
@@ -145,19 +149,37 @@ func (m *ExactMatcher) Unpack(s string) error {
 	return nil
 }
 
-func matchAnyStrings(m stringMatcher, strs []string) bool {
-	for _, s := range strs {
-		if m.MatchString(s) {
-			return true
+func matchAnyStrings(m stringMatcher, strs interface{}) bool {
+	switch v := strs.(type) {
+	case []interface{}:
+		for _, s := range v {
+			if str, ok := s.(string); ok && m.MatchString(str) {
+				return true
+			}
+		}
+	case []string:
+		for _, s := range v {
+			if m.MatchString(s) {
+				return true
+			}
 		}
 	}
 	return false
 }
 
-func matchAllStrings(m stringMatcher, strs []string) bool {
-	for _, s := range strs {
-		if !m.MatchString(s) {
-			return false
+func matchAllStrings(m stringMatcher, strs interface{}) bool {
+	switch v := strs.(type) {
+	case []interface{}:
+		for _, s := range v {
+			if str, ok := s.(string); ok && !m.MatchString(str) {
+				return false
+			}
+		}
+	case []string:
+		for _, s := range v {
+			if !m.MatchString(s) {
+				return false
+			}
 		}
 	}
 	return true

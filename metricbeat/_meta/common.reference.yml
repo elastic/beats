@@ -14,7 +14,7 @@
 metricbeat.config.modules:
 
   # Glob pattern for configuration reloading
-  path: ${path.config}/conf.d/*.yml
+  path: ${path.config}/modules.d/*.yml
 
   # Period on which files under path should be checked for changes
   reload.period: 10s
@@ -43,3 +43,12 @@ metricbeat.max_start_delay: 10s
 #              metricsets: ["leader", "self", "store"]
 #              period: 10s
 #              hosts: ["${host}:2379"]
+
+#=========================== Timeseries instance ===============================
+
+# Enabling this will add a `timeseries.instance` keyword field to all metric
+# events. For a given metricset, this field will be unique for every single item
+# being monitored.
+# This setting is experimental.
+
+#timeseries.enabled: false

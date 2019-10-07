@@ -27,17 +27,11 @@ package galera_status
 import (
 	"database/sql"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mysql"
 
 	"github.com/pkg/errors"
-)
-
-var (
-	debugf = logp.MakeDebug("mysql-galera-status")
 )
 
 // init registers the MetricSet with the central registry.
@@ -56,25 +50,24 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The mysql galera_status metricset is experimental")
-
+	cfgwarn.Experimental("The galera_status metricset is experimental.")
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if m.db == nil {
 		var err error
 		m.db, err = mysql.NewDB(m.HostData().URI)
 		if err != nil {
-			return nil, errors.Wrap(err, "Galera-status fetch failed")
+			return errors.Wrap(err, "Galera-status fetch failed")
 		}
 	}
 
 	status, err := m.loadStatus(m.db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	event := eventMapping(status)
@@ -82,7 +75,12 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if m.Module().Config().Raw {
 		event["raw"] = rawEventMapping(status)
 	}
-	return event, nil
+
+	reporter.Event(mb.Event{
+		MetricSetFields: event,
+	})
+
+	return nil
 }
 
 // loadStatus loads all status entries from the given database into an array.
@@ -109,4 +107,12 @@ func (m *MetricSet) loadStatus(db *sql.DB) (map[string]string, error) {
 	}
 
 	return galeraStatus, nil
+}
+
+// Close closes the database connection and prevents future queries.
+func (m *MetricSet) Close() error {
+	if m.db == nil {
+		return nil
+	}
+	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
 }

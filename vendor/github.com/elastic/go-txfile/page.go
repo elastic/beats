@@ -48,6 +48,14 @@ func newPage(tx *Tx, id PageID) *Page {
 	return &Page{id: id, ondiskID: id, tx: tx}
 }
 
+func (p *Page) onWriteNew() {
+	p.tx.accessStats.New++
+}
+
+func (p *Page) onUpdated() {
+	p.tx.accessStats.Update++
+}
+
 // ID returns the pages PageID. The ID can be used to store a reference
 // to this page, for use within another transaction.
 func (p *Page) ID() PageID { return p.id }
@@ -70,8 +78,22 @@ func (p *Page) MarkDirty() error {
 	if err := p.canWrite(op); err != nil {
 		return err
 	}
-	p.flags.dirty = true
+
+	p.setDirty()
 	return nil
+}
+
+func (p *Page) setDirty() {
+	if p.flags.dirty {
+		return
+	}
+
+	p.flags.dirty = true
+	if p.flags.new {
+		p.onWriteNew()
+	} else {
+		p.onUpdated()
+	}
 }
 
 // Free marks a page as free. Freeing a dirty page will return an error.
@@ -203,7 +225,7 @@ func (p *Page) SetBytes(contents []byte) error {
 		p.bytes = contents
 	}
 
-	p.flags.dirty = true
+	p.setDirty()
 	return nil
 }
 

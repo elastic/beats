@@ -45,14 +45,16 @@ type ProcsMap map[int]*Process
 // Process is the structure which holds the information of a process running on the host.
 // It includes pid, gid and it interacts with gosigar to fetch process data from the host.
 type Process struct {
-	Pid             int    `json:"pid"`
-	Ppid            int    `json:"ppid"`
-	Pgid            int    `json:"pgid"`
-	Name            string `json:"name"`
-	Username        string `json:"username"`
-	State           string `json:"state"`
-	CmdLine         string `json:"cmdline"`
-	Cwd             string `json:"cwd"`
+	Pid             int      `json:"pid"`
+	Ppid            int      `json:"ppid"`
+	Pgid            int      `json:"pgid"`
+	Name            string   `json:"name"`
+	Username        string   `json:"username"`
+	State           string   `json:"state"`
+	Args            []string `json:"args"`
+	CmdLine         string   `json:"cmdline"`
+	Cwd             string   `json:"cwd"`
+	Executable      string   `json:"executable"`
 	Mem             sigar.ProcMem
 	Cpu             sigar.ProcTime
 	SampleTime      time.Time
@@ -98,15 +100,16 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	}
 
 	proc := Process{
-		Pid:      pid,
-		Ppid:     state.Ppid,
-		Pgid:     state.Pgid,
-		Name:     state.Name,
-		Username: state.Username,
-		State:    getProcState(byte(state.State)),
-		CmdLine:  cmdline,
-		Cwd:      exe.Cwd,
-		Env:      env,
+		Pid:        pid,
+		Ppid:       state.Ppid,
+		Pgid:       state.Pgid,
+		Name:       state.Name,
+		Username:   state.Username,
+		State:      getProcState(byte(state.State)),
+		CmdLine:    cmdline,
+		Cwd:        exe.Cwd,
+		Executable: exe.Name,
+		Env:        env,
 	}
 
 	return &proc, nil
@@ -130,12 +133,16 @@ func (proc *Process) getDetails(envPredicate func(string) bool) error {
 		return fmt.Errorf("error getting process cpu time for pid=%d: %v", proc.Pid, err)
 	}
 
-	if proc.CmdLine == "" {
+	if len(proc.Args) == 0 {
 		args := sigar.ProcArgs{}
 		if err := args.Get(proc.Pid); err != nil && !sigar.IsNotImplemented(err) {
 			return fmt.Errorf("error getting process arguments for pid=%d: %v", proc.Pid, err)
 		}
-		proc.CmdLine = strings.Join(args.List, " ")
+		proc.Args = args.List
+	}
+
+	if proc.CmdLine == "" && len(proc.Args) > 0 {
+		proc.CmdLine = strings.Join(proc.Args, " ")
 	}
 
 	if fd, err := getProcFDUsage(proc.Pid); err != nil {
@@ -283,12 +290,20 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 		},
 	}
 
+	if len(process.Args) > 0 {
+		proc["args"] = process.Args
+	}
+
 	if process.CmdLine != "" {
 		proc["cmdline"] = process.CmdLine
 	}
 
 	if process.Cwd != "" {
 		proc["cwd"] = process.Cwd
+	}
+
+	if process.Executable != "" {
+		proc["exe"] = process.Executable
 	}
 
 	if len(process.Env) > 0 {
@@ -468,7 +483,7 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		logp.Err("Error getting process details. pid=%d: %v", process.Pid, err)
+		logp.Debug("processes", "Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
 		return nil
 	}
 

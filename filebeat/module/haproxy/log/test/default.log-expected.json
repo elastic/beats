@@ -1,0 +1,24 @@
+[
+    {
+        "destination.ip": "1.2.3.4",
+        "destination.port": 5000,
+        "event.dataset": "haproxy.log",
+        "event.module": "haproxy",
+        "fileset.name": "log",
+        "haproxy.frontend_name": "main",
+        "haproxy.mode": "HTTP",
+        "haproxy.source": "1.2.3.4",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.name": "haproxy",
+        "process.pid": 24551,
+        "service.type": "haproxy",
+        "source.address": "1.2.3.4",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "1.2.3.4",
+        "source.port": 40780
+    }
+]

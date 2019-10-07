@@ -1,30 +1,30 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "elasticsearch": {
         "ccr": {
             "follower": {
-                "global_checkpoint": 1,
-                "index": "my_follower",
-                "operations_indexed": 2,
+                "global_checkpoint": -1,
+                "index": "my_index_f",
+                "operations_written": 0,
                 "shard": {
                     "number": 0
                 },
-                "time_since_last_fetch": {
-                    "ms": 4926
+                "time_since_last_read": {
+                    "ms": 42294
                 }
             },
             "leader": {
-                "index": "my_leader",
-                "max_seq_no": 1
+                "index": "my_index",
+                "max_seq_no": -1
             }
         },
         "cluster": {
-            "id": "KSGkOjOuSg6whAgtpPyhQw",
-            "name": "elasticsearch"
+            "id": "3LbUkLkURz--FR-YO0wLNA",
+            "name": "es1"
         }
     },
     "metricset": {

@@ -20,45 +20,47 @@
 package stats
 
 import (
-	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "memcached")
+	service := compose.EnsureUp(t, "memcached")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func TestFetch(t *testing.T) {
+	service := compose.EnsureUp(t, "memcached")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+}
+
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "memcached",
 		"metricsets": []string{"stats"},
-		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+		"hosts":      []string{host},
 	}
-}
-
-func getEnvHost() string {
-	host := os.Getenv("MEMCACHED_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func getEnvPort() string {
-	port := os.Getenv("MEMCACHED_PORT")
-
-	if len(port) == 0 {
-		port = "11211"
-	}
-	return port
 }

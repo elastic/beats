@@ -4,24 +4,31 @@
     "grok": {
       "field": "message",
       "patterns": [
-        "%{DATA:nginx.error.time} \\[%{DATA:nginx.error.level}\\] %{NUMBER:nginx.error.pid}#%{NUMBER:nginx.error.tid}: (\\*%{NUMBER:nginx.error.connection_id} )?%{GREEDYDATA:nginx.error.message}"
+        "%{DATA:nginx.error.time} \\[%{DATA:log.level}\\] %{NUMBER:process.pid:long}#%{NUMBER:process.thread.id:long}: (\\*%{NUMBER:nginx.error.connection_id:long} )?%{GREEDYDATA:message}"
       ],
       "ignore_missing": true
-    }
-  },{
-    "remove":{
-      "field": "message"
     }
   }, {
     "rename": {
       "field": "@timestamp",
-      "target_field": "read_timestamp"
+      "target_field": "event.created"
     }
   }, {
     "date": {
+      "if": "ctx.event.timezone == null",
       "field": "nginx.error.time",
       "target_field": "@timestamp",
-      "formats": ["YYYY/MM/dd H:m:s"]
+      "formats": ["yyyy/MM/dd H:m:s"],
+      "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+    }
+  }, {
+    "date": {
+      "if": "ctx.event.timezone != null",
+      "field": "nginx.error.time",
+      "target_field": "@timestamp",
+      "formats": ["yyyy/MM/dd H:m:s"],
+      "timezone": "{{ event.timezone }}",
+      "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
     }
   }, {
     "remove": {

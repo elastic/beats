@@ -62,6 +62,91 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
+		// Scenarios being tested:
+		// have co.elastic.logs/disable set to false.
+		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// metrics/module must be found in hints.metrics
+		// not.to.include must not be part of hints
+		// period is annotated at both container and pod level. Container level value must be in hints
+		{
+			annotations: map[string]string{
+				"co.elastic.logs/multiline.pattern": "^test",
+				"co.elastic.metrics/module":         "prometheus",
+				"co.elastic.metrics/period":         "10s",
+				"co.elastic.metrics.foobar/period":  "15s",
+				"co.elastic.metrics.foobar1/period": "15s",
+				"not.to.include":                    "true",
+			},
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"multiline": common.MapStr{
+						"pattern": "^test",
+					},
+				},
+				"metrics": common.MapStr{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+		},
+		// Scenarios being tested:
+		// have co.elastic.logs/disable set to false.
+		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// metrics/module must be found in hints.metrics
+		// not.to.include must not be part of hints
+		// period is annotated at both container and pod level. Container level value must be in hints
+		{
+			annotations: map[string]string{
+				"co.elastic.logs/disable":           "false",
+				"co.elastic.logs/multiline.pattern": "^test",
+				"co.elastic.metrics/module":         "prometheus",
+				"co.elastic.metrics/period":         "10s",
+				"co.elastic.metrics.foobar/period":  "15s",
+				"co.elastic.metrics.foobar1/period": "15s",
+				"not.to.include":                    "true",
+			},
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"multiline": common.MapStr{
+						"pattern": "^test",
+					},
+					"disable": "false",
+				},
+				"metrics": common.MapStr{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+		},
+		// Scenarios being tested:
+		// have co.elastic.logs/disable set to true.
+		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// metrics/module must be found in hints.metrics
+		// not.to.include must not be part of hints
+		// period is annotated at both container and pod level. Container level value must be in hints
+		{
+			annotations: map[string]string{
+				"co.elastic.logs/disable":           "true",
+				"co.elastic.logs/multiline.pattern": "^test",
+				"co.elastic.metrics/module":         "prometheus",
+				"co.elastic.metrics/period":         "10s",
+				"co.elastic.metrics.foobar/period":  "15s",
+				"co.elastic.metrics.foobar1/period": "15s",
+				"not.to.include":                    "true",
+			},
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"multiline": common.MapStr{
+						"pattern": "^test",
+					},
+					"disable": "true",
+				},
+				"metrics": common.MapStr{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

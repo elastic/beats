@@ -1,78 +1,147 @@
 {
-  "description": "Pipeline for parsing Nginx access logs. Requires the geoip and user_agent plugins.",
-  "processors": [{
-    "grok": {
-      "field": "message",
-      "patterns":[
-        "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:nginx.access.user_name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:nginx.access.response_code} %{NUMBER:nginx.access.body_sent.bytes} \"%{DATA:nginx.access.referrer}\" \"%{DATA:nginx.access.agent}\""
-        ],
-      "pattern_definitions": {
-        "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
-      },
-      "ignore_missing": true
-    }
-  }, {
-    "grok": {
-      "field": "nginx.access.info",
-      "patterns": [
-          "%{WORD:nginx.access.method} %{DATA:nginx.access.url} HTTP/%{NUMBER:nginx.access.http_version}",
-          ""
-      ],
-      "ignore_missing": true
-    }
-  }, {
-    "remove": {
-      "field": "nginx.access.info"
-    }
-  }, {
-    "split": {
-      "field": "nginx.access.remote_ip_list",
-      "separator": "\"?,?\\s+"
-    }
-  }, {
-    "script": {
-      "lang": "painless",
-      "inline": "boolean isPrivate(def ip) { try { StringTokenizer tok = new StringTokenizer(ip, '.'); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.nginx.access.remote_ip_list) {     if (!isPrivate(item)) {       ctx.nginx.access.remote_ip = item;       found = true;       break;     }   }   if (!found) {     ctx.nginx.access.remote_ip = ctx.nginx.access.remote_ip_list[0];   }"
-      }
-  }, {
-    "remove":{
-      "field": "message"
-    }
-  }, {
-    "rename": {
-      "field": "@timestamp",
-      "target_field": "read_timestamp"
-    }
-  }, {
-    "date": {
-      "field": "nginx.access.time",
-      "target_field": "@timestamp",
-      "formats": ["dd/MMM/YYYY:H:m:s Z"]
-    }
-  }, {
-    "remove": {
-      "field": "nginx.access.time"
-    }
-  }, {
-    "user_agent": {
-      "field": "nginx.access.agent",
-      "target_field": "nginx.access.user_agent"
-    }
-  }, {
-    "rename": {
-      "field": "nginx.access.agent",
-      "target_field": "nginx.access.user_agent.original"
-    }
-  }, {
-    "geoip": {
-      "field": "nginx.access.remote_ip",
-      "target_field": "nginx.access.geoip"
-    }
-  }],
-  "on_failure" : [{
-    "set" : {
-      "field" : "error.message",
-      "value" : "{{ _ingest.on_failure_message }}"
-    }
-  }]
+    "description": "Pipeline for parsing Nginx access logs. Requires the geoip and user_agent plugins.",
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "\"?(?:%{IP_LIST:nginx.access.remote_ip_list}|%{DATA:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{DATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\""
+                ],
+                "pattern_definitions": {
+                    "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
+                },
+                "ignore_missing": true
+            }
+        },
+        {
+            "grok": {
+                "field": "nginx.access.info",
+                "patterns": [
+                    "%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}",
+                    ""
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "nginx.access.info"
+            }
+        },
+        {
+            "split": {
+                "field": "nginx.access.remote_ip_list",
+                "separator": "\"?,?\\s+",
+                "ignore_missing": true
+            }
+        },
+        {
+            "split": {
+                "field": "nginx.access.origin",
+                "separator": "\"?,?\\s+",
+                "ignore_missing": true
+            }
+        },
+        {
+            "set": {
+                "field": "source.ip",
+                "value": ""
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   try {    ctx.source.ip = null;    if (ctx.nginx.access.remote_ip_list == null) { return; }    def found = false;    for (def item : ctx.nginx.access.remote_ip_list) {        if (!isPrivate(params.dot, item)) {            ctx.source.ip = item;            found = true;            break;        }    }    if (!found) {     ctx.source.ip = ctx.nginx.access.remote_ip_list[0];   }} catch (Exception e) { ctx.source.ip = null; }",
+                "params": {
+                    "dot": "."
+                }
+            }
+        },
+        {
+            "remove": {
+                "field": "source.ip",
+                "if": "ctx.source.ip == null"
+            }
+        },
+        {
+            "convert": {
+                "field": "source.ip",
+                "target_field": "source.address",
+                "type": "string",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "message"
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "date": {
+                "field": "nginx.access.time",
+                "target_field": "@timestamp",
+                "formats": [
+                    "dd/MMM/yyyy:H:m:s Z"
+                ],
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
+        },
+        {
+            "remove": {
+                "field": "nginx.access.time"
+            }
+        },
+        {
+            "user_agent": {
+                "field": "user_agent.original"
+            }
+        },
+        {
+            "geoip": {
+                "field": "source.ip",
+                "target_field": "source.geo",
+                "ignore_missing": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
+                "ignore_missing": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
 }

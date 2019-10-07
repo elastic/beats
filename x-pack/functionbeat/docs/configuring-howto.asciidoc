@@ -1,0 +1,98 @@
+[id="configuring-howto-{beatname_lc}"]
+[role="xpack"]
+= Configuring {beatname_uc}
+
+[partintro]
+--
+Before modifying configuration settings, make sure you've completed the
+<<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
+This section describes some common use cases for changing configuration options.
+
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+
+The following topics describe how to configure {beatname_uc}:
+
+* <<configuration-{beatname_lc}-options>>
+* <<configuration-general-options>>
+* <<configuring-internal-queue>>
+* <<configuring-output>>
+* <<ilm>>
+* <<configuration-ssl>>
+* <<filtering-and-enhancing-data>>
+* <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
+* <<setup-kibana-endpoint>>
+* <<configuration-template>>
+* <<configuration-logging>>
+* <<using-environ-vars>>
+* <<yaml-tips>>
+* <<regexp-support>>
+* <<{beatname_lc}-reference-yml>>
+
+--
+
+include::./config-options.asciidoc[]
+
+include::./general-options.asciidoc[]
+
+:allplatforms:
+[role="xpack"]
+include::{libbeat-dir}/docs/queueconfig.asciidoc[]
+:allplatforms!:
+
+[role="xpack"]
+include::{libbeat-dir}/docs/outputconfig.asciidoc[tag=shared-outputconfig]
+
+* <<elasticsearch-output>>
+* <<logstash-output>>
+* <<configure-cloud-id>>
+
+[role="xpack"]
+include::{libbeat-dir}/docs/outputs/output-elasticsearch.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/outputs/output-logstash.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/outputs/output-cloud.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
+
+include::./filtering.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/shared-geoip.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/setup-config.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
+
+:standalone:
+[role="xpack"]
+include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
+:standalone!:
+
+:standalone:
+:allplatforms:
+[role="xpack"]
+include::{libbeat-dir}/docs/yaml.asciidoc[]
+:standalone!:
+:allplatforms!:
+
+[role="xpack"]
+include::{libbeat-dir}/docs/regexp.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/reference-yml.asciidoc[]

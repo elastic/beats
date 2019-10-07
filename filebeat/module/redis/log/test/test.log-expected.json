@@ -1,44 +1,44 @@
 [
     {
-        "@timestamp": "2018-05-30T12:23:52.442Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
-        "input.type": "log", 
-        "offset": 0, 
-        "prospector.type": "log", 
-        "redis.log.level": "notice", 
-        "redis.log.message": "Saving the final RDB snapshot before exiting.", 
-        "redis.log.pid": "98738", 
-        "redis.log.role": "master"
-    }, 
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 0,
+        "message": "Saving the final RDB snapshot before exiting.",
+        "process.pid": 98738,
+        "redis.log.role": "master",
+        "service.type": "redis"
+    },
     {
-        "@timestamp": "2018-05-30T10:05:20.000Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
-        "input.type": "log", 
-        "offset": 76, 
-        "prospector.type": "log", 
-        "redis.log.level": "debug", 
-        "redis.log.message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects."
-    }, 
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 76,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects.",
+        "service.type": "redis"
+    },
     {
-        "@timestamp": "2018-05-31T04:32:08.000Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
-        "input.type": "log", 
-        "offset": 165, 
-        "prospector.type": "log", 
-        "redis.log.level": "notice", 
-        "redis.log.message": "The server is now ready to accept connections on port 6379\""
-    }, 
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 165,
+        "message": "The server is now ready to accept connections on port 6379\"",
+        "service.type": "redis"
+    },
     {
-        "@timestamp": "2017-05-30T10:57:24.000Z", 
-        "fileset.module": "redis", 
-        "fileset.name": "log", 
-        "input.type": "log", 
-        "offset": 250, 
-        "prospector.type": "log", 
-        "redis.log.message": "Received SIGINT scheduling shutdown...", 
-        "redis.log.pid": "5092"
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 250,
+        "message": "Received SIGINT scheduling shutdown...",
+        "process.pid": 5092,
+        "service.type": "redis"
     }
 ]

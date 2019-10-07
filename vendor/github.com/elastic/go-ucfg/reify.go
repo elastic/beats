@@ -189,7 +189,7 @@ func reifyMap(opts *options, to reflect.Value, from *Config) Error {
 		to.Set(reflect.MakeMap(to.Type()))
 	}
 	for k, value := range fields {
-		opts.activeFields = NewFieldSet(parentFields)
+		opts.activeFields = newFieldSet(parentFields)
 		key := reflect.ValueOf(k)
 
 		old := to.MapIndex(key)
@@ -249,7 +249,7 @@ func reifyStruct(opts *options, orig reflect.Value, cfg *Config) Error {
 				opts = tmp
 			}
 
-			opts.activeFields = NewFieldSet(parentFields)
+			opts.activeFields = newFieldSet(parentFields)
 
 			vField := to.Field(i)
 			validators, err := parseValidatorTags(stField.Tag.Get(opts.validatorTag))
@@ -656,7 +656,7 @@ func doReifyPrimitive(
 	}
 
 	previous := opts.opts.activeFields
-	opts.opts.activeFields = NewFieldSet(previous)
+	opts.opts.activeFields = newFieldSet(previous)
 	valT, err := val.typ(opts.opts)
 	if err != nil {
 		ctx := val.Context()

@@ -9,6 +9,17 @@
 
 ############################# Heartbeat ######################################
 
+
+# Define a directory to load monitor definitions from. Definitions take the form
+# of individual yaml files.
+heartbeat.config.monitors:
+  # Directory + glob pattern to search for configuration files
+  path: ${path.config}/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  reload.enabled: false
+  # How often to check for changes
+  reload.period: 5s
+
 # Configure monitors
 heartbeat.monitors:
 - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
@@ -62,6 +73,16 @@ heartbeat.monitors:
 
     # Interval between file file changed checks.
     #interval: 5s
+
+# Define a directory to load monitor definitions from. Definitions take the form
+# of individual yaml files.
+# heartbeat.config.monitors:
+  # Directory + glob pattern to search for configuration files
+  #path: /path/to/my/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  #reload.enabled: true
+  # How often to check for changes
+  #reload.period: 1s
 
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
@@ -208,6 +229,14 @@ heartbeat.monitors:
     # Required response contents.
     #body:
 
+    # Parses the body as JSON, then checks against the given condition expression
+    #json:
+    #- description: Explanation of what the check does
+    #  condition:
+    #    equals:
+    #      myField: expectedValue
+
+
   # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
   # Configure file json file to be watched for changes to the monitor:
   #watch.poll_file:
@@ -267,7 +296,7 @@ heartbeat.scheduler:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -310,7 +339,7 @@ heartbeat.scheduler:
       # Sets the write buffer size.
       #buffer_size: 1MiB
 
-      # Maximum duration after which events are flushed, if the write buffer
+      # Maximum duration after which events are flushed if the write buffer
       # is not full yet. The default value is 1s.
       #flush.timeout: 1s
 
@@ -324,7 +353,7 @@ heartbeat.scheduler:
       #codec: cbor
     #read:
       # Reader flush timeout, waiting for more events to become available, so
-      # to fill a complete batch, as required by the outputs.
+      # to fill a complete batch as required by the outputs.
       # If flush_timeout is 0, all available events are forwarded to the
       # outputs immediately.
       # The default value is 0s.
@@ -343,7 +372,7 @@ heartbeat.scheduler:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -406,6 +435,7 @@ heartbeat.scheduler:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -433,7 +463,7 @@ heartbeat.scheduler:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -443,10 +473,53 @@ heartbeat.scheduler:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
+# The following example copies the value of message to message_copied
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: message_copied
+#    fail_on_error: true
+#    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -475,15 +548,15 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Configure escaping html symbols in strings.
-  #escape_html: true
+  # Configure escaping HTML symbols in strings.
+  #escape_html: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -494,20 +567,25 @@ output.elasticsearch:
   # Optional index name. The default is "heartbeat" plus date
   # and generates [heartbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "heartbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "heartbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: "/elasticsearch"
 
   # Custom HTTP headers to add to each request
   #headers:
   #  X-My-Header: Contents of the header
 
-  # Proxy server url
+  # Proxy server URL
   #proxy_url: http://proxy:3128
+
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
 
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
@@ -529,45 +607,43 @@ output.elasticsearch:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Configure http request timeout before failing a request to Elasticsearch.
+  # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
+  # and certificates will be accepted. In this mode, SSL-based connections are
   # susceptible to man-in-the-middle attacks. Use only for testing. Default is
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -583,8 +659,8 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
-  # Configure escaping html symbols in strings.
-  #escape_html: true
+  # Configure escaping HTML symbols in strings.
+  #escape_html: false
 
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
@@ -593,7 +669,7 @@ output.elasticsearch:
   # Not yet supported for async connections (i.e. with the "pipelining" option set)
   #ttl: 30s
 
-  # Optional load balance the events between the Logstash hosts. Default is false.
+  # Optionally load-balance events between Logstash hosts. Default is false.
   #loadbalance: false
 
   # Number of batches to be sent asynchronously to Logstash while processing
@@ -626,7 +702,7 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
@@ -635,7 +711,7 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
@@ -646,7 +722,7 @@ output.elasticsearch:
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
   # Optional passphrase for decrypting the Certificate Key.
@@ -655,7 +731,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -682,7 +758,7 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # The list of Kafka broker addresses from where to fetch the cluster metadata.
+  # The list of Kafka broker addresses from which to fetch the cluster metadata.
   # The cluster metadata contain the actual Kafka brokers events are published
   # to.
   #hosts: ["localhost:9092"]
@@ -691,7 +767,7 @@ output.elasticsearch:
   # using any event field. To set the topic from document type use `%{[type]}`.
   #topic: beats
 
-  # The Kafka event key setting. Use format string to create unique event key.
+  # The Kafka event key setting. Use format string to create a unique event key.
   # By default no event key will be generated.
   #key: ''
 
@@ -712,35 +788,38 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version heartbeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Heartbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
   #codec.json:
-    # Pretty print json event
+    # Pretty-print JSON event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
-    #escape_html: true
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
 
-  # Metadata update configuration. Metadata do contain leader information
-  # deciding which broker to use when publishing.
+  # Metadata update configuration. Metadata contains leader information
+  # used to decide which broker to use when publishing.
   #metadata:
     # Max metadata request retry attempts when cluster is in middle of leader
     # election. Defaults to 3 retries.
     #retry.max: 3
 
-    # Waiting time between retries during leader elections. Default is 250ms.
+    # Wait time between retries during leader elections. Default is 250ms.
     #retry.backoff: 250ms
 
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
+
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
 
   # The number of times to retry publishing an event after a publishing failure.
-  # After the specified number of retries, the events are typically dropped.
+  # After the specified number of retries, events are typically dropped.
   # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
   # all events are published.  Set max_retries to a value less than 0 to retry
   # until all events are published. The default is 3.
@@ -749,6 +828,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -788,7 +871,7 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
   #ssl.enabled: true
 
   # Optional SSL configuration options. SSL is off by default.
@@ -801,7 +884,7 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
@@ -817,7 +900,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -834,23 +917,19 @@ output.elasticsearch:
     # Pretty print json event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
-    #escape_html: true
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
 
-  # The list of Redis servers to connect to. If load balancing is enabled, the
+  # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
-
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
   # default is heartbeat.
   #key: heartbeat
 
-  # The password to authenticate with. The default is no authentication.
+  # The password to authenticate to Redis with. The default is no authentication.
   #password:
 
   # The Redis database number where the events are published. The default is 0.
@@ -951,11 +1030,11 @@ output.elasticsearch:
 
   # Configure JSON encoding
   #codec.json:
-    # Pretty print json event
+    # Pretty-print JSON event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
-    #escape_html: true
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
@@ -966,7 +1045,7 @@ output.elasticsearch:
   #filename: heartbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every heartbeat restart, the files are rotated. The default value is 10240
+  # every Heartbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -978,7 +1057,6 @@ output.elasticsearch:
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
 
-
 #----------------------------- Console output ---------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -986,34 +1064,34 @@ output.elasticsearch:
 
   # Configure JSON encoding
   #codec.json:
-    # Pretty print json event
+    # Pretty-print JSON event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
-    #escape_html: true
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
 
 #================================= Paths ======================================
 
-# The home path for the heartbeat installation. This is the default base path
+# The home path for the Heartbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the heartbeat installation. This is the default
+# The configuration path for the Heartbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the heartbeat installation. This is the default base path
-# for all the files in which heartbeat needs to store its data. If not set by a
+# The data path for the Heartbeat installation. This is the default base path
+# for all the files in which Heartbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a heartbeat installation. This is the default location for
+# The logs path for a Heartbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1076,14 +1154,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "heartbeat-%{[beat.version]}"
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.name: "heartbeat-%{[beat.version]}"
+# Template name. By default the template name is "heartbeat-%{[agent.version]}"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.name: "heartbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.pattern: "heartbeat-%{[beat.version]}-*"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.pattern: "heartbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1095,10 +1173,10 @@ output.elasticsearch:
 #- name: field_name
 #  type: field_type
 
-# Enable json template loading. If this is enabled, the fields.yml is ignored.
+# Enable JSON template loading. If this is enabled, the fields.yml is ignored.
 #setup.template.json.enabled: false
 
-# Path to the json template file
+# Path to the JSON template file
 #setup.template.json.path: "${path.config}/template.json"
 
 # Name under which the template is stored in Elasticsearch
@@ -1123,6 +1201,41 @@ setup.template.settings:
   #_source:
     #enabled: false
 
+#============================== Setup ILM =====================================
+
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
+
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
+#setup.ilm.enabled: auto
+
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'heartbeat-%{[agent.version]}'. 
+#setup.ilm.rollover_alias: "heartbeat"
+
+# Set the rollover index pattern. The default is "%{now/d}-000001".
+#setup.ilm.pattern: "{now/d}-000001"
+
+# Set the lifecycle policy name. The default policy name is
+# 'heartbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -1140,7 +1253,7 @@ setup.kibana:
   #username: "elastic"
   #password: "changeme"
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: ""
 
   # Use SSL settings for HTTPS. Default is true.
@@ -1152,27 +1265,27 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
 
@@ -1190,13 +1303,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, heartbeat periodically logs its internal metrics that have changed
+# If enabled, Heartbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1231,27 +1347,38 @@ logging.files:
   # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
-  # unix epoch. Defaults to disabled.
+  # Unix epoch. Defaults to disabled.
   #interval: 0
 
-# Set to true to log messages in json format.
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
+
+# Set to true to log messages in JSON format.
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# heartbeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== X-Pack Monitoring ===============================
+# Heartbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Heartbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
@@ -1267,7 +1394,7 @@ logging.files:
   #username: "beats_system"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -1299,7 +1426,7 @@ logging.files:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # Configure HTTP request timeout before failing an request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -1311,27 +1438,27 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1360,3 +1487,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: false

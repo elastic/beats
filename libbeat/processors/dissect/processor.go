@@ -25,17 +25,22 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
+
+const flagParsingError = "dissect_parsing_error"
 
 type processor struct {
 	config config
 }
 
 func init() {
-	processors.RegisterPlugin("dissect", newProcessor)
+	processors.RegisterPlugin("dissect", NewProcessor)
+	jsprocessor.RegisterPlugin("Dissect", NewProcessor)
 }
 
-func newProcessor(c *common.Config) (processors.Processor, error) {
+// NewProcessor constructs a new dissect processor.
+func NewProcessor(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -60,6 +65,14 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	m, err := p.config.Tokenizer.Dissect(s)
 	if err != nil {
+		if err := common.AddTagsWithKey(
+			event.Fields,
+			beat.FlagField,
+			[]string{flagParsingError},
+		); err != nil {
+			return event, errors.Wrap(err, "cannot add new flag the event")
+		}
+
 		return event, err
 	}
 

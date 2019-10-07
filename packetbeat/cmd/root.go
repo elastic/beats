@@ -26,6 +26,7 @@ import (
 	_ "github.com/elastic/beats/packetbeat/include"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/packetbeat/beater"
 )
 
@@ -43,6 +44,6 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(genDevicesCommand())
 }

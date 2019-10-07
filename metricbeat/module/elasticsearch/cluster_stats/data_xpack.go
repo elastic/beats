@@ -33,24 +33,19 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func clusterNeedsTLSEnabled(license, stackStats common.MapStr) (bool, error) {
+type clusterStatsLicense struct {
+	*elasticsearch.License
+	ClusterNeedsTLS bool `json:"cluster_needs_tls"`
+}
+
+func clusterNeedsTLSEnabled(license *elasticsearch.License, stackStats common.MapStr) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
-	value, err := license.GetValue("type")
-	if err != nil {
-		return false, elastic.MakeErrorForMissingField("type", elastic.Elasticsearch)
-	}
-
-	licenseType, ok := value.(string)
-	if !ok {
-		return false, fmt.Errorf("license type is not a string")
-	}
-
-	if licenseType != "trial" {
+	if !license.IsOneOf("trial") {
 		return false, nil
 	}
 
 	// TLS does not need to be enabled if security is not enabled
-	value, err = stackStats.GetValue("security.enabled")
+	value, err := stackStats.GetValue("security.enabled")
 	if err != nil {
 		return false, elastic.MakeErrorForMissingField("security.enabled", elastic.Elasticsearch)
 	}
@@ -142,6 +137,22 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 	return false, nil
 }
 
+func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
+	// For security reasons we only get the display_name setting
+	filterPaths := []string{"*.cluster.metadata.display_name"}
+	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(m.HTTP, m.HTTP.GetURI(), filterPaths)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to get cluster settings")
+	}
+
+	clusterSettings, err = elasticsearch.MergeClusterSettings(clusterSettings)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to merge cluster settings")
+	}
+
+	return clusterSettings, nil
+}
+
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -150,6 +161,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	}
 
 	clusterStats := common.MapStr(data)
+	clusterStats.Delete("_nodes")
 
 	value, err := clusterStats.GetValue("cluster_name")
 	if err != nil {
@@ -159,6 +171,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if !ok {
 		return fmt.Errorf("cluster name is not a string")
 	}
+	clusterStats.Delete("cluster_name")
 
 	license, err := elasticsearch.GetLicense(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
@@ -170,6 +183,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if err != nil {
 		return errors.Wrap(err, "failed to get cluster state from Elasticsearch")
 	}
+	clusterState.Delete("cluster_name")
 
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterState); err != nil {
 		return errors.Wrap(err, "failed to pass through status field")
@@ -190,7 +204,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if err != nil {
 		return errors.Wrap(err, "failed to determine if cluster needs TLS enabled")
 	}
-	license.Put("cluster_needs_tls", clusterNeedsTLS) // This powers a cluster alert for enabling TLS on the ES transport protocol
+
+	l := clusterStatsLicense{license, clusterNeedsTLS}
 
 	isAPMFound, err := apmIndicesExist(clusterState)
 	if err != nil {
@@ -212,11 +227,19 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		"timestamp":     common.Time(time.Now()),
 		"interval_ms":   m.Module().Config().Period / time.Millisecond,
 		"type":          "cluster_stats",
-		"license":       license,
-		"version":       info.Version.Number,
+		"license":       l,
+		"version":       info.Version.Number.String(),
 		"cluster_stats": clusterStats,
 		"cluster_state": clusterState,
 		"stack_stats":   stackStats,
+	}
+
+	clusterSettings, err := getClusterMetadataSettings(m)
+	if err != nil {
+		return err
+	}
+	if clusterSettings != nil {
+		event.RootFields.Put("cluster_settings", clusterSettings)
 	}
 
 	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)

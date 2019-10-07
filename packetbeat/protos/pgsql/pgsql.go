@@ -22,17 +22,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+
+	"go.uber.org/zap"
 )
 
 type pgsqlPlugin struct {
+	log, debug, detail *logp.Logger
+	isDebug, isDetail  bool
 
 	// config
 	ports        []int
@@ -76,20 +80,21 @@ type pgsqlMessage struct {
 
 	direction    uint8
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 }
 
 type pgsqlTransaction struct {
-	tuple        common.TCPTuple
-	src          common.Endpoint
-	dst          common.Endpoint
-	responseTime int32
-	ts           time.Time
-	query        string
-	method       string
-	bytesOut     uint64
-	bytesIn      uint64
-	notes        []string
+	tuple    common.TCPTuple
+	src      common.Endpoint
+	dst      common.Endpoint
+	ts       time.Time
+	endTime  time.Time
+	query    string
+	method   string
+	bytesOut uint64
+	bytesIn  uint64
+	notes    []string
+	isError  bool
 
 	pgsql common.MapStr
 
@@ -125,11 +130,6 @@ var (
 )
 
 var (
-	debugf    = logp.MakeDebug("pgsql")
-	detailedf = logp.MakeDebug("pgsqldetailed")
-)
-
-var (
 	unmatchedResponses = monitoring.NewInt(nil, "pgsql.unmatched_responses")
 )
 
@@ -159,6 +159,11 @@ func New(
 func (pgsql *pgsqlPlugin) init(results protos.Reporter, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
 
+	pgsql.log = logp.NewLogger("pgsql")
+	pgsql.debug = logp.NewLogger("pgsql", zap.AddCallerSkip(1))
+	pgsql.detail = logp.NewLogger("pgsqldetailed", zap.AddCallerSkip(1))
+	pgsql.isDebug, pgsql.isDetail = logp.IsDebug("pgsql"), logp.IsDebug("pgsqldetailed")
+
 	pgsql.transactions = common.NewCache(
 		pgsql.transactionTimeout,
 		protos.DefaultTransactionHashSize)
@@ -184,6 +189,20 @@ func (pgsql *pgsqlPlugin) getTransaction(k common.HashableTCPTuple) []*pgsqlTran
 		return v.([]*pgsqlTransaction)
 	}
 	return nil
+}
+
+//go:inline
+func (pgsql *pgsqlPlugin) debugf(format string, v ...interface{}) {
+	if pgsql.isDebug {
+		pgsql.debug.Debugf(format, v...)
+	}
+}
+
+//go:inline
+func (pgsql *pgsqlPlugin) detailf(format string, v ...interface{}) {
+	if pgsql.isDetail {
+		pgsql.detail.Debugf(format, v...)
+	}
 }
 
 func (pgsql *pgsqlPlugin) GetPorts() []int {
@@ -236,13 +255,13 @@ func (pgsql *pgsqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 			data:    pkt.Payload,
 			message: &pgsqlMessage{ts: pkt.Ts},
 		}
-		logp.Debug("pgsqldetailed", "New stream created")
+		pgsql.detailf("New stream created")
 	} else {
 		// concatenate bytes
 		priv.data[dir].data = append(priv.data[dir].data, pkt.Payload...)
-		logp.Debug("pgsqldetailed", "Len data: %d cap data: %d", len(priv.data[dir].data), cap(priv.data[dir].data))
+		pgsql.detailf("Len data: %d cap data: %d", len(priv.data[dir].data), cap(priv.data[dir].data))
 		if len(priv.data[dir].data) > tcp.TCPMaxDataInStream {
-			debugf("Stream data too large, dropping TCP stream")
+			pgsql.debugf("Stream data too large, dropping TCP stream")
 			priv.data[dir] = nil
 			return priv
 		}
@@ -261,12 +280,11 @@ func (pgsql *pgsqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 		}
 
 		ok, complete := pgsql.pgsqlMessageParser(priv.data[dir])
-		//logp.Debug("pgsqldetailed", "MessageParser returned ok=%v complete=%v", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			priv.data[dir] = nil
-			debugf("Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
+			pgsql.debugf("Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
 			return priv
 		}
 
@@ -332,7 +350,7 @@ func (pgsql *pgsqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	// next layer but mark it as incomplete.
 	stream := pgsqlData.data[dir]
 	if messageHasEnoughData(stream.message) {
-		debugf("Message not complete, but sending to the next layer")
+		pgsql.debugf("Message not complete, but sending to the next layer")
 		m := stream.message
 		m.toExport = true
 		m.end = stream.parseOffset
@@ -377,7 +395,7 @@ func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
 	// separated by ';'
 	queries := pgsqlQueryParser(msg.query)
 
-	logp.Debug("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
+	pgsql.debugf("Queries (%d) :%s", len(queries), queries)
 
 	transList := pgsql.getTransaction(tuple.Hashable())
 	if transList == nil {
@@ -413,7 +431,7 @@ func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
 	tuple := msg.tcpTuple
 	transList := pgsql.getTransaction(tuple.Hashable())
 	if transList == nil || len(transList) == 0 {
-		debugf("Response from unknown transaction. Ignoring.")
+		pgsql.debugf("Response from unknown transaction. Ignoring.")
 		unmatchedResponses.Add(1)
 		return
 	}
@@ -423,29 +441,32 @@ func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
 
 	// check if the request was received
 	if trans.pgsql == nil {
-		debugf("Response from unknown transaction. Ignoring.")
+		pgsql.debugf("Response from unknown transaction. Ignoring.")
 		unmatchedResponses.Add(1)
 		return
 	}
 
 	trans.pgsql.Update(common.MapStr{
-		"iserror":        msg.isError,
-		"num_rows":       msg.numberOfRows,
-		"num_fields":     msg.numberOfFields,
-		"error_code":     msg.errorCode,
-		"error_message":  msg.errorInfo,
-		"error_severity": msg.errorSeverity,
+		"num_rows":   msg.numberOfRows,
+		"num_fields": msg.numberOfFields,
 	})
+	if msg.isError {
+		trans.pgsql.Update(common.MapStr{
+			"error_code":     msg.errorCode,
+			"error_message":  msg.errorInfo,
+			"error_severity": msg.errorSeverity,
+		})
+	}
 	trans.bytesOut = msg.size
-
-	trans.responseTime = int32(msg.ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+	trans.isError = msg.isError
+	trans.endTime = msg.ts
 	trans.responseRaw = common.DumpInCSVFormat(msg.fields, msg.rows)
 
 	trans.notes = append(trans.notes, msg.notes...)
 
 	pgsql.publishTransaction(trans)
 
-	debugf("Postgres transaction completed: %s\n%s", trans.pgsql, trans.responseRaw)
+	pgsql.debugf("Postgres transaction completed: %s\n%s", trans.pgsql, trans.responseRaw)
 }
 
 func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
@@ -453,38 +474,37 @@ func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
 		return
 	}
 
-	fields := common.MapStr{}
+	evt, pbf := pb.NewBeatEvent(t.ts)
+	pbf.SetSource(&t.src)
+	pbf.SetDestination(&t.dst)
+	pbf.Source.Bytes = int64(t.bytesIn)
+	pbf.Destination.Bytes = int64(t.bytesOut)
+	pbf.Event.Start = t.ts
+	pbf.Event.End = t.endTime
+	pbf.Event.Dataset = "pgsql"
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Error.Message = t.notes
 
-	fields["type"] = "pgsql"
-	if t.pgsql["iserror"].(bool) {
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
+	fields["query"] = t.query
+	fields["method"] = t.method
+	fields["pgsql"] = t.pgsql
+
+	if t.isError {
 		fields["status"] = common.ERROR_STATUS
 	} else {
 		fields["status"] = common.OK_STATUS
 	}
-	fields["responsetime"] = t.responseTime
 	if pgsql.sendRequest {
 		fields["request"] = t.requestRaw
 	}
 	if pgsql.sendResponse {
 		fields["response"] = t.responseRaw
 	}
-	fields["query"] = t.query
-	fields["method"] = t.method
-	fields["bytes_out"] = t.bytesOut
-	fields["bytes_in"] = t.bytesIn
-	fields["pgsql"] = t.pgsql
 
-	fields["src"] = &t.src
-	fields["dst"] = &t.dst
-
-	if len(t.notes) > 0 {
-		fields["notes"] = t.notes
-	}
-
-	pgsql.results(beat.Event{
-		Timestamp: t.ts,
-		Fields:    fields,
-	})
+	pgsql.results(evt)
 }
 
 func (pgsql *pgsqlPlugin) removeTransaction(transList []*pgsqlTransaction,

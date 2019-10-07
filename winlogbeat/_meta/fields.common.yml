@@ -1,197 +1,18 @@
-- key: common
-  title: "Common Winlogbeat"
+- key: winlog
+  title: "Winlogbeat"
   description: >
-    Contains common fields available in all event types.
+    Fields from the Windows Event Log.
   fields:
-    - name: type
-      required: true
-      description: >
-        The event log API type used to read the record. The possible values are
-        "wineventlog" for the Windows Event Log API or "eventlogging" for the
-        Event Logging API.
 
-        The Event Logging API was designed for Windows Server 2003
-        or Windows 2000 operating systems. In Windows Vista, the event logging
-        infrastructure was redesigned. On Windows Vista or later operating
-        systems, the Windows Event Log API is used. Winlogbeat automatically
-        detects which API to use for reading event logs.
-
-
-- key: eventlog
-  title: Event log record
-  description: >
-    Contains data from a Windows event log record.
-  fields:
-    - name: activity_id
+    - name: log.file.path
       type: keyword
       required: false
       description: >
-        A globally unique identifier that identifies the current activity. The
-        events that are published with this identifier are part of the same
-        activity.
+        The name of the file the event was read from when Winlogbeat is
+        reading directly from an .evtx file.
 
-    - name: computer_name
-      type: keyword
-      required: true
-      description: >
-        The name of the computer that generated the record. When using Windows
-        event forwarding, this name can differ from the `beat.hostname`.
-
-    - name: event_data
-      type: object
-      object_type: keyword
-      required: false
-      description: >
-        The event-specific data. This field is mutually exclusive with
-        `user_data`. If you are capturing event data on versions prior
-        to Windows Vista, the parameters in `event_data` are named `param1`,
-        `param2`, and so on, because event log parameters are unnamed in
-        earlier versions of Windows.
-
-    - name: event_id
-      type: long
-      required: true
-      description: >
-        The event identifier. The value is specific to the source of the event.
-
-    - name: keywords
-      type: keyword
-      required: false
-      description: >
-        The keywords are used to classify an event.
-
-    - name: log_name
-      type: keyword
-      required: true
-      description: >
-        The name of the event log from which this record was read. This value is
-        one of the names from the `event_logs` collection in the configuration.
-
-    - name: level
-      type: keyword
-      required: false
-      description: >
-        The level of the event. There are five levels of events that can be
-        logged: Success, Information, Warning, Error, Audit Success, and Audit
-        Failure.
-
-    - name: message
-      type: text
-      required: false
-      description: >
-        The message from the event log record.
-
-    - name: message_error
-      type: keyword
-      required: false
-      description: >
-        The error that occurred while reading and formatting the message from
-        the log.
-
-    - name: record_number
-      type: keyword
-      required: true
-      description: >
-        The record number of the event log record. The first record written
-        to an event log is record number 1, and other records are numbered
-        sequentially. If the record number reaches the maximum value (2^32^
-        for the Event Logging API and 2^64^ for the Windows Event Log API),
-        the next record number will be 0.
-
-    - name: related_activity_id
-      type: keyword
-      required: false
-      description: >
-        A globally unique identifier that identifies the activity to which
-        control was transferred to. The related events would then have this
-        identifier as their `activity_id` identifier.
-
-    - name: opcode
-      type: keyword
-      required: false
-      description: >
-        The opcode defined in the event. Task and opcode are typically used to
-        identify the location in the application from where the event was
-        logged.
-
-    - name: provider_guid
-      type: keyword
-      required: false
-      description: >
-        A globally unique identifier that identifies the provider that logged
-        the event.
-
-    - name: process_id
-      type: long
-      required: false
-      description: >
-        The process_id identifies the process that generated the event.
-
-    - name: source_name
-      type: keyword
-      required: true
-      description: >
-        The source of the event log record (the application or service that
-        logged the record).
-
-    - name: task
-      type: keyword
-      required: false
-      description: >
-        The task defined in the event. Task and opcode are typically used to
-        identify the location in the application from where the event was
-        logged. The category used by the Event Logging API (on pre Windows Vista
-        operating systems) is written to this field.
-
-    - name: thread_id
-      type: long
-      required: false
-      description: >
-        The thread_id identifies the thread that generated the event.
-
-    - name: user_data
-      type: object
-      object_type: keyword
-      required: false
-      description: >
-        The event specific data. This field is mutually exclusive with
-        `event_data`.
-
-    - name: user.identifier
-      type: keyword
-      required: false
-      example: S-1-5-21-3541430928-2051711210-1391384369-1001
-      description: >
-        The Windows security identifier (SID) of the account associated with
-        this event.
-
-
-        If Winlogbeat cannot resolve the SID to a name, then the `user.name`,
-        `user.domain`, and `user.type` fields will be omitted from the event.
-        If you discover Winlogbeat not resolving SIDs, review the log for
-        clues as to what the problem may be.
-
-    - name: user.domain
-      type: keyword
-      required: false
-      description: >
-        The domain that the account associated with this event is a member of.
-
-    - name: user.type
-      type: keyword
-      required: false
-      description: >
-        The type of account associated with this event.
-
-    - name: version
-      type: long
-      required: false
-      description: The version number of the event's definition.
-
-    - name: xml
-      type: keyword
-      type: text
-      required: false
+    - name: event.original
+      overwrite: true
       description: >
         The raw XML representation of the event obtained from Windows. This
         field is only available on operating systems supporting the Windows
@@ -199,7 +20,506 @@
         included by default and must be enabled by setting `include_xml: true`
         as a configuration option for an individual event log.
 
-
         The XML representation of the event is useful for troubleshooting
         purposes. The data in the fields reported by Winlogbeat can be compared
         to the data in the XML to diagnose problems.
+
+    - name: winlog
+      type: group
+      description: >
+        All fields specific to the Windows Event Log are defined here.
+      fields:
+
+        - name: api
+          required: true
+          description: >
+            The event log API type used to read the record. The possible values are
+            "wineventlog" for the Windows Event Log API or "eventlogging" for the
+            Event Logging API.
+
+            The Event Logging API was designed for Windows Server 2003
+            or Windows 2000 operating systems. In Windows Vista, the event logging
+            infrastructure was redesigned. On Windows Vista or later operating
+            systems, the Windows Event Log API is used. Winlogbeat automatically
+            detects which API to use for reading event logs.
+
+        - name: activity_id
+          type: keyword
+          required: false
+          description: >
+            A globally unique identifier that identifies the current activity. The
+            events that are published with this identifier are part of the same
+            activity.
+
+        - name: computer_name
+          type: keyword
+          required: true
+          description: >
+            The name of the computer that generated the record. When using Windows
+            event forwarding, this name can differ from `agent.hostname`.
+
+        - name: event_data
+          type: object
+          object_type: keyword
+          required: false
+          description: >
+            The event-specific data. This field is mutually exclusive with
+            `user_data`. If you are capturing event data on versions prior
+            to Windows Vista, the parameters in `event_data` are named `param1`,
+            `param2`, and so on, because event log parameters are unnamed in
+            earlier versions of Windows.
+
+        - name: event_data
+          type: group
+          description: >
+            This is a non-exhaustive list of parameters that are used in
+            Windows events. By having these fields defined in the template they
+            can be used in dashboards and machine-learning jobs.
+          fields:
+            - name: AuthenticationPackageName
+              type: keyword
+            - name: Binary
+              type: keyword
+            - name: BitlockerUserInputTime
+              type: keyword
+            - name: BootMode
+              type: keyword
+            - name: BootType
+              type: keyword
+            - name: BuildVersion
+              type: keyword
+            - name: Company
+              type: keyword
+            - name: CorruptionActionState
+              type: keyword
+            - name: CreationUtcTime
+              type: keyword
+            - name: Description
+              type: keyword
+            - name: Detail
+              type: keyword
+            - name: DeviceName
+              type: keyword
+            - name: DeviceNameLength
+              type: keyword
+            - name: DeviceTime
+              type: keyword
+            - name: DeviceVersionMajor
+              type: keyword
+            - name: DeviceVersionMinor
+              type: keyword
+            - name: DriveName
+              type: keyword
+            - name: DriverName
+              type: keyword
+            - name: DriverNameLength
+              type: keyword
+            - name: DwordVal
+              type: keyword
+            - name: EntryCount
+              type: keyword
+            - name: ExtraInfo
+              type: keyword
+            - name: FailureName
+              type: keyword
+            - name: FailureNameLength
+              type: keyword
+            - name: FileVersion
+              type: keyword
+            - name: FinalStatus
+              type: keyword
+            - name: Group
+              type: keyword
+            - name: IdleImplementation
+              type: keyword
+            - name: IdleStateCount
+              type: keyword
+            - name: ImpersonationLevel
+              type: keyword
+            - name: IntegrityLevel
+              type: keyword
+            - name: IpAddress
+              type: keyword
+            - name: IpPort
+              type: keyword
+            - name: KeyLength
+              type: keyword
+            - name: LastBootGood
+              type: keyword
+            - name: LastShutdownGood
+              type: keyword
+            - name: LmPackageName
+              type: keyword
+            - name: LogonGuid
+              type: keyword
+            - name: LogonId
+              type: keyword
+            - name: LogonProcessName
+              type: keyword
+            - name: LogonType
+              type: keyword
+            - name: MajorVersion
+              type: keyword
+            - name: MaximumPerformancePercent
+              type: keyword
+            - name: MinimumPerformancePercent
+              type: keyword
+            - name: MinimumThrottlePercent
+              type: keyword
+            - name: MinorVersion
+              type: keyword
+            - name: NewProcessId
+              type: keyword
+            - name: NewProcessName
+              type: keyword
+            - name: NewSchemeGuid
+              type: keyword
+            - name: NewTime
+              type: keyword
+            - name: NominalFrequency
+              type: keyword
+            - name: Number
+              type: keyword
+            - name: OldSchemeGuid
+              type: keyword
+            - name: OldTime
+              type: keyword
+            - name: OriginalFileName
+              type: keyword
+            - name: Path
+              type: keyword
+            - name: PerformanceImplementation
+              type: keyword
+            - name: PreviousCreationUtcTime
+              type: keyword
+            - name: PreviousTime
+              type: keyword
+            - name: PrivilegeList
+              type: keyword
+            - name: ProcessId
+              type: keyword
+            - name: ProcessName
+              type: keyword
+            - name: ProcessPath
+              type: keyword
+            - name: ProcessPid
+              type: keyword
+            - name: Product
+              type: keyword
+            - name: PuaCount
+              type: keyword
+            - name: PuaPolicyId
+              type: keyword
+            - name: QfeVersion
+              type: keyword
+            - name: Reason
+              type: keyword
+            - name: SchemaVersion
+              type: keyword
+            - name: ScriptBlockText
+              type: keyword
+            - name: ServiceName
+              type: keyword
+            - name: ServiceVersion
+              type: keyword
+            - name: ShutdownActionType
+              type: keyword
+            - name: ShutdownEventCode
+              type: keyword
+            - name: ShutdownReason
+              type: keyword
+            - name: Signature
+              type: keyword
+            - name: SignatureStatus
+              type: keyword
+            - name: Signed
+              type: keyword
+            - name: StartTime
+              type: keyword
+            - name: State
+              type: keyword
+            - name: Status
+              type: keyword
+            - name: StopTime
+              type: keyword
+            - name: SubjectDomainName
+              type: keyword
+            - name: SubjectLogonId
+              type: keyword
+            - name: SubjectUserName
+              type: keyword
+            - name: SubjectUserSid
+              type: keyword
+            - name: TSId
+              type: keyword
+            - name: TargetDomainName
+              type: keyword
+            - name: TargetInfo
+              type: keyword
+            - name: TargetLogonGuid
+              type: keyword
+            - name: TargetLogonId
+              type: keyword
+            - name: TargetServerName
+              type: keyword
+            - name: TargetUserName
+              type: keyword
+            - name: TargetUserSid
+              type: keyword
+            - name: TerminalSessionId
+              type: keyword
+            - name: TokenElevationType
+              type: keyword
+            - name: TransmittedServices
+              type: keyword
+            - name: UserSid
+              type: keyword
+            - name: Version
+              type: keyword
+            - name: Workstation
+              type: keyword
+            - name: param1
+              type: keyword
+            - name: param2
+              type: keyword
+            - name: param3
+              type: keyword
+            - name: param4
+              type: keyword
+            - name: param5
+              type: keyword
+            - name: param6
+              type: keyword
+            - name: param7
+              type: keyword
+            - name: param8
+              type: keyword
+
+        - name: event_id
+          type: keyword
+          required: true
+          description: >
+            The event identifier. The value is specific to the source of the event.
+
+        - name: keywords
+          type: keyword
+          required: false
+          description: >
+            The keywords are used to classify an event.
+
+        - name: channel
+          type: keyword
+          required: true
+          description: >
+            The name of the channel from which this record was read. This value is
+            one of the names from the `event_logs` collection in the configuration.
+
+        - name: record_id
+          type: keyword
+          required: true
+          description: >
+            The record ID of the event log record. The first record written
+            to an event log is record number 1, and other records are numbered
+            sequentially. If the record number reaches the maximum value (2^32^
+            for the Event Logging API and 2^64^ for the Windows Event Log API),
+            the next record number will be 0.
+
+        - name: related_activity_id
+          type: keyword
+          required: false
+          description: >
+            A globally unique identifier that identifies the activity to which
+            control was transferred to. The related events would then have this
+            identifier as their `activity_id` identifier.
+
+        - name: opcode
+          type: keyword
+          required: false
+          description: >
+            The opcode defined in the event. Task and opcode are typically used to
+            identify the location in the application from where the event was
+            logged.
+
+        - name: provider_guid
+          type: keyword
+          required: false
+          description: >
+            A globally unique identifier that identifies the provider that logged
+            the event.
+
+        - name: process.pid
+          type: long
+          required: false
+          description: >
+            The process_id of the Client Server Runtime Process.
+
+        - name: provider_name
+          type: keyword
+          required: true
+          description: >
+            The source of the event log record (the application or service that
+            logged the record).
+
+        - name: task
+          type: keyword
+          required: false
+          description: >
+            The task defined in the event. Task and opcode are typically used to
+            identify the location in the application from where the event was
+            logged. The category used by the Event Logging API (on pre Windows Vista
+            operating systems) is written to this field.
+
+        - name: process.thread.id
+          type: long
+          required: false
+
+        - name: user_data
+          type: object
+          object_type: keyword
+          required: false
+          description: >
+            The event specific data. This field is mutually exclusive with
+            `event_data`.
+
+        - name: user.identifier
+          type: keyword
+          required: false
+          example: S-1-5-21-3541430928-2051711210-1391384369-1001
+          description: >
+            The Windows security identifier (SID) of the account associated with
+            this event.
+
+            If Winlogbeat cannot resolve the SID to a name, then the `user.name`,
+            `user.domain`, and `user.type` fields will be omitted from the event.
+            If you discover Winlogbeat not resolving SIDs, review the log for
+            clues as to what the problem may be.
+
+        - name: user.name
+          type: keyword
+          description: >
+            Name of the user associated with this event.
+
+        - name: user.domain
+          type: keyword
+          required: false
+          description: >
+            The domain that the account associated with this event is a member of.
+
+        - name: user.type
+          type: keyword
+          required: false
+          description: >
+            The type of account associated with this event.
+
+        - name: version
+          type: long
+          required: false
+          description: The version number of the event's definition.
+
+# Aliases for the old fields
+- key: eventlog
+  title: Legacy Winlogbeat alias
+  description: >
+    Field aliases based on Winlogbeat 6.x that point to the fields for this
+    version of Winlogbeat. These are added to the index template when
+    `migration.6_to_7.enable: true` is set in the configuration.
+  fields:
+    - name: type
+      type: alias
+      path: winlog.api
+      migration: true
+
+    - name: activity_id
+      type: alias
+      path: winlog.activity_id
+      migration: true
+
+    - name: computer_name
+      type: alias
+      path: winlog.computer_name
+      migration: true
+
+    - name: event_id
+      type: alias
+      path: winlog.event_id
+      migration: true
+
+    - name: keywords
+      type: alias
+      path: winlog.keywords
+      migration: true
+
+    - name: log_name
+      type: alias
+      path: winlog.channel
+      migration: true
+
+    - name: message_error
+      type: alias
+      path: error.message
+      migration: true
+
+    - name: record_number
+      type: alias
+      path: winlog.record_id
+      migration: true
+
+    - name: related_activity_id
+      type: alias
+      path: winlog.related_activity_id
+      migration: true
+
+    - name: opcode
+      type: alias
+      path: winlog.opcode
+      migration: true
+
+    - name: provider_guid
+      type: alias
+      path: winlog.provider_guid
+      migration: true
+
+    - name: process_id
+      type: alias
+      path: winlog.process.pid
+      migration: true
+
+    - name: source_name
+      type: alias
+      path: winlog.provider_name
+      migration: true
+
+    - name: task
+      type: alias
+      path: winlog.task
+      migration: true
+
+    - name: thread_id
+      type: alias
+      path: winlog.process.thread.id
+      migration: true
+
+    - name: user.identifier
+      type: alias
+      path:  winlog.user.identifier
+      migration: true
+
+    - name: user.domain
+      type: alias
+      path: winlog.user.domain
+      migration: true
+
+    - name: user.type
+      type: alias
+      path: winlog.user.type
+      migration: true
+
+    - name: version
+      type: alias
+      path: winlog.version
+      migration: true
+
+    - name: xml
+      type: alias
+      path: event.original
+      migration: true

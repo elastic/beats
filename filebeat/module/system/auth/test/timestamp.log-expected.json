@@ -1,0 +1,30 @@
+[
+    {
+        "@timestamp": "2019-06-14T08:40:20.912-02:00",
+        "event.dataset": "system.auth",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "auth",
+        "host.hostname": "localhost",
+        "input.type": "log",
+        "log.file.path": "timestamp.log",
+        "log.offset": 0,
+        "message": "pam_unix(sudo-i:session): session opened for user root by userauth3(uid=0)",
+        "process.name": "sudo",
+        "service.type": "system"
+    },
+    {
+        "@timestamp": "2019-06-14T09:31:15.412-02:00",
+        "event.dataset": "system.auth",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "auth",
+        "host.hostname": "localhost",
+        "input.type": "log",
+        "log.file.path": "timestamp.log",
+        "log.offset": 118,
+        "message": "user nobody logged out.",
+        "process.name": "pam",
+        "service.type": "system"
+    }
+]

@@ -1,0 +1,86 @@
+[
+    {
+        "@timestamp": "2019-03-06T08:55:28.903Z",
+        "coredns.dnssec_ok": false,
+        "coredns.id": "21583",
+        "coredns.query.class": "IN",
+        "coredns.query.name": "httpbin.org.cluster.local.",
+        "coredns.query.size": 43,
+        "coredns.query.type": "A",
+        "coredns.response.code": "NXDOMAIN",
+        "coredns.response.flags": [
+            "QR",
+            "RD",
+            "RA"
+        ],
+        "coredns.response.size": 136,
+        "dns.header_flags": [
+            "QR",
+            "RD",
+            "RA"
+        ],
+        "dns.id": "21583",
+        "dns.question.class": "IN",
+        "dns.question.name": "httpbin.org.cluster.local",
+        "dns.question.type": "A",
+        "dns.response_code": "NXDOMAIN",
+        "event.dataset": "coredns.log",
+        "event.duration": 102078,
+        "event.module": "coredns",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 0,
+        "message": "2019-03-06T08:55:28.903Z [INFO] 172.17.0.4:36413 - 21583 \"A IN httpbin.org.cluster.local. udp 43 false 512\" NXDOMAIN qr,rd,ra 136 0.000102078s",
+        "network.transport": "udp",
+        "service.type": "coredns",
+        "source.address": "172.17.0.4",
+        "source.ip": "172.17.0.4",
+        "source.port": 36413,
+        "tags": [
+            "coredns"
+        ]
+    },
+    {
+        "@timestamp": "2019-03-18T22:13:36.289-07:00",
+        "coredns.dnssec_ok": false,
+        "coredns.id": "14639",
+        "coredns.query.class": "IN",
+        "coredns.query.name": "www.yahoo.com.",
+        "coredns.query.size": 42,
+        "coredns.query.type": "A",
+        "coredns.response.code": "NOERROR",
+        "coredns.response.flags": [
+            "QR",
+            "RD",
+            "RA"
+        ],
+        "coredns.response.size": 188,
+        "dns.header_flags": [
+            "QR",
+            "RD",
+            "RA"
+        ],
+        "dns.id": "14639",
+        "dns.question.class": "IN",
+        "dns.question.name": "www.yahoo.com",
+        "dns.question.type": "A",
+        "dns.response_code": "NOERROR",
+        "event.dataset": "coredns.log",
+        "event.duration": 20948545,
+        "event.module": "coredns",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 143,
+        "message": "2019-03-18T22:13:36.289-07:00 [INFO] [::1]:57413 - 14639 \"A IN www.yahoo.com. udp 42 false 4096\" NOERROR qr,rd,ra 188 0.020948545s",
+        "network.transport": "udp",
+        "service.type": "coredns",
+        "source.address": "::1",
+        "source.ip": "::1",
+        "source.port": 57413,
+        "tags": [
+            "coredns"
+        ]
+    }
+]

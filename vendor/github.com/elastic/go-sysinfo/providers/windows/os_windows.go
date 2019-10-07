@@ -37,6 +37,7 @@ func OperatingSystem() (*types.OSInfo, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, `failed to open HKLM\%v`, path)
 	}
+	defer k.Close()
 
 	osInfo := &types.OSInfo{
 		Family:   "windows",

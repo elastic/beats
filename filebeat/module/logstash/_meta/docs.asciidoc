@@ -15,7 +15,7 @@ The +{modulename}+ module has two filesets:
 
 
 For the `slowlog` fileset, make sure to configure the
-{logstashdoc}/logging.html#_slowlog[Logstash slowlog option].
+{logstash-ref}/logging.html#_slowlog[Logstash slowlog option].
 
 [float]
 === Compatibility
@@ -48,11 +48,11 @@ file to override the default paths for Logstash logs and set the format to json
   log:
     enabled: true
     var.paths: ["/path/to/log/logstash.log*"]
-    format: json
+    var.format: json
   slowlog:
     enabled: true
     var.paths: ["/path/to/log/logstash-slowlog.log*"]
-    format: json
+    var.format: json
 -----
 
 To specify the same settings at the command line, you use:
@@ -88,6 +88,8 @@ include::../include/var-paths.asciidoc[]
 
 The configured Logstash log format. Possible values are: `json` or `plain`. The
 default is `plain`.
+
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

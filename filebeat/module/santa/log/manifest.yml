@@ -1,0 +1,11 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/santa.log
+  - name: input
+    default: file
+
+ingest_pipeline: ingest/pipeline.json
+input: config/{{.input}}.yml

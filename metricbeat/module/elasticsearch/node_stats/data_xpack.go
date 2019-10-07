@@ -22,26 +22,21 @@ import (
 
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
-	sourceNodeXpack = s.Schema{
-		"host":              c.Str("host"),
-		"transport_address": c.Str("transport_address"),
-		"ip":                c.Str("ip"),
-		"name":              c.Str("name"),
-	}
-
 	schemaXpack = s.Schema{
+		"name":              c.Str("name"),
+		"transport_address": c.Str("transport_address"),
 		"indices": c.Dict("indices", s.Schema{
 			"docs": c.Dict("docs", s.Schema{
 				"count": c.Int("count"),
@@ -94,7 +89,7 @@ var (
 					"1m":  c.Float("1m", s.Optional),
 					"5m":  c.Float("5m", s.Optional),
 					"15m": c.Float("15m", s.Optional),
-				}),
+				}, c.DictOptional), // No load average reported by ES on Windows
 			}),
 			"cgroup": c.Dict("cgroup", s.Schema{
 				"cpuacct": c.Dict("cpuacct", s.Schema{
@@ -146,13 +141,14 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"analyze":    c.Dict("analyze", threadPoolStatsSchema),
+			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
 			"write":      c.Dict("write", threadPoolStatsSchema),
 			"generic":    c.Dict("generic", threadPoolStatsSchema),
 			"get":        c.Dict("get", threadPoolStatsSchema),
 			"management": c.Dict("management", threadPoolStatsSchema),
 			"search":     c.Dict("search", threadPoolStatsSchema),
-			"watcher":    c.Dict("watcher", threadPoolStatsSchema),
+			"watcher":    c.Dict("watcher", threadPoolStatsSchema, c.DictOptional),
 		}),
 		"fs": c.Dict("fs", s.Schema{
 			"total": c.Dict("total", s.Schema{
@@ -160,6 +156,15 @@ var (
 				"free_in_bytes":      c.Int("free_in_bytes"),
 				"available_in_bytes": c.Int("available_in_bytes"),
 			}),
+			"io_stats": c.Dict("io_stats", s.Schema{
+				"total": c.Dict("total", s.Schema{
+					"operations":       c.Int("operations"),
+					"read_kilobytes":   c.Int("read_kilobytes"),
+					"read_operations":  c.Int("read_operations"),
+					"write_kilobytes":  c.Int("write_kilobytes"),
+					"write_operations": c.Int("write_operations"),
+				}, c.DictOptional),
+			}, c.DictOptional),
 		}),
 	}
 
@@ -170,7 +175,7 @@ var (
 	}
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -186,43 +191,51 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	// it will provid the data for multiple nodes. This will mean the detection of the
 	// master node will not be accurate anymore as often in these cases a proxy is in front
 	// of ES and it's not know if the request will be routed to the same node as before.
+	var errs multierror.Errors
 	for nodeID, node := range nodesStruct.Nodes {
-		clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HTTP.GetURI(), nodeID)
+		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
 		if err != nil {
-			logp.Err("could not fetch cluster id: %s", err)
+			errs = append(errs, errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 			continue
 		}
 
-		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
-		if err != nil {
-			logp.Err("error determining if connected Elasticsearch node is master: %s", err)
-			continue
-		}
 		event := mb.Event{}
-		// Build source_node object
-		sourceNode, _ := sourceNodeXpack.Apply(node)
-		sourceNode["uuid"] = nodeID
 
 		nodeData, err := schemaXpack.Apply(node)
 		if err != nil {
-			logp.Err("failure to apply node schema: %s", err)
+			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
 			continue
 		}
-
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
+		mlockall, err := elasticsearch.IsMLockAllEnabled(m.HTTP, m.HTTP.GetURI(), nodeID)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		nodeData["mlockall"] = mlockall
+
+		// Build source_node object
+		sourceNode := common.MapStr{
+			"uuid":              nodeID,
+			"name":              nodeData["name"],
+			"transport_address": nodeData["transport_address"],
+		}
+		nodeData.Delete("name")
+		nodeData.Delete("transport_address")
+
 		event.RootFields = common.MapStr{
 			"timestamp":    time.Now(),
-			"cluster_uuid": clusterID,
+			"cluster_uuid": info.ClusterID,
 			"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 			"type":         "node_stats",
-			"source_node":  sourceNode,
 			"node_stats":   nodeData,
+			"source_node":  sourceNode,
 		}
 
 		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		r.Event(event)
 	}
-	return nil
+	return errs.Err()
 }

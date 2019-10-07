@@ -1,0 +1,24 @@
+[
+    {
+        "@timestamp": "2018-12-31T23:00:27.000-02:00",
+        "cisco.ftd.message_id": "999999",
+        "event.action": "firewall-rule",
+        "event.code": 999999,
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.original": "%FTD-7-999999: This message is not filtered.",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "fileset.name": "ftd",
+        "host.hostname": "beats",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 0,
+        "process.name": "asa",
+        "process.pid": 1234,
+        "service.type": "cisco",
+        "tags": [
+            "cisco-ftd"
+        ]
+    }
+]

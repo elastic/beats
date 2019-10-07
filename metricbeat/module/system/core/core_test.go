@@ -23,25 +23,34 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSet(t, getConfig())
+func TestFetch(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	mbtest.ReportingFetch(f)
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "core").Fields.StringToPrint())
+}
+
+func TestData(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+
+	mbtest.ReportingFetchV2Error(f)
 	time.Sleep(500 * time.Millisecond)
 
-	events, errs := mbtest.ReportingFetch(f)
-	if len(errs) > 0 {
-		t.Fatal(errs)
-	}
-	if len(events) == 0 {
-		t.Fatal("no events returned")
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
+	if err != nil {
+		t.Fatal("write", err)
 	}
 
-	event := mbtest.CreateFullEvent(f, events[1])
-	mbtest.WriteEventToDataJSON(t, event, "")
 }
 
 func getConfig() map[string]interface{} {

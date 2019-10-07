@@ -20,7 +20,7 @@ package gotype
 import (
 	"reflect"
 
-	"github.com/elastic/go-structform"
+	structform "github.com/elastic/go-structform"
 )
 
 type foldFn func(c *foldContext, v interface{}) error
@@ -46,16 +46,16 @@ type foldContext struct {
 	opts    options
 }
 
-func Fold(v interface{}, vs structform.Visitor, opts ...Option) error {
+func Fold(v interface{}, vs structform.Visitor, opts ...FoldOption) error {
 	if it, err := NewIterator(vs, opts...); err == nil {
 		return it.Fold(v)
 	}
 	return nil
 }
 
-func NewIterator(vs structform.Visitor, opts ...Option) (*Iterator, error) {
+func NewIterator(vs structform.Visitor, opts ...FoldOption) (*Iterator, error) {
 	reg := newTypeFoldRegistry()
-	O, err := applyOpts(opts)
+	O, err := applyFoldOpts(opts)
 	if err != nil {
 		return nil, err
 	}

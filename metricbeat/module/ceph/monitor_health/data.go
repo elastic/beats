@@ -21,8 +21,9 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Tick struct {
@@ -85,11 +86,11 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) []common.MapStr {
+func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: ", err)
+		return nil, errors.Wrapf(err, "could not get HealthRequest data")
 	}
 
 	events := []common.MapStr{}
@@ -131,5 +132,5 @@ func eventsMapping(content []byte) []common.MapStr {
 		}
 	}
 
-	return events
+	return events, nil
 }

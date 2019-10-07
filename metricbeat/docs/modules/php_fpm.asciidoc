@@ -1,11 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-php_fpm]]
 == PHP_FPM module
-
-beta[]
 
 This module periodically fetches metrics from https://php-fpm.org[PHP-FPM]
 servers.

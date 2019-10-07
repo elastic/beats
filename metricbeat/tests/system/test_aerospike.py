@@ -14,7 +14,3 @@ class Test(metricbeat.BaseTest):
         aerospike namespace metricset test
         """
         self.check_metricset("aerospike", "namespace", self.get_hosts(), self.FIELDS)
-
-    def get_hosts(self):
-        return [os.getenv('AEROSPIKE_HOST', 'localhost') + ':' +
-                os.getenv('AEROSPIKE_PORT', '3000')]

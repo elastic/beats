@@ -15,12 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package diskio
 
 import (
 	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
@@ -60,12 +62,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch creates list of events with diskio stats for all containers.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "failed to get docker stats")
 	}
 
 	formattedStats := m.blkioService.getBlkioStatsList(stats, m.dedot)
-	return eventsMapping(formattedStats), nil
+	eventsMapping(r, formattedStats)
+
+	return nil
+}
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
 }

@@ -1,0 +1,20 @@
+- key: aws
+  title: "aws"
+  description: >
+    `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
+  release: ga
+  fields:
+    - name: aws
+      type: group
+      description: >
+      fields:
+        - name: tags.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Tag key value pairs from aws resources.
+        - name: s3.bucket.name
+          type: keyword
+          description: >
+            Name of a S3 bucket.

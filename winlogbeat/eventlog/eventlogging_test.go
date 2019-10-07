@@ -267,7 +267,7 @@ func TestFormatMessageWithLargeMessage(t *testing.T) {
 	assert.Len(t, records, 1)
 	for _, record := range records {
 		t.Log(record)
-		assert.Equal(t, "The data area passed to a system call is too small.", record.RenderErr)
+		assert.Equal(t, []string{"The data area passed to a system call is too small."}, record.RenderErr)
 	}
 }
 

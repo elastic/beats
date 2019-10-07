@@ -1,0 +1,18 @@
+[
+    {
+        "@timestamp": "2018-12-30T14:22:07.000Z",
+        "destination.address": "::1%0",
+        "destination.ip": "::1",
+        "destination.port": 80,
+        "event.dataset": "iis.error",
+        "event.module": "iis",
+        "fileset.name": "error",
+        "iis.error.reason_phrase": "Timer_ConnectionIdle",
+        "input.type": "log",
+        "log.offset": 195,
+        "service.type": "iis",
+        "source.address": "::1%0",
+        "source.ip": "::1",
+        "source.port": 49958
+    }
+]

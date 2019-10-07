@@ -1,11 +1,11 @@
 # Beats dockerfile used for testing
-FROM golang:1.10.3
+FROM golang:1.12.1
 MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-         netcat python-pip virtualenv && \
+         netcat python-pip virtualenv libpcap-dev && \
     apt-get clean
 
 ENV PYTHON_ENV=/tmp/python-env

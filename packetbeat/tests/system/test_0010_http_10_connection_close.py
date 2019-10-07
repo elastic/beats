@@ -14,9 +14,9 @@ class Test(BaseTest):
 
         assert obj["status"] == "OK"
         assert obj["http.response.headers"]["content-length"] == 11422
-        assert obj["http.response.code"] == 200
+        assert obj["http.response.status_code"] == 200
         assert obj["type"] == "http"
-        assert obj["client_ip"] == "127.0.0.1"
-        assert obj["client_port"] == 37885
-        assert obj["ip"] == "127.0.0.1"
-        assert obj["port"] == 8000
+        assert obj["client.ip"] == "127.0.0.1"
+        assert obj["client.port"] == 37885
+        assert obj["server.ip"] == "127.0.0.1"
+        assert obj["server.port"] == 8000

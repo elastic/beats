@@ -25,7 +25,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )

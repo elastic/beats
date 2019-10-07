@@ -19,24 +19,30 @@ package beat
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 )
+
+// FlagField fields used to keep information or errors when events are parsed.
+const FlagField = "log.flags"
 
 // Event is the common event format shared by all beats.
 // Every event must have a timestamp and provide encodable Fields in `Fields`.
 // The `Meta`-fields can be used to pass additional meta-data to the outputs.
 // Output can optionally publish a subset of Meta, or ignore Meta.
 type Event struct {
-	Timestamp time.Time
-	Meta      common.MapStr
-	Fields    common.MapStr
-	Private   interface{} // for beats private use
+	Timestamp  time.Time
+	Meta       common.MapStr
+	Fields     common.MapStr
+	Private    interface{} // for beats private use
+	TimeSeries bool        // true if the event contains timeseries data
 }
 
 var (
 	errNoTimestamp = errors.New("value is no timestamp")
+	errNoMapStr    = errors.New("value is no map[string]interface{} type")
 )
 
 // SetID overwrites the "id" field in the events metadata.
@@ -51,6 +57,11 @@ func (e *Event) SetID(id string) {
 func (e *Event) GetValue(key string) (interface{}, error) {
 	if key == "@timestamp" {
 		return e.Timestamp, nil
+	} else if subKey, ok := metadataKey(key); ok {
+		if subKey == "" || e.Meta == nil {
+			return e.Meta, nil
+		}
+		return e.Meta.GetValue(subKey)
 	}
 	return e.Fields.GetValue(key)
 }
@@ -65,12 +76,58 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 		default:
 			return nil, errNoTimestamp
 		}
+		return nil, nil
+	} else if subKey, ok := metadataKey(key); ok {
+		if subKey == "" {
+			switch meta := v.(type) {
+			case common.MapStr:
+				e.Meta = meta
+			case map[string]interface{}:
+				e.Meta = meta
+			default:
+				return nil, errNoMapStr
+			}
+		} else if e.Meta == nil {
+			e.Meta = common.MapStr{}
+		}
+		return e.Meta.Put(subKey, v)
 	}
 
-	// TODO: add support to write into '@metadata'?
 	return e.Fields.Put(key, v)
 }
 
 func (e *Event) Delete(key string) error {
+	if subKey, ok := metadataKey(key); ok {
+		if subKey == "" {
+			e.Meta = nil
+			return nil
+		}
+		if e.Meta == nil {
+			return nil
+		}
+		return e.Meta.Delete(subKey)
+	}
 	return e.Fields.Delete(key)
+}
+
+func metadataKey(key string) (string, bool) {
+	if !strings.HasPrefix(key, "@metadata") {
+		return "", false
+	}
+
+	subKey := key[len("@metadata"):]
+	if subKey == "" {
+		return "", true
+	}
+	if subKey[0] == '.' {
+		return subKey[1:], true
+	}
+	return "", false
+}
+
+// SetErrorWithOption sets jsonErr value in the event fields according to addErrKey value.
+func (e *Event) SetErrorWithOption(jsonErr common.MapStr, addErrKey bool) {
+	if addErrKey {
+		e.Fields["error"] = jsonErr
+	}
 }

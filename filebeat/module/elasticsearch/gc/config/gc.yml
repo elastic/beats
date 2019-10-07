@@ -9,7 +9,3 @@ multiline:
   pattern: '^\[?[0-9]{4}-[0-9]{2}-[0-9]{2}'
   negate: true
   match: after
-
-fields:
-  service.name: "elasticsearch"
-fields_under_root: true

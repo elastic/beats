@@ -20,7 +20,12 @@
 package memory
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	sysinfo "github.com/elastic/go-sysinfo"
+	sysinfotypes "github.com/elastic/go-sysinfo/types"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -67,6 +72,17 @@ func GetSwap() (*SwapStat, error) {
 	err := swap.Get()
 	if err != nil {
 		return nil, err
+	}
+
+	// This shouldn't happen, but it has been reported to happen and
+	// this can provoke too big values for used swap.
+	// Workaround this by assuming that all swap is free in that case.
+	if swap.Free > swap.Total || swap.Used > swap.Total {
+		logp.Debug("memory",
+			"Unexpected values for swap memory - total: %v free: %v used: %v.  Setting swap used to 0.",
+			swap.Total, swap.Free, swap.Used)
+		swap.Free = swap.Total
+		swap.Used = 0
 	}
 
 	return &SwapStat{Swap: swap}, nil
@@ -135,4 +151,21 @@ func AddHugeTLBPagesPercentage(s *HugeTLBPagesStat) {
 
 	perc := float64(s.Total-s.Free+s.Reserved) / float64(s.Total)
 	s.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
+}
+
+// GetVMStat gets linux vmstat metrics
+func GetVMStat() (*sysinfotypes.VMStatInfo, error) {
+	h, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read self process information")
+	}
+	if vmstatHandle, ok := h.(sysinfotypes.VMStat); ok {
+		info, err := vmstatHandle.VMStat()
+		if err != nil {
+			return nil, errors.Wrap(err, "error getting VMStat info")
+		}
+		return info, nil
+	}
+	return nil, nil
+
 }

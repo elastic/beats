@@ -18,8 +18,10 @@
 package pod
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -36,6 +38,8 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	logger = logp.NewLogger("kubernetes.pod")
 )
 
 // init registers the MetricSet with the central registry.
@@ -73,25 +77,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
 	body, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error doing HTTP request to fetch 'pod' Metricset data")
 	}
 
 	events, err := eventMapping(body, util.PerfMetrics)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in mapping")
 	}
 
 	m.enricher.Enrich(events)
 
-	return events, nil
+	for _, e := range events {
+		isOpen := reporter.Event(mb.TransformMapStrToEvent("kubernetes", e, nil))
+		if !isOpen {
+			return nil
+		}
+	}
+	return nil
 }
 
 // Close stops this metricset

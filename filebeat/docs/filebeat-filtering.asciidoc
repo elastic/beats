@@ -22,7 +22,7 @@ global processing across all data exported by {beatname_uc}.
 [[using-processors]]
 === Processors
 
-include::../../libbeat/docs/processors.asciidoc[]
+include::{libbeat-dir}/docs/processors.asciidoc[]
 
 [float]
 [[drop-event-example]]
@@ -103,4 +103,4 @@ The resulting output looks something like this:
 }
 -----------------------------------------------------
 
-include::../../libbeat/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/docs/processors-using.asciidoc[]

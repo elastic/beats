@@ -1,0 +1,5137 @@
+
+////
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
+////
+
+[[exported-fields]]
+= Exported fields
+
+[partintro]
+
+--
+This document describes the fields that are exported by Journalbeat. They are
+grouped in the following categories:
+
+* <<exported-fields-beat-common>>
+* <<exported-fields-cloud>>
+* <<exported-fields-common>>
+* <<exported-fields-docker-processor>>
+* <<exported-fields-ecs>>
+* <<exported-fields-host-processor>>
+* <<exported-fields-jolokia-autodiscover>>
+* <<exported-fields-kubernetes-processor>>
+* <<exported-fields-process>>
+
+--
+[[exported-fields-beat-common]]
+== Beat fields
+
+Contains common beat fields available in all event types.
+
+
+
+*`agent.hostname`*::
++
+--
+Hostname of the agent.
+
+type: keyword
+
+--
+
+*`beat.timezone`*::
++
+--
+type: alias
+
+alias to: event.timezone
+
+--
+
+*`fields`*::
++
+--
+Contains user configurable fields.
+
+
+type: object
+
+--
+
+[float]
+=== error
+
+Error fields containing additional info in case of errors.
+
+
+
+*`error.type`*::
++
+--
+Error type.
+
+
+type: keyword
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
+
+--
+
+*`timeseries.instance`*::
++
+--
+Time series instance id
+
+type: keyword
+
+--
+
+[[exported-fields-cloud]]
+== Cloud provider metadata fields
+
+Metadata from cloud providers added by the add_cloud_metadata processor.
+
+
+
+*`cloud.project.id`*::
++
+--
+Name of the project in Google Cloud.
+
+
+example: project-x
+
+--
+
+*`cloud.image.id`*::
++
+--
+Image ID for the cloud instance.
+
+
+example: ami-abcd1234
+
+--
+
+*`meta.cloud.provider`*::
++
+--
+type: alias
+
+alias to: cloud.provider
+
+--
+
+*`meta.cloud.instance_id`*::
++
+--
+type: alias
+
+alias to: cloud.instance.id
+
+--
+
+*`meta.cloud.instance_name`*::
++
+--
+type: alias
+
+alias to: cloud.instance.name
+
+--
+
+*`meta.cloud.machine_type`*::
++
+--
+type: alias
+
+alias to: cloud.machine.type
+
+--
+
+*`meta.cloud.availability_zone`*::
++
+--
+type: alias
+
+alias to: cloud.availability_zone
+
+--
+
+*`meta.cloud.project_id`*::
++
+--
+type: alias
+
+alias to: cloud.project.id
+
+--
+
+*`meta.cloud.region`*::
++
+--
+type: alias
+
+alias to: cloud.region
+
+--
+
+[[exported-fields-common]]
+== Common Journalbeat fields
+
+Contains common fields available in all event types.
+
+
+
+[float]
+=== coredump
+
+Fields used by systemd-coredump kernel helper.
+
+
+
+*`coredump.unit`*::
++
+--
+Annotations of messages containing coredumps from system units.
+
+
+type: keyword
+
+--
+
+*`coredump.user_unit`*::
++
+--
+Annotations of messages containing coredumps from user units.
+
+
+type: keyword
+
+--
+
+[float]
+=== journald
+
+Fields provided by journald.
+
+
+
+[float]
+=== object
+
+Fields to log on behalf of a different program.
+
+
+
+[float]
+=== audit
+
+Audit fields of event.
+
+
+
+*`journald.object.audit.login_uid`*::
++
+--
+The login UID of the object process.
+
+
+type: long
+
+example: 1000
+
+required: False
+
+--
+
+*`journald.object.audit.session`*::
++
+--
+The audit session of the object process.
+
+
+type: long
+
+example: 3
+
+required: False
+
+--
+
+*`journald.object.cmd`*::
++
+--
+The command line of the process.
+
+
+type: keyword
+
+example: /lib/systemd/systemd --user
+
+required: False
+
+--
+
+*`journald.object.name`*::
++
+--
+Name of the executable.
+
+
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+--
+
+*`journald.object.executable`*::
++
+--
+Path to the the executable.
+
+
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+--
+
+*`journald.object.uid`*::
++
+--
+UID of the object process.
+
+
+type: long
+
+required: False
+
+--
+
+*`journald.object.gid`*::
++
+--
+GID of the object process.
+
+
+type: long
+
+required: False
+
+--
+
+*`journald.object.pid`*::
++
+--
+PID of the object process.
+
+
+type: long
+
+required: False
+
+--
+
+[float]
+=== systemd
+
+Systemd fields of event.
+
+
+
+*`journald.object.systemd.owner_uid`*::
++
+--
+The UID of the owner.
+
+
+type: long
+
+required: False
+
+--
+
+*`journald.object.systemd.session`*::
++
+--
+The ID of the systemd session.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`journald.object.systemd.unit`*::
++
+--
+The name of the systemd unit.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`journald.object.systemd.user_unit`*::
++
+--
+The name of the systemd user unit.
+
+
+type: keyword
+
+required: False
+
+--
+
+[float]
+=== kernel
+
+Fields to log on behalf of a different program.
+
+
+
+*`journald.kernel.device`*::
++
+--
+The kernel device name.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`journald.kernel.subsystem`*::
++
+--
+The kernel subsystem name.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`journald.kernel.device_symlinks`*::
++
+--
+Additional symlink names pointing to the device node in /dev.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`journald.kernel.device_node_path`*::
++
+--
+The device node path of this device in /dev.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`journald.kernel.device_name`*::
++
+--
+The kernel device name as it shows up in the device tree below /sys.
+
+
+type: keyword
+
+required: False
+
+--
+
+[float]
+=== code
+
+Fields of the code generating the event.
+
+
+
+*`journald.code.file`*::
++
+--
+The name of the source file where the log is generated.
+
+
+type: keyword
+
+example: ../src/core/manager.c
+
+required: False
+
+--
+
+*`journald.code.function`*::
++
+--
+The name of the function which generated the log message.
+
+
+type: keyword
+
+example: job_log_status_message
+
+required: False
+
+--
+
+*`journald.code.line`*::
++
+--
+The line number of the code which generated the log message.
+
+
+type: long
+
+example: 123
+
+required: False
+
+--
+
+[float]
+=== process
+
+Fields to log on behalf of a different program.
+
+
+
+[float]
+=== audit
+
+Audit fields of event.
+
+
+
+*`journald.process.audit.loginuid`*::
++
+--
+The login UID of the source process.
+
+
+type: long
+
+example: 1000
+
+required: False
+
+--
+
+*`journald.process.audit.session`*::
++
+--
+The audit session of the source process.
+
+
+type: long
+
+example: 3
+
+required: False
+
+--
+
+*`journald.process.cmd`*::
++
+--
+The command line of the process.
+
+
+type: keyword
+
+example: /lib/systemd/systemd --user
+
+required: False
+
+--
+
+*`journald.process.name`*::
++
+--
+Name of the executable.
+
+
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+--
+
+*`journald.process.executable`*::
++
+--
+Path to the the executable.
+
+
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+--
+
+*`journald.process.pid`*::
++
+--
+The ID of the process which logged the message.
+
+
+type: long
+
+example: 1
+
+required: False
+
+--
+
+*`journald.process.gid`*::
++
+--
+The ID of the group which runs the process.
+
+
+type: long
+
+example: 1
+
+required: False
+
+--
+
+*`journald.process.uid`*::
++
+--
+The ID of the user which runs the process.
+
+
+type: long
+
+example: 1
+
+required: False
+
+--
+
+*`journald.process.capabilites`*::
++
+--
+The effective capabilites of the process.
+
+
+required: False
+
+--
+
+[float]
+=== systemd
+
+Fields of systemd.
+
+
+
+*`systemd.invocation_id`*::
++
+--
+The invocation ID for the runtime cycle of the unit the message was generated in.
+
+
+type: keyword
+
+example: 8450f1672de646c88cd133aadd4f2d70
+
+required: False
+
+--
+
+*`systemd.cgroup`*::
++
+--
+The control group path in the systemd hierarchy.
+
+
+type: keyword
+
+example: /user.slice/user-1234.slice/session-2.scope
+
+required: False
+
+--
+
+*`systemd.owner_uid`*::
++
+--
+The owner UID of the systemd user unit or systemd session.
+
+
+type: long
+
+required: False
+
+--
+
+*`systemd.session`*::
++
+--
+The ID of the systemd session.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`systemd.slice`*::
++
+--
+The systemd slice unit.
+
+
+type: keyword
+
+example: user-1234.slice
+
+required: False
+
+--
+
+*`systemd.user_slice`*::
++
+--
+The systemd user slice unit.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`systemd.unit`*::
++
+--
+The name of the systemd unit.
+
+
+type: keyword
+
+example: nginx.service
+
+required: False
+
+--
+
+*`systemd.user_unit`*::
++
+--
+The name of the systemd user unit.
+
+
+type: keyword
+
+example: user-1234.slice
+
+required: False
+
+--
+
+*`systemd.transport`*::
++
+--
+How the log message was received by journald.
+
+
+type: keyword
+
+example: syslog
+
+required: True
+
+--
+
+[float]
+=== host
+
+Fields of the host.
+
+
+
+*`host.boot_id`*::
++
+--
+The boot ID for the boot the log was generated in.
+
+
+type: keyword
+
+example: dd8c974asdf01dbe2ef26d7fasdf264c9
+
+required: False
+
+--
+
+[float]
+=== syslog
+
+Fields of the code generating the event.
+
+
+
+*`syslog.priority`*::
++
+--
+The priority of the message. A syslog compatibility field.
+
+
+type: long
+
+example: 1
+
+required: False
+
+--
+
+*`syslog.facility`*::
++
+--
+The facility of the message. A syslog compatibility field.
+
+
+type: long
+
+example: 1
+
+required: False
+
+--
+
+*`syslog.identifier`*::
++
+--
+The identifier of the message. A syslog compatibility field.
+
+
+type: keyword
+
+example: su
+
+required: False
+
+--
+
+*`custom`*::
++
+--
+Arbitrary fields coming from processes.
+
+
+type: nested
+
+required: False
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
+
+--
+
+
+
+*`container.log.tag`*::
++
+--
+User defined tag of a container.
+
+
+type: keyword
+
+--
+
+[[exported-fields-docker-processor]]
+== Docker fields
+
+Docker stats collected from Docker.
+
+
+
+
+*`docker.container.id`*::
++
+--
+type: alias
+
+alias to: container.id
+
+--
+
+*`docker.container.image`*::
++
+--
+type: alias
+
+alias to: container.image.name
+
+--
+
+*`docker.container.name`*::
++
+--
+type: alias
+
+alias to: container.name
+
+--
+
+*`docker.container.labels`*::
++
+--
+Image labels.
+
+
+type: object
+
+--
+
+[[exported-fields-ecs]]
+== ECS fields
+
+ECS Fields.
+
+
+*`@timestamp`*::
++
+--
+Date/time when the event originated.
+This is the date/time extracted from the event, typically representing when the event was generated by the source.
+If the event source has no original timestamp, this value is typically populated by the first time the event was received by the pipeline.
+Required field for all events.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+--
+
+*`labels`*::
++
+--
+Custom key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
+
+--
+
+*`message`*::
++
+--
+For log events the message field contains the log message, optimized for viewing in a log viewer.
+For structured logs without an original message field, other fields can be concatenated to form a human-readable summary of the event.
+If multiple messages exist, they can be combined into one message.
+
+type: text
+
+example: Hello World
+
+--
+
+*`tags`*::
++
+--
+List of keywords used to tag each event.
+
+type: keyword
+
+example: ["production", "env2"]
+
+--
+
+[float]
+=== agent
+
+The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host.
+Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
+
+
+*`agent.ephemeral_id`*::
++
+--
+Ephemeral identifier of this agent (if one exists).
+This id normally changes across restarts, but `agent.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`agent.id`*::
++
+--
+Unique identifier of this agent (if one exists).
+Example: For Beats this would be beat.id.
+
+type: keyword
+
+example: 8a4f500d
+
+--
+
+*`agent.name`*::
++
+--
+Custom name of the agent.
+This is a name that can be given to an agent. This can be helpful if for example two Filebeat instances are running on the same host but a human readable separation is needed on which Filebeat instance data is coming from.
+If no name is given, the name is often left empty.
+
+type: keyword
+
+example: foo
+
+--
+
+*`agent.type`*::
++
+--
+Type of the agent.
+The agent type stays always the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
+
+type: keyword
+
+example: filebeat
+
+--
+
+*`agent.version`*::
++
+--
+Version of the agent.
+
+type: keyword
+
+example: 6.0.0-rc2
+
+--
+
+[float]
+=== as
+
+An autonomous system (AS) is a collection of connected Internet Protocol (IP) routing prefixes under the control of one or more network operators on behalf of a single administrative entity or domain that presents a common, clearly defined routing policy to the internet.
+
+
+*`as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+[float]
+=== client
+
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
+
+
+*`client.address`*::
++
+--
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
+
+--
+
+*`client.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`client.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`client.bytes`*::
++
+--
+Bytes sent from the client to the server.
+
+type: long
+
+example: 184
+
+format: bytes
+
+--
+
+*`client.domain`*::
++
+--
+Client domain.
+
+type: keyword
+
+--
+
+*`client.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`client.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`client.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`client.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`client.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`client.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`client.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`client.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`client.ip`*::
++
+--
+IP address of the client.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
+
+--
+
+*`client.mac`*::
++
+--
+MAC address of the client.
+
+type: keyword
+
+--
+
+*`client.nat.ip`*::
++
+--
+Translated IP of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`client.nat.port`*::
++
+--
+Translated port of source based NAT sessions (e.g. internal client to internet).
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
+*`client.packets`*::
++
+--
+Packets sent from the client to the server.
+
+type: long
+
+example: 12
+
+--
+
+*`client.port`*::
++
+--
+Port of the client.
+
+type: long
+
+format: string
+
+--
+
+*`client.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`client.user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`client.user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`client.user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`client.user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`client.user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`client.user.id`*::
++
+--
+One or multiple unique identifiers of the user.
+
+type: keyword
+
+--
+
+*`client.user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+[float]
+=== cloud
+
+Fields related to the cloud or infrastructure the events are coming from.
+
+
+*`cloud.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.availability_zone`*::
++
+--
+Availability zone in which this host is running.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.region`*::
++
+--
+Region in which this host is running.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+[float]
+=== container
+
+Container fields are used for meta information about the specific container that is the source of information.
+These fields help correlate data based containers from any runtime.
+
+
+*`container.id`*::
++
+--
+Unique container id.
+
+type: keyword
+
+--
+
+*`container.image.name`*::
++
+--
+Name of the image the container was built on.
+
+type: keyword
+
+--
+
+*`container.image.tag`*::
++
+--
+Container image tag.
+
+type: keyword
+
+--
+
+*`container.labels`*::
++
+--
+Image labels.
+
+type: object
+
+--
+
+*`container.name`*::
++
+--
+Container name.
+
+type: keyword
+
+--
+
+*`container.runtime`*::
++
+--
+Runtime managing this container.
+
+type: keyword
+
+example: docker
+
+--
+
+[float]
+=== destination
+
+Destination fields describe details about the destination of a packet/event.
+Destination fields are usually populated in conjunction with source fields.
+
+
+*`destination.address`*::
++
+--
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
+
+--
+
+*`destination.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`destination.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`destination.bytes`*::
++
+--
+Bytes sent from the destination to the source.
+
+type: long
+
+example: 184
+
+format: bytes
+
+--
+
+*`destination.domain`*::
++
+--
+Destination domain.
+
+type: keyword
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`destination.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`destination.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`destination.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`destination.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`destination.ip`*::
++
+--
+IP address of the destination.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
+
+--
+
+*`destination.mac`*::
++
+--
+MAC address of the destination.
+
+type: keyword
+
+--
+
+*`destination.nat.ip`*::
++
+--
+Translated ip of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`destination.nat.port`*::
++
+--
+Port the source session is translated to by NAT Device.
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
+*`destination.packets`*::
++
+--
+Packets sent from the destination to the source.
+
+type: long
+
+example: 12
+
+--
+
+*`destination.port`*::
++
+--
+Port of the destination.
+
+type: long
+
+format: string
+
+--
+
+*`destination.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`destination.user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`destination.user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`destination.user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`destination.user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`destination.user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`destination.user.id`*::
++
+--
+One or multiple unique identifiers of the user.
+
+type: keyword
+
+--
+
+*`destination.user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+[float]
+=== dns
+
+Fields describing DNS queries and answers.
+DNS events should either represent a single DNS query prior to getting answers (`dns.type:query`) or they should represent a full exchange and contain the query details as well as all of the answers that were provided for this query (`dns.type:answer`).
+
+
+*`dns.answers`*::
++
+--
+An array containing an object for each answer section returned by the server.
+The main keys that should be present in these objects are defined by ECS. Records that have more information may contain more keys than what ECS defines.
+Not all DNS data sources give all details about DNS answers. At minimum, answer objects must contain the `data` key. If more information is available, map as much of it to ECS as possible, and add any additional fields to the answer objects as custom fields.
+
+type: object
+
+--
+
+*`dns.answers.class`*::
++
+--
+The class of DNS data contained in this resource record.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.answers.data`*::
++
+--
+The data describing the resource.
+The meaning of this data depends on the type and class of the resource record.
+
+type: keyword
+
+example: 10.10.10.10
+
+--
+
+*`dns.answers.name`*::
++
+--
+The domain name to which this resource record pertains.
+If a chain of CNAME is being resolved, each answer's `name` should be the one that corresponds with the answer's `data`. It should not simply be the original `question.name` repeated.
+
+type: keyword
+
+example: www.google.com
+
+--
+
+*`dns.answers.ttl`*::
++
+--
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
+
+type: long
+
+example: 180
+
+--
+
+*`dns.answers.type`*::
++
+--
+The type of data contained in this resource record.
+
+type: keyword
+
+example: CNAME
+
+--
+
+*`dns.header_flags`*::
++
+--
+Array of 2 letter DNS header flags.
+Expected values are: AA, TC, RD, RA, AD, CD, DO.
+
+type: keyword
+
+example: ['RD', 'RA']
+
+--
+
+*`dns.id`*::
++
+--
+The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
+
+type: keyword
+
+example: 62111
+
+--
+
+*`dns.op_code`*::
++
+--
+The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
+
+type: keyword
+
+example: QUERY
+
+--
+
+*`dns.question.class`*::
++
+--
+The class of of records being queried.
+
+type: keyword
+
+example: IN
+
+--
+
+*`dns.question.name`*::
++
+--
+The name being queried.
+If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
+
+type: keyword
+
+example: www.google.com
+
+--
+
+*`dns.question.registered_domain`*::
++
+--
+The highest registered domain, stripped of the subdomain.
+For example, the registered domain for "foo.google.com" is "google.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: google.com
+
+--
+
+*`dns.question.type`*::
++
+--
+The type of record being queried.
+
+type: keyword
+
+example: AAAA
+
+--
+
+*`dns.resolved_ip`*::
++
+--
+Array containing all IPs seen in `answers.data`.
+The `answers` array can be difficult to use, because of the variety of data formats it can contain. Extracting all IP addresses seen in there to `dns.resolved_ip` makes it possible to index them as IP addresses, and makes them easier to visualize and query for.
+
+type: ip
+
+example: ['10.10.10.10', '10.10.10.11']
+
+--
+
+*`dns.response_code`*::
++
+--
+The DNS response code.
+
+type: keyword
+
+example: NOERROR
+
+--
+
+*`dns.type`*::
++
+--
+The type of DNS event captured, query or answer.
+If your source of DNS events only gives you DNS queries, you should only create dns events of type `dns.type:query`.
+If your source of DNS events gives you answers as well, you should create one event per query (optionally as soon as the query is seen). And a second event containing all query details as well as an array of answers.
+
+type: keyword
+
+example: answer
+
+--
+
+[float]
+=== ecs
+
+Meta-information specific to ECS.
+
+
+*`ecs.version`*::
++
+--
+ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
+When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
+
+type: keyword
+
+example: 1.0.0
+
+required: True
+
+--
+
+[float]
+=== error
+
+These fields can represent errors of any kind.
+Use them for errors that happen while fetching events or in cases where the event itself contains an error.
+
+
+*`error.code`*::
++
+--
+Error code describing the error.
+
+type: keyword
+
+--
+
+*`error.id`*::
++
+--
+Unique identifier for the error.
+
+type: keyword
+
+--
+
+*`error.message`*::
++
+--
+Error message.
+
+type: text
+
+--
+
+[float]
+=== event
+
+The event fields are used for context information about the log or metric event itself.
+A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
+
+
+*`event.action`*::
++
+--
+The action captured by the event.
+This describes the information in the event. It is more specific than `event.category`. Examples are `group-add`, `process-started`, `file-created`. The value is normally defined by the implementer.
+
+type: keyword
+
+example: user-password-change
+
+--
+
+*`event.category`*::
++
+--
+Event category.
+This contains high-level information about the contents of the event. It is more generic than `event.action`, in the sense that typically a category contains multiple actions. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+type: keyword
+
+example: user-management
+
+--
+
+*`event.code`*::
++
+--
+Identification code for this event, if one exists.
+Some event sources use event codes to identify messages unambiguously, regardless of message language or wording adjustments over time. An example of this is the Windows Event ID.
+
+type: keyword
+
+example: 4648
+
+--
+
+*`event.created`*::
++
+--
+event.created contains the date/time when the event was first read by an agent, or by your pipeline.
+This field is distinct from @timestamp in that @timestamp typically contain the time extracted from the original event.
+In most situations, these two timestamps will be slightly different. The difference can be used to calculate the delay between your source generating an event, and the time when your agent first processed it. This can be used to monitor your agent's or pipeline's ability to keep up with your event source.
+In case the two timestamps are identical, @timestamp should be used.
+
+type: date
+
+--
+
+*`event.dataset`*::
++
+--
+Name of the dataset.
+If an event source publishes more than one type of log or events (e.g. access log, error log), the dataset is used to specify which one the event comes from.
+It's recommended but not required to start the dataset name with the module name, followed by a dot, then the dataset name.
+
+type: keyword
+
+example: apache.access
+
+--
+
+*`event.duration`*::
++
+--
+Duration of the event in nanoseconds.
+If event.start and event.end are known this value should be the difference between the end and start time.
+
+type: long
+
+format: duration
+
+--
+
+*`event.end`*::
++
+--
+event.end contains the date when the event ended or when the activity was last observed.
+
+type: date
+
+--
+
+*`event.hash`*::
++
+--
+Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
+
+type: keyword
+
+example: 123456789012345678901234567890ABCD
+
+--
+
+*`event.id`*::
++
+--
+Unique ID to describe the event.
+
+type: keyword
+
+example: 8a4f500d
+
+--
+
+*`event.kind`*::
++
+--
+The kind of the event.
+This gives information about what type of information the event contains, without being specific to the contents of the event.  Examples are `event`, `state`, `alarm`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+type: keyword
+
+example: state
+
+--
+
+*`event.module`*::
++
+--
+Name of the module this data is coming from.
+If your monitoring agent supports the concept of modules or plugins to process events of a given source (e.g. Apache logs), `event.module` should contain the name of this module.
+
+type: keyword
+
+example: apache
+
+--
+
+*`event.original`*::
++
+--
+Raw text message of entire event. Used to demonstrate log integrity.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+
+type: keyword
+
+example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#124;100&#124; worm successfully stopped&#124;10&#124;src=10.0.0.1 dst=2.1.2.2spt=1232
+
+--
+
+*`event.outcome`*::
++
+--
+The outcome of the event.
+If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+type: keyword
+
+example: success
+
+--
+
+*`event.provider`*::
++
+--
+Source of the event.
+Event transports such as Syslog or the Windows Event Log typically mention the source of an event. It can be the name of the software that generated the event (e.g. Sysmon, httpd), or of a subsystem of the operating system (kernel, Microsoft-Windows-Security-Auditing).
+
+type: keyword
+
+example: kernel
+
+--
+
+*`event.risk_score`*::
++
+--
+Risk score or priority of the event (e.g. security solutions). Use your system's original value here.
+
+type: float
+
+--
+
+*`event.risk_score_norm`*::
++
+--
+Normalized risk score or priority of the event, on a scale of 0 to 100.
+This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
+
+type: float
+
+--
+
+*`event.sequence`*::
++
+--
+Sequence number of the event.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regarless of the timestamp precision.
+
+type: long
+
+format: string
+
+--
+
+*`event.severity`*::
++
+--
+Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+
+type: long
+
+example: 7
+
+format: string
+
+--
+
+*`event.start`*::
++
+--
+event.start contains the date when the event started or when the activity was first observed.
+
+type: date
+
+--
+
+*`event.timezone`*::
++
+--
+This field should be populated when the event's timestamp does not include timezone information already (e.g. default Syslog timestamps). It's optional otherwise.
+Acceptable timezone formats are: a canonical ID (e.g. "Europe/Amsterdam"), abbreviated (e.g. "EST") or an HH:mm differential (e.g. "-05:00").
+
+type: keyword
+
+--
+
+*`event.type`*::
++
+--
+Reserved for future usage.
+Please avoid using this field for user data.
+
+type: keyword
+
+--
+
+[float]
+=== file
+
+A file is defined as a set of information that has been created on, or has existed on a filesystem.
+File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
+
+
+*`file.accessed`*::
++
+--
+Last time the file was accessed.
+Note that not all filesystems keep track of access time.
+
+type: date
+
+--
+
+*`file.created`*::
++
+--
+File creation time.
+Note that not all filesystems store the creation time.
+
+type: date
+
+--
+
+*`file.ctime`*::
++
+--
+Last time the file attributes or metadata changed.
+Note that changes to the file content will update `mtime`. This implies `ctime` will be adjusted at the same time, since `mtime` is an attribute of the file.
+
+type: date
+
+--
+
+*`file.device`*::
++
+--
+Device that is the source of the file.
+
+type: keyword
+
+example: sda
+
+--
+
+*`file.directory`*::
++
+--
+Directory where the file is located.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+*`file.extension`*::
++
+--
+File extension.
+
+type: keyword
+
+example: png
+
+--
+
+*`file.gid`*::
++
+--
+Primary group ID (GID) of the file.
+
+type: keyword
+
+example: 1001
+
+--
+
+*`file.group`*::
++
+--
+Primary group name of the file.
+
+type: keyword
+
+example: alice
+
+--
+
+*`file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`file.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`file.inode`*::
++
+--
+Inode representing the file in the filesystem.
+
+type: keyword
+
+example: 256383
+
+--
+
+*`file.mode`*::
++
+--
+Mode of the file in octal representation.
+
+type: keyword
+
+example: 0640
+
+--
+
+*`file.mtime`*::
++
+--
+Last time the file content was modified.
+
+type: date
+
+--
+
+*`file.name`*::
++
+--
+Name of the file including the extension, without the directory.
+
+type: keyword
+
+example: example.png
+
+--
+
+*`file.owner`*::
++
+--
+File owner's username.
+
+type: keyword
+
+example: alice
+
+--
+
+*`file.path`*::
++
+--
+Full path to the file.
+
+type: keyword
+
+example: /home/alice/example.png
+
+--
+
+*`file.size`*::
++
+--
+File size in bytes.
+Only relevant when `file.type` is "file".
+
+type: long
+
+example: 16384
+
+--
+
+*`file.target_path`*::
++
+--
+Target path for symlinks.
+
+type: keyword
+
+--
+
+*`file.type`*::
++
+--
+File type (file, dir, or symlink).
+
+type: keyword
+
+example: file
+
+--
+
+*`file.uid`*::
++
+--
+The user ID (UID) or security identifier (SID) of the file owner.
+
+type: keyword
+
+example: 1001
+
+--
+
+[float]
+=== geo
+
+Geo fields can carry data about a specific location related to an event.
+This geolocation information can be derived from techniques such as Geo IP, or be user-supplied.
+
+
+*`geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+[float]
+=== group
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+*`group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+[float]
+=== hash
+
+The hash fields represent different hash algorithms and their values.
+Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+
+
+*`hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+[float]
+=== host
+
+A host is defined as a general computing instance.
+ECS host.* fields should be populated with details about the host on which the event happened, or from which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
+
+
+*`host.architecture`*::
++
+--
+Operating system architecture.
+
+type: keyword
+
+example: x86_64
+
+--
+
+*`host.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`host.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`host.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`host.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`host.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`host.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`host.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`host.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`host.hostname`*::
++
+--
+Hostname of the host.
+It normally contains what the `hostname` command returns on the host machine.
+
+type: keyword
+
+--
+
+*`host.id`*::
++
+--
+Unique host id.
+As hostname is not always unique, use values that are meaningful in your environment.
+Example: The current usage of `beat.name`.
+
+type: keyword
+
+--
+
+*`host.ip`*::
++
+--
+Host ip address.
+
+type: ip
+
+--
+
+*`host.mac`*::
++
+--
+Host mac address.
+
+type: keyword
+
+--
+
+*`host.name`*::
++
+--
+Name of the host.
+It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
+
+type: keyword
+
+--
+
+*`host.os.family`*::
++
+--
+OS family (such as redhat, debian, freebsd, windows).
+
+type: keyword
+
+example: debian
+
+--
+
+*`host.os.full`*::
++
+--
+Operating system name, including the version or code name.
+
+type: keyword
+
+example: Mac OS Mojave
+
+--
+
+*`host.os.kernel`*::
++
+--
+Operating system kernel version as a raw string.
+
+type: keyword
+
+example: 4.4.0-112-generic
+
+--
+
+*`host.os.name`*::
++
+--
+Operating system name, without the version.
+
+type: keyword
+
+example: Mac OS X
+
+--
+
+*`host.os.platform`*::
++
+--
+Operating system platform (such centos, ubuntu, windows).
+
+type: keyword
+
+example: darwin
+
+--
+
+*`host.os.version`*::
++
+--
+Operating system version as a raw string.
+
+type: keyword
+
+example: 10.14.1
+
+--
+
+*`host.type`*::
++
+--
+Type of host.
+For Cloud providers this can be the machine type like `t2.medium`. If vm, this could be the container, for example, or other information meaningful in your environment.
+
+type: keyword
+
+--
+
+*`host.uptime`*::
++
+--
+Seconds the host has been up.
+
+type: long
+
+example: 1325
+
+--
+
+*`host.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`host.user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`host.user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`host.user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`host.user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`host.user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`host.user.id`*::
++
+--
+One or multiple unique identifiers of the user.
+
+type: keyword
+
+--
+
+*`host.user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+[float]
+=== http
+
+Fields related to HTTP activity. Use the `url` field set to store the url of the request.
+
+
+*`http.request.body.bytes`*::
++
+--
+Size in bytes of the request body.
+
+type: long
+
+example: 887
+
+format: bytes
+
+--
+
+*`http.request.body.content`*::
++
+--
+The full HTTP request body.
+
+type: keyword
+
+example: Hello world
+
+--
+
+*`http.request.bytes`*::
++
+--
+Total size in bytes of the request (body and headers).
+
+type: long
+
+example: 1437
+
+format: bytes
+
+--
+
+*`http.request.method`*::
++
+--
+HTTP request method.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
+type: keyword
+
+example: get, post, put
+
+--
+
+*`http.request.referrer`*::
++
+--
+Referrer for this HTTP request.
+
+type: keyword
+
+example: https://blog.example.com/
+
+--
+
+*`http.response.body.bytes`*::
++
+--
+Size in bytes of the response body.
+
+type: long
+
+example: 887
+
+format: bytes
+
+--
+
+*`http.response.body.content`*::
++
+--
+The full HTTP response body.
+
+type: keyword
+
+example: Hello world
+
+--
+
+*`http.response.bytes`*::
++
+--
+Total size in bytes of the response (body and headers).
+
+type: long
+
+example: 1437
+
+format: bytes
+
+--
+
+*`http.response.status_code`*::
++
+--
+HTTP response status code.
+
+type: long
+
+example: 404
+
+format: string
+
+--
+
+*`http.version`*::
++
+--
+HTTP version.
+
+type: keyword
+
+example: 1.1
+
+--
+
+[float]
+=== log
+
+Fields which are specific to log events.
+
+
+*`log.level`*::
++
+--
+Original log level of the log event.
+Some examples are `warn`, `error`, `i`.
+
+type: keyword
+
+example: err
+
+--
+
+*`log.logger`*::
++
+--
+The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name.
+
+type: keyword
+
+example: org.elasticsearch.bootstrap.Bootstrap
+
+--
+
+*`log.original`*::
++
+--
+This is the original log message and contains the full log message before splitting it up in multiple parts.
+In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
+This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
+
+type: keyword
+
+example: Sep 19 08:26:10 localhost My log
+
+--
+
+[float]
+=== network
+
+The network is defined as the communication path over which a host or network event happens.
+The network.* fields should be populated with details about the network activity associated with an event.
+
+
+*`network.application`*::
++
+--
+A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
+type: keyword
+
+example: aim
+
+--
+
+*`network.bytes`*::
++
+--
+Total bytes transferred in both directions.
+If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
+
+type: long
+
+example: 368
+
+format: bytes
+
+--
+
+*`network.community_id`*::
++
+--
+A hash of source and destination IPs and ports, as well as the protocol used in a communication. This is a tool-agnostic standard to identify flows.
+Learn more at https://github.com/corelight/community-id-spec.
+
+type: keyword
+
+example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
+
+--
+
+*`network.direction`*::
++
+--
+Direction of the network traffic.
+Recommended values are:
+  * inbound
+  * outbound
+  * internal
+  * external
+  * unknown
+
+When mapping events from a host-based monitoring context, populate this field from the host's point of view.
+When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
+
+type: keyword
+
+example: inbound
+
+--
+
+*`network.forwarded_ip`*::
++
+--
+Host IP address when the source IP address is the proxy.
+
+type: ip
+
+example: 192.1.1.2
+
+--
+
+*`network.iana_number`*::
++
+--
+IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). Standardized list of protocols. This aligns well with NetFlow and sFlow related logs which use the IANA Protocol Number.
+
+type: keyword
+
+example: 6
+
+--
+
+*`network.name`*::
++
+--
+Name given by operators to sections of their network.
+
+type: keyword
+
+example: Guest Wifi
+
+--
+
+*`network.packets`*::
++
+--
+Total packets transferred in both directions.
+If `source.packets` and `destination.packets` are known, `network.packets` is their sum.
+
+type: long
+
+example: 24
+
+--
+
+*`network.protocol`*::
++
+--
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
+type: keyword
+
+example: http
+
+--
+
+*`network.transport`*::
++
+--
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
+type: keyword
+
+example: tcp
+
+--
+
+*`network.type`*::
++
+--
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
+type: keyword
+
+example: ipv4
+
+--
+
+[float]
+=== observer
+
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
+This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
+
+
+*`observer.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`observer.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`observer.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`observer.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`observer.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`observer.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`observer.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`observer.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`observer.hostname`*::
++
+--
+Hostname of the observer.
+
+type: keyword
+
+--
+
+*`observer.ip`*::
++
+--
+IP address of the observer.
+
+type: ip
+
+--
+
+*`observer.mac`*::
++
+--
+MAC address of the observer
+
+type: keyword
+
+--
+
+*`observer.os.family`*::
++
+--
+OS family (such as redhat, debian, freebsd, windows).
+
+type: keyword
+
+example: debian
+
+--
+
+*`observer.os.full`*::
++
+--
+Operating system name, including the version or code name.
+
+type: keyword
+
+example: Mac OS Mojave
+
+--
+
+*`observer.os.kernel`*::
++
+--
+Operating system kernel version as a raw string.
+
+type: keyword
+
+example: 4.4.0-112-generic
+
+--
+
+*`observer.os.name`*::
++
+--
+Operating system name, without the version.
+
+type: keyword
+
+example: Mac OS X
+
+--
+
+*`observer.os.platform`*::
++
+--
+Operating system platform (such centos, ubuntu, windows).
+
+type: keyword
+
+example: darwin
+
+--
+
+*`observer.os.version`*::
++
+--
+Operating system version as a raw string.
+
+type: keyword
+
+example: 10.14.1
+
+--
+
+*`observer.serial_number`*::
++
+--
+Observer serial number.
+
+type: keyword
+
+--
+
+*`observer.type`*::
++
+--
+The type of the observer the data is coming from.
+There is no predefined list of observer types. Some examples are `forwarder`, `firewall`, `ids`, `ips`, `proxy`, `poller`, `sensor`, `APM server`.
+
+type: keyword
+
+example: firewall
+
+--
+
+*`observer.vendor`*::
++
+--
+observer vendor information.
+
+type: keyword
+
+--
+
+*`observer.version`*::
++
+--
+Observer version.
+
+type: keyword
+
+--
+
+[float]
+=== organization
+
+The organization fields enrich data with information about the company or entity the data is associated with.
+These fields help you arrange or filter data stored in an index by one or multiple organizations.
+
+
+*`organization.id`*::
++
+--
+Unique identifier for the organization.
+
+type: keyword
+
+--
+
+*`organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+--
+
+[float]
+=== os
+
+The OS fields contain information about the operating system.
+
+
+*`os.family`*::
++
+--
+OS family (such as redhat, debian, freebsd, windows).
+
+type: keyword
+
+example: debian
+
+--
+
+*`os.full`*::
++
+--
+Operating system name, including the version or code name.
+
+type: keyword
+
+example: Mac OS Mojave
+
+--
+
+*`os.kernel`*::
++
+--
+Operating system kernel version as a raw string.
+
+type: keyword
+
+example: 4.4.0-112-generic
+
+--
+
+*`os.name`*::
++
+--
+Operating system name, without the version.
+
+type: keyword
+
+example: Mac OS X
+
+--
+
+*`os.platform`*::
++
+--
+Operating system platform (such centos, ubuntu, windows).
+
+type: keyword
+
+example: darwin
+
+--
+
+*`os.version`*::
++
+--
+Operating system version as a raw string.
+
+type: keyword
+
+example: 10.14.1
+
+--
+
+[float]
+=== process
+
+These fields contain information about a process.
+These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
+
+
+*`process.args`*::
++
+--
+Array of process arguments.
+May be filtered to protect sensitive information.
+
+type: keyword
+
+example: ['ssh', '-l', 'user', '10.0.0.16']
+
+--
+
+*`process.executable`*::
++
+--
+Absolute path to the process executable.
+
+type: keyword
+
+example: /usr/bin/ssh
+
+--
+
+*`process.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`process.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`process.name`*::
++
+--
+Process name.
+Sometimes called program name or similar.
+
+type: keyword
+
+example: ssh
+
+--
+
+*`process.pgid`*::
++
+--
+Identifier of the group of processes the process belongs to.
+
+type: long
+
+format: string
+
+--
+
+*`process.pid`*::
++
+--
+Process id.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.ppid`*::
++
+--
+Parent process' pid.
+
+type: long
+
+example: 4241
+
+format: string
+
+--
+
+*`process.start`*::
++
+--
+The time the process started.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
+*`process.thread.id`*::
++
+--
+Thread ID.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.thread.name`*::
++
+--
+Thread name.
+
+type: keyword
+
+example: thread-0
+
+--
+
+*`process.title`*::
++
+--
+Process title.
+The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
+
+type: keyword
+
+--
+
+*`process.uptime`*::
++
+--
+Seconds the process has been up.
+
+type: long
+
+example: 1325
+
+--
+
+*`process.working_directory`*::
++
+--
+The working directory of the process.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+[float]
+=== related
+
+This field set is meant to facilitate pivoting around a piece of data.
+Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
+A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+
+
+*`related.ip`*::
++
+--
+All of the IPs seen on your event.
+
+type: ip
+
+--
+
+[float]
+=== server
+
+A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records.
+For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
+
+
+*`server.address`*::
++
+--
+Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
+
+--
+
+*`server.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`server.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`server.bytes`*::
++
+--
+Bytes sent from the server to the client.
+
+type: long
+
+example: 184
+
+format: bytes
+
+--
+
+*`server.domain`*::
++
+--
+Server domain.
+
+type: keyword
+
+--
+
+*`server.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`server.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`server.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`server.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`server.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`server.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`server.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`server.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`server.ip`*::
++
+--
+IP address of the server.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
+
+--
+
+*`server.mac`*::
++
+--
+MAC address of the server.
+
+type: keyword
+
+--
+
+*`server.nat.ip`*::
++
+--
+Translated ip of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`server.nat.port`*::
++
+--
+Translated port of destination based NAT sessions (e.g. internet to private DMZ)
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
+*`server.packets`*::
++
+--
+Packets sent from the server to the client.
+
+type: long
+
+example: 12
+
+--
+
+*`server.port`*::
++
+--
+Port of the server.
+
+type: long
+
+format: string
+
+--
+
+*`server.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`server.user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`server.user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`server.user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`server.user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`server.user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`server.user.id`*::
++
+--
+One or multiple unique identifiers of the user.
+
+type: keyword
+
+--
+
+*`server.user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+[float]
+=== service
+
+The service fields describe the service for or from which the data was collected.
+These fields help you find and correlate logs for a specific service and version.
+
+
+*`service.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows if two instances of the same service are running on the same machine they can be differentiated by the `service.name`.
+Also it allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the service.name could contain the cluster name. For Beats the service.name is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
+
+--
+
+[float]
+=== source
+
+Source fields describe details about the source of a packet/event.
+Source fields are usually populated in conjunction with destination fields.
+
+
+*`source.address`*::
++
+--
+Some event source addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
+
+--
+
+*`source.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`source.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`source.bytes`*::
++
+--
+Bytes sent from the source to the destination.
+
+type: long
+
+example: 184
+
+format: bytes
+
+--
+
+*`source.domain`*::
++
+--
+Source domain.
+
+type: keyword
+
+--
+
+*`source.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`source.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`source.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`source.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`source.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`source.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`source.ip`*::
++
+--
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
+
+--
+
+*`source.mac`*::
++
+--
+MAC address of the source.
+
+type: keyword
+
+--
+
+*`source.nat.ip`*::
++
+--
+Translated ip of source based NAT sessions (e.g. internal client to internet)
+Typically connections traversing load balancers, firewalls, or routers.
+
+type: ip
+
+--
+
+*`source.nat.port`*::
++
+--
+Translated port of source based NAT sessions. (e.g. internal client to internet)
+Typically used with load balancers, firewalls, or routers.
+
+type: long
+
+format: string
+
+--
+
+*`source.packets`*::
++
+--
+Packets sent from the source to the destination.
+
+type: long
+
+example: 12
+
+--
+
+*`source.port`*::
++
+--
+Port of the source.
+
+type: long
+
+format: string
+
+--
+
+*`source.user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`source.user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`source.user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`source.user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`source.user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`source.user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`source.user.id`*::
++
+--
+One or multiple unique identifiers of the user.
+
+type: keyword
+
+--
+
+*`source.user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+[float]
+=== tracing
+
+Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
+
+
+*`tracing.trace.id`*::
++
+--
+Unique identifier of the trace.
+A trace groups multiple events like transactions that belong together. For example, a user request handled by multiple inter-connected services.
+
+type: keyword
+
+example: 4bf92f3577b34da6a3ce929d0e0e4736
+
+--
+
+*`tracing.transaction.id`*::
++
+--
+Unique identifier of the transaction.
+A transaction is the highest level of work measured within a service, such as a request to a server.
+
+type: keyword
+
+example: 00f067aa0ba902b7
+
+--
+
+[float]
+=== url
+
+URL fields provide support for complete or partial URLs, and supports the breaking down into scheme, domain, path, and so on.
+
+
+*`url.domain`*::
++
+--
+Domain of the url, such as "www.elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+
+type: keyword
+
+example: www.elastic.co
+
+--
+
+*`url.fragment`*::
++
+--
+Portion of the url after the `#`, such as "top".
+The `#` is not part of the fragment.
+
+type: keyword
+
+--
+
+*`url.full`*::
++
+--
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top
+
+--
+
+*`url.original`*::
++
+--
+Unmodified original url as seen in the event source.
+Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
+This field is meant to represent the URL as it was observed, complete or not.
+
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
+
+--
+
+*`url.password`*::
++
+--
+Password of the request.
+
+type: keyword
+
+--
+
+*`url.path`*::
++
+--
+Path of the request, such as "/search".
+
+type: keyword
+
+--
+
+*`url.port`*::
++
+--
+Port of the request, such as 443.
+
+type: long
+
+example: 443
+
+format: string
+
+--
+
+*`url.query`*::
++
+--
+The query field describes the query string of the request, such as "q=elasticsearch".
+The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+type: keyword
+
+--
+
+*`url.scheme`*::
++
+--
+Scheme of the request, such as "https".
+Note: The `:` is not part of the scheme.
+
+type: keyword
+
+example: https
+
+--
+
+*`url.username`*::
++
+--
+Username of the request.
+
+type: keyword
+
+--
+
+[float]
+=== user
+
+The user fields describe information about the user that is relevant to the event.
+Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
+
+
+*`user.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.id`*::
++
+--
+One or multiple unique identifiers of the user.
+
+type: keyword
+
+--
+
+*`user.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+[float]
+=== user_agent
+
+The user_agent fields normally come from a browser request.
+They often show up in web service logs coming from the parsed user agent string.
+
+
+*`user_agent.device.name`*::
++
+--
+Name of the device.
+
+type: keyword
+
+example: iPhone
+
+--
+
+*`user_agent.name`*::
++
+--
+Name of the user agent.
+
+type: keyword
+
+example: Safari
+
+--
+
+*`user_agent.original`*::
++
+--
+Unparsed version of the user_agent.
+
+type: keyword
+
+example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
+
+--
+
+*`user_agent.os.family`*::
++
+--
+OS family (such as redhat, debian, freebsd, windows).
+
+type: keyword
+
+example: debian
+
+--
+
+*`user_agent.os.full`*::
++
+--
+Operating system name, including the version or code name.
+
+type: keyword
+
+example: Mac OS Mojave
+
+--
+
+*`user_agent.os.kernel`*::
++
+--
+Operating system kernel version as a raw string.
+
+type: keyword
+
+example: 4.4.0-112-generic
+
+--
+
+*`user_agent.os.name`*::
++
+--
+Operating system name, without the version.
+
+type: keyword
+
+example: Mac OS X
+
+--
+
+*`user_agent.os.platform`*::
++
+--
+Operating system platform (such centos, ubuntu, windows).
+
+type: keyword
+
+example: darwin
+
+--
+
+*`user_agent.os.version`*::
++
+--
+Operating system version as a raw string.
+
+type: keyword
+
+example: 10.14.1
+
+--
+
+*`user_agent.version`*::
++
+--
+Version of the user agent.
+
+type: keyword
+
+example: 12.0
+
+--
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+*`host.containerized`*::
++
+--
+If the host is a container.
+
+
+type: boolean
+
+--
+
+*`host.os.build`*::
++
+--
+OS build information.
+
+
+type: keyword
+
+example: 18D109
+
+--
+
+*`host.os.codename`*::
++
+--
+OS codename, if any.
+
+
+type: keyword
+
+example: stretch
+
+--
+
+[[exported-fields-jolokia-autodiscover]]
+== Jolokia Discovery autodiscover provider fields
+
+Metadata from Jolokia Discovery added by the jolokia provider.
+
+
+
+*`jolokia.agent.version`*::
++
+--
+Version number of jolokia agent.
+
+
+type: keyword
+
+--
+
+*`jolokia.agent.id`*::
++
+--
+Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+
+
+type: keyword
+
+--
+
+*`jolokia.server.product`*::
++
+--
+The container product if detected.
+
+
+type: keyword
+
+--
+
+*`jolokia.server.version`*::
++
+--
+The container's version (if detected).
+
+
+type: keyword
+
+--
+
+*`jolokia.server.vendor`*::
++
+--
+The vendor of the container the agent is running in.
+
+
+type: keyword
+
+--
+
+*`jolokia.url`*::
++
+--
+The URL how this agent can be contacted.
+
+
+type: keyword
+
+--
+
+*`jolokia.secured`*::
++
+--
+Whether the agent was configured for authentication or not.
+
+
+type: boolean
+
+--
+
+[[exported-fields-kubernetes-processor]]
+== Kubernetes fields
+
+Kubernetes metadata added by the kubernetes processor
+
+
+
+
+*`kubernetes.pod.name`*::
++
+--
+Kubernetes pod name
+
+
+type: keyword
+
+--
+
+*`kubernetes.pod.uid`*::
++
+--
+Kubernetes Pod UID
+
+
+type: keyword
+
+--
+
+*`kubernetes.namespace`*::
++
+--
+Kubernetes namespace
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.name`*::
++
+--
+Kubernetes node name
+
+
+type: keyword
+
+--
+
+*`kubernetes.labels.*`*::
++
+--
+Kubernetes labels map
+
+
+type: object
+
+--
+
+*`kubernetes.annotations.*`*::
++
+--
+Kubernetes annotations map
+
+
+type: object
+
+--
+
+*`kubernetes.replicaset.name`*::
++
+--
+Kubernetes replicaset name
+
+
+type: keyword
+
+--
+
+*`kubernetes.deployment.name`*::
++
+--
+Kubernetes deployment name
+
+
+type: keyword
+
+--
+
+*`kubernetes.statefulset.name`*::
++
+--
+Kubernetes statefulset name
+
+
+type: keyword
+
+--
+
+*`kubernetes.container.name`*::
++
+--
+Kubernetes container name
+
+
+type: keyword
+
+--
+
+*`kubernetes.container.image`*::
++
+--
+Kubernetes container image
+
+
+type: keyword
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
+

@@ -19,7 +19,7 @@
 
 package arch
 
-// Based on Linux v4.16.
+// Based on Linux v5.0.
 
 var syscallsARM = map[int]string{
 	0:      "restart_syscall",
@@ -375,6 +375,8 @@ var syscallsARM = map[int]string{
 	395:    "pkey_alloc",
 	396:    "pkey_free",
 	397:    "statx",
+	398:    "rseq",
+	399:    "io_pgetevents",
 	983041: "breakpoint",
 	983042: "cacheflush",
 	983043: "usr26",
@@ -765,6 +767,8 @@ var syscalls386 = map[int]string{
 	382: "pkey_free",
 	383: "statx",
 	384: "arch_prctl",
+	385: "io_pgetevents",
+	386: "rseq",
 }
 
 var syscallsX32 = map[int]string{
@@ -1101,6 +1105,8 @@ var syscallsX32 = map[int]string{
 	330: "pkey_alloc",
 	331: "pkey_free",
 	332: "statx",
+	333: "io_pgetevents",
+	334: "rseq",
 	512: "rt_sigaction",
 	513: "rt_sigreturn",
 	514: "ioctl",
@@ -1473,4 +1479,6 @@ var syscallsX86_64 = map[int]string{
 	330: "pkey_alloc",
 	331: "pkey_free",
 	332: "statx",
+	333: "io_pgetevents",
+	334: "rseq",
 }

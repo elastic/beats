@@ -14,7 +14,7 @@
   # Timestamp
   # https://tools.ietf.org/html/rfc3164#section-4.1.2
   # Match: "Jan" and "January"
-  month = ( "Jan" ("uary")? | "Feb" "ruary"? | "Mar" "ch"? | "Apr" "il"? | "Ma" "y"? | "Jun" "e"? | "Jul" "y"? | "Aug" "ust"? | "Sep" ("tember")? | "Oct" "ober"? | "Nov" "ember"? | "ec" "ember"?) >tok %month;
+  month = ( "Jan" ("uary")? | "Feb" "ruary"? | "Mar" "ch"? | "Apr" "il"? | "Ma" "y"? | "Jun" "e"? | "Jul" "y"? | "Aug" "ust"? | "Sep" ("tember")? | "Oct" "ober"? | "Nov" "ember"? | "Dec" "ember"?) >tok %month;
 
   # Match: " 5" and "10" as the day
   multiple_digits_day = (([12][0-9]) | ("3"[01]))>tok %day;
@@ -42,10 +42,11 @@
   timestamp_rfc3164 = month space day space time;
   time_separator = "T" | "t";
   timestamp_rfc3339 = year "-" month_numeric "-" day_two_digits (time_separator | space) time timezone?;
-  timestamp = timestamp_rfc3339 | timestamp_rfc3164;
+  timestamp = (timestamp_rfc3339 | timestamp_rfc3164) ":"?;
 
-  hostname = [a-zA-Z0-9.-_:]+>tok %hostname;
-  header = timestamp space hostname space;
+  hostname = ([a-zA-Z0-9\.\-_:]*([a-zA-Z0-9] | "::"))+>tok $lookahead_duplicates %hostname;
+  hostVars = (hostname ":") | hostname;
+  header = timestamp space hostVars ":"? space;
 
   # MSG
   # https://tools.ietf.org/html/rfc3164#section-4.1.3
@@ -54,7 +55,9 @@
   syslogprog = program ("[" pid "]")? ":" space;
   message = any+>tok %message;
   msg = syslogprog? message>tok %message;
+  sequence = digit+ ":" space>tok %sequence;
 
-  main := (prio)? (header msg | timestamp space message | message);
+  main := (prio)?(sequence)? (header msg | timestamp space message | message);
+  catch_all := message;
 
 }%%

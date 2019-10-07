@@ -1,0 +1,13 @@
+{
+    "transient": {
+        "cluster": {
+            "remote": {
+                "same": {
+                    "seeds": [
+                        "127.0.0.1:9300"
+                    ]
+                }
+            }
+        }
+    }
+}

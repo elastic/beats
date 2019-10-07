@@ -17,11 +17,22 @@
 
 package cmd
 
-import cmd "github.com/elastic/beats/libbeat/cmd"
-import "github.com/elastic/beats/winlogbeat/beater"
+import (
+	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/winlogbeat/beater"
+
+	// Register fields.
+	_ "github.com/elastic/beats/winlogbeat/include"
+
+	// Import processors and supporting modules.
+	_ "github.com/elastic/beats/libbeat/processors/script"
+	_ "github.com/elastic/beats/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
+)
 
 // Name of this beat
 var Name = "winlogbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, "", beater.New)
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})

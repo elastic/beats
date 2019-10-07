@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outest"
@@ -175,7 +176,17 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"template.enabled": false,
 	})
 
-	grp, err := plugin(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), config)
+	info := beat.Info{Beat: "libbeat"}
+	im, err := idxmgmt.DefaultSupport(nil, info, common.MustNewConfigFrom(
+		map[string]interface{}{
+			"setup.ilm.enabled": false,
+		},
+	))
+	if err != nil {
+		t.Fatal("init index management:", err)
+	}
+
+	grp, err := plugin(im, info, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}

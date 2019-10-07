@@ -8,9 +8,11 @@ package syslog
     variable pe pe;
 }%%
 
-// syslog
-//<34>Oct 11 22:14:15 wopr su: 'su root' failed for foobar
-//<13>Feb  5 17:32:18 10.0.0.99 Use the quad dmg.
+var (
+  noDuplicates = []byte{'-', '.'}
+)
+
+// Parse parses Syslog events.
 func Parse(data []byte, event *event) {
     var p, cs int
     pe := len(data)
@@ -61,6 +63,21 @@ func Parse(data []byte, event *event) {
         event.SetNanosecond(data[tok:p])
       }
 
+      # NOTES: This allow to bail out of obvious non valid
+      # hostname, this might not be ideal in all situation, but
+      # when this happen we just go to the catch all case and at least
+      # extract the message
+      action lookahead_duplicates{
+        if p-1 > 0 {
+          for _, b := range noDuplicates {
+            if data[p] == b && data[p-1] == b {
+              p = tok -1
+              fgoto catch_all;
+            }
+          }
+        }
+      }
+
       action hostname {
         event.SetHostname(data[tok:p])
       }
@@ -75,6 +92,10 @@ func Parse(data []byte, event *event) {
 
       action timezone {
         event.SetTimeZone(data[tok:p])
+      }
+
+      action sequence {
+        event.SetSequence(data[tok:p])
       }
 
       include syslog_rfc3164 "syslog_rfc3164.rl";

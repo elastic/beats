@@ -1,54 +1,70 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "postgresql.statement",
+        "duration": 115000,
+        "module": "postgresql"
+    },
     "metricset": {
-        "host": "postgresql:5432",
-        "module": "postgresql",
-        "name": "statement",
-        "rtt": 115
+        "name": "statement"
     },
     "postgresql": {
         "statement": {
-            "user": {
-                "id": 10
-            },
             "database": {
-                "oid": "12407"
+                "oid": 12379
             },
             "query": {
-                "id":  "3240664890",
-                "text": "SELECT pg_sleep(?);",
-                "calls": "2",
-                "rows": "2",
-                "time": {
-                    "total": 120066.497,
-                    "min": 60029.533,
-                    "max": 60036.964,
-                    "mean": 60033.2485,
-                    "stddev": 3.71549999999843
-                },
+                "calls": 2,
+                "id": "1592910677",
                 "memory": {
-                    "shared": {
-                        "hit": 0,
-                        "read": 0,
-                        "dirtied": 0,
-                        "written": 0,
-                    },
                     "local": {
+                        "dirtied": 0,
                         "hit": 0,
                         "read": 0,
+                        "written": 0
+                    },
+                    "shared": {
                         "dirtied": 0,
-                        "written": 0,
+                        "hit": 0,
+                        "read": 0,
+                        "written": 0
                     },
                     "temp": {
                         "read": 0,
-                        "written": 0,
+                        "written": 0
+                    }
+                },
+                "rows": 3,
+                "text": "SELECT * FROM pg_stat_statements",
+                "time": {
+                    "max": {
+                        "ms": 0.388
+                    },
+                    "mean": {
+                        "ms": 0.235
+                    },
+                    "min": {
+                        "ms": 0.082
+                    },
+                    "stddev": {
+                        "ms": 0.153
+                    },
+                    "total": {
+                        "ms": 0.47000000000000003
                     }
                 }
+            },
+            "user": {
+                "id": 10
             }
         }
+    },
+    "service": {
+        "address": "172.26.0.2:5432",
+        "type": "postgresql"
     }
 }

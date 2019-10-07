@@ -63,7 +63,12 @@ func TestSingleProducerConsumer(
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, withLogOutput(func(t *testing.T) {
+		verbose := testing.Verbose()
+		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
+			if !verbose {
+				t.Parallel()
+			}
+
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
@@ -206,7 +211,12 @@ func TestMultiProducerConsumer(
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, withLogOutput(func(t *testing.T) {
+		verbose := testing.Verbose()
+		t.Run(test.name, withOptLogOutput(verbose, func(t *testing.T) {
+			if !verbose {
+				t.Parallel()
+			}
+
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 

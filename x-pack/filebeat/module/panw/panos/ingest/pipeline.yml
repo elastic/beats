@@ -1,0 +1,389 @@
+description: "Pipeline for Palo Alto Networks PAN-OS Logs"
+processors:
+
+# keep message as log.original.
+ - rename:
+     field: message
+     target_field: log.original
+
+# Set @timestamp to the time when the entry was generated at the data plane.
+ - date:
+     field: "_temp_.generated_time"
+     ignore_failure: true
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+ - date:
+    if: "ctx.event.timezone != null"
+    field: "@timestamp"
+    formats: ["ISO8601"]
+    timezone: "{{ event.timezone }}"
+    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
+# event.created is the time the event was received at the management plane.
+ - date:
+     field: "event.created"
+     target_field: "event.created"
+     ignore_failure: true
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+ - date:
+    if: "ctx.event.timezone != null && ctx.event.created != null "
+    field: "event.created"
+    target_field: "event.created"
+    formats: ["ISO8601"]
+    timezone: "{{ event.timezone }}"
+    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
+# event.start (traffic only) is the time the session started.
+ - date:
+     field: "event.start"
+     target_field: "event.start"
+     ignore_failure: true
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+ - date:
+    if: "ctx.event.timezone != null && ctx.event.start != null"
+    field: "event.start"
+    target_field: "event.start"
+    formats: ["ISO8601"]
+    timezone: "{{ event.timezone }}"
+    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
+# convert integer fields as the output of the CSV processor is always a string.
+ - convert: { type: long, ignore_missing: true, field: client.bytes }
+ - convert: { type: long, ignore_missing: true, field: client.packets }
+ - convert: { type: long, ignore_missing: true, field: client.port }
+ - convert: { type: long, ignore_missing: true, field: server.bytes }
+ - convert: { type: long, ignore_missing: true, field: server.packets }
+ - convert: { type: long, ignore_missing: true, field: server.port }
+ - convert: { type: long, ignore_missing: true, field: source.bytes }
+ - convert: { type: long, ignore_missing: true, field: source.packets }
+ - convert: { type: long, ignore_missing: true, field: source.port }
+ - convert: { type: long, ignore_missing: true, field: destination.bytes }
+ - convert: { type: long, ignore_missing: true, field: destination.packets }
+ - convert: { type: long, ignore_missing: true, field: destination.port }
+ - convert: { type: long, ignore_missing: true, field: network.bytes }
+ - convert: { type: long, ignore_missing: true, field: network.packets }
+ - convert: { type: long, ignore_missing: true, field: event.duration }
+ - convert: { type: long, ignore_missing: true, field: _temp_.labels }
+ - convert: { type: long, ignore_missing: true, field: panw.panos.sequence_number }
+ - convert: { type: long, ignore_missing: true, field: source.nat.port }
+ - convert: { type: long, ignore_missing: true, field: destination.nat.port }
+
+# Remove PCAP ID when zero (no packet capture).
+ - remove:
+     if: 'ctx?.panw?.panos?.network?.pcap_id == "0"'
+     field:
+       - panw.panos.network.pcap_id
+
+# Extract 'flags' bitfield into labels.
+ - script:
+     lang: painless
+     if: 'ctx?._temp_?.labels != null && ctx._temp_.labels != 0'
+     params:
+       pcap_included: 0x80000000
+       ipv6_session: 0x02000000
+       ssl_decrypted: 0x01000000
+       url_filter_denied: 0x00800000
+       nat_translated: 0x00400000
+       captive_portal: 0x00200000
+       x_forwarded_for: 0x00080000
+       http_proxy: 0x00040000
+       container_page: 0x00008000
+       temporary_match: 0x00002000
+       symmetric_return: 0x00000800
+     source: >
+       def labels = ctx?.labels;
+       if (labels == null) {
+          labels = new HashMap();
+          ctx['labels'] = labels;
+       }
+       long value = ctx._temp_.labels;
+       for (entry in params.entrySet()) {
+          if ((value & entry.getValue()) != 0) {
+              labels[entry.getKey()] = true;
+          }
+       }
+
+# normalize event.duration and determine event.end.
+ - script:
+     lang: painless
+     if: 'ctx?.event?.duration != null'
+     params:
+       NANOS_IN_A_SECOND: 1000000000
+     source: >
+       long nanos = ctx['event']['duration'] * params.NANOS_IN_A_SECOND;
+       ctx['event']['duration'] = nanos;
+       def start = ctx.event?.start;
+       if (start != null) {
+          ctx.event['end'] = ZonedDateTime.parse(start).plusNanos(nanos);
+       }
+
+# Set network.direction using src/dst zone (traffic logs).
+ - set:
+     field: network.direction
+     value: inbound
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+ - set:
+     field: network.direction
+     value: outbound
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+ - set:
+     field: network.direction
+     value: internal
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+ - set:
+     field: network.direction
+     value: external
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+ - set:
+     field: network.direction
+     value: unknown
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ((ctx?.panw?.panos?.source?.zone != "trust" && ctx?.panw?.panos?.source?.zone != "untrust") || (ctx?.panw?.panos?.destination?.zone != "trust" && ctx?.panw?.panos?.destination?.zone != "untrust"))'
+
+# Set network.direction from threat direction (Threat logs).
+ - set:
+     field: network.direction
+     value: inbound
+     if: 'ctx?._temp_?.message_type == "THREAT" && (ctx?._temp_?.direction == "0" || ctx?._temp_?.direction == "client-to-server")'
+
+ - set:
+     field: network.direction
+     value: outbound
+     if: 'ctx?._temp_?.message_type == "THREAT" && (ctx?._temp_?.direction == "1" || ctx?._temp_?.direction == "server-to-client")'
+
+ - set:
+     field: network.direction
+     value: unknown
+     if: 'ctx?._temp_?.message_type == "THREAT" && ctx?.network?.direction == null'
+
+# Set network.type for TRAFFIC.
+ - set:
+     field: network.type
+     value: 'ipv4'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session == null'
+ - set:
+     field: network.type
+     value: 'ipv6'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session != null'
+
+  # Set event.category depending on log type.
+ - set:
+     field: event.category
+     value: network_traffic
+     if: 'ctx?._temp_?.message_type == "TRAFFIC"'
+ - set:
+     field: event.category
+     value: security_threat
+     if: 'ctx?._temp_?.message_type == "THREAT"'
+
+ - drop:
+     if: 'ctx?.event?.category == null'
+
+# event.action for traffic logs.
+ - set:
+     field: event.action
+     value: flow_started
+     if: 'ctx?._temp_?.message_subtype == "start"'
+ - set:
+     field: event.action
+     value: flow_terminated
+     if: 'ctx?._temp_?.message_subtype == "end"'
+ - set:
+     field: event.action
+     value: flow_dropped
+     if: 'ctx?._temp_?.message_subtype == "drop"'
+ - set:
+     field: event.action
+     value: flow_denied
+     if: 'ctx?._temp_?.message_subtype == "deny"'
+
+# event.action for threat logs.
+ - set:
+     field: event.action
+     value: data_match
+     if: 'ctx?._temp_?.message_subtype == "data"'
+ - set:
+     field: event.action
+     value: file_match
+     if: 'ctx?._temp_?.message_subtype == "file"'
+ - set:
+     field: event.action
+     value: flood_detected
+     if: 'ctx?._temp_?.message_subtype == "flood"'
+ - set:
+     field: event.action
+     value: packet_attack
+     if: 'ctx?._temp_?.message_subtype == "packet"'
+ - set:
+     field: event.action
+     value: scan_detected
+     if: 'ctx?._temp_?.message_subtype == "scan"'
+ - set:
+     field: event.action
+     value: spyware_detected
+     if: 'ctx?._temp_?.message_subtype == "spyware"'
+ - set:
+     field: event.action
+     value: url_filtering
+     if: 'ctx?._temp_?.message_subtype == "url"'
+ - set:
+     field: event.action
+     value: virus_detected
+     if: 'ctx?._temp_?.message_subtype == "virus"'
+ - set:
+     field: event.action
+     value: exploit_detected
+     if: 'ctx?._temp_?.message_subtype == "vulnerability"'
+ - set:
+     field: event.action
+     value: wildfire_veredict
+     if: 'ctx?._temp_?.message_subtype == "wildfire"'
+ - set:
+     field: event.action
+     value: wildfire_virus_detected
+     if: 'ctx?._temp_?.message_subtype == "wildfire-virus"'
+
+
+# Set numeric log.level from event.severity.
+ - set:
+     field: "event.severity"
+     if: 'ctx.log.level == "critical"'
+     value: 1
+ - set:
+     field: "event.severity"
+     if: 'ctx.log.level == "high"'
+     value: 2
+ - set:
+     field: "event.severity"
+     if: 'ctx.log.level == "medium"'
+     value: 3
+ - set:
+     field: "event.severity"
+     if: 'ctx.log.level == "low"'
+     value: 4
+ - set:
+     field: "event.severity"
+     if: 'ctx.log.level == "informational"'
+     value: 5
+
+# Normalize event.outcome.
+# These values appear in the TRAFFIC docs but look like a mistake.
+ - set:
+     field: event.outcome
+     value: 'drop-icmp'
+     if: 'ctx?.event?.outcome == "drop icmp" || ctx?.event?.outcome == "drop ICMP"'
+ - set:
+     field: event.outcome
+     value: 'reset-both'
+     if: 'ctx?.event?.outcome == "reset both"'
+ - set:
+     field: event.outcome
+     value: 'reset-client'
+     if: 'ctx?.event?.outcome == "reset client"'
+ - set:
+     field: event.outcome
+     value: 'reset-server'
+     if: 'ctx?.event?.outcome == "reset server"'
+
+# Build related.ip array from src/dest/NAT IPs.
+ - append:
+     if: 'ctx?.source?.ip != null'
+     field: related.ip
+     value:
+       - '{{source.ip}}'
+ - append:
+     if: 'ctx?.destination?.ip != null'
+     field: related.ip
+     value:
+       - '{{destination.ip}}'
+ - append:
+     if: 'ctx?.source?.nat?.ip != null'
+     field: related.ip
+     value:
+       - '{{source.nat.ip}}'
+ - append:
+     if: 'ctx?.destination?.nat?.ip != null'
+     field: related.ip
+     value:
+       - '{{destination.nat.ip}}'
+
+# Geolocation for source.
+ - geoip:
+     if: 'ctx?.source?.ip != null'
+     field: source.ip
+     target_field: source.geo
+
+# Geolocation for destination.
+ - geoip:
+     if: 'ctx?.destination?.ip != null'
+     field: destination.ip
+     target_field: destination.geo
+
+# IP Autonomous System (AS) Lookup
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: source.ip
+     target_field: source.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: destination.ip
+     target_field: destination.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - rename:
+     field: source.as.asn
+     target_field: source.as.number
+     ignore_missing: true
+ - rename:
+     field: source.as.organization_name
+     target_field: source.as.organization.name
+     ignore_missing: true
+ - rename:
+     field: destination.as.asn
+     target_field: destination.as.number
+     ignore_missing: true
+ - rename:
+     field: destination.as.organization_name
+     target_field: destination.as.organization.name
+     ignore_missing: true
+
+# Append NAT community_id to network.community_id
+ - append:
+     if: 'ctx?.panw?.panos?.network?.nat?.community_id != null && ctx.panw.panos.network.nat.community_id != ctx?.network?.community_id'
+     field: network.community_id
+     value:
+      - '{{panw.panos.network.nat.community_id}}'
+
+ - grok:
+     if: 'ctx?.panw?.panos?.threat?.name != null'
+     field: panw.panos.threat.name
+     ignore_failure: true
+     patterns:
+       - '%{GREEDYDATA:panw.panos.threat.name}\(\s*%{GREEDYDATA:panw.panos.threat.id}\s*\)'
+
+ - set:
+     field: panw.panos.threat.name
+     value: 'URL-filtering'
+     if: 'ctx?.panw?.panos?.threat?.id == "9999"'
+
+# Remove temporary fields.
+ - remove:
+     field:
+       - _temp_
+     ignore_missing: true
+
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"
+  - remove:
+      field:
+        - _temp_
+      ignore_missing: true

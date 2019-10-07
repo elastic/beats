@@ -1,0 +1,46 @@
+{
+  "test_name": "IPFIX options template from Juniper MX240 JunOS 15.1 R6 S3",
+  "events": [
+    {
+      "Timestamp": "2018-06-01T15:11:53Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_options",
+          "category": "network_traffic",
+          "created": "2018-06-01T15:11:53Z",
+          "kind": "event"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 524288,
+            "timestamp": "2018-06-01T15:11:53Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "options": {
+            "export_protocol_version": 10,
+            "export_transport_protocol": 17,
+            "exported_flow_record_total_count": 76,
+            "exported_message_total_count": 76,
+            "exporter_ipv4_address": "10.0.0.1",
+            "exporter_ipv6_address": "::",
+            "flow_active_timeout": 60,
+            "flow_idle_timeout": 60,
+            "sampling_interval": 1000,
+            "system_init_time_milliseconds": "2010-01-06T07:06:38Z"
+          },
+          "scope": {
+            "exporting_process_id": 2
+          },
+          "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        }
+      },
+      "Private": null
+    }
+  ]
+}

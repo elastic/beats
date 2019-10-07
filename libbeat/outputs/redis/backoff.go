@@ -22,7 +22,7 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
-	"github.com/elastic/beats/libbeat/common"
+	b "github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/publisher"
 )
 
@@ -32,7 +32,7 @@ type backoffClient struct {
 	reason failReason
 
 	done    chan struct{}
-	backoff *common.Backoff
+	backoff b.Backoff
 }
 
 // failReason is used to track the cause of an error.
@@ -51,7 +51,7 @@ const (
 
 func newBackoffClient(client *client, init, max time.Duration) *backoffClient {
 	done := make(chan struct{})
-	backoff := common.NewBackoff(done, init, max)
+	backoff := b.NewEqualJitterBackoff(done, init, max)
 	return &backoffClient{
 		client:  client,
 		done:    done,

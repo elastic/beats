@@ -1,18 +1,24 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "system.diskio",
+        "duration": 115000,
+        "module": "system"
+    },
     "metricset": {
-        "module": "system",
-        "name": "diskio",
-        "rtt": 115
+        "name": "diskio"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "diskio": {
             "io": {
-                "time": 338930
+                "time": 656
             },
             "iostat": {
                 "await": 0,
@@ -21,40 +27,40 @@
                     "avg_size": 0
                 },
                 "read": {
+                    "await": 0,
                     "per_sec": {
                         "bytes": 0
                     },
                     "request": {
                         "merges_per_sec": 0,
                         "per_sec": 0
-                    },
-                    "await": 0
+                    }
                 },
                 "request": {
                     "avg_size": 0
                 },
                 "service_time": 0,
                 "write": {
+                    "await": 0,
                     "per_sec": {
                         "bytes": 0
                     },
                     "request": {
                         "merges_per_sec": 0,
                         "per_sec": 0
-                    },
-                    "await": 0
+                    }
                 }
             },
-            "name": "sda",
+            "name": "nvme0n1p1",
             "read": {
-                "bytes": 2540010496,
-                "count": 128537,
-                "time": 166380
+                "bytes": 8028160,
+                "count": 3290,
+                "time": 130016
             },
             "write": {
-                "bytes": 110828974080,
-                "count": 374728,
-                "time": 2139780
+                "bytes": 5120,
+                "count": 3,
+                "time": 12
             }
         }
     }

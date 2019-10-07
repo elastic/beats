@@ -1,8 +1,8 @@
 [[configuration-heartbeat-options]]
-== Set up monitors
+== Set up {beatname_uc} monitors
 
 ++++
-<titleabbrev>Set up {beatname_uc} monitors</titleabbrev>
+<titleabbrev>Set up monitors</titleabbrev>
 ++++
 
 To configure {beatname_uc} define a set of `monitors` to check your remote hosts.
@@ -33,7 +33,7 @@ heartbeat.monitors:
   check.receive: "Check"
 - type: http
   schedule: '@every 5s'
-  urls: ["http://localhost:80/service/status"]
+  hosts: ["http://localhost:80/service/status"]
   check.response.status: 200
 heartbeat.scheduler:
   limit: 10
@@ -52,6 +52,8 @@ happening to you. To do so you would instead have your +heartbeat.yml+ file cont
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
   path: /path/to/my/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  reload.enabled: true
   # How often to check for changes
   reload.period: 1s
 ----------------------------------------------------------------------
@@ -66,7 +68,7 @@ monitor definitions only, e.g. what is normally under the `heartbeat.monitors` s
 # /path/to/my/monitors.d/localhost_service_check.yml
 - type: http
   schedule: '@every 5s'
-  urls: ["http://localhost:80/service/status"]
+  hosts: ["http://localhost:80/service/status"]
   check.response.status: 200
 ----------------------------------------------------------------------
 
@@ -94,13 +96,26 @@ expected response. See <<monitor-http-options>>.
 The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
 
+[float]
+[[monitor-id]]
+==== `id`
+
+A unique identifier for this configuration. This should not change with edits to the monitor configuration
+regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. Note that this uniqueness is only within a given beat instance. If you want to monitor the same endpoint from multiple locations it is recommended that those heartbeat instances use the same IDs so that their results can be correlated. You can use the `host.geo.name` property to disambiguate them.
+
+When querying against indexed monitor data this is the field you will be aggregating with. Appears in the
+<<exported-fields,exported fields>> as `monitor.id`.
+
+If you do not set this explicitly the monitor's config will be hashed and a generated value used. This value will
+change with any options change to this monitor making aggregations over time between changes impossible. For this reason
+it is recommended that you set this manually.
 
 [float]
 [[monitor-name]]
 ==== `name`
 
-The monitor name. This value appears in the <<exported-fields,exported fields>>
-under the `monitor` field as the job name and the `type` field as the job type.
+Optional human readable name for this monitor. This value appears in the <<exported-fields,exported fields>>
+as `monitor.name`.
 
 [float]
 [[monitor-enabled]]
@@ -353,7 +368,7 @@ the host returns the expected response. These options are valid when the
 
 [float]
 [[monitor-http-urls]]
-==== `urls`
+==== `hosts`
 
 A list of URLs to ping.
 
@@ -363,7 +378,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  urls: ["http://myhost:80"]
+  hosts: ["http://myhost:80"]
 -------------------------------------------------------------------------------
 
 
@@ -404,7 +419,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  urls: ["https://myhost:443"]
+  hosts: ["https://myhost:443"]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
@@ -414,10 +429,24 @@ Example configuration:
 Also see <<configuration-ssl>> for a full description of the `ssl` options.
 
 [float]
+[[monitor-http-response]]
+=== `response`
+
+Controls the indexing of the HTTP response body contents to the `http.response.body.contents` field.
+
+Set `response.include_body` to one of the options listed below.
+
+*`on_error`*:: Include the body if an error is encountered during the check. This is the default.
+*`never`*:: Never include the body.
+*`always`*:: Always include the body with checks.
+
+Set `response.include_body_max_bytes` to control the maximum size of the stored body contents. Defaults to 1024 bytes.
+
+[float]
 [[monitor-http-check]]
 ==== `check`
 
-An optional `request` to send to the remote host and the expected `response`.
+An optional `request` to send to the remote host and the expected `response`. 
 
 Example configuration:
 
@@ -425,7 +454,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  urls: ["http://myhost:80"]
+  hosts: ["http://myhost:80"]
   check.request.method: HEAD
   check.response.status: 200
 -------------------------------------------------------------------------------
@@ -440,10 +469,10 @@ Under `check.request`, specify these options:
 
 Under `check.response`, specify these options:
 
-*`status`*:: The expected status code. If this setting is not configured or
-it's set to 0, any status code other than 404 is accepted.
+*`status`*:: The expected status code. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
 *`headers`*:: The required response headers.
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
+*`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON.
 
 The following configuration shows how to check the response when the body
 contains JSON:
@@ -452,14 +481,18 @@ contains JSON:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  urls: ["https://myhost:80"]
+  hosts: ["https://myhost:80"]
   check.request:
     method: GET
     headers:
       'X-API-Key': '12345-mykey-67890'
   check.response:
     status: 200
-    body: '{"status": "ok"}'
+    json:
+      - description: check status
+        condition:
+          equals:
+            status: ok
 -------------------------------------------------------------------------------
 
 The following configuration shows how to check the response for multiple regex
@@ -469,7 +502,7 @@ patterns:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  urls: ["https://myhost:80"]
+  hosts: ["https://myhost:80"]
   check.request:
     method: GET
     headers:
@@ -488,7 +521,7 @@ regex:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  urls: ["https://myhost:80"]
+  hosts: ["https://myhost:80"]
   check.request:
     method: GET
     headers:
@@ -541,8 +574,7 @@ The timezone for the scheduler. By default the scheduler uses localtime.
 [[monitor-watch-poll-file]]
 ==== `watch.poll_file`
 
-deprecated[6.5.0,Replaced by using dynamic reloading via the
-`heartbeat.config.monitors` option.]
+deprecated:[6.5.0,Replaced by using dynamic reloading via the `heartbeat.config.monitors` option.]
 
 The JSON file to watch for additional monitor configurations. The JSON file can
 contain multiple objects, each of which specifies a different monitor config.

@@ -35,3 +35,5 @@ all versions >= 3.0 (MySQL >= 5.7.0)
 === galera status MetricSet
 
 This is the status metricset of the module galera.
+
+Note: The galera_status metricset is in beta as we might merge it with the status metricset and we don't have tests for it yet.

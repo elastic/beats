@@ -1,7 +1,7 @@
 [id="{beatname_lc}-getting-started"]
 == Getting started with {beatname_uc}
 
-include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
@@ -16,7 +16,7 @@ include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 
 Install {beatname_uc} on all the servers you want to monitor.
 
-include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -75,6 +75,27 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
 [[docker]]
 *docker:*
 
@@ -86,12 +107,15 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-["source", "shell", subs="attributes"]
+["source","sh",subs="attributes"]
 ------------------------------------------------
-docker pull {dockerimage}
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
 endif::[]
+
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[win]]
 *win:*
@@ -138,7 +162,7 @@ For more information about these options, see
 [id="{beatname_lc}-configuration"]
 === Step 2: Configure {beatname_uc}
 
-include::../../libbeat/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
 
 To configure {beatname_uc}:
 
@@ -168,27 +192,25 @@ If you accept the default configuration without specifying additional modules,
 +
 See <<configuring-howto-{beatname_lc}>> for more details about configuring modules.
 
-include::../../libbeat/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
-include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-include::../../libbeat/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
-include::../../libbeat/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in {es}
 
-:allplatforms:
-include::../../libbeat/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the {kib} dashboards
 
-:allplatforms:
-include::../../libbeat/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/docs/dashboards.asciidoc[]
 
 [id="{beatname_lc}-starting"]
 === Step 5: Start {beatname_uc}
@@ -201,35 +223,30 @@ NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can'
 specify command line flags (see <<command-line-options>>). To specify flags,
 start {beatname_uc} in the foreground.
 
-*deb:*
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
-*rpm:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc} start
-----------------------------------------------------------------------
-
-*mac:*
+*mac and linux:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
-sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+sudo ./{beatname_lc} -e
 ----------------------------------------------------------------------
 <1> To monitor system files, you'll be running {beatname_uc} as root, so you
 need to change ownership of the configuration file, or run {beatname_uc} with
 `--strict.perms=false` specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
+
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
 
 *win:*
 
@@ -263,10 +280,10 @@ To make it easier for you to start auditing the activities of users and
 processes on your system, we have created example {beatname_uc} dashboards.
 You loaded the dashboards earlier when you ran the `setup` command.
 
-include::../../libbeat/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/docs/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 [role="screenshot"]
-image:./images/auditbeat-file-integrity-dashboard.png[Auditbeat File Integrity Dashboard]
+image::./images/auditbeat-file-integrity-dashboard.png[Auditbeat File Integrity Dashboard]

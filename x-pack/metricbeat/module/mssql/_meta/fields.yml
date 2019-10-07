@@ -1,0 +1,19 @@
+- key: mssql
+  title: "MSSQL"
+  description: MS SQL module
+  release: beta
+  fields:
+    - name: mssql
+      type: group
+      description: The root field containing all MSSQL fields
+      fields:
+        - name: database
+          type: group
+          description: The database that the metrics is being referred to
+          fields:
+            - name: id
+              type: long
+              description: Unique ID of the database inside MSSQL
+            - name: name
+              type: keyword
+              description: Name of the database

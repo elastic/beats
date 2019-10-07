@@ -128,34 +128,35 @@ class WriteReadTest(BaseTest):
         return event_logs
 
     def assert_common_fields(self, evt, msg=None, eventID=10, sid=None,
-                             level="Information", extra=None):
+                             level="information", extra=None):
 
-        assert host_name(evt["computer_name"]).lower() == host_name(platform.node()).lower()
-        assert "record_number" in evt
+        assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()
+        assert "winlog.record_id" in evt
         self.assertDictContainsSubset({
-            "event_id": eventID,
-            "level": level,
-            "log_name": self.providerName,
-            "source_name": self.applicationName,
-            "type": self.api,
+            "winlog.event_id": eventID,
+            "event.code": eventID,
+            "log.level": level.lower(),
+            "winlog.channel": self.providerName,
+            "winlog.provider_name": self.applicationName,
+            "winlog.api": self.api,
         }, evt)
 
         if msg == None:
             assert "message" not in evt
         else:
             self.assertEquals(evt["message"], msg)
-            self.assertDictContainsSubset({"event_data.param1": msg}, evt)
+            self.assertDictContainsSubset({"winlog.event_data.param1": msg}, evt)
 
         if sid == None:
-            self.assertEquals(evt["user.identifier"], self.get_sid_string())
-            self.assertEquals(evt["user.name"].lower(),
+            self.assertEquals(evt["winlog.user.identifier"], self.get_sid_string())
+            self.assertEquals(evt["winlog.user.name"].lower(),
                               win32api.GetUserName().lower())
-            self.assertEquals(evt["user.type"], "User")
-            assert "user.domain" in evt
+            self.assertEquals(evt["winlog.user.type"], "User")
+            assert "winlog.user.domain" in evt
         else:
-            self.assertEquals(evt["user.identifier"], sid)
-            assert "user.name" not in evt
-            assert "user.type" not in evt
+            self.assertEquals(evt["winlog.user.identifier"], sid)
+            assert "winlog.user.name" not in evt
+            assert "winlog.user.type" not in evt
 
         if extra != None:
             self.assertDictContainsSubset(extra, evt)

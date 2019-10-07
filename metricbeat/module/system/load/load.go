@@ -48,10 +48,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches system load metrics.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	load, err := cpu.Load()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get CPU load values")
+		return errors.Wrap(err, "failed to get CPU load values")
 	}
 
 	avgs := load.Averages()
@@ -69,5 +69,9 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		},
 	}
 
-	return event, nil
+	r.Event(mb.Event{
+		MetricSetFields: event,
+	})
+
+	return nil
 }

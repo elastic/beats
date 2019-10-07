@@ -155,12 +155,7 @@ func implementsUnpacker(t reflect.Type) bool {
 
 	// method receiver is known, check config parameters being compatible
 	tIn := method.Type.In(1)
-	acceptsConfig := tConfig.ConvertibleTo(tIn) || tConfigPtr.ConvertibleTo(tIn)
-	if !acceptsConfig {
-		return false
-	}
-
-	return true
+	return tConfig.ConvertibleTo(tIn) || tConfigPtr.ConvertibleTo(tIn)
 }
 
 func unpackWith(opts *options, v reflect.Value, with value) Error {

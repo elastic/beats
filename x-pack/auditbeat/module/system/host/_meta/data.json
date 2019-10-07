@@ -1,0 +1,54 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "action": "host",
+        "dataset": "host",
+        "module": "system",
+        "kind": "state"
+    },
+    "message": "Ubuntu host ubuntu-bionic (IP: 10.0.2.15) is up for 0 days, 5 hours, 11 minutes",
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "audit": {
+            "host": {
+                "architecture": "x86_64",
+                "boottime": "2018-12-10T15:48:44Z",
+                "containerized": false,
+                "hostname": "ubuntu-bionic",
+                "id": "6f7be6fb33e6c77f057266415c094408",
+                "ip": [
+                    "10.0.2.15",
+                    "fe80::2d:fdff:fe81:e747",
+                    "172.28.128.3",
+                    "fe80::a00:27ff:fe1f:7160",
+                    "172.17.0.1",
+                    "fe80::42:83ff:febe:1a3a",
+                    "172.18.0.1",
+                    "fe80::42:9eff:fed3:d888"
+                ],
+                "mac": [
+                    "02:2d:fd:81:e7:47",
+                    "08:00:27:1f:71:60",
+                    "02:42:83:be:1a:3a",
+                    "02:42:9e:d3:d8:88"
+                ],
+                "os": {
+                    "family": "debian",
+                    "kernel": "4.15.0-42-generic",
+                    "name": "Ubuntu",
+                    "platform": "ubuntu",
+                    "version": "18.04.1 LTS (Bionic Beaver)"
+                },
+                "timezone.name": "UTC",
+                "timezone.offset.sec": 0,
+                "uptime": 18661357350265
+            }
+        }
+    }
+}

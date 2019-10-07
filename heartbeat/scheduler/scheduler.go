@@ -59,7 +59,7 @@ type Canceller func() error
 // all tasks of a job have been finished, the job is marked as done and subject
 // to be re-scheduled.
 type job struct {
-	name     string
+	id       string
 	next     time.Time
 	schedule Schedule
 	fn       TaskFunc
@@ -138,11 +138,11 @@ var ErrAlreadyStopped = errors.New("attempted to add job to already stopped sche
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, name string, entrypoint TaskFunc) (removeFn func() error, err error) {
-	debugf("Add scheduler job '%v'.", name)
+func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn func() error, err error) {
+	debugf("Add scheduler job '%v'.", id)
 
 	j := &job{
-		name:       name,
+		id:         id,
 		fn:         entrypoint,
 		schedule:   sched,
 		registered: false,
@@ -160,7 +160,7 @@ func (s *Scheduler) Add(sched Schedule, name string, entrypoint TaskFunc) (remov
 }
 
 func (s *Scheduler) remove(j *job) error {
-	debugf("Remove scheduler job '%v'", j.name)
+	debugf("Remove scheduler job '%v'", j.id)
 
 	if s.isPreRunning() {
 		s.doRemove(j)
@@ -228,13 +228,13 @@ func (s *Scheduler) run() {
 				}
 
 				if j.running > 0 {
-					debugf("Scheduled job '%v' still active.", j.name)
+					debugf("Scheduled job '%v' still active.", j.id)
 					reschedActive(j, now)
 					continue
 				}
 
 				if s.limit > 0 && s.active == s.limit {
-					logp.Info("Scheduled job '%v' waiting.", j.name)
+					logp.Info("Scheduled job '%v' waiting.", j.id)
 					timer = nil
 					continue
 				}
@@ -245,7 +245,7 @@ func (s *Scheduler) run() {
 		case sig := <-s.finished:
 			s.active--
 			j := sig.entry
-			debugf("Job '%v' returned at %v (cont=%v).", j.name, time.Now(), len(sig.cont))
+			debugf("Job '%v' returned at %v (cont=%v).", j.id, time.Now(), len(sig.cont))
 
 			// add number of job continuation tasks returned to current job task
 			// counter and remove count for task just being finished
@@ -265,7 +265,7 @@ func (s *Scheduler) run() {
 					continue
 				}
 
-				debugf("Start waiting job: %v", waiting.name)
+				debugf("Start waiting job: %v", waiting.id)
 				s.startJob(waiting)
 				break
 			}
@@ -331,7 +331,7 @@ func (s *Scheduler) run() {
 }
 
 func reschedActive(j *job, now time.Time) {
-	logp.Info("Scheduled job '%v' already active.", j.name)
+	logp.Info("Scheduled job '%v' already active.", j.id)
 	if !now.Before(j.next) {
 		j.next = j.schedule.Next(j.next)
 	}
@@ -340,7 +340,7 @@ func reschedActive(j *job, now time.Time) {
 func (s *Scheduler) startJob(j *job) {
 	j.running++
 	j.next = j.schedule.Next(j.next)
-	debugf("Start job '%v' at %v.", j.name, time.Now())
+	debugf("Start job '%v' at %v.", j.id, time.Now())
 
 	s.runTask(task{j, j.fn})
 }
@@ -353,7 +353,7 @@ func (s *Scheduler) runTask(t task) {
 		defer func() {
 			if r := recover(); r != nil {
 				logp.Err("Panic in job '%v'. Recovering, but please report this: %s.",
-					j.name, r)
+					j.id, r)
 				logp.Err("Stacktrace: %s", debug.Stack())
 				s.signalFinished(j, nil)
 			}

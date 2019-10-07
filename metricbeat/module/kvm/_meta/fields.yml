@@ -1,8 +1,7 @@
 - key: kvm
   title: "kvm"
+  release: beta
   description: >
-    experimental[]
-
     kvm module
   fields:
     - name: kvm

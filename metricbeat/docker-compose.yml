@@ -1,4 +1,5 @@
-version: '2'
+version: '2.3'
+
 services:
   beat:
     build: ${PWD}/.
@@ -9,112 +10,168 @@ services:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
       # This is required to on-demand launching the rest on containers for tests & also docker module tests:
       - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
     command: make
-    env_file:
-      - ./module/aerospike/_meta/env
-      - ./module/apache/_meta/env
-      - ./module/ceph/_meta/env
-      - ./module/couchbase/_meta/env
-      - ./module/dropwizard/_meta/env
-      - ./module/elasticsearch/_meta/env
-      - ./module/envoyproxy/_meta/env
-      - ./module/etcd/_meta/env
-      - ./module/haproxy/_meta/env
-      - ./module/http/_meta/env
-      - ./module/jolokia/_meta/env
-      - ./module/kafka/_meta/env
-      - ./module/kibana/_meta/env
-      #- ./module/kubernetes/_meta/env
-      - ./module/logstash/_meta/env
-      - ./module/memcached/_meta/env
-      - ./module/mongodb/_meta/env
-      - ./module/munin/_meta/env
-      - ./module/mysql/_meta/env
-      - ./module/nginx/_meta/env
-      - ./module/php_fpm/_meta/env
-      - ./module/postgresql/_meta/env
-      - ./module/prometheus/_meta/env
-      - ./module/rabbitmq/_meta/env
-      - ./module/redis/_meta/env
-      - ./module/traefik/_meta/env
-      - ./module/uwsgi/_meta/env
-      - ./module/zookeeper/_meta/env
 
   # Modules
   aerospike:
-    build: ./module/aerospike/_meta
-
-  apache:
-    build: ./module/apache/_meta
-
-  apache_2_4_12:
+    image: docker.elastic.co/observability-ci/beats-integration-aerospike:${AEROSPIKE_VERSION:-3.9.0}-1
     build:
-      context: ./module/apache/_meta
-      dockerfile: Dockerfile.2.4.12
+      context: ./module/aerospike/_meta
+      args:
+        AEROSPIKE_VERSION: ${AEROSPIKE_VERSION:-3.9.0}
+    ports:
+      - 3000
+
+  metricbeat:
+    image: docker.elastic.co/observability-ci/beats-integration-metricbeat:${BEAT_VERSION:-7.3.0}-1
+    build:
+      context: ./module/beat/_meta
+      args:
+        BEAT_VERSION: ${BEAT_VERSION:-7.3.0}
+    ports:
+      - 5066
 
   ceph:
-    build: ./module/ceph/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-ceph:${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}-1
+    build:
+      context: ./module/ceph/_meta
+      args:
+        CEPH_VERSION: ${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}
+    ports:
+      - 5000
+
+  consul:
+    image: docker.elastic.co/observability-ci/beats-integration-consul:${CONSUL_VERSION:-1.4.2}-1
+    build:
+      context: ./module/consul/_meta
+      args:
+        CONSUL_VERSION: ${CONSUL_VERSION:-1.4.2}
+    ports:
+      - 8500
 
   couchbase:
-    build: ./module/couchbase/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-couchbase:${COUCHBASE_VERSION:-4.5.1}-1
+    build:
+      context: ./module/couchbase/_meta
+      args:
+        COUCHBASE_VERSION: ${COUCHBASE_VERSION:-4.5.1}
+    ports:
+      - 8091
+
+  couchdb:
+    image: docker.elastic.co/observability-ci/beats-integration-couchdb:${COUCHDB_VERSION:-1.7}-1
+    build:
+      context: ./module/couchdb/_meta
+      args:
+        COUCHDB_VERSION: ${COUCHDB_VERSION:-1.7}
+    ports:
+      - 5984
+
+  # Dummy container for docker tests, so there is a container with
+  # healthcheck generating events
+  docker:
+    image: alpine
+    command: '/bin/sh -c "trap : TERM INT; sleep 15d"'
+    healthcheck:
+      interval: 1s
+      test: ["CMD", "true"]
 
   dropwizard:
-    build: ./module/dropwizard/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-dropwizard:${MAVEN_VERSION:-3.3-jdk-8}-1
+    build:
+      context: ./module/dropwizard/_meta
+      args:
+        MAVEN_VERSION: ${MAVEN_VERSION:-3.3-jdk-8}
+    ports:
+      - 8080
 
   elasticsearch:
-    build: ./module/elasticsearch/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-elasticsearch:${ELASTICSEARCH_VERSION:-7.3.0}-1
+    build:
+      context: ./module/elasticsearch/_meta
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.3.0}
     environment:
-      - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=false"
+    ports:
+      - 9200
 
   envoyproxy:
-    build: ./module/envoyproxy/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-envoyproxy:${ENVOYPROXY_VERSION:-v1.7.0}-1
+    build:
+      context: ./module/envoyproxy/_meta
+      args:
+        ENVOYPROXY_VERSION: ${ENVOYPROXY_VERSION:-v1.7.0}
+    ports:
+      - 9901
 
   etcd:
-    build: ./module/etcd/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-etcd:${ETCD_VERSION:-3.3.10}-1
+    build:
+      context: ./module/etcd/_meta
+      args:
+        ETCD_VERSION: ${ETCD_VERSION:-3.3.10}
+    ports:
+      - 2379
+
+  golang:
+    image: docker.elastic.co/observability-ci/beats-integration-golang:1
+    build:
+      context: ./module/golang/_meta
+    ports:
+      - 6060
 
   haproxy:
-    build: ./module/haproxy/_meta
-
-  haproxy_1_6:
-    build:
+    image: docker.elastic.co/observability-ci/beats-integration-haproxy:${HAPROXY_VERSION:-1.8}-1
+    build: 
       context: ./module/haproxy/_meta
-      dockerfile: Dockerfile.1.6
-
-  haproxy_1_7:
-    build:
-      context: ./module/haproxy/_meta
-      dockerfile: Dockerfile.1.7
+      args:
+        HAPROXY_VERSION: ${HAPROXY_VERSION:-1.8}
+    ports:
+      - 14567
+      - 14568
+      - 14569
 
   http:
-    build: ./module/http/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-http:1
+    build:
+      context: ./module/http/_meta
+    ports:
+      - 8080
 
   jolokia:
-    build: ./module/jolokia/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-jolokia:${JOLOKIA_VERSION:-1.5.0}-1
+    build:
+      context: ./module/jolokia/_meta
+      args:
+        JOLOKIA_VERSION: ${JOLOKIA_VERSION:-1.5.0}
+    ports:
+      - 8778
 
   kafka:
+    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-1
     build:
       context: ./module/kafka/_meta
       args:
-        KAFKA_VERSION: 2.0.0
-
-  kafka_1_1_0:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 1.1.0
-
-  kafka_0_10_2:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 0.10.2.1
+        KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
+    ports:
+      - 9092
 
   kibana:
-    build: ./module/kibana/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.3.0}-1
+    build:
+      context: ./module/kibana/_meta
+      args:
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.3.0}
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601
 
   #kubernetes:
   #  build: ./module/kubernetes/_meta
@@ -126,6 +183,8 @@ services:
   #    - /sys:/sys
   #    - /var/lib/docker:/var/lib/docker
   #    - /var/run:/var/run
+  #  ports:
+  #    - 10255
 
   #kubestate:
   #  build:
@@ -133,63 +192,161 @@ services:
   #    dockerfile: Dockerfile.kube-state
   #  depends_on:
   #    - kubernetes
+  #  ports:
+  #    - 18080
 
   logstash:
-    build: ./module/logstash/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-logstash:${LOGSTASH_VERSION:-7.3.0}-1
+    build:
+      context: ./module/logstash/_meta
+      args:
+        LOGSTASH_VERSION: ${LOGSTASH_VERSION:-7.3.0}
+    ports:
+      - 9600
 
   memcached:
-    build: ./module/memcached/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-memcached:${MEMCACHED_VERSION:-1.4.35}-1
+    build:
+      context: ./module/memcached/_meta
+      args:
+        MEMCACHED_VERSION: ${MEMCACHED_VERSION:-1.4.35}
+    ports:
+      - 11211
 
   mongodb:
-    build: ./module/mongodb/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-mongodb:${MONGODB_VERSION:-3.4}-1
+    build:
+      context: ./module/mongodb/_meta
+      args:
+        MONGODB_VERSION: ${MONGODB_VERSION:-3.4}
     command: mongod --replSet beats
+    ports:
+      - 27017
 
   munin:
-    build: ./module/munin/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-munin:1
+    build:
+      context: ./module/munin/_meta
+    ports:
+      - 4949
 
   mysql:
-    build: ./module/mysql/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-mysql:${MYSQL_VARIANT:-mysql}-${MYSQL_VERSION:-5.7.12}-1
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: ${MYSQL_VARIANT:-mysql}:${MYSQL_VERSION:-5.7.12}
+    ports:
+      - 3306
+
+  nats:
+    image: docker.elastic.co/observability-ci/beats-integration-nats:${NATS_VERSION:-2.0.4}-1
+    build:
+      context: ./module/nats/_meta
+      dockerfile: Dockerfile.2.0.X
+      args:
+        NATS_VERSION: ${NATS_VERSION:-2.0.4}
+    ports:
+      - 8222
+
+  nats_1_3:
+    image: docker.elastic.co/observability-ci/beats-integration-nats:${NATS_VERSION:-1.3.0}-1
+    build:
+      context: ./module/nats/_meta
+      dockerfile: Dockerfile.1.3
+      args:
+        NATS_VERSION: ${NATS_VERSION:-1.3.0}
+    ports:
+      - 8222
 
   nginx:
-    build: ./module/nginx/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-nginx:${NGINX_VERSION:-1.9}-1
+    build: 
+      context: ./module/nginx/_meta
+      args:
+        NGINX_VERSION: ${NGINX_VERSION:-1.9}
+    ports:
+      - 80
 
   phpfpm:
-    build: ./module/php_fpm/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-phpfpm:${PHPFPM_VERSION:-7.1}-1
+    build: 
+      context: ./module/php_fpm/_meta
+      args:
+        PHPFPM_VERSION: ${PHPFPM_VERSION:-7.1}
+    ports:
+      - 81
 
   postgresql:
-    build: ./module/postgresql/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-postgresql:${POSTGRESQL_VERSION:-9.5.3}-1
+    build:
+      context: ./module/postgresql/_meta
+      args:
+        POSTGRESQL_VERSION: ${POSTGRESQL_VERSION:-9.5.3}
+    ports:
+      - 5432
 
   prometheus:
-    build: ./module/prometheus/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-prometheus:${PROMETHEUS_VERSION:-2.6.0}-1
+    build:
+      context: ./module/prometheus/_meta
+      args:
+        PROMETHEUS_VERSION: ${PROMETHEUS_VERSION:-2.6.0}
+    ports:
+      - 9090
 
   rabbitmq:
-    build: ./module/rabbitmq/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-rabbitmq:${RABBITMQ_VERSION:-3.7.4}-1
+    build:
+      context: ./module/rabbitmq/_meta
+      args:
+        RABBITMQ_VERSION: ${RABBITMQ_VERSION:-3.7.4}
+    ports:
+      - 15672
 
   redis:
-    build: ./module/redis/_meta
-
-  redis_4:
+    image: docker.elastic.co/observability-ci/beats-integration-redis:${REDIS_VERSION:-3.2.12}-1
     build:
       context: ./module/redis/_meta
       args:
-        REDIS_VERSION: 4.0.11
-
-  redis_5:
-    build:
-      context: ./module/redis/_meta
-      args:
-        REDIS_VERSION: 5.0-rc4
+        REDIS_VERSION: ${REDIS_VERSION:-3.2.12}
+    ports:
+      - 6379
 
   traefik:
-    build: ./module/traefik/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-traefik:${TRAEFIK_VERSION:-1.6}-1
+    build:
+      context: ./module/traefik/_meta
+      args:
+        TRAEFIK_VERSION: ${TRAEFIK_VERSION:-1.6}
+    ports:
+     - 8080
 
   uwsgi_tcp:
-    build: ./module/uwsgi/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-uwsgi:py${PYTHON_VERSION:-3.6}-1
+    build:
+      context: ./module/uwsgi/_meta
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.6}
     command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --wsgi-file app.py
+    ports:
+      - 9191
 
   uwsgi_http:
-    build: ./module/uwsgi/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-uwsgi:py${PYTHON_VERSION:-3.6}-1
+    build:
+      context: ./module/uwsgi/_meta
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.6}
     command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9192 --memory-report --stats-http --wsgi-file app.py
+    ports:
+      - 9192
 
   zookeeper:
-    build: ./module/zookeeper/_meta
+    image: docker.elastic.co/observability-ci/beats-integration-zookeeper:${ZOOKEEPER_VERSION:-3.5.5}-1
+    build:
+      context: ./module/zookeeper/_meta
+      args:
+        ZOOKEEPER_VERSION: ${ZOOKEEPER_VERSION:-3.5.5}
+    ports:
+      - 2181

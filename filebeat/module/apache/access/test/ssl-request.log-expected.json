@@ -1,0 +1,19 @@
+[
+    {
+        "@timestamp": "2018-08-10T07:45:56.000Z",
+        "apache.access.ssl.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "apache.access.ssl.protocol": "TLSv1.2",
+        "event.dataset": "apache.access",
+        "event.module": "apache",
+        "fileset.name": "access",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 1375,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "apache",
+        "source.address": "172.30.0.119",
+        "source.ip": "172.30.0.119",
+        "url.original": "/nagiosxi/ajaxhelper.php?cmd=getxicoreajax&amp;opts=%7B%22func%22%3A%22get_admin_tasks_html%22%2C%22args%22%3A%22%22%7D&amp;nsp=b5c7d5d4b6f7d0cf0c92f9cbdf737f6a5c838218425e6ae21"
+    }
+]

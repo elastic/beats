@@ -34,10 +34,55 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MYSQL_FIELDS), evt.keys())
-        mysql_info = evt["mysql"]["status"]
+        self.assertItemsEqual(self.de_dot(MYSQL_FIELDS), evt.keys(), evt)
+
+        status = evt["mysql"]["status"]
+        assert status["connections"] > 0
+        assert status["opened_tables"] > 0
 
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('MYSQL_DSN', 'root:test@tcp(localhost:3306)/')]
+        return ['root:test@tcp({})/'.format(self.compose_host())]
+
+
+class TestMysql80(Test):
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mysql',
+        'MYSQL_VERSION': '8.0.13',
+    }
+
+
+class TestPercona57(Test):
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'percona',
+        'MYSQL_VERSION': '5.7.24',
+    }
+
+
+class TestPercona80(Test):
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'percona',
+        'MYSQL_VERSION': '8.0.13-4',
+    }
+
+
+class TestMariadb102(Test):
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mariadb',
+        'MYSQL_VERSION': '10.2.23',
+    }
+
+
+class TestMariadb103(Test):
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mariadb',
+        'MYSQL_VERSION': '10.3.14',
+    }
+
+
+class TestMariadb104(Test):
+    COMPOSE_ENV = {
+        'MYSQL_VARIANT': 'mariadb',
+        'MYSQL_VERSION': '10.4.4',
+    }

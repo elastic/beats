@@ -48,8 +48,7 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
-                         "state", "username"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
@@ -373,6 +372,9 @@ class Test(metricbeat.BaseTest):
             "extras": {
                 "process.env.whitelist": ["PATH"],
                 "process.include_cpu_ticks": True,
+
+                # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
+                "process.include_per_cpu": False,
             }
         }])
         proc = self.start_beat()
@@ -394,10 +396,6 @@ class Test(metricbeat.BaseTest):
             env = process.pop("env", None)
             if env is not None:
                 found_env = True
-
-            # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
-            if "cgroup" in process and "cpuacct" in process["cgroup"]:
-                del process["cgroup"]["cpuacct"]["percpu"]
 
             self.assert_fields_are_documented(evt)
 
@@ -443,13 +441,13 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output()[0]
 
-        assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
+        assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
-        self.check_username(output["system.process.username"])
+        self.check_username(output["user.name"])
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_socket_summary(self):
         """
         Test system/socket_summary output.
@@ -480,6 +478,9 @@ class Test(metricbeat.BaseTest):
 
             assert isinstance(tcp["all"]["count"], int)
             assert isinstance(tcp["all"]["listening"], int)
+            assert isinstance(tcp["all"]["established"], int)
+            assert isinstance(tcp["all"]["close_wait"], int)
+            assert isinstance(tcp["all"]["time_wait"], int)
 
             assert isinstance(udp["all"]["count"], int)
 

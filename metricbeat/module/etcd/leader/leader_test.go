@@ -22,12 +22,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"regexp"
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"testing"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestEventMapping(t *testing.T) {
@@ -40,26 +41,94 @@ func TestEventMapping(t *testing.T) {
 }
 
 func TestFetchEventContent(t *testing.T) {
-	absPath, err := filepath.Abs("../_meta/test/")
 
-	response, err := ioutil.ReadFile(absPath + "/leaderstats.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
-	}))
-	defer server.Close()
+	const (
+		module              = "etcd"
+		metricset           = "leader"
+		mockedFetchLocation = "../_meta/test/"
+	)
 
-	config := map[string]interface{}{
-		"module":     "etcd",
-		"metricsets": []string{"leader"},
-		"hosts":      []string{server.URL},
+	var testcases = []struct {
+		name            string
+		mockedFetchFile string
+		httpCode        int
+
+		expectedFetchErrorRegexp string
+		expectedNumEvents        int
+	}{
+		{
+			name:              "Leader member stats",
+			mockedFetchFile:   "/leaderstats.json",
+			httpCode:          http.StatusOK,
+			expectedNumEvents: 1,
+		},
+		{
+			name:              "Follower member",
+			mockedFetchFile:   "/leaderstats_follower.json",
+			httpCode:          http.StatusForbidden,
+			expectedNumEvents: 0,
+		},
+		{
+			name:                     "Simulating credentials issue",
+			mockedFetchFile:          "/leaderstats_empty.json",
+			httpCode:                 http.StatusForbidden,
+			expectedFetchErrorRegexp: "fetching HTTP response returned status code 403",
+			expectedNumEvents:        0,
+		},
+		{
+			name:                     "Simulating failure message",
+			mockedFetchFile:          "/leaderstats_internalerror.json",
+			httpCode:                 http.StatusInternalServerError,
+			expectedFetchErrorRegexp: "fetching HTTP response returned status code 500:.+",
+			expectedNumEvents:        0,
+		}}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			absPath, err := filepath.Abs(mockedFetchLocation + tc.mockedFetchFile)
+			assert.NoError(t, err)
+
+			response, err := ioutil.ReadFile(absPath)
+			assert.NoError(t, err)
+
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tc.httpCode)
+				w.Header().Set("Content-Type", "application/json;")
+				w.Write([]byte(response))
+			}))
+			defer server.Close()
+
+			config := map[string]interface{}{
+				"module":     module,
+				"metricsets": []string{metricset},
+				"hosts":      []string{server.URL},
+			}
+
+			f := mbtest.NewReportingMetricSetV2Error(t, config)
+			events, errs := mbtest.ReportingFetchV2Error(f)
+
+			if tc.expectedFetchErrorRegexp != "" {
+				for _, err := range errs {
+					if match, _ := regexp.MatchString(tc.expectedFetchErrorRegexp, err.Error()); match {
+						// found expected fetch error, no need for further checks
+						return
+					}
+				}
+				t.Fatalf("Expected fetch error not found:\n Expected:%s\n Got: %+v",
+					tc.expectedFetchErrorRegexp,
+					errs)
+			}
+
+			if len(errs) > 0 {
+				t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+			}
+
+			assert.Equal(t, tc.expectedNumEvents, len(events))
+
+			for i := range events {
+				t.Logf("%s/%s event[%d]: %+v", f.Module().Name(), f.Name(), i, events[i])
+			}
+		})
 	}
-	f := mbtest.NewEventFetcher(t, config)
-	event, err := f.Fetch()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }

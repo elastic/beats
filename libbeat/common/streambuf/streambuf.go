@@ -33,10 +33,10 @@
 package streambuf
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
-
 	"bytes"
 	"errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Error returned if Append or Write operation is not allowed due to the buffer

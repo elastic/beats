@@ -35,7 +35,7 @@ type redisMessage struct {
 	ts time.Time
 
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	isRequest bool
@@ -44,15 +44,11 @@ type redisMessage struct {
 	message   common.NetString
 	method    common.NetString
 	path      common.NetString
-
-	next *redisMessage
 }
 
-const (
-	start = iota
-	bulkArray
-	simpleMessage
-)
+func (msg *redisMessage) Size() int {
+	return len(msg.message)
+}
 
 var (
 	empty    = common.NetString("")

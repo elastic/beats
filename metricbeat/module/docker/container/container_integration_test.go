@@ -26,11 +26,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	f := mbtest.NewFetcher(t, getConfig())
+	f.WriteEvents(t, "")
 }
 
 func getConfig() map[string]interface{} {

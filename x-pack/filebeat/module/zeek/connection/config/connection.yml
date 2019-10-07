@@ -1,0 +1,75 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+processors:
+  - drop_fields:
+      fields: ["json.orig_bytes","json.resp_bytes","json.tunnel_parents"]
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.connection"
+
+        - from: "zeek.connection.duration"
+          to: "temp.duration"
+
+        - from: "zeek.connection.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.connection.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.connection.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.connection.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.connection.proto"
+          to: "network.transport"
+
+        - from: "zeek.connection.service"
+          to: "network.application"
+
+        - from: "zeek.connection.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.connection.orig_ip_bytes"
+          to: "source.bytes"
+
+        - from: "zeek.connection.resp_ip_bytes"
+          to: "destination.bytes"
+
+        - from: "zeek.connection.orig_pkts"
+          to: "source.packets"
+
+        - from: "zeek.connection.resp_pkts"
+          to: "destination.packets"
+
+        - from: "zeek.connection.conn_state"
+          to: "zeek.connection.state"
+          
+      ignore_missing: true
+      fail_on_error: false
+{{ if .community_id }}
+  - if:
+      equals.network.transport: icmp
+    then:
+      community_id:
+        fields:
+          source_ip: source.address
+          destination_ip: destination.address
+          icmp_type: source.port
+          icmp_code: destination.port
+    else:
+      community_id:
+        fields:
+          source_ip: source.address
+          destination_ip: destination.address
+{{ end }}

@@ -2,12 +2,12 @@ import re
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system')))
 
 from beat.beat import TestCase
 
-COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
-                 "metricset.module", "metricset.rtt", "host.name"]
+COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
+                 "metricset.module", "metricset.rtt", "host.name", "service.name", "event", "ecs"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -19,9 +19,19 @@ class BaseTest(TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.beat_name = "metricbeat"
-        self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+        if not hasattr(self, 'beat_name'):
+            self.beat_name = "metricbeat"
+
+        if not hasattr(self, 'beat_path'):
+            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+
         super(BaseTest, self).setUpClass()
+
+    def setUp(self):
+        super(BaseTest, self).setUp()
+
+    def tearDown(self):
+        super(BaseTest, self).tearDown()
 
     def de_dot(self, existing_fields):
         fields = {}
@@ -85,11 +95,13 @@ class BaseTest(TestCase):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
+        print output
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print(evt)
 
         fields = COMMON_FIELDS + fields
+        print fields
         self.assertItemsEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)

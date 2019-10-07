@@ -48,7 +48,7 @@ type ConfigManager interface {
 }
 
 // FactoryFunc for creating a config manager
-type FactoryFunc func(*reload.Registry, uuid.UUID) (ConfigManager, error)
+type FactoryFunc func(*common.Config, *reload.Registry, uuid.UUID) (ConfigManager, error)
 
 // Register a config manager
 func Register(name string, fn FactoryFunc, stability feature.Stability) {
@@ -59,7 +59,7 @@ func Register(name string, fn FactoryFunc, stability feature.Stability) {
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
 func Factory() FactoryFunc {
-	factories, err := feature.Registry.LookupAll(Namespace)
+	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
 	if err != nil {
 		return nilFactory
 	}
@@ -76,7 +76,9 @@ func Factory() FactoryFunc {
 // nilManager, fallback when no manager is present
 type nilManager struct{}
 
-func nilFactory(*reload.Registry, uuid.UUID) (ConfigManager, error) { return nilManager{}, nil }
+func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (ConfigManager, error) {
+	return nilManager{}, nil
+}
 
 func (nilManager) Enabled() bool                           { return false }
 func (nilManager) Start()                                  {}

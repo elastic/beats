@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -44,24 +45,28 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return errors.Wrap(err, "failed to get cluster ID from Elasticsearch")
 	}
 
+	var errs multierror.Errors
 	for _, index := range stateData.RoutingTable.Indices {
 		for _, shards := range index.Shards {
 			for _, shard := range shards {
 				event := mb.Event{}
 				fields, err := schema.Apply(shard)
 				if err != nil {
+					errs = append(errs, errors.Wrap(err, "failure to apply shard schema"))
 					continue
 				}
 
 				// Handle node field: could be string or null
 				err = elasticsearch.PassThruField("node", shard, fields)
 				if err != nil {
+					errs = append(errs, errors.Wrap(err, "failure passing through node field"))
 					continue
 				}
 
 				// Handle relocating_node field: could be string or null
 				err = elasticsearch.PassThruField("relocating_node", shard, fields)
 				if err != nil {
+					errs = append(errs, errors.Wrap(err, "failure passing through relocating_node field"))
 					continue
 				}
 
@@ -82,6 +87,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 				if nodeID != nil { // shard has not been allocated yet
 					sourceNode, err := getSourceNode(nodeID.(string), stateData)
 					if err != nil {
+						errs = append(errs, errors.Wrap(err, "failure getting source node information"))
 						continue
 					}
 					event.RootFields.Put("source_node", sourceNode)
@@ -89,17 +95,16 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 				event.ID, err = getEventID(stateData.StateID, fields)
 				if err != nil {
+					errs = append(errs, errors.Wrap(err, "failure getting event ID"))
 					continue
 				}
 
 				event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-
 				r.Event(event)
-
 			}
 		}
 	}
-	return nil
+	return errs.Err()
 }
 
 func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {

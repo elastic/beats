@@ -1,0 +1,81 @@
+- name: performance
+  type: group
+  description: performance metricset fetches information about the Performance Counters
+  release: beta
+  fields:
+    - name: page_splits_per_sec
+      type: long
+      description: Number of page splits per second that occur as the result of overflowing index pages.
+
+    - name: lock_waits_per_sec
+      type: long
+      description: Number of lock requests per second that required the caller to wait.
+
+    - name: user_connections
+      type: long
+      description: Total number of user connections
+
+    - name: transactions
+      description: Total number of transactions
+      type: long
+
+    - name: active_temp_tables
+      description: Number of temporary tables/table variables in use.
+      type: long
+
+    - name: connections_reset_per_sec
+      type: long
+      description: Total number of logins started from the connection pool.
+
+    - name: logins_per_sec
+      description: Total number of logins started per second. This does not include pooled connections.
+      type: long
+
+    - name: logouts_per_sec
+      description: Total number of logout operations started per second.
+      type: long
+
+    - name: recompilations_per_sec
+      type: long
+      description: Number of statement recompiles per second. Counts the number of times statement recompiles are triggered. Generally, you want the recompiles to be low.
+
+    - name: compilations_per_sec
+      description: Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.
+      type: long
+
+    - name: batch_requests_per_sec
+      description: Number of Transact-SQL command batches received per second. This statistic is affected by all constraints (such as I/O, number of users, cache size, complexity of requests, and so on). High batch requests mean good throughput.
+      type: long
+
+    - name: buffer
+      type: group
+      fields:
+        - name: cache_hit
+          type: group
+          description: Indicates the percentage of pages found in the buffer cache without having to read from disk.
+          fields:
+            - name: pct
+              description: The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high
+              type: double
+
+        - name: page_life_expectancy
+          type: group
+          description: Indicates the number of seconds a page will stay in the buffer pool without references.
+          fields:
+            - name: sec
+              description: Indicates the number of seconds a page will stay in the buffer pool without references (in seconds).
+              type: long
+
+        - name: checkpoint_pages_per_sec
+          description: Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.
+          type: long
+
+        - name: database_pages
+          description: Indicates the number of pages in the buffer pool with database content.
+          fields:
+          type: long
+
+        - name: target_pages
+          description: Ideal number of pages in the buffer pool.
+          fields:
+          type: long

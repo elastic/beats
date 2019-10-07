@@ -46,3 +46,28 @@ func TestConnectCallbacksManagement(t *testing.T) {
 		t.Fatalf("third callback cannot be retrieved")
 	}
 }
+
+func TestGlobalConnectCallbacksManagement(t *testing.T) {
+	f0 := func(client *Client) error { fmt.Println("i am function #0"); return nil }
+	f1 := func(client *Client) error { fmt.Println("i am function #1"); return nil }
+	f2 := func(client *Client) error { fmt.Println("i am function #2"); return nil }
+
+	_, err := RegisterGlobalCallback(f0)
+	if err != nil {
+		t.Fatalf("error while registering callback: %v", err)
+	}
+	id1, err := RegisterGlobalCallback(f1)
+	if err != nil {
+		t.Fatalf("error while registering callback: %v", err)
+	}
+	id2, err := RegisterGlobalCallback(f2)
+	if err != nil {
+		t.Fatalf("error while registering callback: %v", err)
+	}
+
+	t.Logf("removing second callback")
+	DeregisterGlobalCallback(id1)
+	if _, ok := globalCallbackRegistry.callbacks[id2]; !ok {
+		t.Fatalf("third callback cannot be retrieved")
+	}
+}

@@ -73,30 +73,30 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches network IO metrics from the OS.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := net.IOCounters(true)
 	if err != nil {
-		return nil, errors.Wrap(err, "network io counters")
+		return errors.Wrap(err, "network io counters")
 	}
 
-	var events []common.MapStr
-	if m.interfaces == nil {
-		// Include all stats.
-		for _, counters := range stats {
-			events = append(events, ioCountersToMapStr(counters))
-		}
-	} else {
-		// Select stats by interface name.
-		for _, counters := range stats {
+	for _, counters := range stats {
+		if m.interfaces != nil {
+			// Select stats by interface name.
 			name := strings.ToLower(counters.Name)
-			if _, include := m.interfaces[name]; include {
-				events = append(events, ioCountersToMapStr(counters))
+			if _, include := m.interfaces[name]; !include {
 				continue
 			}
 		}
+
+		isOpen := r.Event(mb.Event{
+			MetricSetFields: ioCountersToMapStr(counters),
+		})
+		if !isOpen {
+			return nil
+		}
 	}
 
-	return events, nil
+	return nil
 }
 
 func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {

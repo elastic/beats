@@ -5,82 +5,131 @@
 package management
 
 import (
-	"os"
+	"io"
+	"text/template"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/kibana"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/x-pack/libbeat/management/api"
-
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/libbeat/kibana"
 )
+
+// ManagedConfigTemplate is used to overwrite settings file during enrollment
+const ManagedConfigTemplate = `
+
+#========================= Central Management =================================
+
+# Beats is configured under central management, you can define most settings
+# from the Kibana UI. You can update this file to configure the settings that
+# are not supported by Kibana Beats management.
+
+{{.CentralManagementSettings}}
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
+
+#================================ Logging =====================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]
+
+#============================== X-Pack Monitoring ===============================
+# {{.BeatName}} can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
+
+# Set to true to enable the monitoring reporter.
+#monitoring.enabled: false
+
+# Uncomment to send the metrics to Elasticsearch. Most settings from the
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
+`
 
 // Config for central management
 type Config struct {
 	// true when enrolled
-	Enabled bool
+	Enabled bool `config:"enabled" yaml:"enabled"`
 
 	// Poll configs period
-	Period time.Duration
+	Period time.Duration `config:"period" yaml:"period"`
 
-	AccessToken string
+	EventsReporter EventReporterConfig `config:"events_reporter" yaml:"events_reporter"`
 
-	Kibana *kibana.ClientConfig
+	AccessToken string `config:"access_token" yaml:"access_token"`
 
-	Configs api.ConfigBlocks
+	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
+
+	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
+}
+
+// EventReporterConfig configuration of the events reporter.
+type EventReporterConfig struct {
+	Period       time.Duration `config:"period" yaml:"period"`
+	MaxBatchSize int           `config:"max_batch_size" yaml:"max_batch_size" validate:"nonzero,positive"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
 		Period: 60 * time.Second,
+		EventsReporter: EventReporterConfig{
+			Period:       30 * time.Second,
+			MaxBatchSize: 1000,
+		},
+		Blacklist: ConfigBlacklistSettings{
+			Patterns: map[string]string{
+				"output": "console|file",
+			},
+		},
 	}
 }
 
-// Load settings from its source file
-func (c *Config) Load() error {
-	path := paths.Resolve(paths.Data, "management.yml")
-	config, err := common.LoadFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			// File is not present, beat is not enrolled
-			return nil
-		}
-		return err
-	}
-
-	if err = config.Unpack(&c); err != nil {
-		return err
-	}
-
-	return nil
+type templateParams struct {
+	CentralManagementSettings string
+	BeatName                  string
 }
 
-// Save settings to management.yml file
-func (c *Config) Save() error {
-	path := paths.Resolve(paths.Data, "management.yml")
+// OverwriteConfigFile will overwrite beat settings file with the enrolled template
+func (c *Config) OverwriteConfigFile(wr io.Writer, beatName string) error {
+	t := template.Must(template.New("beat.management.yml").Parse(ManagedConfigTemplate))
 
-	data, err := yaml.Marshal(c)
+	tmp := struct {
+		Management *Config `yaml:"management"`
+	}{
+		Management: c,
+	}
+
+	data, err := yaml.Marshal(tmp)
 	if err != nil {
 		return err
 	}
 
-	// write temporary file first
-	tempFile := path + ".new"
-	f, err := os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		return errors.Wrap(err, "failed to store central management settings")
+	params := templateParams{
+		CentralManagementSettings: string(data),
+		BeatName:                  beatName,
 	}
 
-	_, err = f.Write(data)
-	f.Close()
-	if err != nil {
-		return err
-	}
-
-	// move temporary file into final location
-	err = file.SafeFileRotate(path, tempFile)
-	return err
+	return t.Execute(wr, params)
 }

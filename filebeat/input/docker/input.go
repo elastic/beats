@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/log"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/pkg/errors"
@@ -44,6 +45,8 @@ func NewInput(
 	context input.Context,
 ) (input.Input, error) {
 	logger := logp.NewLogger("docker")
+
+	cfgwarn.Deprecate("8.0.0", "'docker' input deprecated. Use 'container' input instead.")
 
 	// Wrap log input with custom docker settings
 	config := defaultConfig
@@ -65,7 +68,7 @@ func NewInput(
 	}
 
 	if len(ids) == 0 {
-		return nil, errors.New("Docker input requires at least one entry under 'containers.ids'")
+		return nil, errors.New("Docker input requires at least one entry under 'containers.ids' or 'containers.paths'")
 	}
 
 	for idx, containerID := range ids {
@@ -84,8 +87,14 @@ func NewInput(
 		return nil, errors.Wrap(err, "update input config")
 	}
 
-	if err := cfg.SetBool("docker-json.cri_flags", -1, config.Partial); err != nil {
+	if err := cfg.SetBool("docker-json.cri_flags", -1, config.CRIFlags); err != nil {
 		return nil, errors.Wrap(err, "update input config")
+	}
+
+	if config.CRIForce {
+		if err := cfg.SetString("docker-json.format", -1, "cri"); err != nil {
+			return nil, errors.Wrap(err, "update input config")
+		}
 	}
 
 	// Add stream to meta to ensure different state per stream

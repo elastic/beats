@@ -2,7 +2,7 @@
   type: group
   description: >
     consumergroup
-  release: beta
+  release: ga
   fields:
     - name: broker
       type: group
@@ -40,7 +40,7 @@
       description: consumer offset into partition being read
 
     - name: meta
-      type: text
+      type: keyword
       description: custom consumer meta data string
 
     - name: error.code

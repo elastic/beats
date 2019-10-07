@@ -3,7 +3,7 @@
 
 The list below covers the changes during the 6.0.0-alpha1, -alpha2, -beta1, -beta2, -rc1 and -rc2 releases.
 
-Also read <<breaking-changes-6.0>> for more detail about changes that affect
+Also read {beats-ref-60}/breaking-changes-6.0.html[Breaking changes] for more detail about changes that affect
 upgrade.
 
 ==== Breaking changes

@@ -21,7 +21,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -34,7 +34,7 @@ func IDLayer() Layer {
 	return _idLayer
 }
 
-var _idLayer = Layer(func(event common.MapStr, next transport.Dialer) (transport.Dialer, error) {
+var _idLayer = Layer(func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 	return next, nil
 })
 
@@ -43,7 +43,7 @@ var _idLayer = Layer(func(event common.MapStr, next transport.Dialer) (transport
 func ConstAddrLayer(address string) Layer {
 	build := constAddr(address)
 
-	return func(event common.MapStr, next transport.Dialer) (transport.Dialer, error) {
+	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		return build(next), nil
 	}
 }
@@ -108,7 +108,7 @@ func constAddr(addr string) func(transport.Dialer) transport.Dialer {
 }
 
 func withNetDialer(layer NetDialer, fn func(transport.Dialer) transport.Dialer) NetDialer {
-	return func(event common.MapStr) (transport.Dialer, error) {
+	return func(event *beat.Event) (transport.Dialer, error) {
 		origDialer, err := layer.build(event)
 		if err != nil {
 			return nil, err
@@ -118,7 +118,7 @@ func withNetDialer(layer NetDialer, fn func(transport.Dialer) transport.Dialer) 
 }
 
 func withLayerDialer(layer Layer, fn func(transport.Dialer) transport.Dialer) Layer {
-	return func(event common.MapStr, next transport.Dialer) (transport.Dialer, error) {
+	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		origDialer, err := layer.build(event, next)
 		if err != nil {
 			return nil, err

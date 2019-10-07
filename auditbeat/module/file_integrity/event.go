@@ -249,8 +249,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 				file["uid"] = info.SID
 			}
 		} else {
-			file["uid"] = info.UID
-			file["gid"] = info.GID
+			file["uid"] = strconv.Itoa(int(info.UID))
+			file["gid"] = strconv.Itoa(int(info.GID))
 			file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 		}
 

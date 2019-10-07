@@ -32,6 +32,25 @@ func TestParseSyslog(t *testing.T) {
 		syslog event
 	}{
 		{
+			title: "Cisco's syslog",
+			log:   []byte("<190>589265: Feb 8 18:55:31.306: %SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet"),
+			syslog: event{
+				priority:   190,
+				message:    "%SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet",
+				hostname:   "",
+				program:    "",
+				pid:        -1,
+				month:      2,
+				day:        8,
+				year:       2018,
+				hour:       18,
+				minute:     55,
+				second:     31,
+				nanosecond: 306000000,
+				sequence:   589265,
+			},
+		},
+		{
 			title: "no timezone in date",
 			log:   []byte("<190>2018-06-19 02:13:38 super mon message"),
 			syslog: event{
@@ -508,6 +527,96 @@ func TestParseSyslog(t *testing.T) {
 			},
 		},
 		{
+			title: "ipv6: 1::",
+			log:   []byte("<13>Feb 25 17:32:18 1:: Use the Force!"),
+			syslog: event{
+				message:  "Use the Force!",
+				hostname: "1::",
+				priority: 13,
+				pid:      -1,
+				month:    2,
+				day:      25,
+				hour:     17,
+				minute:   32,
+				second:   18,
+			},
+		},
+		{
+			title: "ipv6: 1::2",
+			log:   []byte("<13>Feb 25 17:32:18 1::2 Use the Force!"),
+			syslog: event{
+				message:  "Use the Force!",
+				hostname: "1::2",
+				priority: 13,
+				pid:      -1,
+				month:    2,
+				day:      25,
+				hour:     17,
+				minute:   32,
+				second:   18,
+			},
+		},
+		{
+			title: "ipv6: 1::2:5",
+			log:   []byte("<13>Feb 25 17:32:18 1::2:5 Use the Force!"),
+			syslog: event{
+				message:  "Use the Force!",
+				hostname: "1::2:5",
+				priority: 13,
+				pid:      -1,
+				month:    2,
+				day:      25,
+				hour:     17,
+				minute:   32,
+				second:   18,
+			},
+		},
+		{
+			title: "ipv4 mapped on ipv6",
+			log:   []byte("<13>Feb 25 17:32:18 ::ffff:0:255.255.255.255 Use the Force!"),
+			syslog: event{
+				message:  "Use the Force!",
+				hostname: "::ffff:0:255.255.255.255",
+				priority: 13,
+				pid:      -1,
+				month:    2,
+				day:      25,
+				hour:     17,
+				minute:   32,
+				second:   18,
+			},
+		},
+		{
+			title: "ipv4 embedded on ipv6",
+			log:   []byte("<13>Feb 25 17:32:18 60::ffff::10.0.1.120 Use the Force!"),
+			syslog: event{
+				message:  "Use the Force!",
+				hostname: "60::ffff::10.0.1.120",
+				priority: 13,
+				pid:      -1,
+				month:    2,
+				day:      25,
+				hour:     17,
+				minute:   32,
+				second:   18,
+			},
+		},
+		{
+			title: "ipv6: 1:2:3:4:5:6:7:8",
+			log:   []byte("<13>Feb 25 17:32:18 1:2:3:4:5:6:7:8 Use the Force!"),
+			syslog: event{
+				message:  "Use the Force!",
+				hostname: "1:2:3:4:5:6:7:8",
+				priority: 13,
+				pid:      -1,
+				month:    2,
+				day:      25,
+				hour:     17,
+				minute:   32,
+				second:   18,
+			},
+		},
+		{
 			title: "Number inf the host",
 			log:   []byte("<164>Oct 26 15:19:25 1.2.3.4 ASA1-2: Deny udp src DRAC:10.1.2.3/43434 dst outside:192.168.0.1/53 by access-group \"acl_drac\" [0x0, 0x0]"),
 			syslog: event{
@@ -558,6 +667,46 @@ func TestParseSyslog(t *testing.T) {
 			assert.Equal(t, test.syslog.loc, l.loc)
 		})
 	}
+}
+
+func TestMonth(t *testing.T) {
+	months := []time.Month{
+		time.January,
+		time.February,
+		time.March,
+		time.April,
+		time.May,
+		time.June,
+		time.July,
+		time.August,
+		time.September,
+		time.October,
+		time.November,
+		time.December,
+	}
+
+	t.Run("short month", func(t *testing.T) {
+		for _, month := range months {
+			shortMonth := month.String()[:3]
+			t.Run("Month "+shortMonth, func(t *testing.T) {
+				log := fmt.Sprintf("<34>%s 1 22:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", shortMonth)
+				l := newEvent()
+				Parse([]byte(log), l)
+				assert.Equal(t, month, l.Month())
+			})
+		}
+	})
+
+	t.Run("full month", func(t *testing.T) {
+		for _, month := range months {
+			t.Run("Month "+month.String(), func(t *testing.T) {
+				log := fmt.Sprintf("<34>%s 1 22:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", month.String())
+				l := newEvent()
+				Parse([]byte(log), l)
+				assert.Equal(t, month, l.Month())
+			})
+		}
+	})
 }
 
 func TestDay(t *testing.T) {

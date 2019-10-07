@@ -1,0 +1,79 @@
+- name: host
+  type: group
+  description: >
+    `host` contains general host information.
+  release: beta
+  fields:
+  - name: uptime
+    type: long
+    format: duration
+    input_format: nanoseconds
+    output_format: asDays
+    output_precision: 1
+    description: >
+        Uptime in nanoseconds.
+  - name: boottime
+    type: date
+    description: >
+        Boot time.
+  - name: containerized
+    type: boolean
+    description: >
+        Set if host is a container.
+  - name: timezone.name
+    type: keyword
+    description: >
+        Name of the timezone of the host, e.g. BST.
+  - name: timezone.offset.sec
+    type: long
+    description: >
+        Timezone offset in seconds.
+  - name: hostname
+    type: keyword
+    description: >
+        Hostname.
+  - name: id
+    type: keyword
+    description: >
+        Host ID.
+  - name: architecture
+    type: keyword
+    description: >
+        Host architecture (e.g. x86_64).
+  - name: mac
+    type: keyword
+    description: >
+        MAC addresses.
+  - name: ip
+    type: ip
+    description: >
+        IP addresses.
+  - name: os
+    type: group
+    description: >
+      `os` contains information about the operating system.
+    fields:
+    - name: codename
+      type: keyword
+      description: >
+        OS codename, if any (e.g. stretch).
+    - name: platform
+      type: keyword
+      description: >
+        OS platform (e.g. centos, ubuntu, windows).
+    - name: name
+      type: keyword
+      description: >
+        OS name (e.g. Mac OS X).
+    - name: family
+      type: keyword
+      description: >
+        OS family (e.g. redhat, debian, freebsd, windows).
+    - name: version
+      type: keyword
+      description: >
+        OS version.
+    - name: kernel
+      type: keyword
+      description: >
+        The operating system's kernel version.

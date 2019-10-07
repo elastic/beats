@@ -12,10 +12,65 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
-=== Beats version HEAD
-https://github.com/elastic/beats/compare/v6.3.0..master[Check the HEAD diff]
+=== Beats version 7.1.1
+https://github.com/elastic/beats/compare/v7.1.0..v7.1.1[Check the HEAD diff]
 
-The list below covers the major changes between 6.3.0 and master only.
+=== Beats version 7.1.0
+https://github.com/elastic/beats/compare/v7.0.0..v7.1.0[Check the HEAD diff]
+
+=== Beats version 7.0.1
+https://github.com/elastic/beats/compare/v7.0.0..v7.0.1[Check the HEAD diff]
+
+=== Beats version 7.0.0-GA
+https://github.com/elastic/beats/compare/v7.0.0-rc2..v7.0.0[Check the HEAD diff]
+
+The list below covers the major changes between 7.0.0-rc2 and 7.0 only.
+
+==== Added
+
+- Added support for using PYTHON_EXE to control what Python interpreter is used
+  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
+
+=== Beats version 7.0.0-rc2
+https://github.com/elastic/beats/compare/v7.0.0-rc1..v7.0.0-rc2[Check the HEAD diff]
+
+=== Beats version 7.0.0-rc1
+https://github.com/elastic/beats/compare/v7.0.0-beta1..v7.0.0-rc1[Check the HEAD diff]
+
+==== Breaking changes
+
+- Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
+- Remove SkipNormalization, SkipAgentMetadata, SkipAddHostName. {pull}10801[10801] {pull}10769[10769]
+
+==== Bugfixes
+
+- Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
+- Fix duplication check for `append_fields` option. {pull}10959[10959]
+
+==== Added
+
+- Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]
+
+=== Beats version 7.0.0-beta1
+https://github.com/elastic/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the HEAD diff]
+
+==== Breaking changes
+- Outputs receive Index Manager as additional parameter. The index manager can
+  be used to create an index selector. {pull}10347[10347]
+- Remove support for loading dashboards to Elasticsearch 5. {pull}10451[10451]
+
+==== Added
+
+- Allow multiple object type configurations per field. {pull}9772[9772]
+- Move agent metadata addition to a processor. {pull}9952[9952]
+- Add (*common.Config).Has and (*common.Config).Remove. {pull}10363[10363]
+- Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]
+- Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]
+
+=== Beats version 7.0.0-alpha2
+https://github.com/elastic/beats/compare/v6.3.0..v7.0.0-alpha2[Check the HEAD diff]
+
+The list below covers the major changes between 6.3.0 and 7.0.0-alpha2 only.
 
 ==== Breaking changes
 
@@ -30,12 +85,17 @@ The list below covers the major changes between 6.3.0 and master only.
   has a magefile.go with a fields target. The `FIELDS_FILE_PATH` make variable is no longer
   used because the value is specified in magefile.go. {pull}7670[7670]
 - Outputs must implement String. {pull}6404[6404]
+- Renamed `-beat-name` CLI option used in `kibana_index_pattern.go` to `-beat` for consistency with other scripts in `dev-tools/cmd`. {pull}8615[8615]
+- Systemd unit file template used on Linux packaging now includes environment variables to ease flag overriding. One of them includes the `-e` flag, making beats log to stderr by default on systemd uses. {pull}8942[8942]
+- Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
+- Move generator packages of Filebeat from `scripts/generator` to `generator`. {pull}9147[9147]
 
 ==== Bugfixes
 
 - Fix permissions of generated Filebeat filesets. {pull}7140[7140]
 - Collect fields from _meta/fields.yml too. {pull}8397[8397]
 - Fix issue on asset generation that could lead to different results in Windows. {pull}8464[8464]
+- Remove default version qualifier, you can use `VERSION_QUALIFIER` environment variable to set it. {pull}9148[9148]
 
 ==== Added
 
@@ -54,3 +114,18 @@ The list below covers the major changes between 6.3.0 and master only.
 - Set current year in generator templates. {pull}8396[8396]
 - You can now override default settings of libbeat by using instance.Settings. {pull}8449[8449]
 - Add `-space-id` option to `export_dashboards.go` script to support Kibana Spaces {pull}7942[7942]
+- Add `-name` option to `asset.go` script to explicitly name the asset rather than using its filename. {pull}8693[8693]
+- Add `-out` option to `kibana_index_pattern.go` to control the output dir to make it possible to write the generated output to `build/kibana` instead of `_meta/kibana.generated` (but the output dir remains unchanged at this point). {pull}8615[8615]
+- Add `module_fields.go` for generated `fields.go` files for modules. {pull}8615[8615]
+- Add `mage.GenerateModuleReferenceConfig` for generating reference config files that include configuration sections from the module directory. {pull}8615[8615]
+- Add `mage.GenerateFieldsGo` for generating fields.go files. {pull}8615[8615]
+- Add `mage.KibanaDashboards` for collecting Kibana dashboards and generating index patterns. {pull}8615[8615]
+- Allow to disable config resolver using the `Settings.DisableConfigResolver` field when initializing libbeat. {pull}8769[8769]
+- Add `mage.AddPlatforms` to allow to specify dependent platforms when building a beat. {pull}8889[8889]
+- Add `cfgwarn.CheckRemoved6xSetting(s)` to display a warning for options removed in 7.0. {pull}8909[8909]
+- Add docker image building to `mage.Package`. {pull}8898[8898]
+- Simplified exporting of dashboards. {pull}7730[7730]
+- Update Beats to use go 1.11.2 {pull}8746[8746]
+- Allow/Merge fields.yml overrides {pull}9188[9188]
+- Filesets can now define multiple ingest pipelines, with the first one considered as the entry point pipeline. {pull}8914[8914]
+- Add `group_measurements_by_instance` option to windows perfmon metricset. {pull}8688[8688]

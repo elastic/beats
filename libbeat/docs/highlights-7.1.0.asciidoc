@@ -1,0 +1,22 @@
+[[release-highlights-7.1.0]]
+=== 7.1.0 release highlights
+++++
+<titleabbrev>7.1.0</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Here are the highlights of the new features and enhancements in 7.1.0.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+Some Elastic Stack security features, such as encrypted communications, 
+file and native authentication, and role-based access control, are now available 
+in more subscription levels. For details, see https://www.elastic.co/subscriptions.
+// end::notable-highlights[]
+
+Refer to the {beats} <<breaking-changes-7.1, Breaking Changes>> and <<release-notes, 
+Release Notes>> for a list of bug fixes and other changes.
+
+

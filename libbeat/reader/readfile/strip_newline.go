@@ -18,18 +18,31 @@
 package readfile
 
 import (
+	"bytes"
+
 	"github.com/elastic/beats/libbeat/reader"
 )
 
 // StripNewline reader removes the last trailing newline characters from
 // read lines.
 type StripNewline struct {
-	reader reader.Reader
+	reader         reader.Reader
+	nl             []byte
+	lineEndingFunc func(*StripNewline, []byte) int
 }
 
 // New creates a new line reader stripping the last tailing newline.
-func NewStripNewline(r reader.Reader) *StripNewline {
-	return &StripNewline{r}
+func NewStripNewline(r reader.Reader, terminator LineTerminator) *StripNewline {
+	lineEndingFunc := (*StripNewline).lineEndingChars
+	if terminator == AutoLineTerminator {
+		lineEndingFunc = (*StripNewline).autoLineEndingChars
+	}
+
+	return &StripNewline{
+		reader:         r,
+		nl:             lineTerminatorCharacters[terminator],
+		lineEndingFunc: lineEndingFunc,
+	}
 }
 
 // Next returns the next line.
@@ -40,20 +53,26 @@ func (p *StripNewline) Next() (reader.Message, error) {
 	}
 
 	L := message.Content
-	message.Content = L[:len(L)-lineEndingChars(L)]
+	message.Content = L[:len(L)-p.lineEndingFunc(p, L)]
 
 	return message, err
 }
 
 // isLine checks if the given byte array is a line, means has a line ending \n
-func isLine(l []byte) bool {
-	return l != nil && len(l) > 0 && l[len(l)-1] == '\n'
+func (p *StripNewline) isLine(l []byte) bool {
+	return bytes.HasSuffix(l, p.nl)
 }
 
-// lineEndingChars returns the number of line ending chars the given by array has
-// In case of Unix/Linux files, it is -1, in case of Windows mostly -2
-func lineEndingChars(l []byte) int {
-	if !isLine(l) {
+func (p *StripNewline) lineEndingChars(l []byte) int {
+	if !p.isLine(l) {
+		return 0
+	}
+
+	return len(p.nl)
+}
+
+func (p *StripNewline) autoLineEndingChars(l []byte) int {
+	if !p.isLine(l) {
 		return 0
 	}
 

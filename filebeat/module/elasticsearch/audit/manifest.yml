@@ -4,10 +4,20 @@ var:
   - name: paths
     default:
       - /var/log/elasticsearch/*_access.log
+      - /var/log/elasticsearch/*_audit.log
+      - /var/log/elasticsearch/*_audit.json
     os.darwin:
-      - /usr/local/elasticsearch/*_access.log
+      - /usr/local/var/lib/elasticsearch/*_access.log
+      - /usr/local/var/lib/elasticsearch/*_audit.log
+      - /usr/local/var/lib/elasticsearch/*_audit.json
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_access.log
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_audit.log
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_audit.json
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ingest/pipeline-json.json
+  - ingest/pipeline-plaintext.json
+
 input: config/audit.yml

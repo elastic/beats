@@ -1,0 +1,51 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-couchdb]]
+== couchdb module
+
+beta[]
+
+This is the couchdb module.
+
+The default metricset is `server`.
+
+[float]
+=== Compatibility
+
+The Couchdb module is tested with Couchdb 1.7.
+
+
+[float]
+=== Dashboard
+
+The CouchDB module comes with a predefined dashboard for CouchDB database specific stats. For example:
+
+image::./images/metricbeat-couchdb-overview.png[]
+
+
+[float]
+=== Example configuration
+
+The couchdb module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: couchdb
+  metricsets: ["server"]
+  period: 10s
+  hosts: ["localhost:5984"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-couchdb-server,server>>
+
+include::couchdb/server.asciidoc[]
+

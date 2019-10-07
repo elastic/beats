@@ -27,7 +27,9 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/ecs/code/go/ecs"
 )
 
 var (
@@ -86,9 +88,37 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 	v4, err := dhcpv4.FromBytes(pkt.Payload)
 	if err != nil {
 		metricParseFailures.Inc()
-		p.log.Warnw("dropping packet: failed parsing DHCP data", "error", err)
+		p.log.Warnw("Dropping packet: failed parsing DHCP data", "error", err)
 		return nil
 	}
+
+	evt, pbf := pb.NewBeatEvent(pkt.Ts)
+
+	// source/destination (note: this protocol does not produce a bi-flow.)
+	src, dst := common.MakeEndpointPair(pkt.Tuple.BaseTuple, nil)
+	pbf.SetSource(&src)
+	pbf.SetDestination(&dst)
+	pbf.Source.Bytes = int64(len(pkt.Payload))
+
+	if v4.Opcode() == dhcpv4.OpcodeBootReply {
+		// Reverse
+		client, server := ecs.Client(*pbf.Destination), ecs.Server(*pbf.Source)
+		pbf.Client = &client
+		pbf.Server = &server
+	} else {
+		client, server := ecs.Client(*pbf.Source), ecs.Server(*pbf.Destination)
+		pbf.Client = &client
+		pbf.Server = &server
+	}
+
+	pbf.Event.Start = pkt.Ts
+	pbf.Event.Dataset = "dhcpv4"
+	pbf.Network.Transport = "udp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
+	fields["status"] = "OK"
 
 	dhcpData := common.MapStr{
 		"op_code":        strings.ToLower(v4.OpcodeToString()),
@@ -99,6 +129,7 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 		"flags":          strings.ToLower(v4.FlagsToString()),
 		"client_mac":     v4.ClientHwAddrToString(),
 	}
+	fields["dhcpv4"] = dhcpData
 
 	if !v4.ClientIPAddr().IsUnspecified() {
 		dhcpData.Put("client_ip", v4.ClientIPAddr().String())
@@ -117,35 +148,11 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 	}
 
 	if opts, err := optionsToMap(v4.StrippedOptions()); err != nil {
-		p.log.Warnw("failed converting DHCP options to map",
+		p.log.Warnw("Failed converting DHCP options to map",
 			"dhcpv4", v4, "error", err)
 	} else if len(opts) > 0 {
 		dhcpData.Put("option", opts)
 	}
 
-	event := &beat.Event{
-		Timestamp: pkt.Ts,
-		Fields: common.MapStr{
-			"transport": "udp",
-			"type":      "dhcpv4",
-			"status":    "OK",
-			"dhcpv4":    dhcpData,
-		},
-	}
-
-	if v4.Opcode() == dhcpv4.OpcodeBootReply {
-		event.PutValue("ip", pkt.Tuple.SrcIP.String())
-		event.PutValue("port", pkt.Tuple.SrcPort)
-		event.PutValue("client_ip", pkt.Tuple.DstIP.String())
-		event.PutValue("client_port", pkt.Tuple.DstPort)
-		event.PutValue("bytes_out", len(pkt.Payload))
-	} else {
-		event.PutValue("ip", pkt.Tuple.DstIP.String())
-		event.PutValue("port", pkt.Tuple.DstPort)
-		event.PutValue("client_ip", pkt.Tuple.SrcIP.String())
-		event.PutValue("client_port", pkt.Tuple.SrcPort)
-		event.PutValue("bytes_in", len(pkt.Payload))
-	}
-
-	return event
+	return &evt
 }

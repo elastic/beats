@@ -22,22 +22,30 @@ import (
 	"compress/zlib"
 	"encoding/base64"
 	"io/ioutil"
+	"sort"
 )
 
 // FieldsRegistry contains a list of fields.yml files
 // As each entry is an array of bytes multiple fields.yml can be added under one path.
 // This can become useful as we don't have to generate anymore the fields.yml but can
 // package each local fields.yml from things like processors.
-var FieldsRegistry = map[string]map[string]string{}
+var FieldsRegistry = map[string]map[int]map[string]string{}
 
 // SetFields sets the fields for a given beat and asset name
-func SetFields(beat, name string, asset func() string) error {
+func SetFields(beat, name string, p Priority, asset func() string) error {
 	data := asset()
 
+	priority := int(p)
+
 	if _, ok := FieldsRegistry[beat]; !ok {
-		FieldsRegistry[beat] = map[string]string{}
+		FieldsRegistry[beat] = map[int]map[string]string{}
 	}
-	FieldsRegistry[beat][name] = data
+
+	if _, ok := FieldsRegistry[beat][priority]; !ok {
+		FieldsRegistry[beat][priority] = map[string]string{}
+	}
+
+	FieldsRegistry[beat][priority][name] = data
 
 	return nil
 }
@@ -45,13 +53,35 @@ func SetFields(beat, name string, asset func() string) error {
 // GetFields returns a byte array contains all fields for the given beat
 func GetFields(beat string) ([]byte, error) {
 	var fields []byte
-	for _, data := range FieldsRegistry[beat] {
-		output, err := DecodeData(data)
-		if err != nil {
-			return nil, err
-		}
 
-		fields = append(fields, output...)
+	// Get all priorities and sort them
+	beatRegistry := FieldsRegistry[beat]
+	priorities := make([]int, 0, len(beatRegistry))
+	for p := range beatRegistry {
+		priorities = append(priorities, p)
+	}
+	sort.Ints(priorities)
+
+	for _, priority := range priorities {
+
+		priorityRegistry := beatRegistry[priority]
+
+		// Sort all entries with same priority alphabetically
+		entries := make([]string, 0, len(priorityRegistry))
+		for e := range priorityRegistry {
+			entries = append(entries, e)
+		}
+		sort.Strings(entries)
+
+		for _, entry := range entries {
+			data := priorityRegistry[entry]
+			output, err := DecodeData(data)
+			if err != nil {
+				return nil, err
+			}
+
+			fields = append(fields, output...)
+		}
 	}
 	return fields, nil
 }

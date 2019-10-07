@@ -52,3 +52,11 @@ class Test(metricbeat.BaseTest):
         print(evt)
 
         assert evt["jolokia"]["test"]["gc"]["collection_count"] >= 0
+
+        # Check Jolokia autodiscover metadata is added
+        assert evt['jolokia']['server']['product'] == 'tomcat'
+        assert evt['jolokia']['server']['vendor'] == 'Apache'
+
+        # Remove "test" fields because namespace specific fields are not documented
+        del(evt["jolokia"]["test"])
+        self.assert_fields_are_documented(output[0])

@@ -1,4 +1,11 @@
-This module periodically fetches metrics from
-https://prometheus.io/docs/[Prometheus].
+This module periodically scrapes metrics from
+https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].
 
-The default metricset is `collector`.
+[float]
+=== Dashboard
+
+The Prometheus module comes with a predefined dashboard for Prometheus specific stats. For example:
+
+image::./images/metricbeat-prometheus-overview.png[]
+
+

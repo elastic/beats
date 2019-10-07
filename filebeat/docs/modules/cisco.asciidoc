@@ -1,0 +1,291 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-cisco]]
+[role="xpack"]
+
+:modulename: cisco
+:has-dashboards: true
+
+== Cisco module
+
+beta[]
+
+This is a module for Cisco network device's logs. It includes the following
+filesets for receiving logs over syslog or read from a file:
+
+- `asa` fileset: supports Cisco ASA firewall logs.
+- `ftd` fileset: supports Cisco Firepower Threat Defense logs.
+- `ios` fileset: supports Cisco IOS router and switch logs.
+
+Cisco ASA devices also support exporting flow records using NetFlow, which is
+supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
+{beatname_uc}.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for ASA:
+
+[role="screenshot"]
+image::./images/kibana-cisco-asa.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to run via syslog on port 9001 for ASA and
+port 9002 for IOS. However it can also be configured to read from a file path.
+See the following example.
+
+["source","yaml",subs="attributes"]
+-----
+- module: cisco
+  asa:
+    enabled: true
+    var.paths: ["/var/log/cisco-asa.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: asa
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `asa` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  asa:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
+    var.log_level: 5
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.log_level`*::
+
+An integer between 1 and 7 that allows to filter messages based on the
+severity level. The different severity levels supported by the Cisco ASA are:
+
+[width="30%",cols="^1,2",options="header"]
+|===========================
+| log_level | severity
+|     1     | Alert
+|     2     | Critical
+|     3     | Error
+|     4     | Warning
+|     5     | Notification
+|     6     | Informational
+|     7     | Debugging
+|===========================
+
+A value of 7 (default) will not filter any messages. A lower value will drop
+any messages with a severity level higher than the specified value. For
+example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
+and 3 (Error). All other messages will be dropped.
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9001.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `ftd` fileset settings
+
+The Cisco FTD fileset primarily supports parsing IPv4 and IPv6 access list log
+messages similar to that of ASA devices as well as Security Event Syslog
+Messages for Intrusion, Connection, File and Malware events.
+
+*Field mappings*
+
+The `ftd` fileset maps Security Event Syslog Messages to the Elastic Common
+Schema (ECS) format. The following table illustrates the mapping from
+Security Event fields to ECS. The `cisco.ftd` prefix is used when there is no
+corresponding ECS field available.
+
+Mappings for Intrusion events fields:
+[options="header"]
+|====================================
+| FTD Field | Mapped fields
+| ApplicationProtocol | network.protocol
+| DstIP | destination.ip
+| DstPort | destination.port
+| EgressInterface | cisco.ftd.destination_interface
+| GID | service.id
+| HTTPResponse | http.response.status_code
+| IngressInterface | cisco.ftd.source_interface
+| InlineResult | event.outcome
+| IntrusionPolicy | cisco.ftd.rule_name
+| Message | message
+| Protocol | network.transport
+| SrcIP | source.ip
+| SrcPort | source.port
+| User | user.id, user.name
+| WebApplication | network.application
+|====================================
+
+Mappings for Connection and Security Intelligence events fields:
+[options="header"]
+|====================================
+| FTD Field | Mapped fields
+| ACPolicy | cisco.ftd.rule_name
+| AccessControlRuleAction | event.outcome
+| AccessControlRuleName | cisco.ftd.rule_name
+| ApplicationProtocol | network.protocol
+| ConnectionDuration | event.duration
+| DNSQuery | dns.question.name
+| DNSRecordType | dns.question.type
+| DNSResponseType | dns.response_code
+| DstIP | destination.ip
+| DstPort | destination.port
+| EgressInterface | cisco.ftd.destination_interface
+| HTTPReferer | http.request.referrer
+| HTTPResponse | http.response.status_code
+| IngressInterface | cisco.ftd.source_interface
+| InitiatorBytes | source.bytes
+| InitiatorPackets | source.packets
+| NetBIOSDomain | host.hostname
+| Protocol | network.transport
+| ReferencedHost | url.domain
+| ResponderBytes | destination.bytes
+| ResponderPackets | destination.packets
+| SSLActualAction | event.outcome
+| SSLServerName | server.domain
+| SrcIP | source.ip
+| SrcPort | source.port
+| URL | url.original
+| User | user.name
+| UserAgent | user_agent.original
+| WebApplication | network.application
+| originalClientSrcIP | client.ip
+|====================================
+
+Mappings for File and Malware events fields:
+[options="header"]
+|====================================
+| FTD Field | Mapped fields
+| ApplicationProtocol | network.protocol
+| ArchiveFileName | file.name
+| ArchiveSHA256 | file.hash.sha256
+| Client | network.application
+| DstIP | destination.ip
+| DstPort | destination.port
+| FileName | file.name
+| FilePolicy | cisco.ftd.rule_name
+| FileSHA256 | file.hash.sha256
+| FileSize | file.size
+| FirstPacketSecond | event.start
+| Protocol | network.transport
+| SrcIP | source.ip
+| SrcPort | source.port
+| URI | url.original
+| User | user.name
+| WebApplication | network.application
+|====================================
+
+*Example configuration:*
+
+[source,yaml]
+----
+- module: cisco
+  ftd:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9003
+    var.log_level: 5
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.log_level`*::
+
+An integer between 1 and 7 that allows to filter messages based on the
+severity level. The different severity levels supported by the Cisco ASA are:
+
+[width="30%",cols="^1,2",options="header"]
+|===========================
+| log_level | severity
+|     1     | Alert
+|     2     | Critical
+|     3     | Error
+|     4     | Warning
+|     5     | Notification
+|     6     | Informational
+|     7     | Debugging
+|===========================
+
+A value of 7 (default) will not filter any messages. A lower value will drop
+any messages with a severity level higher than the specified value. For
+example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
+and 3 (Error). All other messages will be dropped.
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9003.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `ios` fileset settings
+
+The Cisco IOS fileset primarily supports parsing IPv4 and IPv6 access list log
+messages.
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  ios:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9002
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9002.
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-cisco,exported fields>> section.
+

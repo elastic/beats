@@ -18,12 +18,15 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/generator/fields"
+	"github.com/elastic/beats/libbeat/mapping"
 )
 
 func main() {
@@ -65,6 +68,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error getting file info of target Beat: %+v\n", err)
 		os.Exit(1)
 	}
+	beat.Close()
+	esBeats.Close()
 
 	// If a community Beat does not have its own fields.yml file, it still requires
 	// the fields coming from libbeat to generate e.g assets. In case of Elastic Beats,
@@ -78,9 +83,7 @@ func main() {
 
 	var fieldsFiles []*fields.YmlFile
 	for _, fieldsFilePath := range beatFieldsPaths {
-		pathToModules := filepath.Join(beatPath, fieldsFilePath)
-
-		fieldsFile, err := fields.CollectModuleFiles(pathToModules)
+		fieldsFile, err := fields.CollectModuleFiles(fieldsFilePath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot collect fields.yml files: %+v\n", err)
 			os.Exit(2)
@@ -89,11 +92,29 @@ func main() {
 		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
-	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, output)
+	var buffer bytes.Buffer
+	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, &buffer)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
 		os.Exit(3)
 	}
 
-	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, filepath.Join(beatPath, output))
+	_, err = mapping.LoadFields(buffer.Bytes())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Generated global fields.yml file for %s is invalid: %+v\n", name, err)
+		os.Exit(3)
+	}
+
+	if output == "-" {
+		fmt.Print(buffer.String())
+		return
+	}
+
+	err = ioutil.WriteFile(output, buffer.Bytes(), 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot write global fields.yml file for %s: %v", name, err)
+	}
+
+	outputPath, _ := filepath.Abs(output)
+	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, outputPath)
 }

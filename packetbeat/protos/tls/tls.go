@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
@@ -35,7 +36,7 @@ type stream struct {
 	applayer.Stream
 	parser       parser
 	tcptuple     *common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 }
 
 type tlsConnectionData struct {
@@ -358,31 +359,45 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if len(fingerprints) > 0 {
 		tls["fingerprints"] = fingerprints
 	}
-	fields := common.MapStr{
-		"type":   "tls",
-		"status": status,
-		"tls":    tls,
-		"src":    src,
-		"dst":    dst,
+
+	// TLS version in use
+	if conn.handshakeCompleted > 1 {
+		var version string
+		if serverHello != nil {
+			var ok bool
+			if value, exists := serverHello.extensions.Parsed["supported_versions"]; exists {
+				version, ok = value.(string)
+			}
+			if !ok {
+				version = serverHello.version.String()
+			}
+		} else if clientHello != nil {
+			version = clientHello.version.String()
+		}
+		tls["version"] = version
 	}
-	// set "server" to SNI, if provided
+
+	evt, pbf := pb.NewBeatEvent(conn.startTime)
+	pbf.SetSource(src)
+	pbf.SetDestination(dst)
+	pbf.Event.Start = conn.startTime
+	pbf.Event.End = conn.endTime
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = "tls"
+
+	fields := evt.Fields
+	fields["type"] = pbf.Network.Protocol
+	fields["status"] = status
+	fields["tls"] = tls
+
+	// set "server.domain" to SNI, if provided
 	if value, ok := clientHello.extensions.Parsed["server_name_indication"]; ok {
 		if list, ok := value.([]string); ok && len(list) > 0 {
-			fields["server"] = list[0]
+			pbf.Destination.Domain = list[0]
 		}
 	}
 
-	// set "responsetime" if handshake completed
-	responseTime := int32(conn.endTime.Sub(conn.startTime) / time.Millisecond)
-	if responseTime >= 0 {
-		fields["responsetime"] = responseTime
-	}
-
-	timestamp := time.Now()
-	return beat.Event{
-		Timestamp: timestamp,
-		Fields:    fields,
-	}
+	return evt
 }
 
 func (plugin *tlsPlugin) getCerts(certs []*x509.Certificate) (common.MapStr, []common.MapStr) {

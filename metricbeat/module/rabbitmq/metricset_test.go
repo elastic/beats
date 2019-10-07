@@ -20,13 +20,14 @@ package rabbitmq
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
-
-	"github.com/stretchr/testify/assert"
 )
+
+var logger = logp.NewLogger("rabbitmq")
 
 func init() {
 	mb.Registry.MustAddMetricSet("rabbitmq", "test", newTestMetricSet,
@@ -47,9 +48,12 @@ func newTestMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch makes an HTTP request to fetch connections metrics from the connections endpoint.
-func (m *testMetricSet) Fetch() ([]common.MapStr, error) {
+func (m *testMetricSet) Fetch(reporter mb.ReporterV2) {
 	_, err := m.HTTP.FetchContent()
-	return nil, err
+	if err != nil {
+		logger.Error(err)
+		reporter.Error(err)
+	}
 }
 
 func TestManagementPathPrefix(t *testing.T) {
@@ -66,7 +70,9 @@ func TestManagementPathPrefix(t *testing.T) {
 		pathConfigKey: "/management_prefix",
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	_, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	_, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
 }

@@ -21,6 +21,7 @@ package eventlog
 
 import (
 	"expvar"
+	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -113,6 +114,26 @@ func TestReadLargeBatchSize(t *testing.T) {
 			t.Log(kv)
 		}
 	})
+}
+
+func TestReadEvtxFile(t *testing.T) {
+	path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	configureLogp()
+	eventlog, teardown := setupWinEventLog(t, 0, map[string]interface{}{
+		"name": path,
+	})
+	defer teardown()
+
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Len(t, records, 32)
 }
 
 func setupWinEventLog(t *testing.T, recordID uint64, options map[string]interface{}) (EventLog, func()) {

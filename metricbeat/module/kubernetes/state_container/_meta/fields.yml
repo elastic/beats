@@ -32,11 +32,11 @@
       type: group
       fields:
         - name: limit.cores
-          type: long
+          type: float
           description: >
             Container CPU cores limit
         - name: request.cores
-          type: long
+          type: float
           description: >
             Container CPU requested cores
         - name: limit.nanocores

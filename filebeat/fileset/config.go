@@ -19,9 +19,11 @@ package fileset
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/paths"
 )
 
 // ModuleConfig contains the configuration file options for a module
@@ -35,26 +37,40 @@ type ModuleConfig struct {
 
 // FilesetConfig contains the configuration file options for a fileset
 type FilesetConfig struct {
-	Enabled    *bool                  `config:"enabled"`
-	Var        map[string]interface{} `config:"var"`
-	Input      map[string]interface{} `config:"input"`
-	Prospector map[string]interface{} `config:"prospector"`
+	Enabled *bool                  `config:"enabled"`
+	Var     map[string]interface{} `config:"var"`
+	Input   map[string]interface{} `config:"input"`
 }
 
 // NewFilesetConfig creates a new FilesetConfig from a common.Config.
 func NewFilesetConfig(cfg *common.Config) (*FilesetConfig, error) {
+	if err := cfgwarn.CheckRemoved6xSetting(cfg, "prospector"); err != nil {
+		return nil, err
+	}
+
 	var fcfg FilesetConfig
 	err := cfg.Unpack(&fcfg)
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking configuration")
 	}
 
-	if len(fcfg.Prospector) > 0 {
-		cfgwarn.Deprecate("7.0.0", "prospector is deprecated. Use `input` instead.")
-		if len(fcfg.Input) > 0 {
-			return nil, fmt.Errorf("error prospector and input are defined in the fileset, use only input")
-		}
-		fcfg.Input = fcfg.Prospector
-	}
 	return &fcfg, nil
+}
+
+// mergePathDefaults returns a copy of c containing the path variables that must
+// be available for variable expansion in module configuration (e.g. it enables
+// the use of ${path.config} in module config).
+func mergePathDefaults(c *common.Config) (*common.Config, error) {
+	defaults := common.MustNewConfigFrom(map[string]interface{}{
+		"path": map[string]interface{}{
+			"home":   paths.Paths.Home,
+			"config": "${path.home}",
+			"data":   filepath.Join("${path.home}", "data"),
+			"logs":   filepath.Join("${path.home}", "logs"),
+		},
+	})
+	if err := defaults.Merge(c); err != nil {
+		return nil, err
+	}
+	return defaults, nil
 }

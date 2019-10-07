@@ -20,39 +20,24 @@
 package perfmon
 
 import (
-	"bytes"
-	"regexp"
 	"strconv"
 	"syscall"
 	"unicode/utf16"
-	"unsafe"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/winlogbeat/sys"
 )
 
 // Windows API calls
 //sys _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhOpenQueryW
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhRemoveCounter
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
-//sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
-//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
-//sys _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterValue
-//sys _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *pdhRawCounterItem) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterArray
-//sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
-//sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
+//sys _PdhGetFormattedCounterValueDouble(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueDouble) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetFormattedCounterValueLarge(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLarge) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetFormattedCounterValueLong(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLong) (errcode error) [failretval!=0]= pdh.PdhGetFormattedCounterValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
-
-var (
-	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
-	wildcardRegexp            = regexp.MustCompile(`.*\(\*\).*`)
-	instanceNameRegexp        = regexp.MustCompile(`.*\((.*)\).*`)
-)
+//sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
+//sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 
 type PdhQueryHandle uintptr
 
@@ -62,21 +47,31 @@ type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
 
-type pdhCounterValueItem struct {
-	SzName   uintptr
-	FmtValue PdhCounterValue
+// PdhCounterValueDouble  for double values
+type PdhCounterValueDouble struct {
+	CStatus   uint32
+	Pad_cgo_0 [4]byte
+	Value     float64
+	Pad_cgo_1 [4]byte
 }
 
-type pdhRawCounterItem struct {
-	SzName   uintptr
-	RawValue PdhRawCounter
+// PdhCounterValueLarge for 64 bit integer values
+type PdhCounterValueLarge struct {
+	CStatus   uint32
+	Pad_cgo_0 [4]byte
+	Value     int64
+	Pad_cgo_1 [4]byte
 }
 
-type CounterValueItem struct {
-	Name  string
-	Value PdhCounterValue
+// PdhCounterValueLong for long values
+type PdhCounterValueLong struct {
+	CStatus   uint32
+	Pad_cgo_0 [4]byte
+	Value     int32
+	Pad_cgo_1 [4]byte
 }
 
+// PdhOpenQuery creates a new query.
 func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	var dataSourcePtr *uint16
 	if dataSource != "" {
@@ -91,10 +86,10 @@ func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	if err := _PdhOpenQuery(dataSourcePtr, userData, &handle); err != nil {
 		return InvalidQueryHandle, PdhErrno(err.(syscall.Errno))
 	}
-
 	return handle, nil
 }
 
+// PdhAddCounter adds the specified counter to the query.
 func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
 	var handle PdhCounterHandle
 	if err := _PdhAddCounter(query, counterPath, userData, &handle); err != nil {
@@ -104,6 +99,16 @@ func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (
 	return handle, nil
 }
 
+// PdhRemoveCounter removes the specified counter to the query.
+func PdhRemoveCounter(counter PdhCounterHandle) error {
+	if err := _PdhRemoveCounter(counter); err != nil {
+		return PdhErrno(err.(syscall.Errno))
+	}
+
+	return nil
+}
+
+// PdhCollectQueryData collects the current raw data value for all counters in the specified query.
 func PdhCollectQueryData(query PdhQueryHandle) error {
 	if err := _PdhCollectQueryData(query); err != nil {
 		return PdhErrno(err.(syscall.Errno))
@@ -112,86 +117,72 @@ func PdhCollectQueryData(query PdhQueryHandle) error {
 	return nil
 }
 
-func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat) (uint32, *PdhCounterValue, error) {
+// PdhGetFormattedCounterValueDouble computes a displayable double value for the specified counter.
+func PdhGetFormattedCounterValueDouble(counter PdhCounterHandle) (uint32, *PdhCounterValueDouble, error) {
 	var counterType uint32
-	var value PdhCounterValue
-	if err := _PdhGetFormattedCounterValue(counter, format, &counterType, &value); err != nil {
+	var value PdhCounterValueDouble
+	if err := _PdhGetFormattedCounterValueDouble(counter, PdhFmtDouble|PdhFmtNoCap100, &counterType, &value); err != nil {
 		return 0, nil, PdhErrno(err.(syscall.Errno))
 	}
 
 	return counterType, &value, nil
 }
 
-func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) ([]CounterValueItem, error) {
-	var bufferSize uint32
-	var bufferCount uint32
+// PdhGetFormattedCounterValueLarge computes a displayable large value for the specified counter.
+func PdhGetFormattedCounterValueLarge(counter PdhCounterHandle) (uint32, *PdhCounterValueLarge, error) {
+	var counterType uint32
+	var value PdhCounterValueLarge
+	if err := _PdhGetFormattedCounterValueLarge(counter, PdhFmtLarge|PdhFmtNoCap100, &counterType, &value); err != nil {
+		return 0, nil, PdhErrno(err.(syscall.Errno))
+	}
 
-	if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, nil); err != nil {
-		// From MSDN: You should call this function twice, the first time to get the required
-		// buffer size (set ItemBuffer to NULL and lpdwBufferSize to 0), and the second time to get the data.
+	return counterType, &value, nil
+}
+
+// PdhGetFormattedCounterValueLong computes a displayable long value for the specified counter.
+func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCounterValueLong, error) {
+	var counterType uint32
+	var value PdhCounterValueLong
+	if err := _PdhGetFormattedCounterValueLong(counter, PdhFmtLong|PdhFmtNoCap100, &counterType, &value); err != nil {
+		return 0, nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return counterType, &value, nil
+}
+
+// PdhExpandWildCardPath returns counter paths that match the given counter path.
+func PdhExpandWildCardPath(utfPath *uint16) ([]uint16, error) {
+	var bufferSize uint32
+	if err := _PdhExpandWildCardPath(nil, utfPath, nil, &bufferSize); err != nil {
 		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-
-		// Buffer holds PdhCounterValueItems at the beginning and then null-terminated
-		// strings at the end.
-		buffer := make([]byte, bufferSize)
-		if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, &buffer[0]); err != nil {
+		expandPaths := make([]uint16, bufferSize)
+		if err := _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-
-		values := make([]CounterValueItem, bufferCount)
-		nameBuffer := new(bytes.Buffer)
-		for i := 0; i < len(values); i++ {
-			pdhValueItem := (*pdhCounterValueItem)(unsafe.Pointer(&buffer[i*sizeofPdhCounterValueItem]))
-
-			// The strings are appended to the end of the buffer.
-			nameOffset := pdhValueItem.SzName - (uintptr)(unsafe.Pointer(&buffer[0]))
-			nameBuffer.Reset()
-			if err := sys.UTF16ToUTF8Bytes(buffer[nameOffset:], nameBuffer); err != nil {
-				return nil, err
-			}
-
-			values[i].Name = nameBuffer.String()
-			values[i].Value = pdhValueItem.FmtValue
-		}
-
-		return values, nil
+		return expandPaths, nil
 	}
-
 	return nil, nil
 }
 
-func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, error) {
-	var counterType uint32
-	var value PdhRawCounter
-	if err := _PdhGetRawCounterValue(counter, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
+// PdhExpandCounterPath returns counter paths that match the given counter path, for 32 bit windows.
+func PdhExpandCounterPath(utfPath *uint16) ([]uint16, error) {
+	var bufferSize uint32
+	if err := _PdhExpandCounterPath(utfPath, nil, &bufferSize); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		expandPaths := make([]uint16, bufferSize)
+		if err := _PdhExpandCounterPath(utfPath, &expandPaths[0], &bufferSize); err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		return expandPaths, nil
 	}
-
-	return counterType, &value, nil
+	return nil, nil
 }
 
-func PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
-	var value PdhCounterValue
-	if err := _PdhCalculateCounterFromRawValue(counter, format, rawValue1, rawValue2, &value); err != nil {
-		return nil, PdhErrno(err.(syscall.Errno))
-	}
-
-	return &value, nil
-}
-
-func PdhFormatFromRawValue(format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
-	var counterType uint32
-	var value PdhCounterValue
-	var timeBase uint64
-	if err := _PdhFormatFromRawValue(counterType, format, &timeBase, rawValue1, rawValue2, &value); err != nil {
-		return nil, PdhErrno(err.(syscall.Errno))
-	}
-
-	return &value, nil
-}
-
+// PdhCloseQuery closes all counters contained in the specified query.
 func PdhCloseQuery(query PdhQueryHandle) error {
 	if err := _PdhCloseQuery(query); err != nil {
 		return PdhErrno(err.(syscall.Errno))
@@ -200,228 +191,7 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 	return nil
 }
 
-type Counter struct {
-	handle       PdhCounterHandle
-	format       PdhCounterFormat
-	instanceName string
-	wildcard     bool // wildcard indicates that the path contains a wildcard.
-}
-
-type Counters map[string]*Counter
-
-type Query struct {
-	handle   PdhQueryHandle
-	counters Counters
-}
-
-type Format int
-
-const (
-	FloatFormat Format = iota
-	LongFormat
-)
-
-func NewQuery(dataSource string) (*Query, error) {
-	h, err := PdhOpenQuery(dataSource, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Query{
-		handle:   h,
-		counters: make(Counters),
-	}, nil
-}
-
-func (q *Query) AddCounter(counterPath string, format Format, instanceName string) error {
-	if _, found := q.counters[counterPath]; found {
-		return errors.New("counter already added")
-	}
-
-	h, err := PdhAddCounter(q.handle, counterPath, 0)
-	if err != nil {
-		return err
-	}
-
-	wildcard := wildcardRegexp.MatchString(counterPath)
-
-	// Extract the instance name from the counterPath for non-wildcard paths.
-	if !wildcard && instanceName == "" {
-		matches := instanceNameRegexp.FindStringSubmatch(counterPath)
-		if len(matches) != 2 {
-			return errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
-		}
-		instanceName = matches[1]
-	}
-
-	q.counters[counterPath] = &Counter{
-		handle:       h,
-		instanceName: instanceName,
-		wildcard:     wildcard,
-	}
-	switch format {
-	case FloatFormat:
-		q.counters[counterPath].format = PdhFmtDouble
-	case LongFormat:
-		q.counters[counterPath].format = PdhFmtLarge
-	}
-	return nil
-}
-
-func (q *Query) Execute() error {
-	return PdhCollectQueryData(q.handle)
-}
-
-type Value struct {
-	Instance    string
-	Measurement interface{}
-	Err         error
-}
-
-func (q *Query) Values() (map[string][]Value, error) {
-	rtn := make(map[string][]Value, len(q.counters))
-
-	for path, counter := range q.counters {
-		if counter.wildcard {
-			values, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
-			if err != nil {
-				rtn[path] = append(rtn[path], Value{Err: err})
-				continue
-			}
-
-			for i := 0; i < len(values); i++ {
-				var val interface{}
-
-				switch counter.format {
-				case PdhFmtDouble:
-					val = *(*float64)(unsafe.Pointer(&values[i].Value.LongValue))
-				case PdhFmtLarge:
-					val = *(*int64)(unsafe.Pointer(&values[i].Value.LongValue))
-				}
-
-				rtn[path] = append(rtn[path], Value{Instance: values[i].Name, Measurement: val})
-			}
-		} else {
-			_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
-			if err != nil {
-				rtn[path] = append(rtn[path], Value{Err: err})
-				continue
-			}
-
-			switch counter.format {
-			case PdhFmtDouble:
-				rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-			case PdhFmtLarge:
-				rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-			}
-		}
-	}
-
-	return rtn, nil
-}
-
-// Closes the query and all of its counters.
-func (q *Query) Close() error {
-	return PdhCloseQuery(q.handle)
-}
-
-type PerfmonReader struct {
-	query         *Query            // PDH Query
-	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
-	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed      bool              // Indicates if the query has been executed.
-	log           *logp.Logger
-}
-
-// NewPerfmonReader creates a new instance of PerfmonReader.
-func NewPerfmonReader(config Config) (*PerfmonReader, error) {
-	query, err := NewQuery("")
-	if err != nil {
-		return nil, err
-	}
-
-	r := &PerfmonReader{
-		query:         query,
-		instanceLabel: map[string]string{},
-		measurement:   map[string]string{},
-		log:           logp.NewLogger("perfmon"),
-	}
-
-	for _, counter := range config.CounterConfig {
-		var format Format
-		switch counter.Format {
-		case "float":
-			format = FloatFormat
-		case "long":
-			format = LongFormat
-		}
-		if err := query.AddCounter(counter.Query, format, counter.InstanceName); err != nil {
-			if config.IgnoreNECounters {
-				switch err {
-				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
-					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
-					r.log.Infow("Ignoring non existent counter", "error", err,
-						logp.Namespace("perfmon"), "query", counter.Query)
-					continue
-				}
-			}
-			query.Close()
-			return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
-		}
-
-		r.instanceLabel[counter.Query] = counter.InstanceLabel
-		r.measurement[counter.Query] = counter.MeasurementLabel
-
-	}
-
-	return r, nil
-}
-
-func (r *PerfmonReader) Read() ([]mb.Event, error) {
-	if err := r.query.Execute(); err != nil {
-		return nil, errors.Wrap(err, "failed querying counter values")
-	}
-
-	// Get the values.
-	values, err := r.query.Values()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed formatting counter values")
-	}
-
-	// Write the values into the map.
-	events := make([]mb.Event, 0, len(values))
-
-	for counterPath, values := range values {
-		for _, val := range values {
-			if val.Err != nil && !r.executed {
-				r.log.Debugw("Ignoring the first measurement because the data isn't ready",
-					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-				continue
-			}
-
-			event := mb.Event{
-				MetricSetFields: common.MapStr{},
-				Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
-			}
-
-			if val.Instance != "" {
-				event.MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
-			}
-
-			if val.Measurement != nil {
-				event.MetricSetFields.Put(r.measurement[counterPath], val.Measurement)
-			} else {
-				event.MetricSetFields.Put(r.measurement[counterPath], 0)
-			}
-
-			events = append(events, event)
-		}
-	}
-
-	r.executed = true
-	return events, nil
-}
-
+// Error returns a more explicit error message.
 func (e PdhErrno) Error() string {
 	// If the value is not one of the known PDH errors then assume its a
 	// general windows error.

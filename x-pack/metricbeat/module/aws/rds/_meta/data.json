@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "rds": {
+            "cpu": {
+                "total": {
+                    "pct": 3
+                }
+            },
+            "database_connections": 0,
+            "db_instance": {
+                "arn": "arn:aws:rds:us-east-2:627959692251:db:test1",
+                "class": "db.r5.large",
+                "identifier": "test1",
+                "status": "available"
+            },
+            "deadlocks": 0,
+            "disk_usage": {
+                "bin_log.bytes": 0
+            },
+            "free_local_storage.bytes": 32025966592,
+            "freeable_memory.bytes": 4716777472,
+            "latency": {
+                "commit": 2.810083333333333,
+                "ddl": 0,
+                "dml": 0.08358333333333333,
+                "insert": 0.08358333333333333,
+                "select": 0.24081333333333332,
+                "update": 0
+            },
+            "login_failures": 0,
+            "queries": 8.966517224712922,
+            "throughput": {
+                "commit": 0,
+                "ddl": 0,
+                "delete": 0,
+                "dml": 0,
+                "insert": 0.4999333422210372,
+                "network": 1.4,
+                "network_receive": 0.6999825008749563,
+                "network_transmit": 0.6999650017499125,
+                "select": 2.498168010125908,
+                "update": 0
+            },
+            "transactions": {
+                "active": 0,
+                "blocked": 0
+            }
+        }
+    },
+    "cloud": {
+        "availability_zone": "us-east-2a",
+        "provider": "aws",
+        "region": "us-east-2"
+    },
+    "event": {
+        "dataset": "aws.rds",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "rds"
+    },
+    "service": {
+        "type": "aws"
+    }
+}

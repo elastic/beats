@@ -1,20 +1,19 @@
 [[faq]]
-== Frequently asked questions
+== Common problems
 
-This section contains frequently asked questions about {beatname_uc}. Also check out the
-https://discuss.elastic.co/c/beats/filebeat[{beatname_uc} discussion forum].
+This section describes common problems you might encounter with
+{beatname_uc}. Also check out the
+https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
 
-[float]
 [[filebeat-network-volumes]]
-=== Can't read log files from network volumes?
+=== Can't read log files from network volumes
 
 We do not recommend reading log files from network volumes. Whenever possible, install {beatname_uc} on the host machine and
 send the log files directly from there. Reading files from network volumes (especially on Windows) can have unexpected side
 effects. For example, changed file identifiers may result in {beatname_uc} reading a log file from scratch again.
 
-[float]
 [[filebeat-not-collecting-lines]]
-=== {beatname_uc} isn't collecting lines from a file?
+=== {beatname_uc} isn't collecting lines from a file
 
 {beatname_uc} might be incorrectly configured or unable to send events to the output. To resolve the issue:
 
@@ -31,9 +30,8 @@ it's publishing events successfully:
 ./filebeat -c config.yml -e -d "*"
 ----------------------------------------------------------------------
 
-[float]
 [[open-file-handlers]]
-=== Too many open file handlers?
+=== Too many open file handlers
 
 {beatname_uc} keeps the file handler open in case it reaches the end of a file so that it can read new log lines in near real time. If {beatname_uc} is harvesting a large number of files, the number of open files can become an issue. In most environments, the number of files that are actively updated is low. The `close_inactive` configuration option should be set accordingly to close files that are no longer active.
 
@@ -49,18 +47,16 @@ The `close_renamed` and `close_removed` options can be useful on Windows to reso
 
 Make sure that you read the documentation for these configuration options before using any of them.
 
-[float]
 [[reduce-registry-size]]
-=== Registry file is too large?
+=== Registry file is too large
 
-{beatname_uc} keeps the state of each file and persists the state to disk in the `registry_file`. The file state is used to continue file reading at a previous position when {beatname_uc} is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> and <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>>.
+{beatname_uc} keeps the state of each file and persists the state to disk in the registry file. The file state is used to continue file reading at a previous position when {beatname_uc} is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> and <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>>.
 
 For old files that you no longer touch and are ignored (see <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>), we recommended that you use `clean_inactive`. If old files get removed from disk, then use the `clean_removed` option.
 
 
-[float]
 [[inode-reuse-issue]]
-=== Inode reuse causes {beatname_uc} to skip lines?
+=== Inode reuse causes {beatname_uc} to skip lines
 
 On Linux file systems, {beatname_uc} uses the inode and device to identify files. When a file is removed from disk, the inode may be assigned to a new file. In use cases involving file rotation, if an old file is removed and a new one is created immediately afterwards, the new file may have the exact same inode as the file that was removed. In this case, {beatname_uc} assumes that the new file is the same as the old and tries to continue reading at the old position, which is not correct.
 
@@ -68,56 +64,52 @@ By default states are never removed from the registry file. To resolve the inode
 
 You can use <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> for files that are removed from disk. Be aware that `clean_removed` cleans the file state from the registry whenever a file cannot be found during a scan. If the file shows up again later, it will be sent again from scratch.
 
-[float]
+include::filebeat-log-rotation.asciidoc[]
+
 [[windows-file-rotation]]
-=== Open file handlers cause issues with Windows file rotation?
+=== Open file handlers cause issues with Windows file rotation
 
 On Windows, you might have problems renaming or removing files because {beatname_uc} keeps the file handlers open. This can lead to issues with the file rotating system. To avoid this issue, you can use the <<{beatname_lc}-input-log-close-removed,`close_removed`>> and <<{beatname_lc}-input-log-close-renamed,`close_renamed`>> options together.
 
 IMPORTANT: When you configure these options, files may be closed before the harvester has finished reading the files. If the file cannot be picked up again by the input and the harvester hasn't finish reading the file, the missing lines will never be sent to the output.
 
 
-[float]
 [[filebeat-cpu]]
-=== {beatname_uc} is using too much CPU?
+=== {beatname_uc} is using too much CPU
 
 {beatname_uc} might be configured to scan for files too frequently. Check the setting for `scan_frequency` in the `filebeat.yml`
 config file. Setting `scan_frequency` to less than 1s may cause {beatname_uc} to scan the disk in a tight loop.
 
-[float]
 [[dashboard-fields-incorrect-filebeat]]
-=== Dashboard in Kibana is breaking up data fields incorrectly?
+=== Dashboard in {kib} is breaking up data fields incorrectly
 
 The index template might not be loaded correctly. See <<filebeat-template>>.
 
-[float]
 [[fields-not-indexed]]
-=== Fields are not indexed or usable in Kibana visualizations?
+=== Fields are not indexed or usable in {kib} visualizations
 
 If you have recently performed an operation that loads or parses custom, structured logs,
-you might need to refresh the index to make the fields available in Kibana. To refresh
-the index, use the {elasticsearch}/indices-refresh.html[refresh API]. For example:
+you might need to refresh the index to make the fields available in {kib}. To refresh
+the index, use the {ref}/indices-refresh.html[refresh API]. For example:
 
 ["source","sh"]
 ----------------------------------------------------------------------
 curl -XPOST 'http://localhost:9200/filebeat-2016.08.09/_refresh'
 ----------------------------------------------------------------------
 
-[float]
 [[newline-character-required-eof]]
-=== {beatname_uc} isn't shipping the last line of a file?
+=== {beatname_uc} isn't shipping the last line of a file
 
 {beatname_uc} uses a newline character to detect the end of an event. If lines are added incrementally to a file that's being
 harvested, a newline character is required after the last line, or {beatname_uc} will not read the last line of
 the file.
 
-[float]
 [[faq-deleted-files-are-not-freed]]
-=== {beatname_uc} keeps open file handlers of deleted files for a long time?
+=== {beatname_uc} keeps open file handlers of deleted files for a long time
 
 In the default behaviour, {beatname_uc} opens the files and keeps them open until it
 reaches the end of them.  In situations when the configured output is blocked
-(e.g. Elasticsearch or Logstash is unavailable) for a long time, this can cause
+(e.g. {es} or {ls} is unavailable) for a long time, this can cause
 {beatname_uc} to keep file handlers to files that were deleted from the file system
 in the mean time. As long as {beatname_uc} keeps the deleted files open, the
 operating system doesn't free up the space on disk, which can lead to increase
@@ -130,5 +122,6 @@ reached EOF or not. Note that this option can lead to data loss if the file is
 deleted before {beatname_uc} reaches the end of the file.
 
 
-include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
-include::../../libbeat/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/docs/faq-limit-bandwidth.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-faq.asciidoc[]

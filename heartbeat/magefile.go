@@ -27,68 +27,71 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
-	mage.BeatDescription = "Ping remote services for availability and log " +
+	common.RegisterCheckDeps(Update)
+
+	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
-	mage.BeatServiceName = "heartbeat-elastic"
+	devtools.BeatServiceName = "heartbeat-elastic"
 }
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
+	return devtools.CrossBuild()
 }
 
 // CrossBuildXPack cross-builds the beat with XPack for all target platforms.
 func CrossBuildXPack() error {
-	return mage.CrossBuildXPack()
+	return devtools.CrossBuildXPack()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return mage.Clean()
+	return devtools.CrossBuildGoDaemon()
 }
 
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
-// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseElasticBeatPackaging()
+	devtools.UseElasticBeatPackaging()
+	customizePackaging()
+
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return devtools.TestPackages(devtools.WithMonitorsD())
 }
 
 // Update updates the generated files (aka make update).
@@ -98,19 +101,46 @@ func Update() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return mage.GenerateFieldsYAML("monitors/active")
+	return devtools.GenerateFieldsYAML("monitors/active")
 }
 
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // GoTestIntegration executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+}
+
+func customizePackaging() {
+	monitorsDTarget := "monitors.d"
+	unixMonitorsDir := "/etc/{{.BeatName}}/monitors.d"
+	monitorsD := devtools.PackageFile{
+		Mode:   0644,
+		Source: "monitors.d",
+	}
+
+	for _, args := range devtools.Packages {
+		pkgType := args.Types[0]
+		switch pkgType {
+		case devtools.Docker:
+			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw=eip")
+			args.Spec.Files[monitorsDTarget] = monitorsD
+		case devtools.TarGz, devtools.Zip:
+			args.Spec.Files[monitorsDTarget] = monitorsD
+		case devtools.Deb, devtools.RPM, devtools.DMG:
+			args.Spec.Files[unixMonitorsDir] = monitorsD
+		}
+	}
+}
+
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
 }

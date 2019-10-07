@@ -1,0 +1,283 @@
+[
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 153000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 206,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 6.1e-05,
+        "mysql.slowlog.query": "SELECT count(*) FROM mysql.user WHERE user='root' and password='';",
+        "mysql.slowlog.rows_examined": 5,
+        "mysql.slowlog.rows_sent": 1,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 2456000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 437,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 9.5e-05,
+        "mysql.slowlog.query": "select concat('select count(*) into @discard from `',\n                    TABLE_SCHEMA, '`.`', TABLE_NAME, '`')\n      from information_schema.TABLES where ENGINE='MyISAM';",
+        "mysql.slowlog.rows_examined": 81,
+        "mysql.slowlog.rows_sent": 31,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 6278000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 775,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000153,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`COLUMNS`;",
+        "mysql.slowlog.rows_examined": 808,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 262000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1008,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000204,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`EVENTS`;",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 323000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1238,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000241,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PARAMETERS`;",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 7084000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1472,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000148,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PARTITIONS`;",
+        "mysql.slowlog.rows_examined": 81,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 277000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1707,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000135,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PLUGINS`;",
+        "mysql.slowlog.rows_examined": 23,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 254000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1939,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000159,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PROCESSLIST`;",
+        "mysql.slowlog.rows_examined": 1,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 297000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2174,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000229,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`ROUTINES`;",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 1676000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2406,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.000156,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`TRIGGERS`;",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:37:59.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 8782000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2638,
+        "mysql.slowlog.current_user": "debian-sys-maint",
+        "mysql.slowlog.lock_time.sec": 0.001187,
+        "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`VIEWS`;",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 0,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "debian-sys-maint"
+    },
+    {
+        "@timestamp": "2016-12-09T14:39:02.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 2000268000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2891,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 0.0,
+        "mysql.slowlog.query": "select sleep(2);",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 1,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "root"
+    },
+    {
+        "@timestamp": "2016-12-09T14:39:23.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 138000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 3072,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 5.6e-05,
+        "mysql.slowlog.query": "select * from general_log;",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 0,
+        "mysql.slowlog.schema": "mysql",
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "root"
+    },
+    {
+        "@timestamp": "2016-12-09T14:39:40.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 159000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 3274,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 5.9e-05,
+        "mysql.slowlog.query": "select * from user;",
+        "mysql.slowlog.rows_examined": 5,
+        "mysql.slowlog.rows_sent": 5,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "root"
+    }
+]

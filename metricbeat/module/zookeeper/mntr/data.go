@@ -23,9 +23,11 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/libbeat/common"
+
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
@@ -61,7 +63,7 @@ var (
 	}
 )
 
-func eventMapping(response io.Reader) common.MapStr {
+func eventMapping(response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
 	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(response)
 
@@ -70,11 +72,18 @@ func eventMapping(response io.Reader) common.MapStr {
 		if match := paramMatcher.FindStringSubmatch(scanner.Text()); len(match) == 3 {
 			fullEvent[match[1]] = match[2]
 		} else {
-			logp.Warn("Unexpected line in mntr output: %s", scanner.Text())
+			logger.Infof("Unexpected line in mntr output: %s", scanner.Text())
 		}
 	}
 
 	event, _ := schema.Apply(fullEvent)
+	e := mb.Event{}
+
+	if version, ok := event["version"]; ok {
+		e.RootFields = common.MapStr{}
+		e.RootFields.Put("service.version", version)
+		delete(event, "version")
+	}
 
 	// only exposed by the Leader
 	if _, ok := fullEvent["zk_followers"]; ok {
@@ -86,5 +95,6 @@ func eventMapping(response io.Reader) common.MapStr {
 		schemaUnix.ApplyTo(event, fullEvent)
 	}
 
-	return event
+	e.MetricSetFields = event
+	r.Event(e)
 }

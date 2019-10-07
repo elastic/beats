@@ -19,13 +19,13 @@ package elasticsearch
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
-
-	"strconv"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 )
@@ -68,7 +69,7 @@ var errNoMonitoring = errors.New("xpack monitoring not available")
 // default monitoring api parameters
 var defaultParams = map[string]string{
 	"system_id":          "beats",
-	"system_api_version": "6",
+	"system_api_version": "7",
 }
 
 func init() {
@@ -97,10 +98,16 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
+		Format:      report.FormatXPackMonitoringBulk,
+		ClusterUUID: settings.ClusterUUID,
 	}
 
 	if settings.DefaultUsername != "" {
 		c.Username = settings.DefaultUsername
+	}
+
+	if settings.Format != report.FormatUnknown {
+		c.Format = settings.Format
 	}
 
 	return c
@@ -170,10 +177,17 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
+	processing, err := processing.MakeDefaultSupport(true)(beat, log, common.NewConfig())
+	if err != nil {
+		return nil, err
+	}
+
 	pipeline, err := pipeline.New(
 		beat,
-		pipeline.Monitors{},
-		monitoring,
+		pipeline.Monitors{
+			Metrics: monitoring,
+			Logger:  log,
+		},
 		queueFactory,
 		outputs.Group{
 			Clients:   []outputs.Client{outClient},
@@ -183,6 +197,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		pipeline.Settings{
 			WaitClose:     0,
 			WaitCloseMode: pipeline.NoWaitOnClose,
+			Processors:    processing,
 		})
 	if err != nil {
 		return nil, err
@@ -247,12 +262,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod)
+	go r.snapshotLoop("state", "state", c.StatePeriod, c.ClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, clusterUUID string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -283,15 +298,25 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 		if len(r.tags) > 0 {
 			fields["tags"] = r.tags
 		}
+
+		meta := common.MapStr{
+			"type":        "beats_" + namespace,
+			"interval_ms": int64(period / time.Millisecond),
+			// Converting to seconds as interval only accepts `s` as unit
+			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
+		}
+
+		if clusterUUID == "" {
+			clusterUUID = getClusterUUID()
+		}
+		if clusterUUID != "" {
+			meta.Put("cluster_uuid", clusterUUID)
+		}
+
 		r.client.Publish(beat.Event{
 			Timestamp: ts,
 			Fields:    fields,
-			Meta: common.MapStr{
-				"type":        "beats_" + namespace,
-				"interval_ms": int64(period / time.Millisecond),
-				// Converting to seconds as interval only accepts `s` as unit
-				"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
-			},
+			Meta:      meta,
 		})
 	}
 }
@@ -325,7 +350,11 @@ func makeClient(
 		return nil, err
 	}
 
-	return newPublishClient(esClient, params), nil
+	if config.Format != report.FormatXPackMonitoringBulk && config.Format != report.FormatBulk {
+		return nil, fmt.Errorf("unknown reporting format: %v", config.Format)
+	}
+
+	return newPublishClient(esClient, params, config.Format)
 }
 
 func closing(log *logp.Logger, c io.Closer) {
@@ -356,6 +385,22 @@ func makeMeta(beat beat.Info) common.MapStr {
 		"version": beat.Version,
 		"name":    beat.Name,
 		"host":    beat.Hostname,
-		"uuid":    beat.UUID,
+		"uuid":    beat.ID,
 	}
+}
+
+func getClusterUUID() string {
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	outputsRegistry := stateRegistry.GetRegistry("outputs")
+	if outputsRegistry == nil {
+		return ""
+	}
+
+	elasticsearchRegistry := outputsRegistry.GetRegistry("elasticsearch")
+	if elasticsearchRegistry == nil {
+		return ""
+	}
+
+	snapshot := monitoring.CollectFlatSnapshot(elasticsearchRegistry, monitoring.Full, false)
+	return snapshot.Strings["cluster_uuid"]
 }

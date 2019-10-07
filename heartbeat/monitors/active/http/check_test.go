@@ -24,7 +24,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/libbeat/conditions"
 )
 
 func TestCheckBody(t *testing.T) {
@@ -124,4 +129,136 @@ func TestCheckBody(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCheckJson(t *testing.T) {
+	fooBazEqualsBar := common.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": map[string]interface{}{"baz": "bar"}}})
+	fooBazEqualsBarConf := &conditions.Config{}
+	err := fooBazEqualsBar.Unpack(fooBazEqualsBarConf)
+	require.NoError(t, err)
+
+	fooBazEqualsBarDesc := "foo.baz equals bar"
+
+	var tests = []struct {
+		description string
+		body        string
+		condDesc    string
+		condConf    *conditions.Config
+		result      bool
+	}{
+		{
+			"positive match",
+			"{\"foo\": {\"baz\": \"bar\"}}",
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			true,
+		},
+		{
+			"Negative match",
+			"{\"foo\": 123}",
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			false,
+		},
+		{
+			"unparseable",
+			`notjson`,
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintln(w, test.body)
+			}))
+			defer ts.Close()
+
+			res, err := http.Get(ts.URL)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
+			require.NoError(t, err)
+			checkRes := checker(res)
+
+			if result := checkRes == nil; result != test.result {
+				if test.result {
+					t.Fatalf("Expected condition: '%s' to match body: %s. got: %s", test.condDesc, test.body, checkRes)
+				} else {
+					t.Fatalf("Did not expect condition: '%s' to match body: %s. got: %s", test.condDesc, test.body, checkRes)
+				}
+			}
+		})
+	}
+
+}
+
+func TestCheckJsonWithIntegerComparison(t *testing.T) {
+	fooBazEqualsBar := common.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": 1}})
+	fooBazEqualsBarConf := &conditions.Config{}
+	err := fooBazEqualsBar.Unpack(fooBazEqualsBarConf)
+	require.NoError(t, err)
+
+	fooBazEqualsBarDesc := "foo equals 1"
+
+	var tests = []struct {
+		description string
+		body        string
+		condDesc    string
+		condConf    *conditions.Config
+		result      bool
+	}{
+		{
+			"positive match",
+			"{\"foo\": 1}",
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			true,
+		},
+		{
+			"Negative match",
+			"{\"foo\": 2}",
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			false,
+		},
+		{
+			"Negative match",
+			"{\"foo\": \"some string\"}",
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintln(w, test.body)
+			}))
+			defer ts.Close()
+
+			res, err := http.Get(ts.URL)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
+			require.NoError(t, err)
+			checkRes := checker(res)
+
+			if result := checkRes == nil; result != test.result {
+				if test.result {
+					t.Fatalf("Expected condition: '%s' to match body: %s. got: %s", test.condDesc, test.body, checkRes)
+				} else {
+					t.Fatalf("Did not expect condition: '%s' to match body: %s. got: %s", test.condDesc, test.body, checkRes)
+				}
+			}
+		})
+	}
+
 }

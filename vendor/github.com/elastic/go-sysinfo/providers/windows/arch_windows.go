@@ -18,7 +18,7 @@
 package windows
 
 import (
-	"github.com/elastic/go-windows"
+	windows "github.com/elastic/go-windows"
 )
 
 func Architecture() (string, error) {

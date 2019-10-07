@@ -23,6 +23,9 @@ import (
 	"reflect"
 	"strconv"
 	"syscall"
+	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 type StateOS struct {
@@ -30,6 +33,12 @@ type StateOS struct {
 	IdxLo uint64 `json:"idxlo,"`
 	Vol   uint64 `json:"vol,"`
 }
+
+var (
+	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
+
+	procGetFileInformationByHandleEx = modkernel32.NewProc("GetFileInformationByHandleEx")
+)
 
 // GetOSState returns the platform specific StateOS
 func GetOSState(info os.FileInfo) StateOS {
@@ -106,4 +115,34 @@ func ReadOpen(path string) (*os.File, error) {
 	}
 
 	return os.NewFile(uintptr(handle), path), nil
+}
+
+// IsRemoved checks wheter the file held by f is removed.
+// On Windows IsRemoved reads the DeletePending flags using the GetFileInformationByHandleEx.
+// A file is not removed/unlinked as long as at least one process still own a
+// file handle. A delete file is only marked as deleted, and file attributes
+// can still be read. Only opening a file marked with 'DeletePending' will
+// fail.
+func IsRemoved(f *os.File) bool {
+	hdl := f.Fd()
+	if hdl == uintptr(syscall.InvalidHandle) {
+		return false
+	}
+
+	info := struct {
+		AllocationSize int64
+		EndOfFile      int64
+		NumberOfLinks  int32
+		DeletePending  bool
+		Directory      bool
+	}{}
+	infoSz := unsafe.Sizeof(info)
+
+	const class = 1 // FileStandardInfo
+	r1, _, _ := syscall.Syscall6(
+		procGetFileInformationByHandleEx.Addr(), 4, uintptr(hdl), class, uintptr(unsafe.Pointer(&info)), infoSz, 0, 0)
+	if r1 == 0 {
+		return true // assume file is removed if syscall errors
+	}
+	return info.DeletePending
 }

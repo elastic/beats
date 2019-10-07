@@ -17,16 +17,28 @@
 
 package postgresql
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func GetEnvDSN() string {
-	return os.Getenv("POSTGRESQL_DSN")
+//GetDSN returns the Data Source Name for a given host
+func GetDSN(host string) string {
+	return fmt.Sprintf("postgres://%s?sslmode=disable", host)
 }
 
+//GetEnvUsername returns the username
 func GetEnvUsername() string {
-	return os.Getenv("POSTGRESQL_USERNAME")
+	if username := os.Getenv("POSTGRESQL_USERNAME"); username != "" {
+		return username
+	}
+	return "postgres"
 }
 
+//GetEnvPassword returns the password
 func GetEnvPassword() string {
-	return os.Getenv("POSTGRESQL_PASSWORD")
+	if password := os.Getenv("POSTGRESQL_USERNAME"); password != "" {
+		return password
+	}
+	return "postgres"
 }

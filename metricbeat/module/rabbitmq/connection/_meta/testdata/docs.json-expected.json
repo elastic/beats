@@ -1,0 +1,100 @@
+[
+    {
+        "event": {
+            "dataset": "rabbitmq.connection",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "connection",
+            "period": 10000
+        },
+        "rabbitmq": {
+            "connection": {
+                "channel_max": 65535,
+                "channels": 2,
+                "client_provided": {
+                    "name": "Connection2"
+                },
+                "frame_max": 131072,
+                "host": "::1",
+                "name": "[::1]:60940 -\u003e [::1]:5672",
+                "octet_count": {
+                    "received": 3057,
+                    "sent": 3344
+                },
+                "packet_count": {
+                    "pending": 0,
+                    "received": 352,
+                    "sent": 352
+                },
+                "peer": {
+                    "host": "::1",
+                    "port": 60940
+                },
+                "port": 5672,
+                "type": "network"
+            },
+            "node": {
+                "name": "nodename"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        },
+        "user": {
+            "name": "guest"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.connection",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "connection",
+            "period": 10000
+        },
+        "rabbitmq": {
+            "connection": {
+                "channel_max": 65535,
+                "channels": 8,
+                "client_provided": {
+                    "name": "Connection1"
+                },
+                "frame_max": 131072,
+                "host": "::1",
+                "name": "[::1]:60938 -\u003e [::1]:5672",
+                "octet_count": {
+                    "received": 3764,
+                    "sent": 3840
+                },
+                "packet_count": {
+                    "pending": 0,
+                    "received": 376,
+                    "sent": 376
+                },
+                "peer": {
+                    "host": "::1",
+                    "port": 60938
+                },
+                "port": 5672,
+                "type": "network"
+            },
+            "node": {
+                "name": "nodename"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        },
+        "user": {
+            "name": "guest"
+        }
+    }
+]

@@ -29,7 +29,7 @@ type mongodbMessage struct {
 	ts time.Time
 
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	isResponse      bool
@@ -79,13 +79,13 @@ type mongodbConnectionData struct {
 // Represent a full mongodb transaction (request/reply)
 // These transactions are the end product of this parser
 type transaction struct {
-	cmdline      *common.CmdlineTuple
-	src          common.Endpoint
-	dst          common.Endpoint
-	responseTime int32
-	ts           time.Time
-	bytesOut     int
-	bytesIn      int
+	cmdline  *common.ProcessTuple
+	src      common.Endpoint
+	dst      common.Endpoint
+	ts       time.Time
+	endTime  time.Time
+	bytesOut int
+	bytesIn  int
 
 	mongodb common.MapStr
 
@@ -97,11 +97,18 @@ type transaction struct {
 	documents []interface{}
 }
 
+type msgKind byte
+
+const (
+	msgKindBody             msgKind = 0
+	msgKindDocumentSequence msgKind = 1
+)
+
 type opCode int32
 
 const (
 	opReply      opCode = 1
-	opMsg        opCode = 1000
+	opMsgLegacy  opCode = 1000
 	opUpdate     opCode = 2001
 	opInsert     opCode = 2002
 	opReserved   opCode = 2003
@@ -109,6 +116,7 @@ const (
 	opGetMore    opCode = 2005
 	opDelete     opCode = 2006
 	opKillCursor opCode = 2007
+	opMsg        opCode = 2013
 )
 
 // List of valid mongodb wire protocol operation codes
@@ -123,6 +131,7 @@ var opCodeNames = map[opCode]string{
 	2005: "OP_GET_MORE",
 	2006: "OP_DELETE",
 	2007: "OP_KILL_CURSORS",
+	2013: "OP_MSG",
 }
 
 func validOpcode(o opCode) bool {

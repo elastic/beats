@@ -1,11 +1,11 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-kvm]]
 == kvm module
 
-experimental[]
+beta[]
 
 This is the kvm module.
 

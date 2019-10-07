@@ -31,6 +31,10 @@ func stat(name string, statFunc func(name string) (os.FileInfo, error)) (FileInf
 		return nil, err
 	}
 
+	return wrap(info)
+}
+
+func wrap(info os.FileInfo) (FileInfo, error) {
 	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
 		return nil, errors.New("failed to get uid/gid")

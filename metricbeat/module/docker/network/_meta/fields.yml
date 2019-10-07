@@ -57,7 +57,6 @@
             Total number of outgoing packets.
     - name: inbound
       type: group
-      deprecated: 6.4
       description: >
         Incoming network stats since the container started.
       fields:
@@ -80,7 +79,6 @@
             Total number of incoming packets.
     - name: outbound
       type: group
-      deprecated: 6.4
       description: >
         Outgoing network stats since the container started.
       fields:

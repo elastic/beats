@@ -9,6 +9,13 @@
 //// include::../../libbeat/docs/dashboards.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
+ifdef::has_solutions[]
+TIP: For deeper observability into your infrastructure, use the
+{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
+{infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}. For setup details, see
+the {infra-guide}/index.html[Infrastructure Monitoring Guide].
+endif::has_solutions[]
+
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana. Before you can use
 the dashboards, you need to create the index pattern, +{beat_default_index_prefix}-*+, and
@@ -29,27 +36,25 @@ for your system. The command shown here loads the dashboards from the {beatname_
 package. For more options, such as loading customized dashboards, see
 {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards] in
 the _Beats Developer Guide_.
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 If you've configured the Logstash output, see
 <<load-dashboards-logstash>>.
 endif::[]
 
-ifdef::allplatforms[]
-
-ifeval::["{requires-sudo}"=="yes"]
-
+ifdef::requires-sudo[]
 include::../../libbeat/docs/shared-note-sudo.asciidoc[]
+endif::requires-sudo[]
 
-endif::[]
-
+ifdef::deb_os,rpm_os[]
 *deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 {beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
+endif::deb_os,rpm_os[]
 
-
+ifdef::mac_os[]
 *mac:*
 
 ["source","sh",subs="attributes"]
@@ -57,17 +62,36 @@ endif::[]
 ./{beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
 
+*brew:*
 
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+{beatname_lc} setup --dashboards
+----------------------------------------------------------------------
+endif::mac_os[]
+
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} setup --dashboards
+----------------------------------------------------------------------
+endif::linux_os[]
+
+ifdef::docker_platform[]
 *docker:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 docker run --net="host" {dockerimage} setup --dashboards
 ----------------------------------------------------------------------
+endif::docker_platform[]
 
+ifdef::win_os[]
+ifndef::win_only[]
 *win:*
-
-endif::allplatforms[]
+endif::win_only[]
 
 Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*).
@@ -79,8 +103,9 @@ and run:
 ----------------------------------------------------------------------
 PS > .{backslash}{beatname_lc}.exe setup --dashboards
 ----------------------------------------------------------------------
+endif::win_os[]
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 [[load-dashboards-logstash]]
 ==== Set up dashboards for Logstash output
 
@@ -93,8 +118,7 @@ credentials.
 TIP: The example shows a hard-coded password, but you should store sensitive
 values in the <<keystore,secrets keystore>>.
 
-ifdef::allplatforms[]
-
+ifdef::deb_os,rpm_os[]
 *deb and rpm:*
 
 ["source","sh",subs="attributes"]
@@ -106,8 +130,9 @@ ifdef::allplatforms[]
   -E output.elasticsearch.password={pwd} \
   -E setup.kibana.host=localhost:5601
 ----
+endif::deb_os,rpm_os[]
 
-
+ifdef::mac_os[]
 *mac:*
 
 ["source","sh",subs="attributes"]
@@ -120,7 +145,34 @@ ifdef::allplatforms[]
   -E setup.kibana.host=localhost:5601 
 ----
 
+*brew:*
 
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 
+----
+endif::mac_os[]
+
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 
+----
+endif::linux_os[]
+
+ifdef::docker_platform[]
 *docker:*
 
 ["source","sh",subs="attributes"]
@@ -132,11 +184,12 @@ docker run --net="host" {dockerimage} setup -e \
   -E output.elasticsearch.password={pwd} \
   -E setup.kibana.host=localhost:5601
 ----
+endif::docker_platform[]
 
-
+ifdef::win_os[]
+ifndef::win_only[]
 *win:*
-
-endif::allplatforms[]
+endif::win_only[]
 
 Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*).
@@ -153,7 +206,7 @@ PS > .{backslash}{beatname_lc}.exe setup -e `
   -E output.elasticsearch.password={pwd} `
   -E setup.kibana.host=localhost:5601 
 ----
+endif::win_os[]
 
-
-endif::only-elasticsearch[]
+endif::no-output-logstash[]
 

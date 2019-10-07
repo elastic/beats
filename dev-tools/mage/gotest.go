@@ -39,7 +39,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GoTestArgs are the arguments used for the "goTest*" targets and they define
+// GoTestArgs are the arguments used for the "go*Test" targets and they define
 // how "go test" is invoked. "go test" is always invoked with -v for verbose.
 type GoTestArgs struct {
 	TestName            string            // Test name used in logging.
@@ -51,6 +51,12 @@ type GoTestArgs struct {
 	OutputFile          string            // File to write verbose test output to.
 	JUnitReportFile     string            // File to write a JUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
+}
+
+// TestBinaryArgs are the arguments used when building binary for testing.
+type TestBinaryArgs struct {
+	Name       string // Name of the binary to build
+	InputFiles []string
 }
 
 func makeGoTestArgs(name string) GoTestArgs {
@@ -80,14 +86,25 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	return args
 }
 
+// DefaultTestBinaryArgs returns the default arguments for building
+// a binary for testing.
+func DefaultTestBinaryArgs() TestBinaryArgs {
+	return TestBinaryArgs{
+		Name: BeatName,
+	}
+}
+
 // GoTest invokes "go test" and reports the results to stdout. It returns an
-// error if there was any failuring executing the tests or if there were any
+// error if there was any failure executing the tests or if there were any
 // test failures.
 func GoTest(ctx context.Context, params GoTestArgs) error {
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
 	// Build args list to Go.
 	args := []string{"test", "-v"}
+	if params.Race {
+		args = append(args, "-race")
+	}
 	if len(params.Tags) > 0 {
 		args = append(args, "-tags", strings.Join(params.Tags, " "))
 	}
@@ -203,7 +220,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 }
 
 func makeCommand(ctx context.Context, env map[string]string, cmd string, args ...string) *exec.Cmd {
-	c := exec.CommandContext(ctx, "go", args...)
+	c := exec.CommandContext(ctx, cmd, args...)
 	c.Env = os.Environ()
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
@@ -324,4 +341,26 @@ func (s *GoTestSummary) String() string {
 	}
 
 	return strings.TrimRight(b.String(), "\n")
+}
+
+// BuildSystemTestBinary runs BuildSystemTestGoBinary with default values.
+func BuildSystemTestBinary() error {
+	return BuildSystemTestGoBinary(DefaultTestBinaryArgs())
+}
+
+// BuildSystemTestGoBinary build a binary for testing that is instrumented for
+// testing and measuring code coverage. The binary is only instrumented for
+// coverage when TEST_COVERAGE=true (default is false).
+func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
+	args := []string{
+		"test", "-c",
+		"-o", binArgs.Name + ".test",
+	}
+	if TestCoverage {
+		args = append(args, "-coverpkg", "./...")
+	}
+	if len(binArgs.InputFiles) > 0 {
+		args = append(args, binArgs.InputFiles...)
+	}
+	return sh.RunV("go", args...)
 }

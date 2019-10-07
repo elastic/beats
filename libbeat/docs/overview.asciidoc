@@ -1,7 +1,8 @@
-== Overview
+[[beats-reference]]
+== Beats overview
 
 ++++
-<titleabbrev>Beats overview</titleabbrev>
+<titleabbrev>Overview</titleabbrev>
 ++++
 
 {beats} are open source data shippers that you install as agents on your
@@ -12,7 +13,9 @@ for capturing:
 [horizontal]
 Audit data:: https://www.elastic.co/products/beats/auditbeat[Auditbeat]
 Log files:: https://www.elastic.co/products/beats/filebeat[Filebeat]
+Cloud data:: https://www.elastic.co/products/beats/functionbeat[Functionbeat]
 Availability:: https://www.elastic.co/products/beats/heartbeat[Heartbeat]
+Systemd journals:: https://www.elastic.co/downloads/beats/journalbeat[Journalbeat]
 Metrics:: https://www.elastic.co/products/beats/metricbeat[Metricbeat]
 Network traffic:: https://www.elastic.co/products/beats/packetbeat[Packetbeat]
 Windows event logs:: https://www.elastic.co/products/beats/winlogbeat[Winlogbeat]
@@ -22,9 +25,16 @@ https://www.elastic.co/products/logstash[{ls}], where you can further process
 and enhance the data, before visualizing it in
 https://www.elastic.co/products/logstash[{kib}].
 
-image:./images/beats-platform.png[Beats Platform]
+image::./images/beats-platform.png[Beats Platform]
 
 To get started, see <<getting-started>>.
+
+Want to get up and running quickly with infrastructure metrics monitoring and
+centralized log analytics? Try out the
+{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
+{infra-guide}/logs-ui-overview.html[Logs] UIs
+in {kib}. For setup details, see the {infra-guide}/index.html[Infrastructure
+Monitoring Guide].
 
 [float]
 === Need to capture other kinds of data?

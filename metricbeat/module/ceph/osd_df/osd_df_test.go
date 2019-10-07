@@ -49,14 +49,17 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	event := events[0]
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	nodeInfo := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), nodeInfo.StringToPrint())
 
 	//check osd0 df info
-	nodeInfo := events[0]
 	assert.EqualValues(t, 0, nodeInfo["pg_num"])
 	assert.EqualValues(t, 52325356, nodeInfo["total.byte"])
 	assert.EqualValues(t, 1079496, nodeInfo["used.byte"])
@@ -67,7 +70,7 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "osd.0", nodeInfo["name"])
 
 	//check osd1 df info
-	nodeInfo = events[1]
+	nodeInfo = events[1].MetricSetFields
 	assert.EqualValues(t, 0, nodeInfo["pg_num"])
 	assert.EqualValues(t, 52325356, nodeInfo["total.byte"])
 	assert.EqualValues(t, 1079496, nodeInfo["used.byte"])

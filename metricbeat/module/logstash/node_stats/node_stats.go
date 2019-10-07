@@ -18,65 +18,92 @@
 package node_stats
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/helper"
+	"fmt"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
-const (
-	metricsetName = "node_stats"
-	namespace     = "logstash.node.stats"
-)
-
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(logstash.ModuleName, metricsetName, New,
+	mb.Registry.MustAddMetricSet(logstash.ModuleName, "node_stats", New,
 		mb.WithHostParser(hostParser),
-		mb.WithNamespace(namespace),
+		mb.WithNamespace("logstash.node.stats"),
 		mb.DefaultMetricSet(),
 	)
 }
+
+const (
+	nodeStatsPath = "/_node/stats"
+)
 
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		PathConfigKey: "path",
-		DefaultPath:   "_node/stats",
+		DefaultPath:   nodeStatsPath,
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
-	http *helper.HTTP
+	*logstash.MetricSet
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The logstash node_stats metricset is beta")
-
-	http, err := helper.NewHTTP(base)
+	ms, err := logstash.NewMetricSet(base)
 	if err != nil {
 		return nil, err
 	}
+
+	if ms.XPack {
+		logstashVersion, err := logstash.GetVersion(ms)
+		if err != nil {
+			return nil, err
+		}
+
+		arePipelineGraphAPIsAvailable := logstash.ArePipelineGraphAPIsAvailable(logstashVersion)
+		if err != nil {
+			return nil, err
+		}
+
+		if !arePipelineGraphAPIsAvailable {
+			const errorMsg = "The %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
+			return nil, fmt.Errorf(errorMsg, ms.FullyQualifiedName(), logstash.PipelineGraphAPIsAvailableVersion, logstashVersion)
+		}
+
+		ms.HTTP.SetURI(ms.HTTP.GetURI() + "?vertices=true")
+	}
+
 	return &MetricSet{
-		base,
-		http,
+		ms,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	content, err := m.http.FetchContent()
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
-		return
+		if m.XPack {
+			m.Logger().Error(err)
+			return nil
+		}
+		return err
 	}
 
-	eventMapping(r, content)
+	if !m.XPack {
+		return eventMapping(r, content)
+	}
+
+	err = eventMappingXPack(r, m, content)
+	if err != nil {
+		m.Logger().Error(err)
+	}
+
+	return nil
 }

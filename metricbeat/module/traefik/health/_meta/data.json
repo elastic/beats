@@ -1,28 +1,33 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "traefik.health",
+        "duration": 115000,
+        "module": "traefik"
     },
     "metricset": {
-        "host": "127.0.0.1:8080",
-        "module": "traefik",
         "name": "health",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "name": "traefik",
+        "type": "traefik"
     },
     "traefik": {
         "health": {
             "response": {
                 "avg_time": {
-                    "us": 32
+                    "us": 15
                 },
-                "count": 15,
+                "count": 18,
                 "status_codes": {
-                    "404": 15
+                    "200": 17,
+                    "404": 1
                 }
             },
             "uptime": {
-                "sec": 1944
+                "sec": 64283
             }
         }
     }

@@ -101,7 +101,7 @@ func WTF(format string, v ...interface{}) {
 func Recover(msg string) {
 	if r := recover(); r != nil {
 		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
-		globalLogger().WithOptions(zap.AddCallerSkip(2)).
+		globalLogger().WithOptions(zap.AddCallerSkip(1)).
 			Error(msg, zap.Any("panic", r), zap.Stack("stack"))
 	}
 }

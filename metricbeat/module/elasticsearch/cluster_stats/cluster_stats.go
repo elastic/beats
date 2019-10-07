@@ -20,8 +20,6 @@ package cluster_stats
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -44,8 +42,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
-
 	ms, err := elasticsearch.NewMetricSet(base, clusterStatsPath)
 	if err != nil {
 		return nil, err
@@ -54,34 +50,40 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+clusterStatsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
-		return
+		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "trying to fetch cluster stats from a non master node.")
-		return
+		m.Logger().Debug("trying to fetch cluster stats from a non-master node")
+		return nil
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
-		return
+		return err
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+clusterStatsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
-		return
+		return err
 	}
 
 	if m.MetricSet.XPack {
-		eventMappingXPack(r, m, *info, content)
+		err = eventMappingXPack(r, m, *info, content)
+		if err != nil {
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
+			m.Logger().Error(err)
+			return nil
+		}
 	} else {
-		eventMapping(r, *info, content)
+		return eventMapping(r, *info, content)
 	}
+
+	return nil
 }

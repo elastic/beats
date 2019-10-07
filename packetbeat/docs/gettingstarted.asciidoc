@@ -4,7 +4,7 @@
 The best way to understand the value of a network packet analytics system like
 Packetbeat is to try it on your own traffic.
 
-include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 * <<packetbeat-installation>>
 * <<packetbeat-configuration>>
@@ -17,7 +17,7 @@ include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 [[packetbeat-installation]]
 === Step 1: Install Packetbeat
 
-include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -62,20 +62,7 @@ endif::[]
 [[docker]]
 *docker:*
 
-ifeval::["{release-state}"=="unreleased"]
-
-Version {stack-version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source", "shell", subs="attributes"]
-------------------------------------------------
-docker pull {dockerimage}
-------------------------------------------------
-
-endif::[]
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[mac]]
 *mac:*
@@ -96,6 +83,27 @@ tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{version}-linux-x86_64.tar.gz
+tar xzvf packetbeat-{version}-linux-x86_64.tar.gz
+----------------------------------------------------------------------
+
+endif::[]
+
 [[win]]
 *win:*
 
@@ -107,9 +115,13 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-. Download and install WinPcap from this
-http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
-a driver to enable packet capturing.
+. Download and install a packet sniffing library,
+such as https://nmap.org/npcap/[Npcap], that implements the
+https://github.com/the-tcpdump-group/libpcap[libpcap] interfaces.
++
+If you use Npcap, make sure you install it in WinPcap API-compatible mode. If
+you plan to capture traffic from the loopback device (127.0.0.1 traffic), also
+select the option to support loopback traffic. 
 
 . Download the Packetbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/packetbeat[downloads page].
@@ -139,7 +151,7 @@ more information about these options, see <<configuring-howto-packetbeat>>.
 [[packetbeat-configuration]]
 === Step 2: Configure Packetbeat
 
-include::../../libbeat/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
 
 To configure Packetbeat:
 
@@ -192,9 +204,6 @@ packetbeat.protocols:
 - type: dns
   ports: [53]
 
-  include_authorities: true
-  include_additionals: true
-
 - type: http
   ports: [80, 8080, 8081, 5000, 8002]
 
@@ -202,7 +211,7 @@ packetbeat.protocols:
   ports: [11211]
 
 - type: mysql
-  ports: [3306]
+  ports: [3306,3307]
 
 - type: pgsql
   ports: [5432]
@@ -220,34 +229,29 @@ packetbeat.protocols:
   ports: [9042]
 
 - type: tls
-  ports: [443]
+  ports: [443, 993, 995, 5223, 8443, 8883, 9243]
 
 ----------------------------------------------------------------------
 +
-include::../../libbeat/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
-include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-:requires-sudo: yes
-include::../../libbeat/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
-include::../../libbeat/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 [[packetbeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
-:requires-sudo: yes
-:allplatforms:
-include::../../libbeat/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-:requires-sudo: yes
-:allplatforms:
-include::../../libbeat/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/docs/dashboards.asciidoc[]
 
 [[packetbeat-starting]]
 === Step 5: Start Packetbeat
@@ -260,14 +264,7 @@ NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
 start Packetbeat in the foreground.
 
-*deb:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc} start
-----------------------------------------------------------------------
-
-*rpm:*
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
@@ -276,22 +273,21 @@ sudo service {beatname_lc} start
 
 *docker:*
 
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-docker run {dockerimage}
-----------------------------------------------------------------------
+See <<running-on-docker>>.
 
-*mac:*
+*mac and linux:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo chown root packetbeat.yml <1>
-sudo ./packetbeat -e -c packetbeat.yml -d "publish"
+sudo ./packetbeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Packetbeat as root, so you need to change ownership of the
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]in
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
+
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
 
 *win:*
 
@@ -329,10 +325,13 @@ To make it easier for you to get application performance insights
 from packet data, we have created example {beatname_uc} dashboards. You loaded
 the dashboards earlier when you ran the `setup` command.
 
-include::../../libbeat/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/docs/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
+TIP: To populate the client locations map in the overview dashboard, follow the
+steps described in <<{beatname_lc}-geoip>>.
+
 [role="screenshot"]
-image:./images/packetbeat-statistics.png[Packetbeat statistics]
+image::./images/packetbeat-statistics.png[Packetbeat statistics]

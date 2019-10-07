@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -31,39 +30,28 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+const (
+	fieldsYml = "testdata/fields.yml"
+)
+
 func TestNewGenerator(t *testing.T) {
-	beatDir := tmpPath()
-	defer teardown(beatDir)
+	tmpDir := tmpPath(t)
+	defer os.RemoveAll(tmpDir)
+
+	data, err := ioutil.ReadFile("./testdata/fields.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	v, _ := common.NewVersion("7.0.0")
 	// checks for fields.yml
-	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "nonexistent"), "7.0", *v)
-	assert.Error(t, err)
-
-	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0", *v)
-	assert.NoError(t, err)
+	generator, err := NewGenerator("beat-index", "mybeat.", data, "7.0", *v, true)
+	if err != nil {
+		t.Fatal(err)
+	}
 	assert.Equal(t, "7.0", generator.beatVersion)
-	assert.Equal(t, "beat-index", generator.indexName)
-	assert.Equal(t, filepath.Join(beatDir, "fields.yml"), generator.fieldsYaml)
+	assert.Equal(t, "beat-index-*", generator.indexName)
 
-	// creates file dir and sets name
-	expectedDir := filepath.Join(beatDir, "_meta/kibana.generated/6/index-pattern")
-	assert.Equal(t, expectedDir, generator.targetDir)
-	_, err = os.Stat(generator.targetDir)
-	assert.NoError(t, err)
-
-	v, _ = common.NewVersion("5.0.0")
-	// checks for fields.yml
-	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0", *v)
-	assert.NoError(t, err)
-
-	expectedDir = filepath.Join(beatDir, "_meta/kibana.generated/5/index-pattern")
-	assert.Equal(t, expectedDir, generator.targetDir)
-	_, err = os.Stat(generator.targetDir)
-
-	assert.NoError(t, err)
-
-	assert.Equal(t, "mybeat.json", generator.targetFilename)
 }
 
 func TestCleanName(t *testing.T) {
@@ -82,140 +70,126 @@ func TestCleanName(t *testing.T) {
 	}
 }
 
-func TestGenerateFieldsYaml(t *testing.T) {
-	beatDir := tmpPath()
-	defer teardown(beatDir)
-
-	v, _ := common.NewVersion("6.0.0")
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1", *v)
-
-	_, err = generator.Generate()
-	assert.NoError(t, err)
-
-	generator.fieldsYaml = ""
-	_, err = generator.Generate()
-	assert.Error(t, err)
-}
-
-func TestDumpToFile5x(t *testing.T) {
-	beatDir := tmpPath()
-	defer teardown(beatDir)
-	v, _ := common.NewVersion("5.0.0")
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1", *v)
-
-	_, err = generator.Generate()
-	assert.NoError(t, err)
-
-	generator.targetDir = "./non-existing/something"
-
-	_, err = generator.Generate()
-	assert.Error(t, err)
-}
-
-func TestDumpToFileDefault(t *testing.T) {
-	beatDir := tmpPath()
-	defer teardown(beatDir)
-
-	v, _ := common.NewVersion("7.0.0")
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1", *v)
-
-	_, err = generator.Generate()
-	assert.NoError(t, err)
-
-	generator.targetDir = "./non-existing/something"
-
-	_, err = generator.Generate()
-	assert.Error(t, err)
-}
-
 func TestGenerate(t *testing.T) {
-	beatDir := tmpPath()
-	defer teardown(beatDir)
+	tmpDir := tmpPath(t)
+	defer os.RemoveAll(tmpDir)
 
-	v5, _ := common.NewVersion("5.0.0")
-	v6, _ := common.NewVersion("6.0.0")
-	versions := []*common.Version{v5, v6}
+	v7, _ := common.NewVersion("7.0.0-alpha1")
+	versions := []*common.Version{v7}
+	var d common.MapStr
 	for _, version := range versions {
-		generator, err := NewGenerator("beat-*", "b eat ?!", beatDir, "7.0.0-alpha1", *version)
-		assert.NoError(t, err)
+		data, err := ioutil.ReadFile("./testdata/fields.yml")
+		if err != nil {
+			t.Fatal(err)
+		}
+		generator, err := NewGenerator("beat", "b eat ?!", data, version.String(), *version, true)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-		_, err = generator.Generate()
-		assert.NoError(t, err)
+		d, err = generator.Generate()
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
-	tests := []map[string]string{
-		{"existing": "beat-5.json", "created": "_meta/kibana.generated/5/index-pattern/beat.json"},
-		{"existing": "beat-6.json", "created": "_meta/kibana.generated/6/index-pattern/beat.json"},
+	tests := []compare{
+		{
+			existing: "testdata/beat-6.json",
+			created:  d,
+		},
 	}
-	testGenerate(t, beatDir, tests, true)
+
+	testGenerate(t, tests, true)
+}
+
+type compare struct {
+	existing string
+	created  common.MapStr
 }
 
 func TestGenerateExtensive(t *testing.T) {
-	beatDir, err := filepath.Abs("./testdata/extensive")
-	if err != nil {
-		panic(err)
-	}
-	defer teardown(beatDir)
+	tmpDir := tmpPath(t)
+	defer os.RemoveAll(tmpDir)
 
-	version5, _ := common.NewVersion("5.0.0")
-	version6, _ := common.NewVersion("6.0.0")
-	versions := []*common.Version{version5, version6}
+	version7, _ := common.NewVersion("7.0.0-alpha1")
+	versions := []*common.Version{version7}
+
+	var d common.MapStr
 	for _, version := range versions {
-		generator, err := NewGenerator("metricbeat-*", "metric be at ?!", beatDir, "7.0.0-alpha1", *version)
-		assert.NoError(t, err)
+		data, err := ioutil.ReadFile("testdata/extensive/fields.yml")
+		if err != nil {
+			t.Fatal(err)
+		}
+		generator, err := NewGenerator("metricbeat", "metric be at ?!", data, version.String(), *version, true)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-		_, err = generator.Generate()
-		assert.NoError(t, err)
+		d, err = generator.Generate()
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
-	tests := []map[string]string{
-		{"existing": "metricbeat-5.json", "created": "_meta/kibana.generated/5/index-pattern/metricbeat.json"},
-		{"existing": "metricbeat-6.json", "created": "_meta/kibana.generated/6/index-pattern/metricbeat.json"},
+	tests := []compare{
+		{
+			existing: "testdata/extensive/metricbeat-6.json",
+			created:  d,
+		},
 	}
-	testGenerate(t, beatDir, tests, false)
+	testGenerate(t, tests, false)
 }
 
-func testGenerate(t *testing.T, beatDir string, tests []map[string]string, sourceFilters bool) {
+func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 	for _, test := range tests {
 		// compare default
-		existing, err := readJson(filepath.Join(beatDir, test["existing"]))
-		assert.NoError(t, err)
-		created, err := readJson(filepath.Join(beatDir, test["created"]))
-		assert.NoError(t, err)
+		existing, err := readJson(test.existing)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		var attrExisting, attrCreated common.MapStr
 
-		if strings.Contains(test["existing"], "6") {
-			assert.Equal(t, existing["version"], created["version"])
+		if strings.Contains(test.existing, "6") {
+			assert.Equal(t, existing["version"], test.created["version"])
 
 			objExisting := existing["objects"].([]interface{})[0].(map[string]interface{})
-			objCreated := created["objects"].([]interface{})[0].(map[string]interface{})
+			objCreated := test.created["objects"].([]common.MapStr)[0]
 
 			assert.Equal(t, objExisting["version"], objCreated["version"])
 			assert.Equal(t, objExisting["id"], objCreated["id"])
 			assert.Equal(t, objExisting["type"], objCreated["type"])
 
 			attrExisting = objExisting["attributes"].(map[string]interface{})
-			attrCreated = objCreated["attributes"].(map[string]interface{})
+			attrCreated = objCreated["attributes"].(common.MapStr)
 		} else {
 			attrExisting = existing
-			attrCreated = created
+			attrCreated = test.created
 		}
 
 		// check fieldFormatMap
 		var ffmExisting, ffmCreated map[string]interface{}
 		err = json.Unmarshal([]byte(attrExisting["fieldFormatMap"].(string)), &ffmExisting)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatal(err)
+		}
 		err = json.Unmarshal([]byte(attrCreated["fieldFormatMap"].(string)), &ffmCreated)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatal(err)
+		}
 		assert.Equal(t, ffmExisting, ffmCreated)
 
 		// check fields
 		var fieldsExisting, fieldsCreated []map[string]interface{}
 		err = json.Unmarshal([]byte(attrExisting["fields"].(string)), &fieldsExisting)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatal(err)
+		}
 		err = json.Unmarshal([]byte(attrCreated["fields"].(string)), &fieldsCreated)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatal(err)
+		}
 		assert.Equal(t, len(fieldsExisting), len(fieldsCreated))
 		for _, e := range fieldsExisting {
 			idx := find(fieldsCreated, "name", e["name"].(string))
@@ -227,9 +201,13 @@ func testGenerate(t *testing.T, beatDir string, tests []map[string]string, sourc
 		if sourceFilters {
 			var sfExisting, sfCreated []map[string]interface{}
 			err = json.Unmarshal([]byte(attrExisting["sourceFilters"].(string)), &sfExisting)
-			assert.NoError(t, err)
+			if err != nil {
+				t.Fatal(err)
+			}
 			err = json.Unmarshal([]byte(attrCreated["sourceFilters"].(string)), &sfCreated)
-			assert.NoError(t, err)
+			if err != nil {
+				t.Fatal(err)
+			}
 			assert.Equal(t, len(sfExisting), len(sfCreated))
 			for _, e := range sfExisting {
 				idx := find(sfCreated, "value", e["value"].(string))
@@ -254,6 +232,7 @@ func readJson(path string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	var data map[string]interface{}
 	err = json.Unmarshal(f, &data)
 	if err != nil {
@@ -262,17 +241,10 @@ func readJson(path string) (map[string]interface{}, error) {
 	return data, nil
 }
 
-func tmpPath() string {
-	beatDir, err := filepath.Abs("./testdata")
+func tmpPath(t testing.TB) string {
+	tmpDir, err := ioutil.TempDir("", "kibana-tests")
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-	return beatDir
-}
-
-func teardown(path string) {
-	if path == "" {
-		path = tmpPath()
-	}
-	os.RemoveAll(filepath.Join(path, "_meta"))
+	return tmpDir
 }

@@ -27,12 +27,11 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/logp"
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	"github.com/elastic/go-ucfg/yaml"
-
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
@@ -147,7 +146,7 @@ func OverwriteConfigOpts(options []ucfg.Option) {
 
 func LoadFile(path string) (*Config, error) {
 	if IsStrictPerms() {
-		if err := ownerHasExclusiveWritePerms(path); err != nil {
+		if err := OwnerHasExclusiveWritePerms(path); err != nil {
 			return nil, err
 		}
 	}
@@ -187,6 +186,14 @@ func (c *Config) Path() string {
 
 func (c *Config) PathOf(field string) string {
 	return c.access().PathOf(field, ".")
+}
+
+func (c *Config) Remove(name string, idx int) (bool, error) {
+	return c.access().Remove(name, idx, configOpts...)
+}
+
+func (c *Config) Has(name string, idx int) (bool, error) {
+	return c.access().Has(name, idx, configOpts...)
 }
 
 func (c *Config) HasField(name string) bool {
@@ -258,12 +265,13 @@ func (c *Config) PrintDebugf(msg string, params ...interface{}) {
 		}
 	}
 
-	debugStr := configDebugString(c, filtered)
+	debugStr := DebugString(c, filtered)
 	if debugStr != "" {
 		configDebugf(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
 	}
 }
 
+// Enabled return the configured enabled value or true by default.
 func (c *Config) Enabled() bool {
 	testEnabled := struct {
 		Enabled bool `config:"enabled"`
@@ -350,7 +358,9 @@ func (ns *ConfigNamespace) IsSet() bool {
 	return ns.config != nil
 }
 
-func configDebugString(c *Config, filterPrivate bool) string {
+// DebugString prints a human readable representation of the underlying config using
+// JSON formatting.
+func DebugString(c *Config, filterPrivate bool) string {
 	var bufs []string
 
 	if c.IsDict() {
@@ -406,10 +416,10 @@ func filterDebugObject(c interface{}) {
 	}
 }
 
-// ownerHasExclusiveWritePerms asserts that the current user or root is the
+// OwnerHasExclusiveWritePerms asserts that the current user or root is the
 // owner of the config file and that the config file is (at most) writable by
 // the owner or root (e.g. group and other cannot have write access).
-func ownerHasExclusiveWritePerms(name string) error {
+func OwnerHasExclusiveWritePerms(name string) error {
 	if runtime.GOOS == "windows" {
 		return nil
 	}
@@ -424,7 +434,7 @@ func ownerHasExclusiveWritePerms(name string) error {
 	perm := info.Mode().Perm()
 
 	if fileUID != 0 && euid != fileUID {
-		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
+		return fmt.Errorf(`config file ("%v") must be owned by the user identifier `+
 			`(uid=%v) or root`, name, euid)
 	}
 

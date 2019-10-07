@@ -1,0 +1,55 @@
+[
+    {
+        "@timestamp": "2018-12-31T23:00:27.000-02:00",
+        "cisco.asa.message_id": "999999",
+        "event.action": "firewall-rule",
+        "event.code": 999999,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-7-999999: This message is not filtered.",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "host.hostname": "beats",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 0,
+        "process.name": "asa",
+        "process.pid": 1234,
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa"
+        ]
+    },
+    {
+        "@timestamp": "2018-12-31T23:02:12.000-02:00",
+        "cisco.asa.message_id": "106001",
+        "cisco.asa.source_interface": "eth0",
+        "destination.ip": "192.168.33.12",
+        "destination.port": 443,
+        "event.action": "firewall-rule",
+        "event.code": 106001,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-2-106001: Inbound TCP connection denied from 10.13.12.11/45321 to 192.168.33.12/443 flags URG+SYN+RST on interface eth0",
+        "event.outcome": "deny",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "host.hostname": "beats",
+        "input.type": "log",
+        "log.level": "critical",
+        "log.offset": 174,
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "process.name": "asa",
+        "process.pid": 1234,
+        "service.type": "cisco",
+        "source.ip": "10.13.12.11",
+        "source.port": 45321,
+        "tags": [
+            "cisco-asa"
+        ]
+    }
+]

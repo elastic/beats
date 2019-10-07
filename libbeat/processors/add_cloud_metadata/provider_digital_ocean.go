@@ -24,16 +24,24 @@ import (
 )
 
 // DigitalOcean Metadata Service
-func newDoMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
-	doSchema := func(m map[string]interface{}) common.MapStr {
-		out, _ := s.Schema{
-			"instance_id": c.StrFromNum("droplet_id"),
-			"region":      c.Str("region"),
-		}.Apply(m)
-		return out
-	}
-	doMetadataURI := "/metadata/v1.json"
+var doMetadataFetcher = provider{
+	Name: "digitalocean",
 
-	fetcher, err := newMetadataFetcher(config, "digitalocean", nil, metadataHost, doSchema, doMetadataURI)
-	return fetcher, err
+	Local: true,
+
+	Create: func(provider string, config *common.Config) (metadataFetcher, error) {
+		doSchema := func(m map[string]interface{}) common.MapStr {
+			out, _ := s.Schema{
+				"instance": s.Object{
+					"id": c.StrFromNum("droplet_id"),
+				},
+				"region": c.Str("region"),
+			}.Apply(m)
+			return out
+		}
+		doMetadataURI := "/metadata/v1.json"
+
+		fetcher, err := newMetadataFetcher(config, provider, nil, metadataHost, doSchema, doMetadataURI)
+		return fetcher, err
+	},
 }

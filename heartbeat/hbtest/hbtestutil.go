@@ -19,6 +19,7 @@ package hbtest
 
 import (
 	"crypto/x509"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -26,12 +27,16 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common/mapval"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/common/x509util"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 // HelloWorldBody is the body of the HelloWorldHandler.
@@ -51,6 +56,23 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 	)
 }
 
+// SizedResponseHandler responds with 200 to any request with a body
+// exactly the size of the `bytes` argument, where each byte is the
+// character 'x'
+func SizedResponseHandler(bytes int) http.HandlerFunc {
+	var body strings.Builder
+	for i := 0; i < bytes; i++ {
+		body.WriteString("x")
+	}
+
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+			io.WriteString(w, body.String())
+		},
+	)
+}
+
 // ServerPort takes an httptest.Server and returns its port as a uint16.
 func ServerPort(server *httptest.Server) (uint16, error) {
 	u, err := url.Parse(server.URL)
@@ -65,46 +87,73 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 }
 
 // TLSChecks validates the given x509 cert at the given position.
-func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{
-		"tls": mapval.Map{
-			"rtt.handshake.us":             mapval.IsDuration,
+func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"tls": map[string]interface{}{
+			"rtt.handshake.us":             isdef.IsDuration,
 			"certificate_not_valid_before": certificate.NotBefore,
 			"certificate_not_valid_after":  certificate.NotAfter,
 		},
 	})
 }
 
-// MonitorChecks creates a skima.Validator that represents the "monitor" field present
+// BaseChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
-func MonitorChecks(id string, host string, ip string, scheme string, status string) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{
-		"monitor": mapval.Map{
-			// TODO: This is only optional because, for some reason, TCP returns
-			// this value, but HTTP does not. We should fix this
-			"host":        mapval.Optional(mapval.IsEqual(host)),
-			"duration.us": mapval.IsDuration,
-			"id":          id,
-			"ip":          ip,
-			"scheme":      scheme,
+// If IP is set to "" this will check that the field is not present
+func BaseChecks(ip string, status string, typ string) validator.Validator {
+	var ipCheck isdef.IsDef
+	if len(ip) > 0 {
+		ipCheck = isdef.IsEqual(ip)
+	} else {
+		ipCheck = isdef.Optional(isdef.IsEqual(ip))
+	}
+	return lookslike.MustCompile(map[string]interface{}{
+		"monitor": map[string]interface{}{
+			"ip":          ipCheck,
+			"duration.us": isdef.IsDuration,
 			"status":      status,
+			"id":          isdef.IsNonEmptyString,
+			"name":        isdef.IsString,
+			"type":        typ,
+			"check_group": isdef.IsString,
 		},
 	})
 }
 
-// TCPBaseChecks checks the minimum TCP response, which is only issued
-// without further fields when the endpoint does not respond.
-func TCPBaseChecks(port uint16) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{"tcp.port": port})
+// SummaryChecks validates the "summary" field and its subfields.
+func SummaryChecks(up int, down int) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"summary": map[string]interface{}{
+			"up":   uint16(up),
+			"down": uint16(down),
+		},
+	})
+}
+
+// SimpleURLChecks returns a check for a simple URL
+// with only a scheme, host, and port
+func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) validator.Validator {
+
+	hostPort := host
+	if port != 0 {
+		hostPort = fmt.Sprintf("%s:%d", host, port)
+	}
+
+	u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, hostPort))
+	require.NoError(t, err)
+
+	return lookslike.MustCompile(map[string]interface{}{
+		"url": wrappers.URLFields(u),
+	})
 }
 
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
-// consist of a message (or a mapval isdef that can match the message) and a type under the error key.
+// consist of a message (or a lookslike isdef that can match the message) and a type under the error key.
 // The message is checked only as a substring since exact string matches can be fragile due to platform differences.
-func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{
-		"error": mapval.Map{
-			"message": mapval.IsStringContaining(msgSubstr),
+func ErrorChecks(msgSubstr string, errType string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": map[string]interface{}{
+			"message": isdef.IsStringContaining(msgSubstr),
 			"type":    errType,
 		},
 	})
@@ -112,11 +161,8 @@ func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
 
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
-func RespondingTCPChecks(port uint16) mapval.Validator {
-	return mapval.Compose(
-		TCPBaseChecks(port),
-		mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
-	)
+func RespondingTCPChecks() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": isdef.IsDuration})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded

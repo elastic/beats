@@ -30,6 +30,7 @@ type Connector struct {
 	processors    *processors.Processors
 	eventMeta     common.EventMetadata
 	dynamicFields *common.MapStrPointer
+	timeSeries    bool
 }
 
 type connectorConfig struct {
@@ -58,8 +59,10 @@ func NewConnector(pipeline beat.Pipeline, c *common.Config, dynFields *common.Ma
 
 func (c *Connector) Connect() (beat.Client, error) {
 	return c.pipeline.ConnectWith(beat.ClientConfig{
-		EventMetadata: c.eventMeta,
-		Processor:     c.processors,
-		DynamicFields: c.dynamicFields,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: c.eventMeta,
+			Processor:     c.processors,
+			DynamicFields: c.dynamicFields,
+		},
 	})
 }

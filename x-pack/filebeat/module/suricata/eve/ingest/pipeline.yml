@@ -1,0 +1,231 @@
+---
+description: Pipeline for parsing Suricata EVE logs
+
+processors:
+  - lowercase:
+      field: suricata.eve.http.http_method
+      target_field: http.request.method
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.status
+      target_field: http.response.status_code
+      ignore_missing: true
+  - append:
+      if: ctx.suricata?.eve?.http?.hostname != null
+      value: '{{suricata.eve.http.hostname}}'
+      field: destination.domain
+  - remove:
+      field: suricata.eve.http.hostname
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: >
+        def domain = ctx.destination?.domain;
+        if (domain instanceof Collection) {
+          domain = domain.stream().distinct().collect(Collectors.toList());
+          if (domain.length == 1) {
+            domain = domain[0];
+          }
+          ctx.destination.domain = domain;
+        }
+      ignore_failure: true
+  - set:
+      if: ctx?.destination?.domain != null
+      field: url.domain
+      value: '{{destination.domain}}'
+  - grok:
+      field: suricata.eve.http.url
+      patterns:
+        - '%{PATH:url.path}(?:\?%{QUERY:url.query})?(?:#%{ANY:url.fragment})?'
+      ignore_missing: true
+      pattern_definitions:
+        PATH: '[^?#]*'
+        QUERY: '[^#]*'
+        ANY: '.*'
+  - rename:
+      field: suricata.eve.http.url
+      target_field: url.original
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.http_refer
+      target_field: http.request.referrer
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.length
+      target_field: http.response.body.bytes
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.fileinfo.filename
+      target_field: file.path
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.fileinfo.size
+      target_field: file.size
+      ignore_missing: true
+  - lowercase:
+      field: network.transport
+      ignore_missing: true
+  - lowercase:
+      field: suricata.eve.event_type
+      ignore_missing: true
+  - convert:
+      field: suricata.eve.alert.category
+      target_field: message
+      type: string
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.action
+      target_field: event.outcome
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.severity
+      target_field: event.severity
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.flow.pkts_toclient
+      target_field: destination.packets
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.flow.pkts_toserver
+      target_field: source.packets
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.flow.bytes_toclient
+      target_field: destination.bytes
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.flow.bytes_toserver
+      target_field: source.bytes
+      ignore_missing: true
+  - script:
+      lang: painless
+      source: >
+        long getOrZero(def map, def key) {
+          if (map!=null && map[key]!=null) {
+            return map[key];
+          }
+          return 0;
+        }
+        def network=ctx['network'], source=ctx['source'], dest=ctx['destination'];
+        def sp=getOrZero(source,'packets'), sb=getOrZero(source,'bytes'), dp=getOrZero(dest,'packets'), db=getOrZero(dest,'bytes');
+        if (sb+db+sp+dp > 0) {
+          if (network == null) {
+            network=new HashMap();
+            ctx['network']=network;
+          }
+          if (sb+db > 0) {
+            network['bytes'] = sb+db;
+          }
+          if(sp+dp>0) {
+            network['packets'] = sp+dp;
+          }
+        }
+  - date:
+      field: suricata.eve.flow.start
+      target_field: event.start
+      formats:
+        - ISO8601
+      ignore_failure: true
+  - date:
+      field: suricata.eve.flow.end
+      target_field: event.end
+      formats:
+        - ISO8601
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: >
+        Instant ins(def d) {
+          try {
+            return Instant.parse(d);
+          } catch(Exception e) {
+            return null;
+          }
+        }
+        def ev = ctx['event'];
+        if (ev != null) {
+          def start = ins(ev['start']);
+          def end = ins(ev['end']);
+          if (start != null && end != null && !start.isAfter(end)) {
+            ev['duration'] = Duration.between(start,end).toNanos();
+          }
+        }
+  - lowercase:
+      field: suricata.eve.proto
+      target_field: network.transport
+      ignore_missing: true
+  - lowercase:
+      field: suricata.eve.app_proto
+      target_field: network.protocol
+      ignore_missing: true
+  - user_agent:
+      field: suricata.eve.http.http_user_agent
+      ignore_missing: true
+  - geoip:
+      if: ctx.source?.geo == null
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  - geoip:
+      if: ctx.destination?.geo == null
+      field: destination.ip
+      target_field: destination.geo
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: destination.ip
+      target_field: destination.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - rename:
+      field: destination.as.asn
+      target_field: destination.as.number
+      ignore_missing: true
+  - rename:
+      field: destination.as.organization_name
+      target_field: destination.as.organization.name
+      ignore_missing: true
+  - remove:
+      field:
+        - suricata.eve.app_proto
+        - suricata.eve.flow.end
+        - suricata.eve.flow.start
+        - suricata.eve.http.http_method
+        - suricata.eve.http.http_user_agent
+      ignore_missing: true
+  - script:
+      lang: painless
+      source: >
+        def t = ctx.suricata?.eve?.event_type;
+        if (t == "stats") {
+          ctx['event']['kind'] = "metric";
+        } else if (t == "alert") {
+          ctx['event']['kind'] = "alert";
+          ctx['event']['category'] = "network_traffic";
+        } else {
+          ctx['event']['kind'] = "event";
+          ctx['event']['category'] = "network_traffic";
+        }
+
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

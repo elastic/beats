@@ -28,7 +28,9 @@ This script does the following:
   remote
 * if the --create_pr flag is used, it uses the GitHub API to create the PR
   for you. Note that this requires you to have a Github token with the
-  public_repo scope in the `~/.elastic/github.token` file
+  public_repo scope in the `~/.elastic/github.token` file. This token
+  should be also authorized to Elastic organization so as to work with single-sign-on.
+  (see https://help.github.com/en/articles/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on)
 
 Note that you need to take the commit hashes from `git log` on the
 from_branch, copying the IDs from Github doesn't work in case we squashed the
@@ -131,11 +133,11 @@ def main():
 
         # create PR
         request = session.post(base + "/pulls", json=dict(
-            title="Cherry-pick #{} to {}: {}".format(args.pr_number, args.to_branch, original_pr["title"]),
+            title="Cherry-pick #{} to {}: {}".format(args.pr_number, args.to_branch, original_pr["title"].encode('utf-8')),
             head=remote_user + ":" + tmp_branch,
             base=args.to_branch,
             body="Cherry-pick of PR #{} to {} branch. Original message: \n\n{}"
-            .format(args.pr_number, args.to_branch, original_pr["body"])
+            .format(args.pr_number, args.to_branch, original_pr["body"].encode('utf-8'))
         ))
         if request.status_code > 299:
             print("Creating PR failed: {}".format(request.json()))

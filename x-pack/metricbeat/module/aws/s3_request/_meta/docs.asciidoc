@@ -1,0 +1,32 @@
+The s3_request metricset of aws module allows you to monitor your AWS S3 buckets. `s3_request` metricset
+fetches Cloudwatch daily storage metrics for each S3 bucket from
+https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.html[S3 CloudWatch Request Metrics for Buckets].
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS s3_request metrics.
+----
+ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+----
+
+[float]
+=== Dashboard
+
+The aws s3_request metricset and s3_daily_storage metricset shares one predefined dashboard. For example:
+
+image::./images/metricbeat-aws-s3-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 86400s
+  metricsets:
+    - s3_request
+  access_key_id: '<access_key_id>'
+  secret_access_key: '<secret_access_key>'
+  session_token: '<session_token>'
+----

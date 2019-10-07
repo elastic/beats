@@ -47,6 +47,8 @@ func TestGlobManager(t *testing.T) {
 	assert.NoError(t, err)
 	err = ioutil.WriteFile(dir+"/config2.yml", content, 0644)
 	assert.NoError(t, err)
+	err = ioutil.WriteFile(dir+"/config2-alt.yml.disabled", content, 0644)
+	assert.NoError(t, err)
 	err = ioutil.WriteFile(dir+"/config3.yml.disabled", content, 0644)
 	assert.NoError(t, err)
 
@@ -59,15 +61,17 @@ func TestGlobManager(t *testing.T) {
 
 	assert.True(t, manager.Exists("config1"))
 	assert.True(t, manager.Exists("config2"))
+	assert.True(t, manager.Exists("config2-alt"))
 	assert.True(t, manager.Exists("config3"))
 	assert.False(t, manager.Exists("config4"))
 
 	assert.True(t, manager.Enabled("config1"))
 	assert.True(t, manager.Enabled("config2"))
+	assert.False(t, manager.Enabled("config2-alt"))
 	assert.False(t, manager.Enabled("config3"))
 
 	assert.Equal(t, len(manager.ListEnabled()), 2)
-	assert.Equal(t, len(manager.ListDisabled()), 1)
+	assert.Equal(t, len(manager.ListDisabled()), 2)
 
 	// Test disable
 	if err = manager.Disable("config2"); err != nil {
@@ -75,7 +79,7 @@ func TestGlobManager(t *testing.T) {
 	}
 
 	assert.Equal(t, len(manager.ListEnabled()), 1)
-	assert.Equal(t, len(manager.ListDisabled()), 2)
+	assert.Equal(t, len(manager.ListDisabled()), 3)
 
 	enabled := manager.ListEnabled()
 	assert.Equal(t, enabled[0].Name, "config1")
@@ -87,11 +91,13 @@ func TestGlobManager(t *testing.T) {
 	}
 
 	assert.Equal(t, len(manager.ListEnabled()), 2)
-	assert.Equal(t, len(manager.ListDisabled()), 1)
+	assert.Equal(t, len(manager.ListDisabled()), 2)
 
 	disabled := manager.ListDisabled()
 	assert.Equal(t, disabled[0].Name, "config2")
 	assert.Equal(t, disabled[0].Enabled, false)
+	assert.Equal(t, disabled[1].Name, "config2-alt")
+	assert.Equal(t, disabled[1].Enabled, false)
 
 	// Check correct files layout:
 	files, err := filepath.Glob(dir + "/*")
@@ -101,7 +107,32 @@ func TestGlobManager(t *testing.T) {
 
 	assert.Equal(t, files, []string{
 		filepath.Join(dir, "config1.yml"),
+		filepath.Join(dir, "config2-alt.yml.disabled"),
 		filepath.Join(dir, "config2.yml.disabled"),
 		filepath.Join(dir, "config3.yml"),
 	})
+}
+
+func TestCfgFileSorting(t *testing.T) {
+	cfgFiles := byCfgFileDisplayNames{
+		&CfgFile{
+			"foo",
+			"modules.d/foo.yml",
+			false,
+		},
+		&CfgFile{
+			"foo-variant",
+			"modules.d/foo-variant.yml",
+			false,
+		},
+		&CfgFile{
+			"fox",
+			"modules.d/fox.yml",
+			false,
+		},
+	}
+
+	assert.True(t, cfgFiles.Less(0, 1))
+	assert.False(t, cfgFiles.Less(1, 0))
+	assert.True(t, cfgFiles.Less(0, 2))
 }

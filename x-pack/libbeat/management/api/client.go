@@ -25,7 +25,7 @@ type Client struct {
 }
 
 // ConfigFromURL generates a full kibana client config from an URL
-func ConfigFromURL(kibanaURL string) (*kibana.ClientConfig, error) {
+func ConfigFromURL(kibanaURL string, config *common.Config) (*kibana.ClientConfig, error) {
 	data, err := url.Parse(kibanaURL)
 	if err != nil {
 		return nil, err
@@ -37,14 +37,21 @@ func ConfigFromURL(kibanaURL string) (*kibana.ClientConfig, error) {
 		password, _ = data.User.Password()
 	}
 
-	return &kibana.ClientConfig{
-		Protocol: data.Scheme,
-		Host:     data.Host,
-		Path:     data.Path,
-		Username: username,
-		Password: password,
-		Timeout:  defaultTimeout,
-	}, nil
+	// Lets pick up any configuration from either the YAML or from the -E flags.
+	// and merge it with the provided URL.
+	kibana := kibana.ClientConfig{}
+	if err := config.Unpack(&kibana); err != nil {
+		return nil, err
+	}
+
+	kibana.Protocol = data.Scheme
+	kibana.Host = data.Host
+	kibana.Path = data.Path
+	kibana.Username = username
+	kibana.Password = password
+	kibana.Timeout = defaultTimeout
+
+	return &kibana, nil
 }
 
 // NewClient creates and returns a kibana client
@@ -60,14 +67,20 @@ func NewClient(cfg *kibana.ClientConfig) (*Client, error) {
 
 // do a request to the API and unmarshall the message, error if anything fails
 func (c *Client) request(method, extraPath string,
-	params common.MapStr, headers http.Header, message interface{}) (int, error) {
+	body interface{}, headers http.Header, resp interface{}) (int, error) {
 
-	paramsJSON, err := json.Marshal(params)
+	bodyJSON, err := json.Marshal(body)
 	if err != nil {
 		return 400, err
 	}
 
-	statusCode, result, err := c.client.Request(method, extraPath, nil, headers, bytes.NewBuffer(paramsJSON))
+	statusCode, result, err := c.client.Request(
+		method,
+		extraPath,
+		nil,
+		headers,
+		bytes.NewBuffer(bodyJSON),
+	)
 	if err != nil {
 		return statusCode, err
 	}
@@ -75,7 +88,7 @@ func (c *Client) request(method, extraPath string,
 	if statusCode >= 300 {
 		err = extractError(result)
 	} else {
-		if err = json.Unmarshal(result, message); err != nil {
+		if err = json.Unmarshal(result, resp); err != nil {
 			return statusCode, errors.Wrap(err, "error unmarshaling Kibana response")
 		}
 	}
@@ -83,12 +96,10 @@ func (c *Client) request(method, extraPath string,
 	return statusCode, err
 }
 
-func extractError(result []byte) error {
-	var kibanaResult struct {
-		Message string
+func extractError(b []byte) error {
+	var result BaseResponse
+	if err := json.Unmarshal(b, &result); err != nil {
+		return errors.Wrap(err, "error while parsing Kibana response")
 	}
-	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return errors.Wrap(err, "parsing Kibana response")
-	}
-	return errors.New(kibanaResult.Message)
+	return errors.New(result.Error.Message)
 }

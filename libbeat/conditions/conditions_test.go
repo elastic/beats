@@ -68,8 +68,9 @@ var secdTestEvent = &beat.Event{
 			"ppid":     1,
 			"state":    "running",
 			"username": "monica",
-			"keywords": []string{"foo", "bar"},
+			"keywords": []interface{}{"foo", "bar"},
 		},
+		"tags":  []string{"auditbeat", "prod", "security"},
 		"type":  "process",
 		"final": false,
 	},
@@ -105,10 +106,12 @@ var httpResponseTestEvent = &beat.Event{
 }
 
 func testConfig(t *testing.T, expected bool, event *beat.Event, config *Config) {
+	t.Helper()
 	logp.TestingSetup()
 	cond, err := NewCondition(config)
-	assert.Nil(t, err)
-	assert.Equal(t, expected, cond.Check(event))
+	if assert.NoError(t, err) {
+		assert.Equal(t, expected, cond.Check(event))
+	}
 }
 
 func TestCombinedCondition(t *testing.T) {

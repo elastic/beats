@@ -1,5 +1,6 @@
 - name: server
   type: group
+  release: ga
   description: >
     Contains envoy proxy server stats
   fields:

@@ -27,11 +27,24 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
+
+	errw "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
+
+// ErrNotFound returned when we cannot find any dashboard to import.
+type ErrNotFound struct {
+	ErrorString string
+}
+
+// Error returns the human readable error.
+func (e *ErrNotFound) Error() string { return e.ErrorString }
+
+func newErrNotFound(s string, a ...interface{}) *ErrNotFound {
+	return &ErrNotFound{fmt.Sprintf(s, a...)}
+}
 
 // MessageOutputter is a function type for injecting status logging
 // into this module.
@@ -41,27 +54,23 @@ type Importer struct {
 	cfg     *Config
 	version common.Version
 
-	loader Loader
+	loader KibanaLoader
+	fields common.MapStr
 }
 
-type Loader interface {
-	ImportIndex(file string) error
-	ImportDashboard(file string) error
-	statusMsg(msg string, a ...interface{})
-	Close() error
-}
+// NewImporter creates a new dashboard importer
+func NewImporter(version common.Version, cfg *Config, loader KibanaLoader, fields common.MapStr) (*Importer, error) {
 
-func NewImporter(version common.Version, cfg *Config, loader Loader) (*Importer, error) {
-
-	// Current max version is 6
+	// Current max version is 7
 	if version.Major > 6 {
-		version.Major = 6
+		version.Major = 7
 	}
 
 	return &Importer{
 		cfg:     cfg,
 		version: version,
 		loader:  loader,
+		fields:  fields,
 	}, nil
 }
 
@@ -70,12 +79,12 @@ func (imp Importer) Import() error {
 	if imp.cfg.URL != "" || imp.cfg.File != "" {
 		err := imp.ImportArchive()
 		if err != nil {
-			return fmt.Errorf("Error importing URL/file: %v", err)
+			return errw.Wrap(err, "Error importing URL/file")
 		}
 	} else {
 		err := imp.ImportKibanaDir(imp.cfg.Dir)
 		if err != nil {
-			return fmt.Errorf("Error importing directory %s: %v", imp.cfg.Dir, err)
+			return errw.Wrapf(err, "Error importing directory %s", imp.cfg.Dir)
 		}
 	}
 	return nil
@@ -93,7 +102,7 @@ func (imp Importer) ImportFile(fileType string, file string) error {
 	if fileType == "dashboard" {
 		return imp.loader.ImportDashboard(file)
 	} else if fileType == "index-pattern" {
-		return imp.loader.ImportIndex(file)
+		return imp.loader.ImportIndexFile(file)
 	}
 	return fmt.Errorf("Unexpected file type %s", fileType)
 }
@@ -131,6 +140,7 @@ func (imp Importer) unzip(archive, target string) error {
 	if err != nil {
 		return err
 	}
+	defer reader.Close()
 
 	// Closure to close the files on each iteration
 	unzipFile := func(file *zip.File) error {
@@ -149,6 +159,11 @@ func (imp Importer) unzip(archive, target string) error {
 		if file.FileInfo().IsDir() {
 			return os.MkdirAll(filePath, file.Mode())
 		}
+
+		if err = os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+			return fmt.Errorf("failed making directory for file %v: %v", filePath, err)
+		}
+
 		fileReader, err := file.Open()
 		if err != nil {
 			return err
@@ -281,16 +296,20 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 func (imp Importer) ImportKibanaDir(dir string) error {
 	var err error
 
-	versionPath := strconv.Itoa(imp.version.Major)
+	versionPath := "7"
 
 	dir = path.Join(dir, versionPath)
 
 	imp.loader.statusMsg("Importing directory %v", dir)
 
 	if _, err := os.Stat(dir); err != nil {
-		return fmt.Errorf("No directory %s", dir)
+		return newErrNotFound("No directory %s", dir)
 	}
 
+	// Loads the internal index pattern
+	if imp.fields != nil {
+		imp.loader.ImportIndex(imp.fields)
+	}
 	check := []string{}
 	if !imp.cfg.OnlyDashboards {
 		check = append(check, "index-pattern")
@@ -309,7 +328,7 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	}
 
 	if len(types) == 0 {
-		return fmt.Errorf("The directory %s does not contain the %s subdirectory."+
+		return newErrNotFound("The directory %s does not contain the %s subdirectory."+
 			" There is nothing to import into Kibana.", dir, strings.Join(check, " or "))
 	}
 
@@ -326,8 +345,8 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	}
 
 	if wantDashboards && !importDashboards {
-		return fmt.Errorf("No dashboards to import. Please make sure the %s directory contains a dashboard directory.",
-			dir)
+		return newErrNotFound("No dashboards to import. Please make sure the %s directory "+
+			"contains a dashboard directory.", dir)
 	}
 	return nil
 }

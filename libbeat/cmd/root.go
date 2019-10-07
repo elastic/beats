@@ -23,13 +23,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 func init() {
@@ -54,38 +52,6 @@ type BeatsRootCmd struct {
 	KeystoreCmd   *cobra.Command
 }
 
-// GenRootCmd returns the root command to use for your beat. It takes the beat name, version,
-// and run command, which will be called if no args are given (for backwards compatibility).
-//
-// Deprecated: Use GenRootCmdWithSettings instead.
-func GenRootCmd(name, version string, beatCreator beat.Creator) *BeatsRootCmd {
-	return GenRootCmdWithRunFlags(name, version, beatCreator, nil)
-}
-
-// GenRootCmdWithRunFlags returns the root command to use for your beat. It takes
-// beat name, version, run command, and runFlags. runFlags parameter must the flagset used by
-// run command.
-//
-// Deprecated: Use GenRootCmdWithSettings instead.
-func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
-	return GenRootCmdWithIndexPrefixWithRunFlags(name, name, version, beatCreator, runFlags)
-}
-
-// GenRootCmdWithIndexPrefixWithRunFlags returns the root command to use for your beat. It takes
-// beat name, index prefix, version, run command, and runFlags. runFlags parameter must the flagset used by
-// run command.
-//
-// Deprecated: Use GenRootCmdWithSettings instead.
-func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
-	settings := instance.Settings{
-		Name:        name,
-		IndexPrefix: indexPrefix,
-		Version:     version,
-		RunFlags:    runFlags,
-	}
-	return GenRootCmdWithSettings(beatCreator, settings)
-}
-
 // GenRootCmdWithSettings returns the root command to use for your beat. It take the
 // run command, which will be called if no args are given (for backwards compatibility),
 // and beat settings
@@ -94,29 +60,24 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 		settings.IndexPrefix = settings.Name
 	}
 
-	name := settings.Name
-	version := settings.Version
-	indexPrefix := settings.IndexPrefix
-	runFlags := settings.RunFlags
-
 	rootCmd := &BeatsRootCmd{}
-	rootCmd.Use = name
+	rootCmd.Use = settings.Name
 
 	// Due to a dependence upon the beat name, the default config file path
-	err := cfgfile.ChangeDefaultCfgfileFlag(name)
+	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 	if err != nil {
 		panic(fmt.Errorf("failed to set default config file path: %v", err))
 	}
 
 	// must be updated prior to CLI flag handling.
 
-	rootCmd.RunCmd = genRunCmd(settings, beatCreator, runFlags)
-	rootCmd.SetupCmd = genSetupCmd(name, indexPrefix, version, beatCreator)
-	rootCmd.VersionCmd = genVersionCmd(name, version)
-	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
-	rootCmd.ExportCmd = genExportCmd(name, indexPrefix, version)
-	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
-	rootCmd.KeystoreCmd = genKeystoreCmd(name, indexPrefix, version, runFlags)
+	rootCmd.RunCmd = genRunCmd(settings, beatCreator)
+	rootCmd.ExportCmd = genExportCmd(settings)
+	rootCmd.TestCmd = genTestCmd(settings, beatCreator)
+	rootCmd.SetupCmd = genSetupCmd(settings, beatCreator)
+	rootCmd.KeystoreCmd = genKeystoreCmd(settings)
+	rootCmd.VersionCmd = GenVersionCmd(settings)
+	rootCmd.CompletionCmd = genCompletionCmd(settings, rootCmd)
 
 	// Root command is an alias for run
 	rootCmd.Run = rootCmd.RunCmd.Run

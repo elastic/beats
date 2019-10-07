@@ -22,10 +22,8 @@ kibana:
 
 # Collects all module docs
 .PHONY: collect-docs
-collect-docs: python-env
-	@rm -rf docs/modules
-	@mkdir -p docs/modules
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+collect-docs:
+	mage CollectAll
 
 # Collects all module configs
 .PHONY: configs
@@ -36,7 +34,7 @@ configs: python-env
 	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@rm -rf modules.d
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/modules_collector.py --docs_branch=$(DOCS_BRANCH)
+	mage config
 	@chmod go-w modules.d/*
 	@# Enable system by default:
 	@if [ -f modules.d/system.yml.disabled ]; then mv modules.d/system.yml.disabled modules.d/system.yml; fi
@@ -77,5 +75,4 @@ test-module: python-env update metricbeat.test
 assets:
 	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
 	mkdir -p include/fields
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -pkg include -in ${ES_BEATS}/metricbeat/_meta/fields.common.yml -out include/fields.go $(BEAT_NAME)
-	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)
+	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include -priority asset.LibbeatFieldsPri ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)

@@ -48,7 +48,8 @@ type inputOutletConfig struct {
 	Processors           processors.PluginConfig `config:"processors"`
 
 	// implicit event fields
-	Type string `config:"type"` // input.type
+	Type        string `config:"type"`         // input.type
+	ServiceType string `config:"service.type"` // service.type
 
 	// hidden filebeat modules settings
 	Module  string `config:"_module_name"`  // hidden setting
@@ -81,68 +82,12 @@ func NewOutletFactory(
 // Inputs and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
-func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *common.MapStrPointer) (Outleter, error) {
-	config := inputOutletConfig{}
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	processors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, err
-	}
-
-	setMeta := func(to common.MapStr, key, value string) {
-		if value != "" {
-			to[key] = value
-		}
-	}
-
-	meta := common.MapStr{}
-	setMeta(meta, "pipeline", config.Pipeline)
-
-	fields := common.MapStr{}
-	setMeta(fields, "module", config.Module)
-	setMeta(fields, "name", config.Fileset)
-	if len(fields) > 0 {
-		fields = common.MapStr{
-			"fileset": fields,
-		}
-	}
-	if config.Type != "" {
-		fields["prospector"] = common.MapStr{
-			"type": config.Type,
-		}
-		fields["input"] = common.MapStr{
-			"type": config.Type,
-		}
-	}
-
-	client, err := p.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: config.EventMetadata,
-		DynamicFields: dynFields,
-		Meta:          meta,
-		Fields:        fields,
-		Processor:     processors,
-		Events:        f.eventer,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	outlet := newOutlet(client, f.wgEvents)
-	if f.done != nil {
-		return CloseOnSignal(outlet, f.done), nil
-	}
-	return outlet, nil
+func (f *OutletFactory) Create(p beat.Pipeline) Connector {
+	return &pipelineConnector{parent: f, pipeline: p}
 }
 
-func (*clientEventer) Closing()   {}
-func (*clientEventer) Closed()    {}
-func (*clientEventer) Published() {}
-
-func (c *clientEventer) FilteredOut(_ beat.Event) {}
-func (c *clientEventer) DroppedOnPublish(_ beat.Event) {
-	c.wgEvents.Done()
-}
+func (e *clientEventer) Closing()                        {}
+func (e *clientEventer) Closed()                         {}
+func (e *clientEventer) Published()                      {}
+func (e *clientEventer) FilteredOut(evt beat.Event)      {}
+func (e *clientEventer) DroppedOnPublish(evt beat.Event) { e.wgEvents.Done() }

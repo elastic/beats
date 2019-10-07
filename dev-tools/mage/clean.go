@@ -33,12 +33,8 @@ var DefaultCleanPaths = []string{
 	"fields.yml",
 	"_meta/fields.generated.yml",
 	"_meta/kibana.generated",
-	"_meta/kibana/5/index-pattern/{{.BeatName}}.json",
 	"_meta/kibana/6/index-pattern/{{.BeatName}}.json",
-
-	"../x-pack/{{.BeatName}}/build",
-	"../x-pack/{{.BeatName}}/{{.BeatName}}",
-	"../x-pack/{{.BeatName}}/{{.BeatName}}.exe",
+	"_meta/kibana/7/index-pattern/{{.BeatName}}.json",
 }
 
 // Clean clean generated build artifacts.

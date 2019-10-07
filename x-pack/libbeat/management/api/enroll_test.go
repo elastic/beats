@@ -18,7 +18,7 @@ import (
 func TestEnrollValid(t *testing.T) {
 	beatUUID, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error while generating Beat UUID: %v", err)
+		t.Fatalf("error while generating Beat ID: %v", err)
 	}
 
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func TestEnrollValid(t *testing.T) {
 		assert.Equal(t, "6.3.0", request.Version)
 		assert.Equal(t, "beatname", request.Name)
 
-		fmt.Fprintf(w, `{"access_token": "fooo"}`)
+		fmt.Fprintf(w, `{"success": true, "item": "fooo"}`)
 	}))
 	defer server.Close()
 
@@ -62,15 +62,47 @@ func TestEnrollValid(t *testing.T) {
 }
 
 func TestEnrollError(t *testing.T) {
-	beatUUID := uuid.NewV4()
+	tests := map[string]struct {
+		body         string
+		responseCode int
+	}{
+		"invalid enrollment token": {
+			body:         `{"success": false,  "error": { "message": "Invalid enrollment token", "code": 400 }}`,
+			responseCode: 400,
+		},
+		//NOTE(ph): I believe this is now fixed in the API.
+		"invalid token response": {
+			body:         `{"success": true,  "item": ""}`,
+			responseCode: 200,
+		},
+	}
 
-	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, `{"message": "Invalid enrollment token"}`, 400)
-	}))
-	defer server.Close()
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			beatUUID, err := uuid.NewV4()
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	accessToken, err := client.Enroll("metricbeat", "beatname", "6.3.0", "myhostname.lan", beatUUID, "thisismyenrollmenttoken")
+			server, client := newServerClientPair(t, http.HandlerFunc(func(
+				w http.ResponseWriter,
+				r *http.Request,
+			) {
+				http.Error(w, test.body, test.responseCode)
+			}))
+			defer server.Close()
 
-	assert.NotNil(t, err)
-	assert.Equal(t, "", accessToken)
+			accessToken, err := client.Enroll(
+				"metricbeat",
+				"beatname",
+				"6.3.0",
+				"myhostname.lan",
+				beatUUID,
+				"thisismyenrollmenttoken",
+			)
+
+			assert.NotNil(t, err)
+			assert.Equal(t, "", accessToken)
+		})
+	}
 }

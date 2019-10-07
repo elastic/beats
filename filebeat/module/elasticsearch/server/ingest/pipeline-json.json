@@ -1,0 +1,122 @@
+{
+    "description": "Pipeline for parsing the Elasticsearch server log file in JSON format.",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "json": {
+                "field": "message",
+                "target_field": "elasticsearch.server"
+            }
+        },
+        {
+            "drop": {
+                "if": "ctx.elasticsearch.server.type != 'server'"
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.server.type"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.server.level",
+                "target_field": "log.level"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.server.component",
+                "target_field": "elasticsearch.component"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "cluster.name",
+                "path": "elasticsearch.server"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.server.cluster.name",
+                "target_field": "elasticsearch.cluster.name"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "node.name",
+                "path": "elasticsearch.server"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.server.node.name",
+                "target_field": "elasticsearch.node.name"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "cluster.uuid",
+                "path": "elasticsearch.server"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.server.cluster.uuid",
+                "target_field": "elasticsearch.cluster.uuid",
+                "ignore_missing": true
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "node.id",
+                "path": "elasticsearch.server"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.server.node.id",
+                "target_field": "elasticsearch.node.id",
+                "ignore_missing": true
+            }
+        },
+        {
+            "grok": {
+                "field": "elasticsearch.server.message",
+                "pattern_definitions": {
+                    "GREEDYMULTILINE": "(.|\n)*",
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*",
+                    "GC_ALL": "\\[gc\\]\\[%{NUMBER:elasticsearch.server.gc.overhead_seq}\\] overhead, spent \\[%{NUMBER:elasticsearch.server.gc.collection_duration.time:float}%{DATA:elasticsearch.server.gc.collection_duration.unit}\\] collecting in the last \\[%{NUMBER:elasticsearch.server.gc.observation_duration.time:float}%{DATA:elasticsearch.server.gc.observation_duration.unit}\\]",
+                    "GC_YOUNG": "\\[gc\\]\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]%{SPACE}%{GREEDYMULTILINE:message}"
+                },
+                "patterns": [
+                    "%{GC_ALL}",
+                    "%{GC_YOUNG}",
+                    "((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}%{GREEDYMULTILINE:message}"
+                ]
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.server.message"
+            }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.server.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                "ignore_failure": true
+            }
+        }
+    ]
+}

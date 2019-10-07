@@ -1,36 +1,65 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "system.memory",
+        "duration": 115000,
+        "module": "system"
     },
     "metricset": {
-        "module": "system",
-        "name": "memory",
-        "rtt": 115
+        "name": "memory"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "memory": {
             "actual": {
-                "free": 1311326208,
+                "free": 671084544,
                 "used": {
-                    "bytes": 2827796480,
-                    "pct": 0.6832
+                    "bytes": 362037248,
+                    "pct": 0.3504
                 }
             },
-            "free": 588627968,
+            "free": 340848640,
+            "hugepages": {
+                "default_size": 2097152,
+                "free": 0,
+                "reserved": 0,
+                "surplus": 0,
+                "swap": {
+                    "out": {
+                        "fallback": 0,
+                        "pages": 0
+                    }
+                },
+                "total": 0,
+                "used": {
+                    "bytes": 0,
+                    "pct": 0
+                }
+            },
             "swap": {
-                "free": 23846912,
-                "total": 1073737728,
+                "free": 0,
+                "in": {
+                    "pages": 0
+                },
+                "out": {
+                    "pages": 0
+                },
+                "readahead": {
+                    "cached": 0,
+                    "pages": 0
+                },
+                "total": 0,
                 "used": {
-                    "bytes": 1049890816,
-                    "pct": 0.9778
+                    "bytes": 0,
+                    "pct": 0
                 }
             },
-            "total": 4139122688,
+            "total": 1033121792,
             "used": {
-                "bytes": 3550494720,
-                "pct": 0.8578
+                "bytes": 692273152,
+                "pct": 0.6701
             }
         }
     }

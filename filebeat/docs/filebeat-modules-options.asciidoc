@@ -1,4 +1,4 @@
-:modulename: apache2 mysql
+:modulename: apache mysql
 
 [id="configuration-{beatname_lc}-modules"]
 == Specify which modules to run
@@ -18,7 +18,7 @@ implement and deploy a log monitoring solution.
 * <<enable-modules-cli>>
 * <<enable-modules-config-file>>
 
-include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
 
 When you enable modules, you can also
 <<specify-variable-settings,specify variable settings>> to change the default
@@ -38,13 +38,13 @@ available in {beatname_uc}. You can enable or disable specific module configurat
 under `modules.d` by running the
 <<modules-command,`modules enable` or `modules disable`>> commands.
 
-For example, to enable the `apache2` and `mysql` configs in the `modules.d`
+For example, to enable the `apache` and `mysql` configs in the `modules.d`
 directory, you use:
 
 include::./include/enable-modules-command.asciidoc[]
 
 Then when you run {beatname_uc}, it loads the corresponding module configurations
-specified in the `modules.d` directory (for example, `modules.d/apache2.yml` and
+specified in the `modules.d` directory (for example, `modules.d/apache.yml` and
 `modules.d/mysql.yml`).
 
 To see a list of enabled and disabled modules, run:

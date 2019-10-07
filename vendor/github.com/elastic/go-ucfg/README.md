@@ -89,4 +89,4 @@ The above uses `Counter` as the config variable. ucfg assures that the value is 
 
 ucfg has the following requirements:
 
-* Golang 1.7+
+* Golang 1.10+

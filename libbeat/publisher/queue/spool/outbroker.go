@@ -83,7 +83,18 @@ var errRetry = errors.New("retry")
 
 func newOutBroker(ctx *spoolCtx, qu *pq.Queue, flushTimeout time.Duration) (*outBroker, error) {
 	reader := qu.Reader()
-	avail, err := reader.Available()
+
+	var (
+		avail uint
+		err   error
+	)
+	func() {
+		if err = reader.Begin(); err != nil {
+			return
+		}
+		defer reader.Done()
+		avail, err = reader.Available()
+	}()
 	if err != nil {
 		return nil, err
 	}

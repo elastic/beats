@@ -1,0 +1,43 @@
+# GitHub CODEOWNERS definition
+# See: https://help.github.com/articles/about-codeowners/
+
+# * @elastic/beats
+
+# libbeat
+# /libbeat/ @elastic/beats
+# /auditbeat/ @elastic/beats
+# /packetbeat/ @elastic/beats
+# /filebeat/ @elastic/beats
+# /metricbeat/ @elastic/beats
+# /journalbeat/ @elastic/beats
+# /winlogbeat/ @elastic/beats
+
+# Auditbeat
+/auditbeat/module/ @elastic/siem
+/x-pack/auditbeat/ @elastic/siem
+
+# Packetbeat
+/packetbeat/protos/ @elastic/siem
+/x-pack/packetbeat/ @elastic/siem
+
+# Filebeat
+/filebeat/module/ @elastic/infrastructure
+/filebeat/module/elasticsearch/ @elastic/stack-monitoring
+/filebeat/module/kibana/ @elastic/stack-monitoring
+/filebeat/module/logstash/ @elastic/stack-monitoring
+/x-pack/filebeat/module/ @elastic/infrastructure
+/x-pack/filebeat/module/suricata/ @elastic/secops
+
+# Metricbeat
+/metricbeat/module/ @elastic/infrastructure
+/metricbeat/module/elasticsearch/ @elastic/stack-monitoring
+/metricbeat/module/kibana/ @elastic/stack-monitoring
+/metricbeat/module/logstash/ @elastic/stack-monitoring
+/metricbeat/module/beat/ @elastic/stack-monitoring
+/x-pack/metricbeat/module/ @elastic/infrastructure
+
+# Heartbeat
+/heartbeat/ @elastic/uptime
+
+# Winlogbeat
+/x-pack/winlogbeat/ @elastic/siem

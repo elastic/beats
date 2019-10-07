@@ -7,6 +7,8 @@
 <titleabbrev>Docker</titleabbrev>
 ++++
 
+deprecated:[7.2.0, Use `container` input instead.]
+
 Use the `docker` input to read logs from Docker containers.
 
 This input searches for container logs under its path, and parse them into
@@ -42,6 +44,24 @@ The list of Docker container IDs to read logs from. Specify
 The base path where Docker logs are located. The default
 is `/var/lib/docker/containers`.
 
+===== `containers.paths`
+
+The list of paths to read logs from. This can be used as an alternative to
+`containers.ids` for other runtimes that use the same logging format as docker
+but place their logs in different paths. For example when using CRI-O runtime in
+Kubernetes the following configuration can be used:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: docker
+  containers.paths:
+    - /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
+----
+
+When `containers.paths` is used, `containers.path` is ignored.
+
+
 ===== `containers.stream`
 
 Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
@@ -72,6 +92,11 @@ all containers under the default Docker containers path:
     ids:
       - "*"
 ----
+
+===== `cri.force`
+
+Force CRI format parsing. This disables automatic format detection, use it when you know format is CRI
+to gain some performance. This is false by default.
 
 include::../inputs/input-common-harvester-options.asciidoc[]
 

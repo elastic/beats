@@ -1,4 +1,5 @@
 ifndef::has_module_steps[]
+ifndef::no-output-logstash[]
 . Configure the output. {beatname_uc} supports a variety of
 <<configuring-output,outputs>>, but typically you'll either send events directly
 to {es}, or to {ls} for additional processing.
@@ -6,8 +7,12 @@ to {es}, or to {ls} for additional processing.
 To send output directly to {es} (without using {ls}), set the location of the
 {es} installation:
 +
---
 endif::[]
+ifdef::no-output-logstash[]
+. Configure the {es} output by setting the location of the {es} installation:
++
+endif::[]
+endif::has_module_steps[]
 * If you're running our
 https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service]
 on Elastic Cloud, specify your <<configure-cloud-id,Cloud ID>>. For example:
@@ -26,15 +31,13 @@ output.elasticsearch:
   hosts: ["myEShost:9200"]
 ----------------------------------------------------------------------
 ifndef::has_module_steps[]
---
 +
-ifeval::["{beatname_lc}"!="filebeat" and "{beatname_lc}"!="winlogbeat"]
+ifndef::no-output-logstash[]
 To send output to {ls}, 
 <<logstash-output,Configure the {ls} output>> instead. For all other
 outputs, see <<configuring-output>>.
 endif::[]
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat")]
-To send output to {ls}, make sure you configure the Logstash output in
-<<config-{beatname_lc}-logstash>>. For all other outputs, see <<configuring-output>>.
+ifdef::no-output-logstash[]
+For more information, see <<configuring-output>>.
 endif::[]
-endif::[]
+endif::has_module_steps[]
