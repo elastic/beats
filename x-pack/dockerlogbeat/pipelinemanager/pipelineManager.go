@@ -35,7 +35,7 @@ type Pipeline struct {
 
 // PipelineManager is a handler into the map of pipelines used by the plugin
 type PipelineManager struct {
-	mu     *sync.Mutex
+	mu     sync.Mutex
 	Logger *logp.Logger
 	// pipelines key: config hash
 	pipelines map[string]*Pipeline
@@ -46,8 +46,8 @@ type PipelineManager struct {
 // NewPipelineManager creates a new Pipeline map
 func NewPipelineManager(logCfg *common.Config) *PipelineManager {
 	return &PipelineManager{
-		Logger:    logp.NewLogger("dockerlogbeat"),
-		mu:        new(sync.Mutex),
+		Logger: logp.NewLogger("dockerlogbeat"),
+		//mu:        new(sync.Mutex),
 		pipelines: make(map[string]*Pipeline),
 		clients:   make(map[string]*ClientLogger),
 	}
@@ -80,15 +80,6 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 	}
 
 	return nil
-}
-
-// AddNewPipeline adds a new pipeline with the config to the map
-func (pm *PipelineManager) AddNewPipeline(logOptsConfig map[string]string, name, file string) error {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-
-	hashstring := makeConfigHash(logOptsConfig)
-	return pm.makePipeline(logOptsConfig, name, hashstring)
 }
 
 // CreateClientWithConfig gets the pipeline linked to the given config, and creates a client

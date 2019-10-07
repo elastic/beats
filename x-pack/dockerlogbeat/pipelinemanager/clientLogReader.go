@@ -58,7 +58,7 @@ func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string)
 	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring}, nil
 }
 
-// Close Closes the pipeline client and reader
+// Close closes the pipeline client and reader
 func (cl *ClientLogger) Close() error {
 	logp.Info("Closing ClientLogger")
 	cl.client.Close()
