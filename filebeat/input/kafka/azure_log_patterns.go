@@ -20,10 +20,28 @@ package kafka
 import "time"
 
 const (
+	// ActivityLogs variable used to identify the activitylogs azure metricset
 	ActivityLogs = "ActivityLogs"
-	AuditLogs    = "AuditLogs"
-	SigninLogs   = "SigninLogs"
+	// AuditLogs variable used to identify the auditlogs azure metricset
+	AuditLogs = "AuditLogs"
+	// SigninLogs variable used to identify the signinlogs azure metricset
+	SigninLogs = "SigninLogs"
 )
+
+// AzureActivityLogs structure matches the eventhub message carrying the azure activity logs
+type AzureActivityLogs struct {
+	Records []ActivityLog `json:"records"`
+}
+
+// AzureAuditLogs structure matches the eventhub message carrying the azure audit logs
+type AzureAuditLogs struct {
+	Records []AuditLog `json:"records"`
+}
+
+// AzureSigninLogs structure matches the eventhub message carrying the azure signin logs
+type AzureSigninLogs struct {
+	Records []SigninLog `json:"records"`
+}
 
 // ActivityLogs structure matches the azure activity log format
 type ActivityLog struct {
@@ -75,18 +93,7 @@ type ActivityLog struct {
 	} `json:"properties,omitempty"`
 }
 
-type AzureActivityLogs struct {
-	Records []ActivityLog `json:"records"`
-}
-
-type AzureAuditLogs struct {
-	Records []AuditLog `json:"records"`
-}
-
-type AzureSigninLogs struct {
-	Records []SigninLog `json:"records"`
-}
-
+// AuditLog structure matches the azure audit log format
 type AuditLog struct {
 	Category         string `json:"category"`
 	CorrelationID    string `json:"correlationId"`
@@ -138,6 +145,7 @@ type AuditLog struct {
 	Identity        string `json:"identity"`
 }
 
+// SigninLog structure matches the azure audit log format
 type SigninLog struct {
 	Level            int    `json:"Level"`
 	CallerIPAddress  string `json:"callerIpAddress"`

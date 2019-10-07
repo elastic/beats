@@ -1479,11 +1479,860 @@ type: keyword
 Fields for azure audit logs.
 
 
+
+*`azure.auditlogs.resourceID`*::
++
+--
+Resource ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.operationName`*::
++
+--
+The operation name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.operationVersion`*::
++
+--
+The operation version
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.category`*::
++
+--
+Log category
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.tenantId`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.resultSignature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.durationMs`*::
++
+--
+Activity duration
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.correlationId`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.level`*::
++
+--
+Log level
+
+
+type: keyword
+
+--
+
+[float]
+=== properties
+
+The audit log properties
+
+
+
+*`azure.auditlogs.properties.result`*::
++
+--
+Log result
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.activityDisplayName`*::
++
+--
+Activity display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.resultReason`*::
++
+--
+Reason for the log result
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.correlationId`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.loggedByService`*::
++
+--
+Logged by service
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.operationType`*::
++
+--
+Operation type
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.activityDateTime`*::
++
+--
+Activity timestamp
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.category`*::
++
+--
+category
+
+
+type: keyword
+
+--
+
+[float]
+=== targetResources
+
+Target resources
+
+
+
+*`azure.auditlogs.properties.targetResources.displayName`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.targetResources.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.targetResources.type`*::
++
+--
+Type
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.targetResources.ipAddress`*::
++
+--
+ip Address
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.targetResources.userPrincipalName`*::
++
+--
+User principal name
+
+
+type: keyword
+
+--
+
+[float]
+=== modifiedProperties
+
+Modified properties
+
+
+
+*`azure.auditlogs.properties.targetResources.modifiedProperties.newValue`*::
++
+--
+New value
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.targetResources.modifiedProperties.displayName`*::
++
+--
+Display value
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.targetResources.modifiedProperties.oldValue`*::
++
+--
+Old value
+
+
+type: keyword
+
+--
+
+[float]
+=== initiatedBy
+
+Information regarding the initiator
+
+
+
+[float]
+=== app
+
+App
+
+
+
+*`azure.auditlogs.properties.initiatedBy.app.servicePrincipalName`*::
++
+--
+Service principal name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiatedBy.app.displayName`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiatedBy.app.appId`*::
++
+--
+App ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiatedBy.app.servicePrincipalId`*::
++
+--
+Service principal ID
+
+
+type: keyword
+
+--
+
+[float]
+=== user
+
+User
+
+
+
+*`azure.auditlogs.properties.initiatedBy.user.userPrincipalName`*::
++
+--
+User principal name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiatedBy.user.displayName`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiatedBy.user.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiatedBy.user.ipAddress`*::
++
+--
+ip Address
+
+
+type: keyword
+
+--
+
 [float]
 === signinlogs
 
 Fields for azure audit logs.
 
+
+
+*`azure.signinlogs.resourceID`*::
++
+--
+Resource ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.operationName`*::
++
+--
+The operation name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.operationVersion`*::
++
+--
+The operation version
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.category`*::
++
+--
+Log category
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.tenantId`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.resultSignature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.durationMs`*::
++
+--
+Activity duration
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.correlationId`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.level`*::
++
+--
+Log level
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.resultType`*::
++
+--
+Result type
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.callerIpAddress`*::
++
+--
+Caller Ip address
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.identity`*::
++
+--
+Identity
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.location`*::
++
+--
+Location
+
+
+type: keyword
+
+--
+
+[float]
+=== properties
+
+The signin log properties
+
+
+
+*`azure.signinlogs.properties.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.createdDateTime`*::
++
+--
+Created date time
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.userDisplayName`*::
++
+--
+User display name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.correlationId`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.userPrincipalName`*::
++
+--
+User principal name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.userId`*::
++
+--
+User ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.appId`*::
++
+--
+App ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.appDisplayName`*::
++
+--
+App display name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.ipAddress`*::
++
+--
+Ip address
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.clientAppUsed`*::
++
+--
+Client app used
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.conditionalAccessStatus`*::
++
+--
+Conditional access status
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.originalRequestId`*::
++
+--
+Original request ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.isInteractive`*::
++
+--
+Is interactive
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.tokenIssuerName`*::
++
+--
+Token issuer name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.tokenIssuerType`*::
++
+--
+Token issuer type
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.processingTimeInMilliseconds`*::
++
+--
+Processing time in milliseconds
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.riskDetail`*::
++
+--
+Risk detail
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.riskLevelAggregated`*::
++
+--
+Risk level aggregated
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.riskLevelDuringSignIn`*::
++
+--
+Risk level during signIn
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.riskState`*::
++
+--
+Risk state
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.resourceDisplayName`*::
++
+--
+Resource display name
+
+
+type: keyword
+
+--
+
+[float]
+=== status
+
+Status
+
+
+
+*`azure.signinlogs.properties.status.errorCode`*::
++
+--
+Error code
+
+
+type: keyword
+
+--
+
+[float]
+=== deviceDetail
+
+Status
+
+
+
+*`azure.signinlogs.properties.deviceDetail.deviceId`*::
++
+--
+Device ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.deviceDetail.operatingSystem`*::
++
+--
+Operating system
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.deviceDetail.browser`*::
++
+--
+Browser
+
+
+type: keyword
+
+--
+
+[float]
+=== location
+
+Status
+
+
+
+*`azure.signinlogs.properties.location.city`*::
++
+--
+City
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.location.state`*::
++
+--
+State
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.location.countryOrRegion`*::
++
+--
+Country or region
+
+
+type: keyword
+
+--
+
+[float]
+=== geoCoordinates
+
+GeoCoordinates
+
+
+
+*`azure.signinlogs.properties.location.geoCoordinates.latitude`*::
++
+--
+Latitude
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.location.geoCoordinates.longitude`*::
++
+--
+Longitude
+
+
+type: keyword
+
+--
 
 [[exported-fields-beat-common]]
 == Beat fields

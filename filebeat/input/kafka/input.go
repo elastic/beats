@@ -109,6 +109,7 @@ func (input *kafkaInput) runConsumerGroup(
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
+		// logType will be assigned the configuration option AzureLogs, if the metricset using this input is an azure metricset then we can filter for the azure log types dedicated to the metricset (audit, activity, signin)
 		logType: input.config.AzureLogs,
 	}
 
@@ -338,8 +339,6 @@ func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 	case AuditLogs:
 		// if the fileset is audit logs a filtering of the messages should be done as the eventhub can return different types of messages
 		var obj AzureAuditLogs
-		test := string(bMessage)
-		_ = test
 		err := json.Unmarshal(bMessage, &obj)
 		if err != nil {
 			return nil

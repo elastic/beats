@@ -3,3 +3,173 @@
   description: >
     Fields for azure audit logs.
   fields:
+    - name: resourceID
+      type: keyword
+      description: >
+        Resource ID
+    - name: operationName
+      type: keyword
+      description: >
+        The operation name
+    - name: operationVersion
+      type: keyword
+      description: >
+        The operation version
+    - name: category
+      type: keyword
+      description: >
+        Log category
+    - name: tenantId
+      type: keyword
+      description: >
+        Tenant ID
+    - name: resultSignature
+      type: keyword
+      description: >
+        Result signature
+    - name: durationMs
+      type: keyword
+      description: >
+        Activity duration
+    - name: correlationId
+      type: keyword
+      description: >
+        Correlation ID
+    - name: level
+      type: keyword
+      description: >
+        Log level
+    - name: properties
+      type: group
+      description: >
+        The audit log properties
+      fields:
+        - name: result
+          type: keyword
+          description: >
+            Log result
+        - name: activityDisplayName
+          type: keyword
+          description: >
+            Activity display name
+        - name: resultReason
+          type: keyword
+          description: >
+            Reason for the log result
+        - name: correlationId
+          type: keyword
+          description: >
+            Correlation ID
+        - name: loggedByService
+          type: keyword
+          description: >
+            Logged by service
+        - name: operationType
+          type: keyword
+          description: >
+            Operation type
+        - name: id
+          type: keyword
+          description: >
+            ID
+        - name: activityDateTime
+          type: keyword
+          description: >
+            Activity timestamp
+        - name: category
+          type: keyword
+          description: >
+            category
+        - name: targetResources
+          type: group
+          description: >
+            Target resources
+          fields:
+            - name: displayName
+              type: keyword
+              description: >
+                Display name
+            - name: id
+              type: keyword
+              description: >
+                ID
+            - name: type
+              type: keyword
+              description: >
+                Type
+            - name: ipAddress
+              type: keyword
+              description: >
+                 ip Address
+            - name: userPrincipalName
+              type: keyword
+              description: >
+                User principal name
+            - name: modifiedProperties
+              type: group
+              description: >
+                Modified properties
+              fields:
+                - name: newValue
+                  type: keyword
+                  description: >
+                    New value
+                - name: displayName
+                  type: keyword
+                  description: >
+                    Display value
+                - name: oldValue
+                  type: keyword
+                  description: >
+                    Old value
+        - name: initiatedBy
+          type: group
+          description: >
+            Information regarding the initiator
+          fields:
+            - name: app
+              type: group
+              description: >
+                App
+              fields:
+                - name: servicePrincipalName
+                  type: keyword
+                  description: >
+                    Service principal name
+                - name: displayName
+                  type: keyword
+                  description: >
+                    Display name
+                - name: appId
+                  type: keyword
+                  description: >
+                    App ID
+                - name: servicePrincipalId
+                  type: keyword
+                  description: >
+                    Service principal ID
+            - name: user
+              type: group
+              description: >
+                User
+              fields:
+                - name: userPrincipalName
+                  type: keyword
+                  description: >
+                    User principal name
+                - name: displayName
+                  type: keyword
+                  description: >
+                    Display name
+                - name: id
+                  type: keyword
+                  description: >
+                    ID
+                - name: ipAddress
+                  type: keyword
+                  description: >
+                    ip Address
+
+
+
+

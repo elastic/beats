@@ -1,0 +1,103 @@
+{
+    "_index" : "filebeat-8.0.0-2019.09.26",
+    "_type" : "_doc",
+    "_id" : "2a7e2503-d7e2",
+    "_score" : null,
+    "_source" : {
+        "agent" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "type" : "filebeat",
+            "ephemeral_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "version" : "8.0.0"
+        },
+        "ecs" : {
+            "version" : "1.1.0"
+        },
+        "identity" : {
+            "authorization" : {
+                "evidence" : {
+                    "roleAssignmentScope" : "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "roleDefinitionId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "role" : "Azure EventGrid Service BuiltIn Role",
+                    "roleAssignmentId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "principalId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "principalType" : "ServicePrincipal"
+                },
+                "scope" : "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/resourceGroups/sa-hemant/providers/Microsoft.EventHub/namespaces/azurelsevents/authorizationRules/RootManageSharedAccessKey",
+                "action" : "Microsoft.EventHub/namespaces/authorizationRules/listKeys/action"
+            },
+            "claims" : {
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "ver" : "1.0",
+                "http://schemas.microsoft.com/identity/claims/identityprovider" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                "aio" : "2a7e2503-d7e2-40",
+                "iss" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                "uti" : "2a7e2503-d7e2",
+                "aud" : "https://management.core.windows.net/",
+                "nbf" : "1569500393",
+                "appidacr" : "2",
+                "http://schemas.microsoft.com/identity/claims/tenantid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "appid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "http://schemas.microsoft.com/identity/claims/objectidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "exp" : "1569529493",
+                "iat" : "1569500393"
+            }
+        },
+        "host" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "os" : {
+                "build" : "17134.1006",
+                "kernel" : "10.0.17134.1006 (WinBuild.160101.0800)",
+                "name" : "Windows 10 Pro",
+                "family" : "windows",
+                "version" : "10.0",
+                "platform" : "windows"
+            },
+            "name" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "architecture" : "x86_64"
+        },
+        "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "event" : {
+            "module" : "azure",
+            "dataset" : "azure.activitylogs"
+        },
+        "resultType" : "Failure",
+        "callerIpAddress" : "11.71.131.141",
+        "resourceID" : "/SUBSCRIPTIONS/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/RESOURCEGROUPS/SA-HEMANT/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/AZURELSEVENTS/AUTHORIZATIONRULES/ROOTMANAGESHAREDACCESSKEY",
+        "level" : "Error",
+        "operationName" : "MICROSOFT.EVENTHUB/NAMESPACES/AUTHORIZATIONRULES/LISTKEYS/ACTION",
+        "fileset" : {
+            "name" : "activitylogs"
+        },
+        "resultSignature" : "Failed.NotFound",
+        "input" : {
+            "type" : "azure"
+        },
+        "@timestamp" : "2019-09-26T12:24:53.623Z",
+        "service" : {
+            "type" : "azure"
+        },
+        "kafka" : {
+            "headers" : [
+                "ProfileName: �\fname=default"
+            ],
+            "partition" : 2,
+            "offset" : 12887,
+            "topic" : "insights-operational-logs",
+            "key" : ""
+        },
+        "location" : "global",
+        "category" : "Action",
+        "durationMs" : 11,
+        "properties" : {
+            "serviceRequestId" : null,
+            "statusMessage" : """{"error":{"code":"ParentResourceNotFound","message":"Can not perform requested operation on nested resource. Parent resource 'azurelsevents' not found."}}""",
+            "statusCode" : "NotFound"
+        }
+    },
+    "sort" : [
+        1569500693623
+    ]
+}

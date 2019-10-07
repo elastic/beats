@@ -1,0 +1,107 @@
+{
+    "_index" : "filebeat-8.0.0-2019.10.04",
+    "_type" : "_doc",
+    "_id" : "FXFblm0Bq15PGrhqyTlD",
+    "_score" : null,
+    "_source" : {
+        "agent" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "type" : "filebeat",
+            "ephemeral_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "version" : "8.0.0"
+        },
+        "ecs" : {
+            "version" : "1.1.0"
+        },
+        "host" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "os" : {
+                "build" : "18362.387",
+                "kernel" : "10.0.18362.387 (WinBuild.160101.0800)",
+                "name" : "Windows 10 Pro",
+                "family" : "windows",
+                "version" : "10.0",
+                "platform" : "windows"
+            },
+            "name" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "architecture" : "x86_64"
+        },
+        "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "event" : {
+            "module" : "azure",
+            "dataset" : "azure.auditlogs"
+        },
+        "resourceID" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam",
+        "level" : "Informational",
+        "specification" : "Device Registration Service",
+        "operationName" : "Update device",
+        "fileset" : {
+            "name" : "auditlogs"
+        },
+        "resultSignature" : "None",
+        "input" : {
+            "type" : "kafka"
+        },
+        "@timestamp" : "2019-10-04T10:05:32.944Z",
+        "operationVersion" : "1.0",
+        "service" : {
+            "type" : "azure"
+        },
+        "kafka" : {
+            "headers" : [ ],
+            "partition" : 3,
+            "offset" : 2,
+            "topic" : "insights-logs-auditlogs",
+            "key" : ""
+        },
+        "tenantId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "category" : "AuditLogs",
+        "durationMs" : 0,
+        "properties" : {
+            "result" : "success",
+            "activityDisplayName" : "Update device",
+            "resultReason" : "",
+            "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "loggedByService" : "Core Directory",
+            "operationType" : "Update",
+            "id" : "Directory_2a7e2503",
+            "activityDateTime" : "2019-10-04T10:05:32.9448766+00:00",
+            "additionalDetails" : [ ],
+            "targetResources" : [
+                {
+                    "displayName" : "win10odbc",
+                    "modifiedProperties" : [
+                        {
+                            "newValue" : "",
+                            "displayName" : "Included Updated Properties",
+                            "oldValue" : ""
+                        }
+                    ],
+                    "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "type" : "Device",
+                    "userPrincipalName" : ""
+                }
+            ],
+            "category" : "Device",
+            "initiatedBy" : {
+                "app" : {
+                    "servicePrincipalName" : null,
+                    "displayName" : "Device Registration Service",
+                    "appId" : null,
+                    "servicePrincipalId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73"
+                },
+                "user" : {
+                    "displayName" : null,
+                    "ipAddress" : null,
+                    "id" : "",
+                    "userPrincipalName" : ""
+                }
+            }
+        }
+    },
+    "sort" : [
+        1570183532944
+    ]
+}

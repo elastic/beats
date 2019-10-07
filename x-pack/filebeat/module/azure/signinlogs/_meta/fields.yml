@@ -3,3 +3,201 @@
   description: >
     Fields for azure audit logs.
   fields:
+    - name: resourceID
+      type: keyword
+      description: >
+        Resource ID
+    - name: operationName
+      type: keyword
+      description: >
+        The operation name
+    - name: operationVersion
+      type: keyword
+      description: >
+        The operation version
+    - name: category
+      type: keyword
+      description: >
+        Log category
+    - name: tenantId
+      type: keyword
+      description: >
+        Tenant ID
+    - name: resultSignature
+      type: keyword
+      description: >
+        Result signature
+    - name: durationMs
+      type: keyword
+      description: >
+        Activity duration
+    - name: correlationId
+      type: keyword
+      description: >
+        Correlation ID
+    - name: level
+      type: keyword
+      description: >
+        Log level
+    - name: resultType
+      type: keyword
+      description: >
+        Result type
+    - name: callerIpAddress
+      type: keyword
+      description: >
+        Caller Ip address
+    - name: identity
+      type: keyword
+      description: >
+        Identity
+    - name: location
+      type: keyword
+      description: >
+        Location
+    - name: properties
+      type: group
+      description: >
+        The signin log properties
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            ID
+        - name: createdDateTime
+          type: keyword
+          description: >
+            Created date time
+        - name: userDisplayName
+          type: keyword
+          description: >
+            User display name
+        - name: correlationId
+          type: keyword
+          description: >
+            Correlation ID
+        - name: userPrincipalName
+          type: keyword
+          description: >
+            User principal name
+        - name: userId
+          type: keyword
+          description: >
+            User ID
+        - name: appId
+          type: keyword
+          description: >
+            App ID
+        - name: appDisplayName
+          type: keyword
+          description: >
+            App display name
+        - name: ipAddress
+          type: keyword
+          description: >
+            Ip address
+        - name: clientAppUsed
+          type: keyword
+          description: >
+            Client app used
+        - name: conditionalAccessStatus
+          type: keyword
+          description: >
+            Conditional access status
+        - name: originalRequestId
+          type: keyword
+          description: >
+            Original request ID
+        - name: isInteractive
+          type: keyword
+          description: >
+            Is interactive
+        - name: tokenIssuerName
+          type: keyword
+          description: >
+            Token issuer name
+        - name: tokenIssuerType
+          type: keyword
+          description: >
+            Token issuer type
+        - name: processingTimeInMilliseconds
+          type: keyword
+          description: >
+            Processing time in milliseconds
+        - name: riskDetail
+          type: keyword
+          description: >
+            Risk detail
+        - name: riskLevelAggregated
+          type: keyword
+          description: >
+            Risk level aggregated
+        - name: riskLevelDuringSignIn
+          type: keyword
+          description: >
+            Risk level during signIn
+        - name: riskState
+          type: keyword
+          description: >
+            Risk state
+        - name: resourceDisplayName
+          type: keyword
+          description: >
+            Resource display name
+        - name: status
+          type: group
+          description: >
+            Status
+          fields:
+            - name: errorCode
+              type: keyword
+              description: >
+                Error code
+        - name: deviceDetail
+          type: group
+          description: >
+            Status
+          fields:
+            - name: deviceId
+              type: keyword
+              description: >
+                Device ID
+            - name: operatingSystem
+              type: keyword
+              description: >
+                Operating system
+            - name: browser
+              type: keyword
+              description: >
+                Browser
+        - name: location
+          type: group
+          description: >
+            Status
+          fields:
+            - name: city
+              type: keyword
+              description: >
+                City
+            - name: state
+              type: keyword
+              description: >
+                State
+            - name: countryOrRegion
+              type: keyword
+              description: >
+                Country or region
+            - name: geoCoordinates
+              type: group
+              description: >
+                GeoCoordinates
+              fields:
+                - name: latitude
+                  type: keyword
+                  description: >
+                    Latitude
+                - name: longitude
+                  type: keyword
+                  description: >
+                    Longitude
+
