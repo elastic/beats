@@ -113,6 +113,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	metadata := common.MapStr{}
 	if accessor.GetNamespace() != "" {
 		namespase := accessor.GetNamespace()
+		metadata["namespace"] = accessor.GetNamespace()
 
 		ns, err := g.k8sClient.CoreV1().Namespaces().Get(namespase, metav1.GetOptions{})
 		if err != nil {
@@ -125,11 +126,16 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 			return nil
 		}
 		namespacelabels := namespaceaccessor.GetLabels()
-
-		metadata["namespace"] = accessor.GetNamespace()
-		for label, val := range namespacelabels {
-			metakey := fmt.Sprintf("namespace_%v", label)
-			metadata[metakey] = val
+		
+		for k, v := range namespacelabels {
+			if g.LabelsDedot {
+				label := common.DeDot(k)
+				metakey := fmt.Sprintf("namespace_%v", label)
+				metadata.Put(metakey, v)
+			} else {
+				metakey := fmt.Sprintf("namespace_%v", k)
+				safemapstr.Put(labelMap, metakey, v)
+			}
 		}
 	}
 
