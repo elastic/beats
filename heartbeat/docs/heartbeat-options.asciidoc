@@ -468,15 +468,12 @@ Under `check.request`, specify these options:
 *`body`*:: Optional request body content.
 
 Example configuration:
+This monitor POSTs an `x-www-form-urlencoded` string
+to the endpoint `/demo/add`
 
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  #
-  # This monitor POSTs an x-www-form-urlencoded string
-  # to the endpoint /demo/add, and it examines the
-  # response body for the strings 'saved' or 'Saved'
-  #
   schedule: '@every 5s'
   urls: ["http://localhost:8080/demo/add"]
   check.request:
@@ -499,15 +496,12 @@ Under `check.response`, specify these options:
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
 
 Example configuration:
+This monitor examines the
+response body for the strings `saved` or `Saved`
 
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  #
-  # This monitor POSTs an x-www-form-urlencoded string
-  # to the endpoint /demo/add, and it examines the
-  # response body for the strings 'saved' or 'Saved'
-  #
   schedule: '@every 5s'
   urls: ["http://localhost:8080/demo/add"]
   check.request:
