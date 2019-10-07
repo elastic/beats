@@ -73,6 +73,11 @@ func (f *Log) Read(buf []byte) (int, error) {
 		default:
 		}
 
+		err := f.checkFileDisappearedErrors()
+		if err != nil {
+			return totalN, err
+		}
+
 		n, err := f.fs.Read(buf)
 		if n > 0 {
 			f.offset += int64(n)
@@ -104,12 +109,15 @@ func (f *Log) Read(buf []byte) (int, error) {
 	}
 }
 
-// errorChecks checks how the given error should be handled based on the config options
+// errorChecks determines the cause for EOF errors, and how the EOF event should be handled
+// based on the config options.
 func (f *Log) errorChecks(err error) error {
 	if err != io.EOF {
 		logp.Err("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
 		return err
 	}
+
+	// At this point we have hit EOF!
 
 	// Stdin is not continuable
 	if !f.fs.Continuable() {
@@ -117,11 +125,11 @@ func (f *Log) errorChecks(err error) error {
 		return err
 	}
 
-	if err == io.EOF && f.config.CloseEOF {
+	if f.config.CloseEOF {
 		return err
 	}
 
-	// Refetch fileinfo to check if the file was truncated or disappeared.
+	// Refetch fileinfo to check if the file was truncated.
 	// Errors if the file was removed/rotated after reading and before
 	// calling the stat function
 	info, statErr := f.fs.Stat()
@@ -143,19 +151,38 @@ func (f *Log) errorChecks(err error) error {
 		return ErrInactive
 	}
 
+	return nil
+}
+
+// checkFileDisappearedErrors checks if the log file has been removed or renamed (rotated).
+func (f *Log) checkFileDisappearedErrors() error {
+	// No point doing a stat call on the file if configuration options are
+	// not enabled
+	if !f.config.CloseRenamed && !f.config.CloseRemoved {
+		return nil
+	}
+
+	// Refetch fileinfo to check if the file was renamed or removed.
+	// Errors if the file was removed/rotated after reading and before
+	// calling the stat function
+	info, statErr := f.fs.Stat()
+	if statErr != nil {
+		logp.Err("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
+		return statErr
+	}
+
 	if f.config.CloseRenamed {
 		// Check if the file can still be found under the same path
 		if !file.IsSameFile(f.fs.Name(), info) {
+			logp.Debug("harvester", "close_renamed is enabled and file %s has been renamed", f.fs.Name())
 			return ErrRenamed
 		}
 	}
 
 	if f.config.CloseRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		_, statErr := os.Stat(f.fs.Name())
-
-		// Error means file does not exist.
-		if statErr != nil {
+		if f.fs.Removed() {
+			logp.Debug("harvester", "close_removed is enabled and file %s has been removed", f.fs.Name())
 			return ErrRemoved
 		}
 	}
