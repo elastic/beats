@@ -1,0 +1,13 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: "memory"
+    jmx.mappings:
+      - mbean: 'java.lang:type=Memory'
+        attributes:
+          - attr: HeapMemoryUsage
+            field: heap.usage
+          - attr: NonHeapMemoryUsage
+            field: other.usage

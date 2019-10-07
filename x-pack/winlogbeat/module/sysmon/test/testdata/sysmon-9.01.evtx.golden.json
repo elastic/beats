@@ -77,7 +77,7 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_start"
+      "type": "process_start"
     },
     "hash": {
       "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
@@ -148,7 +148,7 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_start"
+      "type": "process_start"
     },
     "hash": {
       "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
@@ -222,7 +222,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "type": "process_end"
     },
     "log": {
       "level": "information"
@@ -263,7 +263,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "type": "process_end"
     },
     "log": {
       "level": "information"
@@ -304,7 +304,7 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_start"
+      "type": "process_start"
     },
     "hash": {
       "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
@@ -1340,7 +1340,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "type": "process_end"
     },
     "log": {
       "level": "information"
@@ -1381,7 +1381,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "type": "process_end"
     },
     "log": {
       "level": "information"
@@ -1606,7 +1606,7 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "type": "process_end"
     },
     "log": {
       "level": "information"

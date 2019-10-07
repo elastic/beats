@@ -1,0 +1,1 @@
+This is the compute_vm_scaleset metricset of the module azure.

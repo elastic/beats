@@ -61,7 +61,7 @@ func validateProbeList(t *testing.T, probes []helper.ProbeDef) {
 }
 
 func TestRuntimeKProbesAreBackwardsCompatible(t *testing.T) {
-	validateProbeList(t, installKProbes)
+	validateProbeList(t, getAllKProbes())
 }
 
 func TestGuessKProbesAreBackwardsCompatible(t *testing.T) {

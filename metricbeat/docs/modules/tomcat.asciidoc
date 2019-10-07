@@ -1,0 +1,58 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-tomcat]]
+[role="xpack"]
+== Tomcat module
+
+beta[]
+
+This module periodically fetches JMX metrics from Apache Tomcat.
+
+[float]
+=== Compatibility
+The module has been tested with Tomcat 7.0.24 and 9.0.24. Other versions are expected to work.
+
+[float]
+=== Usage
+The Tomcat module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
+
+
+[float]
+=== Example configuration
+
+The Tomcat module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: tomcat
+  metricsets: ['threading', 'cache', 'memory', 'requests']
+  period: 10s
+  hosts: ['localhost:8080']
+  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-tomcat-cache,cache>>
+
+* <<metricbeat-metricset-tomcat-memory,memory>>
+
+* <<metricbeat-metricset-tomcat-requests,requests>>
+
+* <<metricbeat-metricset-tomcat-threading,threading>>
+
+include::tomcat/cache.asciidoc[]
+
+include::tomcat/memory.asciidoc[]
+
+include::tomcat/requests.asciidoc[]
+
+include::tomcat/threading.asciidoc[]
+

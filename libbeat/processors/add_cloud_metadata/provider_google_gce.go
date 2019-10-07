@@ -26,50 +26,56 @@ import (
 )
 
 // Google GCE Metadata Service
-func newGceMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
-	gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
-	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-	gceSchema := func(m map[string]interface{}) common.MapStr {
-		out := common.MapStr{}
+var gceMetadataFetcher = provider{
+	Name: "google-gce",
 
-		trimLeadingPath := func(key string) {
-			v, err := out.GetValue(key)
-			if err != nil {
-				return
+	Local: true,
+
+	Create: func(provider string, config *common.Config) (metadataFetcher, error) {
+		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
+		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
+		gceSchema := func(m map[string]interface{}) common.MapStr {
+			out := common.MapStr{}
+
+			trimLeadingPath := func(key string) {
+				v, err := out.GetValue(key)
+				if err != nil {
+					return
+				}
+				p, ok := v.(string)
+				if !ok {
+					return
+				}
+				out.Put(key, path.Base(p))
 			}
-			p, ok := v.(string)
-			if !ok {
-				return
+
+			if instance, ok := m["instance"].(map[string]interface{}); ok {
+				s.Schema{
+					"instance": s.Object{
+						"id":   c.StrFromNum("id"),
+						"name": c.Str("name"),
+					},
+					"machine": s.Object{
+						"type": c.Str("machineType"),
+					},
+					"availability_zone": c.Str("zone"),
+				}.ApplyTo(out, instance)
+				trimLeadingPath("machine.type")
+				trimLeadingPath("availability_zone")
 			}
-			out.Put(key, path.Base(p))
+
+			if project, ok := m["project"].(map[string]interface{}); ok {
+				s.Schema{
+					"project": s.Object{
+						"id": c.Str("projectId"),
+					},
+				}.ApplyTo(out, project)
+			}
+
+			return out
 		}
 
-		if instance, ok := m["instance"].(map[string]interface{}); ok {
-			s.Schema{
-				"instance": s.Object{
-					"id":   c.StrFromNum("id"),
-					"name": c.Str("name"),
-				},
-				"machine": s.Object{
-					"type": c.Str("machineType"),
-				},
-				"availability_zone": c.Str("zone"),
-			}.ApplyTo(out, instance)
-			trimLeadingPath("machine.type")
-			trimLeadingPath("availability_zone")
-		}
-
-		if project, ok := m["project"].(map[string]interface{}); ok {
-			s.Schema{
-				"project": s.Object{
-					"id": c.Str("projectId"),
-				},
-			}.ApplyTo(out, project)
-		}
-
-		return out
-	}
-
-	fetcher, err := newMetadataFetcher(config, "gcp", gceHeaders, metadataHost, gceSchema, gceMetadataURI)
-	return fetcher, err
+		fetcher, err := newMetadataFetcher(config, provider, gceHeaders, metadataHost, gceSchema, gceMetadataURI)
+		return fetcher, err
+	},
 }

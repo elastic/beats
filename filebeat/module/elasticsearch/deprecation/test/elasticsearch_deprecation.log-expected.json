@@ -1,10 +1,10 @@
 [
     {
-        "@timestamp": "2018-04-23T16:40:13.737Z",
+        "@timestamp": "2018-04-23T16:40:13.737-02:00",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
@@ -13,11 +13,11 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-04-23T16:40:13.862Z",
+        "@timestamp": "2018-04-23T16:40:13.862-02:00",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
@@ -26,11 +26,11 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-04-23T16:40:14.792Z",
+        "@timestamp": "2018-04-23T16:40:14.792-02:00",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
@@ -39,11 +39,11 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-04-23T16:40:15.127Z",
+        "@timestamp": "2018-04-23T16:40:15.127-02:00",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",

@@ -42,18 +42,18 @@ Instead of using raw `docker` input, specifies the module to use to parse logs f
 When module is configured, map container logs to module filesets. You can either configure
 a single fileset like this:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 co.elastic.logs/fileset: access
--------------------------------------------------------------------------------------
+-----
 
 Or configure a fileset per stream in the container (stdout and stderr):
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 co.elastic.logs/fileset.stdout: access
 co.elastic.logs/fileset.stderr: error
--------------------------------------------------------------------------------------
+-----
 
 [float]
 ===== `co.elastic.logs/raw`
@@ -61,10 +61,10 @@ When an entire input/module configuration needs to be completely set the `raw` h
 stringified JSON of the input configuration. `raw` overrides every other hint and can be used to create both a single or
 a list of configurations.
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 co.elastic.logs/raw: "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]"
--------------------------------------------------------------------------------------
+-----
 
 [float]
 ===== `co.elastic.logs/processors`
@@ -75,11 +75,11 @@ of supported processors.
 In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
 arbitrary ordering:
 
-["source","yaml"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 co.elastic.logs/processors.1.dissect.tokenizer: "%{key1} %{key2}"
 co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"
--------------------------------------------------------------------------------------
+-----
 
 In the above sample the processor definition tagged with `1` would be executed first.
 
@@ -88,18 +88,18 @@ In the above sample the processor definition tagged with `1` would be executed f
 
 Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: kubernetes
       hints.enabled: true
--------------------------------------------------------------------------------------
+-----
 
 You can configure the default config that will be launched when a new container is seen, like this:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: kubernetes
@@ -108,29 +108,29 @@ filebeat.autodiscover:
         type: container
         paths:
           - /var/log/container/*-${container.id}.log  # CRI path
--------------------------------------------------------------------------------------
+-----
 
 You can also disable default settings entirely, so only Pods annotated like `co.elastic.logs/enabled: true`
 will be retrieved:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: kubernetes
       hints.enabled: true
       hints.default_config.enabled: false
--------------------------------------------------------------------------------------
+-----
 
 You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} inputs or modules:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 annotations:
   co.elastic.logs/multiline.pattern: '^\['
   co.elastic.logs/multiline.negate: true
   co.elastic.logs/multiline.match: after
--------------------------------------------------------------------------------------
+-----
 
 
 [float]
@@ -141,14 +141,14 @@ hint. For example, these hints configure multiline settings for all containers i
 specific `exclude_lines` hint for the container called `sidecar`.
 
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 annotations:
   co.elastic.logs/multiline.pattern: '^\['
   co.elastic.logs/multiline.negate: true
   co.elastic.logs/multiline.match: after
   co.elastic.logs.sidecar/exclude_lines: '^DBG'
--------------------------------------------------------------------------------------
+-----
 
 
 
@@ -157,18 +157,18 @@ annotations:
 
 Docker autodiscover provider supports hints in labels. To enable it just set `hints.enabled`:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: docker
       hints.enabled: true
--------------------------------------------------------------------------------------
+-----
 
 You can configure the default config that will be launched when a new container is seen, like this:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: docker
@@ -177,28 +177,28 @@ filebeat.autodiscover:
         type: container
         paths:
           - /var/log/container/*-${container.id}.log  # CRI path
--------------------------------------------------------------------------------------
+-----
 
 You can also disable default settings entirely, so only containers labeled with `co.elastic.logs/enabled: true`
 will be retrieved:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: docker
       hints.enabled: true
       hints.default_config.enabled: false
--------------------------------------------------------------------------------------
+-----
 
 You can label Docker containers with useful info to spin up {beatname_uc} inputs, for example:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
   co.elastic.logs/module: nginx
   co.elastic.logs/fileset.stdout: access
   co.elastic.logs/fileset.stderr: error
--------------------------------------------------------------------------------------
+-----
 
 The above labels configure {beatname_uc} to use the Nginx module to harvest logs for this container.
 Access logs will be retrieved from stdout stream, and error logs from stderr.

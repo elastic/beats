@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -61,6 +62,7 @@ grouped in the following categories:
 * <<exported-fields-redis>>
 * <<exported-fields-statsd>>
 * <<exported-fields-system>>
+* <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
@@ -844,6 +846,16 @@ type: object
 
 --
 
+*`aws.s3.bucket.name`*::
++
+--
+Name of a S3 bucket.
+
+
+type: keyword
+
+--
+
 [float]
 === cloudwatch
 
@@ -1343,7 +1355,7 @@ type: keyword
 The number of outstanding IOs (read/write requests) waiting to access the disk.
 
 
-type: long
+type: float
 
 --
 
@@ -1515,7 +1527,7 @@ type: long
 The average number of commit operations per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1525,7 +1537,7 @@ type: long
 The average number of delete queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1535,7 +1547,7 @@ type: long
 The average number of DDL requests per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1545,7 +1557,7 @@ type: long
 The average number of inserts, updates, and deletes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1555,7 +1567,7 @@ type: long
 The average number of insert queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1565,7 +1577,7 @@ type: long
 The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1575,7 +1587,7 @@ type: long
 The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1585,7 +1597,7 @@ type: long
 The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
 
 
-type: long
+type: float
 
 --
 
@@ -1595,7 +1607,7 @@ type: long
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 --
 
@@ -1605,7 +1617,7 @@ type: long
 The average number of select queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1615,7 +1627,7 @@ type: long
 The average number of update queries per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1625,7 +1637,7 @@ type: long
 The average number of bytes written to disk per second.
 
 
-type: long
+type: float
 
 --
 
@@ -1635,7 +1647,7 @@ type: long
 The amount of latency for commit operations, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1647,7 +1659,7 @@ format: duration
 The amount of latency for data definition language (DDL) requests, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1659,7 +1671,7 @@ format: duration
 The amount of latency for inserts, updates, and deletes, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1671,7 +1683,7 @@ format: duration
 The amount of latency for insert queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1683,7 +1695,7 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1695,7 +1707,7 @@ format: duration
 The amount of latency for select queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1707,7 +1719,7 @@ format: duration
 The amount of latency for update queries, in milliseconds.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1719,7 +1731,7 @@ format: duration
 The average amount of time taken per disk I/O operation.
 
 
-type: long
+type: float
 
 format: duration
 
@@ -1784,16 +1796,6 @@ type: long
 
 
 
-*`aws.s3_daily_storage.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
-
 *`aws.s3_daily_storage.bucket.size.bytes`*::
 +
 --
@@ -1822,16 +1824,6 @@ type: long
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
-
-*`aws.s3_request.bucket.name`*::
-+
---
-Name of a S3 bucket.
-
-
-type: keyword
-
---
 
 *`aws.s3_request.requests.total`*::
 +
@@ -2113,6 +2105,301 @@ SQS queue name
 
 
 type: keyword
+
+--
+
+[[exported-fields-azure]]
+== azure fields
+
+azure module
+
+
+
+[float]
+=== azure
+
+
+
+
+[float]
+=== compute_vm
+
+compute_vm
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== compute_vm_scaleset
+
+compute_vm_scaleset
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.compute_vm_scaleset.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.compute_vm_scaleset.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.compute_vm_scaleset.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== monitor
+
+monitor
+
+
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.monitor.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.monitor.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.monitor.namespace`*::
++
+--
+The namespace selected
+
+
+type: keyword
+
+--
+
+*`azure.monitor.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.monitor.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
+*`azure.monitor.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
 
 --
 
@@ -4882,6 +5169,18 @@ format: percent
 
 --
 
+*`docker.cpu.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.kernel.ticks`*::
 +
 --
@@ -4896,6 +5195,18 @@ type: long
 +
 --
 Percentage of total CPU time in the system.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`docker.cpu.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
 
 
 type: scaled_float
@@ -4926,6 +5237,18 @@ format: percent
 
 --
 
+*`docker.cpu.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.user.ticks`*::
 +
 --
@@ -4948,10 +5271,34 @@ format: percent
 
 --
 
+*`docker.cpu.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`docker.cpu.core.*.pct`*::
 +
 --
 Percentage of CPU time in this core.
+
+
+type: object
+
+format: percent
+
+--
+
+*`docker.cpu.core.*.norm.pct`*::
++
+--
+Percentage of CPU time in this core, normalized by the number of CPU cores.
 
 
 type: object
@@ -5020,7 +5367,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current reads per second
 
@@ -5072,7 +5419,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of current writes per second
 
@@ -5124,7 +5471,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Number of reads and writes per second
 
@@ -13781,7 +14128,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -13793,7 +14140,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition ID
 
@@ -13908,7 +14255,7 @@ Partition data.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Partition id.
 
@@ -13981,7 +14328,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 topic error code.
 
@@ -13994,7 +14341,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Topic name
 
@@ -14007,7 +14354,7 @@ type: keyword
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker id
 
@@ -14020,7 +14367,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 Broker address
 
@@ -16860,7 +17207,7 @@ type: float
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU nanocores limit
 
@@ -16873,7 +17220,7 @@ type: long
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 Container CPU requested nanocores
 
@@ -25868,7 +26215,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Longest output list among current client connections (replaced by max_output_buffer).
 
@@ -25891,7 +26238,7 @@ type: long
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 Biggest input buffer among current client connections (replaced by max_input_buffer).
 
@@ -26488,7 +26835,7 @@ type: long
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 The server's current replication offset
 
@@ -30069,6 +30416,317 @@ The OS uptime in milliseconds.
 type: long
 
 format: duration
+
+--
+
+[[exported-fields-tomcat]]
+== Tomcat fields
+
+Tomcat module
+
+
+
+
+[float]
+=== cache
+
+Catalina Cache metrics from the WebResourceRoot
+
+
+*`tomcat.cache.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`tomcat.cache.hit.total`*::
++
+--
+The number of requests for resources that were served from the cache
+
+type: long
+
+--
+
+*`tomcat.cache.size.total.kb`*::
++
+--
+The current estimate of the cache size in kilobytes
+
+type: long
+
+--
+
+*`tomcat.cache.size.max.kb`*::
++
+--
+The maximum permitted size of the cache in kilobytes
+
+type: long
+
+--
+
+*`tomcat.cache.lookup.total`*::
++
+--
+The number of requests for resources
+
+type: long
+
+--
+
+*`tomcat.cache.ttl.ms`*::
++
+--
+The time-to-live for cache entries in milliseconds
+
+type: long
+
+--
+
+[float]
+=== memory
+
+Memory metrics from java.lang JMX
+
+
+*`tomcat.memory.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`tomcat.memory.heap.usage.committed`*::
++
+--
+Committed heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.heap.usage.max`*::
++
+--
+Max heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.heap.usage.used`*::
++
+--
+Used heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.heap.usage.init`*::
++
+--
+Initial heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.committed`*::
++
+--
+Committed non-heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.max`*::
++
+--
+Max non-heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.used`*::
++
+--
+Used non-heap memory usage
+
+type: long
+
+--
+
+*`tomcat.memory.other.usage.init`*::
++
+--
+Initial non-heap memory usage
+
+type: long
+
+--
+
+[float]
+=== requests
+
+Requests processor metrics from GlobalRequestProcessor JMX
+
+
+*`tomcat.requests.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`tomcat.requests.total`*::
++
+--
+Number of requests processed
+
+type: long
+
+--
+
+*`tomcat.requests.bytes.received`*::
++
+--
+Amount of data received, in bytes
+
+type: long
+
+--
+
+*`tomcat.requests.bytes.sent`*::
++
+--
+Amount of data sent, in bytes
+
+type: long
+
+--
+
+*`tomcat.requests.processing.ms`*::
++
+--
+Total time to process the requests
+
+type: long
+
+--
+
+*`tomcat.requests.errors.total`*::
++
+--
+Number of errors
+
+type: long
+
+--
+
+[float]
+=== threading
+
+Threading metrics from the Catalina's ThreadPool JMX
+
+
+*`tomcat.threading.busy`*::
++
+--
+Current busy threads from the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.max`*::
++
+--
+Max threads from the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.current`*::
++
+--
+Current number of threads, taken from the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.keep_alive.total`*::
++
+--
+Total keep alive on the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.keep_alive.timeout.ms`*::
++
+--
+Keep alive timeout on the ThreadPool
+
+type: long
+
+--
+
+*`tomcat.threading.started.total`*::
++
+--
+Current started threads at JVM level (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.user.time.ms`*::
++
+--
+User time in milliseconds (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.cpu.time.ms`*::
++
+--
+CPU time in milliseconds (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.total`*::
++
+--
+Total threads at the JVM level (from java.lang:type=Threading)
+
+type: long
+
+--
+
+*`tomcat.threading.peak`*::
++
+--
+Peak number of threads at JVM level (from java.lang:type=Threading)
+
+type: long
 
 --
 
