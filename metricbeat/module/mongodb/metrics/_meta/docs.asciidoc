@@ -1,1 +1,5 @@
 This is the `metrics` metricset of the MongoDB module.
+
+It requires the following privileges
+
+- https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
