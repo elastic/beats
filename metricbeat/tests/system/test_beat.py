@@ -18,7 +18,7 @@ class Test(metricbeat.BaseTest):
         """
         beat metricset tests
         """
-        self.check_metricset("beat", metricset, self.get_hosts(), self.FIELDS + ["service"])
+        self.check_metricset("beat", metricset, [self.compose_host("metricbeat")], self.FIELDS + ["service"])
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_xpack(self):
@@ -28,7 +28,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "beat",
             "metricsets": self.METRICSETS,
-            "hosts": self.get_hosts(),
+            "hosts": [self.compose_host("metricbeat")],
             "period": "1s",
             "extras": {
                 "xpack.enabled": "true"
@@ -49,4 +49,8 @@ class Test(metricbeat.BaseTest):
 
     def mb_index_exists(self):
         es = Elasticsearch([self.get_elasticsearch_url()])
-        return len(es.cat.indices(index='metricbeat-*', h='index')) > 0
+        return len(es.cat.indices(index='metricbeat-*')) > 0
+
+    def get_elasticsearch_url(self):
+        return "http://" + self.compose_host("elasticsearch")
+
