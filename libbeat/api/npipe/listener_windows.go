@@ -25,7 +25,7 @@ import (
 	"os/user"
 	"strings"
 
-	winio "github.com/microsoft/go-winio"
+	winio "github.com/Microsoft/go-winio"
 	"github.com/pkg/errors"
 )
 
