@@ -4,9 +4,15 @@
 
 package googlepubsub
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/x-pack/filebeat/input"
+)
 
 type config struct {
+	input.Config `config:",inline"`
+
 	// Google Cloud project name.
 	ProjectID string `config:"project_id" validate:"required"`
 

@@ -137,6 +137,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
+			KeepNull:      config.KeepNull,
 		},
 		ACKEvents: func(privates []interface{}) {
 			for _, private := range privates {
