@@ -155,8 +155,12 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Co
 	// ACK for the batch.
 	return func(cfg *common.Config) (core.Client, error) {
 		c := struct {
-			Processors           processors.PluginConfig `config:"processors"`
-			common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+			Processors processors.PluginConfig `config:"processors"`
+
+			// KeepNull determines whether published events will keep null values or omit them.
+			KeepNull bool `config:"keep_null"`
+
+			common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 		}{}
 
 		if err := cfg.Unpack(&c); err != nil {
@@ -173,6 +177,7 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Co
 			Processing: beat.ProcessingConfig{
 				Processor:     processors,
 				EventMetadata: c.EventMetadata,
+				KeepNull:      c.KeepNull,
 			},
 		})
 
