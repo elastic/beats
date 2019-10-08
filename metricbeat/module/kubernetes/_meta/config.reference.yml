@@ -23,6 +23,9 @@
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 # State metrics from kube-state-metrics service:
 - module: kubernetes
   enabled: true
@@ -46,11 +49,17 @@
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 # Kubernetes events
 - module: kubernetes
   enabled: true
   metricsets:
     - event
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 # Kubernetes API server
 # (when running metricbeat as a pod)
@@ -59,6 +68,9 @@
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -69,6 +81,9 @@
   hosts: ["localhost:10249"]
   period: 10s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 # Kubernetes controller manager
 # (URL and deployment will need to be modified to match the controller manager deployment)
 - module: kubernetes
@@ -78,6 +93,9 @@
   hosts: ["http://localhost:10252"]
   period: 10s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 # Kubernetes scheduler
 # (URL and deployment method will need to be adapted to match scheduler deployment)
 - module: kubernetes
@@ -86,3 +104,6 @@
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false

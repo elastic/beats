@@ -1,0 +1,9 @@
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://sa@localhost"]
+  period: 10s
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false

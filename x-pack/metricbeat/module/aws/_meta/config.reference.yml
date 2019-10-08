@@ -6,6 +6,10 @@
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 - module: aws
   period: 300s
   metricsets:
@@ -16,6 +20,10 @@
   default_region: '${AWS_REGION:us-west-1}'
   regions:
     - us-west-1
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 - module: aws
   period: 86400s
   metricsets:
@@ -25,6 +33,10 @@
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 - module: aws
   period: 300s
   metricsets:
@@ -42,6 +54,10 @@
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 - module: aws
   period: 60s
   metricsets:
@@ -50,3 +66,7 @@
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+

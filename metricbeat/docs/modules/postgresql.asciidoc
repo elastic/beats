@@ -99,6 +99,9 @@ metricbeat.modules:
 
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 ----
 
 [float]

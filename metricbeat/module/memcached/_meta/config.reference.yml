@@ -3,3 +3,6 @@
   period: 10s
   hosts: ["localhost:11211"]
   enabled: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false

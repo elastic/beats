@@ -19,3 +19,6 @@
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false

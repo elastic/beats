@@ -30,3 +30,6 @@
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false

@@ -52,6 +52,9 @@ metricbeat.modules:
   #    namespace: "foo"
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

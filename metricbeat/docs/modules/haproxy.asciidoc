@@ -60,6 +60,9 @@ metricbeat.modules:
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
   enabled: true
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 ----
 
 [float]

@@ -1,0 +1,8 @@
+- module: tomcat
+  metricsets: ['threading', 'cache', 'memory', 'requests']
+  period: 10s
+  hosts: ['localhost:8080']
+  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
