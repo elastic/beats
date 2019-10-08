@@ -27,34 +27,18 @@
       type: keyword
       description: >
         Result signature
-    - name: durationMs
-      type: keyword
-      description: >
-        Activity duration
     - name: correlationId
       type: keyword
       description: >
         Correlation ID
-    - name: level
-      type: keyword
-      description: >
-        Log level
     - name: resultType
       type: keyword
       description: >
         Result type
-    - name: callerIpAddress
-      type: keyword
-      description: >
-        Caller Ip address
     - name: identity
       type: keyword
       description: >
         Identity
-    - name: location
-      type: keyword
-      description: >
-        Location
     - name: properties
       type: group
       description: >
@@ -200,4 +184,3 @@
                   type: keyword
                   description: >
                     Longitude
-

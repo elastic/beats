@@ -1393,30 +1393,10 @@ type: keyword
 
 --
 
-*`azure.activitylogs.callerIpAddress`*::
-+
---
-Caller Ip address
-
-
-type: keyword
-
---
-
 *`azure.activitylogs.resourceID`*::
 +
 --
 Resource ID
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.level`*::
-+
---
-Level
 
 
 type: keyword
@@ -1450,26 +1430,6 @@ Properties
 
 
 type: object
-
---
-
-*`azure.activitylogs.location`*::
-+
---
-Location
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.category`*::
-+
---
-Category
-
-
-type: keyword
 
 --
 
@@ -1540,30 +1500,10 @@ type: keyword
 
 --
 
-*`azure.auditlogs.durationMs`*::
-+
---
-Activity duration
-
-
-type: keyword
-
---
-
 *`azure.auditlogs.correlationId`*::
 +
 --
 Correlation ID
-
-
-type: keyword
-
---
-
-*`azure.auditlogs.level`*::
-+
---
-Log level
 
 
 type: keyword
@@ -1929,30 +1869,10 @@ type: keyword
 
 --
 
-*`azure.signinlogs.durationMs`*::
-+
---
-Activity duration
-
-
-type: keyword
-
---
-
 *`azure.signinlogs.correlationId`*::
 +
 --
 Correlation ID
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.level`*::
-+
---
-Log level
 
 
 type: keyword
@@ -1969,30 +1889,10 @@ type: keyword
 
 --
 
-*`azure.signinlogs.callerIpAddress`*::
-+
---
-Caller Ip address
-
-
-type: keyword
-
---
-
 *`azure.signinlogs.identity`*::
 +
 --
 Identity
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.location`*::
-+
---
-Location
 
 
 type: keyword

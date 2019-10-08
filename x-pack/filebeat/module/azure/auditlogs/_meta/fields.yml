@@ -27,18 +27,10 @@
       type: keyword
       description: >
         Result signature
-    - name: durationMs
-      type: keyword
-      description: >
-        Activity duration
     - name: correlationId
       type: keyword
       description: >
         Correlation ID
-    - name: level
-      type: keyword
-      description: >
-        Log level
     - name: properties
       type: group
       description: >

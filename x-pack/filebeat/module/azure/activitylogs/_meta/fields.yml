@@ -64,18 +64,10 @@
       type: keyword
       description: >
         Result Type
-    - name: callerIpAddress
-      type: keyword
-      description: >
-        Caller Ip address
     - name: resourceID
       type: keyword
       description: >
         Resource ID
-    - name: level
-      type: keyword
-      description: >
-        Level
     - name: operationName
       type: keyword
       description: >
@@ -90,12 +82,4 @@
       object_type_mapping_type: "*"
       description: >
         Properties
-    - name: location
-      type: keyword
-      description: >
-        Location
-    - name: category
-      type: keyword
-      description: >
-        Category
 

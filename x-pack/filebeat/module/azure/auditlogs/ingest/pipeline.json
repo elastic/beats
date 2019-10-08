@@ -19,8 +19,22 @@
           }
       },
       {
+          "rename": {
+              "field": "azure.auditlogs.durationMs",
+              "target_field": "event.duration",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.level",
+              "target_field": "log.level",
+              "ignore_missing": true
+          }
+      },
+      {
           "remove": {
-              "field": ["message", "azure.auditlogs.time"],
+              "field": ["message", "azure.auditlogs.time", "azure.auditlogs.durationMs", "azure.auditlogs.level"],
               "ignore_missing": true
           }
       },

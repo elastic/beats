@@ -20,14 +20,35 @@
       },
       {
           "rename": {
-              "field": "identity",
-              "target_field": "specification",
+              "field": "azure.signinlogs.callerIpAddress",
+              "target_field": "source.ip",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.Level",
+              "target_field": "log.level",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.durationMs",
+              "target_field": "event.duration",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.location",
+              "target_field": "geo.country_iso_code",
               "ignore_missing": true
           }
       },
       {
           "remove": {
-              "field": ["message", "time"],
+              "field": ["message", "azure.signinlogs.time","azure.signinlogs.Level", "azure.signinlogs.callerIpAddress","azure.signinlogs.durationMs"],
               "ignore_missing": true
           }
       },

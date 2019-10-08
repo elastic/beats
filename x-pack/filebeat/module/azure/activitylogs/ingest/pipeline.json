@@ -19,8 +19,44 @@
           }
       },
       {
+          "rename": {
+              "field": "azure.activitylogs.callerIpAddress",
+              "target_field": "source.ip",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.level",
+              "target_field": "log.level",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.durationMs",
+              "target_field": "event.duration",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.location",
+              "target_field": "geo.name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.category",
+              "target_field": "event.category",
+              "ignore_missing": true
+          }
+      },
+      {
           "remove": {
-              "field": ["message", "azure.activitylogs.time"],
+              "field": ["message", "azure.activitylogs.time", "azure.activitylogs.callerIpAddress", "azure.activitylogs.category",
+                  "azure.activitylogs.level", "azure.activitylogs.durationMs", "azure.activitylogs.location"],
               "ignore_missing": true
           }
       },
