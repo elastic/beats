@@ -1,0 +1,251 @@
+//begin inner exclude for redis
+ifndef::no-output-redis[]
+[[redis-output]]
+=== Configure the Redis output
+
+++++
+<titleabbrev>Redis</titleabbrev>
+++++
+
+The Redis output inserts the events into a Redis list or a Redis channel.
+This output plugin is compatible with
+the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.redis:
+  hosts: ["localhost"]
+  password: "my_password"
+  key: "{beatname_lc}"
+  db: 0
+  timeout: 5
+------------------------------------------------------------------------------
+
+==== Compatibility
+
+This output works with Redis 3.2.4.
+
+==== Configuration options
+
+You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
+
+===== `enabled`
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is true.
+
+===== `hosts`
+
+The list of Redis servers to connect to. If load balancing is enabled, the events are
+distributed to the servers in the list. If one server becomes unreachable, the events are
+distributed to the reachable servers only. You can define each Redis server by specifying
+`HOST` or `HOST:PORT`. For example: `"192.15.3.2"` or `"test.redis.io:12345"`. If you
+don't specify a port number, the value configured by `port` is used.
+
+===== `index`
+
+The index name added to the events metadata for use by Logstash. The default is "{beatname_lc}".
+
+[[key-option-redis]]
+===== `key`
+
+The name of the Redis list or channel the events are published to. If not
+configured, the value of the `index` setting is used.
+
+You can set the key dynamically by using a format string to access any event
+field. For example, this configuration uses a custom field, `fields.list`, to
+set the Redis list key. If `fields.list` is missing, `fallback` is used:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.redis:
+  hosts: ["localhost"]
+  key: "%{[fields.list]:fallback}"
+------------------------------------------------------------------------------
+
+
+TIP: To learn how to add custom fields to events, see the
+<<libbeat-configuration-fields,`fields`>> option.
+
+See the <<keys-option-redis,`keys`>> setting for other ways to set the key
+dynamically.
+
+[[keys-option-redis]]
+===== `keys`
+
+An array of key selector rules. Each rule specifies the `key` to use for events
+that match the rule. During publishing, {beatname_uc} uses the first matching
+rule in the array. Rules can contain conditionals, format string-based fields,
+and name mappings. If the `keys` setting is missing or no rule matches, the
+<<key-option-redis,`key`>> setting is used.
+
+Rule settings:
+
+*`index`*:: The key format string to use. If this string contains field
+references, such as `%{[fields.name]}`, the fields must exist, or the rule
+fails.
+
+*`mappings`*:: A dictionary that takes the value returned by `key` and maps it to
+a new name.
+
+*`default`*:: The default string value to use if `mappings` does not find a match.
+
+*`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
+All the <<conditions,conditions>> supported by processors are also supported
+here.
+endif::no-processors[]
+
+Example `keys` settings:
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.redis:
+  hosts: ["localhost"]
+  key: "default_list"
+  keys:
+    - key: "info_list"   # send to info_list if `message` field contains INFO
+      when.contains:
+        message: "INFO"
+    - key: "debug_list"  # send to debug_list if `message` field contains DEBUG
+      when.contains:
+        message: "DEBUG"
+    - key: "%{[fields.list]}"
+      mappings:
+        http: "frontend_list"
+        nginx: "frontend_list"
+        mysql: "backend_list"
+------------------------------------------------------------------------------
+
+===== `password`
+
+The password to authenticate with. The default is no authentication.
+
+===== `db`
+
+The Redis database number where the events are published. The default is 0.
+
+===== `datatype`
+
+The Redis data type to use for publishing events.If the data type is `list`, the
+Redis RPUSH command is used and all events are added to the list with the key defined under `key`.
+If the data type `channel` is used, the Redis `PUBLISH` command is used and means that all events
+are pushed to the pub/sub mechanism of Redis. The name of the channel is the one defined under `key`.
+The default value is `list`.
+
+===== `codec`
+
+Output codec configuration. If the `codec` section is missing, events will be json encoded.
+
+See <<configuration-output-codec>> for more information.
+
+===== `host_topology`
+
+deprecated:[5.0.0]
+
+The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
+
+===== `password_topology`
+
+deprecated:[5.0.0]
+
+The password to use for authenticating with the Redis topology server. The default is no authentication.
+
+===== `db_topology`
+
+deprecated:[5.0.0]
+
+The Redis database number where the topology information is stored. The default is 1.
+
+===== `worker`
+
+The number of workers to use for each host configured to publish events to Redis. Use this setting along with the
+`loadbalance` option. For example, if you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+
+===== `loadbalance`
+
+If set to true and multiple hosts or workers are configured, the output plugin load balances published events onto all
+Redis hosts. If set to false, the output plugin sends all events to only one host (determined at random) and will switch
+to another host if the currently selected one becomes unreachable. The default value is true.
+
+===== `timeout`
+
+The Redis connection timeout in seconds. The default is 5 seconds.
+
+===== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Redis after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Redis after a network error. The default is 60s.
+
+===== `max_retries`
+
+ifdef::ignores_max_retries[]
+{beatname_uc} ignores the `max_retries` setting and retries indefinitely.
+endif::[]
+
+ifndef::ignores_max_retries[]
+The number of times to retry publishing an event after a publishing failure.
+After the specified number of retries, the events are typically dropped.
+
+Set `max_retries` to a value less than 0 to retry until all events are published.
+
+The default is 3.
+endif::[]
+
+
+===== `bulk_max_size`
+
+The maximum number of events to bulk in a single Redis request or pipeline. The default is 2048.
+
+If the Beat sends single events, the events are collected into batches. If the
+Beat publishes a large batch of events (larger than the value specified by
+`bulk_max_size`), the batch is split.
+
+Specifying a larger batch size can improve performance by lowering the overhead
+of sending events. However big batch sizes can also increase processing times,
+which might result in API errors, killed connections, timed-out publishing
+requests, and, ultimately, lower throughput.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
+
+===== `ssl`
+
+Configuration options for SSL parameters like the root CA for Redis connections
+guarded by SSL proxies (for example https://www.stunnel.org[stunnel]). See
+<<configuration-ssl>> for more information.
+
+===== `proxy_url`
+
+The URL of the SOCKS5 proxy to use when connecting to the Redis servers. The
+value must be a URL with a scheme of `socks5://`. You cannot use a web proxy
+because the protocol used to communicate with Redis is not based on HTTP.
+
+If the SOCKS5 proxy server requires client authentication, you can embed
+a username and password in the URL.
+
+When using a proxy, hostnames are resolved on the proxy server instead of on the
+client. You can change this behavior by setting the
+<<redis-proxy-use-local-resolver,`proxy_use_local_resolver`>> option.
+
+[[redis-proxy-use-local-resolver]]
+===== `proxy_use_local_resolver`
+
+This option determines whether Redis hostnames are resolved locally when using a proxy.
+The default value is false, which means that name resolution occurs on the proxy server.
+
+//end inner exclude for redis
+endif::[]

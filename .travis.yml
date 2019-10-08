@@ -170,12 +170,6 @@ jobs:
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
-        - TRAVIS_K8S_VERSION=v1.8.0
-      stage: test
-    - os: linux
-      install: deploy/kubernetes/.travis/setup.sh
-      env:
-        - TARGETS="-C deploy/kubernetes test"
         - TRAVIS_K8S_VERSION=v1.9.4
       stage: test
     - os: linux
@@ -184,6 +178,24 @@ jobs:
         - TARGETS="-C deploy/kubernetes test"
         - TRAVIS_K8S_VERSION=v1.10.0
       stage: test
+    - os: linux
+      dist: xenial
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_K8S_VERSION=v1.15.3
+        - TRAVIS_MINIKUBE_VERSION=v1.3.1
+      stage: test
+      addons:
+        apt:
+          update: true
+          packages:
+            - python-virtualenv
+            - libpcap-dev
+            - xsltproc
+            - libxml2-utils
+            - librpm-dev
+
     # TODO include 1.11 once minikube supports it
     #- os: linux
     #  install: deploy/kubernetes/.travis/setup.sh

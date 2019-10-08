@@ -30,4 +30,5 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle/tablespace"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd/server"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/tomcat"
 )

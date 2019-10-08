@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
@@ -49,4 +51,136 @@ func TestGetRegions(t *testing.T) {
 	}
 	assert.Equal(t, 1, len(regionsList))
 	assert.Equal(t, regionName, regionsList[0])
+}
+
+func TestStringInSlice(t *testing.T) {
+	cases := []struct {
+		target         string
+		slice          []string
+		expectedExists bool
+		expectedIdx    int
+	}{
+		{
+			"bar",
+			[]string{"foo", "bar", "baz"},
+			true,
+			1,
+		},
+		{
+			"test",
+			[]string{"foo", "bar", "baz"},
+			false,
+			-1,
+		},
+	}
+	for _, c := range cases {
+		exists, idx := StringInSlice(c.target, c.slice)
+		assert.Equal(t, c.expectedExists, exists)
+		assert.Equal(t, c.expectedIdx, idx)
+	}
+}
+
+var (
+	tagKey1   = "Name"
+	tagValue1 = "ECS Instance"
+	tagKey2   = "User"
+	tagValue2 = "foobar"
+	tagKey3   = "Organization"
+	tagValue3 = "Engineering"
+)
+
+func TestCheckTagFiltersExist(t *testing.T) {
+	cases := []struct {
+		title          string
+		tagFilters     []Tag
+		tags           interface{}
+		expectedExists bool
+	}{
+		{
+			"tagFilters are included in ec2 tags",
+			[]Tag{
+				{
+					Key:   "Name",
+					Value: "ECS Instance",
+				},
+				{
+					Key:   "Organization",
+					Value: "Engineering",
+				},
+			},
+			[]ec2.Tag{
+				{
+					Key:   awssdk.String(tagKey1),
+					Value: awssdk.String(tagValue1),
+				},
+				{
+					Key:   awssdk.String(tagKey2),
+					Value: awssdk.String(tagValue2),
+				},
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue3),
+				},
+			},
+			true,
+		},
+		{
+			"one set of tagFilters is included in resourcegroupstaggingapi tags",
+			[]Tag{
+				{
+					Key:   "Name",
+					Value: "test",
+				},
+				{
+					Key:   "Organization",
+					Value: "Engineering",
+				},
+			},
+			[]resourcegroupstaggingapi.Tag{
+				{
+					Key:   awssdk.String(tagKey1),
+					Value: awssdk.String(tagValue1),
+				},
+				{
+					Key:   awssdk.String(tagKey2),
+					Value: awssdk.String(tagValue2),
+				},
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue3),
+				},
+			},
+			false,
+		},
+		{
+			"tagFilters is not included in resourcegroupstaggingapi tags",
+			[]Tag{
+				{
+					Key:   "Name",
+					Value: "test",
+				},
+			},
+			[]resourcegroupstaggingapi.Tag{
+				{
+					Key:   awssdk.String(tagKey1),
+					Value: awssdk.String(tagValue1),
+				},
+				{
+					Key:   awssdk.String(tagKey2),
+					Value: awssdk.String(tagValue2),
+				},
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue3),
+				},
+			},
+			false,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			exists := CheckTagFiltersExist(c.tagFilters, c.tags)
+			assert.Equal(t, c.expectedExists, exists)
+		})
+	}
 }

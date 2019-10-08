@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
 - Update to Golang 1.12.7. {pull}12931[12931]
 - Remove `in_cluster` configuration parameter for Kuberentes, now in-cluster configuration is used only if no other kubeconfig is specified {pull}13051[13051]
+- Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 
 *Auditbeat*
 
@@ -102,7 +103,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
 - Fix case insensitive regular expressions not working correctly. {pull}13250[13250]
 - Disable `add_kubernetes_metadata` if no matchers found. {pull}13709[13709]
+- Better wording for xpack beats when the _xpack endpoint is not reachable. {pull}13771[13771]
 - Recover from panics in the javascript process and log details about the failure to aid in future debugging. {pull}13690[13690]
+- Make the script processor concurrency-safe. {issue}13690[13690] {pull}13857[13857]
+- Kubernetes watcher at `add_kubernetes_metadata` fails with StatefulSets {pull}13905[13905]
 
 *Auditbeat*
 
@@ -147,6 +151,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
 - Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
 - Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
+- Fixed early expiration of templates (Netflow v9 and IPFIX). {pull}13821[13821]
+- Fixed bad handling of sequence numbers when multiple observation domains were exported by a single device (Netflow V9 and IPFIX). {pull}13821[13821]
+- Fix timezone parsing of rabbitmq module ingest pipelines. {pull}13879[13879]
+- Fix conditions and error checking of date processors in ingest pipelines that use `event.timezone` to parse dates. {pull}13883[13883]
+- Fix timezone parsing of logstash module ingest pipelines. {pull}13890[13890]
+- cisco asa and ftd filesets: Fix parsing of message 106001. {issue}13891[13891] {pull}13903[13903]
+- Fix timezone parsing of iptables, mssql and panw module ingest pipelines. {pull}13926[13926]
+- Fix merging of fields specified in global scope with fields specified under an input's scope. {issue}3628[3628] {pull}13909[13909]
+- Fix delay in enforcing close_renamed and close_removed options. {issue}13488[13488] {pull}13907[13907]
 
 *Heartbeat*
 
@@ -257,6 +270,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add autodetection mode for add_docker_metadata and enable it by default in included configuration files{pull}13374[13374]
 - Added `monitoring.cluster_uuid` setting to associate Beat data with specified ES cluster in Stack Monitoring UI. {pull}13182[13182]
 - Add autodetection mode for add_kubernetes_metadata and enable it by default in included configuration files. {pull}13473[13473]
+- Add `providers` setting to `add_cloud_metadata` processor. {pull}13812[13812]
+- Use less restrictive API to check if template exists. {pull}13847[13847]
+- Do not check for alias when setup.ilm.check_exists is false. {pull}13848[13848]
+- Add support for numeric time zone offsets in timestamp processor. {pull}13902[13902]
 
 *Auditbeat*
 
@@ -313,6 +330,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update CoreDNS module to populate ECS DNS fields. {issue}13320[13320] {pull}13505[13505]
 - Parse query steps in PostgreSQL slowlogs. {issue}13496[13496] {pull}13701[13701]
 - Add support to set the document id in the json reader. {pull}5844[5844]
+- Add input httpjson. {issue}13545[13545] {pull}13546[13546]
+- Filebeat Netflow input: Remove beta label. {pull}13858[13858]
+- Remove `event.timezone` from events that don't need it in some modules that support log formats with and without timezones. {pull}13918[13918]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -370,6 +390,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS ebs metricset. {pull}13167[13167] {issue}11699[11699]
 - Add `metricset.period` field with the configured fetching period. {pull}13242[13242] {issue}12616[12616]
 - Add rate metrics for ec2 metricset. {pull}13203[13203]
+- Add refresh list of perf counters at every fetch {issue}13091[13091]
 - Add Performance metricset to Oracle module {pull}12547[12547]
 - Add proc/vmstat data to the system/memory metricset on linux {pull}13322[13322]
 - Use DefaultMetaGeneratorConfig in MetadataEnrichers to initialize configurations {pull}13414[13414]
@@ -377,7 +398,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for NATS version 2. {pull}13601[13601]
 - Add `docker.cpu.*.norm.pct` metrics for `cpu` metricset of Docker Metricbeat module. {pull}13695[13695]
 - Add `instance` label by default when using Prometheus collector. {pull}13737[13737]
-
+- Add Apache Tomcat module {pull}13491[13491]
+- Add ECS `container.id` and `container.runtime` to kubernetes `state_container` metricset. {pull}13884[13884]
+- Add `job` label by default when using Prometheus collector. {pull}13878[13878]
+- Add `state_resourcequota` metricset for Kubernetes module. {pull}13693[13693]
+- Add tags filter in ec2 metricset. {pull}13872[13872] {issue}13145[13145]
 
 *Packetbeat*
 
@@ -419,6 +444,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 *Metricbeat*
+
+- `kubernetes.container.id` field for `state_container` is deprecated in favour of ECS `container.id` and `container.runtime`. {pull}13884[13884]
 
 *Packetbeat*
 

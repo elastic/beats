@@ -1,12 +1,12 @@
 [
     {
-        "@timestamp": "2018-05-17T08:29:12.177Z",
+        "@timestamp": "2018-05-17T08:29:12.177-02:00",
         "elasticsearch.component": "o.e.c.m.MetaDataCreateIndexService",
         "elasticsearch.index.name": "test-filebeat-modules",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -15,12 +15,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:19:35.939Z",
+        "@timestamp": "2018-05-17T08:19:35.939-02:00",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -29,12 +29,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:19:36.089Z",
+        "@timestamp": "2018-05-17T08:19:36.089-02:00",
         "elasticsearch.component": "o.e.e.NodeEnvironment",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -43,12 +43,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:19:36.090Z",
+        "@timestamp": "2018-05-17T08:19:36.090-02:00",
         "elasticsearch.component": "o.e.e.NodeEnvironment",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -57,11 +57,11 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:19:36.116Z",
+        "@timestamp": "2018-05-17T08:19:36.116-02:00",
         "elasticsearch.component": "o.e.n.Node",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -70,12 +70,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:23:48.941Z",
+        "@timestamp": "2018-05-17T08:23:48.941-02:00",
         "elasticsearch.component": "o.e.c.r.a.DiskThresholdMonitor",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -84,13 +84,13 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:29:09.245Z",
+        "@timestamp": "2018-05-17T08:29:09.245-02:00",
         "elasticsearch.component": "o.e.c.m.MetaDataCreateIndexService",
         "elasticsearch.index.name": "filebeat-test-input",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -99,14 +99,14 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:29:09.576Z",
+        "@timestamp": "2018-05-17T08:29:09.576-02:00",
         "elasticsearch.component": "o.e.c.m.MetaDataMappingService",
         "elasticsearch.index.id": "aOGgDwbURfCV57AScqbCgw",
         "elasticsearch.index.name": "filebeat-test-input",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -115,14 +115,14 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-09T12:47:33.959Z",
+        "@timestamp": "2018-07-09T12:47:33.959-02:00",
         "elasticsearch.component": "o.e.c.m.MetaDataMappingService",
         "elasticsearch.index.id": "3tWftqb4RLKdyCAga9syGA",
         "elasticsearch.index.name": ".kibana",
         "elasticsearch.node.name": "QGY1F5P",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -131,12 +131,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:29:25.598Z",
+        "@timestamp": "2018-05-17T08:29:25.598-02:00",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -145,12 +145,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-05-17T08:29:25.612Z",
+        "@timestamp": "2018-05-17T08:29:25.612-02:00",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -159,12 +159,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T11:45:48.548Z",
+        "@timestamp": "2018-07-03T11:45:48.548-02:00",
         "elasticsearch.component": "o.e.d.z.ZenDiscovery",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "INFO",
@@ -173,12 +173,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T11:45:48.548Z",
+        "@timestamp": "2018-07-03T11:45:48.548-02:00",
         "elasticsearch.component": "o.e.d.z.ZenDiscovery",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.flags": [
@@ -190,11 +190,11 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T11:45:52.666Z",
+        "@timestamp": "2018-07-03T11:45:52.666-02:00",
         "elasticsearch.component": "r.suppressed",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.flags": [
@@ -206,11 +206,11 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T11:48:02.552Z",
+        "@timestamp": "2018-07-03T11:48:02.552-02:00",
         "elasticsearch.component": "r.suppressed",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.flags": [
@@ -222,14 +222,14 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T11:45:27.896Z",
+        "@timestamp": "2018-07-03T11:45:27.896-02:00",
         "elasticsearch.component": "o.e.m.j.JvmGcMonitorService",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "elasticsearch.server.gc.young.one": "3449979",
         "elasticsearch.server.gc.young.two": "986594",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.flags": [
@@ -241,7 +241,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T11:45:45.604Z",
+        "@timestamp": "2018-07-03T11:45:45.604-02:00",
         "elasticsearch.component": "o.e.m.j.JvmGcMonitorService",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "elasticsearch.server.gc.collection_duration.ms": 1600.0,
@@ -249,7 +249,7 @@
         "elasticsearch.server.gc.overhead_seq": "3449992",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "WARN",
@@ -258,12 +258,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T11:48:02.541Z",
+        "@timestamp": "2018-07-03T11:48:02.541-02:00",
         "elasticsearch.component": "o.e.a.b.TransportShardBulkAction",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.level": "WARN",
@@ -272,12 +272,12 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-03T20:10:07.376Z",
+        "@timestamp": "2018-07-03T20:10:07.376-02:00",
         "elasticsearch.component": "o.e.x.m.MonitoringService",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "server",
         "input.type": "log",
         "log.flags": [

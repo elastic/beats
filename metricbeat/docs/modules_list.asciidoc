@@ -95,7 +95,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.17+| .17+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.18+| .18+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>> beta[]  
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -109,6 +109,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
 |<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>   
+|<<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>   
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
@@ -180,6 +181,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-socket_summary,socket_summary>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
+|<<metricbeat-module-tomcat,Tomcat>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.4+| .4+|  |<<metricbeat-metricset-tomcat-cache,cache>> beta[]  
+|<<metricbeat-metricset-tomcat-memory,memory>> beta[]  
+|<<metricbeat-metricset-tomcat-requests,requests>> beta[]  
+|<<metricbeat-metricset-tomcat-threading,threading>> beta[]  
 |<<metricbeat-module-traefik,traefik>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-traefik-health,health>>   
 |<<metricbeat-module-uwsgi,uwsgi>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -240,6 +246,7 @@ include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/statsd.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/uwsgi.asciidoc[]
 include::modules/vsphere.asciidoc[]

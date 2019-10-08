@@ -1,17 +1,24 @@
 [[configuration-ssl]]
+ifndef::apm-server[]
 == Specify SSL settings
+endif::apm-server[]
+ifdef::apm-server[]
+== SSL output settings
 
+You can specify SSL options with any output that supports SSL, like {es}, {ls}, or Kafka.
+endif::[]
+
+ifndef::apm-server[]
 You can specify SSL options when you configure:
 
 * <<configuring-output,outputs>> that support SSL
-ifeval::["{beatname_lc}"!="apm-server"]
 * the <<setup-kibana-endpoint,Kibana endpoint>>
-endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
 * <<configuration-heartbeat-options,{beatname_uc} monitors>> that support SSL
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 * <<metricbeat-modules,modules>> that define the host as an HTTP URL
+endif::[]
 endif::[]
 
 Example output config with SSL enabled:
@@ -24,7 +31,7 @@ output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
 output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
 ----
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 Also see <<configuring-ssl-logstash>>.
 endif::[]
 
