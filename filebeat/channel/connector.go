@@ -106,6 +106,7 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	clientCfg.Processing.Meta = meta
 	clientCfg.Processing.Fields = fields
 	clientCfg.Processing.Processor = userProcessors
+	clientCfg.Processing.KeepNull = config.KeepNull
 	client, err := c.pipeline.ConnectWith(clientCfg)
 	if err != nil {
 		return nil, err

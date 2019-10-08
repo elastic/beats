@@ -59,7 +59,6 @@ type builder struct {
 
 	drop       bool // disabled is set if outputs have been disabled via CLI
 	alwaysCopy bool
-	keepNull   bool // whether to keep null values in events or not
 }
 
 type modifier interface {
@@ -103,7 +102,6 @@ func MakeDefaultSupport(
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
 			TimeSeries           bool                    `config:"timeseries.enabled"`
-			KeepNull             bool                    `config:"keep_null"`
 		}{}
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
@@ -114,7 +112,7 @@ func MakeDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries, cfg.KeepNull)
+		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries)
 	}
 }
 
@@ -167,7 +165,6 @@ func newBuilder(
 	modifiers []modifier,
 	skipNormalize bool,
 	timeSeries bool,
-	keepNull bool,
 ) (*builder, error) {
 	b := &builder{
 		skipNormalize: skipNormalize,
@@ -175,7 +172,6 @@ func newBuilder(
 		log:           log,
 		info:          info,
 		timeSeries:    timeSeries,
-		keepNull:      keepNull,
 	}
 
 	hasProcessors := processors != nil && len(processors.List) > 0
@@ -270,7 +266,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	if !b.skipNormalize {
 		// setup 1: generalize/normalize output (P)
-		processors.add(newGeneralizeProcessor(b.keepNull))
+		processors.add(newGeneralizeProcessor(cfg.KeepNull))
 	}
 
 	// setup 2: add Meta from client config (C)
