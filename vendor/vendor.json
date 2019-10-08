@@ -171,12 +171,6 @@
 			"versionExact": "v0.4.14"
 		},
 		{
-			"checksumSHA1": "hgIAHvJxD+yog1zQGS0rqRGGCWg=",
-			"path": "github.com/Microsoft/go-winio/pkg/guid",
-			"revision": "6c72808b55902eae4c5943626030429ff20f3b63",
-			"revisionTime": "2019-08-06T19:59:04Z"
-		},
-		{
 			"checksumSHA1": "7GaOyxvD4mLFr39pWg40CGZ0yiM=",
 			"path": "github.com/Microsoft/hcsshim/osversion",
 			"revision": "84b0c364e1e3bb91e43b85bf20d72e7948666817",
@@ -2546,14 +2540,6 @@
 			"path": "github.com/matttproud/golang_protobuf_extensions/pbutil",
 			"revision": "c182affec369e30f25d3eb8cd8a478dee585ae7d",
 			"revisionTime": "2018-12-31T17:19:20Z"
-		},
-		{
-			"checksumSHA1": "hmZf5RjoZJIaYHG9PMvRUsnmxRM=",
-			"path": "github.com/microsoft/go-winio",
-			"revision": "6c72808b55902eae4c5943626030429ff20f3b63",
-			"revisionTime": "2019-08-06T19:59:04Z",
-			"version": "=v0.4.14",
-			"versionExact": "v0.4.14"
 		},
 		{
 			"checksumSHA1": "HIr4QObwKUZBt54QIh1+aTzc4hU=",

@@ -4044,8 +4044,6 @@ Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
 
 --------------------------------------------------------------------
 Dependency: github.com/microsoft/go-winio
-Version: =v0.4.14
-Revision: 6c72808b55902eae4c5943626030429ff20f3b63
 License type (autodetected): MIT
 ./vendor/github.com/microsoft/go-winio/LICENSE:
 --------------------------------------------------------------------
