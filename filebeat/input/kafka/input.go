@@ -19,6 +19,7 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -107,6 +108,8 @@ func (input *kafkaInput) runConsumerGroup(
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
+		// yieldEventsFromField will be assigned the configuration option yield_events_from_field
+		yieldEventsFromField: input.config.YieldEventsFromField,
 	}
 
 	input.saramaWaitGroup.Add(1)
@@ -234,6 +237,9 @@ type groupHandler struct {
 	version kafka.Version
 	session sarama.ConsumerGroupSession
 	outlet  channel.Outleter
+	// if the fileset using this input expects to receive multiple messages bundled under a specific field then this value is assigned
+	// ex. in this case are the azure fielsets where the events are found under the json object "records"
+	yieldEventsFromField string
 }
 
 // The metadata attached to incoming events so they can be ACKed once they've
@@ -243,11 +249,11 @@ type eventMeta struct {
 	message *sarama.ConsumerMessage
 }
 
-func (h *groupHandler) createEvent(
+func (h *groupHandler) createEvents(
 	sess sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
-) beat.Event {
+) []beat.Event {
 	timestamp := time.Now()
 	kafkaFields := common.MapStr{
 		"topic":     claim.Topic(),
@@ -266,19 +272,31 @@ func (h *groupHandler) createEvent(
 	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
 		kafkaFields["headers"] = arrayForKafkaHeaders(message.Headers)
 	}
-	event := beat.Event{
-		Timestamp: timestamp,
-		Fields: common.MapStr{
-			"message": string(message.Value),
-			"kafka":   kafkaFields,
-		},
-		Private: eventMeta{
-			handler: h,
-			message: message,
-		},
-	}
 
-	return event
+	// if yieldEventsFromField has been set, then a check for the actual json object will be done and a return for multiple messages is executed
+	var events []beat.Event
+	var messages []string
+	if h.yieldEventsFromField == "" {
+		messages = []string{string(message.Value)}
+	} else {
+		messages = h.parseMultipleMessages(message.Value)
+	}
+	for _, msg := range messages {
+		event := beat.Event{
+			Timestamp: timestamp,
+			Fields: common.MapStr{
+				"message": msg,
+				"kafka":   kafkaFields,
+			},
+			Private: eventMeta{
+				handler: h,
+				message: message,
+			},
+		}
+		events = append(events, event)
+
+	}
+	return events
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -307,8 +325,29 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 
 func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		event := h.createEvent(sess, claim, msg)
-		h.outlet.OnEvent(event)
+		events := h.createEvents(sess, claim, msg)
+		for _, event := range events {
+			h.outlet.OnEvent(event)
+		}
 	}
 	return nil
+}
+
+// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
+func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
+	var messages []string
+	var obj map[string][]interface{}
+	err := json.Unmarshal(bMessage, &obj)
+	if err != nil {
+		return messages
+	}
+	if len(obj[h.yieldEventsFromField]) > 0 {
+		for _, ms := range obj[h.yieldEventsFromField] {
+			js, err := json.Marshal(ms)
+			if err == nil {
+				messages = append(messages, string(js))
+			}
+		}
+	}
+	return messages
 }
