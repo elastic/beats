@@ -9,6 +9,7 @@ package main
 import (
 	"os"
 
+	"github.com/elastic/beats/dev-tools/mage"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
@@ -36,7 +37,12 @@ func Build() error {
 		return errors.Wrap(err, "error changing directory")
 	}
 
-	err = sh.RunV("docker", "build", "--target", "final", "-t", "rootfsimage", "-f", "x-pack/dockerlogbeat/Dockerfile", ".")
+	gv, err := mage.GoVersion()
+	if err != nil {
+		return errors.Wrap(err, "error determining go version")
+	}
+
+	err = sh.RunV("docker", "build", "--build-arg", "versionString"+"="+gv, "--target", "final", "-t", "rootfsimage", "-f", "x-pack/dockerlogbeat/Dockerfile", ".")
 	if err != nil {
 		return errors.Wrap(err, "error building final container image")
 	}
