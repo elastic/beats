@@ -54,9 +54,16 @@
           }
       },
       {
+          "rename": {
+              "field": "azure.activitylogs.resultType",
+              "target_field": "event.outcome",
+              "ignore_missing": true
+          }
+      },
+      {
           "remove": {
               "field": ["message", "azure.activitylogs.time", "azure.activitylogs.callerIpAddress", "azure.activitylogs.category",
-                  "azure.activitylogs.level", "azure.activitylogs.durationMs", "azure.activitylogs.location"],
+                  "azure.activitylogs.level", "azure.activitylogs.durationMs", "azure.activitylogs.location", "azure.activitylogs.resultType"],
               "ignore_missing": true
           }
       },

@@ -60,10 +60,6 @@
       type: keyword
       description: >
         Correlation ID
-    - name: resultType
-      type: keyword
-      description: >
-        Result Type
     - name: resourceID
       type: keyword
       description: >

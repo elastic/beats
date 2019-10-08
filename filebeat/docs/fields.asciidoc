@@ -1383,16 +1383,6 @@ type: keyword
 
 --
 
-*`azure.activitylogs.resultType`*::
-+
---
-Result Type
-
-
-type: keyword
-
---
-
 *`azure.activitylogs.resourceID`*::
 +
 --

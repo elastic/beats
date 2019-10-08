@@ -47,8 +47,23 @@
           }
       },
       {
+          "rename": {
+              "field": "azure.signinlogs.resultType",
+              "target_field": "event.outcome",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.category",
+              "target_field": "event.category",
+              "ignore_missing": true
+          }
+      },
+      {
           "remove": {
-              "field": ["message", "azure.signinlogs.time","azure.signinlogs.Level", "azure.signinlogs.callerIpAddress","azure.signinlogs.durationMs"],
+              "field": ["message", "azure.signinlogs.time","azure.signinlogs.Level", "azure.signinlogs.callerIpAddress","azure.signinlogs.durationMs",
+              "azure.signinlogs.resultType", "azure.signinlogs.category"],
               "ignore_missing": true
           }
       },

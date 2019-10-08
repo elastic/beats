@@ -1,3 +1,5 @@
+[role="xpack"]
+
 :modulename: azure
 :has-dashboards: false
 
@@ -82,15 +84,6 @@ include::../include/what-happens.asciidoc[]
 TODO: document with what versions of the software is this tested
 
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
 
 
 
