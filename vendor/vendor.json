@@ -167,7 +167,7 @@
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "6c72808b55902eae4c5943626030429ff20f3b63",
 			"revisionTime": "2019-08-06T19:59:04Z",
-			"version": "=v0.4.14",
+			"version": "v0.4.14",
 			"versionExact": "v0.4.14"
 		},
 		{
