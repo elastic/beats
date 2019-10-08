@@ -72,7 +72,8 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client *Client
+	Client    *Client
+	MapMetric mapMetric
 }
 
 // NewMetricSet will instantiate a new azure metricset
@@ -86,7 +87,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	//validate config based on metricset
-	switch base.Name() {
+	switch metricsetName {
 	case nativeMetricset:
 		// resources must be configured for the monitor metricset
 		if len(config.Resources) == 0 {
@@ -112,9 +113,11 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}, nil
 }
 
-// FetchValues methods implements the data gathering and data conversion to the right metricset
-func (m *MetricSet) FetchValues(fn mapMetric, report mb.ReporterV2) error {
-	err := m.Client.InitResources(fn, report)
+// Fetch methods implements the data gathering and data conversion to the right metricset
+// It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	err := m.Client.InitResources(m.MapMetric, report)
 	if err != nil {
 		return err
 	}
