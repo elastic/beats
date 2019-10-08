@@ -16696,7 +16696,7 @@ Number of client connections (excluding connections from slaves).
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 type: long
 
@@ -16719,7 +16719,7 @@ Longest output list among current client connections.
 +
 --
 
-deprecated[6.5.0]
+deprecated:[6.5.0]
 
 type: long
 
@@ -17315,7 +17315,7 @@ Number of connected slaves
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
