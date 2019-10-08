@@ -73,7 +73,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		}
 		var dimensions []azure.Dimension
 		if key != noDimension {
-			dimensions = []azure.Dimension{{Name: vmdim, Value: "*"}}
+			dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 		}
 		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, metric.Namespace, dimensions, defaultTimeGrain)...)
 	}
