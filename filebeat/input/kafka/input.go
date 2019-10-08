@@ -108,7 +108,7 @@ func (input *kafkaInput) runConsumerGroup(
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
-		// expandEventListFromField will be assigned the configuration option yield_events_from_field
+		// expandEventListFromField will be assigned the configuration option expand_event_list_from_field
 		expandEventListFromField: input.config.ExpandEventListFromField,
 		log:                      input.log,
 	}

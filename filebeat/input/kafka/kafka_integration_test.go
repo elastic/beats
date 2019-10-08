@@ -201,7 +201,7 @@ func TestInputWithMultipleEvents(t *testing.T) {
 		"topics":                   []string{testTopic},
 		"group_id":                 "filebeat",
 		"wait_close":               0,
-		"expand_events_from_field": "records",
+		"expand_event_list_from_field": "records",
 	})
 
 	// Route input events through our capturer instead of sending through ES.
