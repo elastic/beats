@@ -214,7 +214,7 @@ To grant the required privileges:
 . Create a *writer role*, called something like +{beat_default_index_prefix}_writer+,
 that has the following privileges:
 +
-NOTE: The `monitor` cluster privilege and the `create` privilege on
+NOTE: The `monitor` cluster privilege and the `create_doc` privilege on
 +{beat_default_index_prefix}-*+ indices are required in every configuration.
 +
 [options="header"]
@@ -241,7 +241,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 endif::[]
 
 |Index
-|`create` on +{beat_default_index_prefix}-*+ indices
+|`create_doc` on +{beat_default_index_prefix}-*+ indices
 |Write events into {es}
 
 ifndef::no_ilm[]
