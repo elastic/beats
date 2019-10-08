@@ -3044,6 +3044,15 @@ type: keyword
 
 --
 
+*`event.ingested`*::
++
+--
+Ingest timestamp
+
+type: date
+
+--
+
 [[exported-fields-cef]]
 == Decode CEF processor fields fields
 

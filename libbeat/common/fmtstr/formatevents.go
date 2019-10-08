@@ -460,3 +460,20 @@ func tryConvString(v interface{}) (string, error) {
 		return "", errConvertString
 	}
 }
+
+// EventFormat takes an event format string and an event and returns
+// the expanded string. Returns error if the underlying parsing or
+// compilation fails.
+func EventFormat(format string, event *beat.Event) (string, error) {
+	formatter, err := CompileEvent(format)
+	if err != nil {
+		return "", err
+	}
+
+	expanded, err := formatter.Run(event)
+	if err != nil {
+		return "", err
+	}
+
+	return expanded, nil
+}

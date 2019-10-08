@@ -32,3 +32,7 @@
     - name: timeseries.instance
       type: keyword
       description: Time series instance id
+
+    - name: event.ingested
+      type: date
+      description: Ingest timestamp

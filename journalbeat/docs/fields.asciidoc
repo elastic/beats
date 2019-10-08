@@ -85,6 +85,15 @@ type: keyword
 
 --
 
+*`event.ingested`*::
++
+--
+Ingest timestamp
+
+type: date
+
+--
+
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
 

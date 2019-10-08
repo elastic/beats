@@ -128,3 +128,17 @@ setup.template.json.name: "template-name
 
 NOTE: If the JSON template is used, the `fields.yml` is skipped for the template
 generation.
+
+*`setup.template.default_pipeline.enabled`*:: Set to `false` to disable loading of the
+default ingest pipeline.
+
+*`setup.template.default_pipeline.overwrite`*:: A boolean that specifies whether to overwrite
+the existing pipeline (if any). The default is `false`.
+
+*`setup.template.default_pipeline.name`*:: Specify a custom name for the default pipeline.
+Defaults to `beats_default`.
+
+*`setup.template.default_pipeline.file`*:: Load a custom default pipeline from a file instead
+of the built-in one. Files can be in either JSON or YAML format and must have
+`.json`, `.yaml`, or `.yml` as their extension.
+

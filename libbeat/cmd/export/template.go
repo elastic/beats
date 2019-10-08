@@ -49,7 +49,7 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 
 			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
-			if err := idxManager.Setup(idxmgmt.LoadModeForce, idxmgmt.LoadModeDisabled); err != nil {
+			if err := idxManager.Setup(idxmgmt.LoadModeForce, idxmgmt.LoadModeDisabled, idxmgmt.LoadModeDisabled); err != nil {
 				fatalf("Error exporting template: %+v.", err)
 			}
 		},

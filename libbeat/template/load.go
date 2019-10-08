@@ -34,6 +34,7 @@ import (
 //Loader interface for loading templates
 type Loader interface {
 	Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error
+	LoadDefaultPipeline(config TemplateConfig, info beat.Info) error
 }
 
 // ESLoader implements Loader interface for loading templates to Elasticsearch.
@@ -102,6 +103,39 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	return nil
 }
 
+// LoadDefaultPipeline loads the default pipeline.
+func (l *ESLoader) LoadDefaultPipeline(config TemplateConfig, info beat.Info) error {
+	//build template from config
+	tmpl, err := template(config, info, l.client.GetVersion(), false)
+	if err != nil || tmpl == nil {
+		return err
+	}
+
+	pipelineName := tmpl.GetDefaultPipelineName()
+	loadPipeline := config.DefaultPipeline.Overwrite
+	if !loadPipeline {
+		exists, err := l.ingestPipelineExists(pipelineName)
+		if err != nil {
+			logp.Warn("Could not check if ingest pipeline exists - continue without loading pipeline. Error: %+v", err)
+		} else if !exists {
+			loadPipeline = true
+		} else {
+			logp.Info("Ingest pipeline '%s' already exists and will not be overwritten.", pipelineName)
+		}
+	}
+
+	if loadPipeline {
+		// load default ingest pipeline to ES
+		if err := l.loadIngestPipeline(pipelineName, config); err != nil {
+			return err
+		}
+
+		logp.Info("Ingest pipeline '%s' loaded.", pipelineName)
+	}
+
+	return nil
+}
+
 // loadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
@@ -148,6 +182,26 @@ func (l *FileLoader) Load(config TemplateConfig, info beat.Info, fields []byte, 
 	str := fmt.Sprintf("%s\n", body.StringToPrint())
 	if err := l.client.Write("template", tmpl.name, str); err != nil {
 		return fmt.Errorf("error printing template: %v", err)
+	}
+	return nil
+}
+
+// LoadDefaultPipeline prints the default pipeline to the configured file.
+func (l *FileLoader) LoadDefaultPipeline(config TemplateConfig, info beat.Info) error {
+	//build template from config
+	tmpl, err := template(config, info, l.client.GetVersion(), false)
+	if err != nil || tmpl == nil {
+		return err
+	}
+
+	pipeline, err := getDefaultPipeline(config)
+	if err != nil {
+		return err
+	}
+
+	str := fmt.Sprintf("%s\n", pipeline.StringToPrint())
+	if err := l.client.Write("default-pipeline", tmpl.GetDefaultPipelineName(), str); err != nil {
+		return fmt.Errorf("error printing default-pipeline: %v", err)
 	}
 	return nil
 }

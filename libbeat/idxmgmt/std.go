@@ -70,8 +70,9 @@ type componentType uint8
 
 //go:generate stringer -linecomment -type componentType
 const (
-	componentTemplate componentType = iota //template
-	componentILM                           //ilm
+	componentTemplate        componentType = iota //template
+	componentILM                                  //ilm
+	componentDefaultPipeline                      //default_pipeline
 )
 
 type feature struct {
@@ -135,6 +136,8 @@ func (s *indexSupport) enabled(c componentType) bool {
 		return s.templateCfg.Enabled
 	case componentILM:
 		return s.ilm.Mode() != ilm.ModeDisabled
+	case componentDefaultPipeline:
+		return s.templateCfg.DefaultPipeline.Enabled
 	}
 	return false
 }
@@ -247,7 +250,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 }
 
 //
-func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
+func (m *indexManager) Setup(loadTemplate, loadILM, loadDefaultPipeline LoadMode) error {
 	log := m.support.log
 
 	withILM, err := m.setupWithILM()
@@ -261,6 +264,8 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	ilmComponent := newFeature(componentILM, withILM, m.support.ilm.Overwrite(), loadILM)
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
+	defaultPipelineComponent := newFeature(componentDefaultPipeline, m.support.enabled(componentDefaultPipeline),
+		false, loadDefaultPipeline)
 
 	if ilmComponent.load {
 		// install ilm policy
@@ -273,6 +278,13 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		// The template should be updated if a new policy is created.
 		if policyCreated && templateComponent.enabled {
 			templateComponent.overwrite = true
+		}
+	}
+
+	if defaultPipelineComponent.load {
+		err = m.clientHandler.LoadDefaultPipeline(m.support.templateCfg, m.support.info)
+		if err != nil {
+			return fmt.Errorf("error loading default pipeline: %v", err)
 		}
 	}
 

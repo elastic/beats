@@ -30,10 +30,11 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields mapping.Fields   `config:"append_fields"`
-	Overwrite    bool             `config:"overwrite"`
-	Settings     TemplateSettings `config:"settings"`
-	Order        int              `config:"order"`
+	AppendFields    mapping.Fields   `config:"append_fields"`
+	Overwrite       bool             `config:"overwrite"`
+	Settings        TemplateSettings `config:"settings"`
+	Order           int              `config:"order"`
+	DefaultPipeline PipelineConfig   `config:"default_pipeline"`
 }
 
 // TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
@@ -47,6 +48,12 @@ func DefaultConfig() TemplateConfig {
 	return TemplateConfig{
 		Enabled: true,
 		Fields:  "",
+		Name:    "%{[agent.name]}-%{[agent.version]}",
 		Order:   1,
+		Pattern: "%{[agent.name]}-%{[agent.version]}-*",
+		DefaultPipeline: PipelineConfig{
+			Enabled: true,
+			Name:    "%{[agent.name]}-%{[agent.version]}",
+		},
 	}
 }

@@ -22,21 +22,17 @@ import (
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 )
 
-// GenGetILMPolicyCmd is the command used to export the ilm policy.
-func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
+// GenExportDefaultPipelineCmd writes out the default ingest pipeline.
+func GenExportDefaultPipelineCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
-		Use:   "ilm-policy",
-		Short: "Export ILM policy",
+		Use:   "default-pipeline",
+		Short: "Export Elasticsearch default ingest pipeline to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 			dir, _ := cmd.Flags().GetString("dir")
 
-			if settings.ILM == nil {
-				settings.ILM = ilm.StdSupport
-			}
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
 				fatalfInitCmd(err)
@@ -44,14 +40,14 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 
 			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
-			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce, idxmgmt.LoadModeDisabled); err != nil {
-				fatalf("Error exporting ilm-policy: %+v.", err)
+			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce); err != nil {
+				fatalf("Error exporting default-pipeline: %+v.", err)
 			}
 		},
 	}
 
 	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
-	genTemplateConfigCmd.Flags().String("dir", "", "Specify directory for printing policy files. By default policies are printed to stdout.")
+	genTemplateConfigCmd.Flags().String("dir", "", "Specify directory to write pipeline file to. By default it is printed to stdout.")
 
 	return genTemplateConfigCmd
 }

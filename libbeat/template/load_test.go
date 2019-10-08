@@ -84,6 +84,25 @@ func TestFileLoader_Load(t *testing.T) {
 	}
 }
 
+func TestFileLoader_LoadDefaultPipeline(t *testing.T) {
+	ver := "7.0.0"
+	prefix := "mock"
+	info := beat.Info{Version: ver, IndexPrefix: prefix}
+	tmplName := fmt.Sprintf("%s-%s", prefix, ver)
+
+	fc, err := newFileClient(ver)
+	require.NoError(t, err)
+	fl := NewFileLoader(fc)
+
+	cfg := DefaultConfig()
+
+	err = fl.LoadDefaultPipeline(cfg, info)
+	require.NoError(t, err)
+	assert.Equal(t, "default-pipeline", fc.component)
+	assert.Equal(t, tmplName, fc.name)
+	assert.NotEmpty(t, fc.body)
+}
+
 type fileClient struct {
 	component, name, body, ver string
 }

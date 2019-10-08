@@ -18,7 +18,6 @@
 package template
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -54,6 +53,8 @@ type Template struct {
 	config      TemplateConfig
 	migration   bool
 	order       int
+
+	defaultPipelineName string
 }
 
 // New creates a new template instance
@@ -67,16 +68,6 @@ func New(
 	bV, err := common.NewVersion(beatVersion)
 	if err != nil {
 		return nil, err
-	}
-
-	name := config.Name
-	if name == "" {
-		name = fmt.Sprintf("%s-%s", beatName, bV.String())
-	}
-
-	pattern := config.Pattern
-	if pattern == "" {
-		pattern = name + "-*"
 	}
 
 	event := &beat.Event{
@@ -99,22 +90,25 @@ func New(
 		Timestamp: time.Now(),
 	}
 
-	nameFormatter, err := fmtstr.CompileEvent(name)
-	if err != nil {
-		return nil, err
-	}
-	name, err = nameFormatter.Run(event)
+	// Template name expansion
+	name, err := fmtstr.EventFormat(config.Name, event)
 	if err != nil {
 		return nil, err
 	}
 
-	patternFormatter, err := fmtstr.CompileEvent(pattern)
+	// Template pattern expansion
+	pattern, err := fmtstr.EventFormat(config.Pattern, event)
 	if err != nil {
 		return nil, err
 	}
-	pattern, err = patternFormatter.Run(event)
-	if err != nil {
-		return nil, err
+
+	// Default pipeline name expansion
+	var defaultPipelineName string
+	if config.DefaultPipeline.Enabled {
+		defaultPipelineName, err = fmtstr.EventFormat(config.DefaultPipeline.Name, event)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// In case no esVersion is set, it is assumed the same as beat version
@@ -131,6 +125,8 @@ func New(
 		config:      config,
 		migration:   migration,
 		order:       config.Order,
+
+		defaultPipelineName: defaultPipelineName,
 	}, nil
 }
 
@@ -212,6 +208,11 @@ func (t *Template) GetPattern() string {
 	return t.pattern
 }
 
+// GetDefaultPipelineName returns the name of the default pipeline
+func (t *Template) GetDefaultPipelineName() string {
+	return t.defaultPipelineName
+}
+
 // Generate generates the full template
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
@@ -225,10 +226,7 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 			append(dynamicTemplates, buildDynTmpl(t.esVersion)),
 			common.MapStr(t.config.Settings.Source)),
 		"settings": common.MapStr{
-			"index": buildIdxSettings(
-				t.esVersion,
-				t.config.Settings.Index,
-			),
+			"index": t.buildIdxSettings(),
 		},
 	}
 }
@@ -301,7 +299,7 @@ func buildDynTmpl(ver common.Version) common.MapStr {
 	}
 }
 
-func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.MapStr {
+func (t *Template) buildIdxSettings() common.MapStr {
 	indexSettings := common.MapStr{
 		"refresh_interval": "5s",
 		"mapping": common.MapStr{
@@ -311,6 +309,13 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		},
 	}
 
+	// The built-in default pipeline uses the geoip processor that is only
+	// bundled with Elasticsearch since version 6.7.0.
+	version67, _ := common.NewVersion("6.7.0")
+	if t.config.DefaultPipeline.Enabled && !t.esVersion.LessThan(version67) {
+		indexSettings.Put("default_pipeline", t.defaultPipelineName)
+	}
+
 	// number_of_routing shards is only supported for ES version >= 6.1
 	// If ES >= 7.0 we can exclude this setting as well.
 	version61, _ := common.NewVersion("6.1.0")
@@ -318,7 +323,7 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
-	if ver.Major >= 7 {
+	if t.esVersion.Major >= 7 {
 		// copy defaultFields, as defaultFields is shared global slice.
 		fields := make([]string, len(defaultFields))
 		copy(fields, defaultFields)
@@ -327,7 +332,7 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		indexSettings.Put("query.default_field", fields)
 	}
 
-	indexSettings.DeepUpdate(userSettings)
+	indexSettings.DeepUpdate(t.config.Settings.Index)
 	return indexSettings
 }
 
