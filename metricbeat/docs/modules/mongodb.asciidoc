@@ -55,6 +55,31 @@ The default metricsets are `collstats`, `dbstats` and `status`.
 The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
 work with all versions >= 2.8.
 
+[float]
+=== MongoDB Privileges
+
+In order to use the metricsets, the MongoDB user specified in the module configuration needs to have certain https://docs.mongodb.com/manual/core/authorization/#privileges[privileges]
+
+Using different metricsets requires different set of privileges
+
+* `collstats` requires
+** https://docs.mongodb.com/manual/reference/privilege-actions/#top[`top` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+
+* `dbstats` requires
+** https://docs.mongodb.com/manual/reference/privilege-actions/#listDatabases[`listDatabases` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+** for each of the databases, also need https://docs.mongodb.com/manual/reference/privilege-actions/#dbStats[`dbStats` action] on the https://docs.mongodb.com/manual/reference/resource-document/#database-and-or-collection-resource[`database` resource]
+
+* `status` requires
+** https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+
+* `replstatus` requires
+** https://docs.mongodb.com/manual/reference/privilege-actions/#find[`find`/`listCollections` action] on https://docs.mongodb.com/manual/reference/local-database/[the `local` database resource]
+** https://docs.mongodb.com/manual/reference/privilege-actions/#collStats[`collStats` action] on https://docs.mongodb.com/manual/reference/local-database/#local.oplog.rs[the `local.oplog.rs` collection resource]
+** https://docs.mongodb.com/manual/reference/privilege-actions/#replSetGetStatus[`replSetGetStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+
+* `metrics` requires
+** https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+
 
 [float]
 === Example configuration
