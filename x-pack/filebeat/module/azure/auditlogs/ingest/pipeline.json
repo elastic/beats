@@ -3,7 +3,7 @@
   "processors": [
       {
           "date": {
-              "field": "time",
+              "field": "azure.auditlogs.time",
               "target_field": "@timestamp",
               "ignore_failure": false,
               "formats": [
@@ -13,22 +13,20 @@
       },
       {
           "rename": {
-              "field": "resourceId",
-              "target_field": "resourceID",
-              "ignore_missing": true
-          }
-      },
-      {
-          "rename": {
-              "field": "identity",
-              "target_field": "specification",
+              "field": "azure.auditlogs.resourceId",
+              "target_field": "azure.auditlogs.resourceID",
               "ignore_missing": true
           }
       },
       {
           "remove": {
-              "field": ["message", "time"],
+              "field": ["message", "azure.auditlogs.time"],
               "ignore_missing": true
+          }
+      },
+      {
+          "drop": {
+              "if" : "ctx.azure.auditlogs.category != 'AuditLogs'"
           }
       }
   ],

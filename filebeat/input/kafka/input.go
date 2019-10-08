@@ -109,8 +109,10 @@ func (input *kafkaInput) runConsumerGroup(
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
-		// logType will be assigned the configuration option AzureLogs, if the metricset using this input is an azure metricset then we can filter for the azure log types dedicated to the metricset (audit, activity, signin)
-		logType: input.config.LogType,
+		// yieldEventsFromField will be assigned the configuration option yield_events_from_field,
+		// if the fileset using this input expects to receive multiple messages bundled under a specific field then this value is assigned
+		// ex. in this case are the azure fielsets where the events are found under the json object "records"
+		yieldEventsFromField: input.config.YieldEventsFromField,
 	}
 
 	input.saramaWaitGroup.Add(1)
@@ -235,10 +237,10 @@ func (c channelCtx) Value(key interface{}) interface{} { return nil }
 // and passing ACKs from the output channel back to the kafka cluster.
 type groupHandler struct {
 	sync.Mutex
-	version kafka.Version
-	session sarama.ConsumerGroupSession
-	outlet  channel.Outleter
-	logType kafka.LogType
+	version              kafka.Version
+	session              sarama.ConsumerGroupSession
+	outlet               channel.Outleter
+	yieldEventsFromField string
 }
 
 // The metadata attached to incoming events so they can be ACKed once they've
@@ -275,7 +277,13 @@ func (h *groupHandler) createEvent(
 	// if azure input, then a check for the message is done regarding the list of events
 
 	var events []beat.Event
-	messages := h.parseMultipleMessages(message.Value)
+	var messages []string
+	// if no values are ser
+	if h.yieldEventsFromField == "" {
+		messages = []string{string(message.Value)}
+	} else {
+		messages = h.parseMultipleMessages(message.Value)
+	}
 	for _, msg := range messages {
 		event := beat.Event{
 			Timestamp: timestamp,
@@ -328,56 +336,21 @@ func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sara
 	return nil
 }
 
+// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 	var messages []string
-	// check if logType has been set
-	switch h.logType {
-	// if no log type has been set then the original message should be returned
-	case "":
-	default:
-		return []string{string(bMessage)}
-	case kafka.AuditLogs:
-		// if the fileset is audit logs a filtering of the messages should be done as the eventhub can return different types of messages
-		var obj AzureAuditLogs
-		err := json.Unmarshal(bMessage, &obj)
-		if err != nil {
-			return nil
-		}
-		for _, ms := range obj.Records {
-			js, err := json.Marshal(ms)
-			if err == nil {
-				messages = append(messages, string(js))
-			}
-		}
-		return messages
-	case kafka.ActivityLogs:
-		// if the fileset is activity logs a filtering of the messages should be done as the eventhub can return different types of messages
-		var obj AzureActivityLogs
-		err := json.Unmarshal(bMessage, &obj)
-		if err != nil {
-			return nil
-		}
-		for _, ms := range obj.Records {
-			js, err := json.Marshal(ms)
-			if err == nil {
-				messages = append(messages, string(js))
-			}
-		}
-		return messages
-	case kafka.SigninLogs:
-		// if the fileset is signin logs a filtering of the messages should be done as the eventhub can return different types of messages
-		var obj AzureSigninLogs
-		err := json.Unmarshal(bMessage, &obj)
-		if err != nil {
-			return nil
-		}
-		for _, ms := range obj.Records {
-			js, err := json.Marshal(ms)
-			if err == nil {
-				messages = append(messages, string(js))
-			}
-		}
+	var obj map[string][]interface{}
+	err := json.Unmarshal(bMessage, &obj)
+	if err != nil {
 		return messages
 	}
-	return nil
+	if len(obj[h.yieldEventsFromField]) > 0 {
+		for _, ms := range obj[h.yieldEventsFromField] {
+			js, err := json.Marshal(ms)
+			if err == nil {
+				messages = append(messages, string(js))
+			}
+		}
+	}
+	return messages
 }

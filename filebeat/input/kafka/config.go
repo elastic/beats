@@ -34,23 +34,23 @@ import (
 
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
-	Hosts          []string          `config:"hosts" validate:"required"`
-	Topics         []string          `config:"topics" validate:"required"`
-	GroupID        string            `config:"group_id" validate:"required"`
-	ClientID       string            `config:"client_id"`
-	Version        kafka.Version     `config:"version"`
-	InitialOffset  initialOffset     `config:"initial_offset"`
-	ConnectBackoff time.Duration     `config:"connect_backoff" validate:"min=0"`
-	ConsumeBackoff time.Duration     `config:"consume_backoff" validate:"min=0"`
-	WaitClose      time.Duration     `config:"wait_close" validate:"min=0"`
-	MaxWaitTime    time.Duration     `config:"max_wait_time"`
-	IsolationLevel isolationLevel    `config:"isolation_level"`
-	Fetch          kafkaFetch        `config:"fetch"`
-	Rebalance      kafkaRebalance    `config:"rebalance"`
-	TLS            *tlscommon.Config `config:"ssl"`
-	Username       string            `config:"username"`
-	Password       string            `config:"password"`
-	LogType        kafka.LogType     `config:"log_types"`
+	Hosts                []string          `config:"hosts" validate:"required"`
+	Topics               []string          `config:"topics" validate:"required"`
+	GroupID              string            `config:"group_id" validate:"required"`
+	ClientID             string            `config:"client_id"`
+	Version              kafka.Version     `config:"version"`
+	InitialOffset        initialOffset     `config:"initial_offset"`
+	ConnectBackoff       time.Duration     `config:"connect_backoff" validate:"min=0"`
+	ConsumeBackoff       time.Duration     `config:"consume_backoff" validate:"min=0"`
+	WaitClose            time.Duration     `config:"wait_close" validate:"min=0"`
+	MaxWaitTime          time.Duration     `config:"max_wait_time"`
+	IsolationLevel       isolationLevel    `config:"isolation_level"`
+	Fetch                kafkaFetch        `config:"fetch"`
+	Rebalance            kafkaRebalance    `config:"rebalance"`
+	TLS                  *tlscommon.Config `config:"ssl"`
+	Username             string            `config:"username"`
+	Password             string            `config:"password"`
+	YieldEventsFromField string            `config:"yield_events_from_field"`
 }
 
 type kafkaFetch struct {
@@ -136,13 +136,6 @@ func (c *kafkaInputConfig) Validate() error {
 
 	if err := c.Version.Validate(); err != nil {
 		return err
-	}
-
-	// if any log types are specified by the metricset config then a validation of the type will be done, else, no extra processing will happen to the messages
-	if c.LogType != "" {
-		if err := c.LogType.Validate(); err != nil {
-			return err
-		}
 	}
 
 	if c.Username != "" && c.Password == "" {

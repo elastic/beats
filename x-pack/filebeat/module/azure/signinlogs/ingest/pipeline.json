@@ -3,7 +3,7 @@
   "processors": [
       {
           "date": {
-              "field": "time",
+              "field": "azure.signinlogs.time",
               "target_field": "@timestamp",
               "ignore_failure": false,
               "formats": [
@@ -13,8 +13,8 @@
       },
       {
           "rename": {
-              "field": "resourceId",
-              "target_field": "resourceID",
+              "field": "azure.signinlogs.resourceId",
+              "target_field": "azure.signinlogs.resourceID",
               "ignore_missing": true
           }
       },
@@ -29,6 +29,11 @@
           "remove": {
               "field": ["message", "time"],
               "ignore_missing": true
+          }
+      },
+      {
+          "drop": {
+              "if" : "ctx.azure.signinlogs.category != 'SignInLogs'"
           }
       }
   ],

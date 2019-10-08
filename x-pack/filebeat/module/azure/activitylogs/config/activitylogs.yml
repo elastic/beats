@@ -2,7 +2,7 @@ type: kafka
 hosts: {{ .namespace }}
 topics: {{ .eventhub }}
 group_id: {{ .consumer_group }}
-log_types: "ActivityLogs"
+yield_events_from_field: "records"
 
 username: "$ConnectionString"
 password: {{ .connection_string }}
@@ -11,4 +11,4 @@ ssl.enabled: true
 processors:
 - decode_json_fields:
     fields: ["message"]
-    target: ""
+    target: "azure.activitylogs"

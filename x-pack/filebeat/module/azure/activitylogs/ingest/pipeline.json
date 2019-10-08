@@ -3,7 +3,7 @@
   "processors": [
       {
           "date": {
-              "field": "time",
+              "field": "azure.activitylogs.time",
               "target_field": "@timestamp",
               "ignore_failure": false,
               "formats": [
@@ -13,15 +13,20 @@
       },
       {
           "rename": {
-              "field": "resourceId",
-              "target_field": "resourceID",
+              "field": "azure.activitylogs.resourceId",
+              "target_field": "azure.activitylogs.resourceID",
               "ignore_missing": true
           }
       },
       {
           "remove": {
-              "field": ["message", "time"],
+              "field": ["message", "azure.activitylogs.time"],
               "ignore_missing": true
+          }
+      },
+      {
+          "drop": {
+              "if" : "ctx.azure.activitylogs.identity == null || ctx.azure.activitylogs.identity.claims == null"
           }
       }
   ],
