@@ -69,6 +69,9 @@ metadata:
   labels:
     k8s-app: filebeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
   template:
     metadata:
       labels:
@@ -145,6 +148,9 @@ metadata:
   name: coredns
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: coredns
   template:
     metadata:
       annotations:

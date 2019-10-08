@@ -99,6 +99,9 @@ metadata:
   labels:
     k8s-app: metricbeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: metricbeat
   template:
     metadata:
       labels:
@@ -232,7 +235,7 @@ data:
       hosts: ["kube-state-metrics:8080"]
 ---
 # Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: metricbeat
@@ -240,6 +243,9 @@ metadata:
   labels:
     k8s-app: metricbeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: metricbeat
   template:
     metadata:
       labels:

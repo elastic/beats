@@ -64,6 +64,9 @@ metadata:
   labels:
     k8s-app: filebeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
   template:
     metadata:
       labels:
@@ -105,6 +108,9 @@ metadata:
   name: ambassador
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      service: ambassador
   template:
     metadata:
       annotations:

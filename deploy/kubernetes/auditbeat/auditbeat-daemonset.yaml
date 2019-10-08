@@ -7,6 +7,9 @@ metadata:
   labels:
     k8s-app: auditbeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: auditbeat
   template:
     metadata:
       labels:
