@@ -53,4 +53,3 @@ class Test(metricbeat.BaseTest):
 
     def get_elasticsearch_url(self):
         return "http://" + self.compose_host("elasticsearch")
-
