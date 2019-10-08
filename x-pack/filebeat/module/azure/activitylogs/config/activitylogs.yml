@@ -2,7 +2,7 @@ type: kafka
 hosts: {{ .namespace }}
 topics: {{ .eventhub }}
 group_id: {{ .consumer_group }}
-azure_logs: "ActivityLogs"
+log_types: "ActivityLogs"
 
 username: "$ConnectionString"
 password: {{ .connection_string }}

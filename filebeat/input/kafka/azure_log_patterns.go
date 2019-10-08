@@ -19,15 +19,6 @@ package kafka
 
 import "time"
 
-const (
-	// ActivityLogs variable used to identify the activitylogs azure metricset
-	ActivityLogs = "ActivityLogs"
-	// AuditLogs variable used to identify the auditlogs azure metricset
-	AuditLogs = "AuditLogs"
-	// SigninLogs variable used to identify the signinlogs azure metricset
-	SigninLogs = "SigninLogs"
-)
-
 // AzureActivityLogs structure matches the eventhub message carrying the azure activity logs
 type AzureActivityLogs struct {
 	Records []ActivityLog `json:"records"`

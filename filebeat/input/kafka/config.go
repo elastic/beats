@@ -50,7 +50,7 @@ type kafkaInputConfig struct {
 	TLS            *tlscommon.Config `config:"ssl"`
 	Username       string            `config:"username"`
 	Password       string            `config:"password"`
-	AzureLogs      string            `config:"azure_logs"`
+	LogType        kafka.LogType     `config:"log_types"`
 }
 
 type kafkaFetch struct {
@@ -136,6 +136,13 @@ func (c *kafkaInputConfig) Validate() error {
 
 	if err := c.Version.Validate(); err != nil {
 		return err
+	}
+
+	// if any log types are specified by the metricset config then a validation of the type will be done, else, no extra processing will happen to the messages
+	if c.LogType != "" {
+		if err := c.LogType.Validate(); err != nil {
+			return err
+		}
 	}
 
 	if c.Username != "" && c.Password == "" {

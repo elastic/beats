@@ -110,7 +110,7 @@ func (input *kafkaInput) runConsumerGroup(
 		version: input.config.Version,
 		outlet:  input.outlet,
 		// logType will be assigned the configuration option AzureLogs, if the metricset using this input is an azure metricset then we can filter for the azure log types dedicated to the metricset (audit, activity, signin)
-		logType: input.config.AzureLogs,
+		logType: input.config.LogType,
 	}
 
 	input.saramaWaitGroup.Add(1)
@@ -238,7 +238,7 @@ type groupHandler struct {
 	version kafka.Version
 	session sarama.ConsumerGroupSession
 	outlet  channel.Outleter
-	logType string
+	logType kafka.LogType
 }
 
 // The metadata attached to incoming events so they can be ACKed once they've
@@ -336,7 +336,7 @@ func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 	case "":
 	default:
 		return []string{string(bMessage)}
-	case AuditLogs:
+	case kafka.AuditLogs:
 		// if the fileset is audit logs a filtering of the messages should be done as the eventhub can return different types of messages
 		var obj AzureAuditLogs
 		err := json.Unmarshal(bMessage, &obj)
@@ -350,7 +350,7 @@ func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 			}
 		}
 		return messages
-	case ActivityLogs:
+	case kafka.ActivityLogs:
 		// if the fileset is activity logs a filtering of the messages should be done as the eventhub can return different types of messages
 		var obj AzureActivityLogs
 		err := json.Unmarshal(bMessage, &obj)
@@ -364,7 +364,7 @@ func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 			}
 		}
 		return messages
-	case SigninLogs:
+	case kafka.SigninLogs:
 		// if the fileset is signin logs a filtering of the messages should be done as the eventhub can return different types of messages
 		var obj AzureSigninLogs
 		err := json.Unmarshal(bMessage, &obj)
