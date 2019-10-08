@@ -188,7 +188,7 @@ func TestInputWithMultipleEvents(t *testing.T) {
 
 	// Send test messages to the topic for the input to read.
 	message := testMessage{
-		message: "{\"records\": [{\"val\": \"val1\"}, {\"val\": \"val2\"}]}",
+		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
 		headers: []sarama.RecordHeader{
 			recordHeader("X-Test-Header", "test header value"),
 		},
@@ -197,11 +197,11 @@ func TestInputWithMultipleEvents(t *testing.T) {
 
 	// Setup the input config
 	config := common.MustNewConfigFrom(common.MapStr{
-		"hosts":                   getTestKafkaHost(),
-		"topics":                  []string{testTopic},
-		"group_id":                "filebeat",
-		"wait_close":              0,
-		"yield_events_from_field": "records",
+		"hosts":                    getTestKafkaHost(),
+		"topics":                   []string{testTopic},
+		"group_id":                 "filebeat",
+		"wait_close":               0,
+		"expand_events_from_field": "records",
 	})
 
 	// Route input events through our capturer instead of sending through ES.
@@ -228,8 +228,8 @@ func TestInputWithMultipleEvents(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		msgs := []string{"{\"val\": \"val1\"}", "{\"val\": \"val2\"}"}
-		assert.Contains(t, text, msgs)
+		msgs := []string{"{\"val\":\"val1\"}", "{\"val\":\"val2\"}"}
+		assert.Contains(t, msgs, text)
 		checkMatchingHeaders(t, event, message.headers)
 	case <-timeout:
 		t.Fatal("timeout waiting for incoming events")

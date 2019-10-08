@@ -108,8 +108,9 @@ func (input *kafkaInput) runConsumerGroup(
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
-		// yieldEventsFromField will be assigned the configuration option yield_events_from_field
-		yieldEventsFromField: input.config.YieldEventsFromField,
+		// expandEventListFromField will be assigned the configuration option yield_events_from_field
+		expandEventListFromField: input.config.ExpandEventListFromField,
+		log:                      input.log,
 	}
 
 	input.saramaWaitGroup.Add(1)
@@ -239,7 +240,8 @@ type groupHandler struct {
 	outlet  channel.Outleter
 	// if the fileset using this input expects to receive multiple messages bundled under a specific field then this value is assigned
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
-	yieldEventsFromField string
+	expandEventListFromField string
+	log                      *logp.Logger
 }
 
 // The metadata attached to incoming events so they can be ACKed once they've
@@ -273,10 +275,10 @@ func (h *groupHandler) createEvents(
 		kafkaFields["headers"] = arrayForKafkaHeaders(message.Headers)
 	}
 
-	// if yieldEventsFromField has been set, then a check for the actual json object will be done and a return for multiple messages is executed
+	// if expandEventListFromField has been set, then a check for the actual json object will be done and a return for multiple messages is executed
 	var events []beat.Event
 	var messages []string
-	if h.yieldEventsFromField == "" {
+	if h.expandEventListFromField == "" {
 		messages = []string{string(message.Value)}
 	} else {
 		messages = h.parseMultipleMessages(message.Value)
@@ -335,16 +337,18 @@ func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sara
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
-	var messages []string
 	var obj map[string][]interface{}
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
-		return messages
+		h.log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", h.expandEventListFromField), "error", err)
+		return []string{}
 	}
-	if len(obj[h.yieldEventsFromField]) > 0 {
-		for _, ms := range obj[h.yieldEventsFromField] {
+	var messages []string
+	if len(obj[h.expandEventListFromField]) > 0 {
+		for _, ms := range obj[h.expandEventListFromField] {
 			js, err := json.Marshal(ms)
 			if err == nil {
+				h.log.Errorw(fmt.Sprintf("Kafka serializing message %s", ms), "error", err)
 				messages = append(messages, string(js))
 			}
 		}
