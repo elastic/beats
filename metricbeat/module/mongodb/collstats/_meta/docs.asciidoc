@@ -12,6 +12,6 @@ It is using the `top` administrative command to return usage statistics for each
 - remove
 - commands
 
-It requires the following privileges
+It requires the following privileges:
 
 - https://docs.mongodb.com/manual/reference/privilege-actions/#top[`top` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]

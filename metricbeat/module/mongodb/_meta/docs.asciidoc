@@ -51,9 +51,9 @@ work with all versions >= 2.8.
 [float]
 === MongoDB Privileges
 
-In order to use the metricsets, the MongoDB user specified in the module configuration needs to have certain https://docs.mongodb.com/manual/core/authorization/#privileges[privileges]
+In order to use the metricsets, the MongoDB user specified in the module configuration needs to have certain https://docs.mongodb.com/manual/core/authorization/#privileges[privileges].
 
-Using different metricsets requires different set of privileges
+Using different metricsets requires different set of privileges:
 
 * `collstats` requires
 ** https://docs.mongodb.com/manual/reference/privilege-actions/#top[`top` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
