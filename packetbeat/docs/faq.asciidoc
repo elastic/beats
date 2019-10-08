@@ -42,7 +42,7 @@ For the list of devices shown here, you would configure Packetbeat
 to use device `4`:
 
 ["source","sh"]
-----------------------------------------------------------------------
+----
 PS C:\Users\vagrant\Desktop\packetbeat-1.2.0-windows> .\packetbeat.exe -devices
 0: \Device\NPF_NdisWanBh (NdisWan Adapter)
 1: \Device\NPF_NdisWanIp (NdisWan Adapter)
