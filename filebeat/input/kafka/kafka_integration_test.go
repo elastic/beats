@@ -197,10 +197,10 @@ func TestInputWithMultipleEvents(t *testing.T) {
 
 	// Setup the input config
 	config := common.MustNewConfigFrom(common.MapStr{
-		"hosts":                    getTestKafkaHost(),
-		"topics":                   []string{testTopic},
-		"group_id":                 "filebeat",
-		"wait_close":               0,
+		"hosts":                        getTestKafkaHost(),
+		"topics":                       []string{testTopic},
+		"group_id":                     "filebeat",
+		"wait_close":                   0,
 		"expand_event_list_from_field": "records",
 	})
 
