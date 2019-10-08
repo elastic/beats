@@ -55,7 +55,6 @@ func TestConfiguration(t *testing.T) {
 		})
 
 		_, err := New(nil, simpleMux(), cfg)
-		fmt.Println(err)
 		assert.Equal(t, err == nil, false)
 	})
 }
