@@ -45,8 +45,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix panic in Redis Key metricset when collecting information from a removed key. {pull}13426[13426]
-- Mark Kibana usage stats as collected only if API call succeeds. {pull}13881[13881]
 
 *Packetbeat*
 
@@ -68,8 +66,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Metricbeat*
 
-- Remove _nodes field from under cluster_stats as it's not being used. {pull}13010[13010]
-- Collect license expiry date fields as well. {pull}11652[11652]
 
 *Packetbeat*
 

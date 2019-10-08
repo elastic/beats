@@ -12,6 +12,9 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
+=== Beats version 6.8.4
+https://github.com/elastic/beats/compare/v6.8.3..6.8.4[Check the HEAD diff
+
 === Beats version 6.8.3
 https://github.com/elastic/beats/compare/v6.8.2..6.8.3[Check the HEAD diff
 
