@@ -3,9 +3,19 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.4]]
+=== Beats version 6.8.4
+https://github.com/elastic/beats/compare/v6.8.3...v6.8.4[View commits]
+
+==== Bugfixes
+
+*Metricbeat*
+
+- Mark Kibana usage stats as collected only if API call succeeds. {pull}13881[13881]
+
 [[release-notes-6.8.3]]
 === Beats version 6.8.3
-https://github.com/elastic/beats/compare/v6.8.2...v6.8.3[View commits
+https://github.com/elastic/beats/compare/v6.8.2...v6.8.3[View commits]
 
 ==== Bugfixes
 
