@@ -17,6 +17,7 @@ type config struct {
 	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
 	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
+	GZip                      bool                `config:"gzip"`
 }
 
 func defaultConfig() config {
@@ -25,6 +26,7 @@ func defaultConfig() config {
 			Type: "s3",
 		},
 		VisibilityTimeout: 300 * time.Second,
+		GZip:              false,
 	}
 }
 
