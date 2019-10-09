@@ -273,12 +273,6 @@
 			"revisionTime": "2019-09-20T23:43:18Z"
 		},
 		{
-			"checksumSHA1": "Aulh7C5SVOA4Jzt5eHNH6197Mbk=",
-			"path": "github.com/konsorten/go-windows-terminal-sequences",
-			"revision": "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e",
-			"revisionTime": "2019-02-26T22:47:05Z"
-		},
-		{
 			"checksumSHA1": "bKMZjd2wPw13VwoE7mBeSv5djFA=",
 			"path": "github.com/matttproud/golang_protobuf_extensions/pbutil",
 			"revision": "c182affec369e30f25d3eb8cd8a478dee585ae7d",
@@ -307,12 +301,6 @@
 			"path": "github.com/opencontainers/image-spec/specs-go/v1",
 			"revision": "775207bd45b6cb8153ce218cc59351799217451f",
 			"revisionTime": "2019-08-23T10:51:29Z"
-		},
-		{
-			"checksumSHA1": "I7hloldMJZTqUx6hbVDp5nk9fZQ=",
-			"path": "github.com/pkg/errors",
-			"revision": "27936f6d90f9c8e1145f11ed52ffffbfdb9e0af7",
-			"revisionTime": "2019-02-27T00:00:51Z"
 		},
 		{
 			"checksumSHA1": "vsx+XkLQ3h1JYC65YjukpeubcQQ=",
