@@ -64,7 +64,9 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 // IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not,
 // taking into consideration the existence of KUBECONFIG variable
 func IsInCluster(kubeconfig string) bool {
-	if kubeconfig != "" || getKubeConfigEnvironmentVariable() != "" { return false }
+	if kubeconfig != "" || getKubeConfigEnvironmentVariable() != "" {
+		return false
+	}
 	return true
 }
 
