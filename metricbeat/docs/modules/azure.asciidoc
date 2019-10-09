@@ -106,6 +106,9 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 - module: azure
   metricsets:
   - compute_vm
@@ -116,6 +119,9 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 - module: azure
   metricsets:
   - compute_vm_scaleset
@@ -125,6 +131,9 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 ----
 
 [float]

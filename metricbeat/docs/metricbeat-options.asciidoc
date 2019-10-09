@@ -215,6 +215,12 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
+
+[float]
 ==== `service.name`
 
 A name given by the user to the service the data is collected from. It can be
