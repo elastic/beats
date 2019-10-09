@@ -830,6 +830,16 @@ type: long
 
 
 
+*`cloud.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+
+
+type: keyword
+
+--
+
 [float]
 === aws
 
