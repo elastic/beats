@@ -1955,7 +1955,7 @@ Hostname of the machine from which the metricset was collected. This field may n
 +
 --
 
-deprecated[True]
+deprecated:[True]
 
 type: long
 
@@ -2885,7 +2885,7 @@ Number of current reads per second
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: scaled_float
 
@@ -2937,7 +2937,7 @@ Number of current writes per second
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: scaled_float
 
@@ -2989,7 +2989,7 @@ Number of current operations per second
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: scaled_float
 
@@ -7455,7 +7455,7 @@ Consumer Group ID
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: keyword
 
@@ -7467,7 +7467,7 @@ Topic name
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -7582,7 +7582,7 @@ Partition data.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -7655,7 +7655,7 @@ Error code from fetching partition.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -7668,7 +7668,7 @@ topic error code.
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: keyword
 
@@ -7681,7 +7681,7 @@ Topic name
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: long
 
@@ -7694,7 +7694,7 @@ Broker id
 +
 --
 
-deprecated[6.5]
+deprecated:[6.5]
 
 type: keyword
 
@@ -9278,7 +9278,7 @@ Container CPU requested cores
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: long
 
@@ -9291,7 +9291,7 @@ Container CPU nanocores limit
 +
 --
 
-deprecated[6.4]
+deprecated:[6.4]
 
 type: long
 
