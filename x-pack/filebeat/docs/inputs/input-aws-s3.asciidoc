@@ -59,12 +59,6 @@ In order to make AWS API calls, `s3` input requires AWS credentials.Please see
  <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
-==== `gzip`
-
-Boolean value which specifies whether to decompress `.gz` files. The default
-value is `false`.
-
-[float]
 === AWS Permissions
 Specific AWS permissions are required for IAM user to access SQS and S3:
 ----
