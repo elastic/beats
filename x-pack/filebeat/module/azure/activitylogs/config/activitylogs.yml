@@ -2,7 +2,7 @@ type: kafka
 hosts: {{ .namespace }}
 topics: {{ .eventhub }}
 group_id: {{ .consumer_group }}
-yield_events_from_field: "records"
+expand_event_list_from_field: "records"
 
 username: "$ConnectionString"
 password: {{ .connection_string }}

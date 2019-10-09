@@ -1,7 +1,7 @@
 {
-    "_index" : "filebeat-8.0.0-2019.10.08",
+    "_index" : "filebeat-8.0.0-2019.10.09",
     "_type" : "_doc",
-    "_id" : "2a7e2503-d7e2",
+    "_id" : "2a7e2503-",
     "_score" : null,
     "_source" : {
         "agent" : {
@@ -15,7 +15,7 @@
             "level" : "Error"
         },
         "source" : {
-            "ip" : "51.161.101.191"
+            "ip" : "51.221.31.31"
         },
         "fileset" : {
             "name" : "activitylogs"
@@ -26,7 +26,7 @@
         "input" : {
             "type" : "kafka"
         },
-        "@timestamp" : "2019-10-08T15:24:49.119Z",
+        "@timestamp" : "2019-10-09T08:24:34.373Z",
         "ecs" : {
             "version" : "1.1.0"
         },
@@ -38,7 +38,7 @@
                 "ProfileName: �\fname=default"
             ],
             "partition" : 3,
-            "offset" : 44768,
+            "offset" : 46716,
             "topic" : "insights-operational-logs",
             "key" : ""
         },
@@ -57,7 +57,7 @@
             "architecture" : "x86_64"
         },
         "event" : {
-            "duration" : 11,
+            "duration" : 1.1E7,
             "module" : "azure",
             "category" : "Action",
             "dataset" : "azure.activitylogs",
@@ -85,17 +85,17 @@
                         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                         "ver" : "1.0",
                         "http://schemas.microsoft.com/identity/claims/identityprovider" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
-                        "aio" : "2a7e2503-d7e2",
+                        "aio" : "2a7e2503-d7e2-405a-a84c-c3",
                         "iss" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
-                        "uti" : "2a7e2503-d7e2",
+                        "uti" : "7m-OZFTlhUSg2aXLucMuAA",
                         "aud" : "https://management.core.windows.net/",
-                        "nbf" : "1570547988",
+                        "nbf" : "1570609174",
                         "appidacr" : "2",
                         "http://schemas.microsoft.com/identity/claims/tenantid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                         "appid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                         "http://schemas.microsoft.com/identity/claims/objectidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-                        "exp" : "1570577088",
-                        "iat" : "1570547988"
+                        "exp" : "1570638274",
+                        "iat" : "1570609174"
                     }
                 },
                 "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
@@ -108,6 +108,6 @@
         }
     },
     "sort" : [
-        1570548289119
+        1570609474373
     ]
-},
+}

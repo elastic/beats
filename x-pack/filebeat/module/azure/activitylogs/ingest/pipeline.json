@@ -40,6 +40,15 @@
           }
       },
       {
+          "script": {
+              "lang": "painless",
+              "source": "ctx.event.duration = ctx.event.duration * params.param_nano",
+              "params": {
+                  "param_nano": 1000000
+              }
+          }
+      },
+      {
           "rename": {
               "field": "azure.activitylogs.location",
               "target_field": "geo.name",
@@ -62,8 +71,7 @@
       },
       {
           "remove": {
-              "field": ["message", "azure.activitylogs.time", "azure.activitylogs.callerIpAddress", "azure.activitylogs.category",
-                  "azure.activitylogs.level", "azure.activitylogs.durationMs", "azure.activitylogs.location", "azure.activitylogs.resultType"],
+              "field": ["message", "azure.activitylogs.time"],
               "ignore_missing": true
           }
       },

@@ -1,0 +1,136 @@
+{
+    "_index" : "filebeat-8.0.0-2019.10.08",
+    "_type" : "_doc",
+    "_id" : "2a7e2503-d7e2-405a",
+    "_score" : null,
+    "_source" : {
+        "agent" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "type" : "filebeat",
+            "ephemeral_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "version" : "8.0.0"
+        },
+        "log" : {
+            "level" : 4
+        },
+        "source" : {
+            "ip" : "71.251.171.21"
+        },
+        "fileset" : {
+            "name" : "signinlogs"
+        },
+        "geo" : {
+            "country_iso_code" : "US"
+        },
+        "input" : {
+            "type" : "kafka"
+        },
+        "@timestamp" : "2019-10-08T21:32:19.991Z",
+        "ecs" : {
+            "version" : "1.1.0"
+        },
+        "service" : {
+            "type" : "azure"
+        },
+        "kafka" : {
+            "headers" : [ ],
+            "partition" : 0,
+            "offset" : 700,
+            "topic" : "insights-logs-signinlogs",
+            "key" : ""
+        },
+        "host" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "os" : {
+                "build" : "18362.388",
+                "kernel" : "10.0.183.388 (WinBuild.160101.0800)",
+                "name" : "Windows 10 Pro",
+                "family" : "windows",
+                "version" : "10.0",
+                "platform" : "windows"
+            },
+            "name" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "architecture" : "x86_64"
+        },
+        "event" : {
+            "duration" : 0.0,
+            "module" : "azure",
+            "category" : "SignInLogs",
+            "dataset" : "azure.signinlogs",
+            "outcome" : "0"
+        },
+        "azure" : {
+            "signinlogs" : {
+                "resourceID" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam",
+                "operationName" : "Sign-in activity",
+                "resultSignature" : "None",
+                "operationVersion" : "1.0",
+                "identity" : "Test Test",
+                "tenantId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "properties" : {
+                    "networkLocationDetails" : [ ],
+                    "resourceId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "appliedConditionalAccessPolicies" : [ ],
+                    "deviceDetail" : {
+                        "displayName" : "DESKTOP-MJBCS48",
+                        "trustType" : "Azure AD joined",
+                        "deviceId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "operatingSystem" : "Windows"
+                    },
+                    "isInteractive" : false,
+                    "createdDateTime" : "2019-10-08T21:32:19.9914118+00:00",
+                    "clientAppUsed" : "Mobile Apps and Desktop clients",
+                    "riskLevelAggregated" : "none",
+                    "authenticationProcessingDetails" : [ ],
+                    "processingTimeInMilliseconds" : 96,
+                    "appId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "riskState" : "none",
+                    "authenticationDetails" : [
+                        {
+                            "authenticationStepDateTime" : "2019-10-08T21:32:19.9914118+00:00",
+                            "authenticationStepResultDetail" : "None",
+                            "authenticationStepRequirement" : "Multi Factor Authentication",
+                            "succeeded" : false
+                        }
+                    ],
+                    "userPrincipalName" : "test.test@elastic.co",
+                    "servicePrincipalId" : "",
+                    "tokenIssuerType" : "AzureAD",
+                    "resourceDisplayName" : "Windows Azure Active Directory",
+                    "originalRequestId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "riskEventTypes" : [ ],
+                    "appDisplayName" : "Windows Sign In",
+                    "riskLevelDuringSignIn" : "none",
+                    "ipAddress" : "71.251.171.21",
+                    "authenticationRequirementPolicies" : [ ],
+                    "userDisplayName" : "Test Test",
+                    "userId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "tokenIssuerName" : "",
+                    "riskDetail" : "none",
+                    "location" : {
+                        "countryOrRegion" : "US",
+                        "city" : "San Leandro",
+                        "geoCoordinates" : {
+                            "latitude" : 37.3444379492,
+                            "longitude" : -123.2354456456
+                        },
+                        "state" : "California"
+                    },
+                    "status" : {
+                        "errorCode" : 0,
+                        "additionalDetails" : "MFA claim has expired due to the policies configured on tenant"
+                    },
+                    "mfaDetail" : { }
+                }
+            }
+        }
+    },
+    "sort" : [
+        1570570339991
+    ]
+}

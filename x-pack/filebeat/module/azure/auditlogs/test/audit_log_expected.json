@@ -1,7 +1,7 @@
 {
-    "_index" : "filebeat-8.0.0-2019.10.04",
+    "_index" : "filebeat-8.0.0-2019.10.09",
     "_type" : "_doc",
-    "_id" : "FXFblm0Bq15PGrhqyTlD",
+    "_id" : "2a7e2503-d7e2-405",
     "_score" : null,
     "_source" : {
         "agent" : {
@@ -11,14 +11,34 @@
             "ephemeral_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
             "version" : "8.0.0"
         },
+        "log" : {
+            "level" : "Informational"
+        },
+        "fileset" : {
+            "name" : "auditlogs"
+        },
+        "input" : {
+            "type" : "kafka"
+        },
+        "@timestamp" : "2019-10-08T22:18:17.146Z",
         "ecs" : {
             "version" : "1.1.0"
+        },
+        "service" : {
+            "type" : "azure"
+        },
+        "kafka" : {
+            "headers" : [ ],
+            "partition" : 3,
+            "offset" : 28,
+            "topic" : "insights-logs-auditlogs",
+            "key" : ""
         },
         "host" : {
             "hostname" : "DESKTOP-RFOOE09",
             "os" : {
-                "build" : "18362.387",
-                "kernel" : "10.0.18362.387 (WinBuild.160101.0800)",
+                "build" : "18362.388",
+                "kernel" : "10.0.18362.388 (WinBuild.160101.0800)",
                 "name" : "Windows 10 Pro",
                 "family" : "windows",
                 "version" : "10.0",
@@ -28,80 +48,64 @@
             "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
             "architecture" : "x86_64"
         },
-        "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
         "event" : {
+            "duration" : 0.0,
             "module" : "azure",
-            "dataset" : "azure.auditlogs"
+            "category" : "AuditLogs",
+            "dataset" : "azure.auditlogs",
+            "outcome" : "success"
         },
-        "resourceID" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam",
-        "level" : "Informational",
-        "specification" : "Device Registration Service",
-        "operationName" : "Update device",
-        "fileset" : {
-            "name" : "auditlogs"
-        },
-        "resultSignature" : "None",
-        "input" : {
-            "type" : "kafka"
-        },
-        "@timestamp" : "2019-10-04T10:05:32.944Z",
-        "operationVersion" : "1.0",
-        "service" : {
-            "type" : "azure"
-        },
-        "kafka" : {
-            "headers" : [ ],
-            "partition" : 3,
-            "offset" : 2,
-            "topic" : "insights-logs-auditlogs",
-            "key" : ""
-        },
-        "tenantId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-        "category" : "AuditLogs",
-        "durationMs" : 0,
-        "properties" : {
-            "result" : "success",
-            "activityDisplayName" : "Update device",
-            "resultReason" : "",
-            "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-            "loggedByService" : "Core Directory",
-            "operationType" : "Update",
-            "id" : "Directory_2a7e2503",
-            "activityDateTime" : "2019-10-04T10:05:32.9448766+00:00",
-            "additionalDetails" : [ ],
-            "targetResources" : [
-                {
-                    "displayName" : "win10odbc",
-                    "modifiedProperties" : [
+        "azure" : {
+            "auditlogs" : {
+                "resourceID" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam",
+                "operationVersion" : "1.0",
+                "tenantId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "operationName" : "Disable account",
+                "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "properties" : {
+                    "activityDisplayName" : "Disable account",
+                    "resultReason" : "",
+                    "operationType" : "Update",
+                    "correlationId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "loggedByService" : "Core Directory",
+                    "id" : "Directory_U6",
+                    "activityDateTime" : "2019-10-08T22:18:17.1467655+00:00",
+                    "additionalDetails" : [ ],
+                    "category" : "UserManagement",
+                    "targetResources" : [
                         {
-                            "newValue" : "",
-                            "displayName" : "Included Updated Properties",
-                            "oldValue" : ""
+                            "displayName" : null,
+                            "modifiedProperties" : [
+                                {
+                                    "newValue" : "[false]",
+                                    "displayName" : "AccountEnabled",
+                                    "oldValue" : "[true]"
+                                },
+                                {
+                                    "newValue" : """"AccountEnabled"""",
+                                    "displayName" : "Included Updated Properties",
+                                    "oldValue" : null
+                                }
+                            ],
+                            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                            "type" : "User",
+                            "userPrincipalName" : "test.test@elastic.co"
                         }
                     ],
-                    "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-                    "type" : "Device",
-                    "userPrincipalName" : ""
-                }
-            ],
-            "category" : "Device",
-            "initiatedBy" : {
-                "app" : {
-                    "servicePrincipalName" : null,
-                    "displayName" : "Device Registration Service",
-                    "appId" : null,
-                    "servicePrincipalId" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73"
+                    "initiatedBy" : {
+                        "user" : {
+                            "displayName" : null,
+                            "ipAddress" : null,
+                            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                            "userPrincipalName" : "admintestsds@elastic365.onmicrosoft.com"
+                        }
+                    }
                 },
-                "user" : {
-                    "displayName" : null,
-                    "ipAddress" : null,
-                    "id" : "",
-                    "userPrincipalName" : ""
-                }
+                "resultSignature" : "None"
             }
         }
     },
     "sort" : [
-        1570183532944
+        1570573097146
     ]
-}
+},

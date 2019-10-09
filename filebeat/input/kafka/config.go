@@ -50,7 +50,7 @@ type kafkaInputConfig struct {
 	TLS                  *tlscommon.Config `config:"ssl"`
 	Username             string            `config:"username"`
 	Password             string            `config:"password"`
-	YieldEventsFromField string            `config:"yield_events_from_field"`
+	YieldEventsFromField string            `config:"expand_event_list_from_field"`
 }
 
 type kafkaFetch struct {

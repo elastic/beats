@@ -26,6 +26,22 @@
           }
       },
       {
+          "script": {
+              "lang": "painless",
+              "source": "ctx.event.duration = ctx.event.duration * params.param_nano",
+              "params": {
+                  "param_nano": 1000000
+              }
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.result",
+              "target_field": "event.outcome",
+              "ignore_missing": true
+          }
+      },
+      {
           "rename": {
               "field": "azure.auditlogs.level",
               "target_field": "log.level",
@@ -34,13 +50,20 @@
       },
       {
           "remove": {
-              "field": ["message", "azure.auditlogs.time", "azure.auditlogs.durationMs", "azure.auditlogs.level"],
+              "field": ["message", "azure.auditlogs.time"],
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.category",
+              "target_field": "event.category",
               "ignore_missing": true
           }
       },
       {
           "drop": {
-              "if" : "ctx.azure.auditlogs.category != 'AuditLogs'"
+              "if" : "ctx.event.category != 'AuditLogs'"
           }
       }
   ],
