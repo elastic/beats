@@ -47,7 +47,7 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	if kubeconfig == "" {
 		kubeconfig = getKubeConfigEnvironmentVariable()
 	}
-	logp.Debug("edooo", kubeconfig)
+
 	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
@@ -64,14 +64,8 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 // IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not,
 // taking into consideration the existence of KUBECONFIG variable
 func IsInCluster(kubeconfig string) bool {
-	if kubeconfig == "" {
-		if getKubeConfigEnvironmentVariable() != "" {
-			return false
-		}
-		return true
-	}
-
-	return false
+	if kubeconfig != "" || getKubeConfigEnvironmentVariable() != "" { return false }
+	return true
 }
 
 // DiscoverKubernetesNode figures out the Kubernetes node to use.
