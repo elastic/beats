@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -60,7 +61,7 @@ type Runner struct {
 // New instantiates a new Runner
 func New(
 	conf *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
 	dynFields *common.MapStrPointer,
@@ -91,6 +92,14 @@ func New(
 		return input, err
 	}
 
+	// If there is an input-level index setting, pass it through to event.Meta
+	// via the input's Connector.
+	if input.config.Index != "" {
+		connector = channel.WrapConnector(connector, func(event beat.Event) {
+			event.Meta["index"] = input.config.Index
+		})
+	}
+
 	context := Context{
 		States:        states,
 		Done:          input.done,
@@ -99,7 +108,7 @@ func New(
 		Meta:          nil,
 	}
 	var ipt Input
-	ipt, err = f(conf, outlet, context)
+	ipt, err = f(conf, connector, context)
 	if err != nil {
 		return input, err
 	}
