@@ -23,9 +23,10 @@ import (
 )
 
 var (
-	metricsetName = "ec2"
-	instanceIDIdx = 0
-	metricNameIdx = 1
+	metricsetName  = "ec2"
+	instanceIDIdx  = 0
+	metricNameIdx  = 1
+	labelSeparator = "|"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -44,6 +45,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
+	TagsFilter []aws.Tag `config:"tags_filter"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -52,6 +54,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
+	}
+
+	config := struct {
+		Tags []aws.Tag `config:"tags_filter"`
+	}{}
+
+	err = base.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
@@ -65,7 +76,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet: metricSet,
+		MetricSet:  metricSet,
+		TagsFilter: config.Tags,
 	}, nil
 }
 
@@ -172,14 +184,32 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 			if len(output.Values) == 0 {
 				continue
 			}
+
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
-				labels := strings.Split(*output.Label, " ")
+				labels := strings.Split(*output.Label, labelSeparator)
 				instanceID := labels[instanceIDIdx]
+
+				// Add tags
+				tags := instanceOutput[instanceID].Tags
+				if m.TagsFilter != nil {
+					// Check with each tag filter
+					// If tag filter doesn't exist in tagKeys/tagValues,
+					// then do not report this event/instance.
+					if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
+						continue
+					}
+				}
+
+				for _, tag := range tags {
+					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+				}
+
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
 				if err != nil {
 					return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
 				}
+
 				events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
 				events[instanceID].RootFields.Put("cloud.machine.type", machineType)
 				events[instanceID].RootFields.Put("cloud.availability_zone", *instanceOutput[instanceID].Placement.AvailabilityZone)
@@ -216,12 +246,6 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				privateIP := instanceOutput[instanceID].PrivateIpAddress
 				if privateIP != nil {
 					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
-				}
-
-				// Add tags
-				tags := instanceOutput[instanceID].Tags
-				for _, tag := range tags {
-					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
 				}
 			}
 		}
@@ -307,7 +331,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index in
 	for _, dim := range metricDims {
 		if *dim.Name == "InstanceId" && *dim.Value == instanceID {
 			metricName := *metric.MetricName
-			label := instanceID + " " + metricName
+			label := instanceID + labelSeparator + metricName
 			metricDataQuery = cloudwatch.MetricDataQuery{
 				Id: &id,
 				MetricStat: &cloudwatch.MetricStat{

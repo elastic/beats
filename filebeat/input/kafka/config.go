@@ -34,22 +34,23 @@ import (
 
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
-	Hosts          []string          `config:"hosts" validate:"required"`
-	Topics         []string          `config:"topics" validate:"required"`
-	GroupID        string            `config:"group_id" validate:"required"`
-	ClientID       string            `config:"client_id"`
-	Version        kafka.Version     `config:"version"`
-	InitialOffset  initialOffset     `config:"initial_offset"`
-	ConnectBackoff time.Duration     `config:"connect_backoff" validate:"min=0"`
-	ConsumeBackoff time.Duration     `config:"consume_backoff" validate:"min=0"`
-	WaitClose      time.Duration     `config:"wait_close" validate:"min=0"`
-	MaxWaitTime    time.Duration     `config:"max_wait_time"`
-	IsolationLevel isolationLevel    `config:"isolation_level"`
-	Fetch          kafkaFetch        `config:"fetch"`
-	Rebalance      kafkaRebalance    `config:"rebalance"`
-	TLS            *tlscommon.Config `config:"ssl"`
-	Username       string            `config:"username"`
-	Password       string            `config:"password"`
+	Hosts                    []string          `config:"hosts" validate:"required"`
+	Topics                   []string          `config:"topics" validate:"required"`
+	GroupID                  string            `config:"group_id" validate:"required"`
+	ClientID                 string            `config:"client_id"`
+	Version                  kafka.Version     `config:"version"`
+	InitialOffset            initialOffset     `config:"initial_offset"`
+	ConnectBackoff           time.Duration     `config:"connect_backoff" validate:"min=0"`
+	ConsumeBackoff           time.Duration     `config:"consume_backoff" validate:"min=0"`
+	WaitClose                time.Duration     `config:"wait_close" validate:"min=0"`
+	MaxWaitTime              time.Duration     `config:"max_wait_time"`
+	IsolationLevel           isolationLevel    `config:"isolation_level"`
+	Fetch                    kafkaFetch        `config:"fetch"`
+	Rebalance                kafkaRebalance    `config:"rebalance"`
+	TLS                      *tlscommon.Config `config:"ssl"`
+	Username                 string            `config:"username"`
+	Password                 string            `config:"password"`
+	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
 }
 
 type kafkaFetch struct {
