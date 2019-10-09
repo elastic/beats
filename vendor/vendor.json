@@ -1686,6 +1686,36 @@
 			"revisionTime": "2016-12-05T14:13:22Z"
 		},
 		{
+			"checksumSHA1": "ajAqUByI39Sfm99F/ZNOguPP3Mk=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b",
+			"revisionTime": "2019-08-25T01:20:11Z"
+		},
+		{
+			"checksumSHA1": "x3Hz3DwZpIp521DL8nh9FpOQP/4=",
+			"path": "github.com/hashicorp/go-cleanhttp",
+			"revision": "d3fcbee8e1810ecee4bdbf415f42f84cfd0e3361",
+			"revisionTime": "2019-04-06T16:20:18Z"
+		},
+		{
+			"checksumSHA1": "4RZ1iELCUhuMwFUEzmAMG8YStik=",
+			"path": "github.com/hashicorp/go-rootcerts",
+			"revision": "df8e78a645e18d56ed7bb9ae10ffb8174ab892e2",
+			"revisionTime": "2019-06-10T21:58:08Z"
+		},
+		{
+			"checksumSHA1": "3GXAkeRAhzQdG0kD1zJ7drd73II=",
+			"path": "github.com/hashicorp/nomad/api",
+			"revision": "9882de1df71d7b3ca1167abe533086ac0e4fd1be",
+			"revisionTime": "2019-10-08T13:13:09Z"
+		},
+		{
+			"checksumSHA1": "fqswK1Rf5F7cRNG+UHgY/gQFC78=",
+			"path": "github.com/hashicorp/nomad/api/contexts",
+			"revision": "9882de1df71d7b3ca1167abe533086ac0e4fd1be",
+			"revisionTime": "2019-10-08T13:13:09Z"
+		},
+		{
 			"checksumSHA1": "3LWNcQT7yTaLpEmjhI/3fi8puv0=",
 			"path": "github.com/imdario/mergo",
 			"revision": "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4",
@@ -1851,6 +1881,12 @@
 			"revisionTime": "2018-06-04T21:06:13Z",
 			"version": "v1.0.8",
 			"versionExact": "v1.0.8"
+		},
+		{
+			"checksumSHA1": "7zLQC+jG19ndjH24FVh/+ZliHac=",
+			"path": "github.com/mitchellh/go-homedir",
+			"revision": "af06845cf3004701891bf4fdb884bfe4920b3727",
+			"revisionTime": "2019-01-27T04:21:35Z"
 		},
 		{
 			"checksumSHA1": "sWdAYPKyaT4SW8hNQNpRS0sU4lU=",
