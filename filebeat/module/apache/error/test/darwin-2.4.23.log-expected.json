@@ -1,10 +1,10 @@
 [
     {
-        "@timestamp": "2016-12-26T16:15:55.103Z",
+        "@timestamp": "2016-12-26T16:15:55.103-02:00",
         "apache.error.module": "mpm_prefork",
         "event.dataset": "apache.error",
         "event.module": "apache",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "notice",
@@ -14,11 +14,11 @@
         "service.type": "apache"
     },
     {
-        "@timestamp": "2016-12-26T16:15:55.103Z",
+        "@timestamp": "2016-12-26T16:15:55.103-02:00",
         "apache.error.module": "core",
         "event.dataset": "apache.error",
         "event.module": "apache",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "notice",

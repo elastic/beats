@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-07-04T21:51:29.536Z",
+        "@timestamp": "2018-07-04T21:51:29.536-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -13,7 +13,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 0,
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -22,7 +22,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-04T21:51:29.537Z",
+        "@timestamp": "2018-07-04T21:51:29.537-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -35,7 +35,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 0,
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -44,7 +44,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-04T21:51:29.538Z",
+        "@timestamp": "2018-07-04T21:51:29.538-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -57,7 +57,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 0,
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -66,7 +66,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-04T21:51:30.411Z",
+        "@timestamp": "2018-07-04T21:51:30.411-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -78,7 +78,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 1000000,
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -87,7 +87,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-04T21:51:30.963Z",
+        "@timestamp": "2018-07-04T21:51:30.963-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -100,7 +100,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 0,
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -109,7 +109,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-04T21:51:30.965Z",
+        "@timestamp": "2018-07-04T21:51:30.965-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -122,7 +122,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 0,
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",

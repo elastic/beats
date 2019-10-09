@@ -126,7 +126,7 @@ func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []strin
 	for _, output := range listMetricsOutputs {
 		for _, dim := range output.Dimensions {
 			if *dim.Name == "BucketName" {
-				if aws.StringInSlice(*dim.Value, bucketNames) {
+				if exists, _ := aws.StringInSlice(*dim.Value, bucketNames); exists {
 					continue
 				}
 				bucketNames = append(bucketNames, *dim.Value)
@@ -141,7 +141,7 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	metricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutputs {
-		if !aws.StringInSlice(*listMetric.MetricName, metricNames) {
+		if exists, _ := aws.StringInSlice(*listMetric.MetricName, metricNames); !exists {
 			continue
 		}
 

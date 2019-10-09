@@ -94,7 +94,6 @@ collected by {beatname_uc}.
 * Under a specific {processor-scope}. The processor is applied to the data
 collected for that {processor-scope}.
 ifeval::["{beatname_lc}"=="filebeat"]
-For example:
 +
 [source,yaml]
 ------
@@ -111,6 +110,7 @@ Similarly, for {beatname_uc} modules, you can define processors under the
 `input` section of the module definition.
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
++
 [source,yaml]
 ----
 - module: <module_name>
@@ -123,7 +123,6 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -137,7 +136,6 @@ auditbeat.modules:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -164,7 +162,6 @@ packetbeat.flows:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -178,7 +175,6 @@ heartbeat.monitors:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
-For example:
 +
 [source,yaml]
 ----
@@ -509,8 +505,8 @@ not:
 === Add cloud metadata
 
 The `add_cloud_metadata` processor enriches each event with instance metadata
-from the machine's hosting provider. At startup it will detect the hosting
-provider and cache the instance metadata.
+from the machine's hosting provider. At startup it will query a list of hosting
+providers and cache the instance metadata.
 
 The following cloud providers are supported:
 
@@ -522,6 +518,10 @@ The following cloud providers are supported:
 - Azure Virtual Machine
 - Openstack Nova
 
+The Alibaba Cloud and Tencent cloud providers are disabled by default, because
+they require to access a remote host. The `providers` setting allows users to
+select a list of default providers to query.
+
 The simple configuration below enables the processor.
 
 [source,yaml]
@@ -530,7 +530,7 @@ processors:
 - add_cloud_metadata: ~
 -------------------------------------------------------------------------------
 
-The `add_cloud_metadata` processor has two optional configuration settings.
+The `add_cloud_metadata` processor has three optional configuration settings.
 The first one is `timeout` which specifies the maximum amount of time to wait
 for a successful response when detecting the hosting provider. The default
 timeout value is `3s`.
@@ -539,7 +539,20 @@ If a timeout occurs then no instance metadata will be added to the events. This
 makes it possible to enable this processor for all your deployments (in the
 cloud or on-premise).
 
-The second optional configuration setting is `overwrite`. When `overwrite` is
+The second optional setting is `providers`. The `providers` settings accepts a
+list of cloud provider names to be used. If `providers` is not configured, then
+all providers that do not access a remote endpoint are enabled by default.
+
+List of names the `providers` setting supports:
+- "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
+- "azure" for Azure Virtual Machine (enabled by default).
+- "digitalocean" for Digital Ocean (enabled by default).
+- "aws", or "ec2" for Amazon Web Services (enabled by default).
+- "gcp" for Google Copmute Enging (enabled by default).
+- "openstack", or "nova" for Openstack Nova (enabled by default).
+- "tencent", or "qcloud" for Tencent Cloud (disabled by default).
+
+The third optional configuration setting is `overwrite`. When `overwrite` is
 `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
 default).
 
@@ -715,8 +728,8 @@ processors:
         with.dots: nested
       array:
         - do
-	- re
-	- with.field: mi
+        - re
+        - with.field: mi
 ------------------------------------------------------------------------------
 
 Adds these fields to every event:

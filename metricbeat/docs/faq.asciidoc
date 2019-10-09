@@ -20,6 +20,8 @@ sudo mkdir -p /compat/linux/proc
 sudo mount -t linprocfs /dev/null /compat/linux/proc
 ----
 
+include::faq-unexpected-metrics.asciidoc[]
+
 include::{libbeat-dir}/docs/faq-limit-bandwidth.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-faq.asciidoc[]
