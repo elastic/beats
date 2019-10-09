@@ -399,12 +399,6 @@
 			"revisionTime": "2019-09-11T17:52:35Z"
 		},
 		{
-			"checksumSHA1": "4GI/G+nYyCQ3ltASSBIunUr2LYk=",
-			"path": "github.com/sirupsen/logrus",
-			"revision": "de736cf91b921d56253b4010270681d33fdf7cb5",
-			"revisionTime": "2019-08-07T10:34:36Z"
-		},
-		{
 			"checksumSHA1": "hRpd9yDAKix9wL1+joE44uJrXTQ=",
 			"path": "github.com/tonistiigi/fifo",
 			"revision": "bda0ff6ed73c67bfb5e62bc9c697f146b7fd7f13",
