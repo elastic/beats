@@ -1,4 +1,4 @@
-# dockerlogbeat: a simple, hello-world style example of a docker logging plugin
+# dockerlogbeat: a simple, a docker plugin for sending logs to elasticsearch
 
 
 This code is a working alpha for a [docker logging plugin](https://docs.docker.com/engine/extend/plugins_logging/). With the proper config, it can send logs to elasticsearch.

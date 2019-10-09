@@ -1,5 +1,5 @@
 {
-    "description": "A little example log driver for docker",
+    "description": "A beat for docker logs",
     "documentation": "https://docs.docker.com/engine/extend/plugin_api/",
     "entrypoint": ["/usr/bin/dockerlogbeat"],
     "network": {

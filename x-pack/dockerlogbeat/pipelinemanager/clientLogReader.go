@@ -40,7 +40,7 @@ func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string)
 		WaitClose: 0,
 	}
 	settings.ACKCount = func(n int) {
-		logp.Info("Pipeline client (%s) ACKS; %v", file, n)
+		logp.Debug("Pipeline client (%s) ACKS; %v", file, n)
 	}
 	settings.PublishMode = beat.DefaultGuarantees
 	client, err := pipeline.ConnectWith(settings)

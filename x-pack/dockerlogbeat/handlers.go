@@ -43,10 +43,10 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 			return
 		}
 
-		pm.Logger.Infof("Homepath: %v\n", filepath.Dir(os.Args[0]))
-		pm.Logger.Infof("Got start request object from container %#v\n", startReq.Info.ContainerName)
-		pm.Logger.Infof("Got a container with the following labels: %#v\n", startReq.Info.ContainerLabels)
-		pm.Logger.Infof("Got a container with the following log opts: %#v\n", startReq.Info.Config)
+		pm.Logger.Debugf("Homepath: %v\n", filepath.Dir(os.Args[0]))
+		pm.Logger.Debugf("Got start request object from container %#v\n", startReq.Info.ContainerName)
+		pm.Logger.Debugf("Got a container with the following labels: %#v\n", startReq.Info.ContainerLabels)
+		pm.Logger.Debugf("Got a container with the following log opts: %#v\n", startReq.Info.Config)
 
 		cl, err := pm.CreateClientWithConfig(startReq.Info.Config, startReq.File)
 		if err != nil {
