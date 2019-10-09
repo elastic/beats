@@ -2121,188 +2121,97 @@ azure module
 
 
 
-[float]
-=== compute_vm
+*`azure.namespace`*::
++
+--
+The namespace selected
 
+
+type: keyword
+
+--
+
+*`azure.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.resource.compute_vm.*.*`*::
++
+--
 compute_vm
 
 
-
-[float]
-=== resource
-
-The resource specified
-
-
-
-*`azure.compute_vm.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.resource.type`*::
-+
---
-The type of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.resource.group`*::
-+
---
-The resource group
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.resource.tags.*`*::
-+
---
-Azure resource tags.
-
-
 type: object
 
 --
 
-*`azure.compute_vm.namespace`*::
+*`azure.resource.compute_vm_scaleset.*.*`*::
 +
 --
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.metrics.*.*`*::
-+
---
-Metrics returned.
-
-
-type: object
-
---
-
-*`azure.compute_vm.dimensions.*`*::
-+
---
-Azure metric dimensions.
-
-
-type: object
-
---
-
-[float]
-=== compute_vm_scaleset
-
 compute_vm_scaleset
-
-
-
-[float]
-=== resource
-
-The resource specified
-
-
-
-*`azure.compute_vm_scaleset.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.resource.type`*::
-+
---
-The type of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.resource.group`*::
-+
---
-The resource group
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.resource.tags.*`*::
-+
---
-Azure resource tags.
-
-
-type: object
-
---
-
-*`azure.compute_vm_scaleset.namespace`*::
-+
---
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.metrics.*.*`*::
-+
---
-Metrics returned.
-
-
-type: object
-
---
-
-*`azure.compute_vm_scaleset.dimensions.*`*::
-+
---
-Azure metric dimensions.
 
 
 type: object
@@ -2316,87 +2225,10 @@ monitor
 
 
 
-[float]
-=== resource
-
-The resource specified
-
-
-
-*`azure.monitor.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
-*`azure.monitor.resource.type`*::
-+
---
-The type of the resource
-
-
-type: keyword
-
---
-
-*`azure.monitor.resource.group`*::
-+
---
-The resource group
-
-
-type: keyword
-
---
-
-*`azure.monitor.resource.tags.*`*::
-+
---
-Azure resource tags.
-
-
-type: object
-
---
-
-*`azure.monitor.namespace`*::
-+
---
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.monitor.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.monitor.metrics.*.*`*::
+*`azure.resource.monitor.metrics.*.*`*::
 +
 --
 Metrics returned.
-
-
-type: object
-
---
-
-*`azure.monitor.dimensions.*`*::
-+
---
-Azure metric dimensions.
 
 
 type: object
