@@ -91,7 +91,7 @@ type compressionConfig struct {
 }
 
 var defaultConfig = Config{
-	Timeout:      16 * time.Second,
+	Timeout:      5 * time.Second,
 	MaxRedirects: 10,
 	Response: responseConfig{
 		IncludeBody:         "on_error",

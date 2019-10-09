@@ -34,6 +34,6 @@ type Config struct {
 var DefaultConfig = Config{
 	Mode: monitors.DefaultIPSettings,
 
-	Timeout: 16 * time.Second,
+	Timeout: 5 * time.Second,
 	Wait:    1 * time.Second,
 }

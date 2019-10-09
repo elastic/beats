@@ -43,7 +43,7 @@
   # ports: [80, 9200, 5044]
 
   # Total test connection and data exchange timeout
-  #timeout: 16s
+  #timeout: 5s
 
   # Optional payload string to send to remote and expected answer. If none is
   # configured, the endpoint is expected to be up if connection attempt was

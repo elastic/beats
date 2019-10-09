@@ -27,7 +27,7 @@
   #proxy_url: ''
 
   # Total test connection and data exchange timeout
-  #timeout: 16s
+  #timeout: 5s
 
   # Optional Authentication Credentials
   #username: ''

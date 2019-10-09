@@ -30,7 +30,7 @@ heartbeat.monitors:
   schedule: '@every 10s'
 
   # Total test connection and data exchange timeout
-  #timeout: 16s
+  #timeout: 5s
 
 #==================== Elasticsearch template setting ==========================
 

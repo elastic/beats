@@ -44,7 +44,7 @@ heartbeat.monitors:
   mode: any
 
   # Total running time per ping test.
-  timeout: 16s
+  timeout: 5s
 
   # Waiting duration until another ICMP Echo Request is emitted.
   wait: 1s
@@ -124,7 +124,7 @@ heartbeat.monitors:
   # ports: [80, 9200, 5044]
 
   # Total test connection and data exchange timeout
-  #timeout: 16s
+  #timeout: 5s
 
   # Optional payload string to send to remote and expected answer. If none is
   # configured, the endpoint is expected to be up if connection attempt was
@@ -191,7 +191,7 @@ heartbeat.monitors:
   #proxy_url: ''
 
   # Total test connection and data exchange timeout
-  #timeout: 16s
+  #timeout: 5s
 
   # Optional Authentication Credentials
   #username: ''
