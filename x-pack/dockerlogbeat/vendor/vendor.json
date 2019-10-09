@@ -33,12 +33,6 @@
 			"revisionTime": "2019-07-19T11:48:52Z"
 		},
 		{
-			"checksumSHA1": "OvbnMCvUWjeV6iKz843oHyZMQHY=",
-			"path": "github.com/docker/distribution/registry/api/errcode",
-			"revision": "14b96e55d84c367ebab6caf9f0086de0876eec72",
-			"revisionTime": "2019-09-05T15:29:32Z"
-		},
-		{
 			"checksumSHA1": "QHSqQFYvba2cWt81SAMr6JuZMA4=",
 			"path": "github.com/docker/docker/api/types",
 			"revision": "5b57f41241cb0d8df5886a1db3d7920494a9e432",
@@ -219,22 +213,10 @@
 			"revisionTime": "2019-06-12T16:53:40Z"
 		},
 		{
-			"checksumSHA1": "10R3syDBqKT0ga6kgqCGq1CQNsU=",
-			"path": "github.com/docker/go-metrics",
-			"revision": "b619b3592b65de4f087d9f16863a7e6ff905973c",
-			"revisionTime": "2019-08-28T14:40:21Z"
-		},
-		{
 			"checksumSHA1": "e/cSY11dRBYpw1MpxpKLDG0NO28=",
 			"path": "github.com/docker/go-plugins-helpers/sdk",
 			"revision": "1e6269c305b8c75cfda1c8aa91349c38d7335814",
 			"revisionTime": "2018-10-25T12:07:12Z"
-		},
-		{
-			"checksumSHA1": "uJpTEqskmHWciK0+gjsnpRHXq7k=",
-			"path": "github.com/docker/go-units",
-			"revision": "519db1ee28dcc9fd2474ae59fca29a810482bfb1",
-			"revisionTime": "2019-04-23T14:49:23Z"
 		},
 		{
 			"checksumSHA1": "dQBkq+FEo8aGwGOkc2kamHbFrHU=",
