@@ -423,12 +423,6 @@
 			"revisionTime": "2019-09-27T18:12:02Z"
 		},
 		{
-			"checksumSHA1": "e0xLHThZgMNcuR7aFuY+pzuQVVU=",
-			"path": "google.golang.org/grpc/codes",
-			"revision": "e75b8f483063a1028fbb91dd00a61a7e7f742942",
-			"revisionTime": "2019-09-27T20:42:15Z"
-		},
-		{
 			"checksumSHA1": "UgxkVy6e/BMqXrmS21WmcHtdcd4=",
 			"path": "google.golang.org/grpc/connectivity",
 			"revision": "e75b8f483063a1028fbb91dd00a61a7e7f742942",
