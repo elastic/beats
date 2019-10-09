@@ -15,18 +15,6 @@
 			"revisionTime": "2017-09-29T23:40:23Z"
 		},
 		{
-			"checksumSHA1": "a5067AeVczAVQ6+VgMsWmV+YO3A=",
-			"path": "github.com/Microsoft/go-winio",
-			"revision": "fc70bd9a86b5562b3b5eb1040e803febee1e90a1",
-			"revisionTime": "2019-09-19T02:51:22Z"
-		},
-		{
-			"checksumSHA1": "hgIAHvJxD+yog1zQGS0rqRGGCWg=",
-			"path": "github.com/Microsoft/go-winio/pkg/guid",
-			"revision": "fc70bd9a86b5562b3b5eb1040e803febee1e90a1",
-			"revisionTime": "2019-09-19T02:51:22Z"
-		},
-		{
 			"checksumSHA1": "0rido7hYHQtfq3UJzVT5LClLAWc=",
 			"path": "github.com/beorn7/perks/quantile",
 			"revision": "37c8de3658fcb183f997c4e13e8337516ab753e6",
