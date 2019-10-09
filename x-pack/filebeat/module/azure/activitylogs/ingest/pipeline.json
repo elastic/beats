@@ -8,6 +8,12 @@
           }
       },
       {
+          "drop": {
+              "if" : "ctx.azure.activitylogs.identity == null",
+              "ignore_failure": false
+          }
+      },
+      {
           "date": {
               "field": "azure.activitylogs.time",
               "target_field": "@timestamp",
@@ -18,9 +24,14 @@
           }
       },
       {
+          "remove": {
+              "field": ["message", "azure.activitylogs.time"]
+          }
+      },
+      {
           "rename": {
               "field": "azure.activitylogs.resourceId",
-              "target_field": "azure.activitylogs.resourceID",
+              "target_field": "azure.resource_id",
               "ignore_missing": true
           }
       },
@@ -76,14 +87,80 @@
           }
       },
       {
-          "remove": {
-              "field": ["message", "azure.activitylogs.time"],
+          "rename": {
+              "field": "azure.activitylogs.operationName",
+              "target_field": "azure.activitylogs.operation_name",
               "ignore_missing": true
           }
       },
       {
-          "drop": {
-              "if" : "ctx.azure.activitylogs.identity == null || ctx.azure.activitylogs.identity.claims == null"
+          "rename": {
+              "field": "azure.activitylogs.resultSignature",
+              "target_field": "azure.activitylogs.result_signature",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.roleAssignmentScope",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.role_assignment_scope",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.roleDefinitionId",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.role_definition_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.roleAssignmentId",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.role_assignment_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.principalId",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.principal_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.principalType",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.principal_type",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.correlationId",
+              "target_field": "azure.activitylogs.correlation_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.properties.serviceRequestId",
+              "target_field": "azure.activitylogs.properties.service_request_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.properties.statusMessage",
+              "target_field": "message",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.properties.statusCode",
+              "target_field": "azure.activitylogs.properties.status_code",
+              "ignore_missing": true
           }
       }
   ],

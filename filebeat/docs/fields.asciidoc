@@ -1255,6 +1255,16 @@ Azure Module
 
 
 
+*`azure.resource_id`*::
++
+--
+Resource ID
+
+
+type: keyword
+
+--
+
 [float]
 === activitylogs
 
@@ -1268,16 +1278,6 @@ Fields for Azure activity logs.
 The canonical user ID of the owner of the source bucket.
 
 
-
-*`azure.activitylogs.identity.claims.*`*::
-+
---
-Claims
-
-
-type: object
-
---
 
 [float]
 === authorization
@@ -1293,7 +1293,7 @@ Node allocatable pods
 
 
 
-*`azure.activitylogs.identity.authorization.evidence.roleAssignmentScope`*::
+*`azure.activitylogs.identity.authorization.evidence.role_assignment_scope`*::
 +
 --
 Role assignment scope
@@ -1303,7 +1303,7 @@ type: keyword
 
 --
 
-*`azure.activitylogs.identity.authorization.evidence.roleDefinitionId`*::
+*`azure.activitylogs.identity.authorization.evidence.role_definition_id`*::
 +
 --
 Role definition ID
@@ -1323,7 +1323,7 @@ type: keyword
 
 --
 
-*`azure.activitylogs.identity.authorization.evidence.roleAssignmentId`*::
+*`azure.activitylogs.identity.authorization.evidence.role_assignment_id`*::
 +
 --
 Role assignment ID
@@ -1333,7 +1333,7 @@ type: keyword
 
 --
 
-*`azure.activitylogs.identity.authorization.evidence.principalId`*::
+*`azure.activitylogs.identity.authorization.evidence.principal_id`*::
 +
 --
 Principal ID
@@ -1343,7 +1343,7 @@ type: keyword
 
 --
 
-*`azure.activitylogs.identity.authorization.evidence.principalType`*::
+*`azure.activitylogs.identity.authorization.evidence.principal_type`*::
 +
 --
 Principal type
@@ -1373,7 +1373,7 @@ type: keyword
 
 --
 
-*`azure.activitylogs.correlationId`*::
+*`azure.activitylogs.correlation_id`*::
 +
 --
 Correlation ID
@@ -1383,17 +1383,7 @@ type: keyword
 
 --
 
-*`azure.activitylogs.resourceID`*::
-+
---
-Resource ID
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.operationName`*::
+*`azure.activitylogs.operation_name`*::
 +
 --
 Operation name
@@ -1403,7 +1393,7 @@ type: keyword
 
 --
 
-*`azure.activitylogs.resultSignature`*::
+*`azure.activitylogs.result_signature`*::
 +
 --
 Result signature
@@ -1413,13 +1403,30 @@ type: keyword
 
 --
 
-*`azure.activitylogs.properties.*`*::
-+
---
+[float]
+=== properties
+
 Properties
 
 
-type: object
+
+*`azure.activitylogs.properties.service_request_id`*::
++
+--
+Service Request Id
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.properties.status_code`*::
++
+--
+Status code
+
+
+type: keyword
 
 --
 
@@ -1799,17 +1806,7 @@ Fields for Azure sign-in logs.
 
 
 
-*`azure.signinlogs.resourceID`*::
-+
---
-Resource ID
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.operationName`*::
+*`azure.signinlogs.operation_name`*::
 +
 --
 The operation name
@@ -1819,7 +1816,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.operationVersion`*::
+*`azure.signinlogs.operation_version`*::
 +
 --
 The operation version
@@ -1829,17 +1826,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.category`*::
-+
---
-Log category
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.tenantId`*::
+*`azure.signinlogs.tenant_id`*::
 +
 --
 Tenant ID
@@ -1849,7 +1836,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.resultSignature`*::
+*`azure.signinlogs.result_signature`*::
 +
 --
 Result signature
@@ -1859,20 +1846,10 @@ type: keyword
 
 --
 
-*`azure.signinlogs.correlationId`*::
+*`azure.signinlogs.correlation_id`*::
 +
 --
 Correlation ID
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.resultType`*::
-+
---
-Result type
 
 
 type: keyword
@@ -1906,7 +1883,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.createdDateTime`*::
+*`azure.signinlogs.properties.created_at`*::
 +
 --
 Created date time
@@ -1916,7 +1893,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.userDisplayName`*::
+*`azure.signinlogs.properties.user_display_name`*::
 +
 --
 User display name
@@ -1926,7 +1903,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.correlationId`*::
+*`azure.signinlogs.properties.correlation_id`*::
 +
 --
 Correlation ID
@@ -1936,7 +1913,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.userPrincipalName`*::
+*`azure.signinlogs.properties.user_principal_name`*::
 +
 --
 User principal name
@@ -1946,7 +1923,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.userId`*::
+*`azure.signinlogs.properties.user_id`*::
 +
 --
 User ID
@@ -1956,7 +1933,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.appId`*::
+*`azure.signinlogs.properties.app_id`*::
 +
 --
 App ID
@@ -1966,7 +1943,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.appDisplayName`*::
+*`azure.signinlogs.properties.app_display_name`*::
 +
 --
 App display name
@@ -1976,7 +1953,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.ipAddress`*::
+*`azure.signinlogs.properties.ip_address`*::
 +
 --
 Ip address
@@ -1986,7 +1963,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.clientAppUsed`*::
+*`azure.signinlogs.properties.client_app_used`*::
 +
 --
 Client app used
@@ -1996,7 +1973,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.conditionalAccessStatus`*::
+*`azure.signinlogs.properties.conditional_access_status`*::
 +
 --
 Conditional access status
@@ -2006,7 +1983,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.originalRequestId`*::
+*`azure.signinlogs.properties.original_request_id`*::
 +
 --
 Original request ID
@@ -2016,7 +1993,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.isInteractive`*::
+*`azure.signinlogs.properties.is_interactive`*::
 +
 --
 Is interactive
@@ -2026,7 +2003,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.tokenIssuerName`*::
+*`azure.signinlogs.properties.token_issuer_name`*::
 +
 --
 Token issuer name
@@ -2036,7 +2013,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.tokenIssuerType`*::
+*`azure.signinlogs.properties.token_issuer_type`*::
 +
 --
 Token issuer type
@@ -2046,17 +2023,17 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.processingTimeInMilliseconds`*::
+*`azure.signinlogs.properties.processing_time_ms`*::
 +
 --
 Processing time in milliseconds
 
 
-type: keyword
+type: float
 
 --
 
-*`azure.signinlogs.properties.riskDetail`*::
+*`azure.signinlogs.properties.risk_detail`*::
 +
 --
 Risk detail
@@ -2066,7 +2043,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.riskLevelAggregated`*::
+*`azure.signinlogs.properties.risk_level_aggregated`*::
 +
 --
 Risk level aggregated
@@ -2076,7 +2053,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.riskLevelDuringSignIn`*::
+*`azure.signinlogs.properties.risk_level_during_signin`*::
 +
 --
 Risk level during signIn
@@ -2086,7 +2063,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.riskState`*::
+*`azure.signinlogs.properties.risk_state`*::
 +
 --
 Risk state
@@ -2096,7 +2073,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.resourceDisplayName`*::
+*`azure.signinlogs.properties.resource_display_name`*::
 +
 --
 Resource display name
@@ -2113,7 +2090,7 @@ Status
 
 
 
-*`azure.signinlogs.properties.status.errorCode`*::
+*`azure.signinlogs.properties.status.error_code`*::
 +
 --
 Error code
@@ -2123,14 +2100,24 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.status.additional_details`*::
++
+--
+Additional details
+
+
+type: keyword
+
+--
+
 [float]
-=== deviceDetail
+=== device_detail
 
 Status
 
 
 
-*`azure.signinlogs.properties.deviceDetail.deviceId`*::
+*`azure.signinlogs.properties.device_detail.device_id`*::
 +
 --
 Device ID
@@ -2140,7 +2127,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.deviceDetail.operatingSystem`*::
+*`azure.signinlogs.properties.device_detail.operating_system`*::
 +
 --
 Operating system
@@ -2150,7 +2137,7 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.deviceDetail.browser`*::
+*`azure.signinlogs.properties.device_detail.browser`*::
 +
 --
 Browser
@@ -2160,64 +2147,30 @@ type: keyword
 
 --
 
-[float]
-=== location
+*`azure.signinlogs.properties.device_detail.display_name`*::
++
+--
+Display name
 
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.device_detail.trust_type`*::
++
+--
+Trust type
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.service_principal_id`*::
++
+--
 Status
-
-
-
-*`azure.signinlogs.properties.location.city`*::
-+
---
-City
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.properties.location.state`*::
-+
---
-State
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.properties.location.countryOrRegion`*::
-+
---
-Country or region
-
-
-type: keyword
-
---
-
-[float]
-=== geoCoordinates
-
-GeoCoordinates
-
-
-
-*`azure.signinlogs.properties.location.geoCoordinates.latitude`*::
-+
---
-Latitude
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.properties.location.geoCoordinates.longitude`*::
-+
---
-Longitude
 
 
 type: keyword

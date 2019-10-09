@@ -1,5 +1,6 @@
 - name: activitylogs
   type: group
+  release: beta
   description: >
     Fields for Azure activity logs.
   fields:
@@ -8,12 +9,6 @@
       description: >
         The canonical user ID of the owner of the source bucket.
       fields:
-        - name: claims.*
-          type: object
-          object_type: keyword
-          object_type_mapping_type: "*"
-          description: >
-            Claims
         - name: authorization
           type: group
           description: >
@@ -24,11 +19,11 @@
               description: >
                 Node allocatable pods
               fields:
-                - name: roleAssignmentScope
+                - name: role_assignment_scope
                   type: keyword
                   description: >
                     Role assignment scope
-                - name: roleDefinitionId
+                - name: role_definition_id
                   type: keyword
                   description: >
                     Role definition ID
@@ -36,15 +31,15 @@
                   type: keyword
                   description: >
                     Role
-                - name: roleAssignmentId
+                - name: role_assignment_id
                   type: keyword
                   description: >
                     Role assignment ID
-                - name: principalId
+                - name: principal_id
                   type: keyword
                   description: >
                     Principal ID
-                - name: principalType
+                - name: principal_type
                   type: keyword
                   description: >
                     Principal type
@@ -56,26 +51,29 @@
           type: keyword
           description: >
             Action
-    - name: correlationId
+    - name: correlation_id
       type: keyword
       description: >
         Correlation ID
-    - name: resourceID
-      type: keyword
-      description: >
-        Resource ID
-    - name: operationName
+    - name: operation_name
       type: keyword
       description: >
         Operation name
-    - name: resultSignature
+    - name: result_signature
       type: keyword
       description: >
         Result signature
-    - name: properties.*
-      type: object
-      object_type: keyword
-      object_type_mapping_type: "*"
+    - name: properties
+      type: group
       description: >
         Properties
+      fields:
+        - name: service_request_id
+          type: keyword
+          description: >
+            Service Request Id
+        - name: status_code
+          type: keyword
+          description: >
+            Status code
 

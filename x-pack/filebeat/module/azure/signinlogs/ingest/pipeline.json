@@ -8,6 +8,11 @@
           }
       },
       {
+          "drop": {
+              "if" : "ctx.azure.signinlogs.category != 'SignInLogs'"
+          }
+      },
+      {
           "date": {
               "field": "azure.signinlogs.time",
               "target_field": "@timestamp",
@@ -20,7 +25,7 @@
       {
           "rename": {
               "field": "azure.signinlogs.resourceId",
-              "target_field": "azure.signinlogs.resourceID",
+              "target_field": "azure.resource_id",
               "ignore_missing": true
           }
       },
@@ -76,14 +81,289 @@
           }
       },
       {
-          "remove": {
-              "field": ["message", "azure.signinlogs.time"],
+          "rename": {
+              "field": "azure.signinlogs.operationName",
+              "target_field": "azure.signinlogs.operation_name",
               "ignore_missing": true
           }
       },
       {
-          "drop": {
-              "if" : "ctx.event.category != 'SignInLogs'"
+          "rename": {
+              "field": "azure.signinlogs.resultSignature",
+              "target_field": "azure.signinlogs.result_signature",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.operationVersion",
+              "target_field": "azure.signinlogs.operation_version",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.tenantId",
+              "target_field": "azure.signinlogs.tenant_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.correlationId",
+              "target_field": "azure.signinlogs.correlation_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.networkLocationDetails",
+              "target_field": "azure.signinlogs.properties.network_location_details",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.resourceId",
+              "target_field": "azure.signinlogs.properties.resource_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.appliedConditionalAccessPolicies",
+              "target_field": "azure.signinlogs.properties.applied_conditional_access_policies",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.deviceDetail",
+              "target_field": "azure.signinlogs.properties.device_detail",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.device_detail.deviceId",
+              "target_field": "azure.signinlogs.properties.device_detail.device_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.device_detail.operatingSystem",
+              "target_field": "azure.signinlogs.properties.device_detail.operating_system",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.device_detail.displayName",
+              "target_field": "azure.signinlogs.properties.device_detail.display_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.device_detail.trustType",
+              "target_field": "azure.signinlogs.properties.device_detail.trust_type",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.createdDateTime",
+              "target_field": "azure.signinlogs.properties.created_at",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.userDisplayName",
+              "target_field": "azure.signinlogs.properties.user_display_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.correlationId",
+              "target_field": "azure.signinlogs.properties.correlation_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.userPrincipalName",
+              "target_field": "azure.signinlogs.properties.user_principal_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.userId",
+              "target_field": "azure.signinlogs.properties.user_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.appId",
+              "target_field": "azure.signinlogs.properties.app_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.appDisplayName",
+              "target_field": "azure.signinlogs.properties.app_display_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.ipAddress",
+              "target_field": "azure.signinlogs.properties.ip_address",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.clientAppUsed",
+              "target_field": "azure.signinlogs.properties.client_app_used",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.conditionalAccessStatus",
+              "target_field": "azure.signinlogs.properties.conditional_access_status",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.originalRequestId",
+              "target_field": "azure.signinlogs.properties.original_request_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.isInteractive",
+              "target_field": "azure.signinlogs.properties.is_interactive",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.tokenIssuerName",
+              "target_field": "azure.signinlogs.properties.token_issuer_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.tokenIssuerType",
+              "target_field": "azure.signinlogs.properties.token_issuer_type",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.processingTimeInMilliseconds",
+              "target_field": "azure.signinlogs.properties.processing_time_ms",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.riskDetail",
+              "target_field": "azure.signinlogs.properties.risk_detail",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.riskLevelAggregated",
+              "target_field": "azure.signinlogs.properties.risk_level_aggregated",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.riskLevelDuringSignIn",
+              "target_field": "azure.signinlogs.properties.risk_level_during_signin",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.riskState",
+              "target_field": "azure.signinlogs.properties.risk_state",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.resourceDisplayName",
+              "target_field": "azure.signinlogs.properties.resource_display_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.status.errorCode",
+              "target_field": "azure.signinlogs.properties.status.error_code",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.status.additionalDetails",
+              "target_field": "azure.signinlogs.properties.status.additional_details",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.location.city",
+              "target_field": "geo.city_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.location.state",
+              "target_field": "geo.country_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.location.geoCoordinates.latitude",
+              "target_field": "geo.location.lat",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.location.geoCoordinates.longitude",
+              "target_field": "geo.location.lon",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.signinlogs.properties.servicePrincipalId",
+              "target_field": "azure.signinlogs.properties.service_principal_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "remove": {
+              "field": ["message", "azure.signinlogs.time","azure.signinlogs.properties.location"],
+              "ignore_missing": true
           }
       }
   ],

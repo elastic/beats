@@ -3,38 +3,26 @@
   description: >
     Fields for Azure sign-in logs.
   fields:
-    - name: resourceID
-      type: keyword
-      description: >
-        Resource ID
-    - name: operationName
+    - name: operation_name
       type: keyword
       description: >
         The operation name
-    - name: operationVersion
+    - name: operation_version
       type: keyword
       description: >
         The operation version
-    - name: category
-      type: keyword
-      description: >
-        Log category
-    - name: tenantId
+    - name: tenant_id
       type: keyword
       description: >
         Tenant ID
-    - name: resultSignature
+    - name: result_signature
       type: keyword
       description: >
         Result signature
-    - name: correlationId
+    - name: correlation_id
       type: keyword
       description: >
         Correlation ID
-    - name: resultType
-      type: keyword
-      description: >
-        Result type
     - name: identity
       type: keyword
       description: >
@@ -48,83 +36,83 @@
           type: keyword
           description: >
             ID
-        - name: createdDateTime
+        - name: created_at
           type: keyword
           description: >
             Created date time
-        - name: userDisplayName
+        - name: user_display_name
           type: keyword
           description: >
             User display name
-        - name: correlationId
+        - name: correlation_id
           type: keyword
           description: >
             Correlation ID
-        - name: userPrincipalName
+        - name: user_principal_name
           type: keyword
           description: >
             User principal name
-        - name: userId
+        - name: user_id
           type: keyword
           description: >
             User ID
-        - name: appId
+        - name: app_id
           type: keyword
           description: >
             App ID
-        - name: appDisplayName
+        - name: app_display_name
           type: keyword
           description: >
             App display name
-        - name: ipAddress
+        - name: ip_address
           type: keyword
           description: >
             Ip address
-        - name: clientAppUsed
+        - name: client_app_used
           type: keyword
           description: >
             Client app used
-        - name: conditionalAccessStatus
+        - name: conditional_access_status
           type: keyword
           description: >
             Conditional access status
-        - name: originalRequestId
+        - name: original_request_id
           type: keyword
           description: >
             Original request ID
-        - name: isInteractive
+        - name: is_interactive
           type: keyword
           description: >
             Is interactive
-        - name: tokenIssuerName
+        - name: token_issuer_name
           type: keyword
           description: >
             Token issuer name
-        - name: tokenIssuerType
+        - name: token_issuer_type
           type: keyword
           description: >
             Token issuer type
-        - name: processingTimeInMilliseconds
-          type: keyword
+        - name: processing_time_ms
+          type: float
           description: >
             Processing time in milliseconds
-        - name: riskDetail
+        - name: risk_detail
           type: keyword
           description: >
             Risk detail
-        - name: riskLevelAggregated
+        - name: risk_level_aggregated
           type: keyword
           description: >
             Risk level aggregated
-        - name: riskLevelDuringSignIn
+        - name: risk_level_during_signin
           type: keyword
           description: >
             Risk level during signIn
-        - name: riskState
+        - name: risk_state
           type: keyword
           description: >
             Risk state
-        - name: resourceDisplayName
+        - name: resource_display_name
           type: keyword
           description: >
             Resource display name
@@ -133,20 +121,24 @@
           description: >
             Status
           fields:
-            - name: errorCode
+            - name: error_code
               type: keyword
               description: >
                 Error code
-        - name: deviceDetail
+            - name: additional_details
+              type: keyword
+              description: >
+                Additional details
+        - name: device_detail
           type: group
           description: >
             Status
           fields:
-            - name: deviceId
+            - name: device_id
               type: keyword
               description: >
                 Device ID
-            - name: operatingSystem
+            - name: operating_system
               type: keyword
               description: >
                 Operating system
@@ -154,33 +146,16 @@
               type: keyword
               description: >
                 Browser
-        - name: location
-          type: group
+            - name: display_name
+              type: keyword
+              description: >
+                Display name
+            - name: trust_type
+              type: keyword
+              description: >
+                Trust type
+        - name: service_principal_id
+          type: keyword
           description: >
             Status
-          fields:
-            - name: city
-              type: keyword
-              description: >
-                City
-            - name: state
-              type: keyword
-              description: >
-                State
-            - name: countryOrRegion
-              type: keyword
-              description: >
-                Country or region
-            - name: geoCoordinates
-              type: group
-              description: >
-                GeoCoordinates
-              fields:
-                - name: latitude
-                  type: keyword
-                  description: >
-                    Latitude
-                - name: longitude
-                  type: keyword
-                  description: >
-                    Longitude
+
