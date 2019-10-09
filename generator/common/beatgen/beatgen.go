@@ -79,18 +79,18 @@ var configList = []ConfigItem{
 func Generate() error {
 	cfg, err := getConfig()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Error getting config")
 	}
 	err = setup.GenNewBeat(cfg)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Error generating new beat")
 	}
 
 	absBeatPath := filepath.Join(build.Default.GOPATH, "src", cfg["beat_path"])
 
 	err = os.Chdir(absBeatPath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error changing directory")
 	}
 
 	mg.Deps(setup.CopyVendor)

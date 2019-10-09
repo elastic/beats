@@ -32,20 +32,21 @@ func RunSetup() error {
 	vendorPath := "./vendor/github.com/"
 
 	//Copy mage stuff
-	err := os.MkdirAll(filepath.Join(vendorPath, "magefile"), 0755)
+	toMkdir := filepath.Join(vendorPath, "magefile")
+	err := os.MkdirAll(toMkdir, 0755)
 	if err != nil {
-		return errors.Wrap(err, "error making mage dir")
+		return errors.Wrapf(err, "error making mage directory at %s", toMkdir)
 	}
 
 	err = sh.Run("cp", "-R", filepath.Join(vendorPath, "elastic/beats/vendor/github.com/magefile/mage"), filepath.Join(vendorPath, "magefile"))
 	if err != nil {
-		return errors.Wrap(err, "error copying vendored magefile")
+		return errors.Wrapf(err, "error copying vendored magefile to %s", filepath.Join(vendorPath, "magefile"))
 	}
 
 	//Copy the pkg helper
 	err = sh.Run("cp", "-R", filepath.Join(vendorPath, "elastic/beats/vendor/github.com/pkg"), vendorPath)
 	if err != nil {
-		return errors.Wrap(err, "error copying pkg to vendor")
+		return errors.Wrapf(err, "error copying pkg to %s", vendorPath)
 	}
 
 	pwd, err := os.Getwd()

@@ -12,6 +12,7 @@ must be set up correctly. In addition, the following tools are required:
 
 * https://www.python.org/downloads/[python]
 * https://virtualenv.pypa.io/en/stable/[virtualenv]
+* https://github.com/magefile/mage[mage]
 
 Virtualenv is easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip].
 

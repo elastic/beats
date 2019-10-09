@@ -49,20 +49,20 @@ func GenNewBeat(config map[string]string) error {
 		if info.IsDir() {
 			err := os.MkdirAll(writePath, 0755)
 			if err != nil {
-				return errors.Wrap(err, "error creating directory")
+				return errors.Wrapf(err, "error creating directory %s", writePath)
 			}
 		} else {
 
 			//dump original source file
 			tmplFile, err := ioutil.ReadFile(path)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "error reading source templatse file")
 			}
 			newFile := replaceVars(config, string(tmplFile))
 
 			err = ioutil.WriteFile(writePath, []byte(newFile), 0644)
 			if err != nil {
-				return err
+				return errors.Wrap(err, "error writing beat file")
 			}
 		}
 
