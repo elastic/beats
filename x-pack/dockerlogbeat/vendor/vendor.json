@@ -15,12 +15,6 @@
 			"revisionTime": "2017-09-29T23:40:23Z"
 		},
 		{
-			"checksumSHA1": "0rido7hYHQtfq3UJzVT5LClLAWc=",
-			"path": "github.com/beorn7/perks/quantile",
-			"revision": "37c8de3658fcb183f997c4e13e8337516ab753e6",
-			"revisionTime": "2019-07-31T12:00:54Z"
-		},
-		{
 			"checksumSHA1": "ru5eKWdLzXfpNRL+Mi1bxbmY8DU=",
 			"path": "github.com/containerd/containerd/errdefs",
 			"revision": "36cf5b690dcc00ff0f34ff7799209050c3d0c59a",
