@@ -15917,7 +15917,7 @@ type: date
 Message recorded for the given event
 
 
-type: keyword
+type: text
 
 --
 
