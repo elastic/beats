@@ -58,12 +58,6 @@ type Dimension struct {
 	Value string `config:"value" validate:"nonzero"`
 }
 
-// Tag holds name and value for cloudwatch metricset to filter on.
-type Tag struct {
-	Name  string `config:"name" validate:"nonzero"`
-	Value string `config:"value" validate:"nonzero"`
-}
-
 // Config holds a configuration specific for cloudwatch metricset.
 type Config struct {
 	Namespace          string      `config:"namespace" validate:"nonzero,required"`
@@ -71,24 +65,24 @@ type Config struct {
 	Dimensions         []Dimension `config:"dimensions"`
 	ResourceTypeFilter string      `config:"tags.resource_type_filter"`
 	Statistic          []string    `config:"statistic"`
-	Tags               []Tag       `config:"tags"`
+	Tags               []aws.Tag   `config:"tags"`
 }
 
 type metricsWithStatistics struct {
 	cloudwatchMetric cloudwatch.Metric
 	statistic        []string
-	tags             []Tag
+	tags             []aws.Tag
 }
 
 type listMetricWithDetail struct {
 	metricsWithStats    []metricsWithStatistics
-	resourceTypeFilters map[string][]Tag
+	resourceTypeFilters map[string][]aws.Tag
 }
 
 type metricDetail struct {
 	resourceTypeFilter string
 	names              []string
-	tags               []Tag
+	tags               []aws.Tag
 	statistics         []string
 	dimensions         []cloudwatch.Dimension
 }
@@ -168,7 +162,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 
 		var filteredMetricWithStatsTotal []metricsWithStatistics
-		resourceTypes := map[string][]Tag{}
+		resourceTypes := map[string][]aws.Tag{}
 
 		// Create events based on namespaceDetailTotal from configuration
 		for namespace, metricDetails := range namespaceDetailTotal {
@@ -254,7 +248,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]m
 	var listMetricDetailTotal listMetricWithDetail
 	namespaceDetailTotal := map[string][]metricDetail{}
 	var metricsWithStatsTotal []metricsWithStatistics
-	resourceTypesWithTags := map[string][]Tag{}
+	resourceTypesWithTags := map[string][]aws.Tag{}
 
 	for _, config := range m.CloudwatchConfigs {
 		// If there is no statistic method specified, then use the default.
@@ -412,7 +406,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	return event
 }
 
-func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ClientAPI, listMetricWithStatsTotal []metricsWithStatistics, resourceTypes map[string][]Tag, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, []mb.Event, error) {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ClientAPI, listMetricWithStatsTotal []metricsWithStatistics, resourceTypes map[string][]aws.Tag, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, []mb.Event, error) {
 	// Initialize events for each identifier.
 	events := map[string]mb.Event{}
 
@@ -427,24 +421,15 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 			m.Logger().Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
 		}
 
-		// filter resourceTagMap
-		for _, tagFilter := range tagsFilter {
-			for identifier, tags := range resourceTagMap {
-				var tagKeys []string
-				var tagValues []string
-				for _, t := range tags {
-					tagKeys = append(tagKeys, *t.Key)
-					tagValues = append(tagValues, *t.Value)
-				}
-
-				if exists, idx := aws.StringInSlice(tagFilter.Name, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
-					delete(resourceTagMap, identifier)
-				}
-			}
-		}
-
 		if tagsFilter != nil && resourceTagMap == nil {
 			continue
+		}
+
+		// filter resourceTagMap
+		for identifier, tags := range resourceTagMap {
+			if exists := aws.CheckTagFiltersExist(tagsFilter, tags); !exists {
+				delete(resourceTagMap, identifier)
+			}
 		}
 
 		// Construct metricDataQueries
