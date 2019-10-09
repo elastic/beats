@@ -1287,11 +1287,11 @@ var security = (function () {
         // 4738 - An user account was changed.
         4738: userMgmtEvts.Run,
 
-        // 4767 - A user account was unlocked.
-        4767: userMgmtEvts.Run,
-
         // 4740 - An account was locked out
         4740: userMgmtEvts.Run,
+
+        // 4767 - A user account was unlocked.
+        4767: userMgmtEvts.Run,
 
         // 4781 - The name of an account was changed.
         4781: userRenamed.Run,
