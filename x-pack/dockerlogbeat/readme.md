@@ -18,7 +18,7 @@ Logging plugins work by starting up an HTTP server that reads over a unix socket
 
 
 
-## if you're on OSX, it's nearly impossible to debug docker plugins and the docs are wrong 60% of the time.
+## Debugging on MacOS.
 
 First, you need to shell into the VM that `runc` lives in. To do this, you need to find the tty for the VM. On newer versions of Docker For Mac, it's at: `~/Library/Containers/com.docker.docker/Data/vms/0/tty` On older versions, it's _somewhere_ else in `~/Library/Containers/com.docker.docker`. 
 
