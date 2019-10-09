@@ -48,6 +48,12 @@ class Test(metricbeat.BaseTest):
         """ Kubernetes state container metricset tests """
         self._test_metricset('state_container', 1, self.get_kube_state_hosts())
 
+    @unittest.skipUnless(False and metricbeat.INTEGRATION_TESTS, "integration test")
+    @unittest.skip("flacky kube-state-metrics container healthcheck")
+    def test_state_container(self):
+        """ Kubernetes state container metricset tests """
+        self._test_metricset('state_resourcequota', 1, self.get_kube_state_hosts())
+
     def _test_metricset(self, metricset, expected_events, hosts):
         self.render_config_template(modules=[{
             "name": "kubernetes",
