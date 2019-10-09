@@ -195,6 +195,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 
 	metricSet := MetricSet{
 		&aws.MetricSet{},
+		nil,
 	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
