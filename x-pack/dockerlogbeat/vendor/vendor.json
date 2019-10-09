@@ -111,12 +111,6 @@
 			"revisionTime": "2019-09-27T16:46:57Z"
 		},
 		{
-			"checksumSHA1": "q4R77xtScr+W3m77Otw6kr34ktg=",
-			"path": "github.com/docker/docker/errdefs",
-			"revision": "5b57f41241cb0d8df5886a1db3d7920494a9e432",
-			"revisionTime": "2019-09-27T16:46:57Z"
-		},
-		{
 			"checksumSHA1": "vZk7/lVjHDlRDDf5XJbNMock1WI=",
 			"path": "github.com/docker/docker/pkg/ioutils",
 			"revision": "5b57f41241cb0d8df5886a1db3d7920494a9e432",
@@ -193,12 +187,6 @@
 			"path": "github.com/docker/engine/daemon/logger",
 			"revision": "5b57f41241cb0d8df5886a1db3d7920494a9e432",
 			"revisionTime": "2019-09-27T16:46:57Z"
-		},
-		{
-			"checksumSHA1": "dDq9w/RbibsWDylY21r50jirJOQ=",
-			"path": "github.com/docker/go-connections/nat",
-			"revision": "fd1b1942c4d55f7f210a8387e612dc6ffee78ff6",
-			"revisionTime": "2019-06-12T16:53:40Z"
 		},
 		{
 			"checksumSHA1": "ga0PXcP3aI54ek2hQHmypI/HmSQ=",
