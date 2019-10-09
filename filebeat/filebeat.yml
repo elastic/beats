@@ -11,9 +11,7 @@
 # configuration file.
 
 #=========================== Filebeat inputs =============================
-logging.level: debug
-filebeat.overwrite_pipelines: true
-setup.ilm.enabled: false
+
 filebeat.inputs:
 
 # Each - is an input. Most options can be set at the input level, so
