@@ -1,3 +1,1 @@
-dashboards:
-- id: Filebeat-azure-auditlogs-Dashboard
-  file: Filebeat-azure-audit.json
+

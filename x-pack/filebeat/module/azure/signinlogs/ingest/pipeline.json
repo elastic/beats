@@ -2,6 +2,12 @@
   "description": "Pipeline for parsing azure signin logs.",
   "processors": [
       {
+          "json" : {
+              "field" : "message",
+              "target_field" : "azure.signinlogs"
+          }
+      },
+      {
           "date": {
               "field": "azure.signinlogs.time",
               "target_field": "@timestamp",

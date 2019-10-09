@@ -348,8 +348,9 @@ func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
 		for _, ms := range obj[h.expandEventListFromField] {
 			js, err := json.Marshal(ms)
 			if err == nil {
-				h.log.Errorw(fmt.Sprintf("Kafka serializing message %s", ms), "error", err)
 				messages = append(messages, string(js))
+			}else {
+				h.log.Errorw(fmt.Sprintf("Kafka serializing message %s", ms), "error", err)
 			}
 		}
 	}

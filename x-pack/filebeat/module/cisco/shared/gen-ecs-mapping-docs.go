@@ -14,8 +14,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/pkg/errors"
 )
 
@@ -41,7 +39,7 @@ var outputTables = []struct {
 
 type idMappings map[string]fieldMappings
 
-type fieldMappings map[string]common.StringSet
+type fieldMappings map[string]StringSet
 
 func main() {
 	if err := generate(); err != nil {

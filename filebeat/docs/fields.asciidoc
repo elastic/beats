@@ -1243,9 +1243,9 @@ type: keyword
 --
 
 [[exported-fields-azure]]
-== azure fields
+== Azure fields
 
-azure Module
+Azure Module
 
 
 
@@ -1258,7 +1258,7 @@ azure Module
 [float]
 === activitylogs
 
-Fields for azure Activity logs.
+Fields for Azure activity logs.
 
 
 
@@ -1426,7 +1426,7 @@ type: object
 [float]
 === auditlogs
 
-Fields for azure audit logs.
+Fields for Azure audit logs.
 
 
 
@@ -1795,7 +1795,7 @@ type: keyword
 [float]
 === signinlogs
 
-Fields for azure audit logs.
+Fields for Azure sign-in logs.
 
 
 

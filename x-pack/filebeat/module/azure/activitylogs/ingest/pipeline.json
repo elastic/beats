@@ -2,6 +2,12 @@
   "description": "Pipeline for parsing azure activity logs.",
   "processors": [
       {
+          "json" : {
+              "field" : "message",
+              "target_field" : "azure.activitylogs"
+          }
+      },
+      {
           "date": {
               "field": "azure.activitylogs.time",
               "target_field": "@timestamp",

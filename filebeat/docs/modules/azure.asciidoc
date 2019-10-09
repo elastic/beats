@@ -15,6 +15,13 @@ beta[]
 This is the azure module.
 
 The azure module will concentrate on retrieving different types of log data from Azure.
+There are several requirements before using the module since the logs will actually be read from azure event hubs.
+
+   - the event hubs the azure module will read logs from must have the kafka option enabled .
+   -  the logs have to be exported first to the event hubs https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-create-kafka-enabled
+   - to export activity logs to event hubs users can follow the steps here https://docs.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-export
+   - to export audit and sign-in logs to event hubs users can follow the steps here https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/tutorial-azure-monitor-stream-logs-to-event-hub
+
 The module will contain the following filesets:
 
 `activitylogs` ::

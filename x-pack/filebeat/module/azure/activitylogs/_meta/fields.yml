@@ -1,7 +1,7 @@
 - name: activitylogs
   type: group
   description: >
-    Fields for azure Activity logs.
+    Fields for Azure activity logs.
   fields:
     - name: identity
       type: group

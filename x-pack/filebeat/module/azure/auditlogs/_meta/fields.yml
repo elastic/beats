@@ -1,7 +1,7 @@
 - name: auditlogs
   type: group
   description: >
-    Fields for azure audit logs.
+    Fields for Azure audit logs.
   fields:
     - name: resourceID
       type: keyword

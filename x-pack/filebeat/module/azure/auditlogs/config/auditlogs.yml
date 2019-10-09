@@ -7,8 +7,3 @@ expand_event_list_from_field: "records"
 username: "$ConnectionString"
 password: {{ .connection_string }}
 ssl.enabled: true
-
-processors:
-- decode_json_fields:
-    fields: ["message"]
-    target: "azure.auditlogs"

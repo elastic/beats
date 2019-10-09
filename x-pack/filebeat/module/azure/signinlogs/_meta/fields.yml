@@ -1,7 +1,7 @@
 - name: signinlogs
   type: group
   description: >
-    Fields for azure audit logs.
+    Fields for Azure sign-in logs.
   fields:
     - name: resourceID
       type: keyword
