@@ -39,7 +39,7 @@ var outputTables = []struct {
 
 type idMappings map[string]fieldMappings
 
-type fieldMappings map[string]StringSet
+type fieldMappings map[string]stringSet
 
 func main() {
 	if err := generate(); err != nil {
