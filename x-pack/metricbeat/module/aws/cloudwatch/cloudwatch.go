@@ -161,7 +161,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			if namespaceResourceType.metricNames != nil && namespaceResourceType.dimensions == nil {
 				for _, listMetric := range listMetricsOutput {
-					if !aws.StringInSlice(*listMetric.MetricName, namespaceResourceType.metricNames) {
+					if exists, _ := aws.StringInSlice(*listMetric.MetricName, namespaceResourceType.metricNames); !exists {
 						continue
 					}
 					filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
@@ -169,7 +169,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 							cloudwatchMetric: listMetric,
 							statistic:        namespaceResourceType.statistic,
 						})
-					if namespaceResourceType.resourceTypeFilter != "" && !aws.StringInSlice(namespaceResourceType.resourceTypeFilter, resourceTypes) {
+
+					exists, _ := aws.StringInSlice(namespaceResourceType.resourceTypeFilter, resourceTypes)
+					if namespaceResourceType.resourceTypeFilter != "" && !exists {
 						resourceTypes = append(resourceTypes, namespaceResourceType.resourceTypeFilter)
 					}
 				}
@@ -183,7 +185,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 							cloudwatchMetric: listMetric,
 							statistic:        namespaceResourceType.statistic,
 						})
-					if namespaceResourceType.resourceTypeFilter != "" && !aws.StringInSlice(namespaceResourceType.resourceTypeFilter, resourceTypes) {
+
+					exists, _ := aws.StringInSlice(namespaceResourceType.resourceTypeFilter, resourceTypes)
+					if namespaceResourceType.resourceTypeFilter != "" && !exists {
 						resourceTypes = append(resourceTypes, namespaceResourceType.resourceTypeFilter)
 					}
 				}
@@ -247,7 +251,8 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, []namespaceWit
 				metricsWithStatsTotal = append(metricsWithStatsTotal, metricsWithStats)
 			}
 
-			if config.ResourceTypeFilter != "" && !aws.StringInSlice(config.ResourceTypeFilter, resourceTypes) {
+			exists, _ := aws.StringInSlice(config.ResourceTypeFilter, resourceTypes)
+			if config.ResourceTypeFilter != "" && !exists {
 				resourceTypes = append(resourceTypes, config.ResourceTypeFilter)
 			}
 			continue

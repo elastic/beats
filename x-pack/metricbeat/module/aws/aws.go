@@ -11,6 +11,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -31,6 +32,12 @@ type MetricSet struct {
 	RegionsList []string
 	Period      time.Duration
 	AwsConfig   *awssdk.Config
+}
+
+// Tag holds a configuration specific for ec2 and cloudwatch metricset.
+type Tag struct {
+	Key   string `config:"key"`
+	Value string `config:"value"`
 }
 
 // ModuleName is the name of this module.
@@ -107,14 +114,15 @@ func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error
 	return
 }
 
-// StringInSlice checks if a string is already exists in list
-func StringInSlice(str string, list []string) bool {
-	for _, v := range list {
+// StringInSlice checks if a string is already exists in list and its location
+func StringInSlice(str string, list []string) (bool, int) {
+	for idx, v := range list {
 		if v == str {
-			return true
+			return true, idx
 		}
 	}
-	return false
+	// If this string doesn't exist in given list, then return location to be -1
+	return false, -1
 }
 
 // InitEvent initialize mb.Event with basic information like service.name, cloud.provider
@@ -128,4 +136,33 @@ func InitEvent(regionName string) mb.Event {
 		event.RootFields.Put("cloud.region", regionName)
 	}
 	return event
+}
+
+// CheckTagFiltersExist compare tags filter with a set of tags to see if tags
+// filter is a subset of tags
+func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
+	var tagKeys []string
+	var tagValues []string
+
+	switch tags.(type) {
+	case []resourcegroupstaggingapi.Tag:
+		tagsResource := tags.([]resourcegroupstaggingapi.Tag)
+		for _, tag := range tagsResource {
+			tagKeys = append(tagKeys, *tag.Key)
+			tagValues = append(tagValues, *tag.Value)
+		}
+	case []ec2.Tag:
+		tagsEC2 := tags.([]ec2.Tag)
+		for _, tag := range tagsEC2 {
+			tagKeys = append(tagKeys, *tag.Key)
+			tagValues = append(tagValues, *tag.Value)
+		}
+	}
+
+	for _, tagFilter := range tagsFilter {
+		if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+			return false
+		}
+	}
+	return true
 }

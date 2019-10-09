@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-01-05T18:17:05.000-02:00",
+        "@timestamp": "2019-01-05T20:17:05.000-02:00",
         "destination.ip": "255.55.174.225",
         "destination.mac": "90:10:92:6e:ea:a7",
         "destination.port": 48689,
@@ -35,7 +35,7 @@
         ]
     },
     {
-        "@timestamp": "2019-01-05T18:17:01.000-02:00",
+        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
@@ -73,7 +73,7 @@
         ]
     },
     {
-        "@timestamp": "2019-01-05T18:17:01.000-02:00",
+        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
@@ -113,7 +113,7 @@
         ]
     },
     {
-        "@timestamp": "2019-01-05T18:17:01.000-02:00",
+        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
@@ -151,7 +151,7 @@
         ]
     },
     {
-        "@timestamp": "2019-01-05T18:17:01.000-02:00",
+        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,

@@ -157,6 +157,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix conditions and error checking of date processors in ingest pipelines that use `event.timezone` to parse dates. {pull}13883[13883]
 - Fix timezone parsing of logstash module ingest pipelines. {pull}13890[13890]
 - cisco asa and ftd filesets: Fix parsing of message 106001. {issue}13891[13891] {pull}13903[13903]
+- Fix timezone parsing of iptables, mssql and panw module ingest pipelines. {pull}13926[13926]
+- Fix merging of fields specified in global scope with fields specified under an input's scope. {issue}3628[3628] {pull}13909[13909]
+- Fix delay in enforcing close_renamed and close_removed options. {issue}13488[13488] {pull}13907[13907]
 
 *Heartbeat*
 
@@ -207,6 +210,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `docker.cpu.system.pct` calculation by using the reported number online cpus instead of the number of metrics per cpu. {pull}13691[13691]
 - Fix rds metricset dashboard. {pull}13721[13721]
 - Ignore prometheus untyped metrics with NaN value. {issue}13750[13750] {pull}13790[13790]
+- Change kubernetes.event.message to text {pull}13964[13964]
 
 *Packetbeat*
 
@@ -330,6 +334,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add input httpjson. {issue}13545[13545] {pull}13546[13546]
 - Filebeat Netflow input: Remove beta label. {pull}13858[13858]
 - Remove `event.timezone` from events that don't need it in some modules that support log formats with and without timezones. {pull}13918[13918]
+- Add ExpandEventListFromField config option in the kafka input. {pull}13965[13965]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -395,10 +400,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for NATS version 2. {pull}13601[13601]
 - Add `docker.cpu.*.norm.pct` metrics for `cpu` metricset of Docker Metricbeat module. {pull}13695[13695]
 - Add `instance` label by default when using Prometheus collector. {pull}13737[13737]
+- Add azure module. {pull}13196[13196] {pull}13859[13859]
 - Add Apache Tomcat module {pull}13491[13491]
 - Add ECS `container.id` and `container.runtime` to kubernetes `state_container` metricset. {pull}13884[13884]
 - Add `job` label by default when using Prometheus collector. {pull}13878[13878]
 - Add `state_resourcequota` metricset for Kubernetes module. {pull}13693[13693]
+- Add tags filter in ec2 metricset. {pull}13872[13872] {issue}13145[13145]
 
 *Packetbeat*
 
