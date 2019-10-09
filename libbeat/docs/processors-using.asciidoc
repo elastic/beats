@@ -544,6 +544,7 @@ list of cloud provider names to be used. If `providers` is not configured, then
 all providers that do not access a remote endpoint are enabled by default.
 
 List of names the `providers` setting supports:
+
 - "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
 - "azure" for Azure Virtual Machine (enabled by default).
 - "digitalocean" for Digital Ocean (enabled by default).
