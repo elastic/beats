@@ -411,28 +411,10 @@
 			"revisionTime": "2019-08-16T18:02:39Z"
 		},
 		{
-			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
-			"path": "golang.org/x/net/context",
-			"revision": "c00fd9afed17cfdca9b3e1e3b8de7ef2b3f0347b",
-			"revisionTime": "2019-09-18T13:16:56Z"
-		},
-		{
 			"checksumSHA1": "RNVKKPbxQAFzQ7bawOBsoMrjh2A=",
 			"path": "golang.org/x/sys/unix",
 			"revision": "c990c680b611ac1aeb7d8f2af94a825f98d69720",
 			"revisionTime": "2019-09-26T18:47:27Z"
-		},
-		{
-			"checksumSHA1": "x9eQUCzgMScb1EuyZ09oK62Vfwg=",
-			"path": "golang.org/x/sys/windows",
-			"revision": "c990c680b611ac1aeb7d8f2af94a825f98d69720",
-			"revisionTime": "2019-09-26T18:47:27Z"
-		},
-		{
-			"checksumSHA1": "z5suoCC9wR9GqMu8Wo1Mp1Lv7iw=",
-			"path": "golang.org/x/time/rate",
-			"revision": "c4c64cad1fd0a1a8dab2523e04e61d35308e131e",
-			"revisionTime": "2019-09-19T08:52:11Z"
 		},
 		{
 			"checksumSHA1": "dU5fToNngC22+3DsebkdYv+T3jE=",
