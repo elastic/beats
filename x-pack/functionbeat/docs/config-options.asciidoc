@@ -187,7 +187,7 @@ The starting position to read from a Kinesis stream, valids values are `trim_hor
 The default is trim_horizon.
 
 [float]
-[id="${beatname_lc}-keep-null"]
+[id="{beatname_lc}-keep-null"]
 ==== `keep_null`
 
 If this option is set to true, fields with `null` values will be published in
