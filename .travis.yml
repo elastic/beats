@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: bionic
 services:
   - docker
 
@@ -212,7 +212,7 @@ addons:
       - libpcap-dev
       - xsltproc
       - libxml2-utils
-      - libsystemd-journal-dev
+      - libsystemd-dev
       - librpm-dev
 
 before_install:
