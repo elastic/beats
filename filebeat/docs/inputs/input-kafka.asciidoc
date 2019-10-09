@@ -129,8 +129,8 @@ Kafka fetch settings:
 
 ===== `expand_event_list_from_field`
 
-If the fileset using this input expects to receive multiple messages bundled under a specific field then the config option `expand_event_list_from_field` value can be assigned the name of the json group object.
-For example in the case of azure fielsets the events are found under the json object "records".
+If the fileset using this input expects to receive multiple messages bundled under a specific field then the config option `expand_event_list_from_field` value can be assigned the name of the field.
+For example in the case of azure filesets the events are found under the json object "records".
 ```
 {
 "records": [ {event1}, {event2}]
