@@ -1,0 +1,113 @@
+{
+    "_index" : "filebeat-8.0.0-2019.10.09",
+    "_type" : "_doc",
+    "_id" : "2a7e2503-d7e2-405a",
+    "_score" : null,
+    "_source" : {
+        "agent" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "type" : "filebeat",
+            "ephemeral_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "version" : "8.0.0"
+        },
+        "log" : {
+            "level" : "Error"
+        },
+        "source" : {
+            "ip" : "11.71.231.51"
+        },
+        "fileset" : {
+            "name" : "activitylogs"
+        },
+        "message" : """{"error":{"code":"ParentResourceNotFound","message":"Can not perform requested operation on nested resource. Parent resource 'azurelsevents' not found."}}""",
+        "geo" : {
+            "name" : "global"
+        },
+        "input" : {
+            "type" : "kafka"
+        },
+        "@timestamp" : "2019-10-09T19:39:22.822Z",
+        "ecs" : {
+            "version" : "1.1.0"
+        },
+        "service" : {
+            "type" : "azure"
+        },
+        "kafka" : {
+            "headers" : [
+                "ProfileName: �\fname=default"
+            ],
+            "partition" : 3,
+            "offset" : 47915,
+            "topic" : "insights-operational-logs",
+            "key" : ""
+        },
+        "host" : {
+            "hostname" : "DESKTOP-RFOOE09",
+            "os" : {
+                "build" : "18362.388",
+                "kernel" : "10.0.18362.388 (WinBuild.160101.0800)",
+                "name" : "Windows 10 Pro",
+                "family" : "windows",
+                "version" : "10.0",
+                "platform" : "windows"
+            },
+            "name" : "DESKTOP-RFOOE09",
+            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "architecture" : "x86_64"
+        },
+        "event" : {
+            "duration" : 1.1E7,
+            "module" : "azure",
+            "category" : "Action",
+            "dataset" : "azure.activitylogs",
+            "outcome" : "Failure"
+        },
+        "azure" : {
+            "resource_id" : "/SUBSCRIPTIONS/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/RESOURCEGROUPS/SA-HEMANT/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/AZURELSEVENTS/AUTHORIZATIONRULES/ROOTMANAGESHAREDACCESSKEY",
+            "activitylogs" : {
+                "result_signature" : "Failed.NotFound",
+                "operation_name" : "MICROSOFT.EVENTHUB/NAMESPACES/AUTHORIZATIONRULES/LISTKEYS/ACTION",
+                "identity" : {
+                    "authorization" : {
+                        "evidence" : {
+                            "role_definition_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb7",
+                            "role" : "Azure EventGrid Service BuiltIn Role",
+                            "role_assignment_scope" : "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                            "role_assignment_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                            "principal_type" : "ServicePrincipal",
+                            "principal_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73"
+                        },
+                        "scope" : "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/resourceGroups/sa-hemant/providers/Microsoft.EventHub/namespaces/azurelsevents/authorizationRules/RootManageSharedAccessKey",
+                        "action" : "Microsoft.EventHub/namespaces/authorizationRules/listKeys/action"
+                    },
+                    "claims" : {
+                        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "ver" : "1.0",
+                        "http://schemas.microsoft.com/identity/claims/identityprovider" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                        "aio" : "42VgYChmaFjYVOd58PiHOdfi963fDAA=",
+                        "iss" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                        "uti" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "aud" : "https://management.core.windows.net/",
+                        "nbf" : "1570649662",
+                        "appidacr" : "2",
+                        "http://schemas.microsoft.com/identity/claims/tenantid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "appid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "http://schemas.microsoft.com/identity/claims/objectidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "exp" : "1570678762",
+                        "iat" : "1570649662"
+                    }
+                },
+                "correlation_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "properties" : {
+                    "status_code" : "NotFound",
+                    "service_request_id" : null
+                }
+            }
+        }
+    },
+    "sort" : [
+        1570649962822
+    ]
+}

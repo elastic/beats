@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
@@ -1235,6 +1236,921 @@ type: keyword
 +
 --
 The Transport Layer Security (TLS) version negotiated by the client.
+
+
+type: keyword
+
+--
+
+[[exported-fields-azure]]
+== Azure fields
+
+Azure Module
+
+
+
+[float]
+=== azure
+
+
+
+
+*`azure.resource_id`*::
++
+--
+Resource ID
+
+
+type: keyword
+
+--
+
+[float]
+=== activitylogs
+
+Fields for Azure activity logs.
+
+
+
+[float]
+=== identity
+
+The canonical user ID of the owner of the source bucket.
+
+
+
+[float]
+=== authorization
+
+Node allocatable pods
+
+
+
+[float]
+=== evidence
+
+Node allocatable pods
+
+
+
+*`azure.activitylogs.identity.authorization.evidence.role_assignment_scope`*::
++
+--
+Role assignment scope
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.role_definition_id`*::
++
+--
+Role definition ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.role`*::
++
+--
+Role
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.role_assignment_id`*::
++
+--
+Role assignment ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.principal_id`*::
++
+--
+Principal ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.evidence.principal_type`*::
++
+--
+Principal type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.scope`*::
++
+--
+Scope
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.action`*::
++
+--
+Action
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.correlation_id`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.operation_name`*::
++
+--
+Operation name
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.result_signature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+[float]
+=== properties
+
+Properties
+
+
+
+*`azure.activitylogs.properties.service_request_id`*::
++
+--
+Service Request Id
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.properties.status_code`*::
++
+--
+Status code
+
+
+type: keyword
+
+--
+
+[float]
+=== auditlogs
+
+Fields for Azure audit logs.
+
+
+
+*`azure.auditlogs.operation_name`*::
++
+--
+The operation name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.operation_version`*::
++
+--
+The operation version
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.tenant_id`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.result_signature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.correlation_id`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+[float]
+=== properties
+
+The audit log properties
+
+
+
+*`azure.auditlogs.properties.result`*::
++
+--
+Log result
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.activity_display_name`*::
++
+--
+Activity display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.result_reason`*::
++
+--
+Reason for the log result
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.correlation_id`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.logged_by_service`*::
++
+--
+Logged by service
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.operation_type`*::
++
+--
+Operation type
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.activityDateTime`*::
++
+--
+Activity timestamp
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.category`*::
++
+--
+category
+
+
+type: keyword
+
+--
+
+[float]
+=== target_resources
+
+Target resources
+
+
+
+*`azure.auditlogs.properties.target_resources.display_name`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.type`*::
++
+--
+Type
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.ip_address`*::
++
+--
+ip Address
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.user_principal_name`*::
++
+--
+User principal name
+
+
+type: keyword
+
+--
+
+[float]
+=== modified_properties
+
+Modified properties
+
+
+
+*`azure.auditlogs.properties.target_resources.modified_properties.newValue`*::
++
+--
+New value
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.modified_properties.displayName`*::
++
+--
+Display value
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.modified_properties.oldValue`*::
++
+--
+Old value
+
+
+type: keyword
+
+--
+
+[float]
+=== initiated_by
+
+Information regarding the initiator
+
+
+
+[float]
+=== app
+
+App
+
+
+
+*`azure.auditlogs.properties.initiated_by.app.servicePrincipalName`*::
++
+--
+Service principal name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiated_by.app.displayName`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiated_by.app.appId`*::
++
+--
+App ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiated_by.app.servicePrincipalId`*::
++
+--
+Service principal ID
+
+
+type: keyword
+
+--
+
+[float]
+=== user
+
+User
+
+
+
+*`azure.auditlogs.properties.initiated_by.user.userPrincipalName`*::
++
+--
+User principal name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiated_by.user.displayName`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiated_by.user.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.initiated_by.user.ipAddress`*::
++
+--
+ip Address
+
+
+type: keyword
+
+--
+
+[float]
+=== signinlogs
+
+Fields for Azure sign-in logs.
+
+
+
+*`azure.signinlogs.operation_name`*::
++
+--
+The operation name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.operation_version`*::
++
+--
+The operation version
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.tenant_id`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.result_signature`*::
++
+--
+Result signature
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.correlation_id`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.identity`*::
++
+--
+Identity
+
+
+type: keyword
+
+--
+
+[float]
+=== properties
+
+The signin log properties
+
+
+
+*`azure.signinlogs.properties.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.created_at`*::
++
+--
+Created date time
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.user_display_name`*::
++
+--
+User display name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.correlation_id`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.user_principal_name`*::
++
+--
+User principal name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.user_id`*::
++
+--
+User ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.app_id`*::
++
+--
+App ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.app_display_name`*::
++
+--
+App display name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.ip_address`*::
++
+--
+Ip address
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.client_app_used`*::
++
+--
+Client app used
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.conditional_access_status`*::
++
+--
+Conditional access status
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.original_request_id`*::
++
+--
+Original request ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.is_interactive`*::
++
+--
+Is interactive
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.token_issuer_name`*::
++
+--
+Token issuer name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.token_issuer_type`*::
++
+--
+Token issuer type
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.processing_time_ms`*::
++
+--
+Processing time in milliseconds
+
+
+type: float
+
+--
+
+*`azure.signinlogs.properties.risk_detail`*::
++
+--
+Risk detail
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_level_aggregated`*::
++
+--
+Risk level aggregated
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_level_during_signin`*::
++
+--
+Risk level during signIn
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_state`*::
++
+--
+Risk state
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.resource_display_name`*::
++
+--
+Resource display name
+
+
+type: keyword
+
+--
+
+[float]
+=== status
+
+Status
+
+
+
+*`azure.signinlogs.properties.status.error_code`*::
++
+--
+Error code
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.status.additional_details`*::
++
+--
+Additional details
+
+
+type: keyword
+
+--
+
+[float]
+=== device_detail
+
+Status
+
+
+
+*`azure.signinlogs.properties.device_detail.device_id`*::
++
+--
+Device ID
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.device_detail.operating_system`*::
++
+--
+Operating system
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.device_detail.browser`*::
++
+--
+Browser
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.device_detail.display_name`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.device_detail.trust_type`*::
++
+--
+Trust type
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.service_principal_id`*::
++
+--
+Status
 
 
 type: keyword
