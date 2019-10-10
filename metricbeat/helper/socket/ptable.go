@@ -21,6 +21,7 @@ package socket
 
 import (
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -42,6 +43,7 @@ type Proc struct {
 
 // ProcTable contains all of the active processes (if the current user is root).
 type ProcTable struct {
+	procMount  string
 	fs         procfs.FS
 	procs      map[int]*Proc
 	inodes     map[uint32]*Proc
@@ -66,7 +68,7 @@ func NewProcTable(mountpoint string) (*ProcTable, error) {
 		return nil, err
 	}
 
-	p := &ProcTable{fs: fs, privileged: privileged}
+	p := &ProcTable{procMount: mountpoint, fs: fs, privileged: privileged}
 	p.Refresh()
 	return p, nil
 }
@@ -141,11 +143,12 @@ func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
 	k := 0
 	euid := uint32(os.Geteuid())
 	for i := 0; i < len(procs); i++ {
-		p := t.fs.Path(strconv.Itoa(procs[i].PID))
-		info, err := os.Stat(p)
+		path := filepath.Join(t.procMount, strconv.Itoa(procs[i].PID))
+		info, err := os.Stat(path)
 		if err != nil {
 			continue
 		}
+
 		stat, ok := info.Sys().(*syscall.Stat_t)
 		if !ok || stat.Uid != euid {
 			continue

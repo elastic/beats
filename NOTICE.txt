@@ -4536,7 +4536,8 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/procfs
-Revision: 54d17b57dd7d4a3aa092476596b3f8a933bde349
+Version: v0.0.5
+Revision: 499c85531f756d1129edd26485a5f73871eeb308
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/procfs/LICENSE:
 --------------------------------------------------------------------
