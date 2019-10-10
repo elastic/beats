@@ -9,6 +9,8 @@ Some specific AWS permissions are required for IAM user to collect AWS RDS metri
 cloudwatch:GetMetricData
 ec2:DescribeRegions
 rds:DescribeDBInstances
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]
