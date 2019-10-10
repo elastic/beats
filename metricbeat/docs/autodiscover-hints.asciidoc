@@ -21,6 +21,11 @@ List of metricsets to use, comma separated. If no metricsets are provided, defau
 are used.
 
 [float]
+===== `co.elastic.metrics/metrics_path`
+
+The path to retrieve the metrics from (/metrics by default) for <<prometheus-module>>.
+
+[float]
 ===== `co.elastic.metrics/period`
 
 The time interval for metrics retrieval, ie: 10s

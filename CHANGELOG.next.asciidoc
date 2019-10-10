@@ -155,6 +155,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed bad handling of sequence numbers when multiple observation domains were exported by a single device (Netflow V9 and IPFIX). {pull}13821[13821]
 - Fix timezone parsing of rabbitmq module ingest pipelines. {pull}13879[13879]
 - Fix conditions and error checking of date processors in ingest pipelines that use `event.timezone` to parse dates. {pull}13883[13883]
+- Fix timezone parsing of Cisco module ingest pipelines. {pull}13893[13893]
 - Fix timezone parsing of logstash module ingest pipelines. {pull}13890[13890]
 - cisco asa and ftd filesets: Fix parsing of message 106001. {issue}13891[13891] {pull}13903[13903]
 - Fix timezone parsing of iptables, mssql and panw module ingest pipelines. {pull}13926[13926]
@@ -330,6 +331,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
 - Update CoreDNS module to populate ECS DNS fields. {issue}13320[13320] {pull}13505[13505]
 - Parse query steps in PostgreSQL slowlogs. {issue}13496[13496] {pull}13701[13701]
+- Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776]
 - Add support to set the document id in the json reader. {pull}5844[5844]
 - Add input httpjson. {issue}13545[13545] {pull}13546[13546]
 - Filebeat Netflow input: Remove beta label. {pull}13858[13858]
@@ -400,13 +402,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for NATS version 2. {pull}13601[13601]
 - Add `docker.cpu.*.norm.pct` metrics for `cpu` metricset of Docker Metricbeat module. {pull}13695[13695]
 - Add `instance` label by default when using Prometheus collector. {pull}13737[13737]
-- Add azure module. {pull}13196[13196] {pull}13859[13859]
+- Add azure module. {pull}13196[13196] {pull}13859[13859] {pull}13988[13988]
 - Add Apache Tomcat module {pull}13491[13491]
 - Add ECS `container.id` and `container.runtime` to kubernetes `state_container` metricset. {pull}13884[13884]
 - Add `job` label by default when using Prometheus collector. {pull}13878[13878]
 - Add `state_resourcequota` metricset for Kubernetes module. {pull}13693[13693]
 - Add tags filter in ec2 metricset. {pull}13872[13872] {issue}13145[13145]
 - Add cloud.account.id and cloud.account.name into events from aws module. {issue}13551[13551] {pull}13558[13558]
+- Add `metrics_path` as known hint for autodiscovery {pull}13996[13996]
 
 *Packetbeat*
 
