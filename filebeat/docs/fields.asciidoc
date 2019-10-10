@@ -1437,17 +1437,7 @@ Fields for Azure audit logs.
 
 
 
-*`azure.auditlogs.resourceID`*::
-+
---
-Resource ID
-
-
-type: keyword
-
---
-
-*`azure.auditlogs.operationName`*::
+*`azure.auditlogs.operation_name`*::
 +
 --
 The operation name
@@ -1457,7 +1447,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.operationVersion`*::
+*`azure.auditlogs.operation_version`*::
 +
 --
 The operation version
@@ -1467,17 +1457,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.category`*::
-+
---
-Log category
-
-
-type: keyword
-
---
-
-*`azure.auditlogs.tenantId`*::
+*`azure.auditlogs.tenant_id`*::
 +
 --
 Tenant ID
@@ -1487,7 +1467,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.resultSignature`*::
+*`azure.auditlogs.result_signature`*::
 +
 --
 Result signature
@@ -1497,7 +1477,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.correlationId`*::
+*`azure.auditlogs.correlation_id`*::
 +
 --
 Correlation ID
@@ -1524,7 +1504,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.activityDisplayName`*::
+*`azure.auditlogs.properties.activity_display_name`*::
 +
 --
 Activity display name
@@ -1534,7 +1514,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.resultReason`*::
+*`azure.auditlogs.properties.result_reason`*::
 +
 --
 Reason for the log result
@@ -1544,7 +1524,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.correlationId`*::
+*`azure.auditlogs.properties.correlation_id`*::
 +
 --
 Correlation ID
@@ -1554,7 +1534,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.loggedByService`*::
+*`azure.auditlogs.properties.logged_by_service`*::
 +
 --
 Logged by service
@@ -1564,7 +1544,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.operationType`*::
+*`azure.auditlogs.properties.operation_type`*::
 +
 --
 Operation type
@@ -1605,13 +1585,13 @@ type: keyword
 --
 
 [float]
-=== targetResources
+=== target_resources
 
 Target resources
 
 
 
-*`azure.auditlogs.properties.targetResources.displayName`*::
+*`azure.auditlogs.properties.target_resources.display_name`*::
 +
 --
 Display name
@@ -1621,7 +1601,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.targetResources.id`*::
+*`azure.auditlogs.properties.target_resources.id`*::
 +
 --
 ID
@@ -1631,7 +1611,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.targetResources.type`*::
+*`azure.auditlogs.properties.target_resources.type`*::
 +
 --
 Type
@@ -1641,7 +1621,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.targetResources.ipAddress`*::
+*`azure.auditlogs.properties.target_resources.ip_address`*::
 +
 --
 ip Address
@@ -1651,7 +1631,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.targetResources.userPrincipalName`*::
+*`azure.auditlogs.properties.target_resources.user_principal_name`*::
 +
 --
 User principal name
@@ -1662,13 +1642,13 @@ type: keyword
 --
 
 [float]
-=== modifiedProperties
+=== modified_properties
 
 Modified properties
 
 
 
-*`azure.auditlogs.properties.targetResources.modifiedProperties.newValue`*::
+*`azure.auditlogs.properties.target_resources.modified_properties.newValue`*::
 +
 --
 New value
@@ -1678,7 +1658,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.targetResources.modifiedProperties.displayName`*::
+*`azure.auditlogs.properties.target_resources.modified_properties.displayName`*::
 +
 --
 Display value
@@ -1688,7 +1668,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.targetResources.modifiedProperties.oldValue`*::
+*`azure.auditlogs.properties.target_resources.modified_properties.oldValue`*::
 +
 --
 Old value
@@ -1699,7 +1679,7 @@ type: keyword
 --
 
 [float]
-=== initiatedBy
+=== initiated_by
 
 Information regarding the initiator
 
@@ -1712,7 +1692,7 @@ App
 
 
 
-*`azure.auditlogs.properties.initiatedBy.app.servicePrincipalName`*::
+*`azure.auditlogs.properties.initiated_by.app.servicePrincipalName`*::
 +
 --
 Service principal name
@@ -1722,7 +1702,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.initiatedBy.app.displayName`*::
+*`azure.auditlogs.properties.initiated_by.app.displayName`*::
 +
 --
 Display name
@@ -1732,7 +1712,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.initiatedBy.app.appId`*::
+*`azure.auditlogs.properties.initiated_by.app.appId`*::
 +
 --
 App ID
@@ -1742,7 +1722,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.initiatedBy.app.servicePrincipalId`*::
+*`azure.auditlogs.properties.initiated_by.app.servicePrincipalId`*::
 +
 --
 Service principal ID
@@ -1759,7 +1739,7 @@ User
 
 
 
-*`azure.auditlogs.properties.initiatedBy.user.userPrincipalName`*::
+*`azure.auditlogs.properties.initiated_by.user.userPrincipalName`*::
 +
 --
 User principal name
@@ -1769,7 +1749,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.initiatedBy.user.displayName`*::
+*`azure.auditlogs.properties.initiated_by.user.displayName`*::
 +
 --
 Display name
@@ -1779,7 +1759,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.initiatedBy.user.id`*::
+*`azure.auditlogs.properties.initiated_by.user.id`*::
 +
 --
 ID
@@ -1789,7 +1769,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.initiatedBy.user.ipAddress`*::
+*`azure.auditlogs.properties.initiated_by.user.ipAddress`*::
 +
 --
 ip Address

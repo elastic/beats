@@ -8,6 +8,11 @@
           }
       },
       {
+          "drop": {
+              "if" : "ctx.azure.auditlogs.category != 'AuditLogs'"
+          }
+      },
+      {
           "date": {
               "field": "azure.auditlogs.time",
               "target_field": "@timestamp",
@@ -20,7 +25,7 @@
       {
           "rename": {
               "field": "azure.auditlogs.resourceId",
-              "target_field": "azure.auditlogs.resourceID",
+              "target_field": "azure.resource_id",
               "ignore_missing": true
           }
       },
@@ -68,8 +73,115 @@
           }
       },
       {
-          "drop": {
-              "if" : "ctx.event.category != 'AuditLogs'"
+          "rename": {
+              "field": "azure.auditlogs.operationName",
+              "target_field": "azure.auditlogs.operation_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.resultSignature",
+              "target_field": "azure.auditlogs.result_signature",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.operationVersion",
+              "target_field": "azure.auditlogs.operation_version",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.tenantId",
+              "target_field": "azure.auditlogs.tenant_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.correlationId",
+              "target_field": "azure.auditlogs.correlation_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.activityDisplayName",
+              "target_field": "azure.auditlogs.properties.activity_display_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.resultReason",
+              "target_field": "azure.auditlogs.properties.result_reason",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.correlationId",
+              "target_field": "azure.auditlogs.properties.correlation_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.loggedByService",
+              "target_field": "azure.auditlogs.properties.logged_by_service",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.operationType",
+              "target_field": "azure.auditlogs.properties.operation_type",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.targetResources",
+              "target_field": "azure.auditlogs.properties.target_resources",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.target_resources.displayName",
+              "target_field": "azure.auditlogs.properties.target_resources.display_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.target_resources.ipAddress",
+              "target_field": "azure.auditlogs.properties.target_resources.ip_address",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.target_resources.userPrincipalName",
+              "target_field": "azure.auditlogs.properties.target_resources.user_principal_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.target_resources.modifiedProperties",
+              "target_field": "azure.auditlogs.properties.target_resources.modified_properties",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.initiatedBy",
+              "target_field": "azure.auditlogs.properties.initiated_by",
+              "ignore_missing": true
           }
       }
   ],

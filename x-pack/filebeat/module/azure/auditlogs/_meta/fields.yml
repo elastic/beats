@@ -3,31 +3,23 @@
   description: >
     Fields for Azure audit logs.
   fields:
-    - name: resourceID
-      type: keyword
-      description: >
-        Resource ID
-    - name: operationName
+    - name: operation_name
       type: keyword
       description: >
         The operation name
-    - name: operationVersion
+    - name: operation_version
       type: keyword
       description: >
         The operation version
-    - name: category
-      type: keyword
-      description: >
-        Log category
-    - name: tenantId
+    - name: tenant_id
       type: keyword
       description: >
         Tenant ID
-    - name: resultSignature
+    - name: result_signature
       type: keyword
       description: >
         Result signature
-    - name: correlationId
+    - name: correlation_id
       type: keyword
       description: >
         Correlation ID
@@ -40,23 +32,23 @@
           type: keyword
           description: >
             Log result
-        - name: activityDisplayName
+        - name: activity_display_name
           type: keyword
           description: >
             Activity display name
-        - name: resultReason
+        - name: result_reason
           type: keyword
           description: >
             Reason for the log result
-        - name: correlationId
+        - name: correlation_id
           type: keyword
           description: >
             Correlation ID
-        - name: loggedByService
+        - name: logged_by_service
           type: keyword
           description: >
             Logged by service
-        - name: operationType
+        - name: operation_type
           type: keyword
           description: >
             Operation type
@@ -72,12 +64,12 @@
           type: keyword
           description: >
             category
-        - name: targetResources
+        - name: target_resources
           type: group
           description: >
             Target resources
           fields:
-            - name: displayName
+            - name: display_name
               type: keyword
               description: >
                 Display name
@@ -89,15 +81,15 @@
               type: keyword
               description: >
                 Type
-            - name: ipAddress
+            - name: ip_address
               type: keyword
               description: >
                  ip Address
-            - name: userPrincipalName
+            - name: user_principal_name
               type: keyword
               description: >
                 User principal name
-            - name: modifiedProperties
+            - name: modified_properties
               type: group
               description: >
                 Modified properties
@@ -114,7 +106,7 @@
                   type: keyword
                   description: >
                     Old value
-        - name: initiatedBy
+        - name: initiated_by
           type: group
           description: >
             Information regarding the initiator
