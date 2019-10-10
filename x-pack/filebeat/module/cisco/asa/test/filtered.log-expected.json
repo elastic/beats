@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-12-31T23:00:27.000-02:00",
+        "@timestamp": "2019-01-01T01:00:27.000-02:00",
         "cisco.asa.message_id": "999999",
         "event.action": "firewall-rule",
         "event.code": 999999,
@@ -22,7 +22,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-31T23:02:12.000-02:00",
+        "@timestamp": "2019-01-01T01:02:12.000-02:00",
         "cisco.asa.message_id": "106001",
         "cisco.asa.source_interface": "eth0",
         "destination.ip": "192.168.33.12",
