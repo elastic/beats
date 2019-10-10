@@ -1,0 +1,155 @@
+{
+    "time":"2019-10-04T10:47:34.5949655Z",
+    "resourceId":"/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam",
+    "operationName":"Sign-in activity",
+    "operationVersion":"1.0",
+    "category":"SignInLogs",
+    "tenantId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+    "resultType":"0",
+    "resultSignature":"None",
+    "durationMs":0,
+    "callerIpAddress":"81.191.171.1",
+    "correlationId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+    "identity":"Test  Test",
+    "Level":4,
+    "location":"GB",
+    "properties":{
+        "SignInBondData":{
+            "LocationDetails":{
+                "Latitude":51.11111,
+                "Longitude":-2.1111,
+                "IPChain":null
+            },
+            "MfaDetails":null,
+            "ConditionalAccessDetails":{
+                "MultiCAEvaluationLog":"0|"
+            },
+            "RamDetails":null,
+            "DeviceDetails":{
+                "DeviceDisplayName":null,
+                "DeviceId":"",
+                "IsCompliant":null,
+                "IsManaged":null,
+                "DeviceTrustType":null,
+                "UserAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36",
+                "DevicePlatform":"MacOs",
+                "BrowserId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "BrowserType":"Chrome"
+            },
+            "DisplayDetails":{
+                "UserName":"Test  Test",
+                "ApplicationDisplayName":"Microsoft Office Web Apps Service",
+                "ProxyRestrictionTargetTenantName":null,
+                "ResourceDisplayName":"Windows Azure Active Directory",
+                "AttemptedUsername":null
+            },
+            "ProtocolDetails":{
+                "ResponseTime":131,
+                "IsInteractive":null,
+                "AuthenticationMethodsUsed":null,
+                "NetworkLocation":null,
+                "DomainHintPresent":null,
+                "LoginHintPresent":null,
+                "Protocol":null
+            },
+            "PassThroughAuthenticationDetails":null,
+            "IssuerDetails":null,
+            "SourceAlpEvents":null
+        },
+        "id":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "createdDateTime":"2019-10-04T10:47:34.5949655+00:00",
+        "userDisplayName":"Test  Test",
+        "userPrincipalName":"test_test@elastic.co",
+        "userId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "appId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "appDisplayName":"Microsoft Office Web Apps Service",
+        "ipAddress":"81.191.171.1",
+        "status":{
+            "errorCode":0
+        },
+        "clientAppUsed":"Browser",
+        "deviceDetail":{
+            "deviceId":"",
+            "operatingSystem":"MacOs",
+            "browser":"Chrome 73.0.3683"
+        },
+        "location":{
+            "city":"City1",
+            "state":"State1",
+            "countryOrRegion":"GB",
+            "geoCoordinates":{
+                "latitude":51.111111111111,
+                "longitude":-2.1111111111111111111
+            }
+        },
+        "correlationId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "conditionalAccessStatus":"notApplied",
+        "appliedConditionalAccessPolicies":[
+            {
+                "id":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "displayName":"Require MFA for Azure",
+                "enforcedGrantControls":[
+                    "Mfa"
+                ],
+                "enforcedSessionControls":[
+
+                ],
+                "result":"notApplied",
+                "conditionsSatisfied":1,
+                "conditionsNotSatisfied":2
+            },
+            {
+                "id":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "displayName":"Disable Persistent Browser Sessions",
+                "enforcedGrantControls":[
+
+                ],
+                "enforcedSessionControls":[
+
+                ],
+                "result":"notEnabled",
+                "conditionsSatisfied":0,
+                "conditionsNotSatisfied":0
+            },
+            {
+                "id":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                "displayName":"12-hour Session timeouts",
+                "enforcedGrantControls":[
+
+                ],
+                "enforcedSessionControls":[
+
+                ],
+                "result":"notEnabled",
+                "conditionsSatisfied":0,
+                "conditionsNotSatisfied":0
+            }
+        ],
+        "originalRequestId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "isInteractive":false,
+        "tokenIssuerName":"",
+        "tokenIssuerType":"AzureAD",
+        "authenticationProcessingDetails":[
+
+        ],
+        "networkLocationDetails":[
+
+        ],
+        "processingTimeInMilliseconds":131,
+        "riskDetail":"none",
+        "riskLevelAggregated":"none",
+        "riskLevelDuringSignIn":"none",
+        "riskState":"none",
+        "riskEventTypes":[
+
+        ],
+        "resourceDisplayName":"Windows Azure Active Directory",
+        "resourceId":"2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+        "authenticationDetails":[
+
+        ],
+        "authenticationRequirementPolicies":[
+
+        ]
+    }
+}

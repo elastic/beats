@@ -1,0 +1,175 @@
+{
+  "description": "Pipeline for parsing azure activity logs.",
+  "processors": [
+      {
+          "json" : {
+              "field" : "message",
+              "target_field" : "azure.activitylogs"
+          }
+      },
+      {
+          "drop": {
+              "if" : "ctx.azure.activitylogs.identity == null",
+              "ignore_failure": false
+          }
+      },
+      {
+          "date": {
+              "field": "azure.activitylogs.time",
+              "target_field": "@timestamp",
+              "ignore_failure": false,
+              "formats": [
+                  "ISO8601"
+              ]
+          }
+      },
+      {
+          "remove": {
+              "field": ["message", "azure.activitylogs.time"]
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.resourceId",
+              "target_field": "azure.resource_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.callerIpAddress",
+              "target_field": "source.ip",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.level",
+              "target_field": "log.level",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.durationMs",
+              "target_field": "event.duration",
+              "ignore_missing": true
+          }
+      },
+      {
+          "script": {
+              "lang": "painless",
+              "source": "ctx.event.duration = ctx.event.duration * params.param_nano",
+              "params": {
+                  "param_nano": 1000000
+              }
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.location",
+              "target_field": "geo.name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.category",
+              "target_field": "event.category",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.resultType",
+              "target_field": "event.outcome",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.operationName",
+              "target_field": "azure.activitylogs.operation_name",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.resultSignature",
+              "target_field": "azure.activitylogs.result_signature",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.roleAssignmentScope",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.role_assignment_scope",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.roleDefinitionId",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.role_definition_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.roleAssignmentId",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.role_assignment_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.principalId",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.principal_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.authorization.evidence.principalType",
+              "target_field": "azure.activitylogs.identity.authorization.evidence.principal_type",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.correlationId",
+              "target_field": "azure.activitylogs.correlation_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.properties.serviceRequestId",
+              "target_field": "azure.activitylogs.properties.service_request_id",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.properties.statusMessage",
+              "target_field": "message",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.properties.statusCode",
+              "target_field": "azure.activitylogs.properties.status_code",
+              "ignore_missing": true
+          }
+      }
+  ],
+  "on_failure": [
+  {
+    "set": {
+      "field": "error.message",
+      "value": "{{ _ingest.on_failure_message }}"
+    }
+  }
+  ]
+}

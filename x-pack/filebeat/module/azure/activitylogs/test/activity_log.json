@@ -1,0 +1,95 @@
+{
+    "records": [
+        {
+            "time": "2019-10-04T10:38:37.5151977Z",
+            "resourceId": "/SUBSCRIPTIONS/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/RESOURCEGROUPS/SA-HEMANT/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/AZURELSEVENTS/AUTHORIZATIONRULES/ROOTMANAGESHAREDACCESSKEY",
+            "operationName": "MICROSOFT.EVENTHUB/NAMESPACES/AUTHORIZATIONRULES/LISTKEYS/ACTION",
+            "category": "Action",
+            "resultType": "Start",
+            "resultSignature": "Started.",
+            "durationMs": 0,
+            "callerIpAddress": "51.191.161.11",
+            "correlationId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "identity": {
+                "authorization": {
+                    "scope": "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/resourceGroups/sa-hemant/providers/Microsoft.EventHub/namespaces/azurelsevents/authorizationRules/RootManageSharedAccessKey",
+                    "action": "Microsoft.EventHub/namespaces/authorizationRules/listKeys/action",
+                    "evidence": {
+                        "role": "Azure EventGrid Service BuiltIn Role",
+                        "roleAssignmentScope": "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "roleAssignmentId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "roleDefinitionId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "principalId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "principalType": "ServicePrincipal"
+                    }
+                },
+                "claims": {
+                    "aud": "https://management.core.windows.net/",
+                    "iss": "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                    "iat": "1570185217",
+                    "nbf": "1570185217",
+                    "exp": "1570214317",
+                    "aio": "2a7e2503-d7e2",
+                    "appid": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "appidacr": "2",
+                    "http://schemas.microsoft.com/identity/claims/identityprovider": "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                    "http://schemas.microsoft.com/identity/claims/objectidentifier": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "http://schemas.microsoft.com/identity/claims/tenantid": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "uti": "2a7e2503",
+                    "ver": "1.0"
+                }
+            },
+            "level": "Information",
+            "location": "global"
+        },
+        {
+            "time": "2019-10-04T10:38:37.5251981Z",
+            "resourceId": "/SUBSCRIPTIONS/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/RESOURCEGROUPS/SA-HEMANT/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/AZURELSEVENTS/AUTHORIZATIONRULES/ROOTMANAGESHAREDACCESSKEY",
+            "operationName": "MICROSOFT.EVENTHUB/NAMESPACES/AUTHORIZATIONRULES/LISTKEYS/ACTION",
+            "category": "Action",
+            "resultType": "Failure",
+            "resultSignature": "Failed.NotFound",
+            "durationMs": 11,
+            "callerIpAddress": "51.191.161.11",
+            "correlationId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "identity": {
+                "authorization": {
+                    "scope": "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/resourceGroups/sa-hemant/providers/Microsoft.EventHub/namespaces/azurelsevents/authorizationRules/RootManageSharedAccessKey",
+                    "action": "Microsoft.EventHub/namespaces/authorizationRules/listKeys/action",
+                    "evidence": {
+                        "role": "Azure EventGrid Service BuiltIn Role",
+                        "roleAssignmentScope": "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "roleAssignmentId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "roleDefinitionId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "principalId": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                        "principalType": "ServicePrincipal"
+                    }
+                },
+                "claims": {
+                    "aud": "https://management.core.windows.net/",
+                    "iss": "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                    "iat": "1570185217",
+                    "nbf": "1570185217",
+                    "exp": "1570214317",
+                    "aio": "2a7e2503",
+                    "appid": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "appidacr": "2",
+                    "http://schemas.microsoft.com/identity/claims/identityprovider": "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
+                    "http://schemas.microsoft.com/identity/claims/objectidentifier": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "http://schemas.microsoft.com/identity/claims/tenantid": "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "uti": "2a7e2503",
+                    "ver": "1.0"
+                }
+            },
+            "level": "Error",
+            "location": "global",
+            "properties": {
+                "statusCode": "NotFound",
+                "serviceRequestId": null,
+                "statusMessage": "{\"error\":{\"code\":\"ParentResourceNotFound\",\"message\":\"Can not perform requested operation on nested resource. Parent resource 'azurelsevents' not found.\"}}"
+            }
+        }
+    ]
+}
