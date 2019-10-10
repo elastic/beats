@@ -3,34 +3,16 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "Service": "ELB"
+                "AvailabilityZone": "us-east-1c"
             },
             "namespace": "AWS/ELB"
         },
         "metrics": {
             "BackendConnectionErrors": {
-                "sum": 18
-            },
-            "HTTPCode_Backend_2XX": {
-                "sum": 2
-            },
-            "HTTPCode_Backend_3XX": {
-                "sum": 2
-            },
-            "HTTPCode_Backend_4XX": {
-                "sum": 2
-            },
-            "HTTPCode_ELB_5XX": {
-                "sum": 4
+                "sum": 10
             },
             "HealthyHostCount": {
                 "max": 2
-            },
-            "Latency": {
-                "avg": 0.001534899075826009
-            },
-            "RequestCount": {
-                "sum": 6
             },
             "UnHealthyHostCount": {
                 "max": 1
@@ -38,6 +20,10 @@
         }
     },
     "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
         "provider": "aws",
         "region": "us-east-1"
     },
