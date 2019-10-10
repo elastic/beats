@@ -108,6 +108,10 @@ func Generate() error {
 	mg.Deps(setup.Update)
 	mg.Deps(setup.GitAdd)
 
+	fmt.Printf("=======================\n")
+	fmt.Printf("Your custom beat is now available as %s\n", absBeatPath)
+	fmt.Printf("=======================\n")
+
 	return nil
 }
 
