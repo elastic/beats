@@ -58,7 +58,7 @@ func TestStringInSlice(t *testing.T) {
 		target         string
 		slice          []string
 		expectedExists bool
-		expectedIndex  int
+		expectedIdx    int
 	}{
 		{
 			"bar",
@@ -76,7 +76,7 @@ func TestStringInSlice(t *testing.T) {
 	for _, c := range cases {
 		exists, idx := StringInSlice(c.target, c.slice)
 		assert.Equal(t, c.expectedExists, exists)
-		assert.Equal(t, c.expectedIndex, idx)
+		assert.Equal(t, c.expectedIdx, idx)
 	}
 }
 
