@@ -101,14 +101,17 @@ var ciscoIOS = (function() {
             ],
             ignore_missing: true,
         })
-        .Timestamp({
-            field: "_tmp.timestamp",
-            target_field: "@timestamp",
-            layouts: [
-                'Jan _2 15:04:05.999',
-                'Jan _2 15:04:05.999 MST',
-            ],
-            ignore_missing: true,
+        .Add(function(evt) {
+            processor.Timestamp({
+                field: "_tmp.timestamp",
+                target_field: "@timestamp",
+                timezone: evt.Get("event.timezone"),
+                layouts: [
+                    'Jan _2 15:04:05.999',
+                    'Jan _2 15:04:05.999 MST',
+                ],
+                ignore_missing: true,
+            }).Run(evt);
         })
         .Add(function(evt) {
             evt.Delete("_tmp");
