@@ -20,10 +20,12 @@ package idxmgmt
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -54,12 +56,16 @@ type indexManager struct {
 	assets        Asseter
 }
 
-type indexSelector outil.Selector
+type indexSelector struct {
+	sel      outil.Selector
+	beatInfo beat.Info
+}
 
 type ilmIndexSelector struct {
-	index outil.Selector
-	alias outil.Selector
-	st    *indexState
+	index    outil.Selector
+	alias    outil.Selector
+	st       *indexState
+	beatInfo beat.Info
 }
 
 type componentType uint8
@@ -201,7 +207,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 	}
 
 	if mode != ilm.ModeAuto {
-		return indexSelector(indexSel), nil
+		return indexSelector{indexSel, s.info}, nil
 	}
 
 	selCfg.SetString("index", -1, alias)
@@ -321,7 +327,7 @@ func (m *indexManager) setupWithILM() (bool, error) {
 }
 
 func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
-	if idx := getEventCustomIndex(evt); idx != "" {
+	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
 		return idx, nil
 	}
 
@@ -335,13 +341,13 @@ func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
 }
 
 func (s indexSelector) Select(evt *beat.Event) (string, error) {
-	if idx := getEventCustomIndex(evt); idx != "" {
+	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
 		return idx, nil
 	}
-	return outil.Selector(s).Select(evt)
+	return s.sel.Select(evt)
 }
 
-func getEventCustomIndex(evt *beat.Event) string {
+func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	if len(evt.Meta) == 0 {
 		return ""
 	}
@@ -360,7 +366,54 @@ func getEventCustomIndex(evt *beat.Event) string {
 		}
 	}
 
+	// index-pattern expands the index as formatted text rather than a fixed
+	// or dated string. This was introduced to support the `Index` configuration
+	// field on Filebeat inputs, so it's essentially a workaround to communicate
+	// a specific output behavior to libbeat based on the originating input
+	// (which as implemented now is a Filebeat-specific concept).
+	// If we find ourselves adding additional backchannels like this in Meta,
+	// we should probably add a more formal (non-MapStr) configuration struct to
+	// beat.Event that inputs can use to modulate output behavior.
+	if tmp := evt.Meta["index-pattern"]; tmp != nil {
+		if pattern, ok := tmp.(*fmtstr.EventFormatString); ok {
+			idx, err := expandIndexPattern(pattern, evt.Timestamp, beatInfo)
+			if err == nil {
+				return idx
+			}
+			// Should we log a warning here somehow?
+		}
+	}
+
 	return ""
+}
+
+// Expand the given pattern string as a formatted text field with access to
+// the event's agent and timestamp.
+// This helper mimicks applyStaticFmtstr in ilm.go, creating a placeholder
+// event for the restricted set of fields we allow here. It might be worth
+// making this a shared helper function or otherwise specializing for this case.
+func expandIndexPattern(
+	pattern *fmtstr.EventFormatString, timestamp time.Time, info beat.Info,
+) (string, error) {
+	return pattern.Run(&beat.Event{
+		Fields: common.MapStr{
+			// beat object was left in for backward compatibility reason for older configs.
+			"beat": common.MapStr{
+				"name":    info.Beat,
+				"version": info.Version,
+			},
+			"agent": common.MapStr{
+				"name":    info.Beat,
+				"version": info.Version,
+			},
+			// For the Beats that have an observer role
+			"observer": common.MapStr{
+				"name":    info.Beat,
+				"version": info.Version,
+			},
+		},
+		Timestamp: time.Now(),
+	})
 }
 
 func unpackTemplateConfig(cfg *common.Config) (config template.TemplateConfig, err error) {
