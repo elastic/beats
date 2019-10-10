@@ -10,6 +10,7 @@ INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 if INTEGRATION_TESTS:
     from compose.cli.command import get_project
+    from compose.config.environment import Environment
     from compose.service import BuildAction
     from compose.service import ConvergenceStrategy
 
@@ -22,8 +23,8 @@ class ComposeMixin(object):
     # List of required services to run INTEGRATION_TESTS
     COMPOSE_SERVICES = []
 
-    # Additional build arguments for docker compose build
-    COMPOSE_BUILD_ARGS = {}
+    # Additional environment variables for docker compose
+    COMPOSE_ENV = {}
 
     # timeout waiting for health (seconds)
     COMPOSE_TIMEOUT = 300
@@ -51,13 +52,12 @@ class ComposeMixin(object):
             return container.inspect()['State']['Health']['Status'] == 'healthy'
 
         project = cls.compose_project()
-        project.build(
-            service_names=cls.COMPOSE_SERVICES,
-            build_args=cls.COMPOSE_BUILD_ARGS)
+        project.pull(
+            ignore_pull_failures=True,
+            service_names=cls.COMPOSE_SERVICES)
         project.up(
             strategy=ConvergenceStrategy.always,
             service_names=cls.COMPOSE_SERVICES,
-            do_build=BuildAction.skip,
             timeout=30)
 
         # Wait for them to be healthy
@@ -196,11 +196,15 @@ class ComposeMixin(object):
         def positivehash(x):
             return hash(x) % ((sys.maxsize+1) * 2)
 
-        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_BUILD_ARGS.items())))
+        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
 
     @classmethod
     def compose_project(cls):
-        return get_project(cls.find_compose_path(), project_name=cls.compose_project_name())
+        env = Environment(os.environ.copy())
+        env.update(cls.COMPOSE_ENV)
+        return get_project(cls.find_compose_path(),
+                           project_name=cls.compose_project_name(),
+                           environment=env)
 
     @classmethod
     def find_compose_path(cls):

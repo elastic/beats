@@ -53,6 +53,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_pod"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_replicaset"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_resourcequota"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_statefulset"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/system"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/util"

@@ -10,11 +10,11 @@
 //// This content must be embedded underneath a level 3 heading.
 //////////////////////////////////////////////////////////////////////////
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is not Elasticsearch, you must
 <<load-template-manually,load the template manually>>. 
-endif::only-elasticsearch[]
+endif::[]
 
 In Elasticsearch, {ref}/indices-templates.html[index
 templates] are used to define settings and mappings that determine how fields
@@ -107,13 +107,14 @@ See <<configuration-template>> for the full list of configuration options.
 ==== Load the template manually
 
 To load the template manually, run the <<setup-command,`setup`>> command. A
-connection to Elasticsearch is required. 
-ifndef::only-elasticsearch[]
-If another output is enabled, you need
-to temporarily disable that output and enable Elasticsearch by using the
-`-E` option. The examples here assume that Logstash output is enabled. You can
-omit the `-E` flags if Elasticsearch output is already enabled.
-endif::only-elasticsearch[]
+connection to Elasticsearch is required.  If another output is enabled, you need
+to temporarily disable that output and enable Elasticsearch by using the `-E`
+option.
+ifndef::no-output-logstash[]
+The examples here assume that Logstash output is enabled.
+endif::[]
+You can omit the `-E` flags if Elasticsearch output is already enabled.
+
 
 If you are connecting to a secured Elasticsearch cluster, make sure you've
 configured credentials as described in <<{beatname_lc}-configuration>>.
@@ -129,13 +130,13 @@ ifdef::win_only[]
 To load the template:
 endif::win_only[]
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 :disable_logstash: {sp}-E output.logstash.enabled=false
-endif::only-elasticsearch[]
+endif::[]
 
-ifdef::only-elasticsearch[]
+ifdef::no-output-logstash[]
 :disable_logstash:
-endif::only-elasticsearch[]
+endif::[]
 
 ifdef::requires-sudo[]
 include::./shared-note-sudo.asciidoc[]

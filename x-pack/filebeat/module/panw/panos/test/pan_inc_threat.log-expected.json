@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2012-04-10T04:39:56.000Z",
+        "@timestamp": "2012-04-10T04:39:56.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59309,
         "client.user.name": "crusher",
@@ -24,7 +24,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -73,7 +73,7 @@
         "url.original": "lorexx.cn/loader.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:39:56.000Z",
+        "@timestamp": "2012-04-10T04:39:56.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59313,
         "client.user.name": "crusher",
@@ -97,7 +97,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -146,7 +146,7 @@
         "url.original": "lsiu.info/evo/count.php?o=2"
     },
     {
-        "@timestamp": "2012-04-10T04:39:56.000Z",
+        "@timestamp": "2012-04-10T04:39:56.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59314,
         "client.user.name": "crusher",
@@ -170,7 +170,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -219,7 +219,7 @@
         "url.original": "lsiu.info/evo/count.php?o=5"
     },
     {
-        "@timestamp": "2012-04-10T04:39:57.000Z",
+        "@timestamp": "2012-04-10T04:39:57.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59315,
         "client.user.name": "crusher",
@@ -243,7 +243,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -292,7 +292,7 @@
         "url.original": "lsiu.info/evo/count.php?o=7"
     },
     {
-        "@timestamp": "2012-04-10T04:39:57.000Z",
+        "@timestamp": "2012-04-10T04:39:57.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59316,
         "client.user.name": "crusher",
@@ -316,7 +316,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -365,7 +365,7 @@
         "url.original": "lsiu.info/evo/exploits/x18.php?o=2&t=1241403746&i=1365814122"
     },
     {
-        "@timestamp": "2012-04-10T04:39:57.000Z",
+        "@timestamp": "2012-04-10T04:39:57.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59317,
         "client.user.name": "crusher",
@@ -389,7 +389,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -438,7 +438,7 @@
         "url.original": "lsiu.info/evo/exploits/x19.php?o=2&t=1241403746&i=1365814122"
     },
     {
-        "@timestamp": "2012-04-10T04:39:54.000Z",
+        "@timestamp": "2012-04-10T04:39:54.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59302,
         "client.user.name": "crusher",
@@ -462,7 +462,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -511,7 +511,7 @@
         "url.original": "liteautobestguide.cn/load.php"
     },
     {
-        "@timestamp": "2012-04-10T04:39:54.000Z",
+        "@timestamp": "2012-04-10T04:39:54.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59301,
         "client.user.name": "crusher",
@@ -535,7 +535,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -584,7 +584,7 @@
         "url.original": "liteautobestguide.cn/index.php"
     },
     {
-        "@timestamp": "2012-04-10T04:39:55.000Z",
+        "@timestamp": "2012-04-10T04:39:55.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59303,
         "client.user.name": "crusher",
@@ -608,7 +608,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -657,7 +657,7 @@
         "url.original": "litetopdetect.cn/index.php"
     },
     {
-        "@timestamp": "2012-04-10T04:39:55.000Z",
+        "@timestamp": "2012-04-10T04:39:55.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59304,
         "client.user.name": "crusher",
@@ -681,7 +681,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -730,7 +730,7 @@
         "url.original": "lkmpmlm.com/fff9999.php?aid=0&uid=6cbbc5081e7548e276611ff5059df6ed30c8f8f1&os=513"
     },
     {
-        "@timestamp": "2012-04-10T04:39:52.000Z",
+        "@timestamp": "2012-04-10T04:39:52.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59297,
         "client.user.name": "crusher",
@@ -754,7 +754,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -803,7 +803,7 @@
         "url.original": "girlteenxxxfreemov.com/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:53.000Z",
+        "@timestamp": "2012-04-10T04:39:53.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59299,
         "client.user.name": "crusher",
@@ -827,7 +827,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -876,7 +876,7 @@
         "url.original": "imagesrepository.com/resolution.php"
     },
     {
-        "@timestamp": "2012-04-10T04:39:53.000Z",
+        "@timestamp": "2012-04-10T04:39:53.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59298,
         "client.user.name": "crusher",
@@ -900,7 +900,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -949,7 +949,7 @@
         "url.original": "hottestfiles.com/search/search.php?q=xxx"
     },
     {
-        "@timestamp": "2012-04-10T04:39:54.000Z",
+        "@timestamp": "2012-04-10T04:39:54.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59300,
         "client.user.name": "crusher",
@@ -973,7 +973,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1021,7 +1021,7 @@
         "url.original": "infodist1.com/in.cgi?11&parameter=404"
     },
     {
-        "@timestamp": "2012-04-10T04:39:51.000Z",
+        "@timestamp": "2012-04-10T04:39:51.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59295,
         "client.user.name": "crusher",
@@ -1045,7 +1045,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1094,7 +1094,7 @@
         "url.original": "cls-softwares.com/suc.php"
     },
     {
-        "@timestamp": "2012-04-10T04:39:51.000Z",
+        "@timestamp": "2012-04-10T04:39:51.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59291,
         "client.user.name": "crusher",
@@ -1118,7 +1118,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1167,7 +1167,7 @@
         "url.original": "cls-softwares.com/softwarefortubeview.40013.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:39:52.000Z",
+        "@timestamp": "2012-04-10T04:39:52.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59296,
         "client.user.name": "crusher",
@@ -1188,7 +1188,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1236,7 +1236,7 @@
         "url.original": "findmorepill.com/klik/search.php?q=xxx"
     },
     {
-        "@timestamp": "2012-04-10T04:39:48.000Z",
+        "@timestamp": "2012-04-10T04:39:48.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59280,
         "client.user.name": "crusher",
@@ -1260,7 +1260,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1309,7 +1309,7 @@
         "url.original": "allowedwebsurfing.com/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:49.000Z",
+        "@timestamp": "2012-04-10T04:39:49.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59281,
         "client.user.name": "crusher",
@@ -1333,7 +1333,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1382,7 +1382,7 @@
         "url.original": "antivirus-remote.com/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:49.000Z",
+        "@timestamp": "2012-04-10T04:39:49.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59282,
         "client.user.name": "crusher",
@@ -1406,7 +1406,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1455,7 +1455,7 @@
         "url.original": "bklinkov.ru/hi/start.cfg"
     },
     {
-        "@timestamp": "2012-04-10T04:39:50.000Z",
+        "@timestamp": "2012-04-10T04:39:50.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59290,
         "client.user.name": "crusher",
@@ -1479,7 +1479,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1528,7 +1528,7 @@
         "url.original": "blogsexnakedgirlxxx.com/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:50.000Z",
+        "@timestamp": "2012-04-10T04:39:50.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59286,
         "client.user.name": "crusher",
@@ -1552,7 +1552,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1601,7 +1601,7 @@
         "url.original": "bklinkov.ru/hi/start.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:39:47.000Z",
+        "@timestamp": "2012-04-10T04:39:47.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59275,
         "client.user.name": "crusher",
@@ -1625,7 +1625,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1674,7 +1674,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:47.000Z",
+        "@timestamp": "2012-04-10T04:39:47.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59277,
         "client.user.name": "crusher",
@@ -1698,7 +1698,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1747,7 +1747,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:47.000Z",
+        "@timestamp": "2012-04-10T04:39:47.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59276,
         "client.user.name": "crusher",
@@ -1771,7 +1771,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1820,7 +1820,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:48.000Z",
+        "@timestamp": "2012-04-10T04:39:48.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59278,
         "client.user.name": "crusher",
@@ -1844,7 +1844,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1893,7 +1893,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:48.000Z",
+        "@timestamp": "2012-04-10T04:39:48.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59279,
         "client.user.name": "crusher",
@@ -1917,7 +1917,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1966,7 +1966,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:45.000Z",
+        "@timestamp": "2012-04-10T04:39:45.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59271,
         "client.user.name": "crusher",
@@ -1990,7 +1990,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2039,7 +2039,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:45.000Z",
+        "@timestamp": "2012-04-10T04:39:45.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59269,
         "client.user.name": "crusher",
@@ -2063,7 +2063,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2112,7 +2112,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:45.000Z",
+        "@timestamp": "2012-04-10T04:39:45.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59270,
         "client.user.name": "crusher",
@@ -2136,7 +2136,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2185,7 +2185,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:46.000Z",
+        "@timestamp": "2012-04-10T04:39:46.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59274,
         "client.user.name": "crusher",
@@ -2209,7 +2209,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2258,7 +2258,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:46.000Z",
+        "@timestamp": "2012-04-10T04:39:46.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59273,
         "client.user.name": "crusher",
@@ -2282,7 +2282,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2331,7 +2331,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:46.000Z",
+        "@timestamp": "2012-04-10T04:39:46.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59272,
         "client.user.name": "crusher",
@@ -2355,7 +2355,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2404,7 +2404,7 @@
         "url.original": "-/"
     },
     {
-        "@timestamp": "2012-04-10T04:39:43.000Z",
+        "@timestamp": "2012-04-10T04:39:43.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59261,
         "client.user.name": "crusher",
@@ -2425,7 +2425,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2473,7 +2473,7 @@
         "url.original": "wantfinest.com/tds/in.cgi?default"
     },
     {
-        "@timestamp": "2012-04-10T04:39:38.000Z",
+        "@timestamp": "2012-04-10T04:39:38.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59248,
         "client.user.name": "crusher",
@@ -2494,7 +2494,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2542,7 +2542,7 @@
         "url.original": "sameshitasiteverwas.com/traf/tds/in.cgi?2"
     },
     {
-        "@timestamp": "2012-04-10T04:39:39.000Z",
+        "@timestamp": "2012-04-10T04:39:39.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59251,
         "client.user.name": "crusher",
@@ -2566,7 +2566,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2614,7 +2614,7 @@
         "url.original": "svarkon.ru/update.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:39:36.000Z",
+        "@timestamp": "2012-04-10T04:39:36.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59244,
         "client.user.name": "crusher",
@@ -2638,7 +2638,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2686,7 +2686,7 @@
         "url.original": "onlinescanxpp.com/land/eurl/1.php?code="
     },
     {
-        "@timestamp": "2012-04-10T04:39:34.000Z",
+        "@timestamp": "2012-04-10T04:39:34.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59237,
         "client.user.name": "crusher",
@@ -2707,7 +2707,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2755,7 +2755,7 @@
         "url.original": "nolagtime.com/conn/?JKV_1RWbUUdIfRUWUaITfdIfbREdYEYdfTTRI-6XBB_1WQR-6GF5_1AU-6LC6_1Y-gW-gEUQQ-gE-tsDF6K5D_rpX51_rR-t-66FC_1Q_fQ_fQ_fQ_fQ_fQ_fQ_fQ-62BG_1Q-672V_1YOR-6N8J_1Q-6252_1WQRR-69LV_1-65GZ_1W-6"
     },
     {
-        "@timestamp": "2012-04-10T04:39:35.000Z",
+        "@timestamp": "2012-04-10T04:39:35.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59238,
         "client.user.name": "crusher",
@@ -2776,7 +2776,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2824,7 +2824,7 @@
         "url.original": "nolagtime.com/gwc.txt"
     },
     {
-        "@timestamp": "2012-04-10T04:38:19.000Z",
+        "@timestamp": "2012-04-10T04:38:19.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59010,
         "client.user.name": "crusher",
@@ -2848,7 +2848,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2896,7 +2896,7 @@
         "url.original": "karavan.us/bon/index.php"
     },
     {
-        "@timestamp": "2012-04-10T04:38:14.000Z",
+        "@timestamp": "2012-04-10T04:38:14.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58969,
         "client.user.name": "crusher",
@@ -2917,7 +2917,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2965,7 +2965,7 @@
         "url.original": "findnolimits.com/go.php?sid=1"
     },
     {
-        "@timestamp": "2012-04-10T04:38:12.000Z",
+        "@timestamp": "2012-04-10T04:38:12.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58941,
         "client.user.name": "crusher",
@@ -2986,7 +2986,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3034,7 +3034,7 @@
         "url.original": "bizoplata.ru/moun.html"
     },
     {
-        "@timestamp": "2012-04-10T04:38:12.000Z",
+        "@timestamp": "2012-04-10T04:38:12.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58942,
         "client.user.name": "crusher",
@@ -3055,7 +3055,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3103,7 +3103,7 @@
         "url.original": "bizoplata.ru/palast.html"
     },
     {
-        "@timestamp": "2012-04-10T04:37:28.000Z",
+        "@timestamp": "2012-04-10T04:37:28.000-02:00",
         "client.ip": "204.232.231.46",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -3119,7 +3119,7 @@
         "event.module": "panw",
         "event.outcome": "drop-all-packets",
         "event.severity": 1,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3175,7 +3175,7 @@
         "url.original": "controller.php"
     },
     {
-        "@timestamp": "2012-04-10T04:37:32.000Z",
+        "@timestamp": "2012-04-10T04:37:32.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58856,
         "client.user.name": "crusher",
@@ -3199,7 +3199,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3247,7 +3247,7 @@
         "url.original": "www.15min.it/"
     },
     {
-        "@timestamp": "2012-04-10T04:37:27.000Z",
+        "@timestamp": "2012-04-10T04:37:27.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58847,
         "client.user.name": "crusher",
@@ -3268,7 +3268,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3316,7 +3316,7 @@
         "url.original": "tubemov.com/"
     },
     {
-        "@timestamp": "2012-04-10T04:37:25.000Z",
+        "@timestamp": "2012-04-10T04:37:25.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58841,
         "client.user.name": "crusher",
@@ -3337,7 +3337,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3385,7 +3385,7 @@
         "url.original": "pagesinxt.com/?dn=teenstube.us&flrdr=yes&nxte=js"
     },
     {
-        "@timestamp": "2012-04-10T04:37:05.000Z",
+        "@timestamp": "2012-04-10T04:37:05.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58795,
         "client.user.name": "crusher",
@@ -3406,7 +3406,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3454,7 +3454,7 @@
         "url.original": "movfree.com/"
     },
     {
-        "@timestamp": "2012-04-10T04:36:51.000Z",
+        "@timestamp": "2012-04-10T04:36:51.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58753,
         "client.user.name": "crusher",
@@ -3478,7 +3478,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3526,7 +3526,7 @@
         "url.original": "gometascan.com/"
     },
     {
-        "@timestamp": "2012-04-10T04:36:39.000Z",
+        "@timestamp": "2012-04-10T04:36:39.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58708,
         "client.user.name": "crusher",
@@ -3550,7 +3550,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3598,7 +3598,7 @@
         "url.original": "antivirus-powerful-scannerv2.com/download/Install_11-1.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:36:38.000Z",
+        "@timestamp": "2012-04-10T04:36:38.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58707,
         "client.user.name": "crusher",
@@ -3622,7 +3622,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3670,7 +3670,7 @@
         "url.original": "antivirus-powerful-scannerv2.com/1/?id=11-1&back==TQzyDTyMUQNMI=N"
     },
     {
-        "@timestamp": "2012-04-10T04:36:27.000Z",
+        "@timestamp": "2012-04-10T04:36:27.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58603,
         "client.user.name": "crusher",
@@ -3694,7 +3694,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3742,7 +3742,7 @@
         "url.original": "basdzsdas.com/poker/config.bin"
     },
     {
-        "@timestamp": "2012-04-10T04:36:27.000Z",
+        "@timestamp": "2012-04-10T04:36:27.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58603,
         "client.user.name": "crusher",
@@ -3766,7 +3766,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3814,7 +3814,7 @@
         "url.original": "basdzsdas.com/poker/config.bin"
     },
     {
-        "@timestamp": "2012-04-10T04:19:59.000Z",
+        "@timestamp": "2012-04-10T04:19:59.000-02:00",
         "client.ip": "173.236.179.57",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -3830,7 +3830,7 @@
         "event.module": "panw",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3886,7 +3886,7 @@
         "url.original": "uLLGRaXP.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:36:27.000Z",
+        "@timestamp": "2012-04-10T04:36:27.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 58603,
         "client.user.name": "crusher",
@@ -3910,7 +3910,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3958,7 +3958,7 @@
         "url.original": "basdzsdas.com/poker/config.bin"
     },
     {
-        "@timestamp": "2012-04-10T04:51:29.000Z",
+        "@timestamp": "2012-04-10T04:51:29.000-02:00",
         "client.ip": "91.209.163.202",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -3974,7 +3974,7 @@
         "event.module": "panw",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4022,7 +4022,7 @@
         "url.original": "FunkyEmoticons_setup.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:54:33.000Z",
+        "@timestamp": "2012-04-10T04:54:33.000-02:00",
         "client.ip": "122.226.169.183",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -4038,7 +4038,7 @@
         "event.module": "panw",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4093,7 +4093,7 @@
         "url.original": "52hxw.exe"
     },
     {
-        "@timestamp": "2012-04-10T05:01:00.000Z",
+        "@timestamp": "2012-04-10T05:01:00.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 63007,
         "client.user.name": "crusher",
@@ -4117,7 +4117,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4165,7 +4165,7 @@
         "url.original": "softsellfast.com/test/config.bin"
     },
     {
-        "@timestamp": "2012-04-10T04:45:17.000Z",
+        "@timestamp": "2012-04-10T04:45:17.000-02:00",
         "client.ip": "109.201.131.15",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -4181,7 +4181,7 @@
         "event.module": "panw",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4234,7 +4234,7 @@
         "url.original": "setup.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:46:16.000Z",
+        "@timestamp": "2012-04-10T04:46:16.000-02:00",
         "client.ip": "91.209.163.202",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -4250,7 +4250,7 @@
         "event.module": "panw",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4298,7 +4298,7 @@
         "url.original": "Live-Player_setup.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:42:39.000Z",
+        "@timestamp": "2012-04-10T04:42:39.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59709,
         "client.user.name": "crusher",
@@ -4319,7 +4319,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4367,7 +4367,7 @@
         "url.original": "boialex.narod.ru/config.txt"
     },
     {
-        "@timestamp": "2012-04-10T04:42:42.000Z",
+        "@timestamp": "2012-04-10T04:42:42.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59721,
         "client.user.name": "crusher",
@@ -4388,7 +4388,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4436,7 +4436,7 @@
         "url.original": "edw-melon.narod.ru/config.txt"
     },
     {
-        "@timestamp": "2012-04-10T04:42:51.000Z",
+        "@timestamp": "2012-04-10T04:42:51.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59752,
         "client.user.name": "crusher",
@@ -4457,7 +4457,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4505,7 +4505,7 @@
         "url.original": "maximtushin.narod.ru/config.txt"
     },
     {
-        "@timestamp": "2012-04-10T04:19:59.000Z",
+        "@timestamp": "2012-04-10T04:19:59.000-02:00",
         "client.ip": "173.236.179.57",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -4521,7 +4521,7 @@
         "event.module": "panw",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4577,7 +4577,7 @@
         "url.original": "uLLGRaXP.exe"
     },
     {
-        "@timestamp": "2012-04-10T04:09:01.000Z",
+        "@timestamp": "2012-04-10T04:09:01.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 63183,
         "client.user.name": "crusher",
@@ -4601,7 +4601,7 @@
         "event.module": "panw",
         "event.outcome": "block-url",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4649,7 +4649,7 @@
         "url.original": "marketingsoluchion.biz/fkn/config.bin"
     },
     {
-        "@timestamp": "2012-04-09T08:18:27.000Z",
+        "@timestamp": "2012-04-09T08:18:27.000-02:00",
         "client.ip": "192.168.0.6",
         "client.port": 1047,
         "client.user.name": "jordy",
@@ -4673,7 +4673,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4721,7 +4721,7 @@
         "url.original": "default.aspx"
     },
     {
-        "@timestamp": "2012-04-09T08:18:29.000Z",
+        "@timestamp": "2012-04-09T08:18:29.000-02:00",
         "client.ip": "65.54.161.34",
         "client.port": 80,
         "destination.address": "192.168.0.6",
@@ -4737,7 +4737,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4793,7 +4793,7 @@
         "url.original": "sck.aspx"
     },
     {
-        "@timestamp": "2012-04-09T08:18:32.000Z",
+        "@timestamp": "2012-04-09T08:18:32.000-02:00",
         "client.ip": "65.55.5.231",
         "client.port": 80,
         "destination.address": "192.168.0.6",
@@ -4809,7 +4809,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4865,7 +4865,7 @@
         "url.original": "ADSAdClient31.dll"
     },
     {
-        "@timestamp": "2012-04-09T08:18:33.000Z",
+        "@timestamp": "2012-04-09T08:18:33.000-02:00",
         "client.ip": "192.168.0.6",
         "client.port": 1048,
         "client.user.name": "jordy",
@@ -4889,7 +4889,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4937,7 +4937,7 @@
         "url.original": "c.gif"
     },
     {
-        "@timestamp": "2012-04-09T08:18:37.000Z",
+        "@timestamp": "2012-04-09T08:18:37.000-02:00",
         "client.ip": "74.125.239.17",
         "client.port": 80,
         "destination.address": "192.168.0.6",
@@ -4953,7 +4953,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5006,7 +5006,7 @@
         "url.original": "csi"
     },
     {
-        "@timestamp": "2012-04-09T08:50:12.000Z",
+        "@timestamp": "2012-04-09T08:50:12.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 57502,
         "client.user.name": "picard",
@@ -5027,7 +5027,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5075,7 +5075,7 @@
         "url.original": "internal-tuner.pandora.com"
     },
     {
-        "@timestamp": "2012-04-09T08:58:18.000Z",
+        "@timestamp": "2012-04-09T08:58:18.000-02:00",
         "client.ip": "74.125.224.198",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5091,7 +5091,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5144,7 +5144,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T08:22:27.000Z",
+        "@timestamp": "2012-04-09T08:22:27.000-02:00",
         "client.ip": "188.190.124.75",
         "client.port": 80,
         "destination.address": "192.168.0.6",
@@ -5160,7 +5160,7 @@
         "event.module": "panw",
         "event.outcome": "deny",
         "event.severity": 4,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5208,7 +5208,7 @@
         "url.original": "about.exe"
     },
     {
-        "@timestamp": "2012-04-09T07:11:43.000Z",
+        "@timestamp": "2012-04-09T07:11:43.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5224,7 +5224,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5277,7 +5277,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T07:14:02.000Z",
+        "@timestamp": "2012-04-09T07:14:02.000-02:00",
         "client.ip": "74.125.239.3",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5293,7 +5293,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5346,7 +5346,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T07:14:39.000Z",
+        "@timestamp": "2012-04-09T07:14:39.000-02:00",
         "client.ip": "74.125.239.3",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5362,7 +5362,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5415,7 +5415,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T07:16:03.000Z",
+        "@timestamp": "2012-04-09T07:16:03.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5431,7 +5431,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5484,7 +5484,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T07:18:14.000Z",
+        "@timestamp": "2012-04-09T07:18:14.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 52366,
         "client.user.name": "picard",
@@ -5505,7 +5505,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5553,7 +5553,7 @@
         "url.original": "__utm.gif"
     },
     {
-        "@timestamp": "2012-04-09T07:25:04.000Z",
+        "@timestamp": "2012-04-09T07:25:04.000-02:00",
         "client.ip": "74.125.224.193",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5569,7 +5569,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5622,7 +5622,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T07:36:04.000Z",
+        "@timestamp": "2012-04-09T07:36:04.000-02:00",
         "client.ip": "74.125.239.20",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5638,7 +5638,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5691,7 +5691,7 @@
         "url.original": "nav_logo107.png"
     },
     {
-        "@timestamp": "2012-04-09T08:08:08.000Z",
+        "@timestamp": "2012-04-09T08:08:08.000-02:00",
         "client.ip": "208.80.154.225",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5707,7 +5707,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5760,7 +5760,7 @@
         "url.original": "Eadweard_Muybridge"
     },
     {
-        "@timestamp": "2012-04-09T08:08:44.000Z",
+        "@timestamp": "2012-04-09T08:08:44.000-02:00",
         "client.ip": "208.80.154.234",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5776,7 +5776,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5829,7 +5829,7 @@
         "url.original": "load.php"
     },
     {
-        "@timestamp": "2012-04-09T08:16:57.000Z",
+        "@timestamp": "2012-04-09T08:16:57.000-02:00",
         "client.ip": "65.54.75.25",
         "client.port": 80,
         "destination.address": "192.168.0.6",
@@ -5845,7 +5845,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5901,7 +5901,7 @@
         "url.original": "8fe44cb728c0f40750c64ee906eb72.css"
     },
     {
-        "@timestamp": "2012-04-09T04:06:41.000Z",
+        "@timestamp": "2012-04-09T04:06:41.000-02:00",
         "client.ip": "74.125.224.206",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5917,7 +5917,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5970,7 +5970,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T04:12:52.000Z",
+        "@timestamp": "2012-04-09T04:12:52.000-02:00",
         "client.ip": "74.125.224.195",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -5986,7 +5986,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6039,7 +6039,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T06:07:49.000Z",
+        "@timestamp": "2012-04-09T06:07:49.000-02:00",
         "client.ip": "207.178.96.34",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6055,7 +6055,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6111,7 +6111,7 @@
         "url.original": "appcast.xml"
     },
     {
-        "@timestamp": "2012-04-09T06:48:44.000Z",
+        "@timestamp": "2012-04-09T06:48:44.000-02:00",
         "client.ip": "74.125.224.195",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6127,7 +6127,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6180,7 +6180,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T06:48:59.000Z",
+        "@timestamp": "2012-04-09T06:48:59.000-02:00",
         "client.ip": "74.125.239.20",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6196,7 +6196,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6249,7 +6249,7 @@
         "url.original": "csi"
     },
     {
-        "@timestamp": "2012-04-09T06:50:14.000Z",
+        "@timestamp": "2012-04-09T06:50:14.000-02:00",
         "client.ip": "66.152.109.24",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6265,7 +6265,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6318,7 +6318,7 @@
         "url.original": "index.php"
     },
     {
-        "@timestamp": "2012-04-09T06:51:34.000Z",
+        "@timestamp": "2012-04-09T06:51:34.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6334,7 +6334,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6387,7 +6387,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T06:53:41.000Z",
+        "@timestamp": "2012-04-09T06:53:41.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 49681,
         "client.user.name": "picard",
@@ -6408,7 +6408,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6456,7 +6456,7 @@
         "url.original": "__utm.gif"
     },
     {
-        "@timestamp": "2012-04-09T06:54:35.000Z",
+        "@timestamp": "2012-04-09T06:54:35.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6472,7 +6472,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6525,7 +6525,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T06:54:55.000Z",
+        "@timestamp": "2012-04-09T06:54:55.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6541,7 +6541,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6594,7 +6594,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T03:44:49.000Z",
+        "@timestamp": "2012-04-09T03:44:49.000-02:00",
         "client.ip": "192.168.0.2",
         "client.port": 59781,
         "client.user.name": "jordy",
@@ -6615,7 +6615,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6663,7 +6663,7 @@
         "url.original": "internal-tuner.pandora.com"
     },
     {
-        "@timestamp": "2012-04-09T03:45:45.000Z",
+        "@timestamp": "2012-04-09T03:45:45.000-02:00",
         "client.ip": "74.125.224.201",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6679,7 +6679,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6732,7 +6732,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T03:49:17.000Z",
+        "@timestamp": "2012-04-09T03:49:17.000-02:00",
         "client.ip": "74.125.224.201",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6748,7 +6748,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6801,7 +6801,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T03:53:41.000Z",
+        "@timestamp": "2012-04-09T03:53:41.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6817,7 +6817,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6870,7 +6870,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T03:55:23.000Z",
+        "@timestamp": "2012-04-09T03:55:23.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6886,7 +6886,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6939,7 +6939,7 @@
         "url.original": "js"
     },
     {
-        "@timestamp": "2012-04-09T03:55:52.000Z",
+        "@timestamp": "2012-04-09T03:55:52.000-02:00",
         "client.ip": "74.125.224.198",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -6955,7 +6955,7 @@
         "event.module": "panw",
         "event.outcome": "alert",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7008,7 +7008,7 @@
         "url.original": "ga.js"
     },
     {
-        "@timestamp": "2012-04-09T04:03:55.000Z",
+        "@timestamp": "2012-04-09T04:03:55.000-02:00",
         "client.ip": "74.125.224.200",
         "client.port": 80,
         "destination.address": "192.168.0.2",
@@ -7024,7 +7024,7 @@
         "event.module": "panw",
         "event.outcome": "reset-both",
         "event.severity": 5,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,

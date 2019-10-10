@@ -563,6 +563,15 @@
 			"versionExact": "v0.9.0"
 		},
 		{
+			"checksumSHA1": "FfvZuO9dwWGKCPy8Y2a3gvvORlk=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/iam",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"tree": true,
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
 			"checksumSHA1": "eMHyTG27+3dZ56gst6ofgI4axsQ=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/rds",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",

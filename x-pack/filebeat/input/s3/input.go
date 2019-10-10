@@ -362,9 +362,12 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 		objectHash := s3ObjectHash(s3Info)
 
 		// read from s3 object
-		reader, err := newS3BucketReader(svc, s3Info, p.context)
+		reader, err := p.newS3BucketReader(svc, s3Info)
 		if err != nil {
 			return errors.Wrap(err, "newS3BucketReader failed")
+		}
+		if reader == nil {
+			continue
 		}
 
 		offset := 0
@@ -405,17 +408,24 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 	return nil
 }
 
-func newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info, context *channelContext) (*bufio.Reader, error) {
+func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(s3Info.name),
 		Key:    awssdk.String(s3Info.key),
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
-	resp, err := req.Send(context)
+	resp, err := req.Send(p.context)
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-			return nil, nil
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+				return nil, nil
+			}
+
+			if awsErr.Code() == "NoSuchKey" {
+				p.logger.Warn("Cannot find s3 file with key ", s3Info.key)
+				return nil, nil
+			}
 		}
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}

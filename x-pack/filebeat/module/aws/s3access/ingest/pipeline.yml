@@ -17,7 +17,7 @@ processors:
         S3REQUESTER: "[a-zA-Z0-9\\/_\\.\\-%:@]+"
         S3REQUESTID: "[a-zA-Z0-9]+"
         S3OPERATION: "%{WORD}.%{WORD}.%{WORD}"
-        S3KEY: "[a-zA-Z0-9\\/_\\.\\-%]+"
+        S3KEY: "[a-zA-Z0-9\\/_\\.\\-%+]+"
         S3ID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
         S3VERSION: "[a-zA-Z0-9.]+"
 

@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-01-01T01:00:27.000Z",
+        "@timestamp": "2018-12-31T23:00:27.000-02:00",
         "cisco.ftd.message_id": "999999",
         "event.action": "firewall-rule",
         "event.code": 999999,
@@ -8,7 +8,7 @@
         "event.module": "cisco",
         "event.original": "%FTD-7-999999: This message is not filtered.",
         "event.severity": 7,
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "beats",
         "input.type": "log",

@@ -106,7 +106,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Create Cloudwatch Events for s3_request
 		bucketNames := getBucketNames(listMetricsOutputs)
 		for _, bucketName := range bucketNames {
-			event, err := createS3RequestEvents(metricDataOutputs, regionName, bucketName)
+			event, err := createS3RequestEvents(metricDataOutputs, regionName, bucketName, m.AccountName, m.AccountID)
 			if err != nil {
 				m.Logger().Error(err.Error())
 				event.Error = err
@@ -128,7 +128,7 @@ func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []strin
 	for _, output := range listMetricsOutputs {
 		for _, dim := range output.Dimensions {
 			if *dim.Name == "BucketName" {
-				if aws.StringInSlice(*dim.Value, bucketNames) {
+				if exists, _ := aws.StringInSlice(*dim.Value, bucketNames); exists {
 					continue
 				}
 				bucketNames = append(bucketNames, *dim.Value)
@@ -171,7 +171,7 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	dailyMetricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutputs {
-		if aws.StringInSlice(*listMetric.MetricName, dailyMetricNames) {
+		if exists, _ := aws.StringInSlice(*listMetric.MetricName, dailyMetricNames); exists {
 			continue
 		}
 
@@ -185,8 +185,8 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 }
 
 // CreateS3Events creates s3_request and s3_daily_storage events from Cloudwatch metric data.
-func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event = aws.InitEvent(regionName)
+func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, accountName string, accountID string) (event mb.Event, err error) {
+	event = aws.InitEvent(regionName, accountName, accountID)
 
 	// AWS s3_request metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})

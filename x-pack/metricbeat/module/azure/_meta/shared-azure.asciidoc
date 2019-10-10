@@ -1,0 +1,9 @@
+[float]
+=== Metricset-specific configuration notes
+
+`refresh_list_interval`:: Resources will be retrieved at each fetch call (`period` interval), this means a number of Azure REST calls will be executed each time.
+This will be helpful if the azure users will be adding/removing resources that could match the configuration options so they will not added/removed to the list.
+To reduce on the number of API calls we are executing to retrieve the resources each time, users can configure this setting and make sure the list or resources will not be refreshed as often.
+This is also beneficial for performance and rate/ cost reasons (https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits).
+
+`resources` :: This will contain all options for identifying resources and configuring the desired metrics
