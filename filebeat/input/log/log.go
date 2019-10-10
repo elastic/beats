@@ -180,11 +180,7 @@ func (f *Log) checkFileDisappearedErrors() error {
 	}
 
 	if f.config.CloseRemoved {
-		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		_, statErr := os.Stat(f.fs.Name())
-
-		// Error means file does not exist.
-		if statErr != nil {
+		if isRemoved(f) {
 			return ErrRemoved
 		}
 	}
