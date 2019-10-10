@@ -186,7 +186,8 @@ The `kubernetes` autodiscover provider has the following configuration settings:
   metadata. If it is not set, the processor collects metadata from all
   namespaces. It is unset by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
-  client. It defaults to `KUBECONFIG` environment variable if present.
+  client. If kube_config is not set, KUBECONFIG environment variable will be
+  checked and if not present it will fall back to InCluster.
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 
