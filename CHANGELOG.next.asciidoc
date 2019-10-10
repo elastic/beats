@@ -407,6 +407,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `state_resourcequota` metricset for Kubernetes module. {pull}13693[13693]
 - Add tags filter in ec2 metricset. {pull}13872[13872] {issue}13145[13145]
 - Add cloud.account.id and cloud.account.name into events from aws module. {issue}13551[13551] {pull}13558[13558]
+- Add `metrics_path` as known hint for autodiscovery {pull}13996[13996]
 
 *Packetbeat*
 
