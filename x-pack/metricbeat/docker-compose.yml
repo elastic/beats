@@ -1,15 +1,5 @@
 version: '2.3'
 services:
-  appsearch:
-    build:
-      context: ./module/appsearch/_meta
-    depends_on:
-      - elasticsearch
-    environment:
-      - "elasticsearch.host=http://elasticsearch:9200"
-      - "allow_es_settings_modification=true"
-    ports:
-      - 3002
   beat:
     build: ../../metricbeat
     environment:
@@ -22,6 +12,18 @@ services:
     command: make
 
   # Modules
+  appsearch:
+    build:
+      context: ./module/appsearch/_meta
+    depends_on:
+      - elasticsearch
+    environment:
+      - "elasticsearch.host=http://elasticsearch:9200"
+      - "allow_es_settings_modification=true"
+    ports:
+      - 3002
+    command: --process app-server
+
   cockroachdb:
     build: ./module/cockroachdb/_meta
     ports:
