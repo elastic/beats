@@ -367,6 +367,144 @@ func TestAddErrKeyOption(t *testing.T) {
 	}
 }
 
+func TestOverwriteKeysEnabled(t *testing.T) {
+	tests := []struct {
+		name           string
+		input          common.MapStr
+		target         string
+		expectedOutput common.MapStr
+	}{
+		{
+			name: "trying to overwrite root field",
+			input: common.MapStr{
+				"f":   "old",
+				"msg": "{ \"f\": \"new\" }",
+			},
+			target: "",
+			expectedOutput: common.MapStr{
+				"f":   "new",
+				"msg": "{ \"f\": \"new\" }",
+			},
+		},
+		{
+			name: "trying to overwrite nested field",
+			input: common.MapStr{
+				"f": common.MapStr{
+					"child": "old",
+				},
+				"msg": "{ \"f\": { \"child\": \"new\" } }",
+			},
+			target: "",
+			expectedOutput: common.MapStr{
+				"f": common.MapStr{
+					"child": "new",
+				},
+				"msg": "{ \"f\": { \"child\": \"new\" } }",
+			},
+		},
+		{
+			name: "trying to overwrite nested target field",
+			input: common.MapStr{
+				"f": common.MapStr{
+					"child":       "old",
+					"other_child": "also old",
+				},
+				"msg": "{ \"child\": \"new\" }",
+			},
+			target: "f",
+			expectedOutput: common.MapStr{
+				"f": common.MapStr{
+					"child":       "new",
+					"other_child": "also_old",
+				},
+				"msg": "{ \"child\": \"new\" }",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+				"fields":         fields,
+				"overwrite_keys": true,
+				"target":         test.target,
+			})
+			actual := getActualValue(t, testConfig, test.input)
+
+			assert.Equal(t, test.expectedOutput.String(), actual.String())
+		})
+	}
+}
+
+func TestOverwriteKeysDisabled(t *testing.T) {
+	tests := []struct {
+		name           string
+		input          common.MapStr
+		target         string
+		expectedOutput common.MapStr
+	}{
+		{
+			name: "trying to overwrite root field",
+			input: common.MapStr{
+				"f":   "old",
+				"msg": "{ \"f\": \"new\" }",
+			},
+			target: "",
+			expectedOutput: common.MapStr{
+				"f":   "old",
+				"msg": "{ \"f\": \"new\" }",
+			},
+		},
+		{
+			name: "trying to overwrite nested field",
+			input: common.MapStr{
+				"f": common.MapStr{
+					"child": "old",
+				},
+				"msg": "{ \"f\": { \"child\": \"new\" } }",
+			},
+			target: "",
+			expectedOutput: common.MapStr{
+				"f": common.MapStr{
+					"child": "old",
+				},
+				"msg": "{ \"f\": { \"child\": \"new\" } }",
+			},
+		},
+		{
+			name: "trying to overwrite nested target field",
+			input: common.MapStr{
+				"f": common.MapStr{
+					"child":       "old",
+					"other_child": "also old",
+				},
+				"msg": "{ \"child\": \"new\" }",
+			},
+			target: "f",
+			expectedOutput: common.MapStr{
+				"f": common.MapStr{
+					"child":       "old",
+					"other_child": "also_old",
+				},
+				"msg": "{ \"child\": \"new\" }",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+				"fields":         fields,
+				"overwrite_keys": false,
+				"target":         test.target,
+			})
+			actual := getActualValue(t, testConfig, test.input)
+
+			assert.Equal(t, test.expectedOutput.String(), actual.String())
+		})
+	}
+}
+
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	logp.TestingSetup()
 
