@@ -5,6 +5,3 @@
   metrics_path: /metrics/metrics
   namespace: example
   enabled: true
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false

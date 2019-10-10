@@ -40,9 +40,6 @@ metricbeat.modules:
   # implementation (all characters that are not alphanumeric, or underscore
   # are replaced by underscores).
   #munin.sanitize: false
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
 ----
 
 [float]

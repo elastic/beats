@@ -8,6 +8,3 @@
 
   # Path to server status. Default server-status
   server_status_path: "server-status"
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false

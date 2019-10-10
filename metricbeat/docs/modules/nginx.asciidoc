@@ -43,9 +43,6 @@ metricbeat.modules:
 
   # Path to server status. Default server-status
   server_status_path: "server-status"
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

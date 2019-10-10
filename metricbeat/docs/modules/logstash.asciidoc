@@ -29,9 +29,6 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:9600"]
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

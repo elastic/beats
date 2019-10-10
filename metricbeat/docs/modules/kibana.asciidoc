@@ -38,9 +38,6 @@ metricbeat.modules:
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

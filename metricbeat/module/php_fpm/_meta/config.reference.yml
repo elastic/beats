@@ -6,6 +6,3 @@
   period: 10s
   status_path: "/status"
   hosts: ["localhost:8080"]
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false

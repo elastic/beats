@@ -3,6 +3,3 @@
   metricsets: ["mntr", "server"]
   period: 10s
   hosts: ["localhost:2181"]
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false

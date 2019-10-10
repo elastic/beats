@@ -24,6 +24,3 @@
     #certificate_authority: "/etc/pki/root/ca.pem"
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false

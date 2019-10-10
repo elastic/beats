@@ -20,5 +20,3 @@
   #    template: ".host.shell.metric*" # test.localhost.bash.stats would become metric=stats and tags host=localhost,shell=bash
   #    delimiter: "_"
 
-  # Set to true to publish fields with null values in events.
-  #keep_null: false

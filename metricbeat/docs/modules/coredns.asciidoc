@@ -25,9 +25,6 @@ metricbeat.modules:
   metricsets: ["stats"]
   period: 10s
   hosts: ["localhost:9153"]
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
 ----
 
 [float]

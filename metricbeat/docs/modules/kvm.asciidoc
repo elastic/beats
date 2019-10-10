@@ -30,9 +30,6 @@ metricbeat.modules:
 
   # Timeout to connect to Libvirt server
   #timeout: 1s
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
 ----
 
 [float]

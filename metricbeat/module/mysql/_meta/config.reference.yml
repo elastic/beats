@@ -19,6 +19,3 @@
 
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
