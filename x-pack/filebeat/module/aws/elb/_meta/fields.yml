@@ -1,0 +1,45 @@
+- name: elb
+  type: group
+  description: >
+    Fields for AWS ELB logs.
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the load balancer
+    - name: protocol
+      type: keyword
+      description: >
+        The protocol of the load balancer (http or tcp)
+    - name: request_processing_time.sec
+      type: float
+      description: >
+        The total time in seconds since the connection or request is received until it is sent to a registered backend.
+    - name: backend_processing_time.sec
+      type: float
+      description: >
+        The total time in seconds since the connection is sent to the backend till the backend starts responding.
+    - name: response_processing_time.sec
+      type: float
+      description: >
+        The total time in seconds since the response is received from the backend till it is sent to the client.
+    - name: backend.ip
+      type: keyword
+      description: >
+        The IP address of the backend processing this connection.
+    - name: backend.port
+      type: keyword
+      description: >
+        The port in the backend processing this connection.
+    - name: backend.http.response.status_code
+      type: keyword
+      description: >
+        The status code from the backend (status code sent to the client from ELB is stored in `http.response.status_code`
+    - name: ssl_cipher
+      type: keyword
+      description: >
+        The SSL cipher used in TLS/SSL connections.
+    - name: ssl_protocol
+      type: keyword
+      description: >
+        The SSL protocol used in TLS/SSL connections.

@@ -1006,6 +1006,113 @@ Fields from AWS logs.
 
 
 [float]
+=== elb
+
+Fields for AWS ELB logs.
+
+
+
+*`aws.elb.name`*::
++
+--
+The name of the load balancer
+
+
+type: keyword
+
+--
+
+*`aws.elb.protocol`*::
++
+--
+The protocol of the load balancer (http or tcp)
+
+
+type: keyword
+
+--
+
+*`aws.elb.request_processing_time.sec`*::
++
+--
+The total time in seconds since the connection or request is received until it is sent to a registered backend.
+
+
+type: float
+
+--
+
+*`aws.elb.backend_processing_time.sec`*::
++
+--
+The total time in seconds since the connection is sent to the backend till the backend starts responding.
+
+
+type: float
+
+--
+
+*`aws.elb.response_processing_time.sec`*::
++
+--
+The total time in seconds since the response is received from the backend till it is sent to the client.
+
+
+type: float
+
+--
+
+*`aws.elb.backend.ip`*::
++
+--
+The IP address of the backend processing this connection.
+
+
+type: keyword
+
+--
+
+*`aws.elb.backend.port`*::
++
+--
+The port in the backend processing this connection.
+
+
+type: keyword
+
+--
+
+*`aws.elb.backend.http.response.status_code`*::
++
+--
+The status code from the backend (status code sent to the client from ELB is stored in `http.response.status_code`
+
+
+type: keyword
+
+--
+
+*`aws.elb.ssl_cipher`*::
++
+--
+The SSL cipher used in TLS/SSL connections.
+
+
+type: keyword
+
+--
+
+*`aws.elb.ssl_protocol`*::
++
+--
+The SSL protocol used in TLS/SSL connections.
+
+
+type: keyword
+
+--
+
+[float]
 === s3access
 
 Fields for AWS S3 server access logs.

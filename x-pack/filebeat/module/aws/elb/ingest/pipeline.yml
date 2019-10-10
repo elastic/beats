@@ -1,0 +1,87 @@
+description: "Pipeline for ELB logs"
+
+processors:
+  - grok:
+      field: message
+      # Patterns documented in https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html
+      # Format: timestamp elb client:port backend:port request_processing_time backend_processing_time response_processing_time elb_status_code backend_status_code received_bytes sent_bytes "request" "user_agent" ssl_cipher ssl_protocol
+      patterns:
+        # HTTP
+        - >-
+          %{ELBCOMMON}
+          %{NUMBER:http.response.status_code}
+          (?:-|%{NUMBER:aws.elb.backend.http.response.status_code})
+          %{NUMBER:http.request.body.bytes:long}
+          %{NUMBER:http.response.body.bytes:long}
+          \"%{WORD:http.request.method} %{NOTSPACE:http.request.referrer} HTTP/%{NOTSPACE:http.version}\"
+          \"%{DATA:user_agent.original}\"
+          %{ELBSSL}
+
+        # TCP
+        - >-
+          %{ELBCOMMON}
+          -
+          -
+          %{NUMBER:source.bytes:long}
+          %{NUMBER:destination.bytes:long}
+          \"- - - \"
+          \"-\"
+          %{ELBSSL}
+
+      pattern_definitions:
+        ELBTIMESTAMP: '%{TIMESTAMP_ISO8601:@timestamp}'
+        ELBNAME: '%{NOTSPACE:aws.elb.name}'
+        ELBSOURCE: '%{IP:source.ip}:%{POSINT:source.port}'
+        ELBBACKEND: '(?:-|%{IP:aws.elb.backend.ip}:%{POSINT:aws.elb.backend.port})'
+        ELBPROCESSINGTIME: >-
+          (?:-1|%{NUMBER:aws.elb.request_processing_time.sec:float})
+          (?:-1|%{NUMBER:aws.elb.backend_processing_time.sec:float})
+          (?:-1|%{NUMBER:aws.elb.response_processing_time.sec:float})
+        ELBSSL: >-
+          (?:-|%{NOTSPACE:aws.elb.ssl_cipher})
+          (?:-|%{NOTSPACE:aws.elb.ssl_protocol})
+        ELBCOMMON: >-
+          %{ELBTIMESTAMP}
+          %{ELBNAME}
+          %{ELBSOURCE}
+          %{ELBBACKEND}
+          %{ELBPROCESSINGTIME}
+
+  - set:
+      if: 'ctx.http != null'
+      field: 'aws.elb.protocol'
+      value: 'http'
+
+  - set:
+      if: 'ctx.http == null'
+      field: 'aws.elb.protocol'
+      value: 'tcp'
+
+  - date:
+      field: '@timestamp'
+      formats:
+        - 'ISO8601'
+
+  - geoip:
+      field: 'source.ip'
+      target_field: 'source.geo'
+      ignore_missing: true
+
+  - geoip:
+      database_file: 'GeoLite2-ASN.mmdb'
+      field: 'source.ip'
+      target_field: 'source.as'
+      properties:
+        - 'asn'
+        - 'organization_name'
+      ignore_missing: true
+
+  - remove:
+      field:
+        - message
+      ignore_missing: true
+
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"
