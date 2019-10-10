@@ -483,7 +483,7 @@
             }
           }
         },
-        "title": "VMSS Disk Read (bytes) [Azure]",
+        "title": "VMSS Disk Reads [Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -534,7 +534,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VMSS Disk Read (bytes) [Azure]",
+          "title": "VMSS Disk Reads [Azure]",
           "type": "metrics"
         }
       },
@@ -544,8 +544,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:22:34.725Z",
-      "version": "WzE0MDksMV0="
+      "updated_at": "2019-10-10T14:02:15.620Z",
+      "version": "WzE0MzUsMV0="
     },
     {
       "attributes": {
@@ -711,7 +711,7 @@
             }
           }
         },
-        "title": "VMSS Disk Writes (bytes) [Metricbeat Azure]",
+        "title": "VMSS Disk Writes [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -762,7 +762,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VMSS Disk Writes (bytes) [Metricbeat Azure]",
+          "title": "VMSS Disk Writes [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -772,8 +772,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:22:49.102Z",
-      "version": "WzE0MTAsMV0="
+      "updated_at": "2019-10-10T14:02:36.055Z",
+      "version": "WzE0MzYsMV0="
     },
     {
       "attributes": {
