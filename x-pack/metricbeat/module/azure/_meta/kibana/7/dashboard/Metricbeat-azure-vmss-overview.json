@@ -23,7 +23,7 @@
               "title": "Filters"
             },
             "gridData": {
-              "h": 11,
+              "h": 12,
               "i": "d84767cd-3fc9-438c-a969-f15c4d5fc9c5",
               "w": 6,
               "x": 0,
@@ -36,10 +36,10 @@
           },
           {
             "embeddableConfig": {
-              "title": "VMSS Percentage CPU"
+              "title": "Percentage CPU"
             },
             "gridData": {
-              "h": 11,
+              "h": 12,
               "i": "127eff01-d34c-4bda-8f19-4cf06982989f",
               "w": 20,
               "x": 6,
@@ -47,15 +47,15 @@
             },
             "panelIndex": "127eff01-d34c-4bda-8f19-4cf06982989f",
             "panelRefName": "panel_1",
-            "title": "VMSS Percentage CPU",
+            "title": "Percentage CPU",
             "version": "7.4.0"
           },
           {
             "embeddableConfig": {
-              "title": "VMSS Available Memory"
+              "title": "Available Memory"
             },
             "gridData": {
-              "h": 11,
+              "h": 12,
               "i": "2f85c4f1-a575-49a1-99d3-fbed8a2806ec",
               "w": 22,
               "x": 26,
@@ -63,103 +63,103 @@
             },
             "panelIndex": "2f85c4f1-a575-49a1-99d3-fbed8a2806ec",
             "panelRefName": "panel_2",
-            "title": "VMSS Available Memory",
+            "title": "Available Memory",
             "version": "7.4.0"
           },
           {
             "embeddableConfig": {
-              "title": "VMSS Network In Total"
-            },
-            "gridData": {
-              "h": 11,
-              "i": "e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
-              "w": 12,
-              "x": 0,
-              "y": 11
-            },
-            "panelIndex": "e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
-            "panelRefName": "panel_3",
-            "title": "VMSS Network In Total",
-            "version": "7.4.0"
-          },
-          {
-            "embeddableConfig": {
-              "title": "VMSS Network Out Total"
-            },
-            "gridData": {
-              "h": 11,
-              "i": "64fc0214-97f7-4d52-a9bd-a91449293f1c",
-              "w": 12,
-              "x": 12,
-              "y": 11
-            },
-            "panelIndex": "64fc0214-97f7-4d52-a9bd-a91449293f1c",
-            "panelRefName": "panel_4",
-            "title": "VMSS Network Out Total",
-            "version": "7.4.0"
-          },
-          {
-            "embeddableConfig": {
-              "title": "VMSS Disk Writes"
-            },
-            "gridData": {
-              "h": 11,
-              "i": "12c9c185-81ed-4313-b274-b3384de2d396",
-              "w": 12,
-              "x": 24,
-              "y": 11
-            },
-            "panelIndex": "12c9c185-81ed-4313-b274-b3384de2d396",
-            "panelRefName": "panel_5",
-            "title": "VMSS Disk Writes",
-            "version": "7.4.0"
-          },
-          {
-            "embeddableConfig": {
-              "title": "VMSS Disk Reads"
+              "title": "Disk Reads"
             },
             "gridData": {
               "h": 11,
               "i": "6cbc30b4-658e-4f7a-a888-221775fd0af3",
               "w": 12,
               "x": 36,
-              "y": 11
+              "y": 12
             },
             "panelIndex": "6cbc30b4-658e-4f7a-a888-221775fd0af3",
-            "panelRefName": "panel_6",
-            "title": "VMSS Disk Reads",
+            "panelRefName": "panel_3",
+            "title": "Disk Reads",
             "version": "7.4.0"
           },
           {
             "embeddableConfig": {
-              "title": "VMSS Disk Read Operations/s"
+              "title": "Network In Total"
+            },
+            "gridData": {
+              "h": 11,
+              "i": "e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
+              "w": 12,
+              "x": 0,
+              "y": 12
+            },
+            "panelIndex": "e195e7ba-c736-4bf7-9f23-c96f4acd9b6b",
+            "panelRefName": "panel_4",
+            "title": "Network In Total",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Network Out Total"
+            },
+            "gridData": {
+              "h": 11,
+              "i": "64fc0214-97f7-4d52-a9bd-a91449293f1c",
+              "w": 12,
+              "x": 12,
+              "y": 12
+            },
+            "panelIndex": "64fc0214-97f7-4d52-a9bd-a91449293f1c",
+            "panelRefName": "panel_5",
+            "title": "Network Out Total",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Disk Writes"
+            },
+            "gridData": {
+              "h": 11,
+              "i": "12c9c185-81ed-4313-b274-b3384de2d396",
+              "w": 12,
+              "x": 24,
+              "y": 12
+            },
+            "panelIndex": "12c9c185-81ed-4313-b274-b3384de2d396",
+            "panelRefName": "panel_6",
+            "title": "Disk Writes",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Disk Read Operations/s"
             },
             "gridData": {
               "h": 15,
               "i": "200ae92b-4184-4aed-9868-6ce5e16e7a8d",
               "w": 24,
               "x": 0,
-              "y": 22
+              "y": 23
             },
             "panelIndex": "200ae92b-4184-4aed-9868-6ce5e16e7a8d",
             "panelRefName": "panel_7",
-            "title": "VMSS Disk Read Operations/s",
+            "title": "Disk Read Operations/s",
             "version": "7.4.0"
           },
           {
             "embeddableConfig": {
-              "title": "VMSS Disk Write Operations/s"
+              "title": "Disk Write Operations/s"
             },
             "gridData": {
               "h": 15,
               "i": "36c46a84-3e6b-4a7e-9246-357ae9d10d1e",
               "w": 24,
               "x": 24,
-              "y": 22
+              "y": 23
             },
             "panelIndex": "36c46a84-3e6b-4a7e-9246-357ae9d10d1e",
             "panelRefName": "panel_8",
-            "title": "VMSS Disk Write Operations/s",
+            "title": "Disk Write Operations/s",
             "version": "7.4.0"
           }
         ],
@@ -188,22 +188,22 @@
           "type": "visualization"
         },
         {
-          "id": "64266ec0-eb42-11e9-90ec-112a988266d5",
+          "id": "42cc28d0-ea9a-11e9-90ec-112a988266d5",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "b45fd8e0-eb42-11e9-90ec-112a988266d5",
+          "id": "64266ec0-eb42-11e9-90ec-112a988266d5",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "0d03a670-eb43-11e9-90ec-112a988266d5",
+          "id": "b45fd8e0-eb42-11e9-90ec-112a988266d5",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "42cc28d0-ea9a-11e9-90ec-112a988266d5",
+          "id": "0d03a670-eb43-11e9-90ec-112a988266d5",
           "name": "panel_6",
           "type": "visualization"
         },
@@ -219,8 +219,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-10T10:25:32.955Z",
-      "version": "Wzk4MiwxXQ=="
+      "updated_at": "2019-10-10T12:55:19.764Z",
+      "version": "WzE0MDAsMV0="
     },
     {
       "attributes": {
@@ -270,6 +270,21 @@
                 },
                 "parent": "",
                 "type": "list"
+              },
+              {
+                "fieldName": "azure.dimensions.vmname",
+                "id": "1570711989416",
+                "indexPatternRefName": "control_2_index_pattern",
+                "label": "VM Name (dimension)",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
               }
             ],
             "pinFilters": false,
@@ -294,11 +309,16 @@
           "id": "metricbeat-*",
           "name": "control_1_index_pattern",
           "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_2_index_pattern",
+          "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:14:01.387Z",
-      "version": "Wzk2MiwxXQ=="
+      "updated_at": "2019-10-10T12:53:39.560Z",
+      "version": "WzEzOTgsMV0="
     },
     {
       "attributes": {
@@ -450,6 +470,82 @@
       "type": "visualization",
       "updated_at": "2019-10-10T09:39:08.648Z",
       "version": "WzkzMywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "VMSS Disk Read (bytes) [Azure] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": 0,
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": "azure.resource.type :\"Microsoft.Compute/virtualMachineScaleSets\" "
+            },
+            "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=1m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(252,196,0,1)",
+                "fill": 0,
+                "formatter": "bytes",
+                "id": "39b6adc1-ea99-11e9-8328-799c817fb96b",
+                "label": "VM Disk Read bytes",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "azure.compute_vm_scaleset.disk_read_bytes.total",
+                    "id": "39b6adc2-ea99-11e9-8328-799c817fb96b",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "azure.resource.name",
+                "type": "timeseries",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "VMSS Disk Read (bytes) [Azure] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "42cc28d0-ea9a-11e9-90ec-112a988266d5",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-10-10T09:50:11.606Z",
+      "version": "Wzk0MCwxXQ=="
     },
     {
       "attributes": {
@@ -678,82 +774,6 @@
       "type": "visualization",
       "updated_at": "2019-10-10T10:18:42.719Z",
       "version": "Wzk3MiwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "VMSS Disk Read (bytes) [Azure] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_min": 0,
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
-            "filter": {
-              "language": "kuery",
-              "query": "azure.resource.type :\"Microsoft.Compute/virtualMachineScaleSets\" "
-            },
-            "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
-            "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(252,196,0,1)",
-                "fill": 0,
-                "formatter": "bytes",
-                "id": "39b6adc1-ea99-11e9-8328-799c817fb96b",
-                "label": "VM Disk Read bytes",
-                "line_width": 2,
-                "metrics": [
-                  {
-                    "field": "azure.compute_vm_scaleset.disk_read_bytes.total",
-                    "id": "39b6adc2-ea99-11e9-8328-799c817fb96b",
-                    "type": "avg"
-                  }
-                ],
-                "point_size": 0,
-                "separate_axis": 0,
-                "split_mode": "terms",
-                "stacked": "none",
-                "terms_field": "azure.resource.name",
-                "type": "timeseries",
-                "value_template": "{{value}}"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "@timestamp",
-            "type": "timeseries"
-          },
-          "title": "VMSS Disk Read (bytes) [Azure] ECS",
-          "type": "metrics"
-        }
-      },
-      "id": "42cc28d0-ea9a-11e9-90ec-112a988266d5",
-      "migrationVersion": {
-        "visualization": "7.3.1"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-10-10T09:50:11.606Z",
-      "version": "Wzk0MCwxXQ=="
     },
     {
       "attributes": {
