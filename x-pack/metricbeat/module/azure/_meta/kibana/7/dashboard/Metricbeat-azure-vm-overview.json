@@ -19,19 +19,16 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {
-              "title": "Filters"
-            },
+            "embeddableConfig": {},
             "gridData": {
               "h": 11,
-              "i": "d84767cd-3fc9-438c-a969-f15c4d5fc9c5",
+              "i": "aa881f9d-28d3-4722-822e-3e670021cf52",
               "w": 6,
               "x": 0,
               "y": 0
             },
-            "panelIndex": "d84767cd-3fc9-438c-a969-f15c4d5fc9c5",
+            "panelIndex": "aa881f9d-28d3-4722-822e-3e670021cf52",
             "panelRefName": "panel_0",
-            "title": "Filters",
             "version": "7.4.0"
           },
           {
@@ -170,7 +167,7 @@
       },
       "references": [
         {
-          "id": "686bc990-ea92-11e9-90ec-112a988266d5",
+          "id": "5031b220-eb61-11e9-90ec-112a988266d5",
           "name": "panel_0",
           "type": "visualization"
         },
@@ -216,8 +213,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-10T10:24:26.756Z",
-      "version": "Wzk3OSwxXQ=="
+      "updated_at": "2019-10-10T13:26:22.416Z",
+      "version": "WzE0MTgsMV0="
     },
     {
       "attributes": {
@@ -231,7 +228,7 @@
             }
           }
         },
-        "title": "VM Filters [Metricbeat Azure] ECS",
+        "title": "VM Filters [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -273,11 +270,11 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "VM Filters [Metricbeat Azure] ECS",
+          "title": "VM Filters [Metricbeat Azure]",
           "type": "input_control_vis"
         }
       },
-      "id": "686bc990-ea92-11e9-90ec-112a988266d5",
+      "id": "5031b220-eb61-11e9-90ec-112a988266d5",
       "migrationVersion": {
         "visualization": "7.3.1"
       },
@@ -294,8 +291,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:14:01.387Z",
-      "version": "Wzk2MiwxXQ=="
+      "updated_at": "2019-10-10T13:24:40.129Z",
+      "version": "WzE0MTQsMV0="
     },
     {
       "attributes": {
@@ -309,7 +306,7 @@
             }
           }
         },
-        "title": "VM CPU Utilization [Metricbeat Azure] ECS",
+        "title": "VM CPU Utilization [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -364,7 +361,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM CPU Utilization [Metricbeat Azure] ECS",
+          "title": "VM CPU Utilization [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -374,8 +371,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:07:15.061Z",
-      "version": "Wzk0OCwxXQ=="
+      "updated_at": "2019-10-10T13:27:01.167Z",
+      "version": "WzE0MTksMV0="
     },
     {
       "attributes": {
@@ -389,7 +386,7 @@
             }
           }
         },
-        "title": "VM Available Memory [Metricbeat Azure] ECS",
+        "title": "VM Available Memory [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -439,7 +436,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM Available Memory [Metricbeat Azure] ECS",
+          "title": "VM Available Memory [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -449,8 +446,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:18:15.019Z",
-      "version": "Wzk3MSwxXQ=="
+      "updated_at": "2019-10-10T13:27:17.064Z",
+      "version": "WzE0MjAsMV0="
     },
     {
       "attributes": {
@@ -464,7 +461,7 @@
             }
           }
         },
-        "title": "VM Network In Total [Metricbeat Azure] ECS",
+        "title": "VM Network In Total [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -514,7 +511,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM Network In Total [Metricbeat Azure] ECS",
+          "title": "VM Network In Total [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -524,8 +521,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:13:37.031Z",
-      "version": "Wzk2MCwxXQ=="
+      "updated_at": "2019-10-10T13:28:22.044Z",
+      "version": "WzE0MjQsMV0="
     },
     {
       "attributes": {
@@ -539,7 +536,7 @@
             }
           }
         },
-        "title": "VM Network Out Total [Metricbeat Azure] ECS",
+        "title": "VM Network Out Total [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -590,7 +587,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM Network Out Total [Metricbeat Azure] ECS",
+          "title": "VM Network Out Total [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -600,8 +597,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:13:11.128Z",
-      "version": "Wzk1OCwxXQ=="
+      "updated_at": "2019-10-10T13:27:55.869Z",
+      "version": "WzE0MjIsMV0="
     },
     {
       "attributes": {
@@ -615,7 +612,7 @@
             }
           }
         },
-        "title": "VM Disk Writes (bytes) [Metricbeat Azure] ECS",
+        "title": "VM Disk Writes (bytes) [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -666,7 +663,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM Disk Writes (bytes) [Metricbeat Azure] ECS",
+          "title": "VM Disk Writes (bytes) [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -676,8 +673,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:12:42.649Z",
-      "version": "Wzk1NiwxXQ=="
+      "updated_at": "2019-10-10T13:28:08.242Z",
+      "version": "WzE0MjMsMV0="
     },
     {
       "attributes": {
@@ -691,7 +688,7 @@
             }
           }
         },
-        "title": "VM Disk Read (bytes) [Metricbeat Azure] ECS",
+        "title": "VM Disk Read (bytes) [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -742,7 +739,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM Disk Read (bytes) [Metricbeat Azure] ECS",
+          "title": "VM Disk Read (bytes) [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -752,8 +749,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:08:30.235Z",
-      "version": "Wzk1MCwxXQ=="
+      "updated_at": "2019-10-10T13:27:32.155Z",
+      "version": "WzE0MjEsMV0="
     },
     {
       "attributes": {
@@ -767,7 +764,7 @@
             }
           }
         },
-        "title": "VM Disk Read Operations/s [Metricbeat Azure] ECS",
+        "title": "VM Disk Read Operations/s [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -818,7 +815,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM Disk Read Operations/s [Metricbeat Azure] ECS",
+          "title": "VM Disk Read Operations/s [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -828,8 +825,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:10:47.013Z",
-      "version": "Wzk1MiwxXQ=="
+      "updated_at": "2019-10-10T13:28:53.708Z",
+      "version": "WzE0MjYsMV0="
     },
     {
       "attributes": {
@@ -843,7 +840,7 @@
             }
           }
         },
-        "title": "VM Disk Write Operations/s [Metricbeat Azure] ECS",
+        "title": "VM Disk Write Operations/s [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -894,7 +891,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "VM Disk Write Operations/s [Metricbeat Azure] ECS",
+          "title": "VM Disk Write Operations/s [Metricbeat Azure]",
           "type": "metrics"
         }
       },
@@ -904,8 +901,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T10:12:09.312Z",
-      "version": "Wzk1NCwxXQ=="
+      "updated_at": "2019-10-10T13:28:34.591Z",
+      "version": "WzE0MjUsMV0="
     }
   ],
   "version": "7.4.0"
