@@ -8,7 +8,7 @@ class Test(XPackTest):
     COMPOSE_TIMEOUT = 600
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_status(self):
+    def test_stats(self):
         self.render_config_template(modules=[{
             "name": "appsearch",
             "metricsets": ["stats"],
