@@ -180,7 +180,7 @@ func (f *Log) checkFileDisappearedErrors() error {
 	}
 
 	if f.config.CloseRemoved {
-		if isRemoved(f) {
+		if f.fs.Removed() {
 			return ErrRemoved
 		}
 	}
