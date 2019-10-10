@@ -3112,7 +3112,7 @@ Log stream when reading container logs, can be 'stdout' or 'stderr'
 +
 --
 
-deprecated[6.3]
+deprecated:[6.3]
 
 required: True
 
