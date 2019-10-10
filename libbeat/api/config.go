@@ -24,8 +24,8 @@ type Config struct {
 	Enabled            bool   `config:"enabled"`
 	Host               string `config:"host"`
 	Port               int    `config:"port"`
-	User               string `config:"user"`
-	SecurityDescriptor string `config:"security_descriptor"`
+	User               string `config:"named_pipe.user"`
+	SecurityDescriptor string `config:"named_pipe.security_descriptor"`
 }
 
 var (
