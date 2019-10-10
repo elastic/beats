@@ -27,3 +27,9 @@ processors:
       lang: javascript
       id: misp_script
       file: ${path.home}/module/misp/threat/config/pipeline.js
+  - timestamp:
+      field: json.timestamp
+      layouts:
+        - UNIX
+  - drop_fields:
+      fields: [json]

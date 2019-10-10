@@ -10,12 +10,6 @@ var threat = (function () {
         target: "json",
     });
 
-    var parseTimestamp = function (evt) {
-        var secs = evt.Get("json.timestamp");
-        evt.Delete("json.timestamp");
-        evt.Put("@timestamp", new Date(secs * 1000));
-    };
-
     var categorizeEvent = new processor.AddFields({
         target: "event",
         fields: {
@@ -138,17 +132,14 @@ var threat = (function () {
             evt.Put("error.message", 'Unsupported type: ' + indicator_type);
         }
         evt.Put("misp.threat_indicator.attack_pattern", attackPattern);
-        
     };
 
     var dropOldFields = function (evt) {
         evt.Delete("message");
-        evt.Delete("json");
     };
 
     var pipeline = new processor.Chain()
         .Add(decodeJson)
-        .Add(parseTimestamp)
         .Add(categorizeEvent)
         .Add(setThreatFeedField)
         .Add(convertFields)
