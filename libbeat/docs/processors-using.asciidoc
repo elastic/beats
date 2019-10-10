@@ -1339,7 +1339,7 @@ the Kubernetes node.
 processors:
 - add_kubernetes_metadata:
     host: <hostname>
-    # It defaults to `KUBECONFIG` variable if present.
+    # It defaults to `KUBECONFIG` environment variable if present.
     kube_config: ${HOME}/.kube/config
 -------------------------------------------------------------------------------
 
@@ -1351,7 +1351,7 @@ enables ones that the user is interested in.
 processors:
 - add_kubernetes_metadata:
     host: <hostname>
-    # It defaults to `KUBECONFIG` variable if present.
+    # It defaults to `KUBECONFIG` environment variable if present.
     kube_config: ~/.kube/config
     default_indexers.enabled: false
     default_matchers.enabled: false
@@ -1371,7 +1371,7 @@ mode.
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
-client. It defaults to `KUBECONFIG` variable if present.
+client. It defaults to `KUBECONFIG` environment variable if present.
 `default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
 case you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable/Disable default pod matchers, in

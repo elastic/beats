@@ -79,7 +79,7 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
-  # It defaults to `KUBECONFIG` variable if present.
+  # It defaults to `KUBECONFIG` environment variable if present.
   #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
@@ -101,7 +101,7 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
-  # It defaults to `KUBECONFIG` variable if present.
+  # It defaults to `KUBECONFIG` environment variable if present.
   #kube_config: ~/.kube/config
 
 # Kubernetes events
