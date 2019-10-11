@@ -21,7 +21,7 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 11,
+              "h": 12,
               "i": "aa881f9d-28d3-4722-822e-3e670021cf52",
               "w": 6,
               "x": 0,
@@ -36,7 +36,7 @@
               "title": "VM CPU Utilization"
             },
             "gridData": {
-              "h": 11,
+              "h": 12,
               "i": "e673f70c-f811-4290-9087-578c7dd13675",
               "w": 20,
               "x": 6,
@@ -52,7 +52,7 @@
               "title": "VM Available Memory"
             },
             "gridData": {
-              "h": 11,
+              "h": 12,
               "i": "2473ef72-c56c-4783-a36a-f4b8efd66ab7",
               "w": 22,
               "x": 26,
@@ -64,6 +64,19 @@
             "version": "7.4.0"
           },
           {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "14e225ef-6417-4377-b2cb-6b46b6693b78",
+              "w": 12,
+              "x": 36,
+              "y": 12
+            },
+            "panelIndex": "14e225ef-6417-4377-b2cb-6b46b6693b78",
+            "panelRefName": "panel_3",
+            "version": "7.4.0"
+          },
+          {
             "embeddableConfig": {
               "title": "VM Network In Total"
             },
@@ -72,10 +85,10 @@
               "i": "535d70b3-3f3c-4a84-85ba-ab671b6d144f",
               "w": 12,
               "x": 0,
-              "y": 11
+              "y": 12
             },
             "panelIndex": "535d70b3-3f3c-4a84-85ba-ab671b6d144f",
-            "panelRefName": "panel_3",
+            "panelRefName": "panel_4",
             "title": "VM Network In Total",
             "version": "7.4.0"
           },
@@ -88,10 +101,10 @@
               "i": "6903a45e-bf11-4db2-9497-fd9692e83448",
               "w": 12,
               "x": 12,
-              "y": 11
+              "y": 12
             },
             "panelIndex": "6903a45e-bf11-4db2-9497-fd9692e83448",
-            "panelRefName": "panel_4",
+            "panelRefName": "panel_5",
             "title": "VM Network Out Total",
             "version": "7.4.0"
           },
@@ -104,24 +117,11 @@
               "i": "aa57fa8f-f6ea-45e3-9b2c-ba948d625813",
               "w": 12,
               "x": 24,
-              "y": 11
+              "y": 12
             },
             "panelIndex": "aa57fa8f-f6ea-45e3-9b2c-ba948d625813",
-            "panelRefName": "panel_5",
-            "title": "VM Disk Writes",
-            "version": "7.4.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 12,
-              "i": "14e225ef-6417-4377-b2cb-6b46b6693b78",
-              "w": 12,
-              "x": 36,
-              "y": 11
-            },
-            "panelIndex": "14e225ef-6417-4377-b2cb-6b46b6693b78",
             "panelRefName": "panel_6",
+            "title": "VM Disk Writes",
             "version": "7.4.0"
           },
           {
@@ -133,7 +133,7 @@
               "i": "8879143b-ed83-45ec-8c58-b10dc1597c22",
               "w": 24,
               "x": 0,
-              "y": 23
+              "y": 24
             },
             "panelIndex": "8879143b-ed83-45ec-8c58-b10dc1597c22",
             "panelRefName": "panel_7",
@@ -149,7 +149,7 @@
               "i": "4071f2bf-1794-45ff-b76d-58864226d8b7",
               "w": 24,
               "x": 24,
-              "y": 23
+              "y": 24
             },
             "panelIndex": "4071f2bf-1794-45ff-b76d-58864226d8b7",
             "panelRefName": "panel_8",
@@ -182,22 +182,22 @@
           "type": "visualization"
         },
         {
-          "id": "8b6b9450-ea99-11e9-90ec-112a988266d5",
+          "id": "e8ca65c0-eb45-11e9-90ec-112a988266d5",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "abd32c30-ea99-11e9-90ec-112a988266d5",
+          "id": "8b6b9450-ea99-11e9-90ec-112a988266d5",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "5c016810-ea9a-11e9-90ec-112a988266d5",
+          "id": "abd32c30-ea99-11e9-90ec-112a988266d5",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "e8ca65c0-eb45-11e9-90ec-112a988266d5",
+          "id": "5c016810-ea9a-11e9-90ec-112a988266d5",
           "name": "panel_6",
           "type": "visualization"
         },
@@ -213,8 +213,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-10T13:26:22.416Z",
-      "version": "WzE0MTgsMV0="
+      "updated_at": "2019-10-11T06:25:28.771Z",
+      "version": "WzE0NzEsMV0="
     },
     {
       "attributes": {
@@ -264,6 +264,21 @@
                 },
                 "parent": "",
                 "type": "list"
+              },
+              {
+                "fieldName": "azure.resource.name",
+                "id": "1570774891724",
+                "indexPatternRefName": "control_2_index_pattern",
+                "label": "VM Name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
               }
             ],
             "pinFilters": false,
@@ -288,11 +303,16 @@
           "id": "metricbeat-*",
           "name": "control_1_index_pattern",
           "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_2_index_pattern",
+          "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:24:40.129Z",
-      "version": "WzE0MTQsMV0="
+      "updated_at": "2019-10-11T06:35:45.645Z",
+      "version": "WzE0ODMsMV0="
     },
     {
       "attributes": {
@@ -448,6 +468,82 @@
       "type": "visualization",
       "updated_at": "2019-10-10T13:27:17.064Z",
       "version": "WzE0MjAsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "VM Disk Reads [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": 0,
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": "azure.resource.type :\"Microsoft.Compute/virtualMachines\" "
+            },
+            "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=1m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(252,196,0,1)",
+                "fill": 0,
+                "formatter": "bytes",
+                "id": "39b6adc1-ea99-11e9-8328-799c817fb96b",
+                "label": "VM Disk Read bytes",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "azure.compute_vm.disk_read_bytes.total",
+                    "id": "39b6adc2-ea99-11e9-8328-799c817fb96b",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "azure.resource.name",
+                "type": "timeseries",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "VM Disk Reads [Metricbeat Azure]",
+          "type": "metrics"
+        }
+      },
+      "id": "e8ca65c0-eb45-11e9-90ec-112a988266d5",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-10-10T14:03:59.835Z",
+      "version": "WzE0MzcsMV0="
     },
     {
       "attributes": {
@@ -675,82 +771,6 @@
       "type": "visualization",
       "updated_at": "2019-10-10T14:04:19.809Z",
       "version": "WzE0MzgsMV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "VM Disk Reads [Metricbeat Azure]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_min": 0,
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
-            "filter": {
-              "language": "kuery",
-              "query": "azure.resource.type :\"Microsoft.Compute/virtualMachines\" "
-            },
-            "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
-            "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(252,196,0,1)",
-                "fill": 0,
-                "formatter": "bytes",
-                "id": "39b6adc1-ea99-11e9-8328-799c817fb96b",
-                "label": "VM Disk Read bytes",
-                "line_width": 2,
-                "metrics": [
-                  {
-                    "field": "azure.compute_vm.disk_read_bytes.total",
-                    "id": "39b6adc2-ea99-11e9-8328-799c817fb96b",
-                    "type": "avg"
-                  }
-                ],
-                "point_size": 0,
-                "separate_axis": 0,
-                "split_mode": "terms",
-                "stacked": "none",
-                "terms_field": "azure.resource.name",
-                "type": "timeseries",
-                "value_template": "{{value}}"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "@timestamp",
-            "type": "timeseries"
-          },
-          "title": "VM Disk Reads [Metricbeat Azure]",
-          "type": "metrics"
-        }
-      },
-      "id": "e8ca65c0-eb45-11e9-90ec-112a988266d5",
-      "migrationVersion": {
-        "visualization": "7.3.1"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-10-10T14:03:59.835Z",
-      "version": "WzE0MzcsMV0="
     },
     {
       "attributes": {

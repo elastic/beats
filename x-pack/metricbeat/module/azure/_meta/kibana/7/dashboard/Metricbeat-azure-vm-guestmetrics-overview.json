@@ -24,12 +24,12 @@
             },
             "gridData": {
               "h": 12,
-              "i": "a2505f6c-b43a-4c6b-b525-37bacaacf8f5",
+              "i": "b7b8bcc1-f776-45cf-a149-36665f2de746",
               "w": 6,
               "x": 0,
               "y": 0
             },
-            "panelIndex": "a2505f6c-b43a-4c6b-b525-37bacaacf8f5",
+            "panelIndex": "b7b8bcc1-f776-45cf-a149-36665f2de746",
             "panelRefName": "panel_0",
             "title": "Filters",
             "version": "7.4.0"
@@ -157,7 +157,7 @@
       },
       "references": [
         {
-          "id": "64930c20-eaa6-11e9-90ec-112a988266d5",
+          "id": "5031b220-eb61-11e9-90ec-112a988266d5",
           "name": "panel_0",
           "type": "visualization"
         },
@@ -198,8 +198,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-10T09:16:42.998Z",
-      "version": "WzkxMSwxXQ=="
+      "updated_at": "2019-10-11T06:37:20.491Z",
+      "version": "WzE0ODcsMV0="
     },
     {
       "attributes": {
@@ -213,7 +213,7 @@
             }
           }
         },
-        "title": "Guest Metrics Filters [Metricbeat Azure]",
+        "title": "VM Filters [Metricbeat Azure]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -252,7 +252,7 @@
               },
               {
                 "fieldName": "azure.resource.name",
-                "id": "1570633549847",
+                "id": "1570774891724",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "VM Name",
                 "options": {
@@ -270,11 +270,11 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Guest Metrics Filters [Metricbeat Azure]",
+          "title": "VM Filters [Metricbeat Azure]",
           "type": "input_control_vis"
         }
       },
-      "id": "64930c20-eaa6-11e9-90ec-112a988266d5",
+      "id": "5031b220-eb61-11e9-90ec-112a988266d5",
       "migrationVersion": {
         "visualization": "7.3.1"
       },
@@ -296,8 +296,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:30:16.112Z",
-      "version": "WzE0MzEsMV0="
+      "updated_at": "2019-10-11T06:35:45.645Z",
+      "version": "WzE0ODMsMV0="
     },
     {
       "attributes": {
