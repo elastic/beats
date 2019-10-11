@@ -53,7 +53,7 @@ filebeat.registry_file_permissions: 0600
 [float]
 ==== `config_dir`
 
-deprecated[6.0.0, Use <<load-input-config>> instead.]
+deprecated:[6.0.0, Use <<load-input-config>> instead.]
 
 The full path to the directory that contains additional input configuration files.
 Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
