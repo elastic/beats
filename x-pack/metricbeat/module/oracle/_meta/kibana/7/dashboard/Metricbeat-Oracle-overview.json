@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "An overview of key metrics from all Metricsets in the Oracle database Metricbeat module",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -296,8 +296,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-11T10:49:01.111Z",
-      "version": "WzQ1MSwzXQ=="
+      "updated_at": "2019-10-11T13:24:58.324Z",
+      "version": "WzQ1MiwzXQ=="
     },
     {
       "attributes": {
