@@ -9,12 +9,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/x-pack/filebeat/input"
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 )
 
 type config struct {
-	input.Config              `config:",inline"`
 	harvester.ForwarderConfig `config:",inline"`
 	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
 	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`

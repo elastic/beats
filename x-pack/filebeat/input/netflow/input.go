@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	xpackInput "github.com/elastic/beats/x-pack/filebeat/input"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 )
@@ -90,14 +89,9 @@ func NewInput(
 	initLogger.Do(func() {
 		logger = logp.NewLogger(inputName)
 	})
-	conf := xpackInput.Config{}
-	if err := cfg.Unpack(&conf); err != nil {
-		return nil, err
-	}
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
-			KeepNull:      conf.KeepNull,
 		},
 	})
 	if err != nil {

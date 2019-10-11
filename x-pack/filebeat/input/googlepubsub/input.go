@@ -69,7 +69,6 @@ func NewInput(
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: inputContext.DynamicFields,
-			KeepNull:      conf.KeepNull,
 		},
 	})
 	if err != nil {

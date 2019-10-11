@@ -12,12 +12,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/x-pack/filebeat/input"
 )
 
 // Config contains information about httpjson configuration
 type config struct {
-	input.Config      `config:",inline"`
 	APIKey            string            `config:"api_key"`
 	HTTPClientTimeout time.Duration     `config:"http_client_timeout"`
 	HTTPHeaders       common.MapStr     `config:"http_headers"`
