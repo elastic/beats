@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add new dashboards for Azure vms, vm guest metrics, vm scale sets {pull}14000[14000]
 - Add new Dashboard for PostgreSQL database stats {pull}13187[13187]
 - Add new dashboard for CouchDB database {pull}13198[13198]
 - Add new dashboard for Ceph cluster stats {pull}13216[13216]
