@@ -15,14 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build !windows
+
 package log
 
 import "os"
 
-type File struct {
-	*os.File
+// isRemoved checks wheter the file held by f is removed.
+func isRemoved(f *os.File) bool {
+	_, err := os.Stat(f.Name())
+	return err != nil
 }
-
-func (File) Continuable() bool { return true }
-func (File) HasState() bool    { return true }
-func (f File) Removed() bool   { return isRemoved(f.File) }
