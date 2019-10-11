@@ -116,10 +116,21 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if target != "" {
-			fmt.Println(target)
-			// TODO: deep merge here?
-			// TODO: respect f.overwriteKeys?
-			_, err = event.PutValue(target, output)
+			switch f.overwriteKeys {
+			case true:
+				_, err = event.PutValue(target, output)
+			case false:
+				// Check that field doesn't exist in event already
+				_, err = event.GetValue(target)
+				if err != nil && err != common.ErrKeyNotFound {
+					errs = append(errs, err.Error())
+					continue
+				}
+				if err == common.ErrKeyNotFound {
+					// Field doesn't exist in event; safe to set it
+					_, err = event.PutValue(target, output)
+				}
+			}
 		} else {
 			// Place at root
 			switch t := output.(type) {
