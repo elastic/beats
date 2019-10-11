@@ -116,10 +116,15 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if target != "" {
+			fmt.Println(target)
+			// TODO: deep merge here?
+			// TODO: respect f.overwriteKeys?
 			_, err = event.PutValue(target, output)
 		} else {
+			// Place at root
 			switch t := output.(type) {
 			case map[string]interface{}:
+				// TODO: deep merge IN here?
 				jsontransform.WriteJSONKeys(event, t, f.overwriteKeys, f.addErrorKey)
 			default:
 				errs = append(errs, "failed to add target to root")
