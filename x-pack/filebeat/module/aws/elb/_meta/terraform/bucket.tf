@@ -14,8 +14,11 @@ output "bucket_name" {
 
 resource "aws_sqs_queue" "queue" {
   name = var.queue_name
+}
 
-  policy = "${data.aws_iam_policy_document.sqs_receive_s3_event.json}"
+resource "aws_sqs_queue_policy" "receive_s3_event" {
+  queue_url = "${aws_sqs_queue.queue.id}"
+  policy    = "${data.aws_iam_policy_document.sqs_receive_s3_event.json}"
 }
 
 data "aws_sqs_queue" "queue" {
@@ -29,9 +32,12 @@ output "sqs_queue_url" {
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = "${aws_s3_bucket.test_elb_logs.id}"
 
+  depends_on = ["aws_sqs_queue_policy.receive_s3_event"]
+
   queue {
-    queue_arn = "${aws_sqs_queue.queue.arn}"
-    events    = ["s3:ObjectCreated:*"]
+    queue_arn     = "${aws_sqs_queue.queue.arn}"
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log.gz"
   }
 }
 
@@ -54,7 +60,12 @@ data "aws_iam_policy_document" "sqs_receive_s3_event" {
 
   statement {
     actions   = ["sqs:SendMessage"]
-    resources = ["arn:aws:sqs:*:*:${var.queue_name}"]
+    resources = ["${aws_sqs_queue.queue.arn}"]
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
 
     condition {
       test     = "ArnEquals"

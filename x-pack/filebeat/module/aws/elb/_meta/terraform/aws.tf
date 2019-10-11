@@ -4,5 +4,5 @@ provider "aws" {
   region  = var.region
 }
 
-# Needed to access the service arn
+# Needed to access the service arns
 data "aws_elb_service_account" "main" {}
