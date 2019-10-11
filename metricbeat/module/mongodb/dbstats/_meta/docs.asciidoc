@@ -4,3 +4,41 @@ It requires the following privileges:
 
 - https://docs.mongodb.com/manual/reference/privilege-actions/#listDatabases[`listDatabases` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
 - for each of the databases, also need https://docs.mongodb.com/manual/reference/privilege-actions/#dbStats[`dbStats` action] on the https://docs.mongodb.com/manual/reference/resource-document/#database-and-or-collection-resource[`database` resource]
+
+In Mongo shell, you can use the following command to create the role
+
+....
+db.createRole(
+   {
+     role: "dbstatsRole",
+     privileges: [
+       { resource: { cluster: true }, actions: ["listDatabases"] },
+       // for each of the databases
+       { resource: { db: "db_1"}, actions: ["dbStats"]},
+       { resource: { db: "db_2"}, actions: ["dbStats"]}
+     ],
+     roles: []
+   }
+)
+....
+
+You can then use the following command to create the privileged user
+
+....
+db.createUser(
+    {
+        user: "beats",
+        pwd: "pass",
+        roles: ["dbstatsRole"]
+    }
+)
+....
+
+or grant the role to an existing user
+
+....
+db.grantRolesToUser(
+    "user",
+    ["dbstatsRole"]
+)
+....

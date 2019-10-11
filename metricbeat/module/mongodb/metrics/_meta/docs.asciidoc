@@ -3,3 +3,38 @@ This is the `metrics` metricset of the MongoDB module.
 It requires the following privileges:
 
 - https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+
+In Mongo shell, you can use the following command to create the role
+
+....
+db.createRole(
+   {
+     role: "metricsRole",
+     privileges: [
+       { resource: { cluster: true }, actions: ["serverStatus"] }
+     ],
+     roles: []
+   }
+)
+....
+
+You can then use the following command to create the privileged user
+
+....
+db.createUser(
+    {
+        user: "beats",
+        pwd: "pass",
+        roles: ["metricsRole"]
+    }
+)
+....
+
+or grant the role to an existing user
+
+....
+db.grantRolesToUser(
+    "user",
+    ["metricsRole"]
+)
+....

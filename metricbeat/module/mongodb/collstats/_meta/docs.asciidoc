@@ -15,3 +15,38 @@ It is using the `top` administrative command to return usage statistics for each
 It requires the following privileges:
 
 - https://docs.mongodb.com/manual/reference/privilege-actions/#top[`top` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+
+In Mongo shell, you can use the following command to create the role
+
+....
+db.createRole(
+   {
+     role: "collstatsRole",
+     privileges: [
+       { resource: { cluster: true }, actions: ["top"] },
+     ],
+     roles: []
+   }
+)
+....
+
+You can then use the following command to create the privileged user
+
+....
+db.createUser(
+    {
+        user: "beats",
+        pwd: "pass",
+        roles: ["collstatsRole"]
+    }
+)
+....
+
+or grant the role to an existing user
+
+....
+db.grantRolesToUser(
+    "user",
+    ["collstatsRole"]
+)
+....
