@@ -207,6 +207,8 @@ jobs:
 addons:
   apt:
     update: true
+    sources:
+      - docker-bionic
     packages:
       - python-virtualenv
       - libpcap-dev
