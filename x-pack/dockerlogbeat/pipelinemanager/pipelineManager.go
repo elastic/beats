@@ -56,10 +56,10 @@ func NewPipelineManager(logCfg *common.Config) *PipelineManager {
 // CloseClientWithFile closes the client with the associated file
 func (pm *PipelineManager) CloseClientWithFile(file string) error {
 	pm.mu.Lock()
-	defer pm.mu.Unlock()
 
 	cl, ok := pm.clients[file]
 	if !ok {
+		pm.mu.Unlock()
 		return fmt.Errorf("No client for file %s", file)
 	}
 
@@ -67,16 +67,25 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 	hash := cl.pipelineHash
 	pm.pipelines[hash].refCount--
 
-	pm.Logger.Infof("Closing Client first from pipelineManager")
+	//if the pipeline is no longer in use, clean up
+	if pm.pipelines[hash].refCount < 1 {
+		pipeline := pm.pipelines[hash].pipeline
+		delete(pm.pipelines, hash)
+		//pipelines must be closed after clients
+		defer func() {
+			pm.Logger.Debugf("Pipeline closing")
+			pipeline.Close()
+		}()
+	}
+
+	//mutex is just for the maps
+	//Client and pipeline close may block
+	pm.mu.Unlock()
+
+	pm.Logger.Debugf("Closing Client first from pipelineManager")
 	err := cl.Close()
 	if err != nil {
 		return errors.Wrap(err, "error closing client")
-	}
-
-	if pm.pipelines[hash].refCount < 1 {
-		pm.Logger.Infof("Pipeline  closing")
-		pm.pipelines[hash].pipeline.Close()
-		delete(pm.pipelines, hash)
 	}
 
 	return nil
