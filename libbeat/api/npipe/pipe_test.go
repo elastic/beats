@@ -15,27 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package api
+package npipe
 
-import "os"
+import (
+	"testing"
 
-// Config is the configuration for the API endpoint.
-type Config struct {
-	Enabled            bool   `config:"enabled"`
-	Host               string `config:"host"`
-	Port               int    `config:"port"`
-	User               string `config:"named_pipe.user"`
-	SecurityDescriptor string `config:"named_pipe.security_descriptor"`
-}
-
-var (
-	// DefaultConfig is the default configuration used by the API endpoint.
-	DefaultConfig = Config{
-		Enabled: false,
-		Host:    "localhost",
-		Port:    5066,
-	}
+	"github.com/stretchr/testify/assert"
 )
 
-// File mode for the socket file, owner of the process can do everything, member of the group can read.
-const socketFileMode = os.FileMode(0740)
+func TestIsNPipe(t *testing.T) {
+	t.Run("return true on named pipe", func(t *testing.T) {
+		assert.True(t, IsNPipe("npipe:///hello"))
+		assert.True(t, IsNPipe(`\\.\pipe\hello`))
+	})
+
+	t.Run("return false if its not a named pipe", func(t *testing.T) {
+		assert.False(t, IsNPipe("unix:///tmp/ok.sock"))
+	})
+}
