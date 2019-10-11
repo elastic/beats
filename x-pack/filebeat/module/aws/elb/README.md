@@ -11,4 +11,21 @@ documentation.
 How to manual test this module
 ===
 
-TODO
+* Create an ELB and enable access logs for it, this can be done using the
+  terraform configuration in `_meta`.
+* Make some requests to the service, if terraform was used, this can be done
+  with `curl $(terraform output lb_address)/`
+* Configure filebeat, using the queue url from `terraform output sqs_queue_url`.
+```
+filebeat.modules:
+- module: aws
+  elb:
+   enabled: true
+   var.queue_url: <queue url>
+   var.credential_profile_name: <profile name>
+  s3access:
+   enabled: false
+```
+* Check parsed logs
+
+Please notice that ELB logs can take some minutes before being available in S3.
