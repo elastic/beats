@@ -23,6 +23,12 @@ import (
 	"unsafe"
 )
 
+var (
+	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
+
+	procGetFileInformationByHandleEx = modkernel32.NewProc("GetFileInformationByHandleEx")
+)
+
 // isRemoved checks whether the file held by f is removed.
 // On Windows isRemoved reads the DeletePending flags using the GetFileInformationByHandleEx.
 // A file is not removed/unlinked as long as at least one process still own a
