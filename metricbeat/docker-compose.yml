@@ -87,11 +87,11 @@ services:
       - 8080
 
   elasticsearch:
-    image: docker.elastic.co/observability-ci/beats-integration-elasticsearch:${ELASTICSEARCH_VERSION:-7.3.0}-1
+    image: docker.elastic.co/observability-ci/beats-integration-elasticsearch:${ELASTICSEARCH_VERSION:-7.4.0}-1
     build:
       context: ./module/elasticsearch/_meta
       args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.3.0}
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.4.0}
     environment:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host="
@@ -163,11 +163,11 @@ services:
       - 9092
 
   kibana:
-    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.3.0}-1
+    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
     build:
       context: ./module/kibana/_meta
       args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-7.3.0}
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.4.0}
     depends_on:
       - elasticsearch
     ports:
@@ -196,7 +196,7 @@ services:
   #    - 18080
 
   logstash:
-    image: docker.elastic.co/observability-ci/beats-integration-logstash:${LOGSTASH_VERSION:-7.3.0}-1
+    image: docker.elastic.co/observability-ci/beats-integration-logstash:${LOGSTASH_VERSION:-7.4.0}-1
     build:
       context: ./module/logstash/_meta
       args:
