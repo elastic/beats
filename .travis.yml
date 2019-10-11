@@ -229,9 +229,6 @@ before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" ; fi
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get update ; fi
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get -y install docker-ce docker-ce-cli containerd.io ; fi
-  - docker info
-  - docker version
-  - docker-compose version
 
 
 # Skips installations step
