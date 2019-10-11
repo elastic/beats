@@ -17,3 +17,13 @@ variable "elb_name" {
   type    = string
   default = "filebeat-aws-elb-test"
 }
+
+variable "bucket_name" {
+  type    = string
+  default = "filebeat-aws-elb-test"
+}
+
+variable "queue_name" {
+  type    = string
+  default = "filebeat-aws-elb-test"
+}

@@ -8,8 +8,7 @@ resource "aws_instance" "webserver_backend" {
 
   associate_public_ip_address = true
   vpc_security_group_ids = [
-    "${aws_security_group.test_elb.id}",
-    "${aws_security_group.allow_ssh.id}",
+    "${aws_security_group.allow_http.id}",
   ]
 }
 

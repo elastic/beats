@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "test_elb_logs" {
-  bucket = var.elb_name
+  bucket = var.bucket_name
   acl    = "private"
 
   # Bucket can be destroyed with terraform destroy even if it has objects
@@ -8,8 +8,12 @@ resource "aws_s3_bucket" "test_elb_logs" {
   policy = "${data.aws_iam_policy_document.s3_bucket_lb_write.json}"
 }
 
+output "bucket_name" {
+  value = "${aws_s3_bucket.test_elb_logs.bucket}"
+}
+
 resource "aws_sqs_queue" "queue" {
-  name = "s3-event-notification-queue"
+  name = var.queue_name
 
   policy = "${data.aws_iam_policy_document.sqs_receive_s3_event.json}"
 }
@@ -50,7 +54,8 @@ data "aws_iam_policy_document" "sqs_receive_s3_event" {
 
   statement {
     actions   = ["sqs:SendMessage"]
-    resources = ["arn:aws:sqs:*:*:s3-event-notification-queue"]
+    resources = ["arn:aws:sqs:*:*:${var.queue_name}"]
+
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"

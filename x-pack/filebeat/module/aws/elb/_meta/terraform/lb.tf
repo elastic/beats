@@ -1,7 +1,7 @@
 resource "aws_lb" "test_lb" {
   name            = var.elb_name
   internal        = false
-  security_groups = ["${aws_security_group.test_elb.id}"]
+  security_groups = ["${aws_security_group.allow_http.id}"]
   subnets         = aws_subnet.test_elb.*.id
 
   depends_on = ["aws_internet_gateway.gateway"]
@@ -12,7 +12,7 @@ resource "aws_lb" "test_lb" {
   }
 }
 
-resource "aws_lb_listener" "front_end" {
+resource "aws_lb_listener" "http" {
   load_balancer_arn = "${aws_lb.test_lb.arn}"
   port              = "80"
   protocol          = "HTTP"
