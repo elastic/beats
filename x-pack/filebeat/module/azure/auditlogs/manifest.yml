@@ -1,0 +1,12 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: kafka
+  - name: eventhub
+    default: "insights-logs-auditlogs"
+  - name: consumer_group
+    default: "$Default"
+
+ingest_pipeline: ingest/pipeline.json
+input: config/auditlogs.yml
