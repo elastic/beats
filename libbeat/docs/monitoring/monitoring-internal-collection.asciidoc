@@ -66,10 +66,10 @@ monitoring:
     username: {beat_monitoring_user}
     password: somepassword
 --------------------
-<1> This setting identifies the Elasticsearch cluster under which the
+<1> This setting identifies the {es} cluster under which the
 monitoring data for this {beatname_uc} instance will appear in the
-Stack Monitoring UI. An Elasticsearch cluster's `cluster_uuid` can be
-determined by calling the `GET /` API against that cluster.
+Stack Monitoring UI. To get a cluster's `cluster_uuid`,
+call the `GET /` API against that cluster.
 <2> This setting identifies the hosts and port numbers of {es} nodes
 that are part of the monitoring cluster.
 
