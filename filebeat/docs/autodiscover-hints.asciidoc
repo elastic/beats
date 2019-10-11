@@ -40,41 +40,41 @@ Instead of using raw `docker` input, specifies the module to use to parse logs f
 When module is configured, map container logs to module filesets. You can either configure
 a single fileset like this:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 co.elastic.logs/fileset: access
--------------------------------------------------------------------------------------
+-----
 
 Or configure a fileset per stream in the container (stdout and stderr):
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 co.elastic.logs/fileset.stdout: access
 co.elastic.logs/fileset.stderr: error
--------------------------------------------------------------------------------------
+-----
 
 [float]
 ==== Kubernetes
 
 Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: kubernetes
       hints.enabled: true
--------------------------------------------------------------------------------------
+-----
 
 You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} inputs or modules:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 annotations:
   co.elastic.logs/multiline.pattern: '^\['
   co.elastic.logs/multiline.negate: true
   co.elastic.logs/multiline.match: after
--------------------------------------------------------------------------------------
+-----
 
 
 [float]
@@ -85,14 +85,14 @@ hint. For example, these hints configure multiline settings for all containers i
 specific `exclude_lines` hint for the container called `sidecar`.
 
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 annotations:
   co.elastic.logs/multiline.pattern: '^\['
   co.elastic.logs/multiline.negate: true
   co.elastic.logs/multiline.match: after
   co.elastic.logs.sidecar/exlude_lines: '^DBG'
--------------------------------------------------------------------------------------
+-----
 
 
 
@@ -101,22 +101,22 @@ annotations:
 
 Docker autodiscover provider supports hints in labels. To enable it just set `hints.enabled`:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
 filebeat.autodiscover:
   providers:
     - type: docker
       hints.enabled: true
--------------------------------------------------------------------------------------
+-----
 
 You can label Docker containers with useful info to spin up {beatname_uc} inputs, for example:
 
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
+[source,yaml]
+-----
   co.elastic.logs/module: nginx
   co.elastic.logs/fileset.stdout: access
   co.elastic.logs/fileset.stderr: error
--------------------------------------------------------------------------------------
+-----
 
 The above labels configure {beatname_uc} to use the Nginx module to harvest logs for this container.
 Access logs will be retrieved from stdout stream, and error logs from stderr.
