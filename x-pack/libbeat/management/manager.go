@@ -67,7 +67,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	log := logp.NewLogger(management.DebugK)
 
 	if c.Enabled {
-		log.Warn("DEPRECATED: Central Management is deprecated and will be removed in 8.0")
+		log.Warn("DEPRECATED: Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
 
 		var err error
 

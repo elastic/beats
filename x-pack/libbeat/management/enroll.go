@@ -37,7 +37,7 @@ func Enroll(
 		return err
 	}
 
-	logp.NewLogger(management.DebugK).Warn("DEPRECATED: Central Management is deprecated and will be removed in 8.0")
+	logp.NewLogger(management.DebugK).Warn("DEPRECATED: Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
 
 	accessToken, err := client.Enroll(beat.Info.Beat, beat.Info.Name, beat.Info.Version, beat.Info.Hostname, beat.Info.ID, enrollmentToken)
 	if err != nil {
