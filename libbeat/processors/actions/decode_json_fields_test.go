@@ -390,14 +390,16 @@ func TestOverwriteKeysEnabled(t *testing.T) {
 			name: "trying to overwrite nested field",
 			input: common.MapStr{
 				"f": common.MapStr{
-					"child": "old",
+					"child":       "old",
+					"other_child": "also old",
 				},
 				"msg": "{ \"f\": { \"child\": \"new\" } }",
 			},
 			target: "",
 			expectedOutput: common.MapStr{
 				"f": common.MapStr{
-					"child": "new",
+					"child":       "new",
+					"other_child": "also old",
 				},
 				"msg": "{ \"f\": { \"child\": \"new\" } }",
 			},
@@ -459,14 +461,16 @@ func TestOverwriteKeysDisabled(t *testing.T) {
 			name: "trying to overwrite nested field",
 			input: common.MapStr{
 				"f": common.MapStr{
-					"child": "old",
+					"child":       "old",
+					"other_child": "also old",
 				},
 				"msg": "{ \"f\": { \"child\": \"new\" } }",
 			},
 			target: "",
 			expectedOutput: common.MapStr{
 				"f": common.MapStr{
-					"child": "old",
+					"child":       "old",
+					"other_child": "also old",
 				},
 				"msg": "{ \"f\": { \"child\": \"new\" } }",
 			},
