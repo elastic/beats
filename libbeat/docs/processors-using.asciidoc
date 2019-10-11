@@ -84,6 +84,7 @@ Similarly, for {beatname_uc} modules, you can define processors under the
 `input` section of the module definition. 
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
++
 [source,yaml]
 ----
 - module: <module_name>

@@ -201,7 +201,7 @@ for more information about the environment variables.
 ===== `index`
 
 The index name to write events to. The default is
-+"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
++"{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"+ (for example,
 +"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>). If you are using the pre-built Kibana
@@ -971,19 +971,19 @@ See <<configuration-output-codec>> for more information.
 
 ===== `host_topology`
 
-deprecated[5.0.0]
+deprecated:[5.0.0]
 
 The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
 
 ===== `password_topology`
 
-deprecated[5.0.0]
+deprecated:[5.0.0]
 
 The password to use for authenticating with the Redis topology server. The default is no authentication.
 
 ===== `db_topology`
 
-deprecated[5.0.0]
+deprecated:[5.0.0]
 
 The Redis database number where the topology information is stored. The default is 1.
 
