@@ -15,6 +15,8 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
 
@@ -34,6 +36,8 @@ func Enroll(
 	if err != nil {
 		return err
 	}
+
+	logp.NewLogger(management.DebugK).Warn("DEPRECATED: Central Management is deprecated and will be removed in 8.0")
 
 	accessToken, err := client.Enroll(beat.Info.Beat, beat.Info.Name, beat.Info.Version, beat.Info.Hostname, beat.Info.ID, enrollmentToken)
 	if err != nil {
