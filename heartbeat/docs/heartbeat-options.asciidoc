@@ -1,8 +1,8 @@
 [[configuration-heartbeat-options]]
-== Set up monitors
+== Set up {beatname_uc} monitors
 
 ++++
-<titleabbrev>Set up {beatname_uc} monitors</titleabbrev>
+<titleabbrev>Set up monitors</titleabbrev>
 ++++
 
 To configure {beatname_uc} define a set of `monitors` to check your remote hosts.
@@ -543,8 +543,7 @@ The timezone for the scheduler. By default the scheduler uses localtime.
 [[monitor-watch-poll-file]]
 ==== `watch.poll_file`
 
-deprecated[6.5.0,Replaced by using dynamic reloading via the
-`heartbeat.config.monitors` option.]
+deprecated:[6.5.0,Replaced by using dynamic reloading via the `heartbeat.config.monitors` option.]
 
 The JSON file to watch for additional monitor configurations. The JSON file can
 contain multiple objects, each of which specifies a different monitor config.
