@@ -132,8 +132,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
-	logp.Debug("kubernetes", "Using host: %s", config.Host)
-	logp.Debug("kubernetes", "Initializing watcher")
+	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %s", config.Host)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
