@@ -3,8 +3,12 @@ description: "Pipeline for ELB logs"
 processors:
   - grok:
       field: message
-      # Patterns documented in https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html
+      # ELB patterns documented in https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html
       # Format: timestamp elb client:port backend:port request_processing_time backend_processing_time response_processing_time elb_status_code backend_status_code received_bytes sent_bytes "request" "user_agent" ssl_cipher ssl_protocol
+      #
+      # TODO: Support ELB v2 Application load balancers support https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+      # TODO: Support ELB v2 Netwwork load balancers https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-access-logs.html
+      #
       patterns:
         # HTTP
         - >-
@@ -74,6 +78,16 @@ processors:
       properties:
         - 'asn'
         - 'organization_name'
+      ignore_missing: true
+
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
       ignore_missing: true
 
   - remove:
