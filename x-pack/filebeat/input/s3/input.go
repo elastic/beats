@@ -6,6 +6,7 @@ package s3
 
 import (
 	"bufio"
+	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -433,6 +434,17 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	if resp.Body == nil {
 		return nil, errors.New("s3 get object response body is empty")
 	}
+
+	if strings.HasSuffix(s3Info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+
+		if err != nil {
+			return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+		}
+
+		return bufio.NewReader(gzipReader), nil
+	}
+
 	return bufio.NewReader(resp.Body), nil
 }
 
