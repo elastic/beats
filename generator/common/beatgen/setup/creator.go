@@ -30,7 +30,7 @@ import (
 )
 
 // CfgPrefix specifies the env variable prefix used to configure the beat
-var CfgPrefix = "NEWBEAT"
+const CfgPrefix = "NEWBEAT"
 
 // GenNewBeat generates a new custom beat
 // We assume our config object is populated and valid here
