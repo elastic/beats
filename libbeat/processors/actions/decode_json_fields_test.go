@@ -488,7 +488,7 @@ func TestOverwriteKeysDisabled(t *testing.T) {
 			expectedOutput: common.MapStr{
 				"f": common.MapStr{
 					"child":       "old",
-					"other_child": "also_old",
+					"other_child": "also old",
 				},
 				"msg": "{ \"child\": \"new\" }",
 			},
