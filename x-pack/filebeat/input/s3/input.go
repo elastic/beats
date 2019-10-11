@@ -439,7 +439,7 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 		gzipReader, err := gzip.NewReader(resp.Body)
 
 		if err != nil {
-			return nil, errors.New("Failed to decompress gzipped file")
+			return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
 		}
 
 		return bufio.NewReader(gzipReader), nil
