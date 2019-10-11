@@ -1,8 +1,8 @@
 [[configuration-heartbeat-options]]
-== Set up monitors
+== Set up {beatname_uc} monitors
 
 ++++
-<titleabbrev>Set up Heartbeat monitors</titleabbrev>
+<titleabbrev>Set up monitors</titleabbrev>
 ++++
 
 The `heartbeat.monitors` section of the +heartbeat.yml+ config file specifies
