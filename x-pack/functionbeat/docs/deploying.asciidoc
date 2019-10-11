@@ -57,6 +57,8 @@ export ENABLED_FUNCTIONS=my-kinesis,my-cloudwatch-logs
 set BEAT_STRICT_PERMS=false
 set ENABLED_FUNCTIONS=my-kinesis,my-cloudwatch-logs
 ----
++
+TIP: For easier management, we recommend having one Lambda per function. 
 
 . Run the `package` command to package the functions and dependencies into an
 archive. For example: 
@@ -89,7 +91,3 @@ same path as the configured +{beatname_lc}.yml+ file.
 cloud provider. For example, to deploy the package to AWS,
 <<export-cloudformation-template,export the AWS CloudFormation template>>
 managed by {beatname_uc}, and modify it to work with your infrastructure. 
-
-// REVIEWERS: I could show the aws cloudformation deploy
-// command here, but I think it might be better to avoid doing so. Users should
-// already know this, no?
