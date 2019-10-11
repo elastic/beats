@@ -64,10 +64,8 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	var cache *Cache
 	var blacklist *ConfigBlacklist
 
-	log := logp.NewLogger(management.DebugK)
-
 	if c.Enabled {
-		log.Warn("DEPRECATED: Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
+		cfgwarn.Deprecate("8.0.0", "Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
 
 		var err error
 
@@ -97,6 +95,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	}
 
 	authClient := &api.AuthClient{Client: client, AccessToken: c.AccessToken, BeatUUID: beatUUID}
+	log := logp.NewLogger(management.DebugK)
 
 	return &ConfigManager{
 		config:    c,
