@@ -198,7 +198,8 @@ func sortedStates(states []file.State) []file.State {
 	return tmp
 }
 
-// Test that two registries pointing to the same registry path cannot be created
+// TestLock tests that two registries pointing to the same registry path cannot
+// be created.
 func TestLock(t *testing.T) {
 	tmpDataDir, err := ioutil.TempDir("", "data")
 	if err != nil {
