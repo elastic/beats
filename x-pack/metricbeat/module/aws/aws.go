@@ -90,7 +90,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
 	output, err := req.Send(context.TODO())
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to list account aliases")
+		base.Logger().Warn("failed to list account aliases, please check permission setting: ", err)
 	}
 
 	// There can be more than one aliases for each account, for now we are only
@@ -104,7 +104,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
 	outputIdentity, err := reqIdentity.Send(context.TODO())
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get caller identity")
+		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
 	}
 	metricSet.AccountID = *outputIdentity.Account
 
