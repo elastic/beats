@@ -208,10 +208,10 @@ func TestLock(t *testing.T) {
 	defer os.RemoveAll(tmpDataDir)
 
 	origDataPath := paths.Paths.Data
-	paths.Paths.Data = tmpDataDir
 	defer func() {
 		paths.Paths.Data = origDataPath
 	}()
+	paths.Paths.Data = tmpDataDir
 
 	// Create first registry. Expect it to succeed.
 	_, err = New(config.DefaultConfig.Registry, mockSuccessLoggger{})
