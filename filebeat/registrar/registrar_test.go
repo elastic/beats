@@ -18,6 +18,8 @@
 package registrar
 
 import (
+	"io/ioutil"
+	"os"
 	"reflect"
 	"sort"
 	"strings"
@@ -26,8 +28,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/paths"
 )
+
+type mockSuccessLoggger struct{}
+
+func (l mockSuccessLoggger) Published(n int) bool {
+	return true
+}
 
 func TestRegistrarRead(t *testing.T) {
 	type testCase struct {
@@ -186,4 +196,25 @@ func sortedStates(states []file.State) []file.State {
 		return tmp[i].ID() < tmp[j].ID()
 	})
 	return tmp
+}
+
+// Test that two registries pointing to the same registry path cannot be created
+func TestLock(t *testing.T) {
+	tmpDataDir, err := ioutil.TempDir("", "data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tmpDataDir)
+
+	paths.Paths.InitPaths(&paths.Path{
+		Data: tmpDataDir,
+	})
+
+	// Create first registry. Expect it to succeed.
+	_, err = New(config.DefaultConfig.Registry, mockSuccessLoggger{})
+	assert.NoError(t, err)
+
+	// Try to create another registry with same configuration as first. Expect it to fail.
+	_, err = New(config.DefaultConfig.Registry, mockSuccessLoggger{})
+	assert.EqualError(t, err, ErrAlreadyLocked.Error())
 }

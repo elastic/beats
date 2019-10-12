@@ -92,12 +92,17 @@ func New(cfg config.Registry, out successLogger) (*Registrar, error) {
 
 // Init sets up the Registrar and make sure the registry file is setup correctly
 func (r *Registrar) Init() error {
+	err := r.Lock()
+	if err != nil {
+		return err
+	}
+
 	// The registry file is opened in the data path
 	r.registryFile = paths.Resolve(paths.Data, r.registryFile)
 
 	// Create directory if it does not already exist.
 	registryPath := filepath.Dir(r.registryFile)
-	err := os.MkdirAll(registryPath, 0750)
+	err = os.MkdirAll(registryPath, 0750)
 	if err != nil {
 		return fmt.Errorf("Failed to created registry file dir %s: %v", registryPath, err)
 	}
@@ -280,6 +285,7 @@ func (r *Registrar) Run() {
 	defer func() {
 		r.writeRegistry()
 		r.wg.Done()
+		r.Unlock()
 	}()
 
 	var (
