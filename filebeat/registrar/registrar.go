@@ -92,7 +92,7 @@ func New(cfg config.Registry, out successLogger) (*Registrar, error) {
 
 // Init sets up the Registrar and make sure the registry file is setup correctly
 func (r *Registrar) Init() error {
-	err := r.Lock()
+	err := r.lock()
 	if err != nil {
 		return err
 	}
@@ -285,7 +285,7 @@ func (r *Registrar) Run() {
 	defer func() {
 		r.writeRegistry()
 		r.wg.Done()
-		r.Unlock()
+		r.unlock()
 	}()
 
 	var (

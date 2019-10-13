@@ -30,10 +30,10 @@ var (
 	ErrAlreadyLocked = errors.New("registry already locked by another filebeat")
 )
 
-// Lock attemps to acquire a lock on the registry for the currently-running
+// lock attemps to acquire a lock on the registry for the currently-running
 // Filebeat instance. If another Filebeat instance already has a lock on the registry
 // an ErrAlreadyLocked error is returned.
-func (r *Registrar) Lock() error {
+func (r *Registrar) lock() error {
 	lockFile := r.getLockfilePath()
 
 	f, err := os.OpenFile(lockFile, os.O_WRONLY|os.O_CREATE|os.O_EXCL, r.fileMode)
@@ -48,8 +48,8 @@ func (r *Registrar) Lock() error {
 	return nil
 }
 
-// Unlock attempts to release the lock on a registry previously acquired via Lock().
-func (r *Registrar) Unlock() error {
+// unlock attempts to release the lock on a registry previously acquired via Lock().
+func (r *Registrar) unlock() error {
 	lockFile := r.getLockfilePath()
 
 	err := os.Remove(lockFile)
