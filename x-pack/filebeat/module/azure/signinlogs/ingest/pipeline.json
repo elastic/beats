@@ -365,6 +365,11 @@
               "field": ["message", "azure.signinlogs.time","azure.signinlogs.properties.location"],
               "ignore_missing": true
           }
+      },
+      {
+          "pipeline": {
+              "name": "{< IngestPipeline "azure-shared-pipeline" >}"
+          }
       }
   ],
   "on_failure": [

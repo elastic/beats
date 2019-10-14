@@ -183,6 +183,11 @@
               "target_field": "azure.auditlogs.properties.initiated_by",
               "ignore_missing": true
           }
+      },
+      {
+          "pipeline": {
+              "name": "{< IngestPipeline "azure-shared-pipeline" >}"
+          }
       }
   ],
   "on_failure": [

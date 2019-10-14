@@ -138,7 +138,7 @@
       {
           "rename": {
               "field": "azure.activitylogs.correlationId",
-              "target_field": "azure.activitylogs.correlation_id",
+              "target_field": "azure.correlation_id",
               "ignore_missing": true
           }
       },
@@ -161,6 +161,11 @@
               "field": "azure.activitylogs.properties.statusCode",
               "target_field": "azure.activitylogs.properties.status_code",
               "ignore_missing": true
+          }
+      },
+      {
+          "pipeline": {
+              "name": "{< IngestPipeline "azure-shared-pipeline" >}"
           }
       }
   ],
