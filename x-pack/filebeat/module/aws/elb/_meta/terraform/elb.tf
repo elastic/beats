@@ -1,5 +1,5 @@
 resource "aws_elb" "test_elb" {
-  name            = "${var.elb_name}-elb-http"
+  name            = "${var.elb_name}-elb"
   internal        = false
   security_groups = ["${aws_security_group.allow_http.id}"]
   subnets         = "${aws_subnet.test_elb.*.id}"
@@ -7,9 +7,10 @@ resource "aws_elb" "test_elb" {
   depends_on = ["aws_internet_gateway.gateway"]
 
   access_logs {
-    enabled  = true
-    bucket   = "${aws_s3_bucket.test_elb_logs.bucket}"
-    interval = 5 # minutes
+    enabled       = true
+    bucket        = "${aws_s3_bucket.test_elb_logs.bucket}"
+    bucket_prefix = "elb"
+    interval      = 5 # minutes
   }
 
   listener {

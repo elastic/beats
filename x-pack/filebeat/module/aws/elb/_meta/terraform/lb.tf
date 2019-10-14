@@ -1,14 +1,18 @@
 resource "aws_lb" "test_lb" {
-  name            = var.elb_name
+  name            = "${var.elb_name}-lb"
   internal        = false
   security_groups = ["${aws_security_group.allow_http.id}"]
   subnets         = aws_subnet.test_elb.*.id
 
-  depends_on = ["aws_internet_gateway.gateway"]
+  depends_on = [
+    "aws_internet_gateway.gateway",
+    "aws_s3_bucket_policy.write_logs",
+  ]
 
   access_logs {
     enabled = true
     bucket  = "${aws_s3_bucket.test_elb_logs.bucket}"
+    prefix  = "httplb"
   }
 }
 
@@ -39,6 +43,6 @@ resource "aws_lb_target_group_attachment" "instances" {
   target_group_arn = "${aws_lb_target_group.instances.arn}"
 }
 
-output "lb_address" {
+output "lb_http_address" {
   value = "${aws_lb.test_lb.dns_name}"
 }
