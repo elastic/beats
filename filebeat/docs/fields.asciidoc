@@ -9862,6 +9862,16 @@ type: keyword
 
 --
 
+*`misp.threat_indicator.type`*::
++
+--
+Type of the threat indicator.
+
+
+type: keyword
+
+--
+
 *`misp.threat_indicator.description`*::
 +
 --

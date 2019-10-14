@@ -334,6 +334,12 @@
     description: >
       Version of the threat indicator.
 
+  - name: type
+    level: core
+    type: keyword
+    description: >
+      Type of the threat indicator.
+
   - name: description
     level: core
     type: text
