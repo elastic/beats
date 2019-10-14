@@ -172,7 +172,7 @@ func (w *watcher) sync() error {
 		}
 	}
 
-	w.logger.Debug("Allocations index has changed (%d != %d)",
+	w.logger.Debug("Allocations index has changed: %s %s",
 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 
 	w.waitIndex = meta.LastIndex

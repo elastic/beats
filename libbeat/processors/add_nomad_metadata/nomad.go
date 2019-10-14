@@ -41,6 +41,10 @@ type nomadAnnotator struct {
 
 func init() {
 	processors.RegisterPlugin("add_nomad_metadata", New)
+
+	// Register default indexers
+	Indexing.AddIndexer(AllocationNameIndexerName, NewAllocationNameIndexer)
+	Indexing.AddIndexer(AllocationUUIDIndexerName, NewAllocationUUIDIndexer)
 }
 
 // New constructs a new add_nomad_metadata processor.
@@ -94,7 +98,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	})
 
 	if err != nil {
-		logp.Err("ERROR creating Watcher %v", err.Error())
+		logp.Err("Error creating watcher %v", err.Error())
 		return nil, err
 	}
 

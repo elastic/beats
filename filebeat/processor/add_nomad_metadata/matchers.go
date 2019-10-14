@@ -40,7 +40,8 @@ func init() {
 	cfg := common.NewConfig()
 
 	//Add a container indexer config by default.
-	add_nomad_metadata.Indexing.AddDefaultIndexerConfig(add_nomad_metadata.ContainerIndexerName, *cfg)
+	add_nomad_metadata.Indexing.AddDefaultIndexerConfig(add_nomad_metadata.AllocationNameIndexerName, *cfg)
+	add_nomad_metadata.Indexing.AddDefaultIndexerConfig(add_nomad_metadata.AllocationUUIDIndexerName, *cfg)
 
 	//Add a log path matcher which can extract container ID from the "source" field.
 	add_nomad_metadata.Indexing.AddDefaultMatcherConfig(LogPathMatcherName, *cfg)

@@ -70,33 +70,28 @@ func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 // ResourceMetadata generates metadata for the *given Nomad allocation*
 func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	tasksMeta := g.groupMeta(obj.Job)
-
-	for _, task := range tasksMeta {
+	for idx, task := range tasksMeta {
 		labelMap := common.MapStr{}
 
-		for name, val := range task {
-			obj := val.(common.MapStr)
-
-			if len(g.IncludeLabels) == 0 {
-				for k, v := range obj {
-					if g.LabelsDedot {
-						label := common.DeDot(k)
-						labelMap.Put(label, v)
-					} else {
-						safemapstr.Put(labelMap, k, v)
-					}
+		if len(g.IncludeLabels) == 0 {
+			for k, v := range task {
+				if g.LabelsDedot {
+					label := common.DeDot(k)
+					labelMap.Put(label, v)
+				} else {
+					safemapstr.Put(labelMap, k, v)
 				}
-
-				// Exclude any labels that are present in the exclude_labels config
-				for _, label := range g.ExcludeLabels {
-					labelMap.Delete(label)
-				}
-
-				task[name] = labelMap
-			} else {
-				labelMap = generateMapSubset(task, g.IncludeLabels, g.LabelsDedot)
 			}
+		} else {
+			labelMap = generateMapSubset(task, g.IncludeLabels, g.LabelsDedot)
 		}
+
+		// Exclude any labels that are present in the exclude_labels config
+		for _, label := range g.ExcludeLabels {
+			labelMap.Delete(label)
+		}
+
+		tasksMeta[idx] = labelMap
 	}
 
 	// default labels that we expose / filter with `IncludeLabels`
@@ -108,7 +103,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 		"region":      *obj.Job.Region,
 		"type":        *obj.Job.Type,
 		"uuid":        obj.ID,
-		"meta":        tasksMeta,
+		"tasks":       tasksMeta, // contains metadata for all tasks in the allocation
 	}
 
 	return meta
@@ -124,16 +119,16 @@ func (g *metaGenerator) groupMeta(job *Job) []common.MapStr {
 		group.Meta = meta
 
 		tasks := g.tasksMeta(group)
-		tasksMeta = append(tasksMeta, tasks)
+		tasksMeta = append(tasksMeta, tasks...)
 	}
 
 	return tasksMeta
 }
 
 // returns a map of task name to metadata
-func (g *metaGenerator) tasksMeta(group *TaskGroup) common.MapStr {
+func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 	taskMap := common.MapStr{}
-
+	tasks := []common.MapStr{}
 	for _, task := range group.Tasks {
 		svcMeta := common.MapStr{
 			"name":        []string{},
@@ -150,17 +145,20 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) common.MapStr {
 		joinMeta := group.Meta
 		mergo.Merge(&joinMeta, task.Meta, mergo.WithOverride)
 
-		meta := common.MapStr{}
-		meta.Update(svcMeta)
+		meta := common.MapStr{
+			"name":    task.Name,
+			"service": svcMeta,
+		}
 
 		for k, v := range joinMeta {
 			meta.Put(k, v)
 		}
 
-		taskMap.Put(task.Name, meta)
+		tasks = append(tasks, meta)
 	}
 
-	return taskMap
+	taskMap.Put("tasks", tasks)
+	return tasks
 }
 
 func generateMapSubset(input common.MapStr, keys []string, dedot bool) common.MapStr {

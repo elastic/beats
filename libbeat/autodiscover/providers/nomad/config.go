@@ -30,6 +30,7 @@ type Config struct {
 	Region         string        `config:"region"`
 	Namespace      string        `config:"namespace"`
 	SecretID       string        `config:"secret_id"`
+	Host           string        `config:"host"`
 	WaitTime       time.Duration `config:"wait_time"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout"`

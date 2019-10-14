@@ -95,11 +95,11 @@ func TestAllocationMetadata(t *testing.T) {
 	}
 
 	meta := metaGen.ResourceMetadata(alloc)
-	tasks, _ := meta["meta"].([]common.MapStr)
+	tasks, _ := meta["tasks"].([]common.MapStr)
 	flat := tasks[0].Flatten()
 
 	assert.Equal(t, "my-job", meta["job"])
-	assert.Equal(t, "task-value", flat["task1.key1"])
+	assert.Equal(t, "task-value", flat["key1"])
 	assert.Equal(t, 1, len(tasks))
 	assert.Equal(t, []string{"europe-west4"}, meta["datacenters"])
 }
@@ -124,11 +124,11 @@ func TestExcludeMetadata(t *testing.T) {
 	}
 
 	meta := metaGen.ResourceMetadata(alloc)
-	tasks, _ := meta["meta"].([]common.MapStr)
+	tasks := meta["tasks"].([]common.MapStr)
 	flat := tasks[0].Flatten()
 
-	exists, err := flat.HasKey("task1.key1")
-
-	assert.NotNil(t, err)
+	// verify that key1 is not included in the tasks metadata
+	exists, err := flat.HasKey("key1")
+	assert.Nil(t, err)
 	assert.False(t, exists)
 }

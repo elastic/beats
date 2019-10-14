@@ -27,10 +27,8 @@ import (
 )
 
 const (
-	ContainerIndexerName      = "container"
-	AllocationNameIndexerName = "pod_name"
-	AllocationUUIDIndexerName = "pod_uid"
-	IPPortIndexerName         = "ip_port"
+	AllocationNameIndexerName = "allocation_name"
+	AllocationUUIDIndexerName = "allocation_uid"
 )
 
 // Indexer take known pods and generate all the metadata we need to enrich
@@ -125,7 +123,7 @@ func (i *Indexers) Empty() bool {
 	return false
 }
 
-// AllocationNameIndexer implements default indexer based on pod name
+// AllocationNameIndexer implements default indexer based on the allocation name
 type AllocationNameIndexer struct {
 	metaGen nomad.MetaGenerator
 }
