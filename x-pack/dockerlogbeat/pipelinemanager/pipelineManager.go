@@ -172,7 +172,6 @@ func (pm *PipelineManager) removeClient(file string) (*ClientLogger, error) {
 
 	cl, ok := pm.clients[file]
 	if !ok {
-		pm.mu.Unlock()
 		return nil, fmt.Errorf("No client for file %s", file)
 	}
 

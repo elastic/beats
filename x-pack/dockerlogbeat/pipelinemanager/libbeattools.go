@@ -1,6 +1,9 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package pipelinemanager
 
-// makeConfigHash is the helper function that turns a user config into a hash
 import (
 	"crypto/sha1"
 	"fmt"
@@ -17,6 +20,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// makeConfigHash is the helper function that turns a user config into a hash
 func makeConfigHash(cfg map[string]string) string {
 	var hashString string
 	var orderedVal []string
