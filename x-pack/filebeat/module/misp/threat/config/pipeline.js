@@ -118,7 +118,7 @@ var threat = (function () {
                 evt.Put("destination.domain", v);
                 break;
             case "ip-dst":
-                ip = v.split("/")[0];
+                var ip = v.split("/")[0];
                 attackPattern = '[destination.ip = ' + '\'' + ip + '\'' + ']';
                 evt.Put("destination.ip", ip);
                 break;
@@ -126,11 +126,11 @@ var threat = (function () {
                 arr = v.split("|");
                 if (arr.length == 2) {
                   attackPattern = '[destination.ip = ' + '\'' + arr[0] + '\'' + ' AND destination.port = ' + '\'' + arr[1] + '\'' + ']';
-                  evt.Put("destination.ip", ip);
+                  evt.Put("destination.ip", arr[0]);
                 }
                 break;
             case "ip-src":
-                ip = v.split("/")[0];
+                var ip = v.split("/")[0];
                 attackPattern = '[' + 'source.ip = ' + '\'' + ip + '\'' + ']';
                 evt.Put("source.ip", ip);
                 break;
