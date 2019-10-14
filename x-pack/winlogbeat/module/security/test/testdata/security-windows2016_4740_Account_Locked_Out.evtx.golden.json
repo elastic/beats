@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:39:43.0856521Z",
     "event": {
-      "action": "Account Locked Out",
+      "action": "locked-out-user-account",
       "code": 4740,
       "kind": "event",
       "module": "security"

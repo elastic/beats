@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:40:52.3149485Z",
     "event": {
-      "action": "Account Unlocked",
+      "action": "unlocked-user-account",
       "code": 4767,
       "kind": "event",
       "module": "security"

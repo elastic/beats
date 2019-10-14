@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:24:39.2933111Z",
     "event": {
-      "action": "Account Created",
+      "action": "added-user-account",
       "code": 4720,
       "kind": "event",
       "module": "security"
@@ -74,7 +74,7 @@
   {
     "@timestamp": "2019-09-06T13:25:21.8672707Z",
     "event": {
-      "action": "Account Created",
+      "action": "added-user-account",
       "code": 4720,
       "kind": "event",
       "module": "security"

@@ -27,14 +27,15 @@ var security = (function () {
         "4720": "added-user-account",
         "4722": "enabled-user-account",
         "4723": "changed-password",
-        "4724": "reseted-password",
+        "4724": "reset-password",
         "4725": "disabled-user-account",
         "4726": "deleted-user-account",
         "4738": "modified-user-account",
         "4740": "locked-out-user-account",
         "4767": "unlocked-user-account",
         "4781": "renamed-user-account",
-    }
+    };
+
     // Descriptions of failure status codes.
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625
     var logonFailureStatus = {

@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:28:40.0015275Z",
     "event": {
-      "action": "Account Disabled",
+      "action": "disabled-user-account",
       "code": 4725,
       "kind": "event",
       "module": "security"
@@ -55,7 +55,7 @@
   {
     "@timestamp": "2019-09-06T13:28:55.2644212Z",
     "event": {
-      "action": "Account Disabled",
+      "action": "disabled-user-account",
       "code": 4725,
       "kind": "event",
       "module": "security"

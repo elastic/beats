@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:38:17.5566269Z",
     "event": {
-      "action": "Account Renamed",
+      "action": "renamed-user-account",
       "code": 4781,
       "kind": "event",
       "module": "security"
@@ -53,7 +53,7 @@
   {
     "@timestamp": "2019-09-06T13:38:23.5161066Z",
     "event": {
-      "action": "Account Renamed",
+      "action": "renamed-user-account",
       "code": 4781,
       "kind": "event",
       "module": "security"

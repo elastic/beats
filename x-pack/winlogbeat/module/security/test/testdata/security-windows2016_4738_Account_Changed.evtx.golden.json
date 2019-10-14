@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:36:17.5667652Z",
     "event": {
-      "action": "Account Changed",
+      "action": "modified-user-account",
       "code": 4738,
       "kind": "event",
       "module": "security"
@@ -75,7 +75,7 @@
   {
     "@timestamp": "2019-09-06T13:36:36.3634107Z",
     "event": {
-      "action": "Account Changed",
+      "action": "modified-user-account",
       "code": 4738,
       "kind": "event",
       "module": "security"

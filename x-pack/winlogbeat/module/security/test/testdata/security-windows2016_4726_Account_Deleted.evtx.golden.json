@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:35:25.5153959Z",
     "event": {
-      "action": "Account Deleted",
+      "action": "deleted-user-account",
       "code": 4726,
       "kind": "event",
       "module": "security"
@@ -56,7 +56,7 @@
   {
     "@timestamp": "2019-09-06T13:35:29.6900555Z",
     "event": {
-      "action": "Account Deleted",
+      "action": "deleted-user-account",
       "code": 4726,
       "kind": "event",
       "module": "security"
