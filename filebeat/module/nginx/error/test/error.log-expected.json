@@ -1,9 +1,9 @@
 [
     {
-        "@timestamp": "2016-10-25T14:49:34.000Z",
+        "@timestamp": "2016-10-25T14:49:34.000-02:00",
         "event.dataset": "nginx.error",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -15,10 +15,10 @@
         "service.type": "nginx"
     },
     {
-        "@timestamp": "2016-10-25T14:50:44.000Z",
+        "@timestamp": "2016-10-25T14:50:44.000-02:00",
         "event.dataset": "nginx.error",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",

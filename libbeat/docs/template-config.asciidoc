@@ -8,7 +8,7 @@ mappings in Elasticsearch. If template loading is enabled (the default),
 {beatname_uc} loads the index template automatically after successfully
 connecting to Elasticsearch.
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is Logstash, you must <<load-template-manually,load the template
@@ -24,18 +24,18 @@ you must <<load-template-manually,load the template manually>>.
 
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given
-name, so the final name is +{beatname_lc}-%\{[{beat_version_key}]\}+.
+name, so the final name is +{beatname_lc}-%{[{beat_version_key}]}+.
 
 // Maintainers: a backslash character is required to escape curly braces and
 // asterisks in inline code examples that contain asciidoc attributes. You'll
 // note that a backslash does not appear before the asterisk
-// in +{beatname_lc}-%\{[{beat_version_key}]\}-*+. This is intentional and formats
+// in +{beatname_lc}-%{[{beat_version_key}]}-*+. This is intentional and formats
 // the example as expected.
 
 *`setup.template.pattern`*:: The template pattern to apply to the default index
 settings. The default pattern is +{beat_default_index_prefix}-\*+. The {beatname_uc} version is always
 included in the pattern, so the final pattern is
-+{beat_default_index_prefix}-%\{[{beat_version_key}]\}-*+. The wildcard character `-*` is used to
++{beat_default_index_prefix}-%{[{beat_version_key}]}-*+. The wildcard character `-*` is used to
 match all daily indices.
 +
 Example:

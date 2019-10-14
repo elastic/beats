@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2016-12-26T16:22:14.000Z",
+        "destination.domain": "vhost1.domaine.fr",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -12,7 +13,6 @@
         "input.type": "log",
         "log.offset": 0,
         "service.type": "apache",
-        "destination.domain": "vhost1.domaine.fr",
         "source.ip": "192.168.33.2",
         "url.original": "/hello",
         "user.name": "-",

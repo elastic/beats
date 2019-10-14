@@ -149,7 +149,7 @@ func TestIngest(t *testing.T) {
 	}
 
 	// get _source field from indexed document
-	_, docBody, err := client.apiCall("GET", index, "test", "1/_source", "", nil, nil)
+	_, docBody, err := client.apiCall("GET", index, "", "_source/1", "", nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

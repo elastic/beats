@@ -1,8 +1,8 @@
 [[configuration-heartbeat-options]]
-== Set up monitors
+== Set up {beatname_uc} monitors
 
 ++++
-<titleabbrev>Set up {beatname_uc} monitors</titleabbrev>
+<titleabbrev>Set up monitors</titleabbrev>
 ++++
 
 To configure {beatname_uc} define a set of `monitors` to check your remote hosts.
@@ -386,7 +386,7 @@ Example configuration:
 [[monitor-http-proxy-url]]
 ==== `proxy_url`
 
-The HTTP proxy URL. This setting is optional.
+The HTTP proxy URL. This setting is optional. Example `http://proxy.mydomain.com:3128`
 
 [float]
 [[monitor-http-username]]
@@ -467,11 +467,56 @@ Under `check.request`, specify these options:
 *`headers`*:: A dictionary of additional HTTP headers to send.
 *`body`*:: Optional request body content.
 
+Example configuration:
+This monitor POSTs an `x-www-form-urlencoded` string
+to the endpoint `/demo/add`
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://localhost:8080/demo/add"]
+  check.request:
+    method: POST
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    # urlencode the body:
+    body: "name=first&email=someemail%40someemailprovider.com"
+  check.response:
+    status: 200
+    body:
+      - Saved
+      - saved
+-------------------------------------------------------------------------------
+
 Under `check.response`, specify these options:
 
 *`status`*:: The expected status code. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
 *`headers`*:: The required response headers.
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
+
+Example configuration:
+This monitor examines the
+response body for the strings `saved` or `Saved`
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://localhost:8080/demo/add"]
+  check.request:
+    method: POST
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    # urlencode the body:
+    body: "name=first&email=someemail%40someemailprovider.com"
+  check.response:
+    status: 200
+    body:
+      - Saved
+      - saved
+-------------------------------------------------------------------------------
+
 *`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON.
 
 The following configuration shows how to check the response when the body
@@ -574,8 +619,7 @@ The timezone for the scheduler. By default the scheduler uses localtime.
 [[monitor-watch-poll-file]]
 ==== `watch.poll_file`
 
-deprecated[6.5.0,Replaced by using dynamic reloading via the
-`heartbeat.config.monitors` option.]
+deprecated:[6.5.0,Replaced by using dynamic reloading via the `heartbeat.config.monitors` option.]
 
 The JSON file to watch for additional monitor configurations. The JSON file can
 contain multiple objects, each of which specifies a different monitor config.

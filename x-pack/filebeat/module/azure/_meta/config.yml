@@ -1,0 +1,29 @@
+- module: azure
+  # All logs
+  activitylogs:
+    enabled: true
+    var:
+      # Azure event hub namespace FQDN for example "eventhubs.servicebus.windows.net:9093"
+      namespace: ""
+      # Eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
+      eventhub: ["insights-operational-logs"]
+      # Consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
+      consumer_group: "$Default"
+      # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
+      connection_string: ""
+
+ # auditlogs:
+ #   enabled: true
+ #   var:
+ #     namespace: ""
+ #     eventhub: ["insights-logs-auditlogs"]
+ #     consumer_group: "$Default"
+ #     connection_string: ""
+
+ # signinlogs:
+ #   enabled: true
+ #   var:
+ #     namespace: ""
+ #     eventhub: ["insights-logs-signinlogs"]
+ #     consumer_group: "$Default"
+ #     connection_string: ""

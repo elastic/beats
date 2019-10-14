@@ -6,6 +6,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-apache>>
   * <<filebeat-module-auditd>>
   * <<filebeat-module-aws>>
+  * <<filebeat-module-azure>>
   * <<filebeat-module-cef>>
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
@@ -44,6 +45,7 @@ include::modules-overview.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/auditd.asciidoc[]
 include::modules/aws.asciidoc[]
+include::modules/azure.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]

@@ -30,3 +30,9 @@ http_request_duration_seconds_bucket{le="5"} 3
 http_request_duration_seconds_bucket{le="+Inf"} 3
 http_request_duration_seconds_sum 6
 http_request_duration_seconds_count 3
+# HELP net_conntrack_listener_conn_accepted_total Total number of connections opened to the listener of a given name.
+# TYPE net_conntrack_listener_conn_accepted_total untyped
+net_conntrack_listener_conn_accepted_total{listener_name="http"} 1568652315554
+# HELP net_conntrack_listener_conn_closed_total Total number of connections closed that were made to the listener of a given name.
+# TYPE net_conntrack_listener_conn_closed_total untyped
+net_conntrack_listener_conn_closed_total{listener_name="http"} NaN

@@ -11,6 +11,7 @@
     },
     "prometheus": {
         "labels": {
+            "job": "prometheus",
             "listener_name": "http"
         },
         "metrics": {

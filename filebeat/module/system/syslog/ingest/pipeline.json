@@ -29,6 +29,7 @@
         },
         {
             "date": {
+                "if": "ctx.event.timezone == null",
                 "field": "system.syslog.timestamp",
                 "target_field": "@timestamp",
                 "formats": [
@@ -37,7 +38,7 @@
                     "MMM d HH:mm:ss",
                     "ISO8601"
                 ],
-                "ignore_failure": true
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
         },
         {

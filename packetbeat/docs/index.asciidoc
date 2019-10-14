@@ -1,6 +1,6 @@
 = Packetbeat Reference
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
 

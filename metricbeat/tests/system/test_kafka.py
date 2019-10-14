@@ -59,10 +59,10 @@ class KafkaTest(metricbeat.BaseTest):
 
 
 class Kafka_1_1_0_Test(KafkaTest):
-    COMPOSE_SERVICES = ['kafka_1_1_0']
+    COMPOSE_ENV = {"KAFKA_VERSION": "1.1.0"}
     VERSION = "1.1.0"
 
 
 class Kafka_0_10_2_Test(KafkaTest):
-    COMPOSE_SERVICES = ['kafka_0_10_2']
-    VERSION = "0.10.2"
+    COMPOSE_ENV = {"KAFKA_VERSION": "0.10.2.2"}
+    VERSION = "0.10.2.2"

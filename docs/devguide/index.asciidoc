@@ -1,7 +1,7 @@
 [[beats-reference]]
 = Beats Developer Guide
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
 

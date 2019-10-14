@@ -44,7 +44,7 @@ branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
-cd $\{GOPATH\}/src/github.com/elastic/beats
+cd ${GOPATH}/src/github.com/elastic/beats
 git checkout {branch}
 ----
 
