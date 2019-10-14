@@ -9,6 +9,8 @@ Some specific AWS permissions are required for IAM user to collect AWS s3_reques
 ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]

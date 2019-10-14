@@ -41,27 +41,32 @@ the following privileges:
 +
 [options="header"]
 |====
-|Privileges | Why needed?
+|Type | Privilege | Purpose
 
+|Cluster
 |`monitor`
-|Send monitoring data to the cluster
+|Retrieve cluster details (e.g. version)
 
 ifndef::no_ilm[]
+|Cluster
 |`manage_ilm`
 |Set up and manage index lifecycle management (ILM) policy
 endif::no_ilm[]
 
 ifdef::has_ml_jobs[]
+|Cluster
 |`manage_ml`
-|Set up machine learning job configurations
+|Set up Machine Learning job configurations
 endif::has_ml_jobs[]
 
+|Index
 |`manage` on +{beat_default_index_prefix}-*+ indices
 |Set up aliases used by ILM
  
 ifdef::has_ml_jobs[]
+|Index
 |`read` on +{beat_default_index_prefix}-*+ indices
-|Read {beatname_uc} indices in order to set up machine learning jobs
+|Read {beatname_uc} indices in order to set up Machine Learning jobs
 endif::has_ml_jobs[]
 |====
 +
@@ -76,7 +81,7 @@ need to set up {beatname_uc}:
 +
 [options="header"]
 |====
-|Roles | Why needed?
+|Role | Purpose
 
 |`kibana_user`
 |Load dependencies, such as example dashboards, if available, into {kib}
@@ -122,21 +127,23 @@ If you don't use the +{beat_default_index_prefix}_system+ user:
 +
 [options="header"]
 |====
-|Privileges | Why needed?
+|Type | Privilege | Purpose
 
+|Cluster
 |`monitor`
-|Send monitoring info
-
-|`kibana_user`
-|Use {kib}
+|Retrieve cluster details (e.g. version)
 |====
 
-. Assign the *monitoring role*, along with the following built-in role, to
+. Assign the *monitoring role*, along with the following built-in roles, to
 users who need to monitor {beatname_uc}: 
 +
 [options="header"]
 |====
-|Role | Why needed?
+|Role | Purpose
+
+|`kibana_user`
+|Use {kib}
+
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
@@ -164,19 +171,22 @@ information.
 +
 [options="header"]
 |====
-|Role | Why needed?
+|Role | Purpose
+
 |`remote_monitoring_collector`
 |Collect monitoring metrics from {beatname_uc}
+
 |`remote_monitoring_agent`
 |Send monitoring data to the monitoring cluster
 |====
 
 . Assign the following role to users who will view the monitoring data in
 {kib}:
-
++
 [options="header"]
 |====
-|Role | Why needed?
+|Role | Purpose
+
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
@@ -185,71 +195,73 @@ endif::serverless[]
 [[privileges-to-publish-events]]
 ==== Grant privileges and roles needed for publishing
 
-Users who publish events to {es} need to create and read from {beatname_uc}
+Users who publish events to {es} need to create and write to {beatname_uc}
 indices. To minimize the privileges required by the writer role, you can use the
-<<privileges-to-setup-beats,setup role>> to pre-load dependencies. Then turn off
-setup options in the  {beatname_uc} config file before running {beatname_uc} to
-publish events. For example:
+<<privileges-to-setup-beats,setup role>> to pre-load dependencies.
 
 ifndef::no_ilm[]
-[source,yaml]
-----
-setup.template.enabled: false
-setup.ilm.check_exists: false
-setup.ilm.overwrite: false <1>
-----
-<1> Omit `ilm.check_exists` and `ilm.overwrite` if ILM is disabled.
-endif::no_ilm[]
+When using ILM, turn off the ILM setup check in the {beatname_uc} config file before
+running {beatname_uc} to publish events:
 
-ifdef::no_ilm[]
 [source,yaml]
 ----
-setup.template.enabled: false
+setup.ilm.check_exists: false
 ----
 endif::no_ilm[]
 
 To grant the required privileges:
 
-. Create a *writer role*, called something like +{beat_default_index_prefix}_writer+, that has
-the following privileges (this list assumes the setup options shown earlier are
-set to `false`):
+. Create a *writer role*, called something like +{beat_default_index_prefix}_writer+,
+that has the following privileges:
++
+NOTE: The `monitor` cluster privilege and the `create_doc` privilege on
++{beat_default_index_prefix}-*+ indices are required in every configuration.
 +
 [options="header"]
 |====
-|Privileges | Why needed?
+|Type | Privilege | Purpose
 
 ifndef::apm-server[]
+|Cluster
 |`monitor`
-|Send monitoring info
+|Retrieve cluster details (e.g. version) 
 endif::apm-server[]
 
 ifndef::no_ilm[]
+|Cluster
 |`read_ilm`
-|Read the ILM policy when connecting to clusters that support ILM
+| Read the ILM policy when connecting to clusters that support ILM.
+Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
-|`manage_pipeline`
-|Load ingest pipelines used by modules
+|Cluster
+|`cluster:admin/ingest/pipeline/get`
+|Check for ingest pipelines used by modules. Needed when using modules.
 endif::[]
 
+|Index
+|`create_doc` on +{beat_default_index_prefix}-*+ indices
+|Write events into {es}
+
 ifndef::no_ilm[]
+|Index
 |`view_index_metadata` on +{beat_default_index_prefix}-*+ indices
-|Check for alias when connecting to clusters that support ILM
+|Check for alias when connecting to clusters that support ILM.
+Not needed when `setup.ilm.check_exists` is `false`.
 endif::no_ilm[]
 
-|`index` on +{beat_default_index_prefix}-*+ indices
-|Index events into {es}
-
+|Index
 |`create_index` on +{beat_default_index_prefix}-*+ indices
-|Create daily indices when connecting to clusters that do not support ILM
+|Create daily indices when connecting to clusters that do not support ILM.
+Not needed when using ILM.
 |====
 ifndef::apm-server[]
 +
 Omit any privileges that aren't relevant in your environment.
 endif::apm-server[]
 
-. Assign the *writer role* to users who will index events into {es}. 
+. Assign the *writer role* to users who will index events into {es}.
 
 [[kibana-user-privileges]]
 ==== Grant privileges and roles needed to read {beatname_uc} data
@@ -270,8 +282,9 @@ the following privilege:
 +
 [options="header"]
 |====
-|Privilege | Why needed?
+|Type | Privilege | Purpose
 
+|Index
 |`read` on +{beat_default_index_prefix}-*+ indices
 |Read data indexed by {beatname_uc}
 |====
@@ -281,7 +294,7 @@ users who need to read {beatname_uc} data:
 +
 [options="header"]
 |====
-|Roles | Why needed?
+|Role | Purpose
 
 |`kibana_user` or `kibana_dashboard_only_user`
 |Use {kib}. `kibana_dashboard_only_user` grants read-only access to dashboards.
@@ -302,10 +315,11 @@ data:
 +
 [options="header"]
 |====
-|Roles | Why needed?
+|Role | Purpose
 
 |`kibana_user` and `apm_user`
 |Use the APM UI
+
 |`admin`
 |Read and update APM Agent configuration via Kibana
 |====

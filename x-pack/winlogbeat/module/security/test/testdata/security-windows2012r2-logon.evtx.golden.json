@@ -8,6 +8,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -79,6 +80,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -150,6 +152,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -227,6 +230,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -298,6 +302,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -372,6 +377,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -446,6 +452,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -520,6 +527,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -594,6 +602,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -671,6 +680,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -745,6 +755,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -822,6 +833,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -896,6 +908,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -967,6 +980,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -1038,6 +1052,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -1109,6 +1124,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -1180,6 +1196,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
     "log": {
@@ -1251,6 +1268,7 @@
       "kind": "event",
       "module": "security",
       "outcome": "failure",
+      "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_failure"
     },
     "log": {

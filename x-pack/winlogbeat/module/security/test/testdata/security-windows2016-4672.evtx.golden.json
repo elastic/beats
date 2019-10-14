@@ -5,7 +5,8 @@
       "action": "Special Logon",
       "code": 4672,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"

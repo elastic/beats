@@ -31,6 +31,7 @@ func init() {
 					"_llseek",
 					"access",
 					"brk",
+					"chmod",
 					"clock_gettime",
 					"clone",
 					"close",
