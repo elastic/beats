@@ -79,7 +79,8 @@ type listMetricWithDetail struct {
 	resourceTypeFilters map[string][]aws.Tag
 }
 
-type metricDetail struct {
+// namespaceDetail collects configuration details for each namespace
+type namespaceDetail struct {
 	resourceTypeFilter string
 	names              []string
 	tags               []aws.Tag
@@ -152,8 +153,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 
 		// Create events based on namespaceDetailTotal from configuration
-		for namespace, metricDetails := range namespaceDetailTotal {
-			resourceTypes := map[string][]aws.Tag{}
+		for namespace, namespaceDetails := range namespaceDetailTotal {
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 			if err != nil {
 				m.Logger().Info(err.Error())
@@ -164,52 +164,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			for _, metricD := range metricDetails {
-				if metricD.resourceTypeFilter != "" {
-					if _, ok := resourceTypes[metricD.resourceTypeFilter]; ok {
-						resourceTypes[metricD.resourceTypeFilter] = append(resourceTypes[metricD.resourceTypeFilter], metricD.tags...)
-					} else {
-						resourceTypes[metricD.resourceTypeFilter] = metricD.tags
-					}
-				}
-			}
+			// filter listMetricsOutput by detailed configuration per each namespace
+			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespaceDetails)
+			// get resource type filters and tags filters for each namespace
+			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
 
-			var filteredMetricWithStatsTotal []metricsWithStatistics
-			for _, listMetric := range listMetricsOutput {
-				for _, metricD := range metricDetails {
-					if metricD.names != nil && metricD.dimensions == nil {
-						if exists, _ := aws.StringInSlice(*listMetric.MetricName, metricD.names); !exists {
-							continue
-						}
-						filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
-							metricsWithStatistics{
-								cloudwatchMetric: listMetric,
-								statistic:        metricD.statistics,
-								tags:             metricD.tags,
-							})
-
-					} else if metricD.names == nil && metricD.dimensions != nil {
-						if !compareAWSDimensions(listMetric.Dimensions, metricD.dimensions) {
-							continue
-						}
-						filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
-							metricsWithStatistics{
-								cloudwatchMetric: listMetric,
-								statistic:        metricD.statistics,
-								tags:             metricD.tags,
-							})
-					} else {
-						filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
-							metricsWithStatistics{
-								cloudwatchMetric: listMetric,
-								statistic:        metricD.statistics,
-								tags:             metricD.tags,
-							})
-					}
-				}
-			}
-
-			eventsWithIdentifier, eventsNoIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypes, regionName, startTime, endTime)
+			eventsWithIdentifier, eventsNoIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
@@ -223,9 +183,68 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]metricDetail) {
+// filterListMetricsOutput compares config details with listMetricsOutput and filter out the ones don't match
+func filterListMetricsOutput(listMetricsOutput []cloudwatch.Metric, namespaceDetails []namespaceDetail) []metricsWithStatistics {
+	var filteredMetricWithStatsTotal []metricsWithStatistics
+	for _, listMetric := range listMetricsOutput {
+		for _, configPerNamespace := range namespaceDetails {
+			if configPerNamespace.names != nil && configPerNamespace.dimensions == nil {
+				// if metric names are given in config but no dimensions, filter
+				// out the metrics with other names
+				if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
+					continue
+				}
+				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+					metricsWithStatistics{
+						cloudwatchMetric: listMetric,
+						statistic:        configPerNamespace.statistics,
+						tags:             configPerNamespace.tags,
+					})
+
+			} else if configPerNamespace.names == nil && configPerNamespace.dimensions != nil {
+				// if metric names are not given in config but dimensions are
+				// given, only keep the metrics with matching dimensions
+				if !compareAWSDimensions(listMetric.Dimensions, configPerNamespace.dimensions) {
+					continue
+				}
+				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+					metricsWithStatistics{
+						cloudwatchMetric: listMetric,
+						statistic:        configPerNamespace.statistics,
+						tags:             configPerNamespace.tags,
+					})
+			} else {
+				// if no metric name or dimensions given, then keep all listMetricsOutput
+				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+					metricsWithStatistics{
+						cloudwatchMetric: listMetric,
+						statistic:        configPerNamespace.statistics,
+						tags:             configPerNamespace.tags,
+					})
+			}
+		}
+	}
+	return filteredMetricWithStatsTotal
+}
+
+// Collect resource type filters and tag filters from config for cloudwatch
+func constructTagsFilters(namespaceDetails []namespaceDetail) map[string][]aws.Tag {
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	for _, configPerNamespace := range namespaceDetails {
+		if configPerNamespace.resourceTypeFilter != "" {
+			if _, ok := resourceTypeTagFilters[configPerNamespace.resourceTypeFilter]; ok {
+				resourceTypeTagFilters[configPerNamespace.resourceTypeFilter] = append(resourceTypeTagFilters[configPerNamespace.resourceTypeFilter], configPerNamespace.tags...)
+			} else {
+				resourceTypeTagFilters[configPerNamespace.resourceTypeFilter] = configPerNamespace.tags
+			}
+		}
+	}
+	return resourceTypeTagFilters
+}
+
+func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]namespaceDetail) {
 	var listMetricDetailTotal listMetricWithDetail
-	namespaceDetailTotal := map[string][]metricDetail{}
+	namespaceDetailTotal := map[string][]namespaceDetail{}
 	var metricsWithStatsTotal []metricsWithStatistics
 	resourceTypesWithTags := map[string][]aws.Tag{}
 
@@ -270,28 +289,19 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]m
 			continue
 		}
 
-		if config.MetricName != nil {
-			metricD := metricDetail{
-				names:              config.MetricName,
-				tags:               config.Tags,
-				statistics:         config.Statistic,
-				resourceTypeFilter: config.ResourceTypeFilter,
-			}
-
-			if _, ok := namespaceDetailTotal[config.Namespace]; ok {
-				namespaceDetailTotal[config.Namespace] = append(namespaceDetailTotal[config.Namespace], metricD)
-			} else {
-				namespaceDetailTotal[config.Namespace] = []metricDetail{metricD}
-			}
-			continue
-		}
-
-		metricD := metricDetail{
+		configPerNamespace := namespaceDetail{
+			names:              config.MetricName,
 			tags:               config.Tags,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceTypeFilter,
+			dimensions:         cloudwatchDimensions,
 		}
-		namespaceDetailTotal[config.Namespace] = []metricDetail{metricD}
+
+		if _, ok := namespaceDetailTotal[config.Namespace]; ok {
+			namespaceDetailTotal[config.Namespace] = append(namespaceDetailTotal[config.Namespace], configPerNamespace)
+		} else {
+			namespaceDetailTotal[config.Namespace] = []namespaceDetail{configPerNamespace}
+		}
 	}
 
 	listMetricDetailTotal.resourceTypeFilters = resourceTypesWithTags
@@ -385,7 +395,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	return event
 }
 
-func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ClientAPI, listMetricWithStatsTotal []metricsWithStatistics, resourceTypes map[string][]aws.Tag, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, []mb.Event, error) {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ClientAPI, listMetricWithStatsTotal []metricsWithStatistics, resourceTypeTagFilters map[string][]aws.Tag, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, []mb.Event, error) {
 	// Initialize events for each identifier.
 	events := map[string]mb.Event{}
 
@@ -406,7 +416,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(metricDataResults)
-	if len(resourceTypes) == 0 {
+	if len(resourceTypeTagFilters) == 0 {
 		if !timestamp.IsZero() {
 			for _, output := range metricDataResults {
 				if len(output.Values) == 0 {
@@ -435,7 +445,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	}
 
 	// Get tags
-	for resourceType, tagsFilter := range resourceTypes {
+	for resourceType, tagsFilter := range resourceTypeTagFilters {
 		resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
 		if err != nil {
 			// If GetResourcesTags failed, continue report event just without tags.

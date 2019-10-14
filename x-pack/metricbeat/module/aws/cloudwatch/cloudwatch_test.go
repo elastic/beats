@@ -142,8 +142,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		resourceTypeFilters: resourceTypeFiltersEC2,
 	}
 
-	expectedNamespaceWithDetailS3 := map[string][]metricDetail{}
-	expectedNamespaceWithDetailS3["AWS/S3"] = []metricDetail{
+	expectedNamespaceWithDetailS3 := map[string][]namespaceDetail{}
+	expectedNamespaceWithDetailS3["AWS/S3"] = []namespaceDetail{
 		{
 			statistics: defaultStatistics,
 		},
@@ -187,38 +187,38 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		resourceTypeFilters: resourceTypeFiltersEC2RDS,
 	}
 
-	expectedNamespaceDetailLambda := map[string][]metricDetail{}
-	expectedNamespaceDetailLambda["AWS/Lambda"] = []metricDetail{
+	expectedNamespaceDetailLambda := map[string][]namespaceDetail{}
+	expectedNamespaceDetailLambda["AWS/Lambda"] = []namespaceDetail{
 		{
 			statistics: defaultStatistics,
 		},
 	}
 
-	expectedNamespaceWithDetailEC2S3 := map[string][]metricDetail{}
-	expectedNamespaceWithDetailEC2S3["AWS/EC2"] = []metricDetail{
+	expectedNamespaceWithDetailEC2S3 := map[string][]namespaceDetail{}
+	expectedNamespaceWithDetailEC2S3["AWS/EC2"] = []namespaceDetail{
 		{
 			resourceTypeFilter: "ec2:instance",
 			names:              []string{"CPUUtilization"},
 			statistics:         defaultStatistics,
 		},
 	}
-	expectedNamespaceWithDetailEC2S3["AWS/S3"] = []metricDetail{
+	expectedNamespaceWithDetailEC2S3["AWS/S3"] = []namespaceDetail{
 		{
 			resourceTypeFilter: "s3",
 			statistics:         defaultStatistics,
 		},
 	}
 
-	expectedNamespaceWithDetailEBS := map[string][]metricDetail{}
-	expectedNamespaceWithDetailEBS["AWS/EBS"] = []metricDetail{
+	expectedNamespaceWithDetailEBS := map[string][]namespaceDetail{}
+	expectedNamespaceWithDetailEBS["AWS/EBS"] = []namespaceDetail{
 		{
 			resourceTypeFilter: "ec2",
 			statistics:         defaultStatistics,
 		},
 	}
 
-	expectedNamespaceWithDetailEC2 := map[string][]metricDetail{}
-	expectedNamespaceWithDetailEC2["AWS/EC2"] = []metricDetail{
+	expectedNamespaceWithDetailEC2 := map[string][]namespaceDetail{}
+	expectedNamespaceWithDetailEC2["AWS/EC2"] = []namespaceDetail{
 		{
 			resourceTypeFilter: "ec2:instance",
 			names:              []string{"CPUUtilization", "StatusCheckFailed"},
@@ -226,16 +226,16 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		},
 	}
 
-	expectedNamespaceWithDetailKafka := map[string][]metricDetail{}
-	expectedNamespaceWithDetailKafka["AWS/Kafka"] = []metricDetail{
+	expectedNamespaceWithDetailKafka := map[string][]namespaceDetail{}
+	expectedNamespaceWithDetailKafka["AWS/Kafka"] = []namespaceDetail{
 		{
 			names:      []string{"MemoryUsed"},
 			statistics: defaultStatistics,
 		},
 	}
 
-	expectedNamespaceDetailTotal := map[string][]metricDetail{}
-	expectedNamespaceDetailTotal["AWS/EC2"] = []metricDetail{
+	expectedNamespaceDetailTotal := map[string][]namespaceDetail{}
+	expectedNamespaceDetailTotal["AWS/EC2"] = []namespaceDetail{
 		{
 			resourceTypeFilter: resourceTypeEC2,
 			names:              []string{"CPUUtilization"},
@@ -248,7 +248,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 		},
 	}
-	expectedNamespaceDetailTotal["AWS/ELB"] = []metricDetail{
+	expectedNamespaceDetailTotal["AWS/ELB"] = []namespaceDetail{
 		{
 			resourceTypeFilter: "elasticloadbalancing",
 			names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
@@ -273,13 +273,13 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		},
 	}
 
-	expectedNamespaceDetailELBLambda := map[string][]metricDetail{}
-	expectedNamespaceDetailELBLambda["AWS/Lambda"] = []metricDetail{
+	expectedNamespaceDetailELBLambda := map[string][]namespaceDetail{}
+	expectedNamespaceDetailELBLambda["AWS/Lambda"] = []namespaceDetail{
 		{
 			statistics: defaultStatistics,
 		},
 	}
-	expectedNamespaceDetailELBLambda["AWS/ELB"] = []metricDetail{
+	expectedNamespaceDetailELBLambda["AWS/ELB"] = []namespaceDetail{
 		{
 			resourceTypeFilter: "elasticloadbalancing",
 			names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
@@ -299,6 +299,20 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Key:   "name",
 					Value: "test-elb2",
+				},
+			},
+		},
+	}
+
+	expectedNamespaceWithDetailEC2WithNoMetricName := map[string][]namespaceDetail{}
+	expectedNamespaceWithDetailEC2WithNoMetricName["AWS/EC2"] = []namespaceDetail{
+		{
+			resourceTypeFilter: "ec2:instance",
+			statistics:         []string{"Average"},
+			dimensions: []cloudwatch.Dimension{
+				{
+					Name:  awssdk.String("InstanceId"),
+					Value: awssdk.String("i-1"),
 				},
 			},
 		},
@@ -308,7 +322,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		title                         string
 		cloudwatchMetricsConfig       []Config
 		expectedListMetricDetailTotal listMetricWithDetail
-		expectedNamespaceDetailTotal  map[string][]metricDetail
+		expectedNamespaceDetailTotal  map[string][]namespaceDetail
 	}{
 		{
 			"test with a specific metric",
@@ -327,7 +341,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			expectedListMetricWithDetailEC2,
-			map[string][]metricDetail{},
+			map[string][]namespaceDetail{},
 		},
 		{
 			"test with a specific metric and a namespace",
@@ -554,7 +568,28 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			expectedListMetricWithDetailEC2RDS,
 			expectedNamespaceDetailELBLambda,
 		},
+		{
+			"Test with no metric name",
+			[]Config{
+				{
+					Namespace: "AWS/EC2",
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-1",
+						},
+					},
+					Statistic:          []string{"Average"},
+					ResourceTypeFilter: "ec2:instance",
+				},
+			},
+			listMetricWithDetail{
+				resourceTypeFilters: map[string][]aws.Tag{},
+			},
+			expectedNamespaceWithDetailEC2WithNoMetricName,
+		},
 	}
+
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
 			m.CloudwatchConfigs = c.cloudwatchMetricsConfig
@@ -665,6 +700,238 @@ func TestCompareAWSDimensions(t *testing.T) {
 		t.Run(c.title, func(t *testing.T) {
 			output := compareAWSDimensions(c.dim1, c.dim2)
 			assert.Equal(t, c.expectedResult, output)
+		})
+	}
+}
+
+func TestConstructTagsFilters(t *testing.T) {
+	expectedResourceTypeTagFiltersEC2 := map[string][]aws.Tag{}
+	expectedResourceTypeTagFiltersEC2["ec2:instance"] = nil
+
+	expectedResourceTypeTagFiltersELB := map[string][]aws.Tag{}
+	expectedResourceTypeTagFiltersELB["elasticloadbalancing"] = []aws.Tag{
+		{
+			Key:   "name",
+			Value: "test-elb1",
+		},
+		{
+			Key:   "name",
+			Value: "test-elb2",
+		},
+	}
+
+	expectedResourceTypeTagFiltersELBEC2 := map[string][]aws.Tag{}
+	expectedResourceTypeTagFiltersELBEC2["elasticloadbalancing"] = []aws.Tag{
+		{
+			Key:   "name",
+			Value: "test-elb",
+		},
+	}
+	expectedResourceTypeTagFiltersELBEC2["ec2:instance"] = []aws.Tag{
+		{
+			Key:   "name",
+			Value: "test-ec2",
+		},
+	}
+
+	cases := []struct {
+		title                  string
+		namespaceDetails       []namespaceDetail
+		resourceTypeTagFilters map[string][]aws.Tag
+	}{
+		{
+			"test with one config per namespace",
+			[]namespaceDetail{
+				{
+					resourceTypeFilter: "ec2:instance",
+					statistics:         []string{"Average"},
+					dimensions: []cloudwatch.Dimension{
+						{
+							Name:  awssdk.String("InstanceId"),
+							Value: awssdk.String("i-1"),
+						},
+					},
+				},
+			},
+			expectedResourceTypeTagFiltersEC2,
+		},
+		{
+			"test with two configs for the same namespace",
+			[]namespaceDetail{
+				{
+					resourceTypeFilter: "elasticloadbalancing",
+					names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
+					statistics:         []string{"Sum"},
+					tags: []aws.Tag{
+						{
+							Key:   "name",
+							Value: "test-elb1",
+						},
+					},
+				},
+				{
+					resourceTypeFilter: "elasticloadbalancing",
+					names:              []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
+					statistics:         []string{"Maximum"},
+					tags: []aws.Tag{
+						{
+							Key:   "name",
+							Value: "test-elb2",
+						},
+					},
+				},
+			},
+			expectedResourceTypeTagFiltersELB,
+		},
+		{
+			"test with two configs for different namespaces",
+			[]namespaceDetail{
+				{
+					resourceTypeFilter: "elasticloadbalancing",
+					names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
+					statistics:         []string{"Sum"},
+					tags: []aws.Tag{
+						{
+							Key:   "name",
+							Value: "test-elb",
+						},
+					},
+				},
+				{
+					resourceTypeFilter: "ec2:instance",
+					names:              []string{"CPUUtilization"},
+					statistics:         defaultStatistics,
+					tags: []aws.Tag{
+						{
+							Key:   "name",
+							Value: "test-ec2",
+						},
+					},
+				},
+			},
+			expectedResourceTypeTagFiltersELBEC2,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			output := constructTagsFilters(c.namespaceDetails)
+			assert.Equal(t, c.resourceTypeTagFilters, output)
+		})
+	}
+}
+
+func TestFilterListMetricsOutput(t *testing.T) {
+	cases := []struct {
+		title                        string
+		listMetricsOutput            []cloudwatch.Metric
+		namespaceDetails             []namespaceDetail
+		filteredMetricWithStatsTotal []metricsWithStatistics
+	}{
+		{
+			"test filter cloudwatch metrics with dimension",
+			[]cloudwatch.Metric{
+				{
+					Dimensions: []cloudwatch.Dimension{
+						{
+							Name:  awssdk.String("DBClusterIdentifier"),
+							Value: awssdk.String("test1-cluster"),
+						},
+						{
+							Name:  awssdk.String("Role"),
+							Value: awssdk.String("READER"),
+						}},
+					MetricName: awssdk.String("CommitThroughput"),
+					Namespace:  awssdk.String("AWS/RDS"),
+				},
+				{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-1"),
+					}},
+					MetricName: awssdk.String("CPUUtilization"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+			},
+			[]namespaceDetail{
+				{
+					resourceTypeFilter: "ec2:instance",
+					statistics:         []string{"Average"},
+					dimensions: []cloudwatch.Dimension{
+						{
+							Name:  awssdk.String("InstanceId"),
+							Value: awssdk.String("i-1"),
+						},
+					},
+				},
+			},
+			[]metricsWithStatistics{
+				{
+					cloudwatch.Metric{
+						Dimensions: []cloudwatch.Dimension{{
+							Name:  awssdk.String("InstanceId"),
+							Value: awssdk.String("i-1"),
+						}},
+						MetricName: awssdk.String("CPUUtilization"),
+						Namespace:  awssdk.String("AWS/EC2"),
+					},
+					[]string{"Average"},
+					nil,
+				},
+			},
+		},
+		{
+			"test filter cloudwatch metrics with name",
+			[]cloudwatch.Metric{
+				{
+					Dimensions: []cloudwatch.Dimension{
+						{
+							Name:  awssdk.String("DBClusterIdentifier"),
+							Value: awssdk.String("test1-cluster"),
+						},
+						{
+							Name:  awssdk.String("Role"),
+							Value: awssdk.String("READER"),
+						}},
+					MetricName: awssdk.String("CommitThroughput"),
+					Namespace:  awssdk.String("AWS/RDS"),
+				},
+				{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-1"),
+					}},
+					MetricName: awssdk.String("CPUUtilization"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+			},
+			[]namespaceDetail{
+				{
+					names:              []string{"CPUUtilization"},
+					resourceTypeFilter: "ec2:instance",
+					statistics:         []string{"Average"},
+				},
+			},
+			[]metricsWithStatistics{
+				{
+					cloudwatch.Metric{
+						Dimensions: []cloudwatch.Dimension{{
+							Name:  awssdk.String("InstanceId"),
+							Value: awssdk.String("i-1"),
+						}},
+						MetricName: awssdk.String("CPUUtilization"),
+						Namespace:  awssdk.String("AWS/EC2"),
+					},
+					[]string{"Average"},
+					nil,
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			output := filterListMetricsOutput(c.listMetricsOutput, c.namespaceDetails)
+			assert.Equal(t, c.filteredMetricWithStatsTotal, output)
 		})
 	}
 }
