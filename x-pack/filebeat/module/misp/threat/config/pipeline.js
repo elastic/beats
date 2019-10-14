@@ -63,7 +63,7 @@ var threat = (function () {
                 arr = v.split("|");
                 if (arr.length == 2) {
                     var domain = arr[0];
-                    var ip = arr[1].split("/")[0];
+                    ip = arr[1].split("/")[0];
                     attackPattern = '[' + '(' + 'dns.question.name = ' + '\'' + domain + '\'' + ' OR url.domain = ' + '\'' + domain + '\'' + ')' +
                         ' AND ' + '(' + 'source.ip = ' + '\'' + ip + '\'' + ' OR destination.ip = ' + '\'' + ip + '\'' + ')' + ']';
                     evt.Put("dns.question.name", domain);
