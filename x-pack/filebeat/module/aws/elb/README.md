@@ -14,7 +14,9 @@ How to manual test this module
 * Create an ELB and enable access logs for it, this can be done using the
   terraform configuration in `_meta`.
 * Make some requests to the service, if terraform was used, this can be done
-  with `curl $(terraform output lb_address)/`
+  with:
+  * ELB (classic) load balancer: `curl $(terraform output elb_address)/`
+  * Application Load Balancer: `curl $(terraform output elb_address)/`
 * Configure filebeat, using the queue url from `terraform output sqs_queue_url`.
 ```
 filebeat.modules:
