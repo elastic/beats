@@ -10180,7 +10180,7 @@ type: long
 NetFlow version used.
 
 
-type: long
+type: integer
 
 --
 
@@ -11549,28 +11549,28 @@ type: long
 
 --
 
-*`netflow.post_nast_ource_ipv4_address`*::
+*`netflow.post_nat_source_ipv4_address`*::
 +
 --
 type: ip
 
 --
 
-*`netflow.post_nadt_estination_ipv4_address`*::
+*`netflow.post_nat_destination_ipv4_address`*::
 +
 --
 type: ip
 
 --
 
-*`netflow.post_napst_ource_transport_port`*::
+*`netflow.post_napt_source_transport_port`*::
 +
 --
 type: integer
 
 --
 
-*`netflow.post_napdt_estination_transport_port`*::
+*`netflow.post_napt_destination_transport_port`*::
 +
 --
 type: integer
@@ -11941,14 +11941,14 @@ type: long
 
 --
 
-*`netflow.post_nast_ource_ipv6_address`*::
+*`netflow.post_nat_source_ipv6_address`*::
 +
 --
 type: ip
 
 --
 
-*`netflow.post_nadt_estination_ipv6_address`*::
+*`netflow.post_nat_destination_ipv6_address`*::
 +
 --
 type: ip
@@ -12242,14 +12242,14 @@ type: long
 
 --
 
-*`netflow.hash_ipp_ayload_offset`*::
+*`netflow.hash_ip_payload_offset`*::
 +
 --
 type: long
 
 --
 
-*`netflow.hash_ipp_ayload_size`*::
+*`netflow.hash_ip_payload_size`*::
 +
 --
 type: long
@@ -12305,14 +12305,14 @@ type: keyword
 
 --
 
-*`netflow.upper_cli_imit`*::
+*`netflow.upper_ci_limit`*::
 +
 --
 type: double
 
 --
 
-*`netflow.lower_cli_imit`*::
+*`netflow.lower_ci_limit`*::
 +
 --
 type: double
@@ -12599,14 +12599,14 @@ type: long
 
 --
 
-*`netflow.distinct_count_of_sourc_eipa_ddress`*::
+*`netflow.distinct_count_of_source_ip_address`*::
 +
 --
 type: long
 
 --
 
-*`netflow.distinct_count_of_destinatio_nipa_ddress`*::
+*`netflow.distinct_count_of_destination_ip_address`*::
 +
 --
 type: long
@@ -12711,14 +12711,14 @@ type: long
 
 --
 
-*`netflow.selector_itd_otal_flows_observed`*::
+*`netflow.selector_id_total_flows_observed`*::
 +
 --
 type: long
 
 --
 
-*`netflow.selector_itd_otal_flows_selected`*::
+*`netflow.selector_id_total_flows_selected`*::
 +
 --
 type: long
@@ -13005,7 +13005,7 @@ type: short
 
 --
 
-*`netflow.mib_object_valuei_pa_ddress`*::
+*`netflow.mib_object_value_ip_address`*::
 +
 --
 type: ip
@@ -13229,7 +13229,7 @@ type: long
 
 --
 
-*`netflow.max_bieb_ntries`*::
+*`netflow.max_bib_entries`*::
 +
 --
 type: long
