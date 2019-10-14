@@ -151,7 +151,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		svcCloudwatch := cloudwatch.New(awsConfig)
 		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 
-		var filteredMetricWithStatsTotal []metricsWithStatistics
 		// Create events based on namespaceDetailTotal from configuration
 		for namespace, metricDetails := range namespaceDetailTotal {
 			resourceTypes := map[string][]aws.Tag{}
@@ -175,6 +174,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				}
 			}
 
+			var filteredMetricWithStatsTotal []metricsWithStatistics
 			for _, listMetric := range listMetricsOutput {
 				for _, metricD := range metricDetails {
 					if metricD.names != nil && metricD.dimensions == nil {
