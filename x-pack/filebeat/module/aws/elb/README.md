@@ -15,8 +15,10 @@ How to manual test this module
   terraform configuration in `_meta`.
 * Make some requests to the service, if terraform was used, this can be done
   with:
-  * ELB (classic) load balancer: `curl $(terraform output elb_address)/`
-  * Application Load Balancer: `curl $(terraform output elb_address)/`
+  * ELB (classic) load balancer, HTTP listener: `curl $(terraform output elb_http_address)/`
+  * ELB (classic) load balancer, TCP listener: `curl $(terraform output elb_tcp_address)/`
+  * Application Load Balancer (HTTP): `curl $(terraform output lb_http_address)/`
+  * Application Load Balancer (TCP): `curl $(terraform output lb_tcp_address)/`
 * Configure filebeat, using the queue url from `terraform output sqs_queue_url`.
 ```
 filebeat.modules:
