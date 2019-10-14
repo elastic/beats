@@ -239,7 +239,8 @@ func (m *MetricSet) Setup() (err error) {
 
 	hasIPv6, err := detectIPv6()
 	if err != nil {
-		return errors.Wrap(err, "error detecting IPv6 support")
+		m.log.Debugf("Error detecting IPv6 support: %v", err)
+		hasIPv6 = false
 	}
 	m.log.Debugf("IPv6 supported: %v", hasIPv6)
 	if m.config.EnableIPv6 != nil {
@@ -459,6 +460,13 @@ func (m *mountPoint) String() string {
 }
 
 func detectIPv6() (bool, error) {
+	// Check that AF_INET6 is available.
+	// This fails when the kernel is booted with ipv6.disable=1
+	fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, 0)
+	if err != nil {
+		return false, nil
+	}
+	unix.Close(fd)
 	loopback, err := helper.NewIPv6Loopback()
 	if err != nil {
 		return false, err

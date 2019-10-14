@@ -103,7 +103,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Create Cloudwatch Events for s3_daily_storage
 		bucketNames := getBucketNames(listMetricsOutputs)
 		for _, bucketName := range bucketNames {
-			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName)
+			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName, m.AccountName, m.AccountID)
 			if err != nil {
 				err = errors.Wrap(err, "createCloudWatchEvents failed")
 				m.Logger().Error(err)
@@ -183,8 +183,8 @@ func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index
 	return
 }
 
-func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event = aws.InitEvent(regionName)
+func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, accountName string, accountID string) (event mb.Event, err error) {
+	event = aws.InitEvent(regionName, accountName, accountID)
 
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})

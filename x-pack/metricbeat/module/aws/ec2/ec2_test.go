@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -191,7 +193,10 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		},
 	}
 
-	metricSet := MetricSet{}
+	metricSet := MetricSet{
+		&aws.MetricSet{},
+		nil,
+	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
