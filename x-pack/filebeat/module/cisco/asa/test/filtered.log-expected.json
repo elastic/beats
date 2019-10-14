@@ -25,6 +25,7 @@
         "@timestamp": "2019-01-01T01:02:12.000-02:00",
         "cisco.asa.message_id": "106001",
         "cisco.asa.source_interface": "eth0",
+        "destination.address": "192.168.33.12",
         "destination.ip": "192.168.33.12",
         "destination.port": 443,
         "event.action": "firewall-rule",
@@ -46,6 +47,7 @@
         "process.name": "asa",
         "process.pid": 1234,
         "service.type": "cisco",
+        "source.address": "10.13.12.11",
         "source.ip": "10.13.12.11",
         "source.port": 45321,
         "tags": [
