@@ -27,17 +27,30 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 
 	// mage:import
+	build "github.com/elastic/beats/dev-tools/mage/target/build"
+	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/dashboards"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/docs"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	// mage:import
+	update "github.com/elastic/beats/dev-tools/mage/target/update"
 )
 
 func init() {
-	common.RegisterCheckDeps(Update)
+	common.RegisterCheckDeps(update.Update)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
@@ -45,32 +58,6 @@ func init() {
 //CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)
-}
-
-// Build builds the Beat binary.
-func Build() error {
-	return devtools.Build(devtools.DefaultBuildArgs())
-}
-
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
-// Do not use directly, use crossBuild instead.
-func GolangCrossBuild() error {
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuild cross-builds the beat for all target platforms.
-func CrossBuild() error {
-	return devtools.CrossBuild()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // Package packages the Beat for distribution.
@@ -84,8 +71,8 @@ func Package() {
 	devtools.UseElasticBeatOSSPackaging()
 	metricbeat.CustomizePackaging()
 
-	mg.Deps(Update, metricbeat.PrepareModulePackagingOSS)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(update.Update, metricbeat.PrepareModulePackagingOSS)
+	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -106,18 +93,6 @@ func Config() {
 
 func configYML() error {
 	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
-}
-
-// Update updates the generated files (aka make update).
-func Update() error {
-	// TODO to replace by a pure mage implementation:
-	// - Generate docs/fields.asciidoc
-	/*
-		mg.SerialDeps(Fields, Dashboards, Config,
-			metricbeat.PrepareModulePackagingOSS,
-			devtools.GenerateModuleIncludeListGo)
-	*/
-	return sh.Run("make", "update")
 }
 
 // MockedTests runs the HTTP tests using the mocked data inside each {module}/{metricset}/testdata folder.

@@ -32,8 +32,8 @@ If you're upgrading other products in the stack, also read the
 {stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. 
 
 We recommend that you fully upgrade {es} and {kib} to version 7.0
-before upgrading {beats}. If you're on {beats} 6.0 through 6.6,
-upgrade the {stack} and {beats} to version 6.7 *before* proceeding with the
+before upgrading {beats}. If you're on {beats} 6.0 through 6.7,
+upgrade the {stack} and {beats} to version 6.8 *before* proceeding with the
 7.0 upgrade.
 
 Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
@@ -42,19 +42,19 @@ supported.
 IMPORTANT: Please read through all upgrade steps before proceeding. These steps
 are required before running the software for the first time.
 
-[[upgrading-to-6.7]]
-==== Upgrade to {beats} 6.7 before upgrading to 7.0
+[[upgrading-to-6.8]]
+==== Upgrade to {beats} 6.8 before upgrading to 7.0
 
-The upgrade procedure assumes that you have {beats} 6.7 installed. If you're on
-a previous 6.x version of {beats}, upgrade to version 6.7 first. If you're using
+The upgrade procedure assumes that you have {beats} 6.8 installed. If you're on
+a previous 6.x version of {beats}, upgrade to version 6.8 first. If you're using
 other products in the {stack}, upgrade {beats} as part of the
 {stack-ref}/upgrading-elastic-stack.html[{stack} upgrade process].
 
-Upgrading to 6.7 is required because the {es} index template was modified to
+Upgrading to 6.8 is required because the {es} index template was modified to
 be compatible with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
 
-After upgrading to 6.7, use the {ref}/indices-templates.html#getting[Index
-Template API] to verify that the 6.7 index template has been created in {ES}.
+After upgrading to 6.8, use the {ref}/indices-templates.html#getting[Index
+Template API] to verify that the 6.8 index template has been created in {ES}.
 
 :asset: the index template
 :option: template
@@ -65,7 +65,7 @@ NOTE: In previous versions, we advised users to manually force loading of the
 index template. This is no longer recommended. Use the `setup` command instead.
 
 *Metricbeat and Filebeat users:* If you use {beats} central management,
-make sure you migrate the {beats} central management index to 6.7 before you
+make sure you migrate the {beats} central management index to 6.8 before you
 upgrade to 7.0. Although central management is not a GA-level feature in 7.0,
 we've provided a migration tool to help you migrate your configurations from
 version 6.6 to 6.7 or later. For more information, see the
@@ -195,7 +195,7 @@ these changes in place, you generally don't have to do anything to upgrade the
 index template when you move to a new version. Just load the new version of the
 index template *before* ingesting any data into {es}. 
 
-If you plan to run {beats} 6.7 and 7.0 in parallel, make sure you
+If you plan to run {beats} 6.7 or higher and 7.0 in parallel, make sure you
 <<enable-ecs-compatibility,enable the compatibility layer>> *before* you load
 the index template. 
 

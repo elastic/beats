@@ -128,3 +128,17 @@ func TestExpired(t *testing.T) {
 	result := resConfig.Expired()
 	assert.True(t, result)
 }
+
+func TestCompareMetricValues(t *testing.T) {
+	var val1 *float64
+	var val2 *float64
+	result := compareMetricValues(val1, val2)
+	assert.True(t, result)
+	float1 := 1.23
+	val1 = &float1
+	result = compareMetricValues(val1, val2)
+	assert.False(t, result)
+	val2 = &float1
+	result = compareMetricValues(val1, val2)
+	assert.True(t, result)
+}

@@ -65,8 +65,9 @@ processors:
 # Parse the date included in FTD logs
 #
  - date:
+     if: "ctx.event.timezone == null"
      field: "_temp_.raw_date"
-     ignore_failure: true
+     target_field: "@timestamp"
      formats:
       - "ISO8601"
       - "MMM  d HH:mm:ss"
@@ -85,11 +86,30 @@ processors:
       - "MMM dd yyyy HH:mm:ss z"
       - "EEE MMM  d yyyy HH:mm:ss z"
       - "EEE MMM dd yyyy HH:mm:ss z"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
      if: "ctx.event.timezone != null"
-     field: "@timestamp"
-     formats: ["ISO8601"]
      timezone: "{{ event.timezone }}"
+     field: "_temp_.raw_date"
+     target_field: "@timestamp"
+     formats:
+      - "ISO8601"
+      - "MMM  d HH:mm:ss"
+      - "MMM dd HH:mm:ss"
+      - "EEE MMM  d HH:mm:ss"
+      - "EEE MMM dd HH:mm:ss"
+      - "MMM  d HH:mm:ss z"
+      - "MMM dd HH:mm:ss z"
+      - "EEE MMM  d HH:mm:ss z"
+      - "EEE MMM dd HH:mm:ss z"
+      - "MMM  d yyyy HH:mm:ss"
+      - "MMM dd yyyy HH:mm:ss"
+      - "EEE MMM  d yyyy HH:mm:ss"
+      - "EEE MMM dd yyyy HH:mm:ss"
+      - "MMM  d yyyy HH:mm:ss z"
+      - "MMM dd yyyy HH:mm:ss z"
+      - "EEE MMM  d yyyy HH:mm:ss z"
+      - "EEE MMM dd yyyy HH:mm:ss z"
      on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 #

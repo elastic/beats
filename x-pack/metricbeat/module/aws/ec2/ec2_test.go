@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -33,19 +35,19 @@ var (
 
 	id1         = "cpu1"
 	metricName1 = "CPUUtilization"
-	label1      = instanceID + " " + metricName1
+	label1      = instanceID + labelSeparator + metricName1
 
 	id2         = "status1"
 	metricName2 = "StatusCheckFailed"
-	label2      = instanceID + " " + metricName2
+	label2      = instanceID + labelSeparator + metricName2
 
 	id3         = "status2"
 	metricName3 = "StatusCheckFailed_System"
-	label3      = instanceID + " " + metricName3
+	label3      = instanceID + labelSeparator + metricName3
 
 	id4         = "status3"
 	metricName4 = "StatusCheckFailed_Instance"
-	label4      = instanceID + " " + metricName4
+	label4      = instanceID + labelSeparator + metricName4
 )
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
@@ -191,7 +193,10 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		},
 	}
 
-	metricSet := MetricSet{}
+	metricSet := MetricSet{
+		&aws.MetricSet{},
+		nil,
+	}
 	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
@@ -216,7 +221,7 @@ func TestConstructMetricQueries(t *testing.T) {
 	listMetricsOutput := []cloudwatch.Metric{listMetric}
 	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 5*time.Minute)
 	assert.Equal(t, 1, len(metricDataQuery))
-	assert.Equal(t, "i-123 CPUUtilization", *metricDataQuery[0].Label)
+	assert.Equal(t, "i-123|CPUUtilization", *metricDataQuery[0].Label)
 	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)
 	assert.Equal(t, metricName1, *metricDataQuery[0].MetricStat.Metric.MetricName)
 	assert.Equal(t, namespace, *metricDataQuery[0].MetricStat.Metric.Namespace)

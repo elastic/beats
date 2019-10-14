@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -22,7 +22,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -44,7 +44,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11749",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -55,11 +55,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11749 for outside:100.66.211.242/80 to inside:172.31.98.44/1758 duration 0:01:07 bytes 38110 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:49.000Z",
+        "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -79,7 +79,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11748",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -90,11 +90,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11748 for outside:100.66.211.242/80 to inside:172.31.98.44/1757 duration 0:01:07 bytes 44010 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:49.000Z",
+        "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -114,7 +114,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11745",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -125,11 +125,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11745 for outside:100.66.185.90/80 to inside:172.31.98.44/1755 duration 0:01:07 bytes 7652 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:49.000Z",
+        "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -149,7 +149,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11744",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -160,11 +160,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11744 for outside:100.66.185.90/80 to inside:172.31.98.44/1754 duration 0:01:07 bytes 7062 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:49.000Z",
+        "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -184,7 +184,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11742",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -195,11 +195,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11742 for outside:100.66.160.197/80 to inside:172.31.98.44/1752 duration 0:01:08 bytes 5738 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:48.000Z",
+        "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -219,7 +219,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11738",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -230,11 +230,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11738 for outside:100.66.205.14/80 to inside:172.31.98.44/1749 duration 0:01:08 bytes 4176 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:48.000Z",
+        "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -254,7 +254,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11739",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -265,11 +265,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11739 for outside:100.66.124.33/80 to inside:172.31.98.44/1750 duration 0:01:08 bytes 1715 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:48.000Z",
+        "event.start": "2018-10-10T14:33:48.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -289,7 +289,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11731",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -300,11 +300,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11731 for outside:100.66.35.9/80 to inside:172.31.98.44/1747 duration 0:01:09 bytes 45595 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:47.000Z",
+        "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -324,7 +324,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11723",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -335,11 +335,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11723 for outside:100.66.211.242/80 to inside:172.31.98.44/1742 duration 0:01:09 bytes 27359 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:47.000Z",
+        "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -359,7 +359,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11715",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -370,11 +370,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11715 for outside:100.66.218.21/80 to inside:172.31.98.44/1741 duration 0:01:09 bytes 4457 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:47.000Z",
+        "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -394,7 +394,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11711",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -405,11 +405,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11711 for outside:100.66.198.27/80 to inside:172.31.98.44/1739 duration 0:01:09 bytes 26709 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:47.000Z",
+        "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -429,7 +429,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11712",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -440,11 +440,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 69000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11712 for outside:100.66.198.27/80 to inside:172.31.98.44/1740 duration 0:01:09 bytes 22097 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:47.000Z",
+        "event.start": "2018-10-10T14:33:47.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -464,7 +464,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11708",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -475,11 +475,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 70000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11708 for outside:100.66.202.211/80 to inside:172.31.98.44/1738 duration 0:01:10 bytes 2209 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:46.000Z",
+        "event.start": "2018-10-10T14:33:46.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -499,7 +499,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11746",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -510,11 +510,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 67000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11746 for outside:100.66.124.15/80 to inside:172.31.98.44/1756 duration 0:01:07 bytes 10404 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:49.000Z",
+        "event.start": "2018-10-10T14:33:49.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -534,7 +534,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11706",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -545,11 +545,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 70000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11706 for outside:100.66.124.15/80 to inside:172.31.98.44/1737 duration 0:01:10 bytes 123694 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:46.000Z",
+        "event.start": "2018-10-10T14:33:46.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -569,7 +569,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11702",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -580,11 +580,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 71000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11702 for outside:100.66.209.247/80 to inside:172.31.98.44/1736 duration 0:01:11 bytes 35835 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:33:45.000Z",
+        "event.start": "2018-10-10T14:33:45.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -604,7 +604,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11753",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -615,11 +615,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 30000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11753 for outside:100.66.35.162/80 to inside:172.31.98.44/1765 duration 0:00:30 bytes 0 SYN Timeout",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:26.000Z",
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -639,7 +639,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -661,7 +661,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -683,7 +683,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11758",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -694,11 +694,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11758 for outside:100.66.80.32/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 148",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -718,7 +718,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -740,7 +740,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11759",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -751,11 +751,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11759 for outside:100.66.252.6/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 164",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -775,7 +775,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -797,7 +797,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -819,7 +819,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -841,7 +841,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -863,7 +863,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -885,7 +885,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -907,7 +907,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11762",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -918,11 +918,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11762 for outside:100.66.238.126/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 111",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -942,7 +942,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11763",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -953,11 +953,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11763 for outside:100.66.93.51/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 237",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -977,7 +977,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -999,7 +999,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1021,7 +1021,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1043,7 +1043,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1065,7 +1065,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1087,7 +1087,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11772",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1098,11 +1098,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11772 for outside:100.66.240.126/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 87",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1122,7 +1122,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11773",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1133,11 +1133,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11773 for outside:100.66.44.45/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 221",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1157,7 +1157,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1179,7 +1179,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1201,7 +1201,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1223,7 +1223,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1245,7 +1245,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11775",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1256,11 +1256,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11775 for outside:100.66.157.232/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 101",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1280,7 +1280,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11776",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1291,11 +1291,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11776 for outside:100.66.178.133/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 126",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1315,7 +1315,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1337,7 +1337,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1359,7 +1359,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11777",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -1370,11 +1370,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11777 for outside:100.66.133.112/80 to inside:172.31.98.44/1453 duration 0:00:00 bytes 862 TCP FINs",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1394,7 +1394,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1416,7 +1416,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11778",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1427,11 +1427,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11778 for outside:100.66.157.232/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 104",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1451,7 +1451,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11779",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1462,11 +1462,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11779 for outside:100.66.204.197/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 176",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1486,7 +1486,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1508,7 +1508,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1530,7 +1530,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1552,7 +1552,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1574,7 +1574,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1596,7 +1596,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1618,7 +1618,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1640,7 +1640,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11783",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1651,11 +1651,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11783 for outside:100.66.100.4/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 104",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1675,7 +1675,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1697,7 +1697,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1719,7 +1719,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1741,7 +1741,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1763,7 +1763,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1785,7 +1785,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11784",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -1796,11 +1796,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11784 for outside:100.66.198.40/80 to inside:172.31.98.44/1457 duration 0:00:00 bytes 593 TCP FINs",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1820,7 +1820,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1842,7 +1842,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1864,7 +1864,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11786",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -1875,11 +1875,11 @@
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302016: Teardown UDP connection 11786 for outside:100.66.1.107/53 to inside:172.31.98.44/56132 duration 0:00:00 bytes 375",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -1899,7 +1899,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1921,7 +1921,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1943,7 +1943,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
         "event.code": 305012,
@@ -1965,7 +1965,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -1987,7 +1987,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -2009,7 +2009,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
         "event.code": 305012,
@@ -2031,7 +2031,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
         "event.code": 305012,
@@ -2053,7 +2053,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
         "event.code": 305012,
@@ -2075,7 +2075,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
         "event.code": 305012,
@@ -2097,7 +2097,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
         "event.code": 305012,
@@ -2119,7 +2119,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305012",
         "event.action": "firewall-rule",
         "event.code": 305012,
@@ -2141,7 +2141,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11564",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -2152,11 +2152,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 325000000000,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11564 for outside:100.66.115.46/80 to inside:172.31.156.80/1382 duration 0:05:25 bytes 575 TCP FINs",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:29:31.000Z",
+        "event.start": "2018-10-10T14:29:31.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -2176,7 +2176,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.connection_id": "11797",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302014",
@@ -2187,11 +2187,11 @@
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-10-10T10:34:56.000-02:00",
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 11797 for outside:100.66.19.254/80 to inside:172.31.156.80/1385 duration 0:00:00 bytes 5391 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2018-10-10T12:34:56.000Z",
+        "event.start": "2018-10-10T14:34:56.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "localhost",
@@ -2211,7 +2211,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -2233,7 +2233,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -2255,7 +2255,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2287,7 +2287,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2319,7 +2319,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2351,7 +2351,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2383,7 +2383,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2415,7 +2415,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2447,7 +2447,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2479,7 +2479,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2511,7 +2511,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2543,7 +2543,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2575,7 +2575,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2607,7 +2607,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2639,7 +2639,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "inbound",
@@ -2671,7 +2671,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -2693,7 +2693,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -2715,7 +2715,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -2737,7 +2737,7 @@
         ]
     },
     {
-        "@timestamp": "2018-10-10T10:34:56.000-02:00",
+        "@timestamp": "2018-10-10T12:34:56.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,

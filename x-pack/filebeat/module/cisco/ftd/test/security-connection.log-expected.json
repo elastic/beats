@@ -638,7 +638,7 @@
         "user.name": "No Authentication Required"
     },
     {
-        "@timestamp": "2019-08-14T13:09:41.000-02:00",
+        "@timestamp": "2019-08-14T15:09:41.000-02:00",
         "cisco.ftd.destination_interface": "output",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
@@ -683,12 +683,12 @@
         "event.code": 430003,
         "event.dataset": "cisco.ftd",
         "event.duration": 1000000000,
-        "event.end": "2019-08-14T13:09:41.000-02:00",
+        "event.end": "2019-08-14T15:09:41.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-1-430003: AccessControlRuleAction: Block, AccessControlRuleReason: File Block, SrcIP: 10.0.1.20, DstIP: 10.0.100.30, SrcPort: 41544, DstPort: 8000, Protocol: tcp, IngressInterface: input, EgressInterface: output, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Intrusion-Rule, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: curl/7.58.0, Client: cURL, ClientVersion: 7.58.0, ApplicationProtocol: HTTP, ConnectionDuration: 1, FileCount: 1, InitiatorPackets: 4, ResponderPackets: 7, InitiatorBytes: 365, ResponderBytes: 1927, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: 10.0.100.30:8000, URL: http://10.0.100.30:8000/eicar_com.zip",
         "event.outcome": "block",
         "event.severity": 1,
-        "event.start": "2019-08-14T15:09:40.000Z",
+        "event.start": "2019-08-14T17:09:40.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",

@@ -1,0 +1,14 @@
+- key: azure
+  title: "Azure"
+  release: beta
+  description: >
+    Azure Module
+  fields:
+    - name: azure
+      type: group
+      description: >
+      fields:
+        - name: resource_id
+          type: keyword
+          description: >
+            Resource ID
