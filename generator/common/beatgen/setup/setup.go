@@ -74,9 +74,15 @@ func CopyVendor() error {
 	if err != nil {
 		return errors.Wrap(err, "error creating vendor dir")
 	}
-	if _, isDev := os.LookupEnv(CfgPrefix + "_DEV"); isDev {
+
+	isClean, err := checkBeatsDirClean()
+	if err != nil {
+		return errors.Wrap(err, "error in checkIfBeatsDirClean")
+	}
+
+	if !isClean {
 		//Dev mode. Use CP.
-		fmt.Printf("CopyVendor running in dev mode, elastic/beats will be copied into the vendor directory with cp\n")
+		fmt.Printf("You have uncommited changes in elastic/beats. Running CopyVendor running in dev mode, elastic/beats will be copied into the vendor directory with cp\n")
 		vendorPath = filepath.Join(vendorPath, "beats")
 
 		err = sh.Run("cp", "-R", beatPath, vendorPath)
@@ -108,6 +114,24 @@ func CopyVendor() error {
 
 	return nil
 
+}
+
+// checkIfBeatsDirClean checks to see if the working elastic/beats dir is modified.
+// If it is, we'll use a different method to copy beats to vendor/
+func checkBeatsDirClean() (bool, error) {
+	beatPath, err := devtools.ElasticBeatsDir()
+	if err != nil {
+		return false, errors.Wrap(err, "Could not find ElasticBeatsDir")
+	}
+	out, err := sh.Output("git", "-C", beatPath, "status", "--porcelain")
+	if err != nil {
+		return false, errors.Wrap(err, "Error checking status of elastic/beats repo")
+	}
+
+	if len(out) == 0 {
+		return true, nil
+	}
+	return false, nil
 }
 
 // GitInit initializes a new git repo in the current directory
