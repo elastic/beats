@@ -35,6 +35,7 @@ var threat = (function () {
         var indicator_type = evt.Get("json.type");
         var attackPattern;
         var arr;
+        var ip;
         var filename;
         var v = evt.Get("json.value");
         evt.Put("message", v);
@@ -118,7 +119,7 @@ var threat = (function () {
                 evt.Put("destination.domain", v);
                 break;
             case "ip-dst":
-                var ip = v.split("/")[0];
+                ip = v.split("/")[0];
                 attackPattern = '[destination.ip = ' + '\'' + ip + '\'' + ']';
                 evt.Put("destination.ip", ip);
                 break;
@@ -130,7 +131,7 @@ var threat = (function () {
                 }
                 break;
             case "ip-src":
-                var ip = v.split("/")[0];
+                ip = v.split("/")[0];
                 attackPattern = '[' + 'source.ip = ' + '\'' + ip + '\'' + ']';
                 evt.Put("source.ip", ip);
                 break;
