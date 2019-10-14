@@ -7,7 +7,8 @@ class Test(XPackTest):
     COMPOSE_SERVICES = ['appsearch']
     COMPOSE_TIMEOUT = 600
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    # This test timeouts in CI https://github.com/elastic/beats/issues/14057
+    @unittest.skip("temporarily disabled")
     def test_stats(self):
         self.render_config_template(modules=[{
             "name": "appsearch",
