@@ -38,6 +38,8 @@ ec2:DescribeInstances
 ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]
