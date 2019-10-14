@@ -18,8 +18,6 @@
 package nomad
 
 import (
-	"fmt"
-	"os"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -86,14 +84,9 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
-	hostname, err := os.Hostname()
-	if err != nil || len(hostname) == 0 {
-		return nil, fmt.Errorf("Error getting the hostname: %v", err)
-	}
-
 	options := nomad.WatchOptions{
-		SyncTimeout: 1 * time.Second,
-		Node:        hostname,
+		SyncTimeout: 120 * time.Second,
+		Node:        config.Host,
 	}
 
 	watcher, err := nomad.NewWatcher(client, options)
@@ -116,16 +109,16 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	// add an event handler to deal with the "events" receveid from the API
 	watcher.AddEventHandler(nomad.ResourceEventHandlerFuncs{
 		AddFunc: func(obj nomad.Resource) {
-			logp.Debug("nomad", "Watcher Allocation add: %+v", obj)
+			logp.Debug("nomad", "Watcher Allocation add: %+v", obj.ID)
 			p.emit(&obj, "start")
 		},
 		UpdateFunc: func(obj nomad.Resource) {
-			logp.Debug("nomad", "Watcher Allocation update: %+v", obj)
+			logp.Debug("nomad", "Watcher Allocation update: %+v", obj.ID)
 			p.emit(&obj, "stop")
 			p.emit(&obj, "start")
 		},
 		DeleteFunc: func(obj nomad.Resource) {
-			logp.Debug("nomad", "Watcher Allocation delete: %+v", obj)
+			logp.Debug("nomad", "Watcher Allocation delete: %+v", obj.ID)
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "stop") })
 		},
 	})
@@ -169,22 +162,31 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 		nodeName = host
 	}
 
-	objMeta := p.metagen.ResourceMetadata(*obj)
+	// metadata from the entire allocation
+	rawMeta := p.metagen.ResourceMetadata(*obj)
+	tasks, ok := rawMeta["tasks"].([]common.MapStr)
+	if !ok {
+		logp.Err("Error getting the allocation's metadata: %+v", rawMeta)
+	}
+	rawMeta.Delete("tasks")
 
-	for _, group := range obj.Job.TaskGroups {
-		for range group.Tasks {
-			event := bus.Event{
-				"provider": p.uuid,
-				"id":       obj.ID,
-				flag:       true,
-				"host":     nodeName,
-				"meta": common.MapStr{
-					"nomad": objMeta,
-				},
-			}
+	// emit per-task separated events
+	for i := range tasks {
+		// TODO Fix this
+		// patch rawMeta with the meta for the current task
+		rawMeta.Put("tasks", []common.MapStr{
+			tasks[i],
+		})
 
-			p.publish(event)
+		event := bus.Event{
+			"provider": p.uuid,
+			"id":       obj.ID,
+			flag:       true,
+			"host":     nodeName,
+			"meta":     rawMeta,
 		}
+
+		p.publish(event)
 	}
 }
 
@@ -237,6 +239,14 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 		// that there is not an attempt to spin up a docker input for a rkt container and when a
 		// rkt input exists it would be natively supported.
 		e["container"] = container
+	}
+
+	// for hints we look at the aggregated task's meta
+	if rawTasks, ok := meta["tasks"]; ok {
+		tasks := rawTasks.([]common.MapStr)
+
+		// TODO Fix this issue here
+		meta = tasks[0]
 	}
 
 	cname := builder.GetContainerName(container)

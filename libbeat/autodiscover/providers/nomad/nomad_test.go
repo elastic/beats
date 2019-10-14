@@ -44,27 +44,6 @@ func TestGenerateHints(t *testing.T) {
 			event:  bus.Event{},
 			result: bus.Event{},
 		},
-		// Only kubernetes payload must return only kubernetes as part of the hint
-		{
-			event: bus.Event{
-				"meta": common.MapStr{
-					"task1": common.MapStr{
-						"group-key": "group",
-						"job-key":   "job",
-						"task-key":  "task",
-					},
-				},
-			},
-			result: bus.Event{
-				"meta": common.MapStr{
-					"task1": common.MapStr{
-						"group-key": "group",
-						"job-key":   "job",
-						"task-key":  "task",
-					},
-				},
-			},
-		},
 		// Scenarios being tested:
 		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
 		// metrics/module must be found in hints.metrics
@@ -72,20 +51,28 @@ func TestGenerateHints(t *testing.T) {
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
 			event: bus.Event{
-				"meta": getNestedAnnotations(common.MapStr{
-					"co.elastic.logs/multiline.pattern": "^test",
-					"co.elastic.metrics/module":         "prometheus",
-					"co.elastic.metrics/period":         "10s",
-					"not.to.include":                    "true",
-				}),
+				"meta": common.MapStr{
+					"tasks": []common.MapStr{
+						getNestedAnnotations(common.MapStr{
+							"co.elastic.logs/multiline.pattern": "^test",
+							"co.elastic.metrics/module":         "prometheus",
+							"co.elastic.metrics/period":         "10s",
+							"not.to.include":                    "true",
+						}),
+					},
+				},
 			},
 			result: bus.Event{
-				"meta": getNestedAnnotations(common.MapStr{
-					"co.elastic.logs/multiline.pattern": "^test",
-					"co.elastic.metrics/module":         "prometheus",
-					"co.elastic.metrics/period":         "10s",
-					"not.to.include":                    "true",
-				}),
+				"meta": common.MapStr{
+					"tasks": []common.MapStr{
+						getNestedAnnotations(common.MapStr{
+							"co.elastic.logs/multiline.pattern": "^test",
+							"co.elastic.metrics/module":         "prometheus",
+							"co.elastic.metrics/period":         "10s",
+							"not.to.include":                    "true",
+						}),
+					},
+				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
 						"multiline": common.MapStr{
@@ -107,7 +94,7 @@ func TestGenerateHints(t *testing.T) {
 		config: cfg,
 	}
 	for _, test := range tests {
-		assert.Equal(t, p.generateHints(test.event), test.result)
+		assert.Equal(t, test.result, p.generateHints(test.event))
 	}
 }
 
@@ -184,27 +171,27 @@ func TestEmitEvent(t *testing.T) {
 				"start":    true,
 				"host":     host,
 				"meta": common.MapStr{
-					"nomad": common.MapStr{
-						"datacenters": []string{"europe-west4"},
-						"job":         "my-job",
-						"meta": []common.MapStr{
-							common.MapStr{
-								"task1": common.MapStr{
-									"canary_tags": []string{"web", "nginx"},
-									"group-key":   "group.value",
-									"job-key":     "job.value",
-									"key1":        "task-value",
-									"name":        []string{"web", "nginx"},
-									"tags":        []string{"web", "nginx", "tag-c", "tag-d"},
-									"task-key":    "task.value"},
+					"datacenters": []string{"europe-west4"},
+					"job":         "my-job",
+					"tasks": []common.MapStr{
+						common.MapStr{
+							"group-key": "group.value",
+							"job-key":   "job.value",
+							"key1":      "task-value",
+							"name":      "task1",
+							"service": common.MapStr{
+								"canary_tags": []string{"web", "nginx"},
+								"name":        []string{"web", "nginx"},
+								"tags":        []string{"web", "nginx", "tag-c", "tag-d"},
 							},
+							"task-key": "task.value",
 						},
-						"name":      "job.task",
-						"namespace": "default",
-						"region":    "global",
-						"type":      "service",
-						"uuid":      UUID.String(),
 					},
+					"name":      "job.task",
+					"namespace": "default",
+					"region":    "global",
+					"type":      "service",
+					"uuid":      UUID.String(),
 				},
 			},
 		},
