@@ -1322,6 +1322,20 @@ pod metadata based on all container IDs, and a `logs_path` matcher, which takes
 the `log.file.path` field, extracts the container ID, and uses it to retrieve
 metadata.
 
+
+#### Default Indexers/Matchers
+|===
+|Beat |Default Indexer |Default Matcher
+
+|Metricbeat
+|ip_port
+|fields.lookup_fields: ["metricset.host"]
+
+|Filebeat
+|container
+|logs_path
+|===
+
 The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
 
