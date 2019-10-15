@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix delay in enforcing close_renamed and close_removed options. {issue}13488[13488] {pull}13907[13907]
 - Fix missing netflow fields in index template. {issue}13768[13768] {pull}13914[13914]
 - Fix cisco module's asa and ftd filesets parsing of domain names where an IP address is expected. {issue}14034[14034]
+- Fixed increased memory usage with large files when multiline pattern does not match. {issue}14068[14068]
 
 *Heartbeat*
 
