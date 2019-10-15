@@ -76,13 +76,21 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 		}()
 	}
 
+	timer := time.NewTimer(r.timeout)
+	defer func() {
+		timer.Stop()
+		select {
+		case <-timer.C:
+		default:
+		}
+	}()
 	select {
 	case msg := <-r.ch:
 		if msg.err != nil {
 			r.running = false
 		}
 		return msg.line, msg.err
-	case <-time.After(r.timeout):
+	case <-timer.C:
 		return reader.Message{}, r.signal
 	}
 }
