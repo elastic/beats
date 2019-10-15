@@ -93,7 +93,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 		t.Fatal(err)
 	}
 	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all, dontResolveDNS)
+	flows, err := getFlows(st.DoneFlows(), all)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,9 +181,7 @@ func (noDNSResolution) ResolveIP(pid uint32, ip net.IP) (domain string, found bo
 	return "", false
 }
 
-var dontResolveDNS dnsResolver = noDNSResolution{}
-
-func getFlows(list linkedList, filter func(*flow) bool, resolver dnsResolver) (evs []beat.Event, err error) {
+func getFlows(list linkedList, filter func(*flow) bool) (evs []beat.Event, err error) {
 	var errs multierror.Errors
 	for elem := list.get(); elem != nil; elem = list.get() {
 		flow, ok := elem.(*flow)
@@ -194,7 +192,7 @@ func getFlows(list linkedList, filter func(*flow) bool, resolver dnsResolver) (e
 		if !filter(flow) {
 			continue
 		}
-		ev, err := flow.toEvent(true, resolver)
+		ev, err := flow.toEvent(true)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -257,9 +255,25 @@ func copyCString(dst []byte, src []byte) {
 	}
 }
 
+type dnsTestCase struct {
+	found      bool
+	proc       *process
+	ip, domain string
+}
+
+type dnsTestCases []dnsTestCase
+
+func (c dnsTestCases) Run(t *testing.T) {
+	for idx, test := range c {
+		msg := fmt.Sprintf("test entry #%d : %+v", idx, test)
+		domain, found := test.proc.ResolveIP(net.ParseIP(test.ip))
+		assert.Equal(t, test.found, found, msg)
+		assert.Equal(t, test.domain, domain, msg)
+	}
+}
+
 func TestDNSTracker(t *testing.T) {
 	const infiniteExpiration = time.Hour * 3
-	const PID = 777
 	local1 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55555}
 	local2 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55556}
 	trV4 := dns.Transaction{
@@ -277,107 +291,79 @@ func TestDNSTracker(t *testing.T) {
 		Addresses: []net.IP{net.ParseIP("2001:db8::1111"), net.ParseIP("2001:db8::2222")},
 	}
 	t.Run("transaction before register", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
 		tracker := newDNSTracker(infiniteExpiration)
 		tracker.AddTransaction(trV4)
 		tracker.AddTransaction(trV6)
-		tracker.RegisterEndpoint(local1, PID)
-		tracker.RegisterEndpoint(local2, PID)
-		for idx, test := range []struct {
-			found      bool
-			pid        uint32
-			ip, domain string
-		}{
-			{true, PID, "192.0.2.12", "example.net"},
-			{true, PID, "192.0.2.13", "example.net"},
-			{true, PID, "2001:db8::1111", "example.com"},
-			{true, PID, "2001:db8::2222", "example.com"},
-			{false, PID + 1, "192.0.2.12", ""},
-			{false, PID + 1, "2001:db8::2222", ""},
-			{false, PID, "192.168.0.2", ""},
-			{false, PID, "2001:db8::3333", ""},
-		} {
-			msg := fmt.Sprintf("test entry #%d", idx)
-			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
-			assert.Equal(t, test.found, found, msg)
-			assert.Equal(t, test.domain, domain, msg)
-		}
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{true, proc1, "2001:db8::1111", "example.com"},
+			{true, proc1, "2001:db8::2222", "example.com"},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
 	})
 	t.Run("transaction after register", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
 		tracker := newDNSTracker(infiniteExpiration)
-		tracker.RegisterEndpoint(local1, PID)
-		tracker.RegisterEndpoint(local2, PID)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
 		tracker.AddTransaction(trV4)
 		tracker.AddTransaction(trV6)
-		for idx, test := range []struct {
-			found      bool
-			pid        uint32
-			ip, domain string
-		}{
-			{true, PID, "192.0.2.12", "example.net"},
-			{true, PID, "192.0.2.13", "example.net"},
-			{true, PID, "2001:db8::1111", "example.com"},
-			{true, PID, "2001:db8::2222", "example.com"},
-			{false, PID + 1, "192.0.2.12", ""},
-			{false, PID + 1, "2001:db8::2222", ""},
-			{false, PID, "192.168.0.2", ""},
-			{false, PID, "2001:db8::3333", ""},
-		} {
-			msg := fmt.Sprintf("test entry #%d", idx)
-			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
-			assert.Equal(t, test.found, found, msg)
-			assert.Equal(t, test.domain, domain, msg)
-		}
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{true, proc1, "2001:db8::1111", "example.com"},
+			{true, proc1, "2001:db8::2222", "example.com"},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
 	})
 	t.Run("unknown local endpoint", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
 		tracker := newDNSTracker(infiniteExpiration)
-		tracker.RegisterEndpoint(local1, PID)
-		// tracker.RegisterEndpoint(local2, PID)
+		tracker.RegisterEndpoint(local1, proc1)
 		tracker.AddTransaction(trV4)
 		tracker.AddTransaction(trV6)
-		for idx, test := range []struct {
-			found      bool
-			pid        uint32
-			ip, domain string
-		}{
-			{true, PID, "192.0.2.12", "example.net"},
-			{true, PID, "192.0.2.13", "example.net"},
-			{false, PID, "2001:db8::1111", ""},
-			{false, PID, "2001:db8::2222", ""},
-			{false, PID + 1, "192.0.2.12", ""},
-			{false, PID + 1, "2001:db8::2222", ""},
-			{false, PID, "192.168.0.2", ""},
-			{false, PID, "2001:db8::3333", ""},
-		} {
-			msg := fmt.Sprintf("test entry #%d", idx)
-			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
-			assert.Equal(t, test.found, found, msg)
-			assert.Equal(t, test.domain, domain, msg)
-		}
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{false, proc1, "2001:db8::1111", ""},
+			{false, proc1, "2001:db8::2222", ""},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
 	})
 	t.Run("expiration", func(t *testing.T) {
-		tracker := newDNSTracker(time.Millisecond)
-		tracker.RegisterEndpoint(local1, PID)
+		proc1 := &process{pid: 123}
+		tracker := newDNSTracker(10 * time.Millisecond)
 		tracker.AddTransaction(trV4)
-		tracker.RegisterEndpoint(local2, PID)
 		tracker.AddTransaction(trV6)
-		time.Sleep(time.Millisecond * 2)
-		for idx, test := range []struct {
-			found      bool
-			pid        uint32
-			ip, domain string
-		}{
-			{false, PID, "192.0.2.12", ""},
-			{false, PID, "192.0.2.13", ""},
-			{false, PID, "2001:db8::1111", ""},
-			{false, PID, "2001:db8::2222", ""},
-		} {
-			msg := fmt.Sprintf("test entry #%d", idx)
-			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
-			assert.Equal(t, test.found, found, msg)
-			assert.Equal(t, test.domain, domain, msg)
-		}
+		time.Sleep(time.Millisecond * 50)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		dnsTestCases{
+			{false, proc1, "192.0.2.12", ""},
+			{false, proc1, "192.0.2.13", ""},
+			{false, proc1, "2001:db8::1111", ""},
+			{false, proc1, "2001:db8::2222", ""},
+		}.Run(t)
 	})
 	t.Run("same IP different domains", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
 		trV4alt := dns.Transaction{
 			TXID:      1234,
 			Client:    local2,
@@ -388,20 +374,11 @@ func TestDNSTracker(t *testing.T) {
 		tracker := newDNSTracker(infiniteExpiration)
 		tracker.AddTransaction(trV4)
 		tracker.AddTransaction(trV4alt)
-		tracker.RegisterEndpoint(local1, PID)
-		tracker.RegisterEndpoint(local2, PID+1)
-		for idx, test := range []struct {
-			found      bool
-			pid        uint32
-			ip, domain string
-		}{
-			{true, PID, "192.0.2.12", "example.net"},
-			{true, PID + 1, "192.0.2.12", "example.com"},
-		} {
-			msg := fmt.Sprintf("test entry #%d", idx)
-			domain, found := tracker.ResolveIP(test.pid, net.ParseIP(test.ip))
-			assert.Equal(t, test.found, found, msg)
-			assert.Equal(t, test.domain, domain, msg)
-		}
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc2)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc2, "192.0.2.12", "example.com"},
+		}.Run(t)
 	})
 }

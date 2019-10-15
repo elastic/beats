@@ -223,6 +223,24 @@ type process struct {
 
 	// populated by state from created
 	createdTime time.Time
+
+	// populated by DNS enrichment.
+	resolvedDomains map[string]string
+}
+
+func (p *process) addTransaction(tr dns.Transaction) {
+	if p.resolvedDomains == nil {
+		p.resolvedDomains = make(map[string]string)
+	}
+	for _, addr := range tr.Addresses {
+		p.resolvedDomains[addr.String()] = tr.Domain
+	}
+}
+
+// ResolveIP returns the domain associated with the given IP.
+func (p *process) ResolveIP(ip net.IP) (domain string, found bool) {
+	domain, found = p.resolvedDomains[ip.String()]
+	return
 }
 
 type socket struct {
@@ -264,49 +282,27 @@ func (s *socket) Timestamp() time.Time {
 	return s.closeTime
 }
 
-type pidAddress struct {
-	pid  uint32
-	addr net.IP
-}
-
-// String returns the string representation.
-func (p pidAddress) String() string {
-	return strconv.Itoa(int(p.pid)) + "|" + p.addr.String()
-}
-
-type dnsResolver interface {
-	// ResolveIP returns the domain associated to the given IP.
-	ResolveIP(pid uint32, ip net.IP) (domain string, found bool)
-}
-
 type dnsTracker struct {
-	sync.Mutex
 	// map[net.UDPAddr(string)][]dns.Transaction
 	transactionByClient *common.Cache
 
-	// map[net.UDPAddr(string)]uint32
-	pidByClient *common.Cache
-
-	// map[pidAddress(string)]string
-	reverseHosts *common.Cache
+	// map[net.UDPAddr(string)]*process
+	processByClient *common.Cache
 }
 
 func newDNSTracker(timeout time.Duration) dnsTracker {
 	return dnsTracker{
 		transactionByClient: common.NewCache(timeout, 8),
-		pidByClient:         common.NewCache(timeout, 8),
-		reverseHosts:        common.NewCache(timeout, 8),
+		processByClient:     common.NewCache(timeout, 8),
 	}
 }
 
 // AddTransaction registers a new DNS transaction.
 func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
-	dt.Lock()
-	defer dt.Unlock()
 	clientAddr := tr.Client.String()
-	if pidIf := dt.pidByClient.Get(clientAddr); pidIf != nil {
-		if pid, ok := pidIf.(uint32); ok {
-			dt.addTransactionWithPID(tr, pid)
+	if procIf := dt.processByClient.Get(clientAddr); procIf != nil {
+		if proc, ok := procIf.(*process); ok {
+			proc.addTransaction(tr)
 			return
 		}
 	}
@@ -318,51 +314,28 @@ func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
 	dt.transactionByClient.Put(clientAddr, list)
 }
 
-func (dt *dnsTracker) addTransactionWithPID(tr dns.Transaction, pid uint32) {
-	for _, addr := range tr.Addresses {
-		dt.reverseHosts.Put(pidAddress{pid: pid, addr: addr}.String(), tr.Domain)
-	}
-}
-
-// AddTransactionWithPID registers a new DNS transaction from the given PID.
-func (dt *dnsTracker) AddTransactionWithPID(tr dns.Transaction, pid uint32) {
-	dt.Lock()
-	defer dt.Unlock()
-	dt.addTransactionWithPID(tr, pid)
+// AddTransactionWithProcess registers a new DNS transaction for the given process.
+func (dt *dnsTracker) AddTransactionWithProcess(tr dns.Transaction, proc *process) {
+	proc.addTransaction(tr)
 }
 
 // CleanUp removes expired entries from the maps.
 func (dt *dnsTracker) CleanUp() {
-	dt.Lock()
-	defer dt.Unlock()
 	dt.transactionByClient.CleanUp()
-	dt.pidByClient.CleanUp()
-	dt.reverseHosts.CleanUp()
+	dt.processByClient.CleanUp()
 }
 
 // RegisterEndpoint registers a new local endpoint used for DNS queries
 // to correlate captured DNS packets with their originator process.
-func (dt *dnsTracker) RegisterEndpoint(addr net.UDPAddr, pid uint32) {
-	dt.Lock()
-	defer dt.Unlock()
+func (dt *dnsTracker) RegisterEndpoint(addr net.UDPAddr, proc *process) {
 	key := addr.String()
-	dt.pidByClient.Put(key, pid)
+	dt.processByClient.Put(key, proc)
 	if listIf := dt.transactionByClient.Get(key); listIf != nil {
 		list := listIf.([]dns.Transaction)
 		for _, tr := range list {
-			dt.addTransactionWithPID(tr, pid)
+			proc.addTransaction(tr)
 		}
 	}
-}
-
-// ResolveIP returns the domain associated with the given IP.
-func (dt *dnsTracker) ResolveIP(pid uint32, ip net.IP) (domain string, found bool) {
-	dt.Lock()
-	defer dt.Unlock()
-	if domainIf := dt.reverseHosts.Get(pidAddress{pid: pid, addr: ip}.String()); domainIf != nil {
-		domain, found = domainIf.(string)
-	}
-	return
 }
 
 type state struct {
@@ -497,7 +470,7 @@ func (s *state) reapLoop() {
 					// to prevent a feedback loop.
 					continue
 				}
-				ev, err := flow.toEvent(true, &s.dns)
+				ev, err := flow.toEvent(true)
 				if err != nil {
 					s.log.Errorf("Failed to convert flow=%v err=%v", flow, err)
 					continue
@@ -627,13 +600,6 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 				flow.local.addr = f.local.addr
 			}
 		}
-		if f.proto == protoUDP && f.remote.addr.Port == 53 {
-			localUDP := net.UDPAddr{
-				IP:   f.local.addr.IP,
-				Port: f.local.addr.Port,
-			}
-			s.dns.RegisterEndpoint(localUDP, sock.pid)
-		}
 	}
 	if sockNoDir := sock.dir == directionUnknown; sockNoDir != (f.dir == directionUnknown) {
 		if sockNoDir {
@@ -730,9 +696,20 @@ func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	}
 	s.mutualEnrich(sock, &ref)
 	prev.updateWith(ref, s)
+	s.enrichDNS(prev)
 	s.lru.remove(prev)
 	s.lru.add(prev)
 	return nil
+}
+
+func (s *state) enrichDNS(f *flow) {
+	if f.remote.addr.Port == 53 && f.proto == protoUDP && f.pid != 0 && f.process != nil {
+		localUDP := net.UDPAddr{
+			IP:   f.local.addr.IP,
+			Port: f.local.addr.Port,
+		}
+		s.dns.RegisterEndpoint(localUDP, f.process)
+	}
 }
 
 func (f *flow) updateWith(ref flow, s *state) {
@@ -826,7 +803,7 @@ func (l *linkedList) remove(e linkedElement) {
 	e.SetNext(nil)
 }
 
-func (f *flow) toEvent(final bool, resolver dnsResolver) (ev mb.Event, err error) {
+func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	localAddr := f.local.addr
 	remoteAddr := f.remote.addr
 
@@ -894,7 +871,6 @@ func (f *flow) toEvent(final bool, resolver dnsResolver) (ev mb.Event, err error
 
 	metricset := common.MapStr{
 		"kernel_sock_address": fmt.Sprintf("0x%x", f.sock),
-		"internal_version":    "1.0.3",
 	}
 
 	if f.pid != 0 {
@@ -926,13 +902,11 @@ func (f *flow) toEvent(final bool, resolver dnsResolver) (ev mb.Event, err error
 				metricset["egid"] = f.process.egid
 			}
 
-			if resolver != nil {
-				if domain, found := resolver.ResolveIP(f.pid, f.local.addr.IP); found {
-					local["domain"] = domain
-				}
-				if domain, found := resolver.ResolveIP(f.pid, f.remote.addr.IP); found {
-					remote["domain"] = domain
-				}
+			if domain, found := f.process.ResolveIP(f.local.addr.IP); found {
+				local["domain"] = domain
+			}
+			if domain, found := f.process.ResolveIP(f.remote.addr.IP); found {
+				remote["domain"] = domain
 			}
 		}
 		root["process"] = process
