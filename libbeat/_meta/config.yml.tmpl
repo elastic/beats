@@ -97,7 +97,7 @@ processors:
 
 {{- if .UseKubernetesMetadataProcessor }}
   - add_kubernetes_metadata: ~
-{{ else }}
+{{- else -}}
 {{ end }}
 {{else}}
 processors:

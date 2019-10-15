@@ -123,7 +123,6 @@ processors:
   - add_docker_metadata: ~
   - add_kubernetes_metadata: ~
 
-
 #================================ Logging =====================================
 
 # Sets log level. The default log level is info.

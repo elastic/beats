@@ -204,7 +204,6 @@ processors:
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
 
-
 #================================ Logging =====================================
 
 # Sets log level. The default log level is info.
