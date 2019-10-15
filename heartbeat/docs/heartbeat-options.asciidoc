@@ -212,6 +212,13 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+[[monitor-keep-null]]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
+
+[float]
 [[monitor-icmp-options]]
 === ICMP options
 
@@ -446,7 +453,7 @@ Set `response.include_body_max_bytes` to control the maximum size of the stored 
 [[monitor-http-check]]
 ==== `check`
 
-An optional `request` to send to the remote host and the expected `response`. 
+An optional `request` to send to the remote host and the expected `response`.
 
 Example configuration:
 

@@ -208,9 +208,9 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	// Need to make sure that the trigger has finished before extracting
 	// results because there could be data-races between Trigger and Extract.
 	select {
-	case result := <-thread.C():
-		if result.Err != nil {
-			return nil, errors.Wrap(err, "trigger execution failed")
+	case r := <-thread.C():
+		if r.Err != nil {
+			return nil, errors.Wrap(r.Err, "trigger execution failed")
 		}
 	case <-timer.C:
 		return nil, errors.New("timeout while waiting for trigger to complete")

@@ -2267,6 +2267,24 @@
 			"revisionTime": "2019-04-08T17:44:45Z"
 		},
 		{
+			"checksumSHA1": "I7I4rckKCb3SLIY2AqfEmJ/maec=",
+			"path": "github.com/google/gopacket",
+			"revision": "0ad7f2610e344e58c1c95e2adda5c3258da8e97b",
+			"revisionTime": "2019-10-09T16:37:24Z"
+		},
+		{
+			"checksumSHA1": "sN9Kuv7R0K4gjRYnyG95vEb0k9s=",
+			"path": "github.com/google/gopacket/afpacket",
+			"revision": "0ad7f2610e344e58c1c95e2adda5c3258da8e97b",
+			"revisionTime": "2019-10-09T16:37:24Z"
+		},
+		{
+			"checksumSHA1": "CElVSky7n3cuKstd4LrIxGUREuA=",
+			"path": "github.com/google/gopacket/layers",
+			"revision": "0ad7f2610e344e58c1c95e2adda5c3258da8e97b",
+			"revisionTime": "2019-10-09T16:37:24Z"
+		},
+		{
 			"checksumSHA1": "WZoHSeTnVjnPIX2+U1Otst5MUKw=",
 			"path": "github.com/googleapis/gax-go/v2",
 			"revision": "bd5b16380fd03dc758d11cef74ba2e3bc8b0e8c2",
