@@ -45,7 +45,7 @@ Using terraform to deploy a testing scenario
 
 Terraform configuration is included in the metricset to deploy an scenario that deploys
 some instances with running services and a set of load balancers for these
-services
+services.
 
 Configuration files can be found in `_meta/terraform`, and deployed with
 `terraform apply`. It will get credentials from your configuration, some
