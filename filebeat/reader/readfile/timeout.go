@@ -28,7 +28,7 @@ var (
 	errTimeout = errors.New("timeout")
 )
 
-// timeoutProcessor will signal some configurable timeout error if no
+// TimeoutReader will signal some configurable timeout error if no
 // new line can be returned in time.
 type TimeoutReader struct {
 	reader  reader.Reader
@@ -43,7 +43,7 @@ type lineMessage struct {
 	err  error
 }
 
-// New returns a new timeout reader from an input line reader.
+// NewTimeoutReader returns a new timeout reader from an input line reader.
 func NewTimeoutReader(reader reader.Reader, signal error, t time.Duration) *TimeoutReader {
 	if signal == nil {
 		signal = errTimeout
@@ -75,14 +75,15 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 			}
 		}()
 	}
-
+	timer := time.NewTimer(r.timeout)
 	select {
 	case msg := <-r.ch:
 		if msg.err != nil {
 			r.running = false
 		}
+		timer.Stop()
 		return msg.line, msg.err
-	case <-time.After(r.timeout):
+	case <-timer.C:
 		return reader.Message{}, r.signal
 	}
 }
