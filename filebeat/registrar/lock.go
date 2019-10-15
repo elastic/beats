@@ -18,8 +18,9 @@
 package registrar
 
 import (
-	"os"
 	"path/filepath"
+
+	"github.com/gofrs/flock"
 
 	"github.com/pkg/errors"
 )
@@ -34,25 +35,25 @@ var (
 // Filebeat instance. If another Filebeat instance already has a lock on the registry
 // an ErrAlreadyLocked error is returned.
 func (r *Registrar) lock() error {
-	lockFile := r.getLockfilePath()
+	lock := r.newLock()
 
-	f, err := os.OpenFile(lockFile, os.O_WRONLY|os.O_CREATE|os.O_EXCL, r.fileMode)
-	if os.IsExist(err) {
+	isLocked, err := lock.TryLock()
+	if err != nil {
+		return errors.Wrap(err, "unable to lock registry")
+	}
+
+	if !isLocked {
 		return ErrAlreadyLocked
 	}
-	if err != nil {
-		return errors.Wrap(err, "unabled to lock registry")
-	}
-	defer f.Close()
 
 	return nil
 }
 
 // unlock attempts to release the lock on a registry previously acquired via Lock().
 func (r *Registrar) unlock() error {
-	lockFile := r.getLockfilePath()
+	lock := r.newLock()
 
-	err := os.Remove(lockFile)
+	err := lock.Unlock()
 	if err != nil {
 		return errors.Wrap(err, "unable to unlock registry")
 	}
@@ -60,7 +61,9 @@ func (r *Registrar) unlock() error {
 	return nil
 }
 
-func (r *Registrar) getLockfilePath() string {
+func (r *Registrar) newLock() *flock.Flock {
 	registryPath := filepath.Dir(r.registryFile)
-	return filepath.Join(registryPath, "filebeat.lock")
+	lockfilePath := filepath.Join(registryPath, "filebeat.lock")
+
+	return flock.New(lockfilePath)
 }

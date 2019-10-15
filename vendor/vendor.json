@@ -2032,6 +2032,12 @@
 			"revisionTime": "2017-03-24T09:53:51Z"
 		},
 		{
+			"checksumSHA1": "MlaWEe1K+Kpb9wDF88qPoqO1uro=",
+			"path": "github.com/gofrs/flock",
+			"revision": "5135e617513b1e6e205a3a89b042249dee6730c8",
+			"revisionTime": "2019-03-20T16:07:11Z"
+		},
+		{
 			"checksumSHA1": "BfjvAbPn5t/2KrdC5E7418OuzV8=",
 			"path": "github.com/gofrs/uuid",
 			"revision": "47cd1dca1a6e7f807d5a492bd7e7f41d0855b5a1",
