@@ -11,3 +11,7 @@ CHECK_HEADERS_DISABLED=true
 
 # Path to the libbeat Makefile
 -include $(ES_BEATS)/metricbeat/Makefile
+
+.PHONY: copy-vendor
+copy-vendor:
+	mage vendorUpdate

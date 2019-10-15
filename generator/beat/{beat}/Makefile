@@ -13,3 +13,7 @@ CHECK_HEADERS_DISABLED=true
 
 # Path to the libbeat Makefile
 -include $(LIBBEAT_MAKEFILE)
+
+.PHONY: copy-vendor
+copy-vendor:
+	mage vendorUpdate
