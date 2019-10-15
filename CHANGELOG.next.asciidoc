@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Fixed increased memory usage with large files when multiline pattern does not match. {issue}14068[14068]
 
 *Heartbeat*
 
