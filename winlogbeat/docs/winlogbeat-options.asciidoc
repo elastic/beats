@@ -377,6 +377,12 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+==== `event_logs.keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
+
+[float]
 ==== `event_logs.no_more_events`
 
 The action that the event log reader should take when it receives a signal from
