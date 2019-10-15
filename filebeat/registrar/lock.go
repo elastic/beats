@@ -21,7 +21,6 @@ import (
 	"path/filepath"
 
 	"github.com/gofrs/flock"
-
 	"github.com/pkg/errors"
 )
 
