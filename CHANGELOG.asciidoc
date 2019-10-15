@@ -7,7 +7,19 @@
 === Beats version 6.8.4
 https://github.com/elastic/beats/compare/v6.8.3...v6.8.4[View commits]
 
+==== Breaking changes
+
+*Filebeat*
+
+- Fix delay in enforcing close_renamed and close_removed options. {issue}13488[13488] {pull}13907[13907]
+
 ==== Bugfixes
+
+*Filebeat*
+
+- Fix merging of fields specified in global scope with fields specified under an input's scope. {issue}3628[3628] {pull}13909[13909]
+- Fixed early expiration of templates (Netflow v9 and IPFIX). {pull}13821[13821]
+- Fixed bad handling of sequence numbers when multiple observation domains were exported by a single device (Netflow V9 and IPFIX). {pull}13821[13821]
 
 *Metricbeat*
 
