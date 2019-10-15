@@ -33,7 +33,6 @@ var (
 type TimeoutReader struct {
 	reader  reader.Reader
 	timeout time.Duration
-	timer   *time.Timer
 	signal  error
 	running bool
 	ch      chan lineMessage
@@ -76,21 +75,15 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 			}
 		}()
 	}
-	if r.timer == nil {
-		r.timer = time.NewTimer(r.timeout)
-	} else {
-		r.timer.Reset(r.timeout)
-	}
+	timer := time.NewTimer(r.timeout)
 	select {
 	case msg := <-r.ch:
 		if msg.err != nil {
 			r.running = false
 		}
-		if !r.timer.Stop() {
-			<-r.timer.C
-		}
+		timer.Stop()
 		return msg.line, msg.err
-	case <-r.timer.C:
+	case <-timer.C:
 		return reader.Message{}, r.signal
 	}
 }
