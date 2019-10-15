@@ -132,6 +132,7 @@ func (e Record) ToEvent() beat.Event {
 	// ECS data
 	m.Put("event.kind", "event")
 	m.Put("event.code", e.EventIdentifier.ID)
+	m.Put("event.provider", e.Provider.Name)
 	addOptional(m, "event.action", e.Task)
 
 	m.Put("event.created", time.Now())

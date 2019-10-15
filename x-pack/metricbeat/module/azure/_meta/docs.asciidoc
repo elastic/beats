@@ -11,6 +11,23 @@ Additional azure API calls will be executed in order to retrieve information reg
 The azure module mericsets are `monitor`,  `compute_vm` and `compute_vm_scaleset`
 
 [float]
+=== Dashboards
+
+The azure module comes with several predefined dashboards for virtual machines, VM guest metrics and virtual machine scale sets.
+
+The VM overview dashboard shows information about CPU, memory, disk usage as well as operations per second. The two available filters help narrowing down the dashbord to specific regions and/or resource groups. For example:
+
+image::./images/metricbeat-azure-vm-overview.png[]
+
+If VM guest metrics are enabled then the guest metrics overview dashboard can help with monitoring ASP.NET applications and SQL Server metrics. For example:
+
+image::./images/metricbeat-azure-vm-guestmetrics-overview.png[]
+
+The virtual machine scale sets dashboard is similar to the VM dashboard and shows relevant health information about running vm scale sets. For example:
+
+image::./images/metricbeat-azure-vmss-overview.png[]
+
+[float]
 === Module-specific configuration notes
 
 All the tasks executed against the Azure Monitor REST API will use the Azure Resource Manager authentication model.

@@ -61,7 +61,7 @@ This enables auto-discovery and hints for filebeat. When default.disable is set 
 
 #### Note the following section in the DaemonSet, make changes to the yaml file if necessary
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
@@ -69,6 +69,9 @@ metadata:
   labels:
     k8s-app: filebeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
   template:
     metadata:
       labels:
@@ -139,12 +142,15 @@ metadata:
 #### Sample Deployment for coredns. Note the annotations.
 
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: coredns
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: coredns
   template:
     metadata:
       annotations:

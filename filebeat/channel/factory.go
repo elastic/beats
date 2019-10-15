@@ -46,6 +46,7 @@ type inputOutletConfig struct {
 	// event processing
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
+	KeepNull             bool                    `config:"keep_null"`
 
 	// implicit event fields
 	Type        string `config:"type"`         // input.type

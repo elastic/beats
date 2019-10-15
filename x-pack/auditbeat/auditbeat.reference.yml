@@ -38,6 +38,10 @@ auditbeat.modules:
   rate_limit: 0
   include_raw_message: false
   include_warnings: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   # Load audit rules from separate files. Same format as audit.rules(7).
   audit_rule_files: [ '${path.config}/audit.rules.d/*.conf' ]
   audit_rules: |
@@ -109,6 +113,9 @@ auditbeat.modules:
 
   # Detect changes to files included in subdirectories. Disabled by default.
   recursive: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 # The system module collects security related information about a host.
 # All datasets send both periodic state information (e.g. all currently
@@ -1121,7 +1128,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'auditbeat-%{[agent.version]}'. 
+# name is 'auditbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "auditbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
@@ -1384,11 +1391,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

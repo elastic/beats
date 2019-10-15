@@ -57,6 +57,7 @@ type Provider struct {
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The kubernetes autodiscover is beta")
+	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up kubernetes autodiscover provider")
@@ -79,6 +80,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	}
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+
+	logger.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
@@ -116,7 +119,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		appenders: appenders,
 		metagen:   metagen,
 		watcher:   watcher,
-		logger:    logp.NewLogger("kubernetes"),
+		logger:    logger,
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{

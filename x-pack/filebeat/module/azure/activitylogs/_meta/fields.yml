@@ -1,0 +1,79 @@
+- name: activitylogs
+  type: group
+  release: beta
+  description: >
+    Fields for Azure activity logs.
+  fields:
+    - name: identity
+      type: group
+      description: >
+        The canonical user ID of the owner of the source bucket.
+      fields:
+        - name: authorization
+          type: group
+          description: >
+            Node allocatable pods
+          fields:
+            - name: evidence
+              type: group
+              description: >
+                Node allocatable pods
+              fields:
+                - name: role_assignment_scope
+                  type: keyword
+                  description: >
+                    Role assignment scope
+                - name: role_definition_id
+                  type: keyword
+                  description: >
+                    Role definition ID
+                - name: role
+                  type: keyword
+                  description: >
+                    Role
+                - name: role_assignment_id
+                  type: keyword
+                  description: >
+                    Role assignment ID
+                - name: principal_id
+                  type: keyword
+                  description: >
+                    Principal ID
+                - name: principal_type
+                  type: keyword
+                  description: >
+                    Principal type
+        - name: scope
+          type: keyword
+          description: >
+            Scope
+        - name: action
+          type: keyword
+          description: >
+            Action
+    - name: correlation_id
+      type: keyword
+      description: >
+        Correlation ID
+    - name: operation_name
+      type: keyword
+      description: >
+        Operation name
+    - name: result_signature
+      type: keyword
+      description: >
+        Result signature
+    - name: properties
+      type: group
+      description: >
+        Properties
+      fields:
+        - name: service_request_id
+          type: keyword
+          description: >
+            Service Request Id
+        - name: status_code
+          type: keyword
+          description: >
+            Status code
+
