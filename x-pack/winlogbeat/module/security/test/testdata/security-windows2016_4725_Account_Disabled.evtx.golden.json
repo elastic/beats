@@ -5,7 +5,8 @@
       "action": "disabled-user-account",
       "code": 4725,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"
@@ -58,7 +59,8 @@
       "action": "disabled-user-account",
       "code": 4725,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"

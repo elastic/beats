@@ -5,7 +5,8 @@
       "action": "locked-out-user-account",
       "code": 4740,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"

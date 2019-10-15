@@ -5,7 +5,8 @@
       "action": "modified-user-account",
       "code": 4738,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"
@@ -78,7 +79,8 @@
       "action": "modified-user-account",
       "code": 4738,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"

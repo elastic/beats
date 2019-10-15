@@ -5,7 +5,8 @@
       "action": "enabled-user-account",
       "code": 4722,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"
@@ -58,7 +59,8 @@
       "action": "enabled-user-account",
       "code": 4722,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"
