@@ -36,25 +36,29 @@ import (
 type ConfigItem struct {
 	Key     string
 	Default func(map[string]string) string
+	Help    string
 }
 
 // required user config for a custom beat
 // These are specified in env variables with newbeat_*
 var configList = []ConfigItem{
 	{
-		Key: "project_name",
+		Key:  "project_name",
+		Help: "Enter the beat name",
 		Default: func(cfg map[string]string) string {
 			return "examplebeat"
 		},
 	},
 	{
-		Key: "github_name",
+		Key:  "github_name",
+		Help: "Enter your github name",
 		Default: func(cfg map[string]string) string {
 			return "your-github-name"
 		},
 	},
 	{
-		Key: "beat_path",
+		Key:  "beat_path",
+		Help: "Enter the beat path",
 		Default: func(cfg map[string]string) string {
 			ghName, _ := cfg["github_name"]
 			beatName, _ := cfg["project_name"]
@@ -62,13 +66,15 @@ var configList = []ConfigItem{
 		},
 	},
 	{
-		Key: "full_name",
+		Key:  "full_name",
+		Help: "Enter your full name",
 		Default: func(cfg map[string]string) string {
 			return "Firstname Lastname"
 		},
 	},
 	{
-		Key: "type",
+		Key:  "type",
+		Help: "Enter the beat type",
 		Default: func(cfg map[string]string) string {
 			return "beat"
 		},
@@ -135,7 +141,7 @@ func getConfig() (map[string]string, error) {
 		var err error
 		cfgKey, isSet := getEnvConfig(cfgVal.Key)
 		if !isSet {
-			cfgKey, err = getValFromUser(cfgVal.Key, cfgVal.Default(userCfg))
+			cfgKey, err = getValFromUser(cfgVal.Help, cfgVal.Default(userCfg))
 			if err != nil {
 				return userCfg, err
 			}
@@ -159,11 +165,11 @@ func getEnvConfig(cfgKey string) (string, bool) {
 }
 
 // getValFromUser returns a config object from the user. If they don't enter one, fallback to the default
-func getValFromUser(cfgKey, def string) (string, error) {
+func getValFromUser(help, def string) (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
 	// Human-readable prompt
-	fmt.Printf("Enter a %s [%s]: ", strings.Replace(cfgKey, "_", " ", -1), def)
+	fmt.Printf("%s [%s]: ", help, def)
 	str, err := reader.ReadString('\n')
 	if err != nil {
 		return "", err
