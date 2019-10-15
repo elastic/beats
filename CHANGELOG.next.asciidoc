@@ -291,6 +291,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Process: Add file hash of process executable. {pull}11722[11722]
 - Socket: Add network.transport and network.community_id. {pull}12231[12231]
 - Host: Fill top-level host fields. {pull}12259[12259]
+- Socket: Add DNS enrichment. {pull}14004[14004]
 
 *Filebeat*
 
