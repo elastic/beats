@@ -1,8 +1,9 @@
+import json
 import operator
 import platform
 import random
-import json
 import socket
+import time
 import unittest
 from auditbeat_xpack import *
 
@@ -105,6 +106,19 @@ class Test(AuditbeatXPackTest):
         """
         self.with_runner(
             DNSTestCase(enabled=False), extra_conf={'socket.dns.enabled': False})
+
+    def test_dns_long_request(self):
+        """
+        test DNS enrichment of long request
+        This test makes sure that DNS information is kept long after the
+        DNS request has been performed, even if the internal DNS state
+        is expired.
+        """
+        self.with_runner(
+            DNSTestCase(delay_seconds=10),
+            extra_conf={
+                'socket.flow_inactive_timeout': '2s'
+            })
 
     def with_runner(self, test, extra_conf=dict()):
         enable_ipv6_loopback()
@@ -471,8 +485,9 @@ class MultiUDP4TestCase:
 
 
 class DNSTestCase:
-    def __init__(self, enabled=True):
+    def __init__(self, enabled=True, delay_seconds=0):
         self.dns_enabled = enabled
+        self.delay = delay_seconds
 
     def run(self):
         req = "\x74\xba\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07elastic" \
@@ -491,6 +506,7 @@ class DNSTestCase:
         msg, _ = dns_cli.recvfrom(64)
         dns_cli.close()
         dns_srv.close()
+        time.sleep(self.delay)
         server.listen(8)
         client.connect(self.server_addr)
         accepted, _ = server.accept()
