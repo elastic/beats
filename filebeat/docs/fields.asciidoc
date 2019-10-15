@@ -1275,6 +1275,16 @@ type: keyword
 
 --
 
+*`azure.tenant_id`*::
++
+--
+tenant ID
+
+
+type: keyword
+
+--
+
 [float]
 === resource
 
@@ -1306,6 +1316,16 @@ type: keyword
 +
 --
 Resource type/namespace
+
+
+type: keyword
+
+--
+
+*`azure.resource.name`*::
++
+--
+Name
 
 
 type: keyword
@@ -1414,16 +1434,6 @@ type: keyword
 +
 --
 Action
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.correlation_id`*::
-+
---
-Correlation ID
 
 
 type: keyword

@@ -16,6 +16,10 @@
           type: keyword
           description: >
             Correlation ID
+        - name: tenant_id
+          type: keyword
+          description: >
+            tenant ID
         - name: resource
           type: group
           description: >
@@ -33,3 +37,7 @@
               type: keyword
               description: >
                 Resource type/namespace
+            - name: name
+              type: keyword
+              description: >
+                Name

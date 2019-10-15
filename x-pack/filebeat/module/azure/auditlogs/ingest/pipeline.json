@@ -96,7 +96,7 @@
       {
           "rename": {
               "field": "azure.auditlogs.tenantId",
-              "target_field": "azure.auditlogs.tenant_id",
+              "target_field": "azure.tenant_id",
               "ignore_missing": true
           }
       },

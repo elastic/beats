@@ -73,10 +73,9 @@
           }
       },
       {
-          "rename": {
-              "field": "azure.activitylogs.category",
-              "target_field": "event.category",
-              "ignore_missing": true
+          "script": {
+              "lang": "painless",
+              "source": "if (ctx.azure.activitylogs.properties.eventCategory == null) { if (ctx.azure.activitylogs.properties.policies != null)  { ctx.event.category = 'Policy';}} else {ctx.event.category = ctx.azure.activitylogs.properties.eventCategory;} if (ctx.event.category == null) {ctx.event.category='Administrative'}"
           }
       },
       {
