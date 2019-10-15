@@ -1,6 +1,6 @@
 - module: aws
   s3access:
-    enabled: true
+    enabled: false
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
@@ -9,7 +9,7 @@
     #var.credential_profile_name: fb-aws
 
   elb:
-    enabled: true
+    enabled: false
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
