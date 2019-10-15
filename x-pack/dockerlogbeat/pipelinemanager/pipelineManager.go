@@ -5,20 +5,13 @@
 package pipelinemanager
 
 import (
-	"crypto/sha1"
 	"fmt"
-	"sort"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // containerConfig is the common.Config unpacking type
@@ -55,29 +48,22 @@ func NewPipelineManager(logCfg *common.Config) *PipelineManager {
 
 // CloseClientWithFile closes the client with the associated file
 func (pm *PipelineManager) CloseClientWithFile(file string) error {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
 
-	cl, ok := pm.clients[file]
-	if !ok {
-		return fmt.Errorf("No client for file %s", file)
+	cl, err := pm.removeClient(file)
+	if err != nil {
+		return errors.Wrap(err, "Error removing client")
 	}
 
-	// deincrement the ref count
 	hash := cl.pipelineHash
-	pm.pipelines[hash].refCount--
 
-	pm.Logger.Infof("Closing Client first from pipelineManager")
-	err := cl.Close()
+	pm.Logger.Debugf("Closing Client first from pipelineManager")
+	err = cl.Close()
 	if err != nil {
 		return errors.Wrap(err, "error closing client")
 	}
 
-	if pm.pipelines[hash].refCount < 1 {
-		pm.Logger.Infof("Pipeline  closing")
-		pm.pipelines[hash].pipeline.Close()
-		delete(pm.pipelines, hash)
-	}
+	//if the pipeline is no longer in use, clean up
+	pm.removePipelineIfNeeded(hash)
 
 	return nil
 }
@@ -85,140 +71,114 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 // CreateClientWithConfig gets the pipeline linked to the given config, and creates a client
 // If no pipeline for that config exists, it creates one.
 func (pm *PipelineManager) CreateClientWithConfig(logOptsConfig map[string]string, file string) (*ClientLogger, error) {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
 
-	// check to see if we have a pipeline
-	var err error
 	hashstring := makeConfigHash(logOptsConfig)
 
-	err = pm.makePipeline(logOptsConfig, file, hashstring)
-	if err != nil {
-		return nil, err
+	//If we don't have an existing pipeline for this hash, make one
+	exists := pm.checkIfHashExists(logOptsConfig)
+	var pipeline *Pipeline
+	var err error
+	if !exists {
+		pipeline, err = loadNewPipeline(logOptsConfig, file, pm.Logger)
+		if err != nil {
+			return nil, errors.Wrap(err, "error loading pipeline")
+		}
+		pm.registerPipeline(pipeline, hashstring)
+	} else {
+		pipeline, _ = pm.getPipeline(hashstring)
 	}
 
-	pipeline := pm.pipelines[hashstring]
-
+	//actually get to crafting the new client.
 	cl, err := newClientFromPipeline(pipeline.pipeline, file, hashstring)
 	if err != nil {
 		return nil, err
 	}
-	pm.clients[file] = cl
-	pm.pipelines[hashstring].refCount++
-	// before we finish, prune the client list async
+
+	pm.registerClient(cl, hashstring, file)
 
 	return cl, nil
 }
 
-// a wrapper for various public functions to create pipelines
-// assumes we have a mutex lock. If the pipeline exists, this does nothing.
-func (pm *PipelineManager) makePipeline(logOptsConfig map[string]string, name, hashstring string) error {
+//===================
+// Private methods
+
+// getPipeline gets a pipeline based on a confighash
+func (pm *PipelineManager) getPipeline(hashstring string) (*Pipeline, bool) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	pipeline, exists := pm.pipelines[hashstring]
+	return pipeline, exists
+}
+
+// getClient gets a pipeline client based on a file handle
+func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	cli, exists := pm.clients[file]
+	return cli, exists
+}
+
+// checkIfHashExists is a short atomic function to see if a pipeline alread exists inside the PM. Thread-safe.
+func (pm *PipelineManager) checkIfHashExists(logOptsConfig map[string]string) bool {
+	hashstring := makeConfigHash(logOptsConfig)
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
 	_, test := pm.pipelines[hashstring]
 	if test {
-		return nil
+		return true
 	}
-
-	pipeline, err := loadNewPipeline(logOptsConfig, name, pm.Logger)
-	if err != nil {
-		return errors.Wrap(err, "error loading pipeline")
-	}
-	pm.pipelines[hashstring] = &Pipeline{pipeline: pipeline, refCount: 0}
-	return nil
+	return false
 }
 
-// makeConfigHash is the helper function that turns a user config into a hash
-func makeConfigHash(cfg map[string]string) string {
-	var hashString string
-	var orderedVal []string
+// registerPipeline is a small atomic function that registers a new pipeline with the managers
+// TODO: What happens if we try to register a pipeline that already exists? Which pipeline "wins"?
+func (pm *PipelineManager) registerPipeline(pipeline *Pipeline, hashstring string) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	pm.pipelines[hashstring] = pipeline
 
-	for _, val := range cfg {
-		orderedVal = append(orderedVal, val)
-	}
-
-	sort.Strings(orderedVal)
-
-	for _, val := range orderedVal {
-		hashString = hashString + val
-	}
-
-	sum := sha1.Sum([]byte(hashString))
-
-	return string(sum[:])
 }
 
-// load pipeline starts up a new pipeline with the given config
-func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Logger) (*pipeline.Pipeline, error) {
-	info := beat.Info{
-		Beat:     "dockerlogbeat",
-		Version:  "0",
-		Name:     name,
-		Hostname: "dockerbeat.test",
-	}
+// removePipeline removes a pipeline from the manager if it's refcount is zero.
+func (pm *PipelineManager) removePipelineIfNeeded(hash string) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
 
-	newCfg, err := parseCfgKeys(logOptsConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "error parsing config keys")
+	//if the pipeline is no longer in use, clean up
+	if pm.pipelines[hash].refCount < 1 {
+		pipeline := pm.pipelines[hash].pipeline
+		delete(pm.pipelines, hash)
+		//pipelines must be closed after clients
+		//Just do this here, since the caller doesn't know if we need to close the libbeat pipeline
+		go func() {
+			pm.Logger.Debugf("Pipeline closing from removePipelineIfNeeded")
+			pipeline.Close()
+		}()
 	}
-
-	cfg, err := common.NewConfigFrom(newCfg)
-	if err != nil {
-		return nil, err
-	}
-	config := containerConfig{}
-	err = cfg.Unpack(&config)
-	if err != nil {
-		return nil, fmt.Errorf("unpacking config failed: %v", err)
-	}
-
-	processing, err := processing.MakeDefaultSupport(false)(info, log, cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error in MakeDefaultSupport")
-	}
-
-	pipelineCfg := pipeline.Config{}
-	err = cfg.Unpack(&pipelineCfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error unpacking pipeline config")
-	}
-
-	idx, err := idxmgmt.DefaultSupport(log, info, config.Output.Config())
-	if err != nil {
-		return nil, errors.Wrap(err, "error making index manager")
-	}
-
-	pipeline, err := pipeline.Load(info,
-		pipeline.Monitors{
-			Metrics:   nil,
-			Telemetry: nil,
-			Logger:    log,
-		},
-		pipelineCfg,
-		processing,
-		func(stat outputs.Observer) (string, outputs.Group, error) {
-			cfg := config.Output
-			out, err := outputs.Load(idx, info, stat, cfg.Name(), cfg.Config())
-			return cfg.Name(), out, err
-		},
-	)
-	if err != nil {
-		return nil, errors.Wrap(err, "error in pipeline.Load")
-	}
-
-	return pipeline, nil
 }
 
-// parseCfgKeys helpfully parses the values in the map, so users can specify yml structures.
-func parseCfgKeys(cfg map[string]string) (map[string]interface{}, error) {
+// registerClient registers a new client with the manager. Up to the caller to  actually close the libbeat client
+func (pm *PipelineManager) registerClient(cl *ClientLogger, hashstring, clientFile string) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	pm.clients[clientFile] = cl
+	pm.pipelines[hashstring].refCount++
+}
 
-	outMap := make(map[string]interface{})
+// removeClient deregisters a client
+func (pm *PipelineManager) removeClient(file string) (*ClientLogger, error) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
 
-	for cfgKey, strVal := range cfg {
-		var parsed interface{}
-		if err := yaml.Unmarshal([]byte(strVal), &parsed); err != nil {
-			return nil, err
-		}
-		outMap[cfgKey] = parsed
+	cl, ok := pm.clients[file]
+	if !ok {
+		return nil, fmt.Errorf("No client for file %s", file)
 	}
 
-	return outMap, nil
+	// deincrement the ref count
+	hash := cl.pipelineHash
+	pm.pipelines[hash].refCount--
+	delete(pm.clients, file)
+
+	return cl, nil
 }
