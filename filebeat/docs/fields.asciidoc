@@ -1007,6 +1007,252 @@ Fields from AWS logs.
 
 
 [float]
+=== elb
+
+Fields for AWS ELB logs.
+
+
+
+*`aws.elb.name`*::
++
+--
+The name of the load balancer.
+
+
+type: keyword
+
+--
+
+*`aws.elb.type`*::
++
+--
+The type of the load balancer for v2 Load Balancers.
+
+
+type: keyword
+
+--
+
+*`aws.elb.target_group.arn`*::
++
+--
+The ARN of the target group handling the request.
+
+
+type: keyword
+
+--
+
+*`aws.elb.listener`*::
++
+--
+The ELB listener that received the connection.
+
+
+type: keyword
+
+--
+
+*`aws.elb.protocol`*::
++
+--
+The protocol of the load balancer (http or tcp).
+
+
+type: keyword
+
+--
+
+*`aws.elb.request_processing_time.sec`*::
++
+--
+The total time in seconds since the connection or request is received until it is sent to a registered backend.
+
+
+type: float
+
+--
+
+*`aws.elb.backend_processing_time.sec`*::
++
+--
+The total time in seconds since the connection is sent to the backend till the backend starts responding.
+
+
+type: float
+
+--
+
+*`aws.elb.response_processing_time.sec`*::
++
+--
+The total time in seconds since the response is received from the backend till it is sent to the client.
+
+
+type: float
+
+--
+
+*`aws.elb.connection_time.ms`*::
++
+--
+The total time of the connection in milliseconds, since it is opened till it is closed.
+
+
+type: long
+
+--
+
+*`aws.elb.tls_handshake_time.ms`*::
++
+--
+The total time for the TLS handshake to complete in milliseconds once the connection has been established.
+
+
+type: long
+
+--
+
+*`aws.elb.backend.ip`*::
++
+--
+The IP address of the backend processing this connection.
+
+
+type: keyword
+
+--
+
+*`aws.elb.backend.port`*::
++
+--
+The port in the backend processing this connection.
+
+
+type: keyword
+
+--
+
+*`aws.elb.backend.http.response.status_code`*::
++
+--
+The status code from the backend (status code sent to the client from ELB is stored in `http.response.status_code`
+
+
+type: keyword
+
+--
+
+*`aws.elb.ssl_cipher`*::
++
+--
+The SSL cipher used in TLS/SSL connections.
+
+
+type: keyword
+
+--
+
+*`aws.elb.ssl_protocol`*::
++
+--
+The SSL protocol used in TLS/SSL connections.
+
+
+type: keyword
+
+--
+
+*`aws.elb.chosen_cert.arn`*::
++
+--
+The ARN of the chosen certificate presented to the client in TLS/SSL connections.
+
+
+type: keyword
+
+--
+
+*`aws.elb.chosen_cert.serial`*::
++
+--
+The serial number of the chosen certificate presented to the client in TLS/SSL connections.
+
+
+type: keyword
+
+--
+
+*`aws.elb.incoming_tls_alert`*::
++
+--
+The integer value of TLS alerts received by the load balancer from the client, if present.
+
+
+type: keyword
+
+--
+
+*`aws.elb.tls_named_group`*::
++
+--
+The TLS named group.
+
+
+type: keyword
+
+--
+
+*`aws.elb.trace_id`*::
++
+--
+The contents of the `X-Amzn-Trace-Id` header.
+
+
+type: keyword
+
+--
+
+*`aws.elb.matched_rule_priority`*::
++
+--
+The priority value of the rule that matched the request, if a rule matched.
+
+
+type: keyword
+
+--
+
+*`aws.elb.action_executed`*::
++
+--
+The action executed when processing the request (forward, fixed-response, authenticate...). It can contain several values.
+
+
+type: keyword
+
+--
+
+*`aws.elb.redirect_url`*::
++
+--
+The URL used if a redirection action was executed.
+
+
+type: keyword
+
+--
+
+*`aws.elb.error.reason`*::
++
+--
+The error reason if the executed action failed.
+
+type: keyword
+
+--
+
+[float]
 === s3access
 
 Fields for AWS S3 server access logs.
