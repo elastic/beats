@@ -5,6 +5,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "acl_dmz",
         "cisco.asa.source_interface": "dmz",
+        "destination.address": "192.0.0.8",
         "destination.ip": "192.0.0.8",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -22,6 +23,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.2.30",
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
@@ -34,6 +36,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "acl_dmz",
         "cisco.asa.source_interface": "dmz",
+        "destination.address": "192.0.0.8",
         "destination.ip": "192.0.0.8",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -51,6 +54,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.2.30",
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
@@ -64,6 +68,7 @@
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
         "cisco.asa.suffix": "session",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -81,6 +86,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.2.16",
         "source.ip": "10.1.2.16",
         "source.port": 2241,
         "tags": [
@@ -93,6 +99,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "inside",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.2.10",
         "destination.ip": "192.0.2.10",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -111,6 +118,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "172.29.2.101",
         "source.ip": "172.29.2.101",
         "source.port": 1039,
         "tags": [
@@ -123,6 +131,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "inside",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.2.57",
         "destination.ip": "192.0.2.57",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -141,6 +150,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "172.29.2.3",
         "source.ip": "172.29.2.3",
         "source.port": 1065,
         "tags": [
@@ -267,6 +277,7 @@
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "10.123.1.35",
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
         "event.action": "flow-expiration",
@@ -287,6 +298,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
@@ -301,6 +313,7 @@
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "outside",
         "cisco.asa.source_username": "user1",
+        "destination.address": "10.123.1.35",
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
         "event.action": "flow-expiration",
@@ -321,6 +334,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
@@ -332,6 +346,7 @@
         "cisco.asa.icmp_code": 17233,
         "cisco.asa.mapped_source_ip": "192.168.132.46",
         "cisco.asa.message_id": "302021",
+        "destination.address": "172.24.177.29",
         "destination.ip": "172.24.177.29",
         "event.action": "flow-expiration",
         "event.code": 302021,
@@ -348,6 +363,7 @@
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
+        "source.address": "192.168.132.46",
         "source.ip": "192.168.132.46",
         "tags": [
             "cisco-asa"
@@ -394,6 +410,7 @@
     {
         "@timestamp": "2013-04-30T09:22:33.000-02:00",
         "cisco.asa.message_id": "106007",
+        "destination.address": "10.1.2.60",
         "destination.ip": "10.1.2.60",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -413,6 +430,7 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.0.66",
         "source.ip": "192.0.0.66",
         "source.port": 12981,
         "tags": [
@@ -425,6 +443,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -442,6 +461,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2006,
         "tags": [
@@ -454,6 +474,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -471,6 +492,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49734,
         "tags": [
@@ -483,6 +505,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -500,6 +523,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49735,
         "tags": [
@@ -512,6 +536,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -529,6 +554,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49736,
         "tags": [
@@ -541,6 +567,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -558,6 +585,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49737,
         "tags": [
@@ -570,6 +598,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -587,6 +616,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49738,
         "tags": [
@@ -599,6 +629,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -616,6 +647,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49746,
         "tags": [
@@ -628,6 +660,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -645,6 +678,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2007,
         "tags": [
@@ -657,6 +691,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.168.33.31",
         "destination.ip": "192.168.33.31",
         "destination.port": 25,
         "event.action": "firewall-rule",
@@ -674,6 +709,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.13",
         "source.ip": "10.0.0.13",
         "source.port": 43013,
         "tags": [
@@ -686,6 +722,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -703,6 +740,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2008,
         "tags": [
@@ -713,6 +751,7 @@
         "@timestamp": "2013-04-30T09:23:02.000-02:00",
         "cisco.asa.message_id": "106006",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "10.1.2.42",
         "destination.ip": "10.1.2.42",
         "destination.port": 137,
         "event.action": "firewall-rule",
@@ -731,6 +770,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.66",
         "source.ip": "192.0.2.66",
         "source.port": 137,
         "tags": [
@@ -740,6 +780,7 @@
     {
         "@timestamp": "2013-04-30T09:23:03.000-02:00",
         "cisco.asa.message_id": "106007",
+        "destination.address": "10.1.5.60",
         "destination.ip": "10.1.5.60",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -759,6 +800,7 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.66",
         "source.ip": "192.0.2.66",
         "source.port": 12981,
         "tags": [
@@ -771,6 +813,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -788,6 +831,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2009,
         "tags": [
@@ -800,6 +844,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -817,6 +862,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49776,
         "tags": [
@@ -829,6 +875,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -846,6 +893,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2010,
         "tags": [
@@ -858,6 +906,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -875,6 +924,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2011,
         "tags": [
@@ -887,6 +937,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -904,6 +955,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2012,
         "tags": [
@@ -916,6 +968,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "acl_out",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "10.0.0.132",
         "destination.ip": "10.0.0.132",
         "destination.port": 8111,
         "event.action": "firewall-rule",
@@ -933,6 +986,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.126",
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
@@ -945,6 +999,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "acl_out",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "10.0.0.132",
         "destination.ip": "10.0.0.132",
         "destination.port": 8111,
         "event.action": "firewall-rule",
@@ -962,6 +1017,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.126",
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
@@ -974,6 +1030,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -991,6 +1048,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49840,
         "tags": [
@@ -1003,6 +1061,7 @@
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -1020,6 +1079,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2013,
         "tags": [
@@ -1033,6 +1093,7 @@
         "cisco.asa.rule_name": "acl_in",
         "cisco.asa.source_interface": "inside",
         "cisco.asa.suffix": "session",
+        "destination.address": "192.0.0.99",
         "destination.ip": "192.0.0.99",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -1050,6 +1111,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2241,
         "tags": [
@@ -1102,6 +1164,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "dmz",
         "cisco.asa.source_interface": "dmz",
+        "destination.address": "192.0.0.12",
         "destination.ip": "192.0.0.12",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -1120,6 +1183,7 @@
         "network.transport": "udp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.168.1.33",
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
@@ -1132,6 +1196,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "dmz",
         "cisco.asa.source_interface": "dmz",
+        "destination.address": "192.0.0.12",
         "destination.ip": "192.0.0.12",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -1150,6 +1215,7 @@
         "network.transport": "udp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.168.1.33",
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
@@ -1202,6 +1268,7 @@
         "cisco.asa.destination_interface": "dmz",
         "cisco.asa.message_id": "302014",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "192.168.1.34",
         "destination.ip": "192.168.1.34",
         "destination.port": 5678,
         "event.action": "flow-expiration",
@@ -1223,6 +1290,7 @@
         "network.transport": "tcp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1235,6 +1303,7 @@
         "cisco.asa.destination_interface": "dmz",
         "cisco.asa.message_id": "302014",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "192.168.1.35",
         "destination.ip": "192.168.1.35",
         "destination.port": 5678,
         "event.action": "flow-expiration",
@@ -1256,6 +1325,7 @@
         "network.transport": "tcp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1268,6 +1338,7 @@
         "cisco.asa.destination_interface": "dmz",
         "cisco.asa.message_id": "302014",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "192.168.1.35",
         "destination.ip": "192.168.1.35",
         "destination.port": 5678,
         "event.action": "flow-expiration",
@@ -1289,6 +1360,7 @@
         "network.transport": "tcp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1299,6 +1371,7 @@
         "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.asa.message_id": "106015",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "192.168.1.34",
         "destination.ip": "192.168.1.34",
         "destination.port": 5679,
         "event.action": "firewall-rule",
@@ -1317,6 +1390,7 @@
         "network.transport": "tcp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1327,6 +1401,7 @@
         "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.asa.message_id": "106015",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "192.168.1.34",
         "destination.ip": "192.168.1.34",
         "destination.port": 5679,
         "event.action": "firewall-rule",
@@ -1345,6 +1420,7 @@
         "network.transport": "tcp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1357,6 +1433,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "dmz",
         "cisco.asa.source_interface": "dmz",
+        "destination.address": "192.0.0.12",
         "destination.ip": "192.0.0.12",
         "destination.port": 5000,
         "event.action": "firewall-rule",
@@ -1375,6 +1452,7 @@
         "network.transport": "udp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.168.1.34",
         "source.ip": "192.168.1.34",
         "source.port": 5679,
         "tags": [
@@ -1427,6 +1505,7 @@
         "cisco.asa.destination_interface": "dmz",
         "cisco.asa.message_id": "302014",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
         "destination.port": 1235,
         "event.action": "flow-expiration",
@@ -1448,6 +1527,7 @@
         "network.transport": "tcp",
         "process.name": "<IP>",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1460,6 +1540,7 @@
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "10.44.2.2",
         "destination.ip": "10.44.2.2",
         "destination.port": 500,
         "event.action": "flow-expiration",
@@ -1480,6 +1561,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "10.44.4.4",
         "source.ip": "10.44.4.4",
         "source.port": 500,
         "tags": [
@@ -1490,6 +1572,7 @@
         "@timestamp": "2014-09-12T06:50:53.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1505,6 +1588,7 @@
         "log.level": "critical",
         "log.offset": 8549,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1514,6 +1598,7 @@
         "@timestamp": "2014-09-12T06:51:01.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1529,6 +1614,7 @@
         "log.level": "critical",
         "log.offset": 8670,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1538,6 +1624,7 @@
         "@timestamp": "2014-09-12T06:51:05.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1553,6 +1640,7 @@
         "log.level": "critical",
         "log.offset": 8791,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1562,6 +1650,7 @@
         "@timestamp": "2014-09-12T06:51:05.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1577,6 +1666,7 @@
         "log.level": "critical",
         "log.offset": 8912,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1586,6 +1676,7 @@
         "@timestamp": "2014-09-12T06:51:06.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1601,6 +1692,7 @@
         "log.level": "critical",
         "log.offset": 9033,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1610,6 +1702,7 @@
         "@timestamp": "2014-09-12T06:51:17.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1625,6 +1718,7 @@
         "log.level": "critical",
         "log.offset": 9154,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1634,6 +1728,7 @@
         "@timestamp": "2014-09-12T06:52:48.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.168.1.255",
         "destination.ip": "192.168.1.255",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1649,6 +1744,7 @@
         "log.level": "critical",
         "log.offset": 9275,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1658,6 +1754,7 @@
         "@timestamp": "2014-09-12T06:53:00.000-02:00",
         "cisco.asa.message_id": "106016",
         "cisco.asa.source_interface": "Mobile_Traffic",
+        "destination.address": "192.168.1.255",
         "destination.ip": "192.168.1.255",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1673,6 +1770,7 @@
         "log.level": "critical",
         "log.offset": 9397,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-asa"
@@ -1684,6 +1782,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "PERMIT_IN",
         "cisco.asa.source_interface": "outside",
+        "destination.address": "10.32.112.125",
         "destination.ip": "10.32.112.125",
         "destination.port": 25,
         "event.action": "firewall-rule",
@@ -1702,6 +1801,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.95",
         "source.ip": "192.0.2.95",
         "source.port": 24069,
         "tags": [
@@ -1730,6 +1830,7 @@
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
+        "source.address": "10.2.3.5",
         "source.ip": "10.2.3.5",
         "tags": [
             "cisco-asa"
@@ -1740,6 +1841,7 @@
         "cisco.asa.icmp_type": 0,
         "cisco.asa.message_id": "313004",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "172.16.1.10",
         "destination.ip": "172.16.1.10",
         "event.action": "firewall-rule",
         "event.code": 313004,
@@ -1756,6 +1858,7 @@
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
+        "source.address": "172.16.30.2",
         "source.ip": "172.16.30.2",
         "tags": [
             "cisco-asa"
@@ -1771,6 +1874,7 @@
         "cisco.asa.message_id": "338002",
         "cisco.asa.rule_name": "dynamic",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.88.99.129",
         "destination.domain": "bad.example.com",
         "destination.ip": "192.88.99.129",
         "destination.port": 80,
@@ -1790,6 +1894,7 @@
         "network.transport": "tcp",
         "server.domain": "bad.example.com",
         "service.type": "cisco",
+        "source.address": "10.1.1.45",
         "source.ip": "10.1.1.45",
         "source.nat.ip": "192.88.99.1",
         "source.nat.port": "7890",
@@ -1810,6 +1915,7 @@
         "cisco.asa.source_interface": "inside",
         "cisco.asa.threat_category": "Malware",
         "cisco.asa.threat_level": "very-high",
+        "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
         "destination.port": 80,
         "event.action": "firewall-rule",
@@ -1827,6 +1933,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
         "source.nat.port": "33340",
@@ -1847,6 +1954,7 @@
         "cisco.asa.source_interface": "inside",
         "cisco.asa.threat_category": "Malware",
         "cisco.asa.threat_level": "very-high",
+        "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
         "destination.port": 80,
         "event.action": "firewall-rule",
@@ -1864,6 +1972,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
         "source.nat.port": "33340",
@@ -1875,6 +1984,7 @@
     {
         "@timestamp": "2009-11-16T14:12:35.000-02:00",
         "cisco.asa.message_id": "304001",
+        "destination.address": "192.0.2.1",
         "destination.ip": "192.0.2.1",
         "event.action": "firewall-rule",
         "event.code": 304001,
@@ -1889,6 +1999,7 @@
         "log.level": "notification",
         "log.offset": 10766,
         "service.type": "cisco",
+        "source.address": "10.30.30.30",
         "source.ip": "10.30.30.30",
         "tags": [
             "cisco-asa"
@@ -1898,6 +2009,7 @@
     {
         "@timestamp": "2009-11-16T14:12:36.000-02:00",
         "cisco.asa.message_id": "304001",
+        "destination.address": "192.0.2.32",
         "destination.ip": "192.0.2.32",
         "event.action": "firewall-rule",
         "event.code": 304001,
@@ -1912,6 +2024,7 @@
         "log.level": "notification",
         "log.offset": 10843,
         "service.type": "cisco",
+        "source.address": "10.5.111.32",
         "source.ip": "10.5.111.32",
         "tags": [
             "cisco-asa"
@@ -1922,6 +2035,7 @@
         "@timestamp": "2009-11-16T14:12:37.000-02:00",
         "cisco.asa.message_id": "304002",
         "cisco.asa.source_interface": "inside",
+        "destination.address": "192.0.0.19",
         "destination.ip": "192.0.0.19",
         "event.action": "firewall-rule",
         "event.code": 304002,
@@ -1936,6 +2050,7 @@
         "log.level": "notification",
         "log.offset": 10935,
         "service.type": "cisco",
+        "source.address": "10.69.6.39",
         "source.ip": "10.69.6.39",
         "tags": [
             "cisco-asa"
