@@ -46,5 +46,25 @@
         "source.ip": "192.168.131.39",
         "source.port": "2817",
         "user_agent.original": "curl/7.38.0"
+    },
+    {
+        "@timestamp": "2015-05-13T23:39:43.945Z",
+        "aws.elb.name": "my-loadbalancer",
+        "aws.elb.protocol": "http",
+        "event.dataset": "aws.elb",
+        "event.end": "2015-05-13T23:39:43.945Z",
+        "event.module": "aws",
+        "fileset.name": "elb",
+        "http.request.body.bytes": 0,
+        "http.request.method": "GET",
+        "http.request.referrer": "http://www.example.com:80-",
+        "http.response.body.bytes": 0,
+        "http.response.status_code": "400",
+        "input.type": "log",
+        "log.offset": 321,
+        "service.type": "aws",
+        "source.ip": "192.168.131.39",
+        "source.port": "2817",
+        "user_agent.original": "-"
     }
 ]

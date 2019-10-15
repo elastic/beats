@@ -74,7 +74,7 @@ processors:
           (?:-|%{NUMBER:aws.elb.backend.http.response.status_code})
           %{NUMBER:http.request.body.bytes:long}
           %{NUMBER:http.response.body.bytes:long}
-          \"%{WORD:http.request.method} %{NOTSPACE:http.request.referrer} HTTP/%{NOTSPACE:http.version}\"
+          \"(?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:http.request.referrer}) (?:-|HTTP/%{NOTSPACE:http.version})\"
           \"%{DATA:user_agent.original}\"
           %{ELBSSL}
         ELBTCPLOG: >-
