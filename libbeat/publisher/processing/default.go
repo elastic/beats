@@ -266,7 +266,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	if !b.skipNormalize {
 		// setup 1: generalize/normalize output (P)
-		processors.add(generalizeProcessor)
+		processors.add(newGeneralizeProcessor(cfg.KeepNull))
 	}
 
 	// setup 2: add Meta from client config (C)

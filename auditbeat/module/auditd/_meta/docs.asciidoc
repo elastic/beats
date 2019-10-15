@@ -213,6 +213,9 @@ time.
 - `none`: No backpressure mitigation measures are enabled.
 --
 
+*`keep_null`*:: If this option is set to true, fields with `null` values will be
+published in the output document. By default, `keep_null` is set to `false`.
+
 [float]
 === Audit rules
 
