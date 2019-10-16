@@ -248,7 +248,9 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 
 	s3Infos, err := handleSQSMessage(message)
 	if err != nil {
-		p.logger.Error(errors.Wrap(err, "handleMessage failed"))
+		err = errors.Wrap(err, "handleSQSMessage failed")
+		p.logger.Error(err)
+		errC <- err
 		return
 	}
 
@@ -256,8 +258,8 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 	err = p.handleS3Objects(svcS3, s3Infos, errC)
 	if err != nil {
 		err = errors.Wrap(err, "handleS3Objects failed")
-		errC <- err
 		p.logger.Error(err)
+		errC <- err
 	}
 }
 
@@ -347,6 +349,8 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 				key:    record.S3.object.Key,
 				arn:    record.S3.bucket.Arn,
 			})
+		} else {
+			return nil, errors.New("event source does not match aws:s3 or event name does not start with ObjectCreated")
 		}
 	}
 	return s3Infos, nil

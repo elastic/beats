@@ -92,11 +92,16 @@ func TestHandleMessage(t *testing.T) {
 			},
 		},
 		{
-			"sqs message with event source aws:s3 and event name ObjectCreated:Delete",
+			"sqs message with event source aws:s3 and event name ObjectCreated:CompleteMultipartUpload",
 			sqs.Message{
-				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Delete\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
+				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:CompleteMultipartUpload\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
 			},
-			[]s3Info{},
+			[]s3Info{
+				{
+					name: "test-s3-ks-2",
+					key:  "server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA",
+				},
+			},
 		},
 		{
 			"sqs message with event source aws:ec2 and event name ObjectCreated:Put",
@@ -107,14 +112,19 @@ func TestHandleMessage(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
+	for i, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
 			s3Info, err := handleSQSMessage(c.message)
-			assert.NoError(t, err)
-			assert.Equal(t, len(c.expectedS3Infos), len(s3Info))
-			if len(s3Info) > 0 {
-				assert.Equal(t, c.expectedS3Infos[0].key, s3Info[0].key)
-				assert.Equal(t, c.expectedS3Infos[0].name, s3Info[0].name)
+			if i != 2 {
+				assert.NoError(t, err)
+				assert.Equal(t, len(c.expectedS3Infos), len(s3Info))
+				if len(s3Info) > 0 {
+					assert.Equal(t, c.expectedS3Infos[0].key, s3Info[0].key)
+					assert.Equal(t, c.expectedS3Infos[0].name, s3Info[0].name)
+				}
+			} else {
+				assert.Error(t, err)
+				assert.Nil(t, s3Info)
 			}
 		})
 	}
