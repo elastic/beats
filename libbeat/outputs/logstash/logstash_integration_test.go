@@ -354,6 +354,7 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 }
 
 func TestSendMultipleBigBatchesViaLogstashTCP(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testSendMultipleBigBatchesViaLogstash(t, "multiple-big-tcp", false)
 }
 
@@ -362,10 +363,12 @@ func TestSendMultipleBigBatchesViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testSendMultipleBatchesViaLogstash(t, name, 15, 4*integrationTestWindowSize, tls)
 }
 
 func TestSendMultipleSmallBatchesViaLogstashTCP(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testSendMultipleSmallBatchesViaLogstash(t, "multiple-small-tcp", false)
 }
 
@@ -425,6 +428,7 @@ func testSendMultipleBatchesViaLogstash(
 }
 
 func TestLogstashElasticOutputPluginCompatibleMessageTCP(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-tcp", false)
 }
 
