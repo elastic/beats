@@ -38,7 +38,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Filebeat*
 
-- Fixed increased memory usage with large files when multiline pattern does not match. {issue}14068[14068]
 
 *Heartbeat*
 
