@@ -19,10 +19,6 @@
       type: keyword
       description: >
         Result signature
-    - name: correlation_id
-      type: keyword
-      description: >
-        Correlation ID
     - name: identity
       type: keyword
       description: >

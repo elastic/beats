@@ -8,7 +8,36 @@
       type: group
       description: >
       fields:
-        - name: resource_id
+        - name: subscription_id
           type: keyword
           description: >
-            Resource ID
+            Azure subscription ID
+        - name: correlation_id
+          type: keyword
+          description: >
+            Correlation ID
+        - name: tenant_id
+          type: keyword
+          description: >
+            tenant ID
+        - name: resource
+          type: group
+          description: >
+            Resource
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                Resource ID
+            - name: group
+              type: keyword
+              description: >
+                Resource group
+            - name: type
+              type: keyword
+              description: >
+                Resource type/namespace
+            - name: name
+              type: keyword
+              description: >
+                Name

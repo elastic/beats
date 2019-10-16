@@ -19,10 +19,19 @@
 
 package ecs
 
-// Fields which are specific to log events.
+// Details about the event's logging mechanism or logging transport.
+// The log.* fields are typically populated with details about the logging
+// mechanism used to create and/or transport the event. For example, syslog
+// details belong under `log.syslog.*`.
+// The details specific to your event source are typically not logged under
+// `log.*`, but rather in `event.*` or in other ECS fields.
 type Log struct {
 	// Original log level of the log event.
-	// Some examples are `warn`, `error`, `i`.
+	// If the source of the event provides a log level or textual severity,
+	// this is the one that goes in `log.level`. If your source doesn't specify
+	// one, you may put your event transport's severity here (e.g. Syslog
+	// severity).
+	// Some examples are `warn`, `err`, `i`, `informational`.
 	Level string `ecs:"level"`
 
 	// This is the original log message and contains the full log message
@@ -38,4 +47,48 @@ type Log struct {
 	// The name of the logger inside an application. This is usually the name
 	// of the class which initialized the logger, or can be a custom name.
 	Logger string `ecs:"logger"`
+
+	// The name of the file containing the source code which originated the log
+	// event. Note that this is not the name of the log file.
+	OriginFileName string `ecs:"origin.file.name"`
+
+	// The line number of the file containing the source code which originated
+	// the log event.
+	OriginFileLine int32 `ecs:"origin.file.line"`
+
+	// The name of the function or method which originated the log event.
+	OriginFunction string `ecs:"origin.function"`
+
+	// The Syslog metadata of the event, if the event was transmitted via
+	// Syslog. Please see RFCs 5424 or 3164.
+	Syslog map[string]interface{} `ecs:"syslog"`
+
+	// The Syslog numeric severity of the log event, if available.
+	// If the event source publishing via Syslog provides a different numeric
+	// severity value (e.g. firewall, IDS), your source's numeric severity
+	// should go to `event.severity`. If the event source does not specify a
+	// distinct severity, you can optionally copy the Syslog severity to
+	// `event.severity`.
+	SyslogSeverityCode int64 `ecs:"syslog.severity.code"`
+
+	// The Syslog numeric severity of the log event, if available.
+	// If the event source publishing via Syslog provides a different severity
+	// value (e.g. firewall, IDS), your source's text severity should go to
+	// `log.level`. If the event source does not specify a distinct severity,
+	// you can optionally copy the Syslog severity to `log.level`.
+	SyslogSeverityName string `ecs:"syslog.severity.name"`
+
+	// The Syslog numeric facility of the log event, if available.
+	// According to RFCs 5424 and 3164, this value should be an integer between
+	// 0 and 23.
+	SyslogFacilityCode int64 `ecs:"syslog.facility.code"`
+
+	// The Syslog text-based facility of the log event, if available.
+	SyslogFacilityName string `ecs:"syslog.facility.name"`
+
+	// Syslog numeric priority of the event, if available.
+	// According to RFCs 5424 and 3164, the priority is 8 * facility +
+	// severity. This number is therefore expected to contain a value between 0
+	// and 191.
+	SyslogPriority int64 `ecs:"syslog.priority"`
 }
