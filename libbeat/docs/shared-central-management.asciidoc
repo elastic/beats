@@ -5,6 +5,8 @@
 [partintro]
 --
 
+deprecated[7.5.0,Beats central management is now deprecated. We’re working on a comprehensive solution to replace this feature.]
+
 beta[]
 
 [WARNING]
@@ -37,6 +39,8 @@ include::shared-license-statement.asciidoc[]
 [[how-central-managment-works]]
 [role="xpack"]
 == How central management works
+
+deprecated[7.5.0,Beats central management is now deprecated. We’re working on a comprehensive solution to replace this feature.]
 
 beta[]
 
@@ -104,6 +108,8 @@ the Beat to troubleshoot the problem.
 [[enroll-beats]]
 [role="xpack"]
 == Enroll {beats} in central management
+
+deprecated[7.5.0,Beats central management is now deprecated. We’re working on a comprehensive solution to replace this feature.]
 
 beta[]
 
