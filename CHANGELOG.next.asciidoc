@@ -221,6 +221,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix rds metricset dashboard. {pull}13721[13721]
 - Ignore prometheus untyped metrics with NaN value. {issue}13750[13750] {pull}13790[13790]
 - Change kubernetes.event.message to text {pull}13964[13964]
+- Fix performance counter values for windows/perfmon metricset.{issue}14036[14036] {pull}14039[14039]
 
 *Packetbeat*
 
