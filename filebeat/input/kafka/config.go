@@ -20,6 +20,8 @@ package kafka
 import (
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -52,6 +54,9 @@ type kafkaInputConfig struct {
 	Password                 string            `config:"password"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
 }
+
+// mapMetric function type will map the configuration options to client metrics (depending on the metricset)
+type MapEvents func(messages []string, kafkaFields common.MapStr) []beat.Event
 
 type kafkaFetch struct {
 	Min     int32 `config:"min" validate:"min=1"`
@@ -127,6 +132,7 @@ func defaultConfig() kafkaInputConfig {
 		},
 	}
 }
+
 
 // Validate validates the config.
 func (c *kafkaInputConfig) Validate() error {

@@ -54,6 +54,7 @@ type kafkaInput struct {
 	saramaWaitGroup sync.WaitGroup // indicates a sarama consumer group is active
 	log             *logp.Logger
 	runOnce         sync.Once
+	mapEvents MapEvents
 }
 
 // NewInput creates a new kafka input
@@ -66,6 +67,12 @@ func NewInput(
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading kafka input config")
+	}
+	 var maps MapEvents
+	eventFunc, err := inputContext.DynamicFields.Get().GetValue("map_events")
+	if err == nil || eventFunc!= nil {
+		maps = eventFunc.(MapEvents)
+		inputContext.DynamicFields.Get().Delete("map_events")
 	}
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
@@ -97,7 +104,9 @@ func NewInput(
 		context:      inputContext,
 		outlet:       out,
 		log:          logp.NewLogger("kafka input").With("hosts", config.Hosts),
+		mapEvents: maps,
 	}
+
 
 	return input, nil
 }
@@ -111,6 +120,8 @@ func (input *kafkaInput) runConsumerGroup(
 		// expandEventListFromField will be assigned the configuration option expand_event_list_from_field
 		expandEventListFromField: input.config.ExpandEventListFromField,
 		log:                      input.log,
+		// mapEvents will be assigned the configuration option map_events
+		mapEvents:                input.mapEvents,
 	}
 
 	input.saramaWaitGroup.Add(1)
@@ -242,6 +253,9 @@ type groupHandler struct {
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
 	expandEventListFromField string
 	log                      *logp.Logger
+	// if the fileset/input using/overriding this input expects to map the events differently than the default kafka options then a mapEvent func will be set
+	// ex. in this case is the azure input where the events contain specific fields to be mapped differently
+	mapEvents                MapEvents
 }
 
 // The metadata attached to incoming events so they can be ACKed once they've
@@ -276,27 +290,31 @@ func (h *groupHandler) createEvents(
 	}
 
 	// if expandEventListFromField has been set, then a check for the actual json object will be done and a return for multiple messages is executed
-	var events []beat.Event
 	var messages []string
+	var events []beat.Event
 	if h.expandEventListFromField == "" {
 		messages = []string{string(message.Value)}
 	} else {
 		messages = h.parseMultipleMessages(message.Value)
 	}
-	for _, msg := range messages {
-		event := beat.Event{
-			Timestamp: timestamp,
-			Fields: common.MapStr{
-				"message": msg,
-				"kafka":   kafkaFields,
-			},
-			Private: eventMeta{
-				handler: h,
-				message: message,
-			},
+	// if mapEvents has been set, then the events will be mapped by the caller of the kafka input
+	if h.mapEvents != nil {
+		events = h.mapEvents(messages, kafkaFields)
+	} else {
+		for _, msg := range messages {
+			event := beat.Event{
+				Timestamp: timestamp,
+				Fields: common.MapStr{
+					"message": msg,
+					"kafka":   kafkaFields,
+				},
+				Private: eventMeta{
+					handler: h,
+					message: message,
+				},
+			}
+			events = append(events, event)
 		}
-		events = append(events, event)
-
 	}
 	return events
 }
