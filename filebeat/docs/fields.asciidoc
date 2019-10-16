@@ -1559,7 +1559,17 @@ type: keyword
 
 --
 
-*`azure.resource.type`*::
+*`azure.resource.provider`*::
++
+--
+Resource type/namespace
+
+
+type: keyword
+
+--
+
+*`azure.resource.namespace`*::
 +
 --
 Resource type/namespace
@@ -1589,21 +1599,21 @@ Fields for Azure activity logs.
 [float]
 === identity
 
-The canonical user ID of the owner of the source bucket.
+Identity
 
 
 
 [float]
 === authorization
 
-Node allocatable pods
+Authorization
 
 
 
 [float]
 === evidence
 
-Node allocatable pods
+Evidence
 
 
 

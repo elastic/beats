@@ -7,17 +7,17 @@
     - name: identity
       type: group
       description: >
-        The canonical user ID of the owner of the source bucket.
+        Identity
       fields:
         - name: authorization
           type: group
           description: >
-            Node allocatable pods
+            Authorization
           fields:
             - name: evidence
               type: group
               description: >
-                Node allocatable pods
+                Evidence
               fields:
                 - name: role_assignment_scope
                   type: keyword
