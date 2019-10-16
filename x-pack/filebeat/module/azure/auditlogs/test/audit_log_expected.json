@@ -24,6 +24,9 @@
         "ecs" : {
             "version" : "1.1.0"
         },
+        "cloud" : {
+            "provider" : "azure"
+        },
         "service" : {
             "type" : "azure"
         },
@@ -58,7 +61,6 @@
         "azure" : {
             "auditlogs" : {
                 "operation_name" : "Add member to group",
-                "tenant_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                 "operation_version" : "1.0",
                 "identity" : "Microsoft Office 365 Portal",
                 "correlation_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
@@ -115,7 +117,11 @@
                     "result_reason" : ""
                 }
             },
-            "resource_id" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam"
+            "tenant_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "resource" : {
+                "provider" : "Microsoft.aadiam",
+                "id" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam"
+            }
         }
     },
     "sort" : [

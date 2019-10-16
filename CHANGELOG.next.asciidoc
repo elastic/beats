@@ -169,6 +169,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix missing netflow fields in index template. {issue}13768[13768] {pull}13914[13914]
 - Fix cisco module's asa and ftd filesets parsing of domain names where an IP address is expected. {issue}14034[14034]
 - Fixed increased memory usage with large files when multiline pattern does not match. {issue}14068[14068]
+- panw module: Use geo.name instead of geo.country_iso_code for free-form location. {issue}13272[13272]
 
 *Heartbeat*
 
@@ -220,6 +221,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix rds metricset dashboard. {pull}13721[13721]
 - Ignore prometheus untyped metrics with NaN value. {issue}13750[13750] {pull}13790[13790]
 - Change kubernetes.event.message to text {pull}13964[13964]
+- Fix performance counter values for windows/perfmon metricset.{issue}14036[14036] {pull}14039[14039]
 
 *Packetbeat*
 
@@ -343,7 +345,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
 - Update CoreDNS module to populate ECS DNS fields. {issue}13320[13320] {pull}13505[13505]
 - Parse query steps in PostgreSQL slowlogs. {issue}13496[13496] {pull}13701[13701]
-- Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776]
+- Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776] {pull}14033[14033]
 - Add support to set the document id in the json reader. {pull}5844[5844]
 - Add input httpjson. {issue}13545[13545] {pull}13546[13546]
 - Filebeat Netflow input: Remove beta label. {pull}13858[13858]
