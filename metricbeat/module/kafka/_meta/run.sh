@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ZOOKEEPER_HOST=${ZOOKEEPER_HOST:-zookeeper}
+
 if [ -n "$KAFKA_ADVERTISED_HOST_AUTO" ]; then
 	KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME):9092
 fi
@@ -22,10 +24,11 @@ if [ -z "$KAFKA_ADVERTISED_HOST" ]; then
        done
 fi
 
-wait_for_port() {
+wait_for() {
     count=20
-    port=$1
-    while ! nc -z localhost $port && [[ $count -ne 0 ]]; do
+    host=$1
+    port=$2
+    while ! nc -z $host $port && [[ $count -ne 0 ]]; do
         count=$(( $count - 1 ))
         [[ $count -eq 0 ]] && return 1
         sleep 0.5
@@ -35,14 +38,14 @@ wait_for_port() {
 }
 
 
-echo "Starting ZooKeeper"
-${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
-wait_for_port 2181
+echo "Waiting for ZooKeeper"
+wait_for $ZOOKEEPER_HOST 2181
 
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
 export KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
+    --override zookeeper.connect=$ZOOKEEPER_HOST:2181 \
     --override authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer \
     --override super.users=User:admin \
     --override sasl.enabled.mechanisms=PLAIN \
@@ -54,17 +57,17 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override inter.broker.listener.name=INSIDE \
     --override logs.dir=${KAFKA_LOGS_DIR} &
 
-wait_for_port 9092
+wait_for localhost 9092
 
 echo "Kafka load status code $?"
 
 # ACLS used to prepare tests
-${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:producer --operation All --cluster --topic '*' --group '*'
-${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:consumer --operation All --cluster --topic '*' --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=${ZOOKEEPER_HOST}:2181 --add --allow-principal User:producer --operation All --cluster --topic '*' --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=${ZOOKEEPER_HOST}:2181 --add --allow-principal User:consumer --operation All --cluster --topic '*' --group '*'
 
 # Minimal ACLs required by metricbeat. If this needs to be changed, please update docs too
-${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Describe --group '*'
-${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Read --topic '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=${ZOOKEEPER_HOST}:2181 --add --allow-principal User:stats --operation Describe --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=${ZOOKEEPER_HOST}:2181 --add --allow-principal User:stats --operation Read --topic '*'
 
 touch /tmp/.acls_loaded
 
