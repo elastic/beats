@@ -29,11 +29,12 @@
         },
         {
             "date": {
-                "field": "logstash.log.timeMillis",
+                "field": "logstash.log.timestamp",
+                "target_field": "@timestamp",
                 "formats": [
-                    "UNIX_MS"
+                    "ISO8601"
                 ],
-                "target_field": "@timestamp"
+                "ignore_failure": true
             }
         },
         {
