@@ -2,7 +2,7 @@ intrusion,430001,ACPolicy,
 intrusion,430001,ApplicationProtocol,network.protocol
 intrusion,430001,Classification,
 intrusion,430001,Client,
-intrusion,430001,DstIP,destination.ip
+intrusion,430001,DstIP,destination.address
 intrusion,430001,DstPort,destination.port
 intrusion,430001,EgressInterface,cisco.ftd.destination_interface
 intrusion,430001,EgressZone,
@@ -23,7 +23,7 @@ intrusion,430001,Protocol,network.transport
 intrusion,430001,Revision,
 intrusion,430001,SID,
 intrusion,430001,SSLActualAction,
-intrusion,430001,SrcIP,source.ip
+intrusion,430001,SrcIP,source.address
 intrusion,430001,SrcPort,source.port
 intrusion,430001,User,user.id,user.name
 intrusion,430001,VLAN_ID,
@@ -41,7 +41,7 @@ flow_start,430002,DNSQuery,dns.question.name
 flow_start,430002,DNSRecordType,dns.question.type
 flow_start,430002,DNSResponseType,dns.response_code
 flow_start,430002,DNSSICategory,
-flow_start,430002,DstIP,destination.ip
+flow_start,430002,DstIP,destination.address
 flow_start,430002,DstPort,destination.port
 flow_start,430002,EgressInterface,cisco.ftd.destination_interface
 flow_start,430002,EgressZone,
@@ -57,13 +57,13 @@ flow_start,430002,IPReputationSICategory,
 flow_start,430002,IPSCount,
 flow_start,430002,NAPPolicy,
 flow_start,430002,NetBIOSDomain,host.hostname
-flow_start,430002,originalClientSrcIP,client.ip
+flow_start,430002,originalClientSrcIP,client.address
 flow_start,430002,Prefilter Policy,
 flow_start,430002,Protocol,network.transport
 flow_start,430002,ReferencedHost,url.domain
 flow_start,430002,SecIntMatchingIP,
 flow_start,430002,Security Group,
-flow_start,430002,SrcIP,source.ip
+flow_start,430002,SrcIP,source.address
 flow_start,430002,SrcPort,source.port
 flow_start,430002,SSLActualAction,event.outcome
 flow_start,430002,SSLCertificate,
@@ -102,7 +102,7 @@ flow_end,430003,DNSQuery,dns.question.name
 flow_end,430003,DNSRecordType,dns.question.type
 flow_end,430003,DNSResponseType,dns.response_code
 flow_end,430003,DNSSICategory,
-flow_end,430003,DstIP,destination.ip
+flow_end,430003,DstIP,destination.address
 flow_end,430003,DstPort,destination.port
 flow_end,430003,EgressInterface,cisco.ftd.destination_interface
 flow_end,430003,EgressZone,
@@ -120,7 +120,7 @@ flow_end,430003,IPReputationSICategory,
 flow_end,430003,IPSCount,
 flow_end,430003,NAPPolicy,
 flow_end,430003,NetBIOSDomain,host.hostname
-flow_end,430003,originalClientSrcIP,client.ip
+flow_end,430003,originalClientSrcIP,client.address
 flow_end,430003,Prefilter Policy,
 flow_end,430003,Protocol,network.transport
 flow_end,430003,ReferencedHost,url.domain
@@ -128,7 +128,7 @@ flow_end,430003,ResponderBytes,destination.bytes
 flow_end,430003,ResponderPackets,destination.packets
 flow_end,430003,SecIntMatchingIP,
 flow_end,430003,Security Group,
-flow_end,430003,SrcIP,source.ip
+flow_end,430003,SrcIP,source.address
 flow_end,430003,SrcPort,source.port
 flow_end,430003,SSLActualAction,event.outcome
 flow_end,430003,SSLCertificate,
@@ -159,7 +159,7 @@ file,430004,ArchiveFileName,file.name
 file,430004,ArchiveFileStatus,
 file,430004,ArchiveSHA256,file.hash.sha256
 file,430004,Client,network.application
-file,430004,DstIP,destination.ip
+file,430004,DstIP,destination.address
 file,430004,DstPort,destination.port
 file,430004,FileAction,
 file,430004,FileDirection,
@@ -174,7 +174,7 @@ file,430004,FirstPacketSecond,event.start
 file,430004,Protocol,network.transport
 file,430004,SHA_Disposition,
 file,430004,SperoDisposition,
-file,430004,SrcIP,source.ip
+file,430004,SrcIP,source.address
 file,430004,SrcPort,source.port
 file,430004,SSLActualAction,
 file,430004,SSLCertificate,
@@ -188,7 +188,7 @@ malware,430005,ArchiveFileName,file.name
 malware,430005,ArchiveFileStatus,
 malware,430005,ArchiveSHA256,file.hash.sha256
 malware,430005,Client,network.application
-malware,430005,DstIP,destination.ip
+malware,430005,DstIP,destination.address
 malware,430005,DstPort,destination.port
 malware,430005,FileAction,
 malware,430005,FileDirection,
@@ -203,7 +203,7 @@ malware,430005,FirstPacketSecond,event.start
 malware,430005,Protocol,network.transport
 malware,430005,SHA_Disposition,
 malware,430005,SperoDisposition,
-malware,430005,SrcIP,source.ip
+malware,430005,SrcIP,source.address
 malware,430005,SrcPort,source.port
 malware,430005,SSLActualAction,
 malware,430005,SSLCertificate,

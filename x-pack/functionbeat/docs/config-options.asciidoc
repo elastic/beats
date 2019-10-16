@@ -185,3 +185,10 @@ The number of events to read from a Kinesis stream, the minimal values is 100 an
 
 The starting position to read from a Kinesis stream, valids values are `trim_horizon` and `latest`.
 The default is trim_horizon.
+
+[float]
+[id="{beatname_lc}-keep-null"]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.

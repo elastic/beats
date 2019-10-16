@@ -46,6 +46,9 @@ func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 			devtools.OSSBeatDir("_meta/beat.docker.yml"),
 			devtools.LibbeatDir("_meta/config.docker.yml"),
 		},
+		ExtraVars: map[string]interface{}{
+			"UseKubernetesMetadataProcessor": true,
+		},
 	}
 }
 
