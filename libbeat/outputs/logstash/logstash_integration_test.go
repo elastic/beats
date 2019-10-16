@@ -488,6 +488,7 @@ func TestLogstashElasticOutputPluginBulkCompatibleMessageTCP(t *testing.T) {
 }
 
 func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-tls", true)
 }
 
