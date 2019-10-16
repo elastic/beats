@@ -96,7 +96,7 @@
       {
           "rename": {
               "field": "azure.auditlogs.tenantId",
-              "target_field": "azure.auditlogs.tenant_id",
+              "target_field": "azure.tenant_id",
               "ignore_missing": true
           }
       },
@@ -182,6 +182,11 @@
               "field": "azure.auditlogs.properties.initiatedBy",
               "target_field": "azure.auditlogs.properties.initiated_by",
               "ignore_missing": true
+          }
+      },
+      {
+          "pipeline": {
+              "name": "{< IngestPipeline "azure-shared-pipeline" >}"
           }
       }
   ],
