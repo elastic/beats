@@ -22,8 +22,6 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 
 - Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
 - For "metricbeat style" generated custom beats, the mage target `GoTestIntegration` has changed to `GoIntegTest` and `GoTestUnit` has changed to `GoUnitTest`. {pull}13341[13341]
-- Build docker and kubernetes features only on supported platforms. {pull}13509[13509]
-- Need to register new processors to be used in the JS processor in their `init` functions. {pull}13509[13509]
 
 ==== Bugfixes
 
@@ -53,4 +51,3 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add checks for types and formats used in fields definitions in `fields.yml` files. {pull}13188[13188]
 - Makefile included in generator copies files from beats repository using `git archive` instead of cp. {pull}13193[13193]
 - Strip debug symbols from binaries to reduce binary sizes. {issue}12768[12768]
-- Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
