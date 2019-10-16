@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -197,5 +198,105 @@ func TestBuiltInTest(t *testing.T) {
 	_, err := newFromConfig(c)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "failed to parse test timestamp")
+	}
+}
+
+func TestTimezone(t *testing.T) {
+	cases := map[string]struct {
+		Timezone string
+		Expected time.Time
+		Error    bool
+	}{
+		"no timezone": {
+			Expected: expected,
+		},
+		"location label": {
+			// Use a location without DST to avoid surprises
+			Timezone: "America/Panama",
+			Expected: expected.Add(5 * time.Hour),
+		},
+		"UTC label": {
+			Timezone: "Etc/UTC",
+			Expected: expected,
+		},
+		"GMT label": {
+			Timezone: "Etc/GMT+2",
+			Expected: expected.Add(2 * time.Hour),
+		},
+		"UTC as standard offset": {
+			Timezone: "+0000",
+			Expected: expected,
+		},
+		"standard offset": {
+			Timezone: "+0430",
+			Expected: expected.Add(-4*time.Hour - 30*time.Minute),
+		},
+		"hour and minute offset": {
+			Timezone: "+03:00",
+			Expected: expected.Add(-3 * time.Hour),
+		},
+		"minute offset": {
+			Timezone: "+00:30",
+			Expected: expected.Add(-30 * time.Minute),
+		},
+		"abbreviated hour offset": {
+			Timezone: "+04",
+			Expected: expected.Add(-4 * time.Hour),
+		},
+		"negative hour and minute offset": {
+			Timezone: "-03:30",
+			Expected: expected.Add(3*time.Hour + 30*time.Minute),
+		},
+		"negative minute offset": {
+			Timezone: "-00:30",
+			Expected: expected.Add(30 * time.Minute),
+		},
+		"negative abbreviated hour offset": {
+			Timezone: "-04",
+			Expected: expected.Add(4 * time.Hour),
+		},
+
+		"unsupported UTC representation": {
+			Timezone: "Z",
+			Error:    true,
+		},
+		"non-existing location": {
+			Timezone: "Kalimdor/Orgrimmar",
+			Error:    true,
+		},
+		"incomplete offset": {
+			Timezone: "-400",
+			Error:    true,
+		},
+	}
+
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			config := defaultConfig()
+			config.Field = "ts"
+			config.Timezone = c.Timezone
+			config.Layouts = append(config.Layouts, time.ANSIC)
+
+			processor, err := newFromConfig(config)
+			if c.Error {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			originalTimestamp := expected.Format(time.ANSIC)
+			t.Logf("Original timestamp: %+v", originalTimestamp)
+			t.Logf("Timezone: %s", c.Timezone)
+
+			event := &beat.Event{
+				Fields: common.MapStr{
+					config.Field: originalTimestamp,
+				},
+			}
+
+			event, err = processor.Run(event)
+			assert.NoError(t, err)
+			assert.Equal(t, c.Expected, event.Timestamp)
+		})
 	}
 }

@@ -52,7 +52,7 @@ data:
       recursive: true
 ---
 # Deploy a auditbeat instance per node for node metrics retrieval
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: auditbeat
@@ -60,6 +60,9 @@ metadata:
   labels:
     k8s-app: auditbeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: auditbeat
   template:
     metadata:
       labels:
@@ -148,7 +151,7 @@ spec:
           path: /var/lib/auditbeat-data
           type: DirectoryOrCreate
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: auditbeat
@@ -161,7 +164,7 @@ roleRef:
   name: auditbeat
   apiGroup: rbac.authorization.k8s.io
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: auditbeat

@@ -31,11 +31,16 @@ type Connector struct {
 	eventMeta     common.EventMetadata
 	dynamicFields *common.MapStrPointer
 	timeSeries    bool
+	keepNull      bool
 }
 
 type connectorConfig struct {
-	Processors           processors.PluginConfig `config:"processors"`
-	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
+	Processors processors.PluginConfig `config:"processors"`
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool `config:"keep_null"`
+
+	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
 
 func NewConnector(pipeline beat.Pipeline, c *common.Config, dynFields *common.MapStrPointer) (*Connector, error) {
@@ -54,6 +59,7 @@ func NewConnector(pipeline beat.Pipeline, c *common.Config, dynFields *common.Ma
 		processors:    processors,
 		eventMeta:     config.EventMetadata,
 		dynamicFields: dynFields,
+		keepNull:      config.KeepNull,
 	}, nil
 }
 
@@ -63,6 +69,7 @@ func (c *Connector) Connect() (beat.Client, error) {
 			EventMetadata: c.eventMeta,
 			Processor:     c.processors,
 			DynamicFields: c.dynamicFields,
+			KeepNull:      c.keepNull,
 		},
 	})
 }

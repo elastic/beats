@@ -376,6 +376,18 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
+	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
+	// set the appropriate permission on the unix domain file without having to whitelist anything
+	// that would be set at runtime.
+	if b.Config.HTTP.Enabled() {
+		s, err := api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		if err != nil {
+			return errw.Wrap(err, "could not start the HTTP server for the API")
+		}
+		s.Start()
+		defer s.Stop()
+	}
+
 	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
 		return err
 	}
@@ -428,10 +440,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-
-	if b.Config.HTTP.Enabled() {
-		api.Start(b.Config.HTTP)
-	}
 
 	// Launch config manager
 	b.ConfigManager.Start()

@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
+* <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
@@ -823,12 +824,294 @@ type: long
 
 --
 
+[[exported-fields-appsearch]]
+== appsearch fields
+
+appsearch module
+
+
+
+[float]
+=== appsearch
+
+
+
+
+[float]
+=== stats
+
+App Search stats
+
+
+
+[float]
+=== jvm
+
+JVM stats
+
+
+
+[float]
+=== memory_usage
+
+Memory usage
+
+
+
+*`appsearch.stats.jvm.memory_usage.heap_init.bytes`*::
++
+--
+Heap init used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_used.bytes`*::
++
+--
+Heap used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_committed.bytes`*::
++
+--
+Committed heap to the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_max.bytes`*::
++
+--
+Max heap used by the JVM in bytes
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.non_heap_init.bytes`*::
++
+--
+Non-Heap initial memory used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.non_heap_committed.bytes`*::
++
+--
+Non-Heap committed memory used by the JVM in bytes.
+
+
+type: long
+
+--
+
+[float]
+=== queues
+
+Worker queues
+
+
+
+*`appsearch.stats.queues.analytics_events.count`*::
++
+--
+Number of pending jobs in the `analytics_events` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.document_destroyer.count`*::
++
+--
+Number of pending jobs in the `document_destroyer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.engine_destroyer.count`*::
++
+--
+Number of pending jobs in the `engine_destroyer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.index_adder.count`*::
++
+--
+Number of pending jobs in the `index_adder` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.indexed_doc_remover.count`*::
++
+--
+Number of pending jobs in the `indexed_doc_remover` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.mailer.count`*::
++
+--
+Number of pending jobs in the `mailer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.refresh_document_counts.count`*::
++
+--
+Number of pending jobs in the `refresh_document_counts` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.reindexer.count`*::
++
+--
+Number of pending jobs in the `reindexer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.schema_updater.count`*::
++
+--
+Number of pending jobs in the `schema_updater` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.failed.count`*::
++
+--
+Number of failed jobs waiting to be retried.
+
+
+type: long
+
+--
+
+[float]
+=== requests
+
+Request metrics
+
+
+
+*`appsearch.stats.requests.count`*::
++
+--
+Number of recently completed requests
+
+
+type: long
+
+--
+
+[float]
+=== api.duration
+
+API response time metrics
+
+
+
+*`appsearch.stats.requests.api.duration.avg.ms`*::
++
+--
+Average response time in milliseconds
+
+
+type: long
+
+--
+
+*`appsearch.stats.requests.api.duration.max.ms`*::
++
+--
+Max response time in milliseconds
+
+
+type: long
+
+--
+
+[float]
+=== web.duration
+
+Dashboard response time metrics
+
+
+
+*`appsearch.stats.requests.web.duration.avg.ms`*::
++
+--
+Average response time in milliseconds
+
+
+type: long
+
+--
+
+*`appsearch.stats.requests.web.duration.max.ms`*::
++
+--
+Max response time in milliseconds
+
+
+type: long
+
+--
+
 [[exported-fields-aws]]
 == aws fields
 
 `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
 
 
+
+*`cloud.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+
+
+type: keyword
+
+--
 
 [float]
 === aws
@@ -2121,188 +2404,97 @@ azure module
 
 
 
-[float]
-=== compute_vm
+*`azure.namespace`*::
++
+--
+The namespace selected
 
+
+type: keyword
+
+--
+
+*`azure.subscription_id`*::
++
+--
+The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.dimensions.*`*::
++
+--
+Azure metric dimensions.
+
+
+type: object
+
+--
+
+[float]
+=== resource
+
+The resource specified
+
+
+
+*`azure.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
+*`azure.resource.type`*::
++
+--
+The type of the resource
+
+
+type: keyword
+
+--
+
+*`azure.resource.group`*::
++
+--
+The resource group
+
+
+type: keyword
+
+--
+
+*`azure.resource.tags.*`*::
++
+--
+Azure resource tags.
+
+
+type: object
+
+--
+
+*`azure.resource.compute_vm.*.*`*::
++
+--
 compute_vm
 
 
-
-[float]
-=== resource
-
-The resource specified
-
-
-
-*`azure.compute_vm.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.resource.type`*::
-+
---
-The type of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.resource.group`*::
-+
---
-The resource group
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.resource.tags.*`*::
-+
---
-Azure resource tags.
-
-
 type: object
 
 --
 
-*`azure.compute_vm.namespace`*::
+*`azure.resource.compute_vm_scaleset.*.*`*::
 +
 --
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.compute_vm.metrics.*.*`*::
-+
---
-Metrics returned.
-
-
-type: object
-
---
-
-*`azure.compute_vm.dimensions.*`*::
-+
---
-Azure metric dimensions.
-
-
-type: object
-
---
-
-[float]
-=== compute_vm_scaleset
-
 compute_vm_scaleset
-
-
-
-[float]
-=== resource
-
-The resource specified
-
-
-
-*`azure.compute_vm_scaleset.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.resource.type`*::
-+
---
-The type of the resource
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.resource.group`*::
-+
---
-The resource group
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.resource.tags.*`*::
-+
---
-Azure resource tags.
-
-
-type: object
-
---
-
-*`azure.compute_vm_scaleset.namespace`*::
-+
---
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.compute_vm_scaleset.metrics.*.*`*::
-+
---
-Metrics returned.
-
-
-type: object
-
---
-
-*`azure.compute_vm_scaleset.dimensions.*`*::
-+
---
-Azure metric dimensions.
 
 
 type: object
@@ -2316,87 +2508,10 @@ monitor
 
 
 
-[float]
-=== resource
-
-The resource specified
-
-
-
-*`azure.monitor.resource.name`*::
-+
---
-The name of the resource
-
-
-type: keyword
-
---
-
-*`azure.monitor.resource.type`*::
-+
---
-The type of the resource
-
-
-type: keyword
-
---
-
-*`azure.monitor.resource.group`*::
-+
---
-The resource group
-
-
-type: keyword
-
---
-
-*`azure.monitor.resource.tags.*`*::
-+
---
-Azure resource tags.
-
-
-type: object
-
---
-
-*`azure.monitor.namespace`*::
-+
---
-The namespace selected
-
-
-type: keyword
-
---
-
-*`azure.monitor.subscription_id`*::
-+
---
-The subscription ID
-
-
-type: keyword
-
---
-
-*`azure.monitor.metrics.*.*`*::
+*`azure.resource.monitor.metrics.*.*`*::
 +
 --
 Metrics returned.
-
-
-type: object
-
---
-
-*`azure.monitor.dimensions.*`*::
-+
---
-Azure metric dimensions.
 
 
 type: object
@@ -15917,7 +16032,7 @@ type: date
 Message recorded for the given event
 
 
-type: keyword
+type: text
 
 --
 
@@ -17626,6 +17741,58 @@ The number of fully labeled replicas per ReplicaSet
 
 
 type: long
+
+--
+
+[float]
+=== resourcequota
+
+kubernetes resourcequota metrics
+
+
+
+*`kubernetes.resourcequota.created.sec`*::
++
+--
+Epoch seconds since the ResourceQuota was created
+
+type: double
+
+--
+
+*`kubernetes.resourcequota.quota`*::
++
+--
+Quota informed (hard or used) for the resource
+
+type: double
+
+--
+
+*`kubernetes.resourcequota.name`*::
++
+--
+ResourceQuota name
+
+type: keyword
+
+--
+
+*`kubernetes.resourcequota.type`*::
++
+--
+Quota information type, `hard` or `used`
+
+type: keyword
+
+--
+
+*`kubernetes.resourcequota.resource`*::
++
+--
+Resource name the quota applies to
+
+type: keyword
 
 --
 

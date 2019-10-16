@@ -127,6 +127,17 @@ Kafka fetch settings:
 *`max`*:: The maximum number of bytes to read per request. Defaults to 0
 (no limit).
 
+===== `expand_event_list_from_field`
+
+If the fileset using this input expects to receive multiple messages bundled under a specific field then the config option `expand_event_list_from_field` value can be assigned the name of the field.
+For example in the case of azure filesets the events are found under the json object "records".
+```
+{
+"records": [ {event1}, {event2}]
+}
+```
+This setting will be able to split the messages under the group value ('records') into separate events.
+
 ===== `rebalance`
 
 Kafka rebalance settings:

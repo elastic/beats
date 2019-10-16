@@ -162,7 +162,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 
 		objType = "replicaset"
 	case *StatefulSet:
-		ss := client.AppsV1().ReplicaSets(opts.Namespace)
+		ss := client.AppsV1().StatefulSets(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				return ss.List(options)
