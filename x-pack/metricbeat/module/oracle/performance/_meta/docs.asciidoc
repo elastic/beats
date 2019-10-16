@@ -6,9 +6,9 @@
 * *machine*: Operating system machine name
 * *buffer_pool*: Name of the buffer pool in the instance
 * *username*: Oracle username
-* *io_reloads*: Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are tumber of times a PIN was requested for objects of this namespace
+* *io_reloads*: Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are the number of times a PIN was requested for objects of this namespace.
 * *lock_requests*: Average of the ratio between 'gethits' and 'gets' being 'Gethits' the number of times an object's handle was found in memory and 'gets' the number of times a lock was requested for objects of this namespace.
-* *pin_requests*: Average of all pinhits/pins ratios being 'PinHits' the number of times all of the metadata pieces of the library object were found in memory and 'pins' the number of times a PIN was requested for objects of this namespace
+* *pin_requests*: Average of all pinhits/pins ratios being 'PinHits' the number of times all of the metadata pieces of the library object were found in memory and 'pins' the number of times a PIN was requested for objects of this namespace.
 * *cache.buffer.hit.pct*: The cache hit ratio of the specified buffer pool.
 * *cache.physical_reads*: Physical reads
 * *cache.get.consistent*: Consistent gets statistic
