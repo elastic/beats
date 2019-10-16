@@ -7,26 +7,6 @@
 === Beats version 7.4.1
 https://github.com/elastic/beats/compare/v7.4.0...v7.4.1[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -35,6 +15,8 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.4.1[View commits]
 - Make the script processor concurrency-safe. {issue}13690[13690] {pull}13857[13857]
 
 *Auditbeat*
+
+- Socket dataset: Fix start errors when IPv6 is disabled on the kernel. {issue}13953[13953] {pull}13966[13966]
 
 *Filebeat*
 
@@ -45,62 +27,11 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.4.1[View commits]
 - Fix delay in enforcing close_renamed and close_removed options. {issue}13488[13488] {pull}13907[13907]
 - Fix missing netflow fields in index template. {issue}13768[13768] {pull}13914[13914]
 - Fix cisco module's asa and ftd filesets parsing of domain names where an IP address is expected. {issue}14034[14034]
-
-*Heartbeat*
-
-*Journalbeat*
+- Fixed increased memory usage with large files when multiline pattern does not match. {issue}14068[14068]
 
 *Metricbeat*
 
 - Mark Kibana usage stats as collected only if API call succeeds. {pull}13881[13881]
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Added
-
-*Affecting all Beats*
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Functionbeat*
-
-*Winlogbeat*
-
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
 
 [[release-notes-7.4.0]]
 === Beats version 7.4.0
