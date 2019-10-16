@@ -1,5 +1,6 @@
 #!/bin/bash
 
+KAFKA_BROKER_NAME=${KAFKA_BROKER_NAME:-kafka}
 ZOOKEEPER_HOST=${ZOOKEEPER_HOST:-zookeeper}
 
 if [ -n "$KAFKA_ADVERTISED_HOST_AUTO" ]; then
@@ -45,6 +46,7 @@ echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
 export KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
+    --override host.name=$KAFKA_BROKER_NAME \
     --override zookeeper.connect=$ZOOKEEPER_HOST:2181 \
     --override authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer \
     --override super.users=User:admin \

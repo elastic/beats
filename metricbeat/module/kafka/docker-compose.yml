@@ -16,7 +16,37 @@ services:
       context: ./_meta
       args:
         KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
-    depends_on:
-      - zookeeper
+    environment:
+      KAFKA_BROKER_NAME: kafka1
     ports:
       - 9092
+    depends_on:
+      - zookeeper
+      - kafka2
+      - kafka3
+
+  kafka2:
+    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-2
+    build:
+      context: ./_meta
+      args:
+        KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
+    environment:
+      KAFKA_BROKER_NAME: kafka2
+    ports:
+      - 9092
+    depends_on:
+      - zookeeper
+
+  kafka3:
+    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-2
+    build:
+      context: ./_meta
+      args:
+        KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
+    environment:
+      KAFKA_BROKER_NAME: kafka3
+    ports:
+      - 9092
+    depends_on:
+      - zookeeper
