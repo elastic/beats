@@ -2,15 +2,18 @@
   "description": "Pipeline for parsing azure activity logs.",
   "processors": [
       {
-          "json" : {
-              "field" : "message",
-              "target_field" : "azure.activitylogs"
+          "script": {
+              "source": "ctx.message = ctx.message.replace(params.empty_field_name, '')",
+              "params": {
+                  "empty_field_name":  "\"\":\"\","
+              },
+              "ignore_failure": true
           }
       },
       {
-          "drop": {
-              "if" : "ctx.azure.activitylogs.identity == null",
-              "ignore_failure": false
+          "json" : {
+              "field" : "message",
+              "target_field" : "azure.activitylogs"
           }
       },
       {
@@ -59,10 +62,11 @@
       {
           "script": {
               "lang": "painless",
-              "source": "ctx.event.duration = ctx.event.duration * params.param_nano",
+              "source": "if (ctx.event.duration!= null) {ctx.event.duration = ctx.event.duration * params.param_nano;}",
               "params": {
                   "param_nano": 1000000
-              }
+              },
+              "ignore_failure": true
           }
       },
       {
@@ -75,7 +79,8 @@
       {
           "script": {
               "lang": "painless",
-              "source": "if (ctx.azure.activitylogs.properties.eventCategory == null) { if (ctx.azure.activitylogs.properties.policies != null)  { ctx.event.category = 'Policy';}} else {ctx.event.category = ctx.azure.activitylogs.properties.eventCategory;} if (ctx.event.category == null) {ctx.event.category='Administrative'}"
+              "source": "if (ctx.azure.activitylogs.properties.eventCategory == null) { if (ctx.azure.activitylogs.properties.policies != null)  { ctx.event.category = 'Policy';}} else {ctx.event.category = ctx.azure.activitylogs.properties.eventCategory;} if (ctx.event.category == null) {ctx.event.category='Administrative'}",
+              "ignore_failure": true
           }
       },
       {

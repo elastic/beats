@@ -29,7 +29,7 @@
                     "SUBID" : "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
                     "GROUPID" : ".+",
                     "PROVIDERNAME" : "([A-Z])\\w+.([A-Z])\\w+/([A-Z])\\w+.",
-                    "NAME": "^((?!AUTHORIZATIONRULES).)*$"
+                    "NAME": "((?!AUTHORIZATIONRULES).)*$"
                 },
                 "ignore_failure": true
             }
@@ -53,7 +53,7 @@
         },
         {
             "script": {
-                "source": "ctx.event.outcome = ctx.event.outcome.substring(0,1).toUpperCase() + ctx.event.outcome.substring(1,ctx.event.outcome.length()).toLowerCase()",
+                "source": "if (ctx.event.outcome !=null) {ctx.event.outcome = ctx.event.outcome.substring(0,1).toUpperCase() + ctx.event.outcome.substring(1,ctx.event.outcome.length()).toLowerCase();}",
                 "ignore_failure": true
             }
         }
