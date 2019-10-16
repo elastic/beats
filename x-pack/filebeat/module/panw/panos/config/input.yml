@@ -130,8 +130,8 @@ processors:
         panw.panos.url.category: 33
         log.level: 34
         _temp_.direction: 35
-        source.geo.country_iso_code: 38
-        destination.geo.country_iso_code: 39
+        _temp_.srcloc: 38
+        _temp_.dstloc: 39
         panw.panos.network.pcap_id: 42
         panw.panos.file.hash: 43
         user_agent.original: 46
