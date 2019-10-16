@@ -92,6 +92,8 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 	}
 
+	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %v", config.Host)
+
 	return kubernetes.NewWatcher(client, resource, options)
 }
 

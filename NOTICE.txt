@@ -2003,6 +2003,41 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/google/gopacket
+Revision: 0ad7f2610e344e58c1c95e2adda5c3258da8e97b
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/google/gopacket/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2012 Google, Inc. All rights reserved.
+Copyright (c) 2009-2011 Andreas Krennmair. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Andreas Krennmair, Google, nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/google/uuid
 Revision: 281f560d28af7174109514e936f94c2ab2cb2823
 License type (autodetected): BSD-3-Clause
@@ -4044,7 +4079,8 @@ Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
 
 --------------------------------------------------------------------
 Dependency: github.com/Microsoft/go-winio
-Revision: f533f7a102197536779ea3a8cb881d639e21ec5a
+Version: v0.4.14
+Revision: 6c72808b55902eae4c5943626030429ff20f3b63
 License type (autodetected): MIT
 ./vendor/github.com/Microsoft/go-winio/LICENSE:
 --------------------------------------------------------------------

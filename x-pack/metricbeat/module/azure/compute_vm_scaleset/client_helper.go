@@ -58,14 +58,12 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		vmdim = customVMDimension
 	}
 	for _, metricName := range supportedMetricNames {
-		if (metricName.Name.LocalizedValue != nil && !strings.Contains(*metricName.Name.LocalizedValue, "(Deprecated)")) || metricName.Name.LocalizedValue == nil {
-			if metricName.Dimensions == nil || len(*metricName.Dimensions) == 0 {
-				groupedMetrics[noDimension] = append(groupedMetrics[noDimension], metricName)
-			} else if containsDimension(vmdim, *metricName.Dimensions) {
-				groupedMetrics[vmdim] = append(groupedMetrics[vmdim], metricName)
-			} else if containsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
-				groupedMetrics[defaultSlotIDDimension] = append(groupedMetrics[defaultSlotIDDimension], metricName)
-			}
+		if metricName.Dimensions == nil || len(*metricName.Dimensions) == 0 {
+			groupedMetrics[noDimension] = append(groupedMetrics[noDimension], metricName)
+		} else if containsDimension(vmdim, *metricName.Dimensions) {
+			groupedMetrics[vmdim] = append(groupedMetrics[vmdim], metricName)
+		} else if containsDimension(defaultSlotIDDimension, *metricName.Dimensions) {
+			groupedMetrics[defaultSlotIDDimension] = append(groupedMetrics[defaultSlotIDDimension], metricName)
 		}
 	}
 	for key, metricGroup := range groupedMetrics {
@@ -75,7 +73,7 @@ func mapMetric(client *azure.Client, metric azure.MetricConfig, resource resourc
 		}
 		var dimensions []azure.Dimension
 		if key != noDimension {
-			dimensions = []azure.Dimension{{Name: vmdim, Value: "*"}}
+			dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 		}
 		metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, metric.Namespace, dimensions, defaultTimeGrain)...)
 	}

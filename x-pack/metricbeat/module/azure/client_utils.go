@@ -64,8 +64,13 @@ func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, s
 // metricExists will check if the metric value has been retrieved in the past
 func metricExists(name string, metric insights.MetricValue, metrics []MetricValue) bool {
 	for _, met := range metrics {
-		if name == met.name && metric.TimeStamp.Time == met.timestamp && metric.Average == met.avg && metric.Total == met.total && metric.Minimum == met.min &&
-			metric.Maximum == met.max && metric.Count == met.count {
+		if name == met.name &&
+			metric.TimeStamp.Equal(met.timestamp) &&
+			compareMetricValues(met.avg, metric.Average) &&
+			compareMetricValues(met.total, metric.Total) &&
+			compareMetricValues(met.max, metric.Maximum) &&
+			compareMetricValues(met.min, metric.Minimum) &&
+			compareMetricValues(met.count, metric.Count) {
 			return true
 		}
 	}
@@ -131,4 +136,18 @@ func mapTags(azureTags map[string]*string) map[string]string {
 		tags[key] = *value
 	}
 	return tags
+}
+
+// compareMetricValues will compare 2 pointer values
+func compareMetricValues(metVal *float64, metricVal *float64) bool {
+	if metVal == nil && metricVal == nil {
+		return true
+	}
+	if metVal == nil || metricVal == nil {
+		return false
+	}
+	if *metVal == *metricVal {
+		return true
+	}
+	return false
 }

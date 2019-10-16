@@ -79,13 +79,53 @@ filebeat.modules:
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
   s3access:
-    enabled: true
+    enabled: false
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
+
+  elb:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+#-------------------------------- Azure Module --------------------------------
+- module: azure
+  # All logs
+  activitylogs:
+    enabled: true
+    var:
+      # Azure event hub namespace FQDN for example "eventhubs.servicebus.windows.net:9093"
+      namespace: ""
+      # Eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
+      eventhub: ["insights-operational-logs"]
+      # Consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
+      consumer_group: "$Default"
+      # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
+      connection_string: ""
+
+ # auditlogs:
+ #   enabled: true
+ #   var:
+ #     namespace: ""
+ #     eventhub: ["insights-logs-auditlogs"]
+ #     consumer_group: "$Default"
+ #     connection_string: ""
+
+ # signinlogs:
+ #   enabled: true
+ #   var:
+ #     namespace: ""
+ #     eventhub: ["insights-logs-signinlogs"]
+ #     consumer_group: "$Default"
+ #     connection_string: ""
 
 #--------------------------------- CEF Module ---------------------------------
 - module: cef
@@ -363,6 +403,16 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#--------------------------------- MISP Module ---------------------------------
+- module: misp
+  threat:
+    enabled: true
+
+    # MISP Configuration
+    var.api_key: "XXXXXXXXXXXXXX" # API key for MISP
+    var.json_objects_array: "response.Attribute"
+    var.url: "http://X.X.X.X/attributes/restSearch" # X.X.X.X is the IP address of the MISP server
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
@@ -644,6 +694,9 @@ filebeat.inputs:
   # fields added by Filebeat itself, the custom fields overwrite the default
   # fields.
   #fields_under_root: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Ignore files which were modified more then the defined timespan in the past.
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
@@ -2052,7 +2105,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'filebeat-%{[agent.version]}'. 
+# name is 'filebeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "filebeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
@@ -2315,11 +2368,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

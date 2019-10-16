@@ -2,10 +2,11 @@
   {
     "@timestamp": "2019-05-17T11:06:58.210768Z",
     "event": {
-      "action": "Logoff",
+      "action": "logged-out",
       "code": 4634,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"
@@ -51,10 +52,11 @@
   {
     "@timestamp": "2019-05-19T16:15:38.542273Z",
     "event": {
-      "action": "Logoff",
+      "action": "logged-out",
       "code": 4634,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
     },
     "log": {
       "level": "information"

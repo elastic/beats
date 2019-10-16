@@ -212,6 +212,13 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+[[monitor-keep-null]]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.
+
+[float]
 [[monitor-icmp-options]]
 === ICMP options
 
@@ -386,7 +393,7 @@ Example configuration:
 [[monitor-http-proxy-url]]
 ==== `proxy_url`
 
-The HTTP proxy URL. This setting is optional.
+The HTTP proxy URL. This setting is optional. Example `http://proxy.mydomain.com:3128`
 
 [float]
 [[monitor-http-username]]
@@ -446,7 +453,7 @@ Set `response.include_body_max_bytes` to control the maximum size of the stored 
 [[monitor-http-check]]
 ==== `check`
 
-An optional `request` to send to the remote host and the expected `response`. 
+An optional `request` to send to the remote host and the expected `response`.
 
 Example configuration:
 
@@ -467,11 +474,56 @@ Under `check.request`, specify these options:
 *`headers`*:: A dictionary of additional HTTP headers to send.
 *`body`*:: Optional request body content.
 
+Example configuration:
+This monitor POSTs an `x-www-form-urlencoded` string
+to the endpoint `/demo/add`
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://localhost:8080/demo/add"]
+  check.request:
+    method: POST
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    # urlencode the body:
+    body: "name=first&email=someemail%40someemailprovider.com"
+  check.response:
+    status: 200
+    body:
+      - Saved
+      - saved
+-------------------------------------------------------------------------------
+
 Under `check.response`, specify these options:
 
 *`status`*:: The expected status code. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
 *`headers`*:: The required response headers.
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
+
+Example configuration:
+This monitor examines the
+response body for the strings `saved` or `Saved`
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://localhost:8080/demo/add"]
+  check.request:
+    method: POST
+    headers:
+      'Content-Type': 'application/x-www-form-urlencoded'
+    # urlencode the body:
+    body: "name=first&email=someemail%40someemailprovider.com"
+  check.response:
+    status: 200
+    body:
+      - Saved
+      - saved
+-------------------------------------------------------------------------------
+
 *`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON.
 
 The following configuration shows how to check the response when the body

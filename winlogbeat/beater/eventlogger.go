@@ -34,11 +34,15 @@ type eventLogger struct {
 	source     eventlog.EventLog
 	eventMeta  common.EventMetadata
 	processors beat.ProcessorList
+	keepNull   bool
 }
 
 type eventLoggerConfig struct {
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool `config:"keep_null"`
 }
 
 func newEventLogger(
@@ -70,6 +74,7 @@ func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 			EventMetadata: e.eventMeta,
 			Meta:          nil, // TODO: configure modules/ES ingest pipeline?
 			Processor:     e.processors,
+			KeepNull:      e.keepNull,
 		},
 		ACKCount: func(n int) {
 			addPublished(api, n)
