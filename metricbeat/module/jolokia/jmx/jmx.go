@@ -18,7 +18,9 @@
 package jmx
 
 import (
+	"fmt"
 	"github.com/elastic/beats/metricbeat/helper"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -96,18 +98,32 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	var allEvents []common.MapStr
+	var fieldKey string
+
+	eventList := common.MapStr{}
 
 	allEvents, err := m.jolokia.Fetch(m)
 	if err != nil {
 		return err
 	}
 
-	// Set dynamic namespace.
 	for _, event := range allEvents {
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-			Namespace:       m.Module().Name() + "." + m.namespace,
-		})
+		for key, val := range event.Flatten() {
+			detotKey := strings.Replace(key, ".", "_", -1)
+			switch v := val.(type) {
+			case float64:
+				fieldKey = fmt.Sprintf("jvm.jmx.metrics.numeric.%v", detotKey)
+			case string:
+				fieldKey = fmt.Sprintf("jvm.jmx.metrics.string.%v", detotKey)
+			default:
+				logp.Debug("jolokia", "JMX value should be doulbe or string and received %v", v)
+			}
+			eventList.Put(fieldKey, val)
+		}
 	}
+
+	reporter.Event(mb.Event{
+		RootFields: eventList,
+	})
 	return nil
 }
