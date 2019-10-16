@@ -51,10 +51,6 @@
           type: keyword
           description: >
             Action
-    - name: correlation_id
-      type: keyword
-      description: >
-        Correlation ID
     - name: operation_name
       type: keyword
       description: >
