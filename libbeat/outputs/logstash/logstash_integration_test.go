@@ -276,10 +276,12 @@ func checkAll(checks ...func() bool) func() bool {
 }
 
 func TestSendMessageViaLogstashTCP(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testSendMessageViaLogstash(t, "basic-tcp", false)
 }
 
 func TestSendMessageViaLogstashTLS(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testSendMessageViaLogstash(t, "basic-tls", true)
 }
 
@@ -314,10 +316,12 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 }
 
 func TestSendMultipleViaLogstashTCP(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testSendMultipleViaLogstash(t, "multiple-tcp", false)
 }
 
 func TestSendMultipleViaLogstashTLS(t *testing.T) {
+	t.Skip("skipped until https://github.com/logstash-plugins/logstash-output-elasticsearch/issues/887 is resolved")
 	testSendMultipleViaLogstash(t, "multiple-tls", true)
 }
 
