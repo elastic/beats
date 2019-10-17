@@ -1,7 +1,7 @@
 {
-    "_index" : "filebeat-8.0.0-2019.10.09",
+    "_index" : "filebeat-8.0.0-2019.10.15-000001",
     "_type" : "_doc",
-    "_id" : "2a7e2503-d7e2-405a-a84c-c3",
+    "_id" : "2a7e2503-d7e2-405a-a",
     "_score" : null,
     "_source" : {
         "agent" : {
@@ -15,24 +15,27 @@
             "level" : 4
         },
         "source" : {
-            "ip" : "91.171.71.101"
+            "ip" : "11.161.161.171"
         },
         "fileset" : {
             "name" : "signinlogs"
         },
         "geo" : {
-            "city_name" : "Paris",
-            "country_iso_code" : "FR",
-            "country_name" : "Paris",
+            "city_name" : "Sunnyvale",
+            "country_iso_code" : "US",
+            "country_name" : "California",
             "location" : {
-                "lon" : 2.341434343434343,
-                "lat" : 48.24353454545454
+                "lon" : -122.01692199707031,
+                "lat" : 37.38819122314453
             }
+        },
+        "cloud" : {
+            "provider" : "azure"
         },
         "input" : {
             "type" : "kafka"
         },
-        "@timestamp" : "2019-10-09T20:57:56.668Z",
+        "@timestamp" : "2019-10-15T18:39:47.255Z",
         "ecs" : {
             "version" : "1.1.0"
         },
@@ -41,8 +44,8 @@
         },
         "kafka" : {
             "headers" : [ ],
-            "partition" : 2,
-            "offset" : 1326,
+            "partition" : 0,
+            "offset" : 2562,
             "topic" : "insights-logs-signinlogs",
             "key" : ""
         },
@@ -69,7 +72,6 @@
         },
         "azure" : {
             "signinlogs" : {
-                "tenant_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                 "operation_version" : "1.0",
                 "result_signature" : "None",
                 "operation_name" : "Sign-in activity",
@@ -77,17 +79,44 @@
                 "correlation_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                 "properties" : {
                     "risk_level_aggregated" : "none",
-                    "applied_conditional_access_policies" : [ ],
-                    "created_at" : "2019-10-09T20:57:56.6687852+00:00",
-                    "risk_level_during_signin" : "none",
-                    "authenticationProcessingDetails" : [
+                    "client_app_used" : "Browser",
+                    "applied_conditional_access_policies" : [
                         {
-                            "value" : "True",
-                            "key" : "Domain Hint Present"
+                            "conditionsNotSatisfied" : 2,
+                            "result" : "notApplied",
+                            "conditionsSatisfied" : 1,
+                            "enforcedSessionControls" : [ ],
+                            "enforcedGrantControls" : [
+                                "Mfa"
+                            ],
+                            "displayName" : "Require MFA for Azure (Can come from Okta)",
+                            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73"
+                        },
+                        {
+                            "conditionsNotSatisfied" : 0,
+                            "result" : "notEnabled",
+                            "conditionsSatisfied" : 0,
+                            "enforcedSessionControls" : [ ],
+                            "enforcedGrantControls" : [ ],
+                            "displayName" : "Disable Persistent Browser Sessions",
+                            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73"
+                        },
+                        {
+                            "conditionsNotSatisfied" : 0,
+                            "result" : "notEnabled",
+                            "conditionsSatisfied" : 0,
+                            "enforcedSessionControls" : [ ],
+                            "enforcedGrantControls" : [ ],
+                            "displayName" : "12-hour Session timeouts",
+                            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73"
                         }
                     ],
+                    "created_at" : "2019-10-15T18:39:47.2550003+00:00",
+                    "risk_level_during_signin" : "none",
+                    "authenticationProcessingDetails" : [ ],
                     "token_issuer_type" : "AzureAD",
                     "original_request_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+                    "conditional_access_status" : "notApplied",
                     "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                     "app_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                     "authenticationDetails" : [ ],
@@ -96,19 +125,20 @@
                     "is_interactive" : false,
                     "service_principal_id" : "",
                     "authenticationRequirementPolicies" : [ ],
-                    "app_display_name" : "Microsoft Teams Web Client",
-                    "ip_address" : "91.171.71.101",
+                    "app_display_name" : "Partner Center Sales Connect ",
+                    "alternateSignInName" : "test@elastic.co",
+                    "ip_address" : "11.161.161.171",
                     "device_detail" : {
                         "device_id" : "",
-                        "browser" : "Chrome 77.0.3865",
+                        "browser" : "Safari 12.1",
                         "operating_system" : "MacOs"
                     },
                     "risk_detail" : "none",
                     "token_issuer_name" : "",
-                    "resource_display_name" : "Microsoft Teams Services",
+                    "resource_display_name" : "Windows Azure Active Directory",
                     "risk_state" : "none",
                     "user_principal_name" : "test@elastic.co",
-                    "processing_time_ms" : 601,
+                    "processing_time_ms" : 189,
                     "user_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                     "resource_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
                     "correlation_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
@@ -118,10 +148,14 @@
                     }
                 }
             },
-            "resource_id" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam"
+            "tenant_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
+            "resource" : {
+                "provider" : "Microsoft.aadiam",
+                "id" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam"
+            }
         }
     },
     "sort" : [
-        1570654676668
+        1571164787255
     ]
 }

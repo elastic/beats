@@ -1502,10 +1502,77 @@ Azure Module
 
 
 
-*`azure.resource_id`*::
+*`azure.subscription_id`*::
++
+--
+Azure subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.correlation_id`*::
++
+--
+Correlation ID
+
+
+type: keyword
+
+--
+
+*`azure.tenant_id`*::
++
+--
+tenant ID
+
+
+type: keyword
+
+--
+
+[float]
+=== resource
+
+Resource
+
+
+
+*`azure.resource.id`*::
 +
 --
 Resource ID
+
+
+type: keyword
+
+--
+
+*`azure.resource.group`*::
++
+--
+Resource group
+
+
+type: keyword
+
+--
+
+*`azure.resource.type`*::
++
+--
+Resource type/namespace
+
+
+type: keyword
+
+--
+
+*`azure.resource.name`*::
++
+--
+Name
 
 
 type: keyword
@@ -1620,16 +1687,6 @@ type: keyword
 
 --
 
-*`azure.activitylogs.correlation_id`*::
-+
---
-Correlation ID
-
-
-type: keyword
-
---
-
 *`azure.activitylogs.operation_name`*::
 +
 --
@@ -1718,16 +1775,6 @@ type: keyword
 +
 --
 Result signature
-
-
-type: keyword
-
---
-
-*`azure.auditlogs.correlation_id`*::
-+
---
-Correlation ID
 
 
 type: keyword
@@ -2067,16 +2114,6 @@ type: keyword
 +
 --
 Result signature
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.correlation_id`*::
-+
---
-Correlation ID
 
 
 type: keyword
