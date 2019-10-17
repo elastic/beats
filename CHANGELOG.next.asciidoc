@@ -171,6 +171,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix cisco module's asa and ftd filesets parsing of domain names where an IP address is expected. {issue}14034[14034]
 - Fixed increased memory usage with large files when multiline pattern does not match. {issue}14068[14068]
 - panw module: Use geo.name instead of geo.country_iso_code for free-form location. {issue}13272[13272]
+- Fix calculation of `network.bytes` and `network.packets` for bi-directional netflow events. {pull}14111[14111]
 
 *Heartbeat*
 
@@ -354,6 +355,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ExpandEventListFromField config option in the kafka input. {pull}13965[13965]
 - Add ELB fileset to AWS module. {pull}14020[14020]
 - Add module for MISP (Malware Information Sharing Platform). {pull}13805[13805]
+- Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
