@@ -5,26 +5,28 @@ It requires the following privileges:
 - https://docs.mongodb.com/manual/reference/privilege-actions/#listDatabases[`listDatabases` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
 - for each of the databases, also need https://docs.mongodb.com/manual/reference/privilege-actions/#dbStats[`dbStats` action] on the https://docs.mongodb.com/manual/reference/resource-document/#database-and-or-collection-resource[`database` resource]
 
-In Mongo shell, you can use the following command to create the role
+You can use the following command in Mongo shell to create the role (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-....
+["source","js",subs="attributes"]
+----
 db.createRole(
    {
      role: "dbstatsRole",
      privileges: [
        { resource: { cluster: true }, actions: ["listDatabases"] },
        // for each of the databases
-       { resource: { db: "db_1"}, actions: ["dbStats"]},
-       { resource: { db: "db_2"}, actions: ["dbStats"]}
+       { resource: { db: "db_1", collection: ""}, actions: ["dbStats"]},
+       { resource: { db: "db_2", collection: ""}, actions: ["dbStats"]}
      ],
      roles: []
    }
 )
-....
+----
 
-You can then use the following command to create the privileged user
+You can then use the following command in Mongo shell to create the privileged user (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-....
+["source","js",subs="attributes"]
+----
 db.createUser(
     {
         user: "beats",
@@ -32,13 +34,11 @@ db.createUser(
         roles: ["dbstatsRole"]
     }
 )
-....
+----
 
-or grant the role to an existing user
+You can use the following command in Mongo shell to grant the role to an existing user (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-....
-db.grantRolesToUser(
-    "user",
-    ["dbstatsRole"]
-)
-....
+["source","js",subs="attributes"]
+----
+db.grantRolesToUser("user", ["dbstatsRole"])
+----

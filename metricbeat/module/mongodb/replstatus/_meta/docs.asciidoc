@@ -6,25 +6,27 @@ It requires the following privileges:
 - https://docs.mongodb.com/manual/reference/privilege-actions/#collStats[`collStats` action] on https://docs.mongodb.com/manual/reference/local-database/#local.oplog.rs[the `local.oplog.rs` collection resource]
 - https://docs.mongodb.com/manual/reference/privilege-actions/#replSetGetStatus[`replSetGetStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
 
-In Mongo shell, you can use the following command to create the role
+You can use the following command in Mongo shell to create the role (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-....
+["source","js",subs="attributes"]
+----
 db.createRole(
    {
      role: "replstatusRole",
      privileges: [
-       { resource: { db: "local" }, actions: ["listCollections"] },
+       { resource: { db: "local", collection: "" }, actions: ["listCollections"] },
        { resource: { db: "local", collection: "oplog.rs" }, actions: ["collStats"] },
        { resource: { cluster: true }, actions: ["replSetGetStatus"] },
      ],
      roles: []
    }
 )
-....
+----
 
-You can then use the following command to create the privileged user
+You can then use the following command in Mongo shell to create the privileged user (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-....
+["source","js",subs="attributes"]
+----
 db.createUser(
     {
         user: "beats",
@@ -32,13 +34,11 @@ db.createUser(
         roles: ["replstatusRole"]
     }
 )
-....
+----
 
-or grant the role to an existing user
+You can use the following command in Mongo shell to grant the role to an existing user (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-....
-db.grantRolesToUser(
-    "user",
-    ["replstatusRole"]
-)
-....
+["source","js",subs="attributes"]
+----
+db.grantRolesToUser("user", ["replstatusRole"])
+----
