@@ -1610,6 +1610,16 @@ Authorization
 
 
 
+*`azure.activitylogs.identity.claims.name`*::
++
+--
+Initiated by user
+
+
+type: keyword
+
+--
+
 *`azure.activitylogs.identity.claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name`*::
 +
 --

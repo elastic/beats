@@ -14,6 +14,10 @@
           description: >
             Authorization
           fields:
+            - name: name
+              type: keyword
+              description: >
+                Initiated by user
             - name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name
               type: keyword
               description: >
