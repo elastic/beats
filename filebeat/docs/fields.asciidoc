@@ -1604,6 +1604,43 @@ Identity
 
 
 [float]
+=== claims
+
+Authorization
+
+
+
+*`azure.activitylogs.identity.claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name`*::
++
+--
+Schema
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname`*::
++
+--
+Schema
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname`*::
++
+--
+Schema
+
+
+type: keyword
+
+--
+
+[float]
 === authorization
 
 Authorization

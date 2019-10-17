@@ -9,6 +9,23 @@
       description: >
         Identity
       fields:
+        - name: claims
+          type: group
+          description: >
+            Authorization
+          fields:
+            - name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name
+              type: keyword
+              description: >
+                Schema
+            - name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname
+              type: keyword
+              description: >
+                Schema
+            - name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname
+              type: keyword
+              description: >
+                Schema
         - name: authorization
           type: group
           description: >
