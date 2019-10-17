@@ -60,66 +60,27 @@ work with all versions >= 2.8.
 
 In order to use the metricsets, the MongoDB user specified in the module configuration needs to have certain https://docs.mongodb.com/manual/core/authorization/#privileges[privileges].
 
-Using different metricsets requires different set of privileges:
+We recommend using the https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor[`clusterMonitor` role] to cover all the necessary privileges.
 
-* `collstats` requires
-** https://docs.mongodb.com/manual/reference/privilege-actions/#top[`top` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
+You can use the following command in Mongo shell to create the privileged user (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-* `dbstats` requires
-** https://docs.mongodb.com/manual/reference/privilege-actions/#listDatabases[`listDatabases` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
-** for each of the databases, also need https://docs.mongodb.com/manual/reference/privilege-actions/#dbStats[`dbStats` action] on the https://docs.mongodb.com/manual/reference/resource-document/#database-and-or-collection-resource[`database` resource]
-
-* `status` requires
-** https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
-
-* `replstatus` requires
-** https://docs.mongodb.com/manual/reference/privilege-actions/#find[`find`/`listCollections` action] on https://docs.mongodb.com/manual/reference/local-database/[the `local` database resource]
-** https://docs.mongodb.com/manual/reference/privilege-actions/#collStats[`collStats` action] on https://docs.mongodb.com/manual/reference/local-database/#local.oplog.rs[the `local.oplog.rs` collection resource]
-** https://docs.mongodb.com/manual/reference/privilege-actions/#replSetGetStatus[`replSetGetStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
-
-* `metrics` requires
-** https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
-
-In Mongo shell, you can use the following command to create the role that encompass all of the privileges
-
-....
-db.createRole(
-   {
-     role: "beatsRole",
-     privileges: [
-       { resource: { db: "local" }, actions: ["listCollections"] },
-       { resource: { db: "local", collection: "oplog.rs" }, actions: ["collStats"] },
-       { resource: { cluster: true }, actions: ["top", "listDatabases", "serverStatus", "replSetGetStatus"] },
-       // for each of the databases you want to use dbstats metricset with
-       { resource: { db: "db_1"}, actions: ["dbStats"]},
-       { resource: { db: "db_2"}, actions: ["dbStats"]},
-
-     ],
-     roles: []
-   }
-)
-....
-
-You can then use the following command to create the privileged user
-
-....
+["source","js",subs="attributes"]
+----
 db.createUser(
     {
         user: "beats",
         pwd: "pass",
-        roles: ["beatsRole"]
+        roles: ["clusterMonitor"]
     }
 )
-....
+----
 
-or grant the role to an existing user
+You can use the following command in Mongo shell to grant the role to an existing user (make sure you are using the `admin` db by using `db` command in Mongo shell).
 
-....
-db.grantRolesToUser(
-    "user",
-    ["beatsRole"]
-)
-....
+["source","js",subs="attributes"]
+----
+db.grantRolesToUser("user", ["clusterMonitor"])
+----
 
 
 [float]
