@@ -1,0 +1,3 @@
+- module: gcp
+  metricsets: ['compute']
+  period: 10s
