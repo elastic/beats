@@ -104,6 +104,25 @@ tar xzvf packetbeat-{version}-linux-x86_64.tar.gz
 
 endif::[]
 
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{version}-linux-x86_64.tar.gz
+tar xzvf packetbeat-{version}-linux-x86_64.tar.gz
+----------------------------------------------------------------------
+
+endif::[]
+
 [[win]]
 *win:*
 

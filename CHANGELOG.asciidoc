@@ -670,6 +670,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 ==== Added
 
 *Affecting all Beats*
+- Unify dashboard exporter tools. {pull}9097[9097]
 
 - Unify dashboard exporter tools. {pull}9097[9097]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
@@ -679,6 +680,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Add geo fields to `add_host_metadata` processor. {pull}9392[9392]
 
 *Filebeat*
+- Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 
 - Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]

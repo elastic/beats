@@ -2599,15 +2599,6 @@ type: object
 
 --
 
-*`observer.product`*::
-+
---
-Product name.
-
-type: keyword
-
---
-
 *`source.service.name`*::
 +
 --
