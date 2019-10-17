@@ -68,7 +68,8 @@
           "port": 53787
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-15T03:30:00Z",
@@ -137,7 +138,8 @@
           "port": 136
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-15T03:30:00Z",
@@ -206,7 +208,8 @@
           "port": 44155
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-15T03:30:00Z",
@@ -275,7 +278,8 @@
           "port": 0
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-15T03:30:00Z",
@@ -344,7 +348,8 @@
           "port": 136
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-15T03:30:00Z",
@@ -413,7 +418,8 @@
           "port": 55869
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-15T03:30:00Z",
@@ -482,7 +488,8 @@
           "port": 9430
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-15T03:30:00Z",
@@ -551,7 +558,8 @@
           "port": 33689
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }
