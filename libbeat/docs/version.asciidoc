@@ -5,6 +5,3 @@
 :python: 2.7.9
 :docker: 1.12
 :docker-compose: 1.11
-:branch: master
-:major-version: 8.x
-:ecs_version: 1.1
