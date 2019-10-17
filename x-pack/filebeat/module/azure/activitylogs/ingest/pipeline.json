@@ -168,6 +168,49 @@
           }
       },
       {
+          "geoip" : {
+              "field" : "source.ip",
+              "target_field" : "geo",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.activitylogs.identity.claims.name",
+              "target_field": "azure.activitylogs.identity.claims_initiated_by_user.fullname",
+              "ignore_missing": true
+          }
+      },
+      {
+          "script": {
+              "lang": "painless",
+              "source": "if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'] != null) {  ctx.azure.activitylogs.identity.claims_initiated_by_user.surname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'];}",
+              "ignore_failure": true
+          }
+      },
+      {
+          "script": {
+              "lang": "painless",
+              "source": "if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] != null) {  ctx.azure.activitylogs.identity.claims_initiated_by_user.name = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];}",
+              "ignore_failure": true
+          }
+      },
+      {
+          "script": {
+              "lang": "painless",
+              "source": "if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'] != null) {  ctx.azure.activitylogs.identity.claims_initiated_by_user.givenname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'];}",
+              "ignore_failure": true
+          }
+      },
+      {
+          "set": {
+              "if" : "ctx.azure.activitylogs.identity.claims_initiated_by_user.fullname != null",
+              "field": "azure.activitylogs.identity.claims_initiated_by_user.schema",
+              "value": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims"
+          }
+      },
+
+      {
           "pipeline": {
               "name": "{< IngestPipeline "azure-shared-pipeline" >}"
           }

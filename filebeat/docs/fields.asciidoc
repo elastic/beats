@@ -1604,43 +1604,53 @@ Identity
 
 
 [float]
-=== claims
+=== claims_initiated_by_user
 
-Authorization
+Claims initiated by user
 
 
 
-*`azure.activitylogs.identity.claims.name`*::
+*`azure.activitylogs.identity.claims_initiated_by_user.name`*::
 +
 --
-Initiated by user
+Name
 
 
 type: keyword
 
 --
 
-*`azure.activitylogs.identity.claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name`*::
+*`azure.activitylogs.identity.claims_initiated_by_user.givenname`*::
 +
 --
-Schema
+Givenname
 
 
 type: keyword
 
 --
 
-*`azure.activitylogs.identity.claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname`*::
+*`azure.activitylogs.identity.claims_initiated_by_user.surname`*::
 +
 --
-Schema
+Surname
 
 
 type: keyword
 
 --
 
-*`azure.activitylogs.identity.claims.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname`*::
+*`azure.activitylogs.identity.claims_initiated_by_user.fullname`*::
++
+--
+Fullname
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.claims_initiated_by_user.schema`*::
 +
 --
 Schema

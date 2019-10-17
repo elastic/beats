@@ -9,24 +9,28 @@
       description: >
         Identity
       fields:
-        - name: claims
+        - name: claims_initiated_by_user
           type: group
           description: >
-            Authorization
+            Claims initiated by user
           fields:
             - name: name
               type: keyword
               description: >
-                Initiated by user
-            - name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name
+                Name
+            - name: givenname
               type: keyword
               description: >
-                Schema
-            - name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname
+                Givenname
+            - name: surname
               type: keyword
               description: >
-                Schema
-            - name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname
+                Surname
+            - name: fullname
+              type: keyword
+              description: >
+                Fullname
+            - name: schema
               type: keyword
               description: >
                 Schema
