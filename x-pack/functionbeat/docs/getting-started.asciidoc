@@ -12,10 +12,11 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 [id="{beatname_lc}-installation"]
 [role="xpack"]
-=== Step 1: Download the {beatname_uc} package
+=== Step 1: Download {beatname_uc}
 
-The {beatname_uc} package contains the command line tools, configuration file,
-and binary code required to run {beatname_uc} in your serverless environment. 
+The {beatname_uc} distribution contains the command line tools, configuration
+file, and binary code required to run {beatname_uc} in your serverless
+environment. 
 
 To download and extract the package, use the commands that work with your
 system.
@@ -80,10 +81,10 @@ endif::[]
 [role="xpack"]
 === Step 2: Configure {beatname_uc}
 
-Before deploying {beatname_uc} to your serverless environment, you need to
-specify details about the functions that you want to deploy, including the
-function name, type, and triggers that will cause the function to execute.
-You also need to specify connection details for your {es} cluster. 
+Before deploying {beatname_uc} to your cloud provider, you need to specify
+details about the cloud functions that you want to deploy, including the
+function name and type, and the triggers that will cause the function to
+execute. You also need to specify connection details for your {es} cluster. 
 
 You specify settings in the  +{beatname_lc}.yml+ configuration file. This file
 is located in the archive that you extracted earlier.
@@ -106,9 +107,8 @@ events from CloudWatch Logs and forwards the events to {es}.
     description: "lambda function for cloudwatch logs"
     triggers:
       - log_group_name: /aws/lambda/my-lambda-function
-output.elasticsearch:
-  cloud.id: "MyESDeployment:SomeLongString=="
-  cloud.auth: "elastic:SomeLongString"
+cloud.id: "MyESDeployment:SomeLongString=="
+cloud.auth: "elastic:SomeLongString"
 -------------------------------------------------------------------------------------
 
 To configure {beatname_uc}:
@@ -121,8 +121,8 @@ uploaded. For example:
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 ----
 
-. Define the functions that you want to deploy. For each function, you must
-specify:
+. Define the functions that you want to deploy. Define a function for each
+service you want to monitor. For each function, you must specify:
 +
 [horizontal]
 `name`:: A unique name for the Lambda function.  
@@ -135,7 +135,7 @@ are:
 is `cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs` or
 `kinesis`, specify a list of Amazon Resource Names (ARNs). 
 +
-When a message is sent to the specified log group or queue, the Lambda function
+When a message is sent to the specified log group or queue, the cloud function
 executes and sends message events to the output configured for {beatname_uc}.
 +
 The following example configures a function called `sqs` that collects data
@@ -167,68 +167,64 @@ include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [id="{beatname_lc}-deploying"]
 [role="xpack"]
-=== Step 4: Deploy {beatname_uc} code to your serverless environment
+=== Step 4: Deploy {beatname_uc}
 
-Before deploying functions to your serverless environment, make sure your user
-has the credentials required to authenticate with your cloud service provider.
-For example, if you are deploying an AWS Lambda function, you can set
-environment variables that contain your credentials:
+To deploy the cloud functions to your cloud provider, either use the
+{beatname_uc} manager, as described here, or <<own-deployment,use your own
+deployment infrastructure>>.
 
+. Make sure the user has the credentials required to authenticate with your
+cloud service provider. For example, if you're deploying an AWS Lambda
+function, you can set environment variables that contain your credentials:
++
 *linux and mac*:
-
++
 [source, shell]
 ----
 export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
 export AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
 export AWS_DEFAULT_REGION=us-east-1
 ----
-
++
 *win*:
-
++
 [source, shell]
 ----
 set AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
 set AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
 set AWS_DEFAULT_REGION=us-east-1
 ----
-
++
 Set `AWS_DEFAULT_REGION` to the region where your services are running.
 
-Also make sure the user has the permissions required to deploy and run the
+. Make sure the user has the permissions required to deploy and run the
 function. For more information, see <<iam-permissions>>.
 
-After setting credentials and verifying permissions, run the `deploy` command to
-deploy the function.
-
-TIP: Instead of deploying from the command line, you can export an
-{cloudformation-ref} template and use the template with automation software to
-deploy {beatname_uc} code to your cloud environment. For more information, see 
-<<export-cloudformation-template>>.
-
-The following command deploys a function called `cloudwatch`: 
-
+. Deploy the cloud functions.
++
+For example, the following command deploys a function called `cloudwatch`: 
++
 *linux and mac:*
-
++
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 ./{beatname_lc} -v -e -d "*" deploy cloudwatch
 ----------------------------------------------------------------------
-
++
 *win:*
-
++
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 .{backslash}{beatname_lc}.exe -v -e -d "*" deploy cloudwatch
 ----------------------------------------------------------------------
-
-{beatname_uc} is now deployed in your serverless environment and ready to send
-log events to the configured output.
++
+The function is deployed in your cloud environment and ready to send log events
+to the configured output.
 
 If deployment fails, see <<faq>> for help troubleshooting.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
-
 
 [[view-kibana-dashboards]]
 [role="xpack"]
