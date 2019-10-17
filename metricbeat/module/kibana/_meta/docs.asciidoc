@@ -3,8 +3,7 @@ There are two modules that collect metrics about {kib}:
 * The Kibana module tracks only the high-level metrics. The default metricset in
 this module is `status`.
 * The Kibana X-Pack module enables you to monitor more Kibana metrics with our
-{ref}/monitor-elasticsearch-cluster.html[monitoring] feature. The default metricset in
-this module is `stats`.
+{stack} {monitor-features}. The default metricset in this module is `stats`.
 
 [float]
 === Compatibility

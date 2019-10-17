@@ -340,7 +340,7 @@ endif::apm-server[]
 ==== Learn more about users and roles
 
 Want to learn more about creating users and roles? See
-{ref}/elasticsearch-security.html[Securing the {stack}]. Also see:
+{ref}/secure-cluster.html[Secure a cluster]. Also see:
 
 * {ref}/security-privileges.html[Security privileges] for a description of
 available privileges
