@@ -147,6 +147,7 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
+	setUmask()
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
 	version := settings.Version
