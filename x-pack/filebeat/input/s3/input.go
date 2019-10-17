@@ -17,6 +17,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -59,15 +61,16 @@ func init() {
 
 // Input is a input for s3
 type s3Input struct {
-	outlet     channel.Outleter // Output of received s3 logs.
-	config     config
-	awsConfig  awssdk.Config
-	logger     *logp.Logger
-	close      chan struct{}
-	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
-	context    *channelContext
-	workerWg   sync.WaitGroup // Waits on s3 worker goroutine.
-	stopOnce   sync.Once
+	outlet           channel.Outleter // Output of received s3 logs.
+	config           config
+	awsConfig        awssdk.Config
+	logger           *logp.Logger
+	close            chan struct{}
+	workerOnce       sync.Once // Guarantees that the worker goroutine is only started once.
+	context          *channelContext
+	workerWg         sync.WaitGroup // Waits on s3 worker goroutine.
+	stopOnce         sync.Once
+	messageBlackList []string // list of messageIDs that s3 input will not read.
 }
 
 type s3Info struct {
@@ -157,12 +160,13 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 
 	closeChannel := make(chan struct{})
 	p := &s3Input{
-		outlet:    out,
-		config:    config,
-		awsConfig: awsConfig,
-		logger:    logger,
-		close:     closeChannel,
-		context:   &channelContext{closeChannel},
+		outlet:           out,
+		config:           config,
+		awsConfig:        awsConfig,
+		logger:           logger,
+		close:            closeChannel,
+		context:          &channelContext{closeChannel},
+		messageBlackList: []string{},
 	}
 	return p, nil
 }
@@ -236,6 +240,10 @@ func (p *s3Input) processor(queueURL string, messages []sqs.Message, visibilityT
 
 	// process messages received from sqs
 	for i := range messages {
+		if exists, _ := aws.StringInSlice(*messages[i].MessageId, p.messageBlackList); exists {
+			continue
+		}
+
 		errC := make(chan error)
 		go p.processMessage(svcS3, messages[i], &wg, errC)
 		go p.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, &wg, errC)
@@ -248,7 +256,13 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 
 	s3Infos, err := handleSQSMessage(message)
 	if err != nil {
-		p.logger.Error(errors.Wrap(err, "handleMessage failed"))
+		if exists, _ := aws.StringInSlice(*message.MessageId, p.messageBlackList); !exists {
+			p.messageBlackList = append(p.messageBlackList, *message.MessageId)
+		}
+
+		err = errors.Wrap(err, "handleSQSMessage failed")
+		p.logger.Error(err)
+		errC <- err
 		return
 	}
 
@@ -256,8 +270,8 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 	err = p.handleS3Objects(svcS3, s3Infos, errC)
 	if err != nil {
 		err = errors.Wrap(err, "handleS3Objects failed")
-		errC <- err
 		p.logger.Error(err)
+		errC <- err
 	}
 }
 
@@ -340,13 +354,16 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 	var s3Infos []s3Info
 	for _, record := range msg.Records {
-		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "ObjectCreated:") {
+		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "TESTObjectCreated:") {
 			s3Infos = append(s3Infos, s3Info{
 				region: record.AwsRegion,
 				name:   record.S3.bucket.Name,
 				key:    record.S3.object.Key,
 				arn:    record.S3.bucket.Arn,
 			})
+		} else {
+			return nil, errors.New("event source does not match " +
+				"aws:s3 or event name does not start with ObjectCreated")
 		}
 	}
 	return s3Infos, nil

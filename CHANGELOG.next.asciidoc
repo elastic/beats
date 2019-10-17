@@ -35,8 +35,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
-- Add support for gzipped files in S3 input {pull}13980[13980]
-- Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
 
 *Heartbeat*
 
@@ -356,6 +354,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ELB fileset to AWS module. {pull}14020[14020]
 - Add module for MISP (Malware Information Sharing Platform). {pull}13805[13805]
 - Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
+- Add support for gzipped files in S3 input {pull}13980[13980]
+- Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
