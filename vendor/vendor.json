@@ -2273,10 +2273,11 @@
 			"revisionTime": "2019-10-09T16:37:24Z"
 		},
 		{
-			"checksumSHA1": "sN9Kuv7R0K4gjRYnyG95vEb0k9s=",
+			"checksumSHA1": "msNKeCHS4V89szexDN6/ixw1gYs=",
+			"origin": "github.com/adriansr/gopacket/afpacket",
 			"path": "github.com/google/gopacket/afpacket",
-			"revision": "0ad7f2610e344e58c1c95e2adda5c3258da8e97b",
-			"revisionTime": "2019-10-09T16:37:24Z"
+			"revision": "a13a1c6078605c1b528df079debf4ffe33be7f8d",
+			"revisionTime": "2019-10-18T08:38:32Z"
 		},
 		{
 			"checksumSHA1": "CElVSky7n3cuKstd4LrIxGUREuA=",
