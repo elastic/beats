@@ -22,5 +22,5 @@ package instance
 import "syscall"
 
 func setUmask() int {
-	return syscall.Umask(027) // 640 for files | 750 for dirs
+	return syscall.Umask(0027) // 0640 for files | 0750 for dirs
 }
