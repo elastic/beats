@@ -1,5 +1,5 @@
-# This sample sets up a an Elasticsearch cluster along with a Kibana instance
-# and an APM server, configured to be able to communicate with each other
+# This sample sets up a an Elasticsearch cluster along with a Kibana instance,
+# configured to be able to communicate with each other
 apiVersion: elasticsearch.k8s.elastic.co/v1alpha1
 kind: Elasticsearch
 metadata:
@@ -15,7 +15,7 @@ spec:
           - name: elasticsearch
             resources:
               limits:
-                memory: 2Gi  
+                memory: 2Gi
     volumeClaimTemplates:
     - metadata:
         name: data
@@ -24,7 +24,7 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 2Gi  
+            storage: 2Gi
 ---
 apiVersion: kibana.k8s.elastic.co/v1alpha1
 kind: Kibana
