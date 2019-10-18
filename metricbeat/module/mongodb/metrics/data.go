@@ -22,7 +22,7 @@ import (
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
-var schema = s.Schema{
+var schemaMetrics = s.Schema{
 	"commands": c.Dict("metrics.commands", s.Schema{
 		"is_self":                 c.Dict("_isSelf", commandSchema),
 		"aggregate":               c.Dict("aggregate", commandSchema),
@@ -54,7 +54,7 @@ var schema = s.Schema{
 		"server_status":           c.Dict("serverStatus", commandSchema),
 		"update":                  c.Dict("update", commandSchema),
 		"whatsmyuri":              c.Dict("whatsmyuri", commandSchema),
-	}),
+	}, c.DictOptional),
 	"cursor": c.Dict("metrics.cursor", s.Schema{
 		"timed_out": c.Int("timedOut"),
 		"open": c.Dict("open", s.Schema{
@@ -79,10 +79,10 @@ var schema = s.Schema{
 	"operation": c.Dict("metrics.operation", s.Schema{
 		"scan_and_order":  c.Int("scanAndOrder"),
 		"write_conflicts": c.Int("writeConflicts"),
-	}),
+	}, c.DictOptional),
 	"query_executor": c.Dict("metrics.queryExecutor", s.Schema{
-		"scanned_indexes":   s.Object{"count": c.Int("scanned")},
-		"scanned_documents": s.Object{"count": c.Int("scannedObjects")},
+		"scanned_indexes":   s.Object{"count": c.Int("scanned", s.Optional)},
+		"scanned_documents": s.Object{"count": c.Int("scannedObjects", s.Optional)},
 	}),
 	"replication": c.Dict("metrics.repl", replicationSchema, c.DictOptional),
 	"storage": c.Dict("metrics.storage.freelist", s.Schema{
@@ -91,10 +91,10 @@ var schema = s.Schema{
 			"requests":         c.Int("requests"),
 			"scanned":          c.Int("scanned"),
 		}),
-	}),
+	}, c.DictOptional),
 	"ttl": c.Dict("metrics.ttl", s.Schema{
-		"deleted_documents": s.Object{"count": c.Int("deletedDocuments")},
-		"passes":            s.Object{"count": c.Int("passes")},
+		"deleted_documents": s.Object{"count": c.Int("deletedDocuments", s.Optional)},
+		"passes":            s.Object{"count": c.Int("passes", s.Optional)},
 	}),
 }
 
@@ -118,19 +118,19 @@ var replicationSchema = s.Schema{
 				"work":      c.Int("scheduledWork"),
 				"failures":  c.Int("schedulingFailures"),
 			},
-		}),
+		}, c.DictOptional),
 		"queues": c.Dict("queues", s.Schema{
 			"in_progress": s.Object{
-				"network":   c.Int("networkInProgress"),
-				"dbwork":    c.Int("dbWorkInProgress"),
-				"exclusive": c.Int("exclusiveInProgress"),
+				"network":   c.Int("networkInProgress", s.Optional),
+				"dbwork":    c.Int("dbWorkInProgress", s.Optional),
+				"exclusive": c.Int("exclusiveInProgress", s.Optional),
 			},
-			"sleepers": c.Int("sleepers"),
-			"ready":    c.Int("ready"),
-			"free":     c.Int("free"),
-		}),
+			"sleepers": c.Int("sleepers", s.Optional),
+			"ready":    c.Int("ready", s.Optional),
+			"free":     c.Int("free", s.Optional),
+		}, c.DictOptional),
 		"unsignaled_events": c.Int("unsignaledEvents"),
-		"event_waiters":     c.Int("eventWaiters"),
+		"event_waiters":     c.Int("eventWaiters", s.Optional),
 		"shutting_down":     c.Bool("shuttingDown"),
 		"network_interface": c.Str("networkInterface"),
 	}),
@@ -138,7 +138,7 @@ var replicationSchema = s.Schema{
 		"attempts_to_become_secondary": c.Int("attemptsToBecomeSecondary"),
 		"batches":                      c.Dict("batches", countAndTimeSchema),
 		"ops":                          c.Int("ops"),
-	}),
+	}, c.DictOptional),
 	"buffer": c.Dict("buffer", s.Schema{
 		"count":    c.Int("count"),
 		"max_size": s.Object{"bytes": c.Int("maxSizeBytes")},
@@ -148,7 +148,7 @@ var replicationSchema = s.Schema{
 		"completed":       c.Int("completed"),
 		"failed_attempts": c.Int("failedAttempts"),
 		"failures":        c.Int("failures"),
-	}),
+	}, c.DictOptional),
 	"network": c.Dict("network", s.Schema{
 		"bytes":          c.Int("bytes"),
 		"getmores":       c.Dict("getmores", countAndTimeSchema),
@@ -158,7 +158,7 @@ var replicationSchema = s.Schema{
 	"preload": c.Dict("preload", s.Schema{
 		"docs":    c.Dict("docs", countAndTimeSchema),
 		"indexes": c.Dict("indexes", countAndTimeSchema),
-	}),
+	}, c.DictOptional),
 }
 
 var countAndTimeSchema = s.Schema{

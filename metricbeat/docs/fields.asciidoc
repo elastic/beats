@@ -20014,7 +20014,7 @@ Reports data from the query execution system.
 
 
 
-*`mongodb.metrics.query_executor.scanned_indexes`*::
+*`mongodb.metrics.query_executor.scanned_indexes.count`*::
 +
 --
 The total number of index items scanned during queries and query-plan evaluation.
@@ -20024,7 +20024,7 @@ type: long
 
 --
 
-*`mongodb.metrics.query_executor.scanned_documents`*::
+*`mongodb.metrics.query_executor.scanned_documents.count`*::
 +
 --
 The total number of documents scanned during queries and query-plan evaluation.
@@ -20468,7 +20468,7 @@ Reports on the operation of the resource use of the ttl index process.
 
 
 
-*`mongodb.metrics.ttl.deleted_documents`*::
+*`mongodb.metrics.ttl.deleted_documents.count`*::
 +
 --
 The total number of documents deleted from collections with a ttl index.
@@ -20478,7 +20478,7 @@ type: long
 
 --
 
-*`mongodb.metrics.ttl.passes`*::
+*`mongodb.metrics.ttl.passes.count`*::
 +
 --
 The number of times the background process removes documents from collections with a ttl index.

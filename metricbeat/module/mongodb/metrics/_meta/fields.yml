@@ -313,11 +313,11 @@
       description: >
         Reports data from the query execution system.
       fields:
-        - name: scanned_indexes
+        - name: scanned_indexes.count
           type: long
           description: >
             The total number of index items scanned during queries and query-plan evaluation.
-        - name: scanned_documents
+        - name: scanned_documents.count
           type: long
           description: >
             The total number of documents scanned during queries and query-plan evaluation.
@@ -522,11 +522,11 @@
       description: >
         Reports on the operation of the resource use of the ttl index process.
       fields:
-        - name: deleted_documents
+        - name: deleted_documents.count
           type: long
           description: >
             The total number of documents deleted from collections with a ttl index.
-        - name: passes
+        - name: passes.count
           type: long
           description: >
             The number of times the background process removes documents from collections with a ttl index.
