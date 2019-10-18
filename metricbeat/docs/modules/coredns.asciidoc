@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-coredns]]
+[role="xpack"]
 == coredns module
 
 beta[]

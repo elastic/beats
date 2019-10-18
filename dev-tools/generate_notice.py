@@ -228,8 +228,10 @@ def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=Non
 
 
 APACHE2_LICENSE_TITLES = [
+    "Apache License 2.0",
     "Apache License Version 2.0",
     "Apache License, Version 2.0",
+    "licensed under the Apache 2.0 license",  # github.com/zmap/zcrypto
     re.sub(r"\s+", " ", """Apache License
     ==============
 

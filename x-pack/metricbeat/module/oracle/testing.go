@@ -12,35 +12,15 @@ import (
 )
 
 // GetOracleConnectionDetails return a valid SID to use for testing
-func GetOracleConnectionDetails() string {
+func GetOracleConnectionDetails(host string) string {
 	params := goracle.ConnectionParams{
-		SID:      fmt.Sprintf("%s:%s/%s", GetOracleEnvHost(), GetOracleEnvPort(), GetOracleEnvServiceName()),
+		SID:      fmt.Sprintf("%s/%s", host, GetOracleEnvServiceName()),
 		Username: GetOracleEnvUsername(),
 		Password: GetOracleEnvPassword(),
 		IsSysDBA: true,
 	}
 
 	return params.StringWithPassword()
-}
-
-// GetOracleEnvHost returns the hostname to use with Oracle testing server or the value of the environment variable ORACLE_HOST if not empty
-func GetOracleEnvHost() string {
-	host := os.Getenv("ORACLE_HOST")
-
-	if len(host) == 0 {
-		host = "localhost"
-	}
-	return host
-}
-
-// GetOracleEnvPort returns the port to use with Oracle testing server or the value of the environment variable ORACLE_PORT if not empty
-func GetOracleEnvPort() string {
-	port := os.Getenv("ORACLE_PORT")
-
-	if len(port) == 0 {
-		port = "1521"
-	}
-	return port
 }
 
 // GetOracleEnvServiceName returns the service name to use with Oracle testing server or the value of the environment variable ORACLE_SERVICE_NAME if not empty

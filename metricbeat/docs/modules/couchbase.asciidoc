@@ -15,6 +15,14 @@ The Couchbase module is tested with Couchbase 4.5.1.
 
 
 [float]
+=== Dashboard
+
+The Couchbase module comes with a predefined dashboard for Couchbase cluster, node, bucket specific stats. For example:
+
+image::./images/metricbeat-couchbase-overview.png[]
+
+
+[float]
 === Example configuration
 
 The Couchbase module supports the standard configuration options that are described

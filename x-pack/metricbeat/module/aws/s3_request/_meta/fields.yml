@@ -4,10 +4,6 @@
     `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
   release: beta
   fields:
-    - name: bucket.name
-      type: keyword
-      description: >
-        Name of a S3 bucket.
     - name: requests.total
       type: long
       description: >

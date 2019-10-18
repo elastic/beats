@@ -40,18 +40,6 @@ func (self *LoadAverage) Get() error {
 	return nil
 }
 
-func (self *Uptime) Get() error {
-	tv := syscall.Timeval32{}
-
-	if err := sysctlbyname("kern.boottime", &tv); err != nil {
-		return err
-	}
-
-	self.Length = time.Since(time.Unix(int64(tv.Sec), int64(tv.Usec)*1000)).Seconds()
-
-	return nil
-}
-
 func (self *Mem) Get() error {
 	var vmstat C.vm_statistics_data_t
 

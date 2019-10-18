@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of IBM MQ",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -42,7 +42,7 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_1",
-            "title": "[Filebeat] IBM MQ Top 5 Errors",
+            "title": "Top 5 Errors [Filebeat IBM MQ]",
             "version": "7.0.0"
           },
           {
@@ -131,7 +131,7 @@
         "timeFrom": "now-2M",
         "timeRestore": true,
         "timeTo": "now",
-        "title": "[Filebeat] IBM MQ error log overview",
+        "title": "[Filebeat IBM MQ] Overview of error log overview",
         "version": 1
       },
       "id": "ba1d8830-7c7b-11e9-9645-e37efaf5baff",
@@ -196,7 +196,7 @@
             }
           }
         },
-        "title": "[Filebeat] Errors over time by Queue Manager",
+        "title": "Errors over time by Queue Manager [Filebeat IBM MQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -240,7 +240,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Filebeat] Errors over time by Queue Manager",
+          "title": "Errors over time by Queue Manager [Filebeat IBM MQ]",
           "type": "metrics"
         }
       },
@@ -292,7 +292,7 @@
             }
           }
         },
-        "title": "[Filebeat] Top 5 Errors",
+        "title": "Top 5 Errors [Filebeat IBM MQ]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -386,7 +386,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "[Filebeat] Top 5 Errors",
+          "title": "Top 5 Errors [Filebeat IBM MQ]",
           "type": "table"
         }
       },
@@ -422,7 +422,7 @@
             }
           }
         },
-        "title": "[Filebeat] IBM MQ Control",
+        "title": "Control [Filebeat IBM MQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -449,7 +449,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "[Filebeat] IBM MQ Control",
+          "title": "Control [Filebeat IBM MQ]",
           "type": "input_control_vis"
         }
       },
@@ -520,7 +520,7 @@
           "@timestamp",
           "desc"
         ],
-        "title": "[Filebeat] Errorlogs",
+        "title": "Errorlogs [Filebeat IBM MQ]",
         "version": 1
       },
       "id": "82db7ba0-adec-11e9-8358-1517661d7c84",
@@ -556,7 +556,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "[Filebeat] Errors per code, queue manager and host",
+        "title": "Errors per code, queue manager and host [Filebeat IBM MQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -643,7 +643,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "[Filebeat] Errors per code, queue manager and host",
+          "title": "Errors per code, queue manager and host [Filebeat IBM MQ]",
           "type": "pie"
         }
       },
@@ -675,7 +675,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "[Filebeat] Different error codes",
+        "title": "Different error codes [Filebeat IBM MQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -731,7 +731,7 @@
             },
             "type": "metric"
           },
-          "title": "[Filebeat] Different error codes",
+          "title": "Different error codes [Filebeat IBM MQ]",
           "type": "metric"
         }
       },
@@ -763,7 +763,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "[Filebeat] Number of Queue Manager",
+        "title": "Number of Queue Manager [Filebeat IBM MQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -819,7 +819,7 @@
             },
             "type": "metric"
           },
-          "title": "[Filebeat] Number of Queue Manager",
+          "title": "Number of Queue Manager [Filebeat IBM MQ]",
           "type": "metric"
         }
       },
@@ -851,7 +851,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "[Filebeat] Last error",
+        "title": "Last error [Filebeat IBM MQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -907,7 +907,7 @@
             },
             "type": "metric"
           },
-          "title": "[Filebeat] Last error",
+          "title": "Last error [Filebeat IBM MQ]",
           "type": "metric"
         }
       },

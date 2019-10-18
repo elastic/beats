@@ -13,12 +13,25 @@
         Core id
     - name: database
       example: "mydb"
-      description:
+      description: >
         Name of database
     - name: query
       example: "SELECT * FROM users;"
-      description:
+      description: >
         Query statement.
+    - name: query_step
+      example: "parse"
+      description: >
+        Statement step when using extended query protocol (one of statement, parse, bind or execute)
+    - name: query_name
+      example: "pdo_stmt_00000001"
+      description: >
+        Name given to a query when using extended query protocol. If it is "<unnamed>", or not present,
+        this field is ignored.
+
+    - name: error.code
+      type: long
+      description: Error code returned by Postgres (if any)
 
     - name: timezone
       type: alias

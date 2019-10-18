@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[{{getBeatName}}-module-{{.Base}}]]
+{{- if .IsXpack}}
+[role="xpack"]{{end}}
 == {{.Title}} module
 
 {{if not (eq .Release "ga") -}}

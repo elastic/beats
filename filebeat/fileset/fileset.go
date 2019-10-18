@@ -41,7 +41,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
-	"github.com/elastic/beats/libbeat/paths"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -353,17 +352,8 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error reading input config: %v", err)
 	}
 
-	// Additional default settings, that must be available for variable expansion.
-	defaults := common.MustNewConfigFrom(map[string]interface{}{
-		"path": map[string]interface{}{
-			"home":   paths.Paths.Home,
-			"config": "${path.home}",
-			"data":   fmt.Sprint("${path.home}", string(os.PathSeparator), "data"),
-			"logs":   fmt.Sprint("${path.home}", string(os.PathSeparator), "logs"),
-		},
-	})
-
-	if err := cfg.Merge(defaults); err != nil {
+	cfg, err = mergePathDefaults(cfg)
+	if err != nil {
 		return nil, err
 	}
 

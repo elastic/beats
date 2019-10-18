@@ -1,0 +1,34 @@
+[[faq-unexpected-metrics]]
+=== {beatname_uc} collects system metrics for interfaces you didn't configure
+
+The <<metricbeat-module-system,System>> module specifies several metricsets
+that are enabled by default unless you explicitly disable them. To disable a
+default metricset, comment it out in the `modules.d/system.yml` configuration
+file. If _all_ metricsets are commented out and the System module is enabled,
+{beatname_uc} uses the default metricsets.
+
+For example, to disable the `network` metricset, comment it out:
+
+[source,yaml]
+----
+  - module: system
+    period: 10s
+    metricsets:
+      - cpu
+      - load
+      - memory
+      #- network
+      - process
+      - process_summary
+      - socket_summary
+      #- entropy
+      #- core
+      #- diskio
+      #- socket
+----
+
+You cannot override the default configuration by adding another module
+definition to the configuration. There is no concept of inheritance.
+{beatname_uc} combines all module configurations at runtime. This enables you to
+specify module definitions that use different combinations of metricsets,
+periods, and hosts.

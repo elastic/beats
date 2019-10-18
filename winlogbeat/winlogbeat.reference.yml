@@ -26,9 +26,18 @@ winlogbeat.event_logs:
   - name: Application
     ignore_older: 72h
 
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
   - name: System
 
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
   - name: Security
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
 
 
 
@@ -73,7 +82,7 @@ winlogbeat.event_logs:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -991,7 +1000,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'winlogbeat-%{[agent.version]}'. 
+# name is 'winlogbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "winlogbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
@@ -1135,13 +1144,18 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # Winlogbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Winlogbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
@@ -1249,11 +1263,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

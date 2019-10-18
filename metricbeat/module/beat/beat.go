@@ -93,6 +93,9 @@ type Info struct {
 
 // State construct contains the relevant data from the Beat's /state endpoint
 type State struct {
+	Monitoring struct {
+		ClusterUUID string `json:"cluster_uuid"`
+	} `json:"monitoring"`
 	Output struct {
 		Name string `json:"name"`
 	} `json:"output"`

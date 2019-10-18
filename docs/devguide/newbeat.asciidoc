@@ -44,7 +44,7 @@ branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
-cd $\{GOPATH\}/src/github.com/elastic/beats
+cd ${GOPATH}/src/github.com/elastic/beats
 git checkout {branch}
 ----
 
@@ -122,24 +122,23 @@ mkdir ${GOPATH}/src/github.com/{user}
 cd ${GOPATH}/src/github.com/{user}
 --------------------
 
-Run python and specify the path to the Beat generator:
+Run the mage script to generate the custom beat:
 
-NOTE: Python 2 is required (Python 3 will not work).
 
 [source,shell]
 --------------------
-python $GOPATH/src/github.com/elastic/beats/script/generate.py
+mage GenerateCustomBeat
 --------------------
 
-Python will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.
+The mage script will prompt you to enter information about your Beat. For the `project_name`, enter `Countbeat`.
 For the `github_name`, enter your github id. The `beat` and `beat_path` are set to the correct values automatically (just press Enter to accept each default). For the `full_name`, enter your firstname and lastname.
 
 [source,shell]
 ---------
-Beat Name [Examplebeat]: Countbeat
-Your Github Name [your-github-name]: {username}
-Beat Path [github.com/{github id}/{beat name}]:
-Firstname Lastname: {Full Name}
+Enter a project name [examplebeat]:  Countbeat
+Enter a github name [your-github-name]: {username}
+Enter a beat path [github.com/{username}/countbeat]: 
+Enter a full name [Firstname Lastname]: {Full Name}
 ---------
 
 The Beat generator creates a directory called `countbeat` inside of your project folder (e.g. {project folder}/github.com/{github id}/countbeat).

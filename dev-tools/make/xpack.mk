@@ -24,6 +24,8 @@ check: mage
 clean: mage
 	mage clean
 
+fix-permissions:
+
 .PHONY: fmt
 fmt: mage
 	mage fmt
@@ -37,6 +39,8 @@ help:
 .PHONY: release
 release: mage
 	mage package
+
+stop-environment:
 
 .PHONY: testsuite
 testsuite: mage

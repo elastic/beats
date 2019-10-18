@@ -4,6 +4,6 @@ multiple versions. To monitor more Beat metrics, use our {stack-ov}/xpack-monito
 The default metricset is `stats`.
 
 [float]
-=== Compability
+=== Compatibility
 
 The Beat module is tested with Metricbeat 7.2 and is expected to work with all 7.x versions.

@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.dns"
@@ -40,6 +41,7 @@ var instanceID = atomic.MakeUint32(0)
 
 func init() {
 	processors.RegisterPlugin("dns", New)
+	jsprocessor.RegisterPlugin("DNS", New)
 }
 
 type processor struct {

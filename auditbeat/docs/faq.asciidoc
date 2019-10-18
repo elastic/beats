@@ -1,8 +1,8 @@
 [[faq]]
-== Frequently asked questions
+== Common problems
 
-This section contains frequently asked questions about {beatname_uc}. Also check
-out the
+This section describes common problems you might encounter with
+{beatname_uc}. Also check out the
 https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
 
 include::./faq-ulimit.asciidoc[]

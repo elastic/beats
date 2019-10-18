@@ -189,7 +189,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Visible",
+        "title": "SQS Messages Visible [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -276,7 +276,7 @@
             }
           }
         },
-        "title": "AWS SQS Oldest Message Age in Seconds",
+        "title": "SQS Oldest Message Age in Seconds [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -350,7 +350,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Received",
+        "title": "SQS Messages Received [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -431,7 +431,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Deleted",
+        "title": "SQS Messages Deleted [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -501,7 +501,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Delayed",
+        "title": "SQS Messages Delayed [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -571,7 +571,7 @@
             }
           }
         },
-        "title": "AWS SQS Messages Sent",
+        "title": "SQS Messages Sent [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -646,7 +646,7 @@
             }
           }
         },
-        "title": "AWS SQS Filters",
+        "title": "SQS Filters [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -724,7 +724,7 @@
             }
           }
         },
-        "title": "AWS SQS Empty Receives",
+        "title": "SQS Empty Receives [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {

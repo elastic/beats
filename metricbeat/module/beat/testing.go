@@ -17,33 +17,11 @@
 
 package beat
 
-import "os"
-
-// GetEnvHost for Metricbeat
-func GetEnvHost() string {
-	host := os.Getenv("BEAT_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-// GetEnvPort for Metricbeat
-func GetEnvPort() string {
-	port := os.Getenv("BEAT_PORT")
-
-	if len(port) == 0 {
-		port = "5066"
-	}
-	return port
-}
-
 // GetConfig for Metricbeat
-func GetConfig(metricset string) map[string]interface{} {
+func GetConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     ModuleName,
 		"metricsets": []string{metricset},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":      []string{host},
 	}
 }

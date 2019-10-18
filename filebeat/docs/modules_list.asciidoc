@@ -5,6 +5,9 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-modules-overview>>
   * <<filebeat-module-apache>>
   * <<filebeat-module-auditd>>
+  * <<filebeat-module-aws>>
+  * <<filebeat-module-azure>>
+  * <<filebeat-module-cef>>
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-elasticsearch>>
@@ -18,6 +21,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-kafka>>
   * <<filebeat-module-kibana>>
   * <<filebeat-module-logstash>>
+  * <<filebeat-module-misp>>
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mssql>>
   * <<filebeat-module-mysql>>
@@ -41,6 +45,9 @@ This file is generated! See scripts/docs_collector.py
 include::modules-overview.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/auditd.asciidoc[]
+include::modules/aws.asciidoc[]
+include::modules/azure.asciidoc[]
+include::modules/cef.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
@@ -54,6 +61,7 @@ include::modules/iptables.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/logstash.asciidoc[]
+include::modules/misp.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/mysql.asciidoc[]

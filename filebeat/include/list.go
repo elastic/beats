@@ -23,6 +23,7 @@ import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/filebeat/input/container"
 	_ "github.com/elastic/beats/filebeat/input/docker"
+	_ "github.com/elastic/beats/filebeat/input/kafka"
 	_ "github.com/elastic/beats/filebeat/input/log"
 	_ "github.com/elastic/beats/filebeat/input/redis"
 	_ "github.com/elastic/beats/filebeat/input/stdin"

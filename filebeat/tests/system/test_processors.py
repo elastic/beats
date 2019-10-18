@@ -2,6 +2,8 @@
 from filebeat import BaseTest
 import io
 import os
+import unittest
+import sys
 
 """
 Contains tests for filtering.
@@ -298,6 +300,42 @@ class Test(BaseTest):
 
         self._assert_expected_lines([
             ["42", "hello world", "string\twith tabs and \"broken\" quotes"],
+        ])
+
+    def test_javascript_processor_add_host_metadata(self):
+        """
+        Check JS processor with add_host_metadata
+        """
+
+        self._test_javascript_processor_with_source("""\'var processor = require("processor");
+var addHostMetadata = new processor.AddHostMetadata({"netinfo.enabled": true});
+
+function process(evt) {
+    addHostMetadata.Run(evt);
+}\'
+""")
+
+        output = self.read_output()
+        for evt in output:
+            assert "host.hostname" in evt
+
+    def _test_javascript_processor_with_source(self, script_source):
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[
+                {
+                    "script": {
+                        "lang": "javascript",
+                        "source": script_source,
+                    },
+                },
+            ]
+        )
+
+        self._init_and_read_test_input([
+            u"test line 1\n",
+            u"test line 2\n",
+            u"test line 3\n",
         ])
 
     def _init_and_read_test_input(self, input_lines):

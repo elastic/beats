@@ -46,6 +46,7 @@ type config struct {
 	Tags             []string          `config:"tags"`
 	Backoff          backoff           `config:"backoff"`
 	Format           report.Format     `config:"_format"`
+	ClusterUUID      string            `config:"cluster_uuid"`
 }
 
 type backoff struct {

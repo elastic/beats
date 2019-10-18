@@ -98,7 +98,8 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format: report.FormatXPackMonitoringBulk,
+		Format:      report.FormatXPackMonitoringBulk,
+		ClusterUUID: settings.ClusterUUID,
 	}
 
 	if settings.DefaultUsername != "" {
@@ -261,12 +262,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod)
+	go r.snapshotLoop("state", "state", c.StatePeriod, c.ClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, clusterUUID string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -305,7 +306,9 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
 		}
 
-		clusterUUID := getClusterUUID()
+		if clusterUUID == "" {
+			clusterUUID = getClusterUUID()
+		}
 		if clusterUUID != "" {
 			meta.Put("cluster_uuid", clusterUUID)
 		}

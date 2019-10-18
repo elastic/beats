@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Netflow geo location",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

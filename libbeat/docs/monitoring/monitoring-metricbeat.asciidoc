@@ -1,0 +1,259 @@
+[role="xpack"]
+[[monitoring-metricbeat-collection]]
+== Collect {beatname_uc} monitoring data with {metricbeat}
+[subs="attributes"]
+++++
+<titleabbrev>{metricbeat} collection</titleabbrev>
+++++
+
+In 7.3 and later, you can use {metricbeat} to collect data about {beatname_uc} 
+and ship it to the monitoring cluster, rather than routing it through the 
+production cluster as described in <<monitoring-internal-collection>>.
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+Because you'll be using {metricbeat} to _monitor_ {beatname_uc}, you'll need to
+run two instances of {beatname_uc}: a main instance that collects metrics from
+the system and services running on the server, and a second instance that
+collects metrics from {beatname_uc} only. Using a separate instance as a
+monitoring agent allows you to send monitoring data to a dedicated monitoring
+cluster. If the main agent goes down, the monitoring agent remains active.
+
+If you're running {beatname_uc} as a service, this approach requires extra work
+because you need to run two instances of the same installed  service
+concurrently. If you don't want to run two instances concurrently, use
+<<monitoring-internal-collection,internal collection>> instead of using
+{metricbeat}.
+endif::[]
+
+To learn about monitoring in general, see 
+{stack-ov}/xpack-monitoring.html[Monitoring the {stack}].
+
+//NOTE: The tagged regions are re-used in the Stack Overview.
+
+To collect and ship monitoring data:
+
+. <<configure-shipper,Configure the shipper you want to monitor>>
+
+. <<configure-metricbeat,Install and configure {metricbeat} to collect monitoring data>>
+
+[float]
+[[configure-shipper]]
+=== Configure the shipper you want to monitor
+
+. Enable the HTTP endpoint to allow external collection of monitoring data:
++
+--
+// tag::enable-http-endpoint[]
+Add the following setting in the {beatname_uc} configuration file
+(+{beatname_lc}.yml+):
+
+[source,yaml]
+----------------------------------
+http.enabled: true
+----------------------------------
+
+By default, metrics are exposed on port 5066. If you need to monitor multiple
+{beats} shippers running on the same server, set `http.port` to expose metrics
+for each shipper on a different port number:
+
+[source,yaml]
+----------------------------------
+http.port: 5067
+----------------------------------
+// end::enable-http-endpoint[]
+--
+
+. Disable the default collection of {beatname_uc} monitoring metrics. +
++
+--
+// tag::disable-beat-collection[]
+Add the following setting in the {beatname_uc} configuration file
+(+{beatname_lc}.yml+): 
+
+[source,yaml]
+----------------------------------
+monitoring.enabled: false
+----------------------------------
+// end::disable-beat-collection[]
+
+For more information, see 
+<<configuration-monitor,Monitoring configuration options>>.
+--
+
+ifndef::serverless[]
+. Start {beatname_uc}.
+endif::[]
+
+[float]
+[[configure-metricbeat]]
+=== Install and configure {metricbeat} to collect monitoring data
+
+ifeval::["{beatname_lc}"!="metricbeat"]
+. {metricbeat-ref}/metricbeat-installation.html[Install {metricbeat}] on the
+same server as {beatname_uc}. If you already have {metricbeat} installed on the
+server, skip this step.
+endif::[]
+ifeval::["{beatname_lc}"=="metricbeat"]
+. The next step depends on how you want to run {metricbeat}:
+* If you're running as a service and want to run a separate monitoring instance,
+take the the steps required for your environment to run two instances of
+{metricbeat} as a service. The steps for doing this vary by platform and are
+beyond the scope of this documentation.
+* If you're running the binary directly in the foreground and want to run a
+separate monitoring instance,
+{metricbeat-ref}/metricbeat-installation.html[install {metricbeat}] to a
+different path. If necessary, set `path.config`, `path.data`, and `path.log`
+to point to the correct directories. See <<directory-layout>> for the default
+locations.
+endif::[]
+
+. Enable the `beat-xpack` module in {metricbeat}. +
++
+--
+// tag::enable-beat-module[]
+For example, to enable the default configuration in the `modules.d` directory, 
+run the following command, using the correct command syntax for your OS:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+metricbeat modules enable beat-xpack
+----------------------------------------------------------------------
+
+For more information, see 
+{metricbeat-ref}/configuration-metricbeat.html[Specify which modules to run] and 
+{metricbeat-ref}/metricbeat-module-beat.html[beat module]. 
+// end::enable-beat-module[]
+--
+
+. Configure the `beat-xpack` module in {metricbeat}. +
++
+--
+// tag::configure-beat-module[]
+The `modules.d/beat-xpack.yml` file contains the following settings:
+
+[source,yaml]
+----------------------------------
+- module: beat
+  metricsets:
+    - stats
+    - state
+  period: 10s
+  hosts: ["http://localhost:5066"]
+  #username: "user"
+  #password: "secret"
+  xpack.enabled: true
+----------------------------------
+ 
+Set the `hosts`, `username`, and `password` settings as required by your
+environment. For other module settings, it's recommended that you accept the
+defaults.
+
+By default, the module collects {beatname_uc} monitoring data from
+`localhost:5066`. If you exposed the metrics on a different host or port when
+you enabled the HTTP endpoint, update the `hosts` setting.
+
+To monitor multiple 
+ifndef::apm-server[]
+{beats} agents,
+endif::[]
+ifdef::apm-server[]
+APM Server instances,
+endif::[]
+specify a list of hosts, for example:
+
+[source,yaml]
+----------------------------------
+hosts: ["http://localhost:5066","http://localhost:5067","http://localhost:5068"]
+----------------------------------
+
+If you configured {beatname_uc} to use encrypted communications, you must access
+it via HTTPS. For example, use a `hosts` setting like `https://localhost:5066`.
+// end::configure-beat-module[]
+
+// tag::remote-monitoring-user[]
+If the Elastic {security-features} are enabled, you must also provide a user 
+ID and password so that {metricbeat} can collect metrics successfully: 
+
+.. Create a user on the production cluster that has the 
+`remote_monitoring_collector` {stack-ov}/built-in-roles.html[built-in role]. 
+Alternatively, use the `remote_monitoring_user` 
+{stack-ov}/built-in-users.html[built-in user].
+
+.. Add the `username` and `password` settings to the beat module configuration 
+file.
+// end::remote-monitoring-user[]
+--
+
+. Optional: Disable the system module in the {metricbeat}.
++
+--
+// tag::disable-system-module[]
+By default, the {metricbeat-ref}/metricbeat-module-system.html[system module] is
+enabled. The information it collects, however, is not shown on the
+*Stack Monitoring* page in {kib}. Unless you want to use that information for
+other purposes, run the following command:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+metricbeat modules disable system
+----------------------------------------------------------------------
+// end::disable-system-module[] 
+--
+
+. Identify where to send the monitoring data. +
++
+--
+TIP: In production environments, we strongly recommend using a separate cluster 
+(referred to as the _monitoring cluster_) to store the data. Using a separate 
+monitoring cluster prevents production cluster outages from impacting your 
+ability to access your monitoring data. It also prevents monitoring activities 
+from impacting the performance of your production cluster.
+
+For example, specify the {es} output information in the {metricbeat} 
+configuration file (`metricbeat.yml`):
+
+[source,yaml]
+----------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["http://es-mon-1:9200", "http://es-mon2:9200"] <1>
+  
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+----------------------------------
+<1> In this example, the data is stored on a monitoring cluster with nodes 
+`es-mon-1` and `es-mon-2`.
+
+If you configured the monitoring cluster to use encrypted communications, you
+must access it via HTTPS. For example, use a `hosts` setting like
+`https://es-mon-1:9200`.
+
+IMPORTANT: The {es} {monitor-features} use ingest pipelines, therefore the
+cluster that stores the monitoring data must have at least one ingest node.
+
+If the {es} {security-features} are enabled on the monitoring cluster, you 
+must provide a valid user ID and password so that {metricbeat} can send metrics 
+successfully: 
+
+.. Create a user on the monitoring cluster that has the 
+`remote_monitoring_agent` {stack-ov}/built-in-roles.html[built-in role]. 
+Alternatively, use the `remote_monitoring_user` 
+{stack-ov}/built-in-users.html[built-in user]. 
++
+TIP: If you're using index lifecycle management, the remote monitoring user
+requires additional privileges to create and read indices. For more
+information, see <<feature-roles>>.
+
+.. Add the `username` and `password` settings to the {es} output information in 
+the {metricbeat} configuration file.
+
+For more information about these configuration options, see 
+{metricbeat-ref}/elasticsearch-output.html[Configure the {es} output].
+--
+
+. {metricbeat-ref}/metricbeat-starting.html[Start {metricbeat}] to begin
+collecting monitoring data. 
+
+. {kibana-ref}/monitoring-data.html[View the monitoring data in {kib}]. 

@@ -435,6 +435,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
@@ -447,6 +449,8 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_cronjob
+    - state_resourcequota
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -454,6 +458,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # Kubernetes events
@@ -582,6 +588,8 @@ metricbeat.modules:
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
   # The username and password can either be set in the DSN or using the username
   # and password config options. Those specified in the DSN take precedence.
   hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
@@ -808,7 +816,7 @@ metricbeat.modules:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -1726,7 +1734,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'metricbeat-%{[agent.version]}'. 
+# name is 'metricbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "metricbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
@@ -1870,13 +1878,18 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Metricbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
@@ -1984,11 +1997,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

@@ -18,7 +18,37 @@ class Test(BaseTest):
         server = self.start_server("hello world", status_code)
 
         self.render_http_config(
-            ["http://localhost:{}".format(server.server_port)])
+            ["localhost:{}".format(server.server_port)])
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
+
+        self.wait_until(
+            lambda: self.output_has(lines=1))
+
+        proc.check_kill_and_wait()
+
+        server.shutdown()
+        output = self.read_output()
+        assert status_code == output[0]["http.response.status_code"]
+
+        if os.name == "nt":
+            # Currently skipped on Windows as fields.yml not generated
+            raise SkipTest
+        self.assert_fields_are_documented(output[0])
+
+    @parameterized.expand([
+        "200", "404"
+    ])
+    def test_http_with_hosts_config(self, status_code):
+        """
+        Test http server
+        """
+        status_code = int(status_code)
+        server = self.start_server("hello world", status_code)
+
+        self.render_http_config_with_hosts(
+            ["localhost:{}".format(server.server_port)])
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("heartbeat is running"))
@@ -98,6 +128,43 @@ class Test(BaseTest):
             server.shutdown()
 
     @parameterized.expand([
+        ('{"foo": "bar"}', {"foo": "bar"}),
+        ('{"foo": true}', {"foo": True},),
+        ('{"foo": 3}', {"foo": 3},),
+    ])
+    def test_json_simple_comparisons(self, body, comparison):
+        """
+        Test JSON response with simple straight-forward comparisons
+        """
+        server = self.start_server(body, 200)
+        try:
+            self.render_config_template(
+                monitors=[{
+                    "type": "http",
+                    "urls": ["http://localhost:{}".format(server.server_port)],
+                    "check_response_json": [{
+                        "description": body,
+                        "condition": {
+                            "equals": comparison
+                        }
+                    }]
+                }]
+            )
+
+            try:
+                proc = self.start_beat()
+                self.wait_until(lambda: self.log_contains("heartbeat is running"))
+
+                self.wait_until(
+                    lambda: self.output_has(lines=1))
+            finally:
+                proc.check_kill_and_wait()
+
+            self.assert_last_status("up")
+        finally:
+            server.shutdown()
+
+    @parameterized.expand([
         (lambda server: "localhost:{}".format(server.server_port), "up"),
         # This IP is reserved in IPv4
         (lambda server: "203.0.113.1:1233", "down"),
@@ -140,5 +207,13 @@ class Test(BaseTest):
             monitors=[{
                 "type": "http",
                 "urls": urls,
+            }]
+        )
+
+    def render_http_config_with_hosts(self, urls):
+        self.render_config_template(
+            monitors=[{
+                "type": "http",
+                "hosts": urls,
             }]
         )

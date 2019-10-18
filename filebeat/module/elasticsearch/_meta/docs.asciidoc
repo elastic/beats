@@ -118,6 +118,8 @@ NOTE: If you're running against Elasticsearch >= 7.0.0, configure the
 `var.paths` setting to point to JSON logs. Otherwise, configure it
 to point to plain text logs.
 
+include::../include/timezone-support.asciidoc[]
+
 :has-dashboards!:
 
 :fileset_ex!:

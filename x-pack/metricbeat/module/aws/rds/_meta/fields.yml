@@ -38,7 +38,7 @@
       description: >
         Specifies the current state of this database.
     - name: disk_queue_depth
-      type: long
+      type: float
       description: >
         The number of outstanding IOs (read/write requests) waiting to access the disk.
     - name: failed_sql_server_agent_jobs
@@ -108,90 +108,90 @@
       description: >
         The average number of failed login attempts per second.
     - name: throughput.commit
-      type: long
+      type: float
       description: >
         The average number of commit operations per second.
     - name: throughput.delete
-      type: long
+      type: float
       description: >
         The average number of delete queries per second.
     - name: throughput.ddl
-      type: long
+      type: float
       description: >
         The average number of DDL requests per second.
     - name: throughput.dml
-      type: long
+      type: float
       description: >
         The average number of inserts, updates, and deletes per second.
     - name: throughput.insert
-      type: long
+      type: float
       description: >
         The average number of insert queries per second.
     - name: throughput.network
-      type: long
+      type: float
       description: >
         The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
     - name: throughput.network_receive
-      type: long
+      type: float
       description: >
         The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
     - name: throughput.network_transmit
-      type: long
+      type: float
       description: >
         The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
     - name: throughput.read
-      type: long
+      type: float
       description: >
         The average amount of time taken per disk I/O operation.
     - name: throughput.select
-      type: long
+      type: float
       description: >
         The average number of select queries per second.
     - name: throughput.update
-      type: long
+      type: float
       description: >
         The average number of update queries per second.
     - name: throughput.write
-      type: long
+      type: float
       description: >
         The average number of bytes written to disk per second.
     - name: latency.commit
-      type: long
+      type: float
       format: duration
       description: >
         The amount of latency for commit operations, in milliseconds.
     - name: latency.ddl
-      type: long
+      type: float
       format: duration
       description: >
         The amount of latency for data definition language (DDL) requests, in milliseconds.
     - name: latency.dml
-      type: long
+      type: float
       format: duration
       description: >
         The amount of latency for inserts, updates, and deletes, in milliseconds.
     - name: latency.insert
-      type: long
+      type: float
       format: duration
       description: >
         The amount of latency for insert queries, in milliseconds.
     - name: latency.read
-      type: long
+      type: float
       format: duration
       description: >
         The average amount of time taken per disk I/O operation.
     - name: latency.select
-      type: long
+      type: float
       format: duration
       description: >
         The amount of latency for select queries, in milliseconds.
     - name: latency.update
-      type: long
+      type: float
       format: duration
       description: >
         The amount of latency for update queries, in milliseconds.
     - name: latency.write
-      type: long
+      type: float
       format: duration
       description: >
         The average amount of time taken per disk I/O operation.

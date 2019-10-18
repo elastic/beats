@@ -109,8 +109,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Category |  | panw.panos.url.category
 | Severity | log.level |
 | Direction | network.direction |
-| Source Location | source.geo.country_iso_code |
-| Destination Location | destination.geo.country_iso_code |
+| Source Location | source.geo.name |
+| Destination Location | destination.geo.name |
 | PCAP_id |  | panw.panos.network.pcap_id
 | Filedigest |  | panw.panos.file.hash
 | User Agent | user_agent.original |
@@ -176,6 +176,8 @@ Set to `0.0.0.0` to bind to all available interfaces.
 The UDP port to listen for syslog traffic. Defaults to `9001`
 
 NOTE: Ports below 1024 require {beatname_uc} to run as root.
+
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

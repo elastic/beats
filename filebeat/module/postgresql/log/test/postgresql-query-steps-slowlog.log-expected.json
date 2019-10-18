@@ -1,0 +1,44 @@
+[
+    {
+        "@timestamp": "2019-09-04T13:52:38.004Z",
+        "event.dataset": "postgresql.log",
+        "event.duration": 12437000,
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "2019-09-04 15:52:38.004 CEST [31136] user@host LOG:  duration: 12.437 ms  parse <unnamed>: select * from table",
+        "postgresql.log.database": "host",
+        "postgresql.log.query": "select * from table",
+        "postgresql.log.query_step": "parse",
+        "postgresql.log.timestamp": "2019-09-04 15:52:38.004 CEST",
+        "process.pid": 31136,
+        "service.type": "postgresql",
+        "user.name": "user"
+    },
+    {
+        "@timestamp": "2019-09-04T13:52:38.004Z",
+        "event.dataset": "postgresql.log",
+        "event.duration": 12437000,
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 111,
+        "message": "2019-09-04 15:52:38.004 CEST [31136] user@host LOG:  duration: 12.437 ms  execute pdo_stmt_00000002: select * from table\n",
+        "postgresql.log.database": "host",
+        "postgresql.log.query": "select * from table\n",
+        "postgresql.log.query_name": "pdo_stmt_00000002",
+        "postgresql.log.query_step": "execute",
+        "postgresql.log.timestamp": "2019-09-04 15:52:38.004 CEST",
+        "process.pid": 31136,
+        "service.type": "postgresql",
+        "user.name": "user"
+    }
+]

@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -63,7 +62,7 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator)
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		return err
 	}), nil
 }
@@ -154,7 +153,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator)
+		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -208,38 +207,46 @@ func execPing(
 	event *beat.Event,
 	client *http.Client,
 	req *http.Request,
-	body []byte,
+	reqBody []byte,
 	timeout time.Duration,
 	validator func(*http.Response) error,
+	responseConfig responseConfig,
 ) (start, end time.Time, errReason reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	req = attachRequestBody(&ctx, req, body)
-	start, end, resp, errReason := execRequest(client, req, validator)
+	req = attachRequestBody(&ctx, req, reqBody)
 
-	if errReason == nil || errReason.Type() != "io" {
-		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-			"rtt": common.MapStr{
-				"total": look.RTT(end.Sub(start)),
-			},
-		}})
+	// Send the HTTP request. We don't immediately return on error since
+	// we may want to add additional fields to contextualize the error.
+	start, resp, errReason := execRequest(client, req, validator)
+
+	// If we have no response object there probably was an IO error, we can skip the rest of the logic
+	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
+	// in other ways
+	if resp == nil {
+		return start, time.Now(), errReason
 	}
 
-	if resp != nil {
-		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-			"response": common.MapStr{"status_code": resp.StatusCode},
-		}})
+	// Add response.status_code
+	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}})
+	// Download the body, close the response body, then attach all fields
+	err := handleRespBody(event, resp, responseConfig, errReason)
+	if err != nil {
+		return start, time.Now(), reason.IOFailed(err)
 	}
 
-	if errReason != nil {
-		if resp != nil {
-			return start, end, errReason
-		}
-		return start, end, errReason
-	}
+	// Mark the end time as now, since we've finished downloading
+	end = time.Now()
 
-	return start, end, nil
+	// Add total HTTP RTT
+	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+		"rtt": common.MapStr{
+			"total": look.RTT(end.Sub(start)),
+		},
+	}})
+
+	return start, end, errReason
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
@@ -252,28 +259,21 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 	return req
 }
 
-func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, end time.Time, resp *http.Response, errReason reason.Reason) {
+// execute the request. Note that this does not close the resp body, which should be done by caller
+func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
-	if resp != nil { // If above errors, the response will be nil
-		defer resp.Body.Close()
-	}
-	end = time.Now()
 
 	if err != nil {
-		return start, end, nil, reason.IOFailed(err)
+		return start, nil, reason.IOFailed(err)
 	}
 
 	err = validator(resp)
 	if err != nil {
-		return start, time.Now(), resp, reason.ValidateFailed(err)
+		return start, resp, reason.ValidateFailed(err)
 	}
 
-	// Read the entirety of the body. Otherwise, the stats for the check
-	// don't include download time.
-	io.Copy(ioutil.Discard, resp.Body)
-
-	return start, time.Now(), resp, nil
+	return start, resp, nil
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {

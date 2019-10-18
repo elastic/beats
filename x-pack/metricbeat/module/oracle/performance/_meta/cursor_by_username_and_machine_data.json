@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "oracle.performance",
+        "duration": 115000,
+        "module": "oracle"
+    },
+    "metricset": {
+        "name": "performance"
+    },
+    "oracle": {
+        "performance": {
+            "cursors": {
+                "avg": 0.6829268292682927,
+                "max": 17,
+                "total": 28
+            },
+            "machine": "2ed9ac3a4c3d",
+            "username": "Unknown"
+        }
+    },
+    "service": {
+        "address": "oracle://sys:Oradoc_db1@localhost/ORCLPDB1.localdomain?connectionClass=\u0026poolIncrement=0\u0026poolMaxSessions=0\u0026poolMinSessions=0\u0026sysdba=1\u0026sysoper=0\u0026sysasm=0\u0026standaloneConnection=0\u0026enableEvents=0\u0026heterogeneousPool=0\u0026prelim=0",
+        "type": "oracle"
+    }
+}

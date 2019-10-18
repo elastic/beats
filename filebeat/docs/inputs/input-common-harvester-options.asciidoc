@@ -191,6 +191,10 @@ must be at the top level in the JSON object and the value associated with the
 key must be a string, otherwise no filtering or multiline aggregation will
 occur.
 
+*`document_id`*:: Option configuration setting that specifies the JSON key to
+set the document id. If configured, the field will be removed from the original
+json document and stored in `@metadata.id`
+
 *`ignore_decoding_error`*:: An optional configuration setting that specifies if
 JSON decoding errors should be logged or not. If set to true, errors will not
 be logged. The default is false.

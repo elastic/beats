@@ -24,14 +24,12 @@ import (
 	"syscall"
 	"unsafe"
 
-	windows2 "golang.org/x/sys/windows"
-
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/disk"
+	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/shirou/gopsutil/disk"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 const (
@@ -41,10 +39,9 @@ const (
 )
 
 var (
-	modkernel32                 = syscall.NewLazyDLL("kernel32.dll")
+	modkernel32                 = windows.NewLazySystemDLL("kernel32.dll")
 	procGetLogicalDriveStringsW = modkernel32.NewProc("GetLogicalDriveStringsW")
 	procGetDriveTypeW           = modkernel32.NewProc("GetDriveTypeW")
-	logger                      = logp.NewLogger("diskio")
 )
 
 type logicalDrive struct {
@@ -145,7 +142,7 @@ func enablePerformanceCounters() error {
 		if err = key.SetDWordValue("EnableCounterForIoctl", 1); err != nil {
 			return errors.Errorf("cannot create HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry in order to enable the performance counters: %s", err)
 		}
-		logger.Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
+		logp.L().Named("diskio").Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
 	}
 	return nil
 }
@@ -247,7 +244,7 @@ func GetVolumeLabel(path *uint16) (string, error) {
 	lpMaximumComponentLength := uint32(0)
 	lpFileSystemFlags := uint32(0)
 	lpFileSystemNameBuffer := make([]uint16, 256)
-	err := windows2.GetVolumeInformation(
+	err := windows.GetVolumeInformation(
 		path,
 		&lpVolumeNameBuffer[0],
 		uint32(len(lpVolumeNameBuffer)),

@@ -20,6 +20,7 @@ package fields
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -104,28 +105,13 @@ func isLibbeat(beatPath string) bool {
 	return filepath.Base(beatPath) == "libbeat"
 }
 
-func writeGeneratedFieldsYml(fieldFiles []*YmlFile, output string) error {
+func writeGeneratedFieldsYml(fieldFiles []*YmlFile, output io.Writer) error {
 	data, err := GenerateFieldsYml(fieldFiles)
 	if err != nil {
 		return err
 	}
 
-	if output == "-" {
-		fw := bufio.NewWriter(os.Stdout)
-		_, err = fw.Write(data)
-		if err != nil {
-			return err
-		}
-		return fw.Flush()
-	}
-
-	f, err := os.Create(output)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	fw := bufio.NewWriter(f)
+	fw := bufio.NewWriter(output)
 	_, err = fw.Write(data)
 	if err != nil {
 		return err
@@ -164,7 +150,7 @@ func writeIndentedLine(buf *bytes.Buffer, line string, indent int) error {
 }
 
 // Generate collects fields.yml files and concatenates them into one global file.
-func Generate(esBeatsPath, beatPath string, files []*YmlFile, output string) error {
+func Generate(esBeatsPath, beatPath string, files []*YmlFile, output io.Writer) error {
 	files, err := collectCommonFiles(esBeatsPath, beatPath, files)
 	if err != nil {
 		return err

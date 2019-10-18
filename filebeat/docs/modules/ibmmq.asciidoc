@@ -3,11 +3,15 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[filebeat-module-ibmmq]]
+[role="xpack"]
+
 :modulename: ibmmq
 
 == IBM MQ module
 
-This is the ibmmq module.
+beta[]
+
+The `ibmmq` module collects and parses the queue manager error logs from IBM MQ in the standard format.
 
 include::../include/what-happens.asciidoc[]
 
@@ -45,7 +49,7 @@ file to override the default paths for IBM MQ errorlog:
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `errorlog` log fileset settings
+==== `errorlog` fileset settings
 
 include::../include/var-paths.asciidoc[]
 

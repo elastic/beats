@@ -5,7 +5,8 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "%{TIMESTAMP_ISO8601:iis.error.time} %{IPORHOST:source.address} %{NUMBER:source.port:long} %{IPORHOST:destination.address} %{IPORHOST:destination.port:long} (?:HTTP/%{NUMBER:http.version}|-) (?:%{WORD:http.request.method}|-) (?:%{URIPATHPARAM:url.original}|-)(?: -)? (?:%{NUMBER:http.response.status_code:long}|-) (?:%{NUMBER}|-) (?:%{NOTSPACE:iis.error.reason_phrase}|-) (?:%{NOTSPACE:iis.error.queue_name}|-)"
+                    "%{TIMESTAMP_ISO8601:iis.error.time} %{IPORHOST:source.address} %{NUMBER:source.port:long} %{IPORHOST:destination.address} %{IPORHOST:destination.port:long} (?:HTTP/%{NUMBER:http.version}|-) (?:%{WORD:http.request.method}|-) (?:-|%{NOTSPACE:url.original}) (?:%{NUMBER}|-) (?:%{NUMBER:http.response.status_code:long}|-) (?:%{NUMBER}|-) (?:-|%{NOTSPACE:iis.error.reason_phrase}) (?:-|%{NOTSPACE:iis.error.queue_name})",
+                    "%{TIMESTAMP_ISO8601:iis.error.time} %{IPORHOST:source.address} %{NUMBER:source.port:long} %{IPORHOST:destination.address} %{IPORHOST:destination.port:long} (?:HTTP/%{NUMBER:http.version}|-) (?:%{WORD:http.request.method}|-) (?:-|%{NOTSPACE:url.original}) (?:%{NUMBER:http.response.status_code:long}|-) (?:%{NUMBER}|-) (?:-|%{NOTSPACE:iis.error.reason_phrase}) (?:-|%{NOTSPACE:iis.error.queue_name})"
                 ],
                 "ignore_missing": true
             }

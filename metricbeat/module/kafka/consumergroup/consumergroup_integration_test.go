@@ -20,9 +20,7 @@
 package consumergroup
 
 import (
-	"fmt"
 	"io"
-	"os"
 	"testing"
 	"time"
 
@@ -35,9 +33,6 @@ import (
 )
 
 const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
-
 	kafkaSASLConsumerUsername = "consumer"
 	kafkaSASLConsumerPassword = "consumer-secret"
 	kafkaSASLUsername         = "stats"
@@ -45,15 +40,18 @@ const (
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(120*time.Second),
+		compose.UpWithAdvertisedHostEnvFile,
+	)
 
-	c, err := startConsumer(t, "metricbeat-test")
+	c, err := startConsumer(t, service.Host(), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
 	defer c.Close()
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	for retries := 0; retries < 3; retries++ {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
@@ -65,15 +63,15 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka")
 
-	c, err := startConsumer(t, "metricbeat-test")
+	c, err := startConsumer(t, service.Host(), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
 	defer c.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	var data []mb.Event
 	var errors []error
@@ -92,8 +90,8 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func startConsumer(t *testing.T, topic string) (io.Closer, error) {
-	brokers := []string{getTestKafkaHost()}
+func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
+	brokers := []string{host}
 	topics := []string{topic}
 	config := saramacluster.NewConfig()
 	config.Net.SASL.Enable = true
@@ -102,30 +100,12 @@ func startConsumer(t *testing.T, topic string) (io.Closer, error) {
 	return saramacluster.NewConsumer(brokers, "test-group", topics, config)
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"consumergroup"},
-		"hosts":      []string{getTestKafkaHost()},
+		"hosts":      []string{host},
 		"username":   kafkaSASLUsername,
 		"password":   kafkaSASLPassword,
 	}
-}
-
-func getTestKafkaHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("KAFKA_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }

@@ -133,7 +133,7 @@
           }
         ],
         "timeRestore": false,
-        "title": " [Filebeat Cisco] ASA Firewall",
+        "title": "[Filebeat Cisco] ASA Firewall",
         "version": 1
       },
       "id": "a555b160-4987-11e9-b8ce-ed898b5ef295",

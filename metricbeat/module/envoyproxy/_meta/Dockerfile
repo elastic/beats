@@ -1,4 +1,5 @@
-FROM envoyproxy/envoy:v1.7.0
+ARG ENVOYPROXY_VERSION
+FROM envoyproxy/envoy:${ENVOYPROXY_VERSION}
 RUN apt-get update
 COPY ./envoy.json /etc/envoy.json
 EXPOSE 10000 9901

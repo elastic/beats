@@ -95,8 +95,8 @@ func create(
 		}
 	}
 
-	js = make([]jobs.Job, len(config.URLs))
-	for i, urlStr := range config.URLs {
+	js = make([]jobs.Job, len(config.Hosts))
+	for i, urlStr := range config.Hosts {
 		u, _ := url.Parse(urlStr)
 		if err != nil {
 			return nil, 0, err
@@ -112,7 +112,7 @@ func create(
 		js[i] = wrappers.WithURLField(u, job)
 	}
 
-	return js, len(config.URLs), nil
+	return js, len(config.Hosts), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {

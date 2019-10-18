@@ -92,6 +92,8 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 	}
 
+	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %v", config.Host)
+
 	return kubernetes.NewWatcher(client, resource, options)
 }
 
@@ -112,7 +114,7 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaConfig := kubernetes.MetaGeneratorConfig{}
+	metaConfig := kubernetes.DefaultMetaGeneratorConfig()
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
@@ -186,7 +188,7 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaConfig := kubernetes.MetaGeneratorConfig{}
+	metaConfig := kubernetes.DefaultMetaGeneratorConfig()
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}

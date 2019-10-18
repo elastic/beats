@@ -156,6 +156,15 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#------------------------------ Appsearch Module ------------------------------
+- module: appsearch
+  metricsets: ["stats"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  #username: "elastic"
+  #password: "changeme"
+
 #--------------------------------- Aws Module ---------------------------------
 - module: aws
   period: 300s
@@ -209,6 +218,37 @@ metricbeat.modules:
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
+
+#-------------------------------- Azure Module --------------------------------
+- module: azure
+  metricsets:
+  - monitor
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - compute_vm
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - compute_vm_scaleset
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
@@ -505,6 +545,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
@@ -517,6 +559,8 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_cronjob
+    - state_resourcequota
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -524,6 +568,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # Kubernetes events
@@ -661,6 +707,8 @@ metricbeat.modules:
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
   # The username and password can either be set in the DSN or using the username
   # and password config options. Those specified in the DSN take precedence.
   hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
@@ -698,8 +746,8 @@ metricbeat.modules:
 
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
-  metricsets: ["tablespace"]
-  enabled: false
+  metricsets: ["tablespace", "performance"]
+  enabled: true
   period: 10s
   hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
 
@@ -803,6 +851,20 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
+#-------------------------------- Statsd Module --------------------------------
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #ttl: "30s"
+
+#-------------------------------- Tomcat Module --------------------------------
+- module: tomcat
+  metricsets: ['threading', 'cache', 'memory', 'requests']
+  period: 10s
+  hosts: ['localhost:8080']
+  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+
 #------------------------------- Traefik Module -------------------------------
 - module: traefik
   metricsets: ["health"]
@@ -898,7 +960,7 @@ metricbeat.modules:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -1816,7 +1878,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'metricbeat-%{[agent.version]}'. 
+# name is 'metricbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "metricbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
@@ -1960,13 +2022,18 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Metricbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
@@ -2074,11 +2141,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

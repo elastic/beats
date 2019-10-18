@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_kubernetes_metadata
 
 import (

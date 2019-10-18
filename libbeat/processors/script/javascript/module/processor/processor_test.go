@@ -18,8 +18,8 @@
 package processor
 
 import (
-	"os"
-	"runtime"
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,10 +27,15 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 
 	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module/require"
 )
+
+func init() {
+	RegisterPlugin("Mock", newMock)
+}
 
 func testEvent() *beat.Event {
 	return &beat.Event{
@@ -49,14 +54,14 @@ func testEvent() *beat.Event {
 	}
 }
 
-func TestNewProcessorAddHostMetadata(t *testing.T) {
+func TestNewProcessorDummyProcessor(t *testing.T) {
 	const script = `
 var processor = require('processor');
 
-var addHostMetadata = new processor.AddHostMetadata({"netinfo.enabled": true});
+var mock = new processor.Mock({"fields": {"added": "new_value"}});
 
 function process(evt) {
-    addHostMetadata.Run(evt);
+    mock.Run(evt);
 }
 `
 
@@ -71,307 +76,32 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	_, err = evt.GetValue("host.hostname")
-	assert.NoError(t, err)
+	checkEvent(t, evt, "added", "new_value")
 }
 
-func TestNewProcessorAddLocale(t *testing.T) {
+func TestChainOfDummyProcessors(t *testing.T) {
 	const script = `
 var processor = require('processor');
 
-var addLocale = new processor.AddLocale();
-
-function process(evt) {
-    addLocale.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = evt.GetValue("event.timezone")
-	assert.NoError(t, err)
-}
-
-func TestNewProcessorAddProcessMetadata(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var addProcessMetadata = new processor.AddProcessMetadata({
-    match_pids: "process.pid",
-    overwrite_keys: true,
-});
-
-function process(evt) {
-    addProcessMetadata.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt := &beat.Event{Fields: common.MapStr{"process": common.MapStr{"pid": os.Getppid()}}}
-	evt, err = p.Run(evt)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = evt.GetValue("process.name")
-	assert.NoError(t, err)
-	t.Logf("%+v", evt.Fields)
-}
-
-func TestNewProcessorCommunityID(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var communityID = new processor.CommunityID();
-
-function process(evt) {
-    communityID.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	id, _ := evt.GetValue("network.community_id")
-	assert.Equal(t, "1:15+Ly6HsDg0sJdTmNktf6rko+os=", id)
-}
-
-func TestNewCopyFields(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var copy = new processor.CopyFields({
-    fields: [
-        {from: "message", to: "log.original"},
-    ],
-});
-
-function process(evt) {
-	copy.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = evt.GetValue("log.original")
-	assert.NoError(t, err)
-}
-
-func TestNewProcessorDecodeJSONFields(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var decodeJSON = new processor.DecodeJSONFields({
-    fields: ["message"],
-    target: "",
-});
-
-function process(evt) {
-	decodeJSON.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt := testEvent()
-	evt.PutValue("message", `{"hello": "world"}`)
-
-	_, err = p.Run(evt)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	v, _ := evt.GetValue("hello")
-	assert.Equal(t, "world", v)
-}
-
-func TestNewProcessorDissect(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var chopLog = new processor.Dissect({
-    tokenizer: "key=%{key}",
-    field: "message",
-});
-
-function process(evt) {
-    chopLog.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	key, _ := evt.GetValue("dissect.key")
-	assert.Equal(t, "hello", key)
-}
-
-func TestNewProcessorDNS(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Windows requires explicit DNS server configuration")
-	}
-
-	const script = `
-var processor = require('processor');
-
-var dns = new processor.DNS({
-    type: "reverse",
-    fields: {
-        "source.ip": "source.domain",
-        "destination.ip": "destination.domain"
-    },
-    tag_on_failure: ["_dns_reverse_lookup_failed"],
-});
-
-function process(evt) {
-	dns.Run(evt);
-    if (evt.Get().tags[0] !== "_dns_reverse_lookup_failed") {
-        throw "missing tag";
-    }
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestNewRename(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var rename = new processor.Rename({
-    fields: [
-        {from: "message", to: "log.original"},
-    ],
-});
-
-function process(evt) {
-	rename.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = evt.GetValue("log.original")
-	assert.NoError(t, err)
-}
-
-func TestNewTruncateFields(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var truncate = new processor.TruncateFields({
-    fields: [
-        "message",
-    ],
-    max_characters: 4,
-});
-
-function process(evt) {
-	truncate.Run(evt);
-}
-`
-
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	evt, err := p.Run(testEvent())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	msg, _ := evt.GetValue("message")
-	assert.Equal(t, "key=", msg)
-}
-
-func TestNewProcessorChain(t *testing.T) {
-	const script = `
-var processor = require('processor');
-
-var localeProcessor = new processor.AddLocale();
+var hungarianHello = new processor.Mock({"fields": {"helló": "világ"}});
+var germanHello = new processor.Mock({"fields": {"hallo": "Welt"}});
 
 var chain = new processor.Chain()
-    .Add(localeProcessor)
-    .Rename({
-        fields: [
-            {from: "event.timezone", to: "timezone"},
-        ],
+    .Add(hungarianHello)
+    .Mock({
+        fields: { "hola": "mundo" },
     })
     .Add(function(evt) {
-		evt.Put("hello", "world");
+        evt.Put("hello", "world");
     })
     .Build();
 
 var chainOfChains = new processor.Chain()
     .Add(chain)
-    .AddFields({fields: {foo: "bar"}})
-	.Build();
-
+	.Add(germanHello)
+    .Build();
 function process(evt) {
-	chainOfChains.Run(evt);
+    chainOfChains.Run(evt);
 }
 `
 
@@ -386,10 +116,49 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	_, err = evt.GetValue("timezone")
+	// checking if hello world is added to the event in different languages
+	checkEvent(t, evt, "helló", "világ")
+	checkEvent(t, evt, "hola", "mundo")
+	checkEvent(t, evt, "hello", "world")
+	checkEvent(t, evt, "hallo", "Welt")
+}
+
+func checkEvent(t *testing.T, evt *beat.Event, key, value string) {
+	s, err := evt.GetValue(key)
 	assert.NoError(t, err)
-	v, _ := evt.GetValue("hello")
-	assert.Equal(t, "world", v)
-	v, _ = evt.GetValue("fields.foo")
-	assert.Equal(t, "bar", v)
+
+	switch ss := s.(type) {
+	case string:
+		assert.Equal(t, ss, value)
+	default:
+		t.Fatal("unexpected type")
+	}
+}
+
+type mockProcessor struct {
+	fields common.MapStr
+}
+
+func newMock(c *common.Config) (processors.Processor, error) {
+	config := struct {
+		Fields common.MapStr `config:"fields" validate:"required"`
+	}{}
+	err := c.Unpack(&config)
+	if err != nil {
+		return nil, fmt.Errorf("fail to unpack the mock processor configuration: %s", err)
+	}
+
+	return &mockProcessor{
+		fields: config.Fields,
+	}, nil
+}
+
+func (m *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
+	event.Fields.DeepUpdate(m.fields)
+	return event, nil
+}
+
+func (m *mockProcessor) String() string {
+	s, _ := json.Marshal(m.fields)
+	return fmt.Sprintf("mock=%s", s)
 }

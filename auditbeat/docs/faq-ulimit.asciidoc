@@ -1,6 +1,5 @@
-[float]
 [[ulimit]]
-=== {beatname_uc} fails to watch folders because too many files are open?
+=== {beatname_uc} fails to watch folders because too many files are open
 
 Because of the way file monitoring is implemented on macOS, you may see a
 warning similar to the following:

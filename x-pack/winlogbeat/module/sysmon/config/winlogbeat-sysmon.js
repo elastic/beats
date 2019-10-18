@@ -373,10 +373,9 @@ var sysmon = (function () {
 
         if (answers.length > 0) {
             evt.Put("dns.answers", answers);
-            evt.Put("dns.answers_count", answers.length);
         }
         if (ips.length > 0) {
-            evt.Put("dns.grouped.ip", ips);
+            evt.Put("dns.resolved_ip", ips);
         }
         evt.Delete("winlog.event_data.QueryResults");
     };
@@ -395,7 +394,7 @@ var sysmon = (function () {
         .AddFields({
             "fields": {
                 "event.category": "process",
-                "event.type:": "process_start",
+                "event.type": "process_start",
             },
             "target": "",
         })
@@ -490,7 +489,7 @@ var sysmon = (function () {
         .AddFields({
             "fields": {
                 "event.category": "process",
-                "event.type:": "process_end",
+                "event.type": "process_end",
             },
             "target": "",
         })
@@ -791,6 +790,12 @@ var sysmon = (function () {
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
+        })
+        .RegisteredDomain({
+            ignore_failure: true,
+            ignore_missing: true,
+            field: "dns.question.name",
+            target_field: "dns.question.registered_domain",
         })
         .Add(translateDnsQueryStatus)
         .Add(splitDnsQueryResults)

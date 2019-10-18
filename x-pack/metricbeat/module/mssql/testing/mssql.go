@@ -8,13 +8,13 @@ import "os"
 
 // GetConfig returns the required configuration options for testing a MSSQL
 // metricset.
-func GetConfig(metricSets ...string) map[string]interface{} {
+func GetConfig(host string, metricSets ...string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mssql",
 		"metricsets": metricSets,
-		"hosts":      []string{EnvOr("MSSQL_HOST", "localhost")},
+		"hosts":      []string{host},
 		"username":   EnvOr("MSSQL_USER", "SA"),
-		"password":   EnvOr("MSSQL_PASSWORD", ""),
+		"password":   EnvOr("MSSQL_PASSWORD", "1234_asdf"),
 	}
 }
 

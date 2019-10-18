@@ -5,8 +5,10 @@ services:
     working_dir: /go/src/github.com/elastic/beats/x-pack/auditbeat
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
+      - /sys:/sys
     command: make
     privileged: true
     pid: host
     cap_add:
       - AUDIT_CONTROL
+      - NET_ADMIN

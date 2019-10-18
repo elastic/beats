@@ -1,12 +1,13 @@
 = Filebeat Reference
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
 
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
+
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 :beatname_pkg: {beatname_lc}
@@ -18,6 +19,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_solutions:
 :ignores_max_retries:
 :has_docker_label_ex:
+:has_decode_cef_processor:
 :has_decode_csv_fields_processor:
 :has_script_processor:
 :has_timestamp_processor:

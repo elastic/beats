@@ -41,7 +41,7 @@ this document.
 By default {beatname_uc} uses the list of trusted certificate authorities from the
 operating system where {beatname_uc} is running. You can configure {beatname_uc} to use a specific list of
 CA certificates instead of the list from the OS. You can also configure it to use client authentication
-by specifying the certificate and key to use when the server requires the Beat to authenticate. Here is an example
+by specifying the certificate and key to use when the server requires the {beatname_uc} to authenticate. Here is an example
 configuration:
 
 ["source","yaml",subs="attributes,callouts"]

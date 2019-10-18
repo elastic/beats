@@ -42,7 +42,7 @@ func newChainBuilder(runtime *goja.Runtime) func(call goja.ConstructorCall) *goj
 		}
 
 		c := &chainBuilder{runtime: runtime, this: call.This}
-		for name, fn := range constructors {
+		for name, fn := range registry.Constructors() {
 			c.this.Set(name, c.makeBuilderFunc(fn))
 		}
 		call.This.Set("Add", c.Add)
