@@ -36,4 +36,3 @@ class TestMetaFile(BaseTest):
         """
         perms = oct(stat.S_IMODE(os.lstat(self.meta_file_path).st_mode))
         self.assertEqual(perms, "0600")
-
