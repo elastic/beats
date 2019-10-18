@@ -58,5 +58,5 @@ output.elasticsearch:
 --------------------------------------------------
 
 To learn more about {stack} security features and other types of
-authentication, see {stack-ov}/elasticsearch-security.html[Securing the
+authentication, see {ref}/elasticsearch-security.html[Securing the
 {stack}].
