@@ -1,8 +1,9 @@
 [
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -11,9 +12,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -22,9 +24,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 246,
@@ -32,9 +35,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 305,
@@ -42,9 +46,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 374,
@@ -52,9 +57,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 433,
@@ -62,9 +68,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 497,
@@ -74,6 +81,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 561,
@@ -83,6 +91,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 624,
@@ -90,18 +99,20 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 662,
-        "message": " InnoDB: Setting file ./ibdata1 size to 10 MB",
+        "message": "InnoDB: Setting file ./ibdata1 size to 10 MB",
         "service.type": "mysql"
     },
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 724,
@@ -109,18 +120,20 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 782,
-        "message": " InnoDB: Log file ./ib_logfile0 did not exist: new to be created",
+        "message": "InnoDB: Log file ./ib_logfile0 did not exist: new to be created",
         "service.type": "mysql"
     },
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 863,
@@ -130,6 +143,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 915,
@@ -137,18 +151,20 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 973,
-        "message": " InnoDB: Log file ./ib_logfile1 did not exist: new to be created",
+        "message": "InnoDB: Log file ./ib_logfile1 did not exist: new to be created",
         "service.type": "mysql"
     },
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1054,
@@ -158,6 +174,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1106,
@@ -167,6 +184,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1164,
@@ -176,6 +194,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1215,
@@ -185,6 +204,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1250,
@@ -194,6 +214,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1290,
@@ -203,6 +224,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1344,
@@ -210,19 +232,21 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:50.000Z",
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1397,
-        "message": " InnoDB: Waiting for the background threads to start",
+        "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:51.000Z",
+        "@timestamp": "2016-12-09T14:18:51.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1466,
@@ -230,29 +254,32 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:51.000Z",
+        "@timestamp": "2016-12-09T14:18:51.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1528,
-        "message": " InnoDB: Starting shutdown...",
+        "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1574,
-        "message": " InnoDB: Shutdown completed; log sequence number 1595675",
+        "message": "InnoDB: Shutdown completed; log sequence number 1595675",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -261,9 +288,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -272,9 +300,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1893,
@@ -282,9 +311,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 1952,
@@ -292,9 +322,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2021,
@@ -302,9 +333,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2080,
@@ -312,9 +344,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2144,
@@ -322,9 +355,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2208,
@@ -332,19 +366,21 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:52.000Z",
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2276,
-        "message": " InnoDB: Waiting for the background threads to start",
+        "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2345,
@@ -354,6 +390,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2413,
@@ -361,9 +398,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "ERROR",
@@ -372,29 +410,32 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2687,
-        "message": " InnoDB: Starting shutdown...",
+        "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 2733,
-        "message": " InnoDB: Shutdown completed; log sequence number 1595675",
+        "message": "InnoDB: Shutdown completed; log sequence number 1595675",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -403,9 +444,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -414,9 +456,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -425,9 +468,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3112,
@@ -435,9 +479,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3171,
@@ -445,9 +490,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3240,
@@ -455,9 +501,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3299,
@@ -465,9 +512,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3363,
@@ -475,9 +523,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3427,
@@ -485,19 +534,21 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:53.000Z",
+        "@timestamp": "2016-12-09T14:18:53.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3495,
-        "message": " InnoDB: Waiting for the background threads to start",
+        "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:54.000Z",
+        "@timestamp": "2016-12-09T14:18:54.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3564,
@@ -505,19 +556,21 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:54.000Z",
+        "@timestamp": "2016-12-09T14:18:54.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3632,
-        "message": " InnoDB: Starting shutdown...",
+        "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "ERROR",
@@ -526,29 +579,32 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3712,
-        "message": " InnoDB: Starting shutdown...",
+        "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 3758,
-        "message": " InnoDB: Shutdown completed; log sequence number 1595675",
+        "message": "InnoDB: Shutdown completed; log sequence number 1595675",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -557,9 +613,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -568,9 +625,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -579,9 +637,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4137,
@@ -589,9 +648,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4196,
@@ -599,9 +659,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4265,
@@ -609,9 +670,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4324,
@@ -619,9 +681,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:56.000Z",
+        "@timestamp": "2016-12-09T14:18:56.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4388,
@@ -629,9 +692,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:57.000Z",
+        "@timestamp": "2016-12-09T14:18:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4452,
@@ -639,19 +703,21 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:57.000Z",
+        "@timestamp": "2016-12-09T14:18:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4520,
-        "message": " InnoDB: Waiting for the background threads to start",
+        "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:58.000Z",
+        "@timestamp": "2016-12-09T14:18:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4589,
@@ -659,9 +725,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:58.000Z",
+        "@timestamp": "2016-12-09T14:18:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -670,20 +737,22 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:58.000Z",
+        "@timestamp": "2016-12-09T14:18:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
         "log.offset": 4736,
-        "message": "  - '127.0.0.1' resolves to '127.0.0.1';",
+        "message": "- '127.0.0.1' resolves to '127.0.0.1';",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:58.000Z",
+        "@timestamp": "2016-12-09T14:18:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -692,9 +761,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:58.000Z",
+        "@timestamp": "2016-12-09T14:18:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -703,9 +773,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:18:58.000Z",
+        "@timestamp": "2016-12-09T14:18:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -716,6 +787,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 4985,
@@ -723,9 +795,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -734,9 +807,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -745,29 +819,32 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5207,
-        "message": " InnoDB: Starting shutdown...",
+        "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5253,
-        "message": " InnoDB: Shutdown completed; log sequence number 1595685",
+        "message": "InnoDB: Shutdown completed; log sequence number 1595685",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -776,9 +853,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -787,9 +865,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -798,9 +877,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5632,
@@ -808,9 +888,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5691,
@@ -818,9 +899,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5760,
@@ -828,9 +910,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5819,
@@ -838,9 +921,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5883,
@@ -848,9 +932,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 5947,
@@ -858,19 +943,21 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:57.000Z",
+        "@timestamp": "2016-12-09T14:37:57.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6015,
-        "message": " InnoDB: Waiting for the background threads to start",
+        "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:58.000Z",
+        "@timestamp": "2016-12-09T14:37:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6084,
@@ -878,9 +965,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:58.000Z",
+        "@timestamp": "2016-12-09T14:37:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -889,20 +977,22 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:58.000Z",
+        "@timestamp": "2016-12-09T14:37:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
         "log.offset": 6231,
-        "message": "  - '127.0.0.1' resolves to '127.0.0.1';",
+        "message": "- '127.0.0.1' resolves to '127.0.0.1';",
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:58.000Z",
+        "@timestamp": "2016-12-09T14:37:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -911,9 +1001,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:58.000Z",
+        "@timestamp": "2016-12-09T14:37:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -922,9 +1013,10 @@
         "service.type": "mysql"
     },
     {
-        "@timestamp": "2016-12-09T14:37:58.000Z",
+        "@timestamp": "2016-12-09T14:37:58.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -935,6 +1027,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6480,
@@ -944,6 +1037,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6580,
@@ -953,6 +1047,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6642,
@@ -962,6 +1057,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6699,
@@ -971,6 +1067,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6756,
@@ -980,6 +1077,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6786,
@@ -989,6 +1087,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6848,
@@ -998,6 +1097,7 @@
     {
         "event.dataset": "mysql.error",
         "event.module": "mysql",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 6890,
