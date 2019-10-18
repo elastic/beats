@@ -31,6 +31,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
@@ -41,8 +44,6 @@ import (
 	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/llpath"
-	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -107,23 +108,10 @@ func httpBaseChecks(urlStr string) validator.Validator {
 func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
 		httpBaseChecks(url),
+		httpBodyChecks(),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
-				"response.status_code": statusCode,
-				"response.body.hash":   isdef.IsString,
-				// TODO add this isdef to lookslike in a robust way
-				"response.body.bytes": isdef.Is("an int64 greater than 0", func(path llpath.Path, v interface{}) *llresult.Results {
-					raw, ok := v.(int64)
-					if !ok {
-						return llresult.SimpleResult(path, false, "%s is not an int64", reflect.TypeOf(v))
-					}
-					if raw >= 0 {
-						return llresult.ValidResult(path)
-					}
-
-					return llresult.SimpleResult(path, false, "value %v not >= 0 ", raw)
-
-				}),
+				"response.status_code":   statusCode,
 				"rtt.content.us":         isdef.IsDuration,
 				"rtt.response_header.us": isdef.IsDuration,
 				"rtt.total.us":           isdef.IsDuration,
@@ -132,6 +120,38 @@ func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 			},
 		}),
 	)
+}
+
+func minimalRespondingHttpChecks(url string, statusCode int) validator.Validator {
+	return lookslike.Compose(
+		httpBaseChecks(url),
+		httpBodyChecks(),
+		lookslike.MustCompile(map[string]interface{}{
+			"http": map[string]interface{}{
+				"response.status_code": statusCode,
+				"rtt.total.us":         isdef.IsDuration,
+			},
+		}),
+	)
+}
+
+func httpBodyChecks() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		// TODO add this isdef to lookslike in a robust way
+		"http.response.body.bytes": isdef.Is("an int64 greater than 0", func(path llpath.Path, v interface{}) *llresult.Results {
+			raw, ok := v.(int64)
+			if !ok {
+				return llresult.SimpleResult(path, false, "%s is not an int64", reflect.TypeOf(v))
+			}
+			if raw >= 0 {
+				return llresult.ValidResult(path)
+			}
+
+			return llresult.SimpleResult(path, false, "value %v not >= 0 ", raw)
+
+		}),
+		"http.response.body.hash": isdef.IsString,
+	})
 }
 
 func respondingHTTPBodyChecks(body string) validator.Validator {
@@ -439,6 +459,53 @@ func TestUnreachableJob(t *testing.T) {
 			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
+		)),
+		event.Fields,
+	)
+}
+
+func TestRedirect(t *testing.T) {
+	redirectingPaths := map[string]string{
+		"/redirect_one": "/redirect_two",
+		"/redirect_two": "/",
+	}
+	expectedBody := "TargetBody"
+	server := httptest.NewServer(hbtest.RedirectHandler(redirectingPaths, expectedBody))
+	defer server.Close()
+
+	testUrl := server.URL + "/redirect_one"
+	configSrc := map[string]interface{}{
+		"urls":                testUrl,
+		"timeout":             "1s",
+		"check.response.body": expectedBody,
+		"max_redirects":       10,
+	}
+
+	config, err := common.NewConfigFrom(configSrc)
+	require.NoError(t, err)
+
+	jobs, _, err := create("redirect", config)
+	require.NoError(t, err)
+
+	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
+
+	event := &beat.Event{}
+	_, err = job(event)
+	require.NoError(t, err)
+
+	fmt.Printf("Test URL %s\n", testUrl)
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.BaseChecks("", "up", "http"),
+			hbtest.SummaryChecks(1, 0),
+			minimalRespondingHttpChecks(testUrl, 200),
+			lookslike.MustCompile(map[string]interface{}{
+				"http.redirects": []string{
+					server.URL + redirectingPaths["/redirect_one"],
+					server.URL + redirectingPaths["/redirect_two"],
+				},
+			}),
 		)),
 		event.Fields,
 	)
