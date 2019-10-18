@@ -57,7 +57,7 @@ type inputOutletConfig struct {
 
 	// Output meta data settings
 	Pipeline string `config:"pipeline"` // ES Ingest pipeline name
-
+	Index    string `config:"index"`    // ES output index pattern
 }
 
 // NewOutletFactory creates a new outlet factory for

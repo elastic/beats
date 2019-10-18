@@ -26,9 +26,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
@@ -91,21 +89,6 @@ func New(
 	f, err = GetFactory(input.config.Type)
 	if err != nil {
 		return input, err
-	}
-
-	// If there is an input-level index setting, pass it through to event.Meta
-	// via the input's Connector.
-	if input.config.Index != "" {
-		indexPattern, err := fmtstr.CompileEvent(input.config.Index)
-		if err != nil {
-			return input, err
-		}
-		connector = channel.WrapConnector(connector, func(event beat.Event) {
-			if event.Meta == nil {
-				event.Meta = common.MapStr{}
-			}
-			event.Meta["index-pattern"] = indexPattern
-		})
 	}
 
 	context := Context{

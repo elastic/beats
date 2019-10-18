@@ -18,8 +18,12 @@
 package channel
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -51,22 +55,24 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return nil, err
 	}
 
-	var err error
-	var userProcessors beat.ProcessorList
+	procs := processors.NewList(nil)
 
-	userProcessors, err = processors.New(config.Processors)
+	userProcessors, err := processors.New(config.Processors)
 	if err != nil {
 		return nil, err
 	}
+	procs.List = append(procs.List, userProcessors)
+
+	if config.Index != "" {
+		indexProcessor, err := newAddIndexPattern(config.Index)
+		if err != nil {
+			return nil, err
+		}
+		procs.List = append(procs.List, indexProcessor)
+	}
 
 	if lst := clientCfg.Processing.Processor; lst != nil {
-		if len(userProcessors.All()) == 0 {
-			userProcessors = lst
-		} else if orig := lst.All(); len(orig) > 0 {
-			newLst := processors.NewList(nil)
-			newLst.List = append(newLst.List, lst, userProcessors)
-			userProcessors = newLst
-		}
+		procs.List = append(procs.List, lst)
 	}
 
 	setOptional := func(to common.MapStr, key string, value string) {
@@ -105,7 +111,7 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	clientCfg.Processing.EventMetadata = config.EventMetadata
 	clientCfg.Processing.Meta = meta
 	clientCfg.Processing.Fields = fields
-	clientCfg.Processing.Processor = userProcessors
+	clientCfg.Processing.Processor = procs
 	client, err := c.pipeline.ConnectWith(clientCfg)
 	if err != nil {
 		return nil, err
@@ -116,4 +122,61 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return CloseOnSignal(outlet, c.parent.done), nil
 	}
 	return outlet, nil
+}
+
+type addIndexPattern struct {
+	pattern      string
+	beatInfo     beat.Info
+	formatString *fmtstr.EventFormatString
+}
+
+func newAddIndexPattern(
+	beatInfo beat.Info, pattern string,
+) (processors.Processor, error) {
+	formatString, err := fmtstr.CompileEvent(pattern)
+	if err != nil {
+		return nil, err
+	}
+	return &addIndexPattern{
+		pattern:      pattern,
+		beatInfo:     beatInfo,
+		formatString: formatString,
+	}, nil
+}
+
+func (aip *addIndexPattern) Run(event *beat.Event) (*beat.Event, error) {
+	if event.Meta == nil {
+		event.Meta = common.MapStr{}
+	}
+	index, err := expandIndexPattern(
+		aip.formatString, event.Timestamp, aip.beatInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	event.Meta["raw-index"] = index
+	return event, nil
+}
+
+func (aip *addIndexPattern) String() string {
+	return fmt.Sprintf("add_index_pattern=%s", aip.pattern)
+}
+
+// Expand the given pattern string as a formatted text field with access to
+// the event's agent and timestamp.
+// This helper mimicks applyStaticFmtstr in ilm.go, creating a placeholder
+// event for the restricted set of fields we allow here. It might be worth
+// making this a shared helper function or otherwise specializing for this case.
+func expandIndexPattern(
+	pattern *fmtstr.EventFormatString, timestamp time.Time, info beat.Info,
+) (string, error) {
+	return pattern.Run(&beat.Event{
+		Fields: common.MapStr{
+			"agent": common.MapStr{
+				"name":    info.Beat,
+				"version": info.Version,
+			},
+		},
+		Timestamp: time.Now(),
+	})
 }

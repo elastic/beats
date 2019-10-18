@@ -20,12 +20,10 @@ package idxmgmt
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -366,54 +364,17 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 		}
 	}
 
-	// index-pattern expands the index as formatted text rather than a fixed
-	// or dated string. This was introduced to support the `Index` configuration
-	// field on Filebeat inputs, so it's essentially a workaround to communicate
-	// a specific output behavior to libbeat based on the originating input
-	// (which as implemented now is a Filebeat-specific concept).
-	// If we find ourselves adding additional backchannels like this in Meta,
-	// we should probably add a more formal (non-MapStr) configuration struct to
-	// beat.Event that inputs can use to modulate output behavior.
-	if tmp := evt.Meta["index-pattern"]; tmp != nil {
-		if pattern, ok := tmp.(*fmtstr.EventFormatString); ok {
-			idx, err := expandIndexPattern(pattern, evt.Timestamp, beatInfo)
-			if err == nil {
-				return idx
-			}
-			// Should we log a warning here somehow?
+	// This is functionally identical to Meta["alias"], returning the overriding
+	// metadata as the index name if present. It is currently used by Filebeat
+	// to send the index for particular inputs to formatted string templates,
+	// which are then expanded by a processor to the "raw-index" field.
+	if tmp := evt.Meta["raw-index"]; tmp != nil {
+		if idx, ok := tmp.(string); ok {
+			return idx
 		}
 	}
 
 	return ""
-}
-
-// Expand the given pattern string as a formatted text field with access to
-// the event's agent and timestamp.
-// This helper mimicks applyStaticFmtstr in ilm.go, creating a placeholder
-// event for the restricted set of fields we allow here. It might be worth
-// making this a shared helper function or otherwise specializing for this case.
-func expandIndexPattern(
-	pattern *fmtstr.EventFormatString, timestamp time.Time, info beat.Info,
-) (string, error) {
-	return pattern.Run(&beat.Event{
-		Fields: common.MapStr{
-			// beat object was left in for backward compatibility reason for older configs.
-			"beat": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-			"agent": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-			// For the Beats that have an observer role
-			"observer": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-		},
-		Timestamp: time.Now(),
-	})
 }
 
 func unpackTemplateConfig(cfg *common.Config) (config template.TemplateConfig, err error) {
