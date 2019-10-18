@@ -7,17 +7,42 @@
     - name: identity
       type: group
       description: >
-        The canonical user ID of the owner of the source bucket.
+        Identity
       fields:
+        - name: claims_initiated_by_user
+          type: group
+          description: >
+            Claims initiated by user
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                Name
+            - name: givenname
+              type: keyword
+              description: >
+                Givenname
+            - name: surname
+              type: keyword
+              description: >
+                Surname
+            - name: fullname
+              type: keyword
+              description: >
+                Fullname
+            - name: schema
+              type: keyword
+              description: >
+                Schema
         - name: authorization
           type: group
           description: >
-            Node allocatable pods
+            Authorization
           fields:
             - name: evidence
               type: group
               description: >
-                Node allocatable pods
+                Evidence
               fields:
                 - name: role_assignment_scope
                   type: keyword

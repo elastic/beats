@@ -70,7 +70,7 @@
         "azure" : {
             "subscription_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
             "resource" : {
-                "resource_group" : "SA-HEMANT",
+                "group" : "SA-HEMANT",
                 "provider" : "MICROSOFT.EVENTHUB",
                 "namespace" : "AZURELSEVENTS",
                 "id" : "/SUBSCRIPTIONS/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/RESOURCEGROUPS/SA-HEMANT/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/AZURELSEVENTS/AUTHORIZATIONRULES/ROOTMANAGESHAREDACCESSKEY",
