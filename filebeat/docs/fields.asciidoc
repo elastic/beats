@@ -1559,7 +1559,17 @@ type: keyword
 
 --
 
-*`azure.resource.type`*::
+*`azure.resource.provider`*::
++
+--
+Resource type/namespace
+
+
+type: keyword
+
+--
+
+*`azure.resource.namespace`*::
 +
 --
 Resource type/namespace
@@ -1589,21 +1599,78 @@ Fields for Azure activity logs.
 [float]
 === identity
 
-The canonical user ID of the owner of the source bucket.
+Identity
 
 
 
 [float]
+=== claims_initiated_by_user
+
+Claims initiated by user
+
+
+
+*`azure.activitylogs.identity.claims_initiated_by_user.name`*::
++
+--
+Name
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.claims_initiated_by_user.givenname`*::
++
+--
+Givenname
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.claims_initiated_by_user.surname`*::
++
+--
+Surname
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.claims_initiated_by_user.fullname`*::
++
+--
+Fullname
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.claims_initiated_by_user.schema`*::
++
+--
+Schema
+
+
+type: keyword
+
+--
+
+[float]
 === authorization
 
-Node allocatable pods
+Authorization
 
 
 
 [float]
 === evidence
 
-Node allocatable pods
+Evidence
 
 
 
