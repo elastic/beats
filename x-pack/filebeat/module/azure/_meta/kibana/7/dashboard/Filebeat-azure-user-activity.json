@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "This dashboard shows user activity in Azure cloud.",
+        "description": "This dashboard shows expanded user activity in Azure cloud.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -240,8 +240,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-18T09:38:05.179Z",
-      "version": "Wzg0NjMsMV0="
+      "updated_at": "2019-10-18T15:21:03.163Z",
+      "version": "WzkyMzksMV0="
     },
     {
       "attributes": {

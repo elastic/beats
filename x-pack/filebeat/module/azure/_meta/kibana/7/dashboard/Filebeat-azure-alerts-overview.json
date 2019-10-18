@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "This dashboard provides alerts overview for Azure cloud",
+        "description": "This dashboard provides expanded alerts overview for Azure cloud",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -124,8 +124,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-17T13:05:54.766Z",
-      "version": "WzQ5NTgsMV0="
+      "updated_at": "2019-10-18T15:21:16.305Z",
+      "version": "WzkyNDEsMV0="
     },
     {
       "attributes": {

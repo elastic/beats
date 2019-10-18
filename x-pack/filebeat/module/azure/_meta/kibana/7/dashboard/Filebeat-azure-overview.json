@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "This dashboard provides an overview of user activity, alerts and resource in Azure cloud.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -284,8 +284,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-18T09:35:54.453Z",
-      "version": "Wzg0NTUsMV0="
+      "updated_at": "2019-10-18T15:20:07.860Z",
+      "version": "WzkyMzcsMV0="
     },
     {
       "attributes": {
