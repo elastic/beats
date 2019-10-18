@@ -147,7 +147,7 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
-	setUmask()
+	setUmaskWithSettings(settings)
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
 	version := settings.Version
@@ -1046,4 +1046,11 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
+}
+
+func setUmaskWithSettings(settings Settings) int {
+	if settings.Umask != nil {
+		return setUmask(*settings.Umask)
+	}
+	return setUmask(0027) // 0640 for files | 0750 for dirs
 }

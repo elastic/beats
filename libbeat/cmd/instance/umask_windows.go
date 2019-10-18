@@ -17,7 +17,7 @@
 
 package instance
 
-func setUmask() int {
+func setUmask(newmask int) int {
 	// Do nothing; no way to set umask on Windows
 	return -1
 }

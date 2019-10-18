@@ -21,6 +21,6 @@ package instance
 
 import "syscall"
 
-func setUmask() int {
-	return syscall.Umask(0027) // 0640 for files | 0750 for dirs
+func setUmask(newmask int) int {
+	return syscall.Umask(newmask)
 }
