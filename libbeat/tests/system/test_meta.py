@@ -1,7 +1,5 @@
 from base import BaseTest
-from elasticsearch import Elasticsearch, TransportError
 
-import logging
 import os
 import stat
 
