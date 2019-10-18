@@ -46,8 +46,8 @@ endif::apm-server[]
 configure the `certificate` and `key` settings. These settings assume that the
 distinguished name (DN) in the certificate is mapped to the appropriate roles in
 the `role_mapping.yml` file on each node in the {es} cluster. For more
-information, see {xpack-ref}/mapping-roles.html#mapping-roles-file[Using Role
-Mapping Files].
+information, see {ref}/mapping-roles.html#mapping-roles-file[Using role
+mapping files].
 +
 ["source","yaml",subs="attributes,callouts"]
 --------------------------------------------------
