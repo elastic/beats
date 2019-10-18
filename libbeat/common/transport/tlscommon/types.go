@@ -65,6 +65,11 @@ var tlsCipherSuites = map[string]tlsCipherSuite{
 	"RSA-AES-128-GCM-SHA256": tlsCipherSuite(tls.TLS_RSA_WITH_AES_128_GCM_SHA256),
 	"RSA-AES-256-CBC-SHA":    tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_CBC_SHA),
 	"RSA-AES-256-GCM-SHA384": tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_GCM_SHA384),
+
+	// TLS 1.3
+	"AES-128-GCM-SHA256":       tlsCipherSuite(tls.TLS_AES_128_GCM_SHA256),
+	"AES-256-GCM-SHA384":       tlsCipherSuite(tls.TLS_AES_256_GCM_SHA384),
+	"CHACHA20-POLY1305-SHA256": tlsCipherSuite(tls.TLS_CHACHA20_POLY1305_SHA256),
 }
 
 var tlsCipherSuitesInverse = make(map[tlsCipherSuite]string, len(tlsCipherSuites))
