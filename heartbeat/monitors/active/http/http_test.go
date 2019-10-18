@@ -122,7 +122,7 @@ func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 	)
 }
 
-func minimalRespondingHttpChecks(url string, statusCode int) validator.Validator {
+func minimalRespondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
 		httpBaseChecks(url),
 		httpBodyChecks(),
@@ -473,9 +473,9 @@ func TestRedirect(t *testing.T) {
 	server := httptest.NewServer(hbtest.RedirectHandler(redirectingPaths, expectedBody))
 	defer server.Close()
 
-	testUrl := server.URL + "/redirect_one"
+	testURL := server.URL + "/redirect_one"
 	configSrc := map[string]interface{}{
-		"urls":                testUrl,
+		"urls":                testURL,
 		"timeout":             "1s",
 		"check.response.body": expectedBody,
 		"max_redirects":       10,
@@ -493,13 +493,13 @@ func TestRedirect(t *testing.T) {
 	_, err = job(event)
 	require.NoError(t, err)
 
-	fmt.Printf("Test URL %s\n", testUrl)
+	fmt.Printf("Test URL %s\n", testURL)
 	testslike.Test(
 		t,
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("", "up", "http"),
 			hbtest.SummaryChecks(1, 0),
-			minimalRespondingHttpChecks(testUrl, 200),
+			minimalRespondingHTTPChecks(testURL, 200),
 			lookslike.MustCompile(map[string]interface{}{
 				"http.redirects": []string{
 					server.URL + redirectingPaths["/redirect_one"],
