@@ -4967,6 +4967,16 @@ type: keyword
 
 --
 
+*`http.response.redirects`*::
++
+--
+List of redirects followed to arrive at final content. Last item on the list is the URL for which body content is shown.
+
+
+type: keyword
+
+--
+
 [float]
 === rtt
 
