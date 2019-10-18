@@ -74,28 +74,11 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.offset": 497,
-        "message": "InnoDB: Completed initialization of buffer pool",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 561,
-        "message": "InnoDB: The first specified data file ./ibdata1 did not exist:",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 624,
-        "message": "InnoDB: a new database to be created!",
+        "message": "InnoDB: Completed initialization of buffer pool\nInnoDB: The first specified data file ./ibdata1 did not exist:\nInnoDB: a new database to be created!",
         "service.type": "mysql"
     },
     {
@@ -105,18 +88,11 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.offset": 662,
-        "message": "InnoDB: Setting file ./ibdata1 size to 10 MB",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 724,
-        "message": "InnoDB: Database physically writes the file full: wait...",
+        "message": "InnoDB: Setting file ./ibdata1 size to 10 MB\nInnoDB: Database physically writes the file full: wait...",
         "service.type": "mysql"
     },
     {
@@ -126,28 +102,11 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.offset": 782,
-        "message": "InnoDB: Log file ./ib_logfile0 did not exist: new to be created",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 863,
-        "message": "InnoDB: Setting log file ./ib_logfile0 size to 5 MB",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 915,
-        "message": "InnoDB: Database physically writes the file full: wait...",
+        "message": "InnoDB: Log file ./ib_logfile0 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile0 size to 5 MB\nInnoDB: Database physically writes the file full: wait...",
         "service.type": "mysql"
     },
     {
@@ -157,78 +116,11 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.offset": 973,
-        "message": "InnoDB: Log file ./ib_logfile1 did not exist: new to be created",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1054,
-        "message": "InnoDB: Setting log file ./ib_logfile1 size to 5 MB",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1106,
-        "message": "InnoDB: Database physically writes the file full: wait...",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1164,
-        "message": "InnoDB: Doublewrite buffer not found: creating new",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1215,
-        "message": "InnoDB: Doublewrite buffer created",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1250,
-        "message": "InnoDB: 127 rollback segment(s) active.",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1290,
-        "message": "InnoDB: Creating foreign key constraint system tables",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1344,
-        "message": "InnoDB: Foreign key constraint system tables created",
+        "message": "InnoDB: Log file ./ib_logfile1 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile1 size to 5 MB\nInnoDB: Database physically writes the file full: wait...\nInnoDB: Doublewrite buffer not found: creating new\nInnoDB: Doublewrite buffer created\nInnoDB: 127 rollback segment(s) active.\nInnoDB: Creating foreign key constraint system tables\nInnoDB: Foreign key constraint system tables created",
         "service.type": "mysql"
     },
     {
@@ -383,18 +275,11 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.offset": 2345,
-        "message": "InnoDB: 5.5.53 started; log sequence number 1595675",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 2413,
-        "message": "ERROR: 1064  You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ALTER TABLE user ADD column Show_view_priv enum('N','Y') CHARACTER SET utf8 NOT ' at line 1",
+        "message": "InnoDB: 5.5.53 started; log sequence number 1595675\nERROR: 1064  You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ALTER TABLE user ADD column Show_view_priv enum('N','Y') CHARACTER SET utf8 NOT ' at line 1",
         "service.type": "mysql"
     },
     {
@@ -404,9 +289,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "ERROR",
         "log.offset": 2653,
-        "message": "Aborting",
+        "message": "Aborting\n",
         "service.type": "mysql"
     },
     {
@@ -438,9 +326,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 2806,
-        "message": "/usr/sbin/mysqld: Shutdown complete",
+        "message": "/usr/sbin/mysqld: Shutdown complete\n",
         "service.type": "mysql"
     },
     {
@@ -573,9 +464,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "ERROR",
         "log.offset": 3678,
-        "message": "Aborting",
+        "message": "Aborting\n",
         "service.type": "mysql"
     },
     {
@@ -607,9 +501,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 3831,
-        "message": "/usr/sbin/mysqld: Shutdown complete",
+        "message": "/usr/sbin/mysqld: Shutdown complete\n",
         "service.type": "mysql"
     },
     {
@@ -779,19 +676,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 4921,
-        "message": "/usr/sbin/mysqld: ready for connections.",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 4985,
-        "message": "Version: '5.5.53-0ubuntu0.12.04.1'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  (Ubuntu)",
+        "message": "/usr/sbin/mysqld: ready for connections.\nVersion: '5.5.53-0ubuntu0.12.04.1'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  (Ubuntu)",
         "service.type": "mysql"
     },
     {
@@ -801,9 +691,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 5081,
-        "message": "/usr/sbin/mysqld: Normal shutdown",
+        "message": "/usr/sbin/mysqld: Normal shutdown\n",
         "service.type": "mysql"
     },
     {
@@ -847,9 +740,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 5326,
-        "message": "/usr/sbin/mysqld: Shutdown complete",
+        "message": "/usr/sbin/mysqld: Shutdown complete\n",
         "service.type": "mysql"
     },
     {
@@ -1019,89 +915,270 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 6416,
-        "message": "/usr/sbin/mysqld: ready for connections.",
+        "message": "/usr/sbin/mysqld: ready for connections.\nVersion: '5.5.53-0ubuntu0.12.04.1-log'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  (Ubuntu)",
         "service.type": "mysql"
     },
     {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6480,
-        "message": "Version: '5.5.53-0ubuntu0.12.04.1-log'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  (Ubuntu)",
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
+        "log.level": "Warning",
         "log.offset": 6580,
-        "message": "vagrant@precise32:~$ cat /var/log/mysql.log | grep phisically",
+        "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
         "service.type": "mysql"
     },
     {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6642,
-        "message": "vagrant@precise32:~$ cat /var/log/mysql.log | grep physi",
+        "log.level": "Note",
+        "log.offset": 6771,
+        "message": "Plugin 'FEDERATED' is disabled.",
         "service.type": "mysql"
     },
     {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6699,
-        "message": "vagrant@precise32:~$ cat /var/log/mysql.log | physically",
+        "log.offset": 6826,
+        "message": "InnoDB: The InnoDB memory heap is disabled",
         "service.type": "mysql"
     },
     {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6756,
-        "message": "physically: command not found",
+        "log.offset": 6885,
+        "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
         "service.type": "mysql"
     },
     {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6786,
-        "message": "vagrant@precise32:~$ cat /var/log/mysql.log | grep physically",
+        "log.offset": 6954,
+        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
         "service.type": "mysql"
     },
     {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6848,
-        "message": "vagrant@precise32:~$ less /var/log/mysql.",
+        "log.offset": 7013,
+        "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
     {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6890,
-        "message": "mysql.err  mysql.log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 7077,
+        "message": "InnoDB: Completed initialization of buffer pool\nInnoDB: The first specified data file ./ibdata1 did not exist:\nInnoDB: a new database to be created!",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 7242,
+        "message": "InnoDB: Setting file ./ibdata1 size to 10 MB\nInnoDB: Database physically writes the file full: wait...",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 7362,
+        "message": "InnoDB: Log file ./ib_logfile0 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile0 size to 5 MB\nInnoDB: Database physically writes the file full: wait...",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 7553,
+        "message": "InnoDB: Log file ./ib_logfile1 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile1 size to 5 MB\nInnoDB: Database physically writes the file full: wait...\nInnoDB: Doublewrite buffer not found: creating new\nInnoDB: Doublewrite buffer created\nInnoDB: 127 rollback segment(s) active.\nInnoDB: Creating foreign key constraint system tables\nInnoDB: Foreign key constraint system tables created",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:50.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 7977,
+        "message": "InnoDB: Waiting for the background threads to start",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:51.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8046,
+        "message": "InnoDB: 5.5.53 started; log sequence number 0",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:51.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8108,
+        "message": "InnoDB: Starting shutdown...",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8154,
+        "message": "InnoDB: Shutdown completed; log sequence number 1595675",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Warning",
+        "log.offset": 8227,
+        "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Note",
+        "log.offset": 8418,
+        "message": "Plugin 'FEDERATED' is disabled.",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8473,
+        "message": "InnoDB: The InnoDB memory heap is disabled",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8532,
+        "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8601,
+        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8660,
+        "message": "InnoDB: Initializing buffer pool, size = 128.0M",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8724,
+        "message": "InnoDB: Completed initialization of buffer pool",
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-09T14:18:52.000-02:00",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.offset": 8788,
+        "message": "InnoDB: highest supported file format is Barracuda.",
         "service.type": "mysql"
     }
 ]

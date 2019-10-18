@@ -524,20 +524,13 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 3888,
-        "message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.",
+        "message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.\nVersion: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew",
         "mysql.thread_id": 0,
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 3991,
-        "message": "Version: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew",
         "service.type": "mysql"
     },
     {
@@ -1291,6 +1284,19 @@
         "log.level": "Note",
         "log.offset": 14008,
         "message": "InnoDB: page_cleaner: 1000ms intended loop took 515624ms. The settings might not be optimal. (flushed=0 and evicted=0, during the time.)",
+        "mysql.thread_id": 0,
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2016-12-11T06:36:50.017Z",
+        "event.dataset": "mysql.error",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Note",
+        "log.offset": 14182,
+        "message": "InnoDB: page_cleaner: 1000ms intended loop took 3598619ms. The settings might not be optimal. (flushed=0 and evicted=0, during the time.)",
         "mysql.thread_id": 0,
         "service.type": "mysql"
     }

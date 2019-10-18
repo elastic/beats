@@ -4,13 +4,14 @@
     "grok": {
         "field": "message",
         "patterns": [
-          "%{MYSQLDATETIME}%{SPACE}(%{NUMBER:mysql.thread_id:long}%{SPACE})?(\\[%{DATA:log.level}\\]%{SPACE})?%{GREEDYDATA:message}",
+          "%{MYSQLDATETIME}%{SPACE}(%{NUMBER:mysql.thread_id:long}%{SPACE})?(\\[%{DATA:log.level}\\]%{SPACE})?%{GREEDYMULTILINE:message}",
           "%{GREEDYDATA:message}"
         ],
         "ignore_missing": true,
         "pattern_definitions": {
           "LOCALDATETIME": "(?:%{YEAR}-%{MONTHNUM}-%{MONTHDAY}|%{NUMBER})%{SPACE}%{TIME}",
-          "MYSQLDATETIME": "(?:%{LOCALDATETIME:_tmp.local_timestamp}|%{TIMESTAMP_ISO8601:_tmp.timestamp})"
+          "MYSQLDATETIME": "(?:%{LOCALDATETIME:_tmp.local_timestamp}|%{TIMESTAMP_ISO8601:_tmp.timestamp})",
+          "GREEDYMULTILINE": "(.|\n)+"
         }
       }
     }, {

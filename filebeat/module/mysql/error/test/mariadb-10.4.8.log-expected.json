@@ -291,20 +291,13 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 1788,
-        "message": "/usr/sbin/mysqld: ready for connections.",
+        "message": "/usr/sbin/mysqld: ready for connections.\nVersion: '10.4.8-MariaDB-log'  socket: '/data/mysqldata/mysql.sock'  port: 3306  MariaDB Server",
         "mysql.thread_id": 0,
-        "service.type": "mysql"
-    },
-    {
-        "event.dataset": "mysql.error",
-        "event.module": "mysql",
-        "event.timezone": "-02:00",
-        "fileset.name": "error",
-        "input.type": "log",
-        "log.offset": 1858,
-        "message": "Version: '10.4.8-MariaDB-log'  socket: '/data/mysqldata/mysql.sock'  port: 3306  MariaDB Server",
         "service.type": "mysql"
     },
     {
@@ -366,9 +359,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
         "log.level": "Note",
         "log.offset": 2317,
-        "message": "Event Scheduler: [root@localhost][test.test_error_log] At line 1 in test.test_error_log",
+        "message": "Event Scheduler: [root@localhost][test.test_error_log] At line 1 in test.test_error_log\n",
         "mysql.thread_id": 12,
         "service.type": "mysql"
     }
