@@ -240,8 +240,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-18T15:21:03.163Z",
-      "version": "WzkyMzksMV0="
+      "updated_at": "2019-10-18T17:27:59.187Z",
+      "version": "WzkyNDUsMV0="
     },
     {
       "attributes": {
@@ -379,7 +379,7 @@
             "default_timefield": "@timestamp",
             "filter": {
               "language": "kuery",
-              "query": "event.dataset :\"azure.activitylogs\" and event.category :\"Administrative\" and azure.activitylogs.identity.claims.name:*"
+              "query": "event.dataset :\"azure.activitylogs\" and event.category :\"Administrative\" and azure.activitylogs.identity.claims_initiated_by_user.fullname :*"
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "filebeat-*",
@@ -432,8 +432,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-17T11:47:32.993Z",
-      "version": "WzQ5MjIsMV0="
+      "updated_at": "2019-10-18T17:27:33.254Z",
+      "version": "WzkyNDMsMV0="
     },
     {
       "attributes": {
