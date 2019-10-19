@@ -50,7 +50,7 @@ processors:
           to: "zeek.rfb.auth.success"
 
         - from: "zeek.rfb.authentication_method"
-          to: "zeek.rfb.auth.auth.method"
+          to: "zeek.rfb.auth.method"
 
       ignore_missing: true
       fail_on_error: false

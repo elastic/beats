@@ -14,15 +14,15 @@
       }
     },
     {
-      "remove": {
-        "field": "zeek.dce_rpc.ts"
-      }
-    },
-    {
       "set": {
         "field": "event.id",
         "value": "{{zeek.session_id}}",
         "if": "ctx.zeek.session_id != null"
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.dce_rpc.ts"
       }
     },
     {

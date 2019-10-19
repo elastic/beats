@@ -26,6 +26,12 @@
       }
     },
     {
+      "remove": {
+        "field": "zeek.smb_cmd.referenced_file",
+	"ignore_missing": true
+      }
+    },
+    {
       "set": {
         "field": "source.ip",
         "value": "{{source.address}}"

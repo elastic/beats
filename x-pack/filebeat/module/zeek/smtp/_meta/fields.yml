@@ -113,3 +113,8 @@
       description: |
         (present if base/protocols/smtp/files.bro is loaded)
         An ordered vector of file unique IDs seen attached to the message.
+
+    - name: is_webmail
+      type: boolean
+      description: |
+        Indicates if the message was sent through a webmail interface.

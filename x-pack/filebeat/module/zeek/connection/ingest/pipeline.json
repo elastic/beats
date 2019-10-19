@@ -19,6 +19,13 @@
       }
     },
     {
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
+      }
+    },
+    {
       "script": {
         "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
         "params": {
@@ -31,13 +38,6 @@
       "remove": {
         "field": "temp.duration",
         "ignore_missing": true
-      }
-    },
-    {
-      "set": {
-        "field": "event.id",
-        "value": "{{zeek.session_id}}",
-        "if": "ctx.zeek.session_id != null"
       }
     },
     {
