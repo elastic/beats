@@ -12,7 +12,7 @@ Before deploying {beatname_uc}, you need to configure one or more functions and
 specify details about the services that will trigger the functions.
 
 You configure the functions in the the +{beatname_lc}.yml+ configuration file.
-When you're done, you can <<{beatname_lc}-deploying,deploy the functions>>
+When you're done, you can <<deploy-to-cloud-provider,deploy the functions>>
 to your serverless environment.
 
 The following example configures two functions: `cloudwatch` and `sqs`. The
@@ -185,3 +185,10 @@ The number of events to read from a Kinesis stream, the minimal values is 100 an
 
 The starting position to read from a Kinesis stream, valids values are `trim_horizon` and `latest`.
 The default is trim_horizon.
+
+[float]
+[id="{beatname_lc}-keep-null"]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.

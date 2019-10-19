@@ -75,7 +75,7 @@ ifndef::apm-server[]
     ...
     "@metadata": { <1>
       "beat": "{beat_default_index_prefix}", <2>
-      "version": "{stack-version}" <3>
+      "version": "{version}" <3>
     }
 }
 ------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ ifdef::apm-server[]
     "@metadata": { <1>
       "beat": "{beat_default_index_prefix}", <2>
       "pipeline":"apm", <3>
-      "version": "{stack-version}" <4>
+      "version": "{version}" <4>
     }
 }
 ------------------------------------------------------------------------------

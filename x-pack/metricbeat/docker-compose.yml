@@ -12,6 +12,18 @@ services:
     command: make
 
   # Modules
+  appsearch:
+    build:
+      context: ./module/appsearch/_meta
+    depends_on:
+      - elasticsearch
+    environment:
+      - "elasticsearch.host=http://elasticsearch:9200"
+      - "allow_es_settings_modification=true"
+    ports:
+      - 3002
+    command: --process app-server
+
   cockroachdb:
     image: docker.elastic.co/observability-ci/beats-integration-cockroachdb:${COCKROACHDB_VERSION:-19.1.1}-1
     build:

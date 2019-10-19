@@ -124,16 +124,14 @@ func (r *Reader) RefreshCounterPaths() error {
 	if err != nil {
 		return errors.Wrap(err, "failed removing unused counter values")
 	}
-	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
-	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-	if err = r.query.CollectData(); err != nil {
-		return errors.Wrap(err, "failed querying counter values")
-	}
+
 	return nil
 }
 
 // Read executes a query and returns those values in an event.
 func (r *Reader) Read() ([]mb.Event, error) {
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := r.query.CollectData(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
 	}

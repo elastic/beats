@@ -366,6 +366,15 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
+	// Try to acquire exclusive lock on data path to prevent another beat instance
+	// sharing same data path.
+	bl := newLocker(b)
+	err = bl.lock()
+	if err != nil {
+		return err
+	}
+	defer bl.unlock()
+
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())

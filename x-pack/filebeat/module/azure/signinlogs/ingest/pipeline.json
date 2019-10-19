@@ -104,7 +104,7 @@
       {
           "rename": {
               "field": "azure.signinlogs.tenantId",
-              "target_field": "azure.signinlogs.tenant_id",
+              "target_field": "azure.tenant_id",
               "ignore_missing": true
           }
       },
@@ -364,6 +364,11 @@
           "remove": {
               "field": ["message", "azure.signinlogs.time","azure.signinlogs.properties.location"],
               "ignore_missing": true
+          }
+      },
+      {
+          "pipeline": {
+              "name": "{< IngestPipeline "azure-shared-pipeline" >}"
           }
       }
   ],

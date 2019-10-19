@@ -360,6 +360,18 @@ processors:
      target_field: destination.as.organization.name
      ignore_missing: true
 
+# Set source|destination.geo.name from panw's srcloc|dstloc
+ - rename:
+     if: 'ctx.source?.geo?.name == null'
+     field: _temp_.srcloc
+     target_field: source.geo.name
+     ignore_missing: true
+ - rename:
+     if: 'ctx.destination?.geo?.name == null'
+     field: _temp_.dstloc
+     target_field: destination.geo.name
+     ignore_missing: true
+
 # Append NAT community_id to network.community_id
  - append:
      if: 'ctx?.panw?.panos?.network?.nat?.community_id != null && ctx.panw.panos.network.nat.community_id != ctx?.network?.community_id'

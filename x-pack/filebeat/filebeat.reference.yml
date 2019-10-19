@@ -79,7 +79,16 @@ filebeat.modules:
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
   s3access:
-    enabled: true
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+  elb:
+    enabled: false
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
@@ -394,6 +403,16 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#--------------------------------- MISP Module ---------------------------------
+- module: misp
+  threat:
+    enabled: true
+
+    # MISP Configuration
+    var.api_key: "XXXXXXXXXXXXXX" # API key for MISP
+    var.json_objects_array: "response.Attribute"
+    var.url: "http://X.X.X.X/attributes/restSearch" # X.X.X.X is the IP address of the MISP server
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
@@ -736,6 +755,9 @@ filebeat.inputs:
   # fields added by Filebeat itself, the custom fields overwrite the default
   # fields.
   #fields_under_root: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
   # Ignore files which were modified more then the defined timespan in the past.
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
