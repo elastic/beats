@@ -13,7 +13,7 @@ Build Filebeat
 ```
 cd x-pack/filebeat
 mage build update
-./filebeat setup --modules=misp -e -d "*" -E 'setup.dashboards.directory=build/kibana'
+./filebeat setup --modules=misp -e -E 'setup.dashboards.directory=module/misp/_meta/kibana'
 ```
 
 Enable the MISP module
