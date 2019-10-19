@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of VSphere host and cluster metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -1263,7 +1263,7 @@
             "desc"
           ]
         ],
-        "title": "[Metricbeat VSphere] search for event module vsphere",
+        "title": "search for event module vsphere [Metricbeat VSphere] ECS",
         "version": 1
       },
       "id": "1411b690-f017-11e9-aaf3-15199b632da7",

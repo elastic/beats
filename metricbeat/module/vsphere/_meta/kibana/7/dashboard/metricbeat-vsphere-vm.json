@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of the VSphere virtualmachine metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -456,7 +456,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "networks from virtualmachine [Metricbeat VSphere] ",
+        "title": "networks from virtualmachine [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -524,7 +524,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "networks from virtualmachine [Metricbeat VSphere] ",
+          "title": "networks from virtualmachine [Metricbeat VSphere] ECS",
           "type": "pie"
         }
       },
@@ -827,7 +827,7 @@
             "desc"
           ]
         ],
-        "title": "[Metricbeat VSphere] search for event module vsphere",
+        "title": "search for event module [Metricbeat VSphere] ECS",
         "version": 1
       },
       "id": "1411b690-f017-11e9-aaf3-15199b632da7",
