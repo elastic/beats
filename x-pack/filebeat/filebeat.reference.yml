@@ -410,9 +410,9 @@ filebeat.modules:
     enabled: true
 
     # MISP Configuration
-    var.api_key: "6ZZAsBQ4TrFxJk34IXYHPtkCn9F6CoGqBDl5FSeJ" # API key for MISP
+    var.api_key: "XXXXXXXXXXXXXX" # API key for MISP
     var.json_objects_array: "response.Attribute"
-    var.url: "http://192.168.86.31/attributes/restSearch" # X.X.X.X is the IP address of the MISP server
+    var.url: "http://X.X.X.X/attributes/restSearch" # X.X.X.X is the IP address of the MISP server
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
