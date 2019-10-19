@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/ftp.log
+    os.linux:
+      - /var/log/bro/current/ftp.log
+    os.darwin:
+      - /usr/local/var/logs/current/ftp.log
+  - name: tags
+    default: [zeek.ftp]
+  - name: community_id
+    default: true
+
+ingest_pipeline: ingest/pipeline.json
+input: config/ftp.yml

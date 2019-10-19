@@ -1,0 +1,26 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.pe"
+
+        - from: "zeek.pe.id"
+          to: "zeek.pe.session_id"
+
+        - from: "zeek.pe.compile_ts"
+          to: "zeek.pe.compile_time"
+
+      ignore_missing: true
+      fail_on_error: false
