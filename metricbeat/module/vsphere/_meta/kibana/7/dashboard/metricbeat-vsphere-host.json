@@ -172,7 +172,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere Free vs Used CPU on Cluster stacked [metricbeat] ECS",
+        "title": "Free vs Used CPU on Cluster stacked [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -343,7 +343,7 @@
               }
             ]
           },
-          "title": "VSphere Free vs Used CPU on Cluster stacked [metricbeat] ECS",
+          "title": "Free vs Used CPU on Cluster stacked [metricbeat VSphere] ECS",
           "type": "area"
         }
       },
@@ -375,7 +375,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere Cluster Memory free vs used stacked [metricbeat] ECS",
+        "title": "Cluster Memory free vs used stacked [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -546,7 +546,7 @@
               }
             ]
           },
-          "title": "VSphere Cluster Memory free vs used stacked [metricbeat] ECS",
+          "title": "Cluster Memory free vs used stacked [Metricbeat VSphere] ECS",
           "type": "area"
         }
       },
@@ -578,7 +578,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere Free vs Used Datastore [metricbeat] ECS",
+        "title": "Free vs Used Datastore [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -749,7 +749,7 @@
               }
             ]
           },
-          "title": "VSphere Free vs Used Datastore [metricbeat] ECS",
+          "title": "Free vs Used Datastore [Metricbeat VSphere] ECS",
           "type": "area"
         }
       },
@@ -780,7 +780,7 @@
             }
           }
         },
-        "title": "VSphere Host top RAM util [metricbeat] ECS",
+        "title": "Host top RAM util [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -882,7 +882,7 @@
             "time_field": "",
             "type": "gauge"
           },
-          "title": "VSphere Host top RAM util [metricbeat] ECS",
+          "title": "Host top RAM util [Metricbeat VSphere] ECS",
           "type": "metrics"
         }
       },
@@ -907,7 +907,7 @@
             }
           }
         },
-        "title": "VSphere Host top CPU util [metricbeat] ECS",
+        "title": "Host top CPU util [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1009,7 +1009,7 @@
             "time_field": "",
             "type": "gauge"
           },
-          "title": "VSphere Host top CPU util [metricbeat] ECS",
+          "title": "Host top CPU util [Metricbeat VSphere] ECS",
           "type": "metrics"
         }
       },
@@ -1034,7 +1034,7 @@
             }
           }
         },
-        "title": "VSphere top datastore used [metricbeat] ECS",
+        "title": "top datastore used [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1141,7 +1141,7 @@
             "time_field": "",
             "type": "gauge"
           },
-          "title": "VSphere top datastore used [metricbeat] ECS",
+          "title": "top datastore used [Metricbeat VSphere] ECS",
           "type": "metrics"
         }
       },
@@ -1167,7 +1167,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere Datastore types [metricbeat] ECS",
+        "title": "Datastore types [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1219,7 +1219,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "VSphere Datastore types [metricbeat] ECS",
+          "title": "Datastore types [Metricbeat VSphere] ECS",
           "type": "pie"
         }
       },
@@ -1263,7 +1263,7 @@
             "desc"
           ]
         ],
-        "title": "[metricbeat] search for event module vsphere",
+        "title": "[Metricbeat VSphere] search for event module vsphere",
         "version": 1
       },
       "id": "1411b690-f017-11e9-aaf3-15199b632da7",

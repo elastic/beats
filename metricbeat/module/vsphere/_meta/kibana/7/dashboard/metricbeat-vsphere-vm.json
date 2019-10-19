@@ -138,7 +138,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere virtualmachine used CPU total ram network [metricbeat] ECS",
+        "title": "virtualmachine used CPU total ram network [Metricbeat VSphere] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -324,7 +324,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "VSphere virtualmachine used CPU total ram network [metricbeat] ECS",
+          "title": "virtualmachine used CPU total ram network [Metricbeat VSphere] ECS",
           "type": "table"
         }
       },
@@ -356,7 +356,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere OS Pie [metricbeat] ECS",
+        "title": "OS Pie [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -424,7 +424,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "VSphere OS Pie [metricbeat] ECS",
+          "title": "OS Pie [Metricbeat VSphere] ECS",
           "type": "pie"
         }
       },
@@ -456,7 +456,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere networks from virtualmachine [Metricbeat] ",
+        "title": "networks from virtualmachine [Metricbeat VSphere] ",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -524,7 +524,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "VSphere networks from virtualmachine [Metricbeat] ",
+          "title": "networks from virtualmachine [Metricbeat VSphere] ",
           "type": "pie"
         }
       },
@@ -556,7 +556,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere how many VMs run on a ESXI host [metricbeat] ECS",
+        "title": "how many VMs run on a ESXI host [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -624,7 +624,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "VSphere how many VMs run on a ESXI host [metricbeat] ECS",
+          "title": "how many VMs run on a ESXI host [Metricbeat VSphere] ECS",
           "type": "pie"
         }
       },
@@ -656,7 +656,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VSphere VM running on what ESXi host [metricbeat] ECS",
+        "title": "VM running on what ESXi host [Metricbeat VSphere] ECS",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -783,7 +783,7 @@
               }
             ]
           },
-          "title": "VSphere VM running on what ESXi host [metricbeat] ECS",
+          "title": "VM running on what ESXi host [Metricbeat VSphere] ECS",
           "type": "heatmap"
         }
       },
@@ -827,7 +827,7 @@
             "desc"
           ]
         ],
-        "title": "[metricbeat] search for event module vsphere",
+        "title": "[Metricbeat VSphere] search for event module vsphere",
         "version": 1
       },
       "id": "1411b690-f017-11e9-aaf3-15199b632da7",
