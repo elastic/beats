@@ -65,7 +65,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "Filebeat-MISP-Overview ",
+        "title": "[Filebeat MISP] Overview",
         "version": 1
       },
       "id": "c6cac9e0-f105-11e9-9a88-690b10c8ee99",
@@ -90,8 +90,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-19T03:42:57.450Z",
-      "version": "WzM1MiwxNF0="
+      "updated_at": "2019-10-19T18:56:55.244Z",
+      "version": "WzM2NCwxNV0="
     },
     {
       "attributes": {
