@@ -1,0 +1,63 @@
+{
+  "description": "Pipeline for normalizing Zeek dhcp.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.dhcp.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.dhcp.ts"
+      }
+    },
+    {
+      "set": {
+        "field": "source.address",
+        "value": "{{zeek.dhcp.address.client}}",
+        "if": "ctx.zeek.dhcp.address?.client != null"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.address",
+        "value": "{{zeek.dhcp.address.server}}",
+        "if": "ctx.zeek.dhcp.address?.server != null"
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{source.address}}",
+        "if": "ctx.source?.address != null"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.ip",
+        "value": "{{destination.address}}",
+        "if": "ctx.destination?.address != null"
+      }
+    },
+    {
+      "set": {
+        "field": "network.name",
+        "value": "{{zeek.dns.domain}}",
+        "if": "ctx.zeek.dns.domain != null"
+      }
+    }
+  ],
+  "on_failure": [{
+    "set": {
+      "field": "error.message",
+      "value": "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

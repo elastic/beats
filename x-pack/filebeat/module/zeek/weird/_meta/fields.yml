@@ -1,0 +1,29 @@
+- name: weird
+  type: group
+  description: >
+    Fields exported by the Zeek Weird log
+  fields:
+    - name: name
+      type: keyword
+      description: |
+        The name of the weird that occurred.
+
+    - name: additional_info
+      type: keyword
+      description: |
+        Additional information accompanying the weird if any.
+
+    - name: notice
+      type: boolean
+      description: |
+        Indicate if this weird was also turned into a notice.
+
+    - name: peer
+      type: keyword
+      description: |
+        The peer that originated this weird. This is helpful in cluster deployments if a particular cluster node is having trouble to help identify which node is having trouble.
+
+    - name: identifier
+      type: keyword
+      description: |
+        This field is to be provided when a weird is generated for the purpose of deduplicating weirds. The identifier string should be unique for a single instance of the weird. This field is used to define when a weird is conceptually a duplicate of a previous weird.
