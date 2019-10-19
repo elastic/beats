@@ -106,7 +106,7 @@
             }
           }
         },
-        "title": "MISP Threat Indicator Type",
+        "title": "Threat Indicator Type [Filebeat MISP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -148,7 +148,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "MISP Threat Indicator Type",
+          "title": "Threat Indicator Type [Filebeat MISP]",
           "type": "pie"
         }
       },
@@ -164,8 +164,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-19T03:42:57.450Z",
-      "version": "WzM1MywxNF0="
+      "updated_at": "2019-10-19T19:03:26.386Z",
+      "version": "WzM2NSwxNV0="
     },
     {
       "attributes": {
@@ -180,7 +180,7 @@
             }
           }
         },
-        "title": "Threat Indicators per Month",
+        "title": "Threat Indicators per Month  [Filebeat MISP]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -296,7 +296,7 @@
               }
             ]
           },
-          "title": "Threat Indicators per Month",
+          "title": "Threat Indicators per Month  [Filebeat MISP]",
           "type": "histogram"
         }
       },
@@ -312,8 +312,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-19T03:42:57.450Z",
-      "version": "WzM1NCwxNF0="
+      "updated_at": "2019-10-19T19:03:46.399Z",
+      "version": "WzM2NiwxNV0="
     },
     {
       "attributes": {
@@ -328,7 +328,7 @@
             }
           }
         },
-        "title": "Threat Indicator Geo Map",
+        "title": "Threat Indicator Geo Map [Filebeat MISP]",
         "uiStateJSON": {
           "mapCenter": [
             -0.17578097424708533,
@@ -402,7 +402,7 @@
               }
             }
           },
-          "title": "Threat Indicator Geo Map",
+          "title": "Threat Indicator Geo Map [Filebeat MISP]",
           "type": "tile_map"
         }
       },
@@ -418,8 +418,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-19T03:42:57.450Z",
-      "version": "WzM1NSwxNF0="
+      "updated_at": "2019-10-19T19:04:04.029Z",
+      "version": "WzM2NywxNV0="
     }
   ],
   "version": "8.0.0-SNAPSHOT"
