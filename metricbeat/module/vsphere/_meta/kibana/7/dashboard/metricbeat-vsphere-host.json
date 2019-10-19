@@ -5,12 +5,113 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "optionsJSON": "{\"useMargins\":true,\"hidePanelTitles\":false}",
-        "panelsJSON": "[{\"version\":\"7.4.0\",\"gridData\":{\"x\":0,\"y\":0,\"w\":24,\"h\":15,\"i\":\"5a175530-7b6d-4d40-af46-5c0c518a97bb\"},\"panelIndex\":\"5a175530-7b6d-4d40-af46-5c0c518a97bb\",\"embeddableConfig\":{},\"panelRefName\":\"panel_0\"},{\"version\":\"7.4.0\",\"gridData\":{\"x\":24,\"y\":0,\"w\":24,\"h\":15,\"i\":\"39b334e1-c61e-42c3-8e2f-ac534a19a986\"},\"panelIndex\":\"39b334e1-c61e-42c3-8e2f-ac534a19a986\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"},{\"version\":\"7.4.0\",\"gridData\":{\"x\":0,\"y\":15,\"w\":24,\"h\":15,\"i\":\"5eb32eda-4f81-490e-a86f-6fc65ea3892a\"},\"panelIndex\":\"5eb32eda-4f81-490e-a86f-6fc65ea3892a\",\"embeddableConfig\":{},\"panelRefName\":\"panel_2\"},{\"version\":\"7.4.0\",\"gridData\":{\"x\":0,\"y\":30,\"w\":48,\"h\":20,\"i\":\"1c91b931-f2ec-4284-90eb-4b257f6f7904\"},\"panelIndex\":\"1c91b931-f2ec-4284-90eb-4b257f6f7904\",\"embeddableConfig\":{},\"panelRefName\":\"panel_3\"},{\"version\":\"7.4.0\",\"gridData\":{\"x\":0,\"y\":50,\"w\":48,\"h\":18,\"i\":\"712d4e28-54ad-452f-9f00-525764d4850d\"},\"panelIndex\":\"712d4e28-54ad-452f-9f00-525764d4850d\",\"embeddableConfig\":{},\"panelRefName\":\"panel_4\"},{\"version\":\"7.4.0\",\"gridData\":{\"x\":0,\"y\":68,\"w\":48,\"h\":18,\"i\":\"b8b5096a-30e1-4249-b8ca-eb4509b4ba59\"},\"panelIndex\":\"b8b5096a-30e1-4249-b8ca-eb4509b4ba59\",\"embeddableConfig\":{},\"panelRefName\":\"panel_5\"},{\"version\":\"7.4.0\",\"gridData\":{\"w\":24,\"h\":15,\"x\":24,\"y\":15,\"i\":\"e561ff05-9f8f-4412-a2e1-d656cb965e96\"},\"panelIndex\":\"e561ff05-9f8f-4412-a2e1-d656cb965e96\",\"embeddableConfig\":{},\"panelRefName\":\"panel_6\"}]",
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5a175530-7b6d-4d40-af46-5c0c518a97bb",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "5a175530-7b6d-4d40-af46-5c0c518a97bb",
+            "panelRefName": "panel_0",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "39b334e1-c61e-42c3-8e2f-ac534a19a986",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "panelIndex": "39b334e1-c61e-42c3-8e2f-ac534a19a986",
+            "panelRefName": "panel_1",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5eb32eda-4f81-490e-a86f-6fc65ea3892a",
+              "w": 24,
+              "x": 0,
+              "y": 15
+            },
+            "panelIndex": "5eb32eda-4f81-490e-a86f-6fc65ea3892a",
+            "panelRefName": "panel_2",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 20,
+              "i": "1c91b931-f2ec-4284-90eb-4b257f6f7904",
+              "w": 48,
+              "x": 0,
+              "y": 30
+            },
+            "panelIndex": "1c91b931-f2ec-4284-90eb-4b257f6f7904",
+            "panelRefName": "panel_3",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 18,
+              "i": "712d4e28-54ad-452f-9f00-525764d4850d",
+              "w": 48,
+              "x": 0,
+              "y": 50
+            },
+            "panelIndex": "712d4e28-54ad-452f-9f00-525764d4850d",
+            "panelRefName": "panel_4",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 18,
+              "i": "b8b5096a-30e1-4249-b8ca-eb4509b4ba59",
+              "w": 48,
+              "x": 0,
+              "y": 68
+            },
+            "panelIndex": "b8b5096a-30e1-4249-b8ca-eb4509b4ba59",
+            "panelRefName": "panel_5",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "e561ff05-9f8f-4412-a2e1-d656cb965e96",
+              "w": 24,
+              "x": 24,
+              "y": 15
+            },
+            "panelIndex": "e561ff05-9f8f-4412-a2e1-d656cb965e96",
+            "panelRefName": "panel_6",
+            "version": "7.4.0"
+          }
+        ],
         "timeRestore": false,
-        "title": "[Metricbeat] VSphere Hosts Overview ECS",
+        "title": "[Metricbeat VSphere] Hosts Overview ECS",
         "version": 1
       },
       "id": "0ebd0be0-f049-11e9-aaf3-15199b632da7",
@@ -55,20 +156,196 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-16T19:22:35.305Z",
-      "version": "WzQyNywyXQ=="
+      "updated_at": "2019-10-19T09:21:42.191Z",
+      "version": "WzY4NiwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "savedSearchRefName": "search_0",
         "title": "VSphere Free vs Used CPU on Cluster stacked [metricbeat] ECS",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"VSphere Free vs Used CPU on Cluster stacked [metricbeat] ECS\",\"type\":\"area\",\"params\":{\"type\":\"area\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Free\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"area\",\"mode\":\"normal\",\"data\":{\"label\":\"Free\",\"id\":\"1\"},\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"},{\"show\":true,\"mode\":\"stacked\",\"type\":\"area\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"Used\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"thresholdLine\":{\"show\":false,\"value\":10,\"width\":1,\"style\":\"full\",\"color\":\"#34130C\"},\"labels\":{},\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"HH:mm:ss\"}},\"params\":{\"date\":true,\"interval\":\"PT30S\",\"format\":\"HH:mm:ss\",\"bounds\":{\"min\":\"2019-10-16T17:49:26.629Z\",\"max\":\"2019-10-16T18:04:26.629Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"max\"},{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"max\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"vsphere.host.cpu.free.mhz\",\"customLabel\":\"Free\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"vsphere.host.cpu.used.mhz\",\"customLabel\":\"Used\"}}]}"
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Free",
+                "field": "vsphere.host.cpu.free.mhz"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Used",
+                "field": "vsphere.host.cpu.used.mhz"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "HH:mm:ss"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-10-16T18:04:26.629Z",
+                    "min": "2019-10-16T17:49:26.629Z"
+                  },
+                  "date": true,
+                  "format": "HH:mm:ss",
+                  "interval": "PT30S"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 1,
+                  "aggType": "max",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "max",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Free"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "3",
+                  "label": "Used"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Free"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "VSphere Free vs Used CPU on Cluster stacked [metricbeat] ECS",
+          "type": "area"
+        }
       },
       "id": "ab07c5d0-f03f-11e9-aaf3-15199b632da7",
       "migrationVersion": {
@@ -82,20 +359,196 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-17T10:07:29.518Z",
-      "version": "WzQ0NywzXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMwNywxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "savedSearchRefName": "search_0",
         "title": "VSphere Cluster Memory free vs used stacked [metricbeat] ECS",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"VSphere Cluster Memory free vs used stacked [metricbeat] ECS\",\"type\":\"area\",\"params\":{\"type\":\"area\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"stacked\",\"type\":\"area\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"cardinal\",\"data\":{\"id\":\"2\",\"label\":\"Used\"},\"valueAxis\":\"ValueAxis-1\"},{\"show\":\"true\",\"type\":\"area\",\"mode\":\"stacked\",\"data\":{\"label\":\"Free\",\"id\":\"1\"},\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"cardinal\",\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"thresholdLine\":{\"show\":false,\"value\":10,\"width\":1,\"style\":\"full\",\"color\":\"#34130C\"},\"labels\":{},\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"HH:mm:ss\"}},\"params\":{\"date\":true,\"interval\":\"PT30S\",\"format\":\"HH:mm:ss\",\"bounds\":{\"min\":\"2019-10-16T17:55:00.451Z\",\"max\":\"2019-10-16T18:10:00.451Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":1,\"format\":{\"id\":\"bytes\"},\"params\":{},\"aggType\":\"max\"},{\"accessor\":2,\"format\":{\"id\":\"bytes\"},\"params\":{},\"aggType\":\"max\"}]}},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"vsphere.host.memory.used.bytes\",\"customLabel\":\"Used\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"vsphere.host.memory.free.bytes\",\"customLabel\":\"Free\"}}]}"
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Used",
+                "field": "vsphere.host.memory.used.bytes"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Free",
+                "field": "vsphere.host.memory.free.bytes"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "HH:mm:ss"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-10-16T18:10:00.451Z",
+                    "min": "2019-10-16T17:55:00.451Z"
+                  },
+                  "date": true,
+                  "format": "HH:mm:ss",
+                  "interval": "PT30S"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 1,
+                  "aggType": "max",
+                  "format": {
+                    "id": "bytes"
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "max",
+                  "format": {
+                    "id": "bytes"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "2",
+                  "label": "Used"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Free"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": ""
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "VSphere Cluster Memory free vs used stacked [metricbeat] ECS",
+          "type": "area"
+        }
       },
       "id": "47125df0-f040-11e9-aaf3-15199b632da7",
       "migrationVersion": {
@@ -109,20 +562,196 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-17T10:07:19.682Z",
-      "version": "WzQ0NSwzXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMwOCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "savedSearchRefName": "search_0",
         "title": "VSphere Free vs Used Datastore [metricbeat] ECS",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"VSphere Free vs Used Datastore [metricbeat] ECS\",\"type\":\"area\",\"params\":{\"type\":\"area\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Free\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"stacked\",\"type\":\"area\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"2\",\"label\":\"Used\"},\"valueAxis\":\"ValueAxis-1\"},{\"show\":\"true\",\"type\":\"area\",\"mode\":\"stacked\",\"data\":{\"label\":\"Free\",\"id\":\"1\"},\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"thresholdLine\":{\"show\":false,\"value\":10,\"width\":1,\"style\":\"full\",\"color\":\"#34130C\"},\"labels\":{},\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"HH:mm:ss\"}},\"params\":{\"date\":true,\"interval\":\"PT30S\",\"format\":\"HH:mm:ss\",\"bounds\":{\"min\":\"2019-10-16T17:56:40.605Z\",\"max\":\"2019-10-16T18:11:40.605Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":1,\"format\":{\"id\":\"bytes\"},\"params\":{},\"aggType\":\"max\"},{\"accessor\":2,\"format\":{\"id\":\"bytes\"},\"params\":{},\"aggType\":\"max\"}]}},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"vsphere.datastore.capacity.used.bytes\",\"customLabel\":\"Used\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"vsphere.datastore.capacity.free.bytes\",\"customLabel\":\"Free\"}}]}"
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Used",
+                "field": "vsphere.datastore.capacity.used.bytes"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Free",
+                "field": "vsphere.datastore.capacity.free.bytes"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "HH:mm:ss"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-10-16T18:11:40.605Z",
+                    "min": "2019-10-16T17:56:40.605Z"
+                  },
+                  "date": true,
+                  "format": "HH:mm:ss",
+                  "interval": "PT30S"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 1,
+                  "aggType": "max",
+                  "format": {
+                    "id": "bytes"
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "max",
+                  "format": {
+                    "id": "bytes"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "2",
+                  "label": "Used"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Free"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#34130C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Free"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "VSphere Free vs Used Datastore [metricbeat] ECS",
+          "type": "area"
+        }
       },
       "id": "783f2c50-f040-11e9-aaf3-15199b632da7",
       "migrationVersion": {
@@ -136,19 +765,126 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-17T10:07:38.228Z",
-      "version": "WzQ0OCwzXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMwOSwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "VSphere Host top RAM util [metricbeat] ECS",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"VSphere Host top RAM util [metricbeat] ECS\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"gauge\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"rgba(59,244,64,1)\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"max\",\"field\":\"vsphere.host.memory.total.bytes\"},{\"id\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\",\"type\":\"max\",\"field\":\"vsphere.host.memory.free.bytes\"},{\"script\":\"params.used / params.total\",\"id\":\"5e69b140-f047-11e9-8ffe-6377df51c23d\",\"type\":\"calculation\",\"variables\":[{\"id\":\"5fadf110-f047-11e9-8ffe-6377df51c23d\",\"name\":\"total\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"},{\"id\":\"61c84590-f047-11e9-8ffe-6377df51c23d\",\"name\":\"used\",\"field\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\"}]}],\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"filter\":{\"query\":\"\",\"language\":\"kuery\"},\"label\":\"\",\"terms_field\":\"vsphere.host.name\",\"terms_order_by\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\"}],\"time_field\":\"\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"axis_scale\":\"normal\",\"show_legend\":1,\"show_grid\":1,\"default_index_pattern\":\"metricbeat-*\",\"default_timefield\":\"@timestamp\",\"isModelInvalid\":false,\"gauge_color_rules\":[{\"value\":0.35,\"id\":\"3e4e64a0-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gt\",\"gauge\":\"rgba(252,220,0,1)\"},{\"value\":0.7,\"id\":\"8e4a5090-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gte\",\"gauge\":\"rgba(251,158,0,1)\"},{\"value\":0.95,\"id\":\"93d7d2d0-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gte\",\"gauge\":\"rgba(159,5,0,1)\",\"text\":null}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"gauge_max\":\"1\",\"filter\":{\"query\":\"event.module : \\\"vsphere\\\" \",\"language\":\"kuery\"},\"ignore_global_filter\":0,\"background_color\":null},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color": null,
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": "event.module : \"vsphere\" "
+            },
+            "gauge_color_rules": [
+              {
+                "gauge": "rgba(252,220,0,1)",
+                "id": "3e4e64a0-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gt",
+                "value": 0.35
+              },
+              {
+                "gauge": "rgba(251,158,0,1)",
+                "id": "8e4a5090-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gte",
+                "value": 0.7
+              },
+              {
+                "gauge": "rgba(159,5,0,1)",
+                "id": "93d7d2d0-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gte",
+                "text": null,
+                "value": 0.95
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_max": "1",
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "ignore_global_filter": 0,
+            "index_pattern": "metricbeat-*",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(59,244,64,1)",
+                "fill": 0.5,
+                "filter": {
+                  "language": "kuery",
+                  "query": ""
+                },
+                "formatter": "percent",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "vsphere.host.memory.total.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  },
+                  {
+                    "field": "vsphere.host.memory.free.bytes",
+                    "id": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                    "type": "max"
+                  },
+                  {
+                    "id": "5e69b140-f047-11e9-8ffe-6377df51c23d",
+                    "script": "params.used / params.total",
+                    "type": "calculation",
+                    "variables": [
+                      {
+                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "id": "5fadf110-f047-11e9-8ffe-6377df51c23d",
+                        "name": "total"
+                      },
+                      {
+                        "field": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                        "id": "61c84590-f047-11e9-8ffe-6377df51c23d",
+                        "name": "used"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "vsphere.host.name",
+                "terms_order_by": "51de05c0-f047-11e9-8ffe-6377df51c23d"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "gauge"
+          },
+          "title": "VSphere Host top RAM util [metricbeat] ECS",
+          "type": "metrics"
+        }
       },
       "id": "867e0c70-f048-11e9-aaf3-15199b632da7",
       "migrationVersion": {
@@ -156,19 +892,126 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-17T10:08:09.307Z",
-      "version": "WzQ1MSwzXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMxMCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "VSphere Host top CPU util [metricbeat] ECS",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"VSphere Host top CPU util [metricbeat] ECS\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"gauge\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"rgba(59,244,64,1)\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"max\",\"field\":\"vsphere.host.cpu.total.mhz\"},{\"id\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\",\"type\":\"max\",\"field\":\"vsphere.host.cpu.used.mhz\"},{\"script\":\"params.used / params.total\",\"id\":\"5e69b140-f047-11e9-8ffe-6377df51c23d\",\"type\":\"calculation\",\"variables\":[{\"id\":\"5fadf110-f047-11e9-8ffe-6377df51c23d\",\"name\":\"total\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"},{\"id\":\"61c84590-f047-11e9-8ffe-6377df51c23d\",\"name\":\"used\",\"field\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\"}]}],\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"filter\":{\"query\":\"\",\"language\":\"kuery\"},\"label\":\"\",\"terms_field\":\"vsphere.host.name\",\"terms_order_by\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\"}],\"time_field\":\"\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"axis_scale\":\"normal\",\"show_legend\":1,\"show_grid\":1,\"default_index_pattern\":\"metricbeat-*\",\"default_timefield\":\"@timestamp\",\"isModelInvalid\":false,\"gauge_color_rules\":[{\"value\":0.35,\"id\":\"3e4e64a0-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gt\",\"gauge\":\"rgba(252,220,0,1)\"},{\"value\":0.7,\"id\":\"8e4a5090-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gte\",\"gauge\":\"rgba(251,158,0,1)\"},{\"value\":0.95,\"id\":\"93d7d2d0-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gte\",\"gauge\":\"rgba(159,5,0,1)\",\"text\":null}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"gauge_max\":\"1\",\"filter\":{\"query\":\"event.module : \\\"vsphere\\\" \",\"language\":\"kuery\"},\"ignore_global_filter\":0,\"background_color\":null},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color": null,
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": "event.module : \"vsphere\" "
+            },
+            "gauge_color_rules": [
+              {
+                "gauge": "rgba(252,220,0,1)",
+                "id": "3e4e64a0-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gt",
+                "value": 0.35
+              },
+              {
+                "gauge": "rgba(251,158,0,1)",
+                "id": "8e4a5090-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gte",
+                "value": 0.7
+              },
+              {
+                "gauge": "rgba(159,5,0,1)",
+                "id": "93d7d2d0-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gte",
+                "text": null,
+                "value": 0.95
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_max": "1",
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "ignore_global_filter": 0,
+            "index_pattern": "metricbeat-*",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(59,244,64,1)",
+                "fill": 0.5,
+                "filter": {
+                  "language": "kuery",
+                  "query": ""
+                },
+                "formatter": "percent",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "vsphere.host.cpu.total.mhz",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  },
+                  {
+                    "field": "vsphere.host.cpu.used.mhz",
+                    "id": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                    "type": "max"
+                  },
+                  {
+                    "id": "5e69b140-f047-11e9-8ffe-6377df51c23d",
+                    "script": "params.used / params.total",
+                    "type": "calculation",
+                    "variables": [
+                      {
+                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "id": "5fadf110-f047-11e9-8ffe-6377df51c23d",
+                        "name": "total"
+                      },
+                      {
+                        "field": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                        "id": "61c84590-f047-11e9-8ffe-6377df51c23d",
+                        "name": "used"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "vsphere.host.name",
+                "terms_order_by": "51de05c0-f047-11e9-8ffe-6377df51c23d"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "gauge"
+          },
+          "title": "VSphere Host top CPU util [metricbeat] ECS",
+          "type": "metrics"
+        }
       },
       "id": "5f74c330-f048-11e9-aaf3-15199b632da7",
       "migrationVersion": {
@@ -176,19 +1019,131 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-17T10:08:21.750Z",
-      "version": "WzQ1MiwzXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMxMSwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "VSphere top datastore used [metricbeat] ECS",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"VSphere top datastore used [metricbeat] ECS\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"gauge\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"rgba(59,244,64,1)\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"max\",\"field\":\"vsphere.datastore.capacity.total.bytes\"},{\"id\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\",\"type\":\"max\",\"field\":\"vsphere.datastore.capacity.used.bytes\"},{\"id\":\"5aec7160-f047-11e9-8ffe-6377df51c23d\",\"type\":\"max\",\"field\":\"vsphere.datastore.capacity.used.pct\"},{\"script\":\"params.used / params.total\",\"id\":\"5e69b140-f047-11e9-8ffe-6377df51c23d\",\"type\":\"calculation\",\"variables\":[{\"id\":\"5fadf110-f047-11e9-8ffe-6377df51c23d\",\"name\":\"total\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"},{\"id\":\"61c84590-f047-11e9-8ffe-6377df51c23d\",\"name\":\"used\",\"field\":\"51de05c0-f047-11e9-8ffe-6377df51c23d\"}]}],\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"filter\":{\"query\":\"\",\"language\":\"kuery\"},\"label\":\"\",\"terms_field\":\"vsphere.datastore.name\",\"terms_order_by\":\"5aec7160-f047-11e9-8ffe-6377df51c23d\"}],\"time_field\":\"\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"axis_scale\":\"normal\",\"show_legend\":1,\"show_grid\":1,\"default_index_pattern\":\"metricbeat-*\",\"default_timefield\":\"@timestamp\",\"isModelInvalid\":false,\"gauge_color_rules\":[{\"value\":0.35,\"id\":\"3e4e64a0-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gt\",\"gauge\":\"rgba(252,220,0,1)\"},{\"value\":0.7,\"id\":\"8e4a5090-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gte\",\"gauge\":\"rgba(251,158,0,1)\"},{\"value\":0.95,\"id\":\"93d7d2d0-f047-11e9-8ffe-6377df51c23d\",\"operator\":\"gte\",\"gauge\":\"rgba(159,5,0,1)\",\"text\":null}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"gauge_max\":\"1\",\"filter\":{\"query\":\"event.module : \\\"vsphere\\\" \",\"language\":\"kuery\"},\"ignore_global_filter\":0,\"background_color\":null},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color": null,
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": "event.module : \"vsphere\" "
+            },
+            "gauge_color_rules": [
+              {
+                "gauge": "rgba(252,220,0,1)",
+                "id": "3e4e64a0-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gt",
+                "value": 0.35
+              },
+              {
+                "gauge": "rgba(251,158,0,1)",
+                "id": "8e4a5090-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gte",
+                "value": 0.7
+              },
+              {
+                "gauge": "rgba(159,5,0,1)",
+                "id": "93d7d2d0-f047-11e9-8ffe-6377df51c23d",
+                "operator": "gte",
+                "text": null,
+                "value": 0.95
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_max": "1",
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "ignore_global_filter": 0,
+            "index_pattern": "metricbeat-*",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(59,244,64,1)",
+                "fill": 0.5,
+                "filter": {
+                  "language": "kuery",
+                  "query": ""
+                },
+                "formatter": "percent",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "vsphere.datastore.capacity.total.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  },
+                  {
+                    "field": "vsphere.datastore.capacity.used.bytes",
+                    "id": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                    "type": "max"
+                  },
+                  {
+                    "field": "vsphere.datastore.capacity.used.pct",
+                    "id": "5aec7160-f047-11e9-8ffe-6377df51c23d",
+                    "type": "max"
+                  },
+                  {
+                    "id": "5e69b140-f047-11e9-8ffe-6377df51c23d",
+                    "script": "params.used / params.total",
+                    "type": "calculation",
+                    "variables": [
+                      {
+                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "id": "5fadf110-f047-11e9-8ffe-6377df51c23d",
+                        "name": "total"
+                      },
+                      {
+                        "field": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                        "id": "61c84590-f047-11e9-8ffe-6377df51c23d",
+                        "name": "used"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "vsphere.datastore.name",
+                "terms_order_by": "5aec7160-f047-11e9-8ffe-6377df51c23d"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "gauge"
+          },
+          "title": "VSphere top datastore used [metricbeat] ECS",
+          "type": "metrics"
+        }
       },
       "id": "79dcd290-f047-11e9-aaf3-15199b632da7",
       "migrationVersion": {
@@ -196,20 +1151,77 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-17T10:07:54.966Z",
-      "version": "WzQ1MCwzXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMxMiwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "savedSearchRefName": "search_0",
         "title": "VSphere Datastore types [metricbeat] ECS",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"VSphere Datastore types [metricbeat] ECS\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100},\"dimensions\":{\"metric\":{\"accessor\":0,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"vsphere.datastore.fstype\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "vsphere.datastore.fstype",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "dimensions": {
+              "metric": {
+                "accessor": 0,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "VSphere Datastore types [metricbeat] ECS",
+          "type": "pie"
+        }
       },
       "id": "d6370680-f049-11e9-aaf3-15199b632da7",
       "migrationVersion": {
@@ -223,8 +1235,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-17T10:08:39.899Z",
-      "version": "WzQ1NSwzXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMxMywxXQ=="
     },
     {
       "attributes": {
@@ -234,7 +1246,16 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"event.module: \\\"vsphere\\\" \",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "event.module: \"vsphere\" "
+            },
+            "version": true
+          }
         },
         "sort": [
           [
@@ -257,8 +1278,8 @@
         }
       ],
       "type": "search",
-      "updated_at": "2019-10-16T13:15:52.312Z",
-      "version": "WzQwMCwyXQ=="
+      "updated_at": "2019-10-19T09:14:27.107Z",
+      "version": "WzMwNiwxXQ=="
     }
   ],
   "version": "7.4.0"
