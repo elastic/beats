@@ -19,10 +19,11 @@ package metrics
 
 import (
 	"github.com/pkg/errors"
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func init() {
