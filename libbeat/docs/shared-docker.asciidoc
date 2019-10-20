@@ -114,7 +114,7 @@ docker run \
 endif::[]
 
 <1> Substitute your Kibana and Elasticsearch hosts and ports.
-<2> If you are using the hosted Elasticsearch Service in Elastic Cloud, replace
+<2> If you are using the hosted {ess} in {ecloud}, replace
 the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password
 using this syntax:
 
@@ -254,7 +254,7 @@ docker run -d \
 endif::[]
 
 <1> Substitute your Elasticsearch hosts and ports.
-<2> If you are using the hosted Elasticsearch Service in Elastic Cloud, replace
+<2> If you are using the hosted {ess} in {ecloud}, replace
 the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password
 using the syntax shown earlier.
 
