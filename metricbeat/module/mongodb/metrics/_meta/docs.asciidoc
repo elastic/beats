@@ -1,40 +1,5 @@
 This is the `metrics` metricset of the MongoDB module.
 
-It requires the following privileges:
+It requires the following privileges, which is covered by the https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor[`clusterMonitor` role]:
 
 - https://docs.mongodb.com/manual/reference/privilege-actions/#serverStatus[`serverStatus` action] on https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource[`cluster` resource]
-
-You can use the following command in Mongo shell to create the role (make sure you are using the `admin` db by using `db` command in Mongo shell).
-
-["source","js",subs="attributes"]
-----
-db.createRole(
-   {
-     role: "metricsRole",
-     privileges: [
-       { resource: { cluster: true }, actions: ["serverStatus"] }
-     ],
-     roles: []
-   }
-)
-----
-
-You can then use the following command in Mongo shell to create the privileged user (make sure you are using the `admin` db by using `db` command in Mongo shell).
-
-["source","js",subs="attributes"]
-----
-db.createUser(
-    {
-        user: "beats",
-        pwd: "pass",
-        roles: ["metricsRole"]
-    }
-)
-----
-
-You can use the following command in Mongo shell to grant the role to an existing user (make sure you are using the `admin` db by using `db` command in Mongo shell).
-
-["source","js",subs="attributes"]
-----
-db.grantRolesToUser("user", ["metricsRole"])
-----
