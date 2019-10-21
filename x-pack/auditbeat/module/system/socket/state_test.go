@@ -8,38 +8,19 @@ package socket
 
 import (
 	"encoding/binary"
-	"errors"
+	"fmt"
 	"net"
 	"testing"
 	"time"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
-
-type testReporter struct {
-	received []mb.Event
-	errors   []error
-}
-
-func (t *testReporter) Event(event mb.Event) bool {
-	t.received = append(t.received, event)
-	return true
-}
-
-func (t *testReporter) Error(err error) bool {
-	t.errors = append(t.errors, err)
-	return true
-}
-
-func (t *testReporter) Done() <-chan struct{} {
-	// Unused
-	return nil
-}
 
 type logWrapper testing.T
 
@@ -108,7 +89,9 @@ func TestTCPConnWithProcess(t *testing.T) {
 		},
 		&doExit{Meta: meta(1234, 1234, 18)},
 	}
-	feedEvents(evs, st, t)
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
 	st.ExpireOlder()
 	flows, err := getFlows(st.DoneFlows(), all)
 	if err != nil {
@@ -177,16 +160,25 @@ func ipv4(ip string) uint32 {
 	return tracing.MachineEndian.Uint32(netIP)
 }
 
-func feedEvents(evs []event, st *state, t *testing.T) {
+func feedEvents(evs []event, st *state, t *testing.T) error {
 	for idx, ev := range evs {
 		t.Logf("Delivering event %d: %s", idx, ev.String())
 		// TODO: err
-		ev.Update(st)
+		if err := ev.Update(st); err != nil {
+			return errors.Wrapf(err, "error feeding event '%s'", ev.String())
+		}
 	}
+	return nil
 }
 
 func all(*flow) bool {
 	return true
+}
+
+type noDNSResolution struct{}
+
+func (noDNSResolution) ResolveIP(pid uint32, ip net.IP) (domain string, found bool) {
+	return "", false
 }
 
 func getFlows(list linkedList, filter func(*flow) bool) (evs []beat.Event, err error) {
@@ -261,4 +253,132 @@ func copyCString(dst []byte, src []byte) {
 	} else {
 		dst[len(dst)-1] = 0
 	}
+}
+
+type dnsTestCase struct {
+	found      bool
+	proc       *process
+	ip, domain string
+}
+
+type dnsTestCases []dnsTestCase
+
+func (c dnsTestCases) Run(t *testing.T) {
+	for idx, test := range c {
+		msg := fmt.Sprintf("test entry #%d : %+v", idx, test)
+		domain, found := test.proc.ResolveIP(net.ParseIP(test.ip))
+		assert.Equal(t, test.found, found, msg)
+		assert.Equal(t, test.domain, domain, msg)
+	}
+}
+
+func TestDNSTracker(t *testing.T) {
+	const infiniteExpiration = time.Hour * 3
+	local1 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55555}
+	local2 := net.UDPAddr{IP: net.ParseIP("192.168.0.2"), Port: 55556}
+	trV4 := dns.Transaction{
+		TXID:      1234,
+		Client:    local1,
+		Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+		Domain:    "example.net",
+		Addresses: []net.IP{net.ParseIP("192.0.2.12"), net.ParseIP("192.0.2.13")},
+	}
+	trV6 := dns.Transaction{
+		TXID:      1235,
+		Client:    local2,
+		Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+		Domain:    "example.com",
+		Addresses: []net.IP{net.ParseIP("2001:db8::1111"), net.ParseIP("2001:db8::2222")},
+	}
+	t.Run("transaction before register", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{true, proc1, "2001:db8::1111", "example.com"},
+			{true, proc1, "2001:db8::2222", "example.com"},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
+	})
+	t.Run("transaction after register", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{true, proc1, "2001:db8::1111", "example.com"},
+			{true, proc1, "2001:db8::2222", "example.com"},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
+	})
+	t.Run("unknown local endpoint", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc1, "192.0.2.13", "example.net"},
+			{false, proc1, "2001:db8::1111", ""},
+			{false, proc1, "2001:db8::2222", ""},
+			{false, proc2, "192.0.2.12", ""},
+			{false, proc2, "2001:db8::2222", ""},
+			{false, proc1, "192.168.0.2", ""},
+			{false, proc1, "2001:db8::3333", ""},
+		}.Run(t)
+	})
+	t.Run("expiration", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		tracker := newDNSTracker(10 * time.Millisecond)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV6)
+		time.Sleep(time.Millisecond * 50)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc1)
+		dnsTestCases{
+			{false, proc1, "192.0.2.12", ""},
+			{false, proc1, "192.0.2.13", ""},
+			{false, proc1, "2001:db8::1111", ""},
+			{false, proc1, "2001:db8::2222", ""},
+		}.Run(t)
+	})
+	t.Run("same IP different domains", func(t *testing.T) {
+		proc1 := &process{pid: 123}
+		proc2 := &process{pid: 124}
+		trV4alt := dns.Transaction{
+			TXID:      1234,
+			Client:    local2,
+			Server:    net.UDPAddr{IP: net.ParseIP("8.8.8.8"), Port: 53},
+			Domain:    "example.com",
+			Addresses: []net.IP{net.ParseIP("192.0.2.12"), net.ParseIP("192.0.2.13")},
+		}
+		tracker := newDNSTracker(infiniteExpiration)
+		tracker.AddTransaction(trV4)
+		tracker.AddTransaction(trV4alt)
+		tracker.RegisterEndpoint(local1, proc1)
+		tracker.RegisterEndpoint(local2, proc2)
+		dnsTestCases{
+			{true, proc1, "192.0.2.12", "example.net"},
+			{true, proc2, "192.0.2.12", "example.com"},
+		}.Run(t)
+	})
 }

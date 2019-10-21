@@ -265,7 +265,7 @@ ifndef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} export config
-{beatname_lc} export template --es.version {stack-version} --index myindexname
+{beatname_lc} export template --es.version {version} --index myindexname
 {beatname_lc} export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 -----
 endif::no_dashboards[]
@@ -274,7 +274,7 @@ ifdef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} export config
-{beatname_lc} export template --es.version {stack-version} --index myindexname
+{beatname_lc} export template --es.version {version} --index myindexname
 -----
 endif::no_dashboards[]
 endif::serverless[]
@@ -283,7 +283,7 @@ ifdef::serverless[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} export config
-{beatname_lc} export template --es.version {stack-version} --index myindexname
+{beatname_lc} export template --es.version {version} --index myindexname
 {beatname_lc} export function cloudwatch
 -----
 endif::serverless[]

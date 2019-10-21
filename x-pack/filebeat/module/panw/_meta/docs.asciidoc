@@ -104,8 +104,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Category |  | panw.panos.url.category
 | Severity | log.level |
 | Direction | network.direction |
-| Source Location | source.geo.country_iso_code |
-| Destination Location | destination.geo.country_iso_code |
+| Source Location | source.geo.name |
+| Destination Location | destination.geo.name |
 | PCAP_id |  | panw.panos.network.pcap_id
 | Filedigest |  | panw.panos.file.hash
 | User Agent | user_agent.original |

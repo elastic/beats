@@ -30,12 +30,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add Filebeat Azure Dashboards {pull}14127[14127]
 - Add read_buffer configuration option. {pull}11739[11739]
 - `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
 - Add support for gzipped files in S3 input {pull}13980[13980]
+- Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
 
 *Heartbeat*
 
@@ -168,6 +170,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix delay in enforcing close_renamed and close_removed options. {issue}13488[13488] {pull}13907[13907]
 - Fix missing netflow fields in index template. {issue}13768[13768] {pull}13914[13914]
 - Fix cisco module's asa and ftd filesets parsing of domain names where an IP address is expected. {issue}14034[14034]
+- Fixed increased memory usage with large files when multiline pattern does not match. {issue}14068[14068]
+- panw module: Use geo.name instead of geo.country_iso_code for free-form location. {issue}13272[13272]
+- Fix azure fields names. {pull}14098[14098]
+- Fix calculation of `network.bytes` and `network.packets` for bi-directional netflow events. {pull}14111[14111]
+- Fix timezone parsing of MySQL module ingest pipelines. {pull}14130[14130]
 
 *Heartbeat*
 
@@ -219,6 +226,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix rds metricset dashboard. {pull}13721[13721]
 - Ignore prometheus untyped metrics with NaN value. {issue}13750[13750] {pull}13790[13790]
 - Change kubernetes.event.message to text {pull}13964[13964]
+- Fix performance counter values for windows/perfmon metricset.{issue}14036[14036] {pull}14039[14039]
 
 *Packetbeat*
 
@@ -283,7 +291,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use less restrictive API to check if template exists. {pull}13847[13847]
 - Do not check for alias when setup.ilm.check_exists is false. {pull}13848[13848]
 - Add support for numeric time zone offsets in timestamp processor. {pull}13902[13902]
+- Add condition to the config file template for add_kubernetes_metadata {pull}14056[14056]
 - Marking Central Management deprecated. {pull}14018[14018]
+- Add `keep_null` setting to allow Beats to publish null values in events. {issue}5522[5522] {pull}13928[13928]
 
 *Auditbeat*
 
@@ -291,6 +301,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Process: Add file hash of process executable. {pull}11722[11722]
 - Socket: Add network.transport and network.community_id. {pull}12231[12231]
 - Host: Fill top-level host fields. {pull}12259[12259]
+- Socket: Add DNS enrichment. {pull}14004[14004]
 
 *Filebeat*
 
@@ -339,13 +350,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ingesting Cisco FTD logs over syslog. {pull}13286[13286]
 - Update CoreDNS module to populate ECS DNS fields. {issue}13320[13320] {pull}13505[13505]
 - Parse query steps in PostgreSQL slowlogs. {issue}13496[13496] {pull}13701[13701]
-- Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776]
+- Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776] {pull}14033[14033]
 - Add support to set the document id in the json reader. {pull}5844[5844]
 - Add input httpjson. {issue}13545[13545] {pull}13546[13546]
 - Filebeat Netflow input: Remove beta label. {pull}13858[13858]
 - Remove `event.timezone` from events that don't need it in some modules that support log formats with and without timezones. {pull}13918[13918]
 - Add ExpandEventListFromField config option in the kafka input. {pull}13965[13965]
+- Add ELB fileset to AWS module. {pull}14020[14020]
 - Add module for MISP (Malware Information Sharing Platform). {pull}13805[13805]
+- Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -421,6 +434,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `metrics_path` as known hint for autodiscovery {pull}13996[13996]
 - Leverage KUBECONFIG when creating k8s client. {pull}13916[13916]
 - Add ability to filter by tags for cloudwatch metricset. {pull}13758[13758] {issue}13145[13145]
+- Add Oracle overview dashboard {pull}14021[14021]
 
 *Packetbeat*
 
