@@ -15,7 +15,6 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
-:has_ml_jobs: yes
 :has_central_config:
 :has_solutions:
 :has_docker_label_ex:
