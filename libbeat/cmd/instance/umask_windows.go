@@ -17,9 +17,11 @@
 
 package instance
 
-import "github.com/elastic/go-sysinfo/types"
+import "errors"
+
+var ErrNotImplemented = errors.New("not implemented on windows")
 
 func setUmask(newmask int) error {
 	// No way to set umask on Windows
-	return types.ErrNotImplemented
+	return ErrNotImplemented
 }

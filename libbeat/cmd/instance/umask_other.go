@@ -19,7 +19,12 @@
 
 package instance
 
-import "syscall"
+import (
+	"errors"
+	"syscall"
+)
+
+var ErrNotImplemented = errors.New("not implemented on platform")
 
 func setUmask(newmask int) error {
 	syscall.Umask(newmask)
