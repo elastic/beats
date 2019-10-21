@@ -24,7 +24,7 @@ import (
 	"syscall"
 )
 
-var ErrNotImplemented = errors.New("not implemented on platform")
+var errNotImplemented = errors.New("not implemented on platform")
 
 func setUmask(newmask int) error {
 	syscall.Umask(newmask)

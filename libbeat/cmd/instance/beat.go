@@ -148,7 +148,7 @@ func initRand() {
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
 	err := setUmaskWithSettings(settings)
-	if err != nil && err != ErrNotImplemented {
+	if err != nil && err != errNotImplemented {
 		return errw.Wrap(err, "could not set umask")
 	}
 

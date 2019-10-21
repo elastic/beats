@@ -19,7 +19,7 @@ package instance
 
 import "errors"
 
-var ErrNotImplemented = errors.New("not implemented on windows")
+var errNotImplemented = errors.New("not implemented on windows")
 
 func setUmask(newmask int) error {
 	// No way to set umask on Windows
