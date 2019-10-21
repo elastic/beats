@@ -356,7 +356,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "OS Pie [Metricbeat VSphere] ECS",
+        "title": "OS Distribution [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
