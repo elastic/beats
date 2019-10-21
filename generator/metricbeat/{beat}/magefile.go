@@ -9,25 +9,13 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/target/build"
+	"github.com/elastic/beats/dev-tools/mage/target/collectors"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/dev-tools/mage/target/update"
 	"github.com/elastic/beats/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
-
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/build"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/pkg"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/collectors"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/update"
 )
 
 func init() {
@@ -92,4 +80,25 @@ func configYML() error {
 		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
 	}
 	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return devtools.Clean()
+}
+
+// Check formats code, updates generated content, check for common errors, and
+// checks for any modified files.
+func Check() {
+	common.Check()
+}
+
+// Fmt formats source code (.go and .py) and adds license headers.
+func Fmt() {
+	common.Fmt()
+}
+
+// Update updates the generated files (aka make update).
+func Update() error {
+	return update.Update()
 }

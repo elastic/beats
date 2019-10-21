@@ -10,20 +10,10 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/generator/common/beatgen"
-
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/pkg"
-	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/build"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/generator/common/beatgen"
 )
 
 func init() {
@@ -65,4 +55,20 @@ func Fields() error {
 // Config generates both the short/reference/docker configs.
 func Config() error {
 	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return devtools.Clean()
+}
+
+// Check formats code, updates generated content, check for common errors, and
+// checks for any modified files.
+func Check() {
+	common.Check()
+}
+
+// Fmt formats source code (.go and .py) and adds license headers.
+func Fmt() {
+	common.Fmt()
 }
