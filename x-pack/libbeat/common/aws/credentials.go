@@ -8,6 +8,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"os"
 )
 
 // ConfigAWS is a structure defined for AWS credentials
@@ -16,6 +17,7 @@ type ConfigAWS struct {
 	SecretAccessKey string `config:"secret_access_key"`
 	SessionToken    string `config:"session_token"`
 	ProfileName     string `config:"credential_profile_name"`
+	CredentialFileDirectory string `config:"credential_file_directory"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -41,13 +43,22 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, nil
 	}
 
+	// If credential_file_directory is empty, then external.LoadDefaultAWSConfig
+	// function will load AWS config from current user's home directory.
+	// Linux/OSX: "$HOME/.aws/credentials"
+	// Windows:   "%USERPROFILE%\.aws\credentials"
+	if config.CredentialFileDirectory != "" {
+		os.Setenv(external.AWSSharedCredentialsFileEnvVar, config.CredentialFileDirectory)
+	}
+
 	// If accessKeyID, secretAccessKey or sessionToken is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
 	if config.ProfileName != "" {
-		return external.LoadDefaultAWSConfig(
+		config, err := external.LoadDefaultAWSConfig(
 			external.WithSharedConfigProfile(config.ProfileName),
 		)
+		return config, err
 	}
 	return external.LoadDefaultAWSConfig()
 }
