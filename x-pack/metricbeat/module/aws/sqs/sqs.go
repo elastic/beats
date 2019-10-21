@@ -16,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -43,8 +42,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The aws sqs metricset is beta.")
-
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
