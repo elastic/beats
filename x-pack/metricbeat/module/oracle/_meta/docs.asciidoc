@@ -8,6 +8,12 @@ which is based on 5.0.13-arch1-1-ARCH Arch Linux. This is important, the module 
 OCI Instant Client is also required and the module has been tested by using version 18.5. See below for more information.
 
 [float]
+== Dashboard
+An overview dashboard for Kibana is already included:
+
+image::./images/metricbeat-oracle-overview.png[]
+
+[float]
 
 == Requirements
 Oracle database requires a special OCI connector to get connected to the database. You can find more information about it in the https://www.oracle.com/database/technologies/instant-client.html[official link of Oracle's webpage]. Oracle's webpage contains a comprehensive manual about installation methods and troubleshooting. A small description is included here but follow Oracle's official documentation if you find some issue. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found https://www.oracle.com/database/technologies/instant-client/downloads.html[here]. The Oracle Technology Network License Agreement with Oracle must be accepted to download the library.

@@ -27,7 +27,7 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {repo} has not yet been released.
+Version {version} of {repo} has not yet been released.
 
 endif::[]
 
@@ -130,7 +130,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {repo} has not yet been released.
+Version {version} of {repo} has not yet been released.
 
 endif::[]
 
