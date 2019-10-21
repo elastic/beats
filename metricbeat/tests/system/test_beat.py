@@ -25,6 +25,15 @@ class Test(metricbeat.BaseTest):
         """
         beat-xpack module tests
         """
+
+        # Give the monitored Metricbeat instance enough time to collect metrics and index them
+        # into Elasticsearch, so it may establish the connection to Elasticsearch and determine
+        # it's cluster UUID in the process. Otherwise, the monitoring Metricbeat instance will
+        # show errors in its log about not being able to determine the Elasticsearch cluster UUID
+        # to be associated with the monitored Metricbeat instance.
+        self.delete_mb_indices()
+        self.wait_until(cond=self.mb_index_exists, max_timeout=60)
+
         self.render_config_template(modules=[{
             "name": "beat",
             "metricsets": self.METRICSETS,
@@ -35,17 +44,14 @@ class Test(metricbeat.BaseTest):
             }
         }])
 
-        # Give the monitored Metricbeat instance enough time to collect metrics and index them
-        # into Elasticsearch, so it may establish the connection to Elasticsearch and determine
-        # it's cluster UUID in the process. Otherwise, the monitoring Metricbeat instance will
-        # show errors in its log about not being able to determine the Elasticsearch cluster UUID
-        # to be associated with the monitored Metricbeat instance.
-        self.wait_until(cond=self.mb_index_exists, max_timeout=60)
-
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
+
+    def delete_mb_indices(self):
+        es = Elasticsearch([self.get_elasticsearch_url()])
+        return es.indices.delete("metricbeat-*")
 
     def mb_index_exists(self):
         es = Elasticsearch([self.get_elasticsearch_url()])
