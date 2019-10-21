@@ -2,9 +2,7 @@ from base import BaseTest
 
 import os
 import stat
-
-
-INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+from beat.beat import INTEGRATION_TESTS
 
 
 class TestMetaFile(BaseTest):
@@ -22,12 +20,14 @@ class TestMetaFile(BaseTest):
         self.wait_until(lambda: self.log_contains("Beat metadata path: " + self.meta_file_path))
         proc.check_kill_and_wait()
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_is_created(self):
         """
         Test that the meta file is created
         """
         self.assertTrue(os.path.exists(self.meta_file_path))
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_has_correct_perms(self):
         """
         Test that the meta file has correct permissions
