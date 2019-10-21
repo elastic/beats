@@ -359,6 +359,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ELB fileset to AWS module. {pull}14020[14020]
 - Add module for MISP (Malware Information Sharing Platform). {pull}13805[13805]
 - Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
+- Add Kibana Dashboard for MISP module. {pull}14147[14147]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
