@@ -9,16 +9,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-
-	"github.com/elastic/go-lookslike/validator"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 
 	// Register JS "require" modules.
 	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module"
