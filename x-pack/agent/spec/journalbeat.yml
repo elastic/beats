@@ -1,0 +1,18 @@
+name: Journalbeat
+cmd: journalbeat
+rules:
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - log/journal
+- copy:
+    from: inputs
+    to: journalbeat
+- filter:
+    selectors:
+    - journalbeat
+    - output
+    - keystore
+when: HasItems(%{[journalbeat.inputs]}) && HasNamespace('output', 'elasticsearch',
+  'redis', 'kafka', 'logstash')

@@ -1,0 +1,24 @@
+name: Heartbeat
+cmd: heartbeat
+rules:
+- filter_values_with_regexp:
+    key: type
+    re: ^monitor/.+
+    selector: inputs
+- map:
+    path: inputs
+    rules:
+    - translate_with_regexp:
+        path: type
+        re: ^monitor/(?P<type>.+)
+        with: $type
+- copy:
+    from: inputs
+    to: heartbeat
+- filter:
+    selectors:
+    - heartbeat
+    - output
+    - keystore
+when: HasItems(%{[heartbeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+  'kafka', 'logstash')
