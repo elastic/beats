@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix azure fields names. {pull}14098[14098] {pull}14132[14132]
+- Fix calculation of `network.bytes` and `network.packets` for bi-directional netflow events. {pull}14111[14111]
 
 *Heartbeat*
 
@@ -80,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776] {pull}14033[14033] {pull}14107[14107]
 - Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
+- Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
 
 *Heartbeat*
 
