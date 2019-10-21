@@ -153,6 +153,13 @@
         }
       },
       "id": "8fc4b140-ed36-11e9-9a88-690b10c8ee99",
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
       "updated_at": "2019-10-19T19:03:26.386Z",
       "version": "WzM2NSwxNV0="
@@ -291,6 +298,13 @@
         }
       },
       "id": "7d369390-f105-11e9-9a88-690b10c8ee99",
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
       "updated_at": "2019-10-19T19:03:46.399Z",
       "version": "WzM2NiwxNV0="
@@ -387,6 +401,13 @@
         }
       },
       "id": "73287f70-f1fb-11e9-9a88-690b10c8ee99",
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
       "updated_at": "2019-10-19T19:04:04.029Z",
       "version": "WzM2NywxNV0="

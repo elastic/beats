@@ -18,7 +18,7 @@ var:
   - name: interval
     default: 0
   - name: json_objects_array
-    default: ""
+    default: "response.Attribute"
   - name: pagination
     default: |-
       {
