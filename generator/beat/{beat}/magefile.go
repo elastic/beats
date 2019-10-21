@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/dev-tools/mage/target/build"
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/dev-tools/mage/target/unittest"
 	"github.com/elastic/beats/generator/common/beatgen"
 )
 
@@ -71,4 +72,9 @@ func Check() {
 // Fmt formats source code (.go and .py) and adds license headers.
 func Fmt() {
 	common.Fmt()
+}
+
+// Test runs all available tests
+func Test() {
+	mg.Deps(unittest.GoUnitTest)
 }

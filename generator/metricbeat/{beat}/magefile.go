@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/dev-tools/mage/target/collectors"
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/dev-tools/mage/target/unittest"
 	"github.com/elastic/beats/dev-tools/mage/target/update"
 	"github.com/elastic/beats/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
@@ -101,4 +102,9 @@ func Fmt() {
 // Update updates the generated files (aka make update).
 func Update() error {
 	return update.Update()
+}
+
+// Test runs all available tests
+func Test() {
+	mg.Deps(unittest.GoUnitTest)
 }
