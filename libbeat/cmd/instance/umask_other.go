@@ -21,6 +21,7 @@ package instance
 
 import "syscall"
 
-func setUmask(newmask int) int {
-	return syscall.Umask(newmask)
+func setUmask(newmask int) error {
+	syscall.Umask(newmask)
+	return nil // the umask syscall always succeeds: http://man7.org/linux/man-pages/man2/umask.2.html#RETURN_VALUE
 }

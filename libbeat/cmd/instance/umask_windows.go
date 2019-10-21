@@ -17,7 +17,9 @@
 
 package instance
 
-func setUmask(newmask int) int {
-	// Do nothing; no way to set umask on Windows
-	return -1
+import "github.com/elastic/go-sysinfo/types"
+
+func setUmask(newmask int) error {
+	// No way to set umask on Windows
+	return types.ErrNotImplemented
 }
