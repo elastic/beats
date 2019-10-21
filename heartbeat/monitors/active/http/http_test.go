@@ -492,7 +492,6 @@ func TestRedirect(t *testing.T) {
 	_, err = job(event)
 	require.NoError(t, err)
 
-	fmt.Printf("Test URL %s\n", testURL)
 	testslike.Test(
 		t,
 		lookslike.Strict(lookslike.Compose(
