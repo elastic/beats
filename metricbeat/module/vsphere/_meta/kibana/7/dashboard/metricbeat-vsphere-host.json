@@ -343,7 +343,7 @@
               }
             ]
           },
-          "title": "Free vs Used CPU on Cluster stacked [metricbeat VSphere] ECS",
+          "title": "Free vs Used CPU on Cluster stacked [Metricbeat VSphere] ECS",
           "type": "area"
         }
       },
