@@ -18,7 +18,7 @@ class TestMetaFile(BaseTest):
 
         self.render_config_template()
         proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Beat metadata path: " + self.meta_file_path))
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
         proc.check_kill_and_wait()
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
