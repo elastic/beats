@@ -434,6 +434,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `metrics_path` as known hint for autodiscovery {pull}13996[13996]
 - Leverage KUBECONFIG when creating k8s client. {pull}13916[13916]
 - Add ability to filter by tags for cloudwatch metricset. {pull}13758[13758] {issue}13145[13145]
+- Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 - Add Oracle overview dashboard {pull}14021[14021]
 
 *Packetbeat*
