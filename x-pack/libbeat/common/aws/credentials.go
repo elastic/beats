@@ -17,7 +17,7 @@ type ConfigAWS struct {
 	SecretAccessKey string `config:"secret_access_key"`
 	SessionToken    string `config:"session_token"`
 	ProfileName     string `config:"credential_profile_name"`
-	CredentialFileDirectory string `config:"credential_file_directory"`
+	SharedCredentialFile string `config:"shared_credential_file"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -43,12 +43,12 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, nil
 	}
 
-	// If credential_file_directory is empty, then external.LoadDefaultAWSConfig
+	// If shared_credential_file is empty, then external.LoadDefaultAWSConfig
 	// function will load AWS config from current user's home directory.
 	// Linux/OSX: "$HOME/.aws/credentials"
 	// Windows:   "%USERPROFILE%\.aws\credentials"
-	if config.CredentialFileDirectory != "" {
-		os.Setenv(external.AWSSharedCredentialsFileEnvVar, config.CredentialFileDirectory)
+	if config.SharedCredentialFile != "" {
+		os.Setenv(external.AWSSharedCredentialsFileEnvVar, config.SharedCredentialFile)
 	}
 
 	// If accessKeyID, secretAccessKey or sessionToken is not given, then load from default config
