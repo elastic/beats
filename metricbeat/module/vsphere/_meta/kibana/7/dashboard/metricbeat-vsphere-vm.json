@@ -556,7 +556,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "how many VMs run on a ESXI host [Metricbeat VSphere] ECS",
+        "title": "VMs per ESXI host [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
