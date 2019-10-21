@@ -79,7 +79,7 @@ data:
       period: 10s
       host: ${NODE_NAME}
       hosts: ["localhost:10255"]
-      # If using Red Hat OpenShift remove the previous hosts entry and 
+      # If using Red Hat OpenShift remove the previous hosts entry and
       # uncomment these settings:
       #hosts: ["https://${HOSTNAME}:10250"]
       #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -216,12 +216,21 @@ data:
     cloud.id: ${ELASTIC_CLOUD_ID}
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
 
+    setup.dashboards.enabled: true
+
     output.elasticsearch:
       hosts: ['https://${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
       ssl.certificate_authorities:
       - /mnt/elastic/tls.crt
+
+    setup.kibana:
+      host: "https://${KIBANA_HOST:kibana}:${KIBANA_PORT:5601}"
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+      ssl.certificate_authorities:
+      - /mnt/kibana/tls.crt
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -280,6 +289,10 @@ spec:
           value: elasticsearch-sample-es-http
         - name: ELASTICSEARCH_PORT
           value: "9200"
+        - name: KIBANA_HOST
+          value: kibana-sample-kb-http
+        - name: KIBANA_PORT
+          value: "5601"
         - name: ELASTICSEARCH_USERNAME
           value: elastic
         - name: ELASTICSEARCH_PASSWORD
@@ -315,6 +328,10 @@ spec:
           mountPath: /mnt/elastic/tls.crt
           readOnly: true
           subPath: tls.crt
+        - name: kb-certs
+          mountPath: /mnt/kibana/tls.crt
+          readOnly: true
+          subPath: tls.crt
       volumes:
       - name: config
         configMap:
@@ -327,6 +344,9 @@ spec:
       - name: es-certs
         secret:
           secretName: elasticsearch-sample-es-http-certs-public
+      - name: kb-certs
+        secret:
+          secretName: kibana-sample-kb-http-certs-public
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
