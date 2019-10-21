@@ -4,16 +4,12 @@
 
 * Module is to be considered _beta_.
 
-## How to try the module from source
+## How to try the module from distribution install
 
 You should already have MISP installed and running. Information about the MISP platform can be found here: https://www.circl.lu/doc/misp.
 
-Build Filebeat
-
 ```
-cd x-pack/filebeat
-mage build update
-./filebeat setup --modules=misp -e -E 'setup.dashboards.directory=module/misp/_meta/kibana'
+./filebeat setup --modules=misp -e --dashboards
 ```
 
 Enable the MISP module
