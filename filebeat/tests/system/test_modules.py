@@ -231,12 +231,15 @@ def clean_keys(obj):
         ('system.auth', 'timestamp.log')
     }
 
+    # flaky test, temporarily remove user_agent.os.name and user_agent.version
+    user_agent_keys = ["user_agent.os.name", "user_agent.version"]
+
     # Keep source log filename for exceptions
     filename = None
     if "log.file.path" in obj:
         filename = os.path.basename(obj["log.file.path"]).lower()
 
-    for key in host_keys + time_keys + other_keys + ecs_key:
+    for key in host_keys + time_keys + other_keys + ecs_key + user_agent_keys:
         delete_key(obj, key)
 
     # Most logs from syslog need their timestamp removed because it doesn't
