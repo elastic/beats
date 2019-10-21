@@ -28,6 +28,7 @@ type OutletFactory struct {
 
 	eventer  beat.ClientEventer
 	wgEvents eventCounter
+	beatInfo beat.Info
 }
 
 type eventCounter interface {
@@ -65,10 +66,12 @@ type inputOutletConfig struct {
 func NewOutletFactory(
 	done <-chan struct{},
 	wgEvents eventCounter,
+	beatInfo beat.Info,
 ) *OutletFactory {
 	o := &OutletFactory{
 		done:     done,
 		wgEvents: wgEvents,
+		beatInfo: beatInfo,
 	}
 
 	if wgEvents != nil {

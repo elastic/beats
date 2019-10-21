@@ -64,7 +64,7 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	procs.List = append(procs.List, userProcessors)
 
 	if config.Index != "" {
-		indexProcessor, err := newAddIndexPattern(config.Index)
+		indexProcessor, err := newAddIndexPattern(c.parent.beatInfo, config.Index)
 		if err != nil {
 			return nil, err
 		}
