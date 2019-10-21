@@ -181,6 +181,7 @@ func (pb *packetbeat) setupFlows() error {
 		Processing: beat.ProcessingConfig{
 			EventMetadata: config.Flows.EventMetadata,
 			Processor:     processors,
+			KeepNull:      config.Flows.KeepNull,
 		},
 	})
 	if err != nil {

@@ -6,6 +6,7 @@ package s3
 
 import (
 	"bufio"
+	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -339,7 +340,7 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 	var s3Infos []s3Info
 	for _, record := range msg.Records {
-		if record.EventSource == "aws:s3" && record.EventName == "ObjectCreated:Put" {
+		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "ObjectCreated:") {
 			s3Infos = append(s3Infos, s3Info{
 				region: record.AwsRegion,
 				name:   record.S3.bucket.Name,
@@ -433,6 +434,17 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	if resp.Body == nil {
 		return nil, errors.New("s3 get object response body is empty")
 	}
+
+	if strings.HasSuffix(s3Info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+
+		if err != nil {
+			return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+		}
+
+		return bufio.NewReader(gzipReader), nil
+	}
+
 	return bufio.NewReader(resp.Body), nil
 }
 

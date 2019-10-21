@@ -65,7 +65,8 @@
           "port": 61775
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -131,7 +132,8 @@
           "port": 61776
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -197,7 +199,8 @@
           "port": 61776
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -263,7 +266,8 @@
           "port": 56635
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -329,7 +333,8 @@
           "port": 56635
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -395,7 +400,8 @@
           "port": 61773
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -461,7 +467,8 @@
           "port": 61773
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -528,7 +535,8 @@
           "port": 56649
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -594,7 +602,8 @@
           "port": 56649
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -660,7 +669,8 @@
           "port": 56649
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -727,7 +737,8 @@
           "port": 61777
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -793,7 +804,8 @@
           "port": 61777
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -859,7 +871,8 @@
           "port": 61777
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -926,7 +939,8 @@
           "port": 56650
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -992,7 +1006,8 @@
           "port": 56650
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -1058,7 +1073,8 @@
           "port": 56650
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -1125,7 +1141,8 @@
           "port": 56651
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -1191,7 +1208,8 @@
           "port": 56651
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -1257,7 +1275,8 @@
           "port": 56651
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

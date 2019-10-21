@@ -124,7 +124,7 @@ Mappings for Intrusion events fields:
 |====================================
 | FTD Field | Mapped fields
 | ApplicationProtocol | network.protocol
-| DstIP | destination.ip
+| DstIP | destination.address
 | DstPort | destination.port
 | EgressInterface | cisco.ftd.destination_interface
 | GID | service.id
@@ -134,7 +134,7 @@ Mappings for Intrusion events fields:
 | IntrusionPolicy | cisco.ftd.rule_name
 | Message | message
 | Protocol | network.transport
-| SrcIP | source.ip
+| SrcIP | source.address
 | SrcPort | source.port
 | User | user.id, user.name
 | WebApplication | network.application
@@ -152,7 +152,7 @@ Mappings for Connection and Security Intelligence events fields:
 | DNSQuery | dns.question.name
 | DNSRecordType | dns.question.type
 | DNSResponseType | dns.response_code
-| DstIP | destination.ip
+| DstIP | destination.address
 | DstPort | destination.port
 | EgressInterface | cisco.ftd.destination_interface
 | HTTPReferer | http.request.referrer
@@ -167,13 +167,13 @@ Mappings for Connection and Security Intelligence events fields:
 | ResponderPackets | destination.packets
 | SSLActualAction | event.outcome
 | SSLServerName | server.domain
-| SrcIP | source.ip
+| SrcIP | source.address
 | SrcPort | source.port
 | URL | url.original
 | User | user.name
 | UserAgent | user_agent.original
 | WebApplication | network.application
-| originalClientSrcIP | client.ip
+| originalClientSrcIP | client.address
 |====================================
 
 Mappings for File and Malware events fields:
@@ -184,7 +184,7 @@ Mappings for File and Malware events fields:
 | ArchiveFileName | file.name
 | ArchiveSHA256 | file.hash.sha256
 | Client | network.application
-| DstIP | destination.ip
+| DstIP | destination.address
 | DstPort | destination.port
 | FileName | file.name
 | FilePolicy | cisco.ftd.rule_name
@@ -192,7 +192,7 @@ Mappings for File and Malware events fields:
 | FileSize | file.size
 | FirstPacketSecond | event.start
 | Protocol | network.transport
-| SrcIP | source.ip
+| SrcIP | source.address
 | SrcPort | source.port
 | URI | url.original
 | User | user.name

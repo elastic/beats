@@ -55,8 +55,8 @@ func TestFetch(t *testing.T) {
 	assert.NotNil(t, metricsets)
 	assert.Nil(t, err)
 	ms, ok := metricsets[0].(*MetricSet)
-	assert.Equal(t, len(ms.client.Config.Resources), 1)
-	assert.Equal(t, ms.client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultVMScalesetNamespace))
+	assert.Equal(t, len(ms.Client.Config.Resources), 1)
+	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultVMScalesetNamespace))
 	c, err = common.NewConfigFrom(resourceConfig)
 	if err != nil {
 		t.Fatal(err)

@@ -53,11 +53,11 @@
           "vlan_id": 0
         },
         "network": {
-          "bytes": 532,
+          "bytes": 332,
           "community_id": "1:3NQ+f2IICsvUP3F8oQM9Js9FO6Q=",
           "direction": "unknown",
           "iana_number": 17,
-          "packets": 6,
+          "packets": 4,
           "transport": "udp"
         },
         "observer": {
@@ -67,11 +67,12 @@
           "bytes": 132,
           "ip": "172.16.32.201",
           "locality": "private",
-          "packets": 200,
+          "packets": 2,
           "port": 46086
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-25T12:58:38Z",
@@ -131,11 +132,11 @@
           "vlan_id": 0
         },
         "network": {
-          "bytes": 356,
+          "bytes": 264,
           "community_id": "1:H1pHO7CtjIP7Q5Rljq4l4EH1wf4=",
           "direction": "unknown",
           "iana_number": 6,
-          "packets": 8,
+          "packets": 6,
           "transport": "tcp"
         },
         "observer": {
@@ -145,11 +146,12 @@
           "bytes": 172,
           "ip": "172.16.32.100",
           "locality": "private",
-          "packets": 92,
+          "packets": 4,
           "port": 63499
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-25T13:03:33Z",
@@ -193,7 +195,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

@@ -5,6 +5,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-prometheus]]
 == Prometheus module
 
+[[prometheus-module]]
 This module periodically scrapes metrics from
 https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].
 

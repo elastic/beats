@@ -21,6 +21,7 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	k8sclient "k8s.io/client-go/kubernetes"
@@ -109,6 +110,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	if err != nil {
 		if kubernetes.IsInCluster(config.KubeConfig) {
 			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
+		} else if config.KubeConfig == "" {
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", os.Getenv("KUBECONFIG"))
 		} else {
 			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
 		}
@@ -132,8 +135,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
-	logp.Debug("kubernetes", "Using host: %s", config.Host)
-	logp.Debug("kubernetes", "Initializing watcher")
+	logp.Debug("kubernetes", "Initializing a new Kubernetes watcher using host: %s", config.Host)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,

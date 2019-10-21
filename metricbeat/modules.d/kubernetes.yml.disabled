@@ -23,6 +23,8 @@
   #annotations.dedot: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
