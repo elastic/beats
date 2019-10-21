@@ -5,7 +5,6 @@ pipeline {
   environment {
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
-    GITHUB_CHECK_NAME = 'Functional Tests'
     PIPELINE = 'beats/poc-metricbeat-functional-tests'
   }
   options {
@@ -44,10 +43,10 @@ pipeline {
         build(job: env.PIPELINE, propagate: false, wait: false,
               parameters: [string(name: 'GO_VERSION', value: "${env.GO_VERSION}"),
                            string(name: 'FEATURE', value: 'all'),
-                           string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_NAME),
-                           string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-                           string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
-        githubNotify(context: "${env.GITHUB_CHECK_NAME}", description: "${env.GITHUB_CHECK_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.PIPELINE.replaceAll('/','+')}")
+                           string(name: 'STACK_VERSION', value: '7.4.0'),
+                           string(name: 'STACK_COMMIT_ID', value: ''),
+                           string(name: 'BEAT_VERSION', value: '7.4.0'),
+                           string(name: 'BEAT_COMMIT_ID', value: '')])
       }
     }
   }
