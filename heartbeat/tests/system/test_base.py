@@ -85,6 +85,7 @@ class Test(BaseTest):
                 "fields.env": "dev"
             }
         )
+
     def test_host_fields_not_present(self):
         """
         Ensure that libbeat isn't adding any host.* fields
