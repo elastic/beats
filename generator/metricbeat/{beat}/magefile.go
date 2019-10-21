@@ -108,3 +108,13 @@ func Update() error {
 func Test() {
 	mg.Deps(unittest.GoUnitTest)
 }
+
+// Build builds the Beat binary.
+func Build() error {
+	return build.Build()
+}
+
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return build.CrossBuild()
+}
