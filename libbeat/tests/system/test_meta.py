@@ -2,6 +2,7 @@ from base import BaseTest
 
 import os
 import stat
+import unittest
 from beat.beat import INTEGRATION_TESTS
 
 
