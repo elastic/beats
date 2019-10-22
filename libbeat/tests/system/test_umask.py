@@ -2,7 +2,8 @@ from base import BaseTest
 
 import os
 import stat
-
+import unittest
+import sys
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
