@@ -28,7 +28,7 @@ ifndef::serverless[]
 endif::[]
 
 To learn about monitoring in general, see 
-{stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
+{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
 
 --
 

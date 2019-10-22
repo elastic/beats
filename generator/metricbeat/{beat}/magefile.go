@@ -9,6 +9,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 
 	// mage:import
@@ -34,6 +35,11 @@ func init() {
 
 	devtools.BeatDescription = "One sentence description of the Beat."
 	devtools.BeatVendor = "{full_name}"
+}
+
+// VendorUpdate updates elastic/beats in the vendor dir
+func VendorUpdate() error {
+	return beatgen.VendorUpdate()
 }
 
 // CollectAll generates the docs and the fields.

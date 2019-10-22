@@ -29,6 +29,7 @@ processors:
         - "zeek.smb_cmd.referenced_file.times.accessed"
         - "zeek.smb_cmd.referenced_file.times.created"
         - "zeek.smb_cmd.referenced_file.times.changed"
+      ignore_missing: true
 
   - drop_fields:
       when:
@@ -38,6 +39,7 @@ processors:
         - "zeek.smb_cmd.referenced_file.uid"
         - "zeek.smb_cmd.referenced_file.id.orig_h"
         - "zeek.smb_cmd.referenced_file.id.resp_h"
+      ignore_missing: true
 
   - rename:
       fields:
@@ -61,9 +63,6 @@ processors:
 
         - from: "zeek.smb_cmd.referenced_file.id.orig_h"
           to: "zeek.smb_cmd.file.host.tx"
-
-        - from: "zeek.smb_cmd.referenced_file.id.resp_h"
-          to: "zeek.smb_cmd.file.host.rx"
 
         - from: "zeek.smb_cmd.referenced_file.id.resp_h"
           to: "zeek.smb_cmd.file.host.rx"

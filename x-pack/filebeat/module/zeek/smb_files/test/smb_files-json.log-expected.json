@@ -1,0 +1,33 @@
+[
+    {
+        "@timestamp": "2017-10-09T16:13:19.576Z",
+        "destination.address": "192.168.10.30",
+        "destination.ip": "192.168.10.30",
+        "destination.port": 445,
+        "event.dataset": "zeek.smb_files",
+        "event.id": "C9YAaEzWLL62yWMn5",
+        "event.module": "zeek",
+        "fileset.name": "smb_files",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:k308wDxRMx/FIEzeh+YwD86zgoA=",
+        "network.protocol": "smb",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.10.31",
+        "source.ip": "192.168.10.31",
+        "source.port": 49239,
+        "tags": [
+            "zeek.smb_files"
+        ],
+        "zeek.session_id": "C9YAaEzWLL62yWMn5",
+        "zeek.smb_files.action": "SMB::FILE_OPEN",
+        "zeek.smb_files.name": "PSEXESVC.exe",
+        "zeek.smb_files.path": "\\\\admin-pc\\ADMIN$",
+        "zeek.smb_files.size": 0,
+        "zeek.smb_files.times.accessed": "2017-10-09T16:13:19.607Z",
+        "zeek.smb_files.times.changed": "2017-10-09T16:13:19.607Z",
+        "zeek.smb_files.times.created": "2017-10-09T16:13:19.607Z",
+        "zeek.smb_files.times.modified": "2017-10-09T16:13:19.607Z"
+    }
+]

@@ -26,7 +26,7 @@
     - name: file
       type: group
       fields:
-        - name: file_size
+        - name: size
           type: integer
           description: |
             Size of the file if the command indicates a file transfer.

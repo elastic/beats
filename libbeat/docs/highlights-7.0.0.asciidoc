@@ -57,7 +57,7 @@ management UI, or directly via the {es} API.
 [float]
 ==== Stack monitoring
 
-The full suite of modules to {stack-ov}/monitoring-production.html[monitor your
+The full suite of modules to {ref}/monitoring-production.html[monitor your
 {stack}] are now GA. These include the {metricbeat} modules for {es}, {ls}, and
 {kib}.
 

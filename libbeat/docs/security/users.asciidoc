@@ -18,9 +18,10 @@ by {beatname_uc}
 create visualizations that access {beatname_uc} data
 
 
-{security} provides built-in roles that grant a subset of the privileges
-needed by {beatname_uc} users. When possible, use the built-in roles to minimize
-the affect of future changes on your security strategy.
+{security} provides {ref}/built-in-roles.html[built-in roles] that grant a
+subset of the privileges needed by {beatname_uc} users. When possible, use the
+built-in roles to minimize the affect of future changes on your security
+strategy.
 
 
 [[privileges-to-setup-beats]]
@@ -108,19 +109,27 @@ Omit any roles that aren't relevant in your environment.
 {security} provides built-in users and roles for monitoring. The privileges and
 roles needed depend on the method used to collect monitoring data.
 
+[IMPORTANT] 
+.Important note for {ecloud} users
+==== 
+Built-in users are not available when running our
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}]
+on {ecloud}. To send monitoring data securely, create a monitoring user and
+grant it the roles described in the following sections.
+====
+
 ===== Internal collection
 
-For <<monitoring-internal-collection,internal collection>>, {security}
-provides the +{beat_default_index_prefix}_system+
-{stack-ov}/built-in-users.html[built-in user] and
-+{beat_default_index_prefix}_system+ {stack-ov}/built-in-roles.html[built-in
-role] for sending monitoring information. You can use the built-in user, or
-create a user who has the privileges needed to send monitoring information.
+For <<monitoring-internal-collection,internal collection>>, {security} provides
+the +{beat_monitoring_user}+ {ref}/built-in-users.html[built-in
+user] and +{beat_monitoring_user}+
+{ref}/built-in-roles.html[built-in role] for sending monitoring information. You
+can use the built-in user, if it's available in your environment, or create a
+user who has the privileges needed to send monitoring information.
 
-If you use the +{beat_default_index_prefix}_system+ user, make sure you
-<<beats-system-user,set the password>>.
+If you use the +{beat_monitoring_user}+ user, make sure you set the password.
 
-If you don't use the +{beat_default_index_prefix}_system+ user:
+If you don't use the +{beat_monitoring_user}+ user:
 
 . Create a *monitoring role*, called something like
 +{beat_default_index_prefix}_monitoring+, that has the following privileges:
@@ -152,15 +161,14 @@ ifndef::serverless[]
 ===== {metricbeat} collection
 
 For <<monitoring-metricbeat-collection,{metricbeat} collection>>, {security}
-provides the `remote_monitoring_user` {stack-ov}/built-in-users.html[built-in
+provides the `remote_monitoring_user` {ref}/built-in-users.html[built-in
 user], and the `remote_monitoring_collector` and `remote_monitoring_agent`
-{stack-ov}/built-in-roles.html[built-in roles] for collecting and sending
-monitoring information. You can use the built-in user, or
-create a user who has the privileges needed to collect and send monitoring
-information.
+{ref}/built-in-roles.html[built-in roles] for collecting and sending
+monitoring information. You can use the built-in user, if it's available in your
+environment, or create a user who has the privileges needed to collect and send
+monitoring information.
 
-If you use the `remote_monitoring_user` user, make sure you
-<<beats-system-user,set the password>>.
+If you use the `remote_monitoring_user` user, make sure you set the password.
 
 If you don't use the `remote_monitoring_user` user:
 
@@ -330,9 +338,9 @@ endif::apm-server[]
 ==== Learn more about users and roles
 
 Want to learn more about creating users and roles? See
-{stack-ov}/elasticsearch-security.html[Securing the {stack}]. Also see:
+{ref}/elasticsearch-security.html[Securing the {stack}]. Also see:
 
-* {stack-ov}/security-privileges.html[Security privileges] for a description of
+* {ref}/security-privileges.html[Security privileges] for a description of
 available privileges
-* {stack-ov}/built-in-roles.html[Built-in roles] for a description of roles that
+* {ref}/built-in-roles.html[Built-in roles] for a description of roles that
 you can assign to users

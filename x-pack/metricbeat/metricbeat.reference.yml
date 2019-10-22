@@ -156,6 +156,15 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#------------------------------ Appsearch Module ------------------------------
+- module: appsearch
+  metricsets: ["stats"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  #username: "elastic"
+  #password: "changeme"
+
 #--------------------------------- Aws Module ---------------------------------
 - module: aws
   period: 300s
@@ -737,8 +746,8 @@ metricbeat.modules:
 
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
-  metricsets: ["tablespace"]
-  enabled: false
+  metricsets: ["tablespace", "performance"]
+  enabled: true
   period: 10s
   hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
 

@@ -340,7 +340,7 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 	var s3Infos []s3Info
 	for _, record := range msg.Records {
-		if record.EventSource == "aws:s3" && record.EventName == "ObjectCreated:Put" {
+		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "ObjectCreated:") {
 			s3Infos = append(s3Infos, s3Info{
 				region: record.AwsRegion,
 				name:   record.S3.bucket.Name,

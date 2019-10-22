@@ -49,7 +49,7 @@ processors:
         - from: "zeek.stats.icmp_conns"
           to: "zeek.stats.connections.icmp.count"
 
-        - from: "zeek.stats.icmp_udp_conns"
+        - from: "zeek.stats.active_icmp_conns"
           to: "zeek.stats.connections.icmp.active"
 
         - from: "zeek.stats.events_proc"

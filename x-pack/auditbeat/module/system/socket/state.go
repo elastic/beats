@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/flowhash"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 	"github.com/elastic/go-libaudit/aucoalesce"
@@ -222,6 +223,24 @@ type process struct {
 
 	// populated by state from created
 	createdTime time.Time
+
+	// populated by DNS enrichment.
+	resolvedDomains map[string]string
+}
+
+func (p *process) addTransaction(tr dns.Transaction) {
+	if p.resolvedDomains == nil {
+		p.resolvedDomains = make(map[string]string)
+	}
+	for _, addr := range tr.Addresses {
+		p.resolvedDomains[addr.String()] = tr.Domain
+	}
+}
+
+// ResolveIP returns the domain associated with the given IP.
+func (p *process) ResolveIP(ip net.IP) (domain string, found bool) {
+	domain, found = p.resolvedDomains[ip.String()]
+	return
 }
 
 type socket struct {
@@ -263,6 +282,62 @@ func (s *socket) Timestamp() time.Time {
 	return s.closeTime
 }
 
+type dnsTracker struct {
+	// map[net.UDPAddr(string)][]dns.Transaction
+	transactionByClient *common.Cache
+
+	// map[net.UDPAddr(string)]*process
+	processByClient *common.Cache
+}
+
+func newDNSTracker(timeout time.Duration) dnsTracker {
+	return dnsTracker{
+		transactionByClient: common.NewCache(timeout, 8),
+		processByClient:     common.NewCache(timeout, 8),
+	}
+}
+
+// AddTransaction registers a new DNS transaction.
+func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
+	clientAddr := tr.Client.String()
+	if procIf := dt.processByClient.Get(clientAddr); procIf != nil {
+		if proc, ok := procIf.(*process); ok {
+			proc.addTransaction(tr)
+			return
+		}
+	}
+	var list []dns.Transaction
+	if prev := dt.transactionByClient.Get(clientAddr); prev != nil {
+		list = prev.([]dns.Transaction)
+	}
+	list = append(list, tr)
+	dt.transactionByClient.Put(clientAddr, list)
+}
+
+// AddTransactionWithProcess registers a new DNS transaction for the given process.
+func (dt *dnsTracker) AddTransactionWithProcess(tr dns.Transaction, proc *process) {
+	proc.addTransaction(tr)
+}
+
+// CleanUp removes expired entries from the maps.
+func (dt *dnsTracker) CleanUp() {
+	dt.transactionByClient.CleanUp()
+	dt.processByClient.CleanUp()
+}
+
+// RegisterEndpoint registers a new local endpoint used for DNS queries
+// to correlate captured DNS packets with their originator process.
+func (dt *dnsTracker) RegisterEndpoint(addr net.UDPAddr, proc *process) {
+	key := addr.String()
+	dt.processByClient.Put(key, proc)
+	if listIf := dt.transactionByClient.Get(key); listIf != nil {
+		list := listIf.([]dns.Transaction)
+		for _, tr := range list {
+			proc.addTransaction(tr)
+		}
+	}
+}
+
 type state struct {
 	sync.Mutex
 	// Used to convert kernel time to user time
@@ -290,6 +365,8 @@ type state struct {
 	// holds sockets in closing state. This is to keep them around until their
 	// close timeout expires.
 	closing linkedList
+
+	dns dnsTracker
 }
 
 func (s *state) getSocket(sock uintptr) *socket {
@@ -324,6 +401,7 @@ func makeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, closeTim
 		inactiveTimeout: inactiveTimeout,
 		closeTimeout:    closeTimeout,
 		clockMaxDrift:   clockMaxDrift,
+		dns:             newDNSTracker(inactiveTimeout * 2),
 	}
 }
 
@@ -429,6 +507,8 @@ func (s *state) ExpireOlder() {
 		}
 		item = s.closing.peek()
 	}
+	// Expire cached DNS
+	s.dns.CleanUp()
 }
 
 func (s *state) CreateProcess(p process) error {
@@ -502,6 +582,13 @@ func (s *state) CreateSocket(ref flow) error {
 		s.onSockTerminated(prev)
 	}
 	return s.createFlow(ref)
+}
+
+func (s *state) OnDNSTransaction(tr dns.Transaction) error {
+	s.Lock()
+	defer s.Unlock()
+	s.dns.AddTransaction(tr)
+	return nil
 }
 
 func (s *state) mutualEnrich(sock *socket, f *flow) {
@@ -609,9 +696,20 @@ func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	}
 	s.mutualEnrich(sock, &ref)
 	prev.updateWith(ref, s)
+	s.enrichDNS(prev)
 	s.lru.remove(prev)
 	s.lru.add(prev)
 	return nil
+}
+
+func (s *state) enrichDNS(f *flow) {
+	if f.remote.addr.Port == 53 && f.proto == protoUDP && f.pid != 0 && f.process != nil {
+		localUDP := net.UDPAddr{
+			IP:   f.local.addr.IP,
+			Port: f.local.addr.Port,
+		}
+		s.dns.RegisterEndpoint(localUDP, f.process)
+	}
 }
 
 func (f *flow) updateWith(ref flow, s *state) {
@@ -773,7 +871,6 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 
 	metricset := common.MapStr{
 		"kernel_sock_address": fmt.Sprintf("0x%x", f.sock),
-		"internal_version":    "1.0.3",
 	}
 
 	if f.pid != 0 {
@@ -803,6 +900,13 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 				metricset["gid"] = f.process.gid
 				metricset["euid"] = f.process.euid
 				metricset["egid"] = f.process.egid
+			}
+
+			if domain, found := f.process.ResolveIP(f.local.addr.IP); found {
+				local["domain"] = domain
+			}
+			if domain, found := f.process.ResolveIP(f.remote.addr.IP); found {
+				remote["domain"] = domain
 			}
 		}
 		root["process"] = process

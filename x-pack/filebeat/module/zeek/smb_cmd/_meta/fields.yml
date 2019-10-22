@@ -53,6 +53,16 @@
       description: |
         If the command referenced a file, store it here.
       fields:
+        - name: name
+          type: keyword
+          description: |
+            Filename if one was seen
+
+        - name: action
+          type: keyword
+          description: |
+            Action this log record represents
+
         - name: uid
           type: keyword
           description: |
