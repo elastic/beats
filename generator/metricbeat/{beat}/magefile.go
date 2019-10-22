@@ -20,6 +20,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -27,20 +28,8 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
-
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/build"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/pkg"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
 )
 
 func init() {
@@ -49,9 +38,40 @@ func init() {
 	devtools.BeatDescription = "One sentence description of the Beat."
 }
 
-// CollectAll generates the docs and the fields.
+//CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)
+}
+
+// Build builds the Beat binary.
+func Build() error {
+	return devtools.Build(devtools.DefaultBuildArgs())
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+}
+
+// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
+func BuildGoDaemon() error {
+	return devtools.BuildGoDaemon()
+}
+
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return devtools.CrossBuild()
+}
+
+// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
+func CrossBuildGoDaemon() error {
+	return devtools.CrossBuildGoDaemon()
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -64,8 +84,13 @@ func Package() {
 	devtools.UseCommunityBeatPackaging()
 
 	mg.Deps(Update)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package, pkg.PackageTest)
+	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// TestPackages tests the generated packages (i.e. file modes, owners, groups).
+func TestPackages() error {
+	return devtools.TestPackages()
 }
 
 // Update updates the generated files (aka make update).
@@ -96,6 +121,20 @@ func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
 
+// GoTestUnit executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoTestUnit(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+}
+
+// GoTestIntegration executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoTestIntegration(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+}
+
 // Config generates both the short/reference/docker configs.
 func Config() error {
 	customDeps := devtools.ConfigFileParams{
@@ -105,4 +144,15 @@ func Config() error {
 		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
 	}
 	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
+}
+
+// Check formats code, updates generated content, check for common errors, and
+// checks for any modified files.
+func Check() {
+	common.Check()
+}
+
+// Fmt formats source code (.go and .py) and adds license headers.
+func Fmt() {
+	common.Fmt()
 }
