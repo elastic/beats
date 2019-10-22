@@ -248,8 +248,7 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 
 	s3Infos, err := handleSQSMessage(message)
 	if err != nil {
-		err = errors.Wrap(err, "handleSQSMessage failed")
-		p.logger.Error(err)
+		p.logger.Error(errors.Wrap(err, "handleSQSMessage failed"))
 		return
 	}
 
