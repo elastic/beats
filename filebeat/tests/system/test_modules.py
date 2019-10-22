@@ -232,7 +232,8 @@ def clean_keys(obj):
     }
 
     # flaky test, temporarily remove user_agent fields
-    user_agent_keys = ["user_agent.os.name", "user_agent.version", "user_agent.name", "user_agent.device.name", "user_agent.original"]
+    user_agent_keys = ["user_agent.os.name", "user_agent.version",
+                       "user_agent.name", "user_agent.device.name", "user_agent.original"]
 
     # Keep source log filename for exceptions
     filename = None
