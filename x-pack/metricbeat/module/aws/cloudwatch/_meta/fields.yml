@@ -2,7 +2,7 @@
   type: group
   description: >
     `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
-  release: beta
+  release: ga
   fields:
     - name: namespace
       type: keyword
