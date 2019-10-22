@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Removed the `add_host_metadata` and `add_cloud_metadata` processors from the default config. These don't fit well with ECS for Heartbeat and were rarely used.
+- Fixed/altered redirect behavior. `max_redirects` now defaults to 0 (no redirects). Following redirects now works across hosts, but some timing fields will not be reported. {pull}14125[14125]
 - Removed `host.name` field that should never have been included. Heartbeat uses `observer.*` fields instead. {pull}14140[14140]
 
 *Journalbeat*
@@ -228,8 +229,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `docker.cpu.system.pct` calculation by using the reported number online cpus instead of the number of metrics per cpu. {pull}13691[13691]
 - Fix rds metricset dashboard. {pull}13721[13721]
 - Ignore prometheus untyped metrics with NaN value. {issue}13750[13750] {pull}13790[13790]
-- Change kubernetes.event.message to text {pull}13964[13964]
-- Fix performance counter values for windows/perfmon metricset.{issue}14036[14036] {pull}14039[14039]
+- Change kubernetes.event.message to text. {pull}13964[13964]
+- Fix performance counter values for windows/perfmon metricset. {issue}14036[14036] {pull}14039[14039]
+- Add FailOnRequired when applying schema and fix metric names in mongodb metrics metricset. {pull}14143[14143]
 
 *Packetbeat*
 
