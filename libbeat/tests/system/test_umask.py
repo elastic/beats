@@ -24,6 +24,7 @@ class TestUmask(BaseTest):
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=2)
         proc.check_kill_and_wait()
 
+    @unittest.skipIf(sys.platform.startswith("win"), "umask is not available on Windows")
     def test_output_file_perms(self):
         """
         Test that output file permissions respect default umask
