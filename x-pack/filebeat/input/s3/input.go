@@ -17,8 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -70,7 +68,6 @@ type s3Input struct {
 	context          *channelContext
 	workerWg         sync.WaitGroup // Waits on s3 worker goroutine.
 	stopOnce         sync.Once
-	messageBlackList []string // list of messageIDs that s3 input will not read.
 }
 
 type s3Info struct {
@@ -166,7 +163,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 		logger:           logger,
 		close:            closeChannel,
 		context:          &channelContext{closeChannel},
-		messageBlackList: []string{},
 	}
 	return p, nil
 }
@@ -240,10 +236,6 @@ func (p *s3Input) processor(queueURL string, messages []sqs.Message, visibilityT
 
 	// process messages received from sqs
 	for i := range messages {
-		if exists, _ := aws.StringInSlice(*messages[i].MessageId, p.messageBlackList); exists {
-			continue
-		}
-
 		errC := make(chan error)
 		go p.processMessage(svcS3, messages[i], &wg, errC)
 		go p.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, &wg, errC)
@@ -256,10 +248,6 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 
 	s3Infos, err := handleSQSMessage(message)
 	if err != nil {
-		if exists, _ := aws.StringInSlice(*message.MessageId, p.messageBlackList); !exists {
-			p.messageBlackList = append(p.messageBlackList, *message.MessageId)
-		}
-
 		err = errors.Wrap(err, "handleSQSMessage failed")
 		p.logger.Error(err)
 		errC <- err
@@ -362,8 +350,7 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 				arn:    record.S3.bucket.Arn,
 			})
 		} else {
-			return nil, errors.New("event source does not match " +
-				"aws:s3 or event name does not start with ObjectCreated")
+			return nil, errors.New("this SQS queue should be dedicated to s3 ObjectCreated event notifications")
 		}
 	}
 	return s3Infos, nil
