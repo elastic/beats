@@ -250,7 +250,6 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 	if err != nil {
 		err = errors.Wrap(err, "handleSQSMessage failed")
 		p.logger.Error(err)
-		errC <- err
 		return
 	}
 
@@ -278,7 +277,10 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 				}
 				p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
-				p.logger.Debug("ACK done, deleting message from SQS")
+				// When ACK done, message will be deleted. Or when message is
+				// not s3 ObjectCreated event related(handleSQSMessage function
+				// failed), it will be removed as well.
+				p.logger.Debug("Deleting message from SQS: ", message.MessageId)
 				// only delete sqs message when errC is closed with no error
 				err := p.deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 				if err != nil {
