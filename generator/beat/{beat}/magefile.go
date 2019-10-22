@@ -9,19 +9,11 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
-
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/build"
-	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/update"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
-	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/pkg"
+	"github.com/elastic/beats/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/dev-tools/mage/target/update"
 )
 
 func init() {
@@ -53,4 +45,35 @@ func Config() error {
 //Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML()
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return devtools.Clean()
+}
+
+// Check formats code, updates generated content, check for common errors, and
+// checks for any modified files.
+func Check() {
+	common.Check()
+}
+
+// Fmt formats source code (.go and .py) and adds license headers.
+func Fmt() {
+	common.Fmt()
+}
+
+// Test runs all available tests
+func Test() {
+	mg.Deps(unittest.GoUnitTest)
+}
+
+// Build builds the Beat binary.
+func Build() error {
+	return build.Build()
+}
+
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return build.CrossBuild()
 }
