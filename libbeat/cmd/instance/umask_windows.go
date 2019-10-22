@@ -23,5 +23,5 @@ var errNotImplemented = errors.New("not implemented on windows")
 
 func setUmask(newmask int) error {
 	// No way to set umask on Windows
-	return ErrNotImplemented
+	return errNotImplemented
 }
