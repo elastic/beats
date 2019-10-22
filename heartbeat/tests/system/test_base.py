@@ -86,6 +86,30 @@ class Test(BaseTest):
             }
         )
 
+    def test_host_fields_not_present(self):
+        """
+        Ensure that libbeat isn't adding any host.* fields
+        """
+        monitor = {
+            "type": "http",
+            "urls": ["http://localhost:9200"],
+        }
+        config = {
+            "monitors": [monitor]
+        }
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/*",
+            **config
+        )
+
+        heartbeat_proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        heartbeat_proc.check_kill_and_wait()
+        doc = self.read_output()[0]
+
+        assert not doc.has_key("host.name")
+
     def run_fields(self, expected, local=None, top=None):
         monitor = {
             "type": "http",

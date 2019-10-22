@@ -17,7 +17,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -91,7 +90,6 @@ type namespaceDetail struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The aws cloudwatch metricset is beta.")
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
