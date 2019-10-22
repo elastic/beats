@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/beats/generator/common/beatgen"
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
@@ -44,6 +45,11 @@ var (
 		"x-pack/metricbeat",
 	}
 )
+
+// GenerateCustomBeat generates a new custom beat
+func GenerateCustomBeat() error {
+	return beatgen.Generate()
+}
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.
@@ -129,6 +135,7 @@ func CheckLicenseHeaders() error {
 			licenser.Exclude("x-pack"),
 			licenser.Exclude("generator/beat/{beat}"),
 			licenser.Exclude("generator/metricbeat/{beat}"),
+			licenser.Exclude("generator/beat/{beat}"),
 		),
 		licenser(
 			licenser.Check(),

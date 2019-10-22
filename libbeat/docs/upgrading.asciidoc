@@ -180,14 +180,14 @@ That's OK. See the clean-up steps described under <<missing-fields>>.
 ==== Upgrade the {es} index template
 
 Index templates and the default index names are versioned. For example,
-{metricbeat} {stack-version} typically creates indices like this:
+{metricbeat} {version} typically creates indices like this:
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
-metricbeat-{stack-version}-2019.04.02
+metricbeat-{version}-2019.04.02
 ------------------------------------------------------------------------------
 
-And the corresponding {es} index template is named +metricbeat-{stack-version}+.
+And the corresponding {es} index template is named +metricbeat-{version}+.
 
 This means that each version of the Beat creates a new index, and it's
 guaranteed that the correct index template for that version is applied. With
@@ -237,7 +237,7 @@ allow {beats} to load and manage the index template, as described under
 IMPORTANT: The index name must match the index pattern in the {beats} index
 template. For example, if {ls} sends events to an index called
 +metricbeat-7-2019.04.02+, but the index template expects indices to match
-+metricbeat-{stack-version}-*+, you may encounter mapping errors and be unable
++metricbeat-{version}-*+, you may encounter mapping errors and be unable
 to index {beats} events.
 
 ==== Upgrade dashboards
@@ -310,12 +310,12 @@ up and start again:
 +
 ["source","sh",subs="attributes"]
 ----
-DELETE metricbeat-{stack-version}-2019.04.02*
+DELETE metricbeat-{version}-2019.04.02*
 ----
 +
 WARNING: Be careful when using wildcards to delete indices. Make sure the
 pattern matches only the indices you want to delete. The example shown here
-deletes all data indexed into the metricbeat-{stack-version} indices on
+deletes all data indexed into the metricbeat-{version} indices on
 2019.04.02.
 
 . If you want the index to work with 6.x dashboards, turn on the compatibility
@@ -325,7 +325,7 @@ layer. See <<enable-ecs-compatibility>>.
 +
 ["source","sh",subs="attributes"]
 ----
-DELETE /_template/metricbeat-{stack-version}
+DELETE /_template/metricbeat-{version}
 ----
 +
 Because the index template was loaded without the compatibility layer enabled,
