@@ -231,8 +231,8 @@ def clean_keys(obj):
         ('system.auth', 'timestamp.log')
     }
 
-    # flaky test, temporarily remove user_agent.os.name and user_agent.version
-    user_agent_keys = ["user_agent.os.name", "user_agent.version"]
+    # flaky test, temporarily remove user_agent.os.name, user_agent.version and user_agent.name
+    user_agent_keys = ["user_agent.os.name", "user_agent.version", "user_agent.name"]
 
     # Keep source log filename for exceptions
     filename = None
