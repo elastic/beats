@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"os"
 )
 
 var (
@@ -88,6 +89,19 @@ func init() {
 
 	for name, t := range tlsVerificationModes {
 		tlsVerificationModesInverse[t] = name
+	}
+
+	// A special case to allow a beats-specific environment variable to turn on
+	// TLS 1.3 support in go 1.12; remove this when we move to go 1.13 (where
+	// TLS 1.3 is on by default).
+	if os.Getenv("BEATS_TLS13") == "1" {
+		withTLS := "tls13=1"
+		goDebug := os.Getenv("GODEBUG")
+		if goDebug != "" {
+			withTLS += "," + goDebug
+		}
+
+		os.Setenv("GODEBUG", withTLS)
 	}
 }
 
