@@ -24,7 +24,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
-        "user_agent.os.name": "Windows XP",
+        "user_agent.os.full": "Windows XP",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "XP",
         "user_agent.version": "8.0"
     },
     {
@@ -52,7 +54,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
-        "user_agent.os.name": "Windows XP",
+        "user_agent.os.full": "Windows XP",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "XP",
         "user_agent.version": "8.0"
     },
     {
@@ -80,7 +84,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
-        "user_agent.os.name": "Windows XP",
+        "user_agent.os.full": "Windows XP",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "XP",
         "user_agent.version": "8.0"
     },
     {
@@ -108,7 +114,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
-        "user_agent.os.name": "Windows XP",
+        "user_agent.os.full": "Windows XP",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "XP",
         "user_agent.version": "8.0"
     },
     {
@@ -136,7 +144,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
-        "user_agent.os.name": "Windows XP",
+        "user_agent.os.full": "Windows XP",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "XP",
         "user_agent.version": "8.0"
     }
 ]
