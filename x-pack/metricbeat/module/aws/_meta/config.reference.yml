@@ -1,19 +1,13 @@
 - module: aws
   period: 300s
+  credential_profile_name: test-mb
   metricsets:
     - ec2
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
 - module: aws
   period: 300s
+  credential_profile_name: test-mb
   metricsets:
     - sqs
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   regions:
     - us-west-1
 - module: aws
@@ -24,18 +18,14 @@
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
 - module: aws
   period: 300s
+  credential_profile_name: test-mb
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EC2
-      metricname: CPUUtilization
+      name: ["CPUUtilization"]
       dimensions:
         - name: InstanceId
           value: i-0686946e22cf9494a
@@ -44,9 +34,6 @@
       tags.resource_type_filter: elasticloadbalancing
 - module: aws
   period: 60s
+  credential_profile_name: test-mb
   metricsets:
     - rds
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
