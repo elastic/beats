@@ -31,8 +31,7 @@ class Test(metricbeat.BaseTest):
         # it's cluster UUID in the process. Otherwise, the monitoring Metricbeat instance will
         # show errors in its log about not being able to determine the Elasticsearch cluster UUID
         # to be associated with the monitored Metricbeat instance.
-        self.delete_mb_indices()
-        self.wait_until(cond=self.mb_index_exists, max_timeout=60)
+        self.wait_until(cond=self.mb_connected_to_es, max_timeout=30)
 
         self.render_config_template(modules=[{
             "name": "beat",
@@ -49,13 +48,5 @@ class Test(metricbeat.BaseTest):
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-    def delete_mb_indices(self):
-        es = Elasticsearch([self.get_elasticsearch_url()])
-        return es.indices.delete("metricbeat-*")
-
-    def mb_index_exists(self):
-        es = Elasticsearch([self.get_elasticsearch_url()])
-        return len(es.cat.indices(index='metricbeat-*')) > 0
-
-    def get_elasticsearch_url(self):
-        return "http://" + self.compose_host("elasticsearch")
+    def mb_connected_to_es(self):
+        return self.service_log_contains('metricbeat', 'Connection to backoff(elasticsearch(')
