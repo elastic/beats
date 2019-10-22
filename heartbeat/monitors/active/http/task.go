@@ -49,11 +49,14 @@ func newHTTPMonitorHostJob(
 	validator RespCheck,
 ) (jobs.Job, error) {
 
+	// Trace visited URLs when redirects occur
+	var redirects []string
 	client := &http.Client{
-		CheckRedirect: makeCheckRedirect(config.MaxRedirects),
+		CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
 		Transport:     transport,
 		Timeout:       config.Timeout,
 	}
+
 	request, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
@@ -62,7 +65,7 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response, &redirects)
 		return err
 	}), nil
 }
@@ -104,7 +107,7 @@ func createPingFactory(
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
-	checkRedirect := makeCheckRedirect(config.MaxRedirects)
+	checkRedirect := makeCheckRedirect(config.MaxRedirects, nil)
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
@@ -153,7 +156,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response, nil)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -211,6 +214,7 @@ func execPing(
 	timeout time.Duration,
 	validator func(*http.Response) error,
 	responseConfig responseConfig,
+	redirects *[]string,
 ) (start, end time.Time, errReason reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -228,8 +232,12 @@ func execPing(
 		return start, time.Now(), errReason
 	}
 
-	// Add response.status_code
-	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}})
+	// Add response.status_code and redirects
+	response := common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}
+	if redirects != nil && len(*redirects) > 0 {
+		response["redirects"] = redirects
+	}
+	eventext.MergeEventFields(event, common.MapStr{"http": response})
 	// Download the body, close the response body, then attach all fields
 	err := handleRespBody(event, resp, responseConfig, errReason)
 	if err != nil {
@@ -298,14 +306,21 @@ func splitHostnamePort(requ *http.Request) (string, uint16, error) {
 	return host, uint16(p), nil
 }
 
-func makeCheckRedirect(max int) func(*http.Request, []*http.Request) error {
+// makeCheckRedirect checks if max redirects are exceeded, also append to the redirects list if we're tracking those.
+// It's kind of ugly to return a result via a pointer argument, but it's the interface the
+// golang HTTP client gives us.
+func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http.Request) error {
 	if max == 0 {
 		return func(_ *http.Request, _ []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
 	}
 
-	return func(_ *http.Request, via []*http.Request) error {
+	return func(r *http.Request, via []*http.Request) error {
+		if redirects != nil {
+			*redirects = append(*redirects, r.URL.String())
+		}
+
 		if max == len(via) {
 			return http.ErrUseLastResponse
 		}
