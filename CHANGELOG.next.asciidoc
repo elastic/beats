@@ -21,6 +21,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Removed the `add_host_metadata` and `add_cloud_metadata` processors from the default config. These don't fit well with ECS for Heartbeat and were rarely used.
+- Fixed/altered redirect behavior. `max_redirects` now defaults to 0 (no redirects). Following redirects now works across hosts, but some timing fields will not be reported. {pull}14125[14125]
+- Removed `host.name` field that should never have been included. Heartbeat uses `observer.*` fields instead. {pull}14140[14140]
 
 *Journalbeat*
 

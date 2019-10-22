@@ -490,7 +490,7 @@ func TestRedirect(t *testing.T) {
 			hbtest.SummaryChecks(1, 0),
 			minimalRespondingHTTPChecks(testURL, 200),
 			lookslike.MustCompile(map[string]interface{}{
-				"http.redirects": []string{
+				"http.response.redirects": []string{
 					server.URL + redirectingPaths["/redirect_one"],
 					server.URL + redirectingPaths["/redirect_two"],
 				},

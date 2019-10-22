@@ -222,7 +222,7 @@ func execPing(
 	validator multiValidator,
 	responseConfig responseConfig,
 	redirects *[]string,
-) (start, end time.Time, err reason.Reason) {
+) (start, end time.Time, errReason reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -247,10 +247,10 @@ func execPing(
 	}
 
 	httpFields := common.MapStr{"response": responseFields}
-
 	if redirects != nil && len(*redirects) > 0 {
-		httpFields["redirects"] = redirects
+		responseFields["redirects"] = redirects
 	}
+
 	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
 
 	// Mark the end time as now, since we've finished downloading
