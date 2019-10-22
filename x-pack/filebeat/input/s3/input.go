@@ -59,15 +59,15 @@ func init() {
 
 // Input is a input for s3
 type s3Input struct {
-	outlet           channel.Outleter // Output of received s3 logs.
-	config           config
-	awsConfig        awssdk.Config
-	logger           *logp.Logger
-	close            chan struct{}
-	workerOnce       sync.Once // Guarantees that the worker goroutine is only started once.
-	context          *channelContext
-	workerWg         sync.WaitGroup // Waits on s3 worker goroutine.
-	stopOnce         sync.Once
+	outlet     channel.Outleter // Output of received s3 logs.
+	config     config
+	awsConfig  awssdk.Config
+	logger     *logp.Logger
+	close      chan struct{}
+	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
+	context    *channelContext
+	workerWg   sync.WaitGroup // Waits on s3 worker goroutine.
+	stopOnce   sync.Once
 }
 
 type s3Info struct {
@@ -157,12 +157,12 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 
 	closeChannel := make(chan struct{})
 	p := &s3Input{
-		outlet:           out,
-		config:           config,
-		awsConfig:        awsConfig,
-		logger:           logger,
-		close:            closeChannel,
-		context:          &channelContext{closeChannel},
+		outlet:    out,
+		config:    config,
+		awsConfig: awsConfig,
+		logger:    logger,
+		close:     closeChannel,
+		context:   &channelContext{closeChannel},
 	}
 	return p, nil
 }
