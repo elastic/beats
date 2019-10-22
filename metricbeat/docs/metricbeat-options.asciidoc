@@ -117,7 +117,7 @@ metricbeat.modules:
 [[config-variants]]
 == Configuration variants
 
-Every module come with a default configuration file. Some modules also come with
+Every module comes with a default configuration file. Some modules also come with
 one or more variant configuration files containing common alternative configurations
 for that module.
 
