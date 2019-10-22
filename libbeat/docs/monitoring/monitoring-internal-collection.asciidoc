@@ -23,7 +23,7 @@ For an alternative method, see <<monitoring-metricbeat-collection>>.
 endif::[]
 
 To learn about monitoring in general, see 
-{stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
+{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
 
 //TODO: Not sure if these docs need to be updated to be parallel with other
 //stack components since this is the old way of configuring monitoring. 
@@ -31,9 +31,7 @@ To learn about monitoring in general, see
 . Create a user that has appropriate authority to send system-level monitoring
 data to {es}. For example, you can use the built-in +{beat_monitoring_user}+ user or
 assign the built-in +{beat_monitoring_user}+ role to another user. For more
-information, see
-{stack-ov}/setting-up-authentication.html[Setting Up User Authentication] and
-{stack-ov}/built-in-roles.html[Built-in Roles].
+information, see <<privileges-to-publish-monitoring>>.
 
 . Add the `monitoring` settings in the {beatname_uc} configuration file. If you
 configured the {es} output and want to send {beatname_uc} monitoring events to
