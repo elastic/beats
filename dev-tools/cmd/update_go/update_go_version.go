@@ -25,6 +25,15 @@ import (
 	"strings"
 )
 
+var files = []string{".go-version",
+	"auditbeat/Dockerfile",
+	"filebeat/Dockerfile",
+	"heartbeat/Dockerfile",
+	"journalbeat/Dockerfile",
+	"libbeat/docs/version.asciidoc",
+	"metricbeat/Dockerfile",
+	"x-pack/functionbeat/Dockerfile"}
+
 func main() {
 	currVersion := getGoVersion()
 	newVersion := flag.String("newversion", currVersion, "new version of Go")
@@ -41,7 +50,7 @@ func main() {
 func getGoVersion() string {
 	version, err := ioutil.ReadFile(".go-version")
 	checkErr(err)
-	return (strings.TrimRight(string(version), "\r\n"))
+	return strings.TrimRight(string(version), "\r\n")
 }
 
 func checkErr(err error) {
@@ -51,15 +60,6 @@ func checkErr(err error) {
 }
 
 func updateGoVersion(oldVersion, newVersion string) {
-	files := []string{".go-version",
-		"auditbeat/Dockerfile",
-		"filebeat/Dockerfile",
-		"heartbeat/Dockerfile",
-		"journalbeat/Dockerfile",
-		"libbeat/docs/version.asciidoc",
-		"metricbeat/Dockerfile",
-		"x-pack/functionbeat/Dockerfile"}
-
 	for _, file := range files {
 		fmt.Printf("Updating Go version from %s to %s in %s\n", oldVersion, newVersion, file)
 		content, err := ioutil.ReadFile(file)
