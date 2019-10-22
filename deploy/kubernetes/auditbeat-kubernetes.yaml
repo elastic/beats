@@ -71,7 +71,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
-        image: docker.elastic.co/beats/auditbeat:6.8.3
+        image: docker.elastic.co/beats/auditbeat:6.8.4
         args: [
           "-c", "/etc/auditbeat.yml"
         ]
