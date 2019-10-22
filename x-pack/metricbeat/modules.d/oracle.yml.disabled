@@ -2,8 +2,8 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-oracle.html
 
 - module: oracle
-  metricsets: ["tablespace"]
-  enabled: false
+  metricsets: ["tablespace", "performance"]
+  enabled: true
   period: 10s
   hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
 
