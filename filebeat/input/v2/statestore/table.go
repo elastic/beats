@@ -30,7 +30,9 @@ import (
 // in sync with all updates applied.
 // Entries are reference counted allowing us to free space in the table if there is
 // no more go-routine potentially accessing a resource.
-type table map[ResourceKey]*resourceEntry
+type table struct {
+	m map[ResourceKey]*resourceEntry
+}
 
 // resourceEntry keeps track of actual resource locks and pending updates.
 type resourceEntry struct {
@@ -51,6 +53,10 @@ type valueState struct {
 	cached  common.MapStr // current value if state == valueOutOfSync
 }
 
+func (t table) Empty() bool {
+	return len(t.m) == 0
+}
+
 func (t table) Create(k ResourceKey) *resourceEntry {
 	lock := make(chan struct{}, 1)
 	lock <- struct{}{}
@@ -59,12 +65,12 @@ func (t table) Create(k ResourceKey) *resourceEntry {
 		lock:     lock,
 		refCount: atomic.MakeUint(1),
 	}
-	t[k] = r
+	t.m[k] = r
 	return r
 }
 
 func (t table) Find(k ResourceKey) *resourceEntry {
-	r := t[k]
+	r := t.m[k]
 	if r != nil {
 		r.Retain()
 	}
@@ -72,7 +78,7 @@ func (t table) Find(k ResourceKey) *resourceEntry {
 }
 
 func (t table) Remove(k ResourceKey) {
-	delete(t, k)
+	delete(t.m, k)
 }
 
 func (r *resourceEntry) Retain() {

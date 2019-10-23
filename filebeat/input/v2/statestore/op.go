@@ -40,6 +40,8 @@ func newUpdateOp(store *Store, key ResourceKey, entry *resourceEntry, updates in
 		entry:   entry,
 		updates: updates,
 	}
+
+	runtime.SetFinalizer(op, (*ResourceUpdateOp).finalize)
 	return op
 }
 
@@ -62,6 +64,10 @@ func (op *ResourceUpdateOp) Close() {
 	runtime.SetFinalizer(op, nil)
 }
 
+func (op *ResourceUpdateOp) finalize() {
+	op.unlink()
+}
+
 func (op *ResourceUpdateOp) closePending() {
 	entry := op.entry
 
@@ -82,6 +88,6 @@ func (op *ResourceUpdateOp) unlink() {
 	store.resourcesMux.Lock()
 	defer store.resourcesMux.Unlock()
 	if entry.Release() {
-		store.resources.Remove(op.key)
+		store.remove(op.key)
 	}
 }

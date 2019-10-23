@@ -71,9 +71,9 @@ func (r *Resource) link(create bool) {
 	store.resourcesMux.Lock()
 	defer store.resourcesMux.Unlock()
 
-	entry := store.resources.Find(r.key)
+	entry := store.find(r.key)
 	if entry == nil && create {
-		entry = store.resources.Create(r.key)
+		entry = store.create(r.key)
 	}
 	r.entry = entry
 }
@@ -93,7 +93,7 @@ func (r *Resource) unlink() {
 	store.resourcesMux.Lock()
 	defer store.resourcesMux.Unlock()
 	if entry.Release() {
-		store.resources.Remove(r.key)
+		store.remove(r.key)
 	}
 }
 
