@@ -25,14 +25,16 @@ import (
 	"strings"
 )
 
-var files = []string{".go-version",
+var files = []string{
+	".go-version",
 	"auditbeat/Dockerfile",
 	"filebeat/Dockerfile",
 	"heartbeat/Dockerfile",
 	"journalbeat/Dockerfile",
 	"libbeat/docs/version.asciidoc",
 	"metricbeat/Dockerfile",
-	"x-pack/functionbeat/Dockerfile"}
+	"x-pack/functionbeat/Dockerfile",
+}
 
 func main() {
 	currVersion := getGoVersion()
