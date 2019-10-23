@@ -58,39 +58,23 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with fingerprint information
 func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
-	var str string
-	for _, k := range p.config.Fields {
-		v, err := event.Fields.GetValue(k)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute fingerprint")
-		}
-
-		var s string
-		switch v := v.(type) {
-		case map[string]interface{}, []interface{}:
-			return nil, errors.Errorf("cannot compute fingerprint using non-scalar field: %v", k)
-		case string:
-			s = v
-		case int:
-			s = strconv.Itoa(v)
-		}
-
-		str += fmt.Sprintf("|%v|%v", k, s)
+	str, err := makeSourceString(p.config.Fields, event.Fields)
+	if err != nil {
+		return nil, makeComputeFingerprintError(err)
 	}
-	str += "|"
 
 	makeFingerprint, err := p.config.Method.factory()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to compute fingerprint")
+		return nil, makeComputeFingerprintError(err)
 	}
 
 	f, err := makeFingerprint(str)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to compute fingerprint")
+		return nil, makeComputeFingerprintError(err)
 	}
 
 	if _, err = event.PutValue(p.config.TargetField, f); err != nil {
-		return nil, errors.Wrap(err, "failed to compute fingerprint")
+		return nil, makeComputeFingerprintError(err)
 	}
 
 	return event, nil
@@ -100,6 +84,33 @@ func (p *fingerprint) String() string {
 	return fmt.Sprintf("%v=[method=[%v]]", processorName, p.config.Method)
 }
 
+func makeSourceString(sourceFields []string, eventFields common.MapStr) (string, error) {
+	var str string
+	for _, k := range sourceFields {
+		v, err := eventFields.GetValue(k)
+		if err == common.ErrKeyNotFound {
+			return "", errors.Wrapf(err, "failed to find field [%v] in event", k)
+		}
+		if err != nil {
+			return "", errors.Wrapf(err, "failed when finding field [%v] in event", k)
+		}
+
+		var s string
+		switch v := v.(type) {
+		case map[string]interface{}, []interface{}:
+			return "", errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
+		case string:
+			s = v
+		case int:
+			s = strconv.Itoa(v)
+		}
+
+		str += fmt.Sprintf("|%v|%v", k, s)
+	}
+	str += "|"
+	return str, nil
+}
+
 func contains(haystack []string, needle string) bool {
 	for _, item := range haystack {
 		if item == needle {
@@ -107,4 +118,8 @@ func contains(haystack []string, needle string) bool {
 		}
 	}
 	return false
+}
+
+func makeComputeFingerprintError(err error) error {
+	return errors.Wrap(err, "failed to compute fingerprint")
 }
