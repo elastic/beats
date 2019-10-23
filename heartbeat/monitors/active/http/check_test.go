@@ -19,6 +19,7 @@ package http
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -118,7 +119,9 @@ func TestCheckBody(t *testing.T) {
 			for _, pattern := range test.patterns {
 				patterns = append(patterns, match.MustCompile(pattern))
 			}
-			check := checkBody(patterns)(res)
+			body, err := ioutil.ReadAll(res.Body)
+			require.NoError(t, err)
+			check := checkBody(patterns)(res, string(body))
 
 			if result := (check == nil); result != test.result {
 				if test.result {
@@ -183,7 +186,9 @@ func TestCheckJson(t *testing.T) {
 
 			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
 			require.NoError(t, err)
-			checkRes := checker(res)
+			body, err := ioutil.ReadAll(res.Body)
+			require.NoError(t, err)
+			checkRes := checker(res, string(body))
 
 			if result := checkRes == nil; result != test.result {
 				if test.result {
@@ -249,7 +254,9 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 
 			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
 			require.NoError(t, err)
-			checkRes := checker(res)
+			body, err := ioutil.ReadAll(res.Body)
+			require.NoError(t, err)
+			checkRes := checker(res, string(body))
 
 			if result := checkRes == nil; result != test.result {
 				if test.result {
