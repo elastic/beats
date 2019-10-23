@@ -103,6 +103,7 @@ type Stat struct {
 	Ttime         string `csv:"ttime"`
 }
 
+// Info represents the show info response from HAProxy
 type Info struct {
 	Name                       string `mapstructure:"Name"`
 	Version                    string `mapstructure:"Version"`
@@ -160,6 +161,7 @@ type clientProto interface {
 	Info() (*bytes.Buffer, error)
 }
 
+// Client is struct that wraps the clientProto interface
 type Client struct {
 	proto clientProto
 }
@@ -251,18 +253,18 @@ func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
 
 	conn, err := net.Dial(p.Network, p.Address)
 	if err != nil {
-		return response, err
+		return response, errors.Wrap(err, "Error connecting")
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(cmd + "\n"))
 	if err != nil {
-		return response, err
+		return response, errors.Wrap(err, "Error writing to connection")
 	}
 
 	recv, err := io.Copy(response, conn)
 	if err != nil {
-		return response, err
+		return response, errors.Wrap(err, "error reading response")
 	}
 	if recv == 0 {
 		return response, errors.New("Got empty response from HAProxy")
