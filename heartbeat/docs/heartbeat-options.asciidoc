@@ -388,6 +388,17 @@ Example configuration:
   hosts: ["http://myhost:80"]
 -------------------------------------------------------------------------------
 
+[float]
+[[monitor-http-max-redirects]]
+==== `max_redirects`
+
+The total number of redirections Heartbeat will follow. Defaults to 0, meaning heartbeat will not follow redirects,
+but will report the status of the redirect. If set to a number greater than 0 heartbeat will follow that number of redirects.
+
+When this option is set to a value greater than zero the `monitor.ip` field will no longer be reported, as multiple
+DNS requests across multiple IPs may return multiple IPs. Fine grained network timing data will also not be recorded, as with redirects
+that data will span multiple requests. Specifically the fields `http.rtt.content.us`, `http.rtt.response_header.us`,
+`http.rtt.total.us`, `http.rtt.validate.us`, `http.rtt.write_request.us` and `dns.rtt.us` will be omitted.
 
 [float]
 [[monitor-http-proxy-url]]
