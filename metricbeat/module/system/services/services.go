@@ -1,0 +1,85 @@
+package services
+
+import (
+	"github.com/coreos/go-systemd/dbus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/pkg/errors"
+)
+
+// Config stores the config object
+type Config struct {
+	StateFilter []string `config:"filesystem.state_filter"`
+}
+
+// init registers the MetricSet with the central registry as soon as the program
+// starts. The New function will be called later to instantiate an instance of
+// the MetricSet for each host defined in the module's configuration. After the
+// MetricSet has been created then Fetch will begin to be called periodically.
+func init() {
+	mb.Registry.MustAddMetricSet("system", "services", New)
+}
+
+// MetricSet holds any configuration or state information. It must implement
+// the mb.MetricSet interface. And this is best achieved by embedding
+// mb.BaseMetricSet because it implements all of the required mb.MetricSet
+// interface methods except for Fetch.
+type MetricSet struct {
+	mb.BaseMetricSet
+	conn *dbus.Conn
+	cfg  Config
+}
+
+// New creates a new instance of the MetricSet. New is responsible for unpacking
+// any MetricSet specific configuration options if there are any.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Beta("The system services metricset is beta.")
+
+	var config Config
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	conn, err := dbus.New()
+	if err != nil {
+		return nil, errors.Wrap(err, "error connecting to dbus")
+	}
+
+	return &MetricSet{
+		BaseMetricSet: base,
+		conn:          conn,
+		cfg:           config,
+	}, nil
+}
+
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	units, err := m.conn.ListUnitsByPatterns(m.cfg.StateFilter, []string{"*.service"})
+	if err != nil {
+		return errors.Wrap(err, "error getting list of running units")
+	}
+
+	for _, unit := range units {
+		//Skip what are basically errors dude to systemd's declarative dependency system
+		if unit.LoadState == "not-found" {
+			continue
+		}
+
+		event, err := getProperties(unit, m.conn)
+		if err != nil {
+			m.Logger().Errorf("Error getting properties for systemd service %s: %s", unit.Name, err)
+			continue
+		}
+
+		isOpen := report.Event(mb.Event{
+			MetricSetFields: event,
+		})
+		if !isOpen {
+			return nil
+		}
+
+	}
+	return nil
+}

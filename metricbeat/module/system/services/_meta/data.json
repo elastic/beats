@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "system.services",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "services",
+        "period": 10000
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "services": {
+            "active_state": "active",
+            "load_state": "loaded",
+            "main_pid": 811,
+            "name": "NetworkManager.service",
+            "resources": {
+                "memory": {
+                    "usage": {
+                        "bytes": 15384576
+                    }
+                },
+                "tasks": {
+                    "count": 4
+                }
+            },
+            "state_since": "2019-10-18T21:24:57.581561-07:00",
+            "sub_state": "running"
+        }
+    }
+}
