@@ -19,6 +19,7 @@ package fingerprint
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -54,9 +55,53 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with fingerprint information
 func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
+	var str string
+	for _, k := range p.config.Fields {
+		v, err := event.Fields.GetValue(k)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to compute fingerprint")
+		}
+
+		var s string
+		switch v := v.(type) {
+		case map[string]interface{}, []interface{}:
+			return nil, errors.Errorf("cannot compute fingerprint using non-scalar field: %v", k)
+		case string:
+			s = v
+		case int:
+			s = strconv.Itoa(v)
+		}
+
+		str += fmt.Sprintf("|%v|%v", k, s)
+	}
+	str += "|"
+
+	makeFingerprint, err := p.config.Method.factory()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to compute fingerprint")
+	}
+
+	f, err := makeFingerprint(str)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to compute fingerprint")
+	}
+
+	if _, err = event.PutValue(p.config.TargetField, f); err != nil {
+		return nil, errors.Wrap(err, "failed to compute fingerprint")
+	}
+
 	return event, nil
 }
 
 func (p *fingerprint) String() string {
 	return fmt.Sprintf("%v=[method=[%v]]", processorName, p.config.Method)
+}
+
+func contains(haystack []string, needle string) bool {
+	for _, item := range haystack {
+		if item == needle {
+			return true
+		}
+	}
+	return false
 }

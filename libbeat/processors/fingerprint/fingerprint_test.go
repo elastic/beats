@@ -53,5 +53,5 @@ func TestMethodSHA256(t *testing.T) {
 
 	v, err := newEvent.GetValue("fingerprint")
 	assert.NoError(t, err)
-	assert.Equal(t, "a292b0c17d13b06dbd244226b72f9e38a87ad9a41fd1853fce3ed875b834fc62", v)
+	assert.Equal(t, "4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144", v)
 }
