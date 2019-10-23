@@ -61,7 +61,7 @@ func formProperties(unit dbus.UnitStatus, props map[string]interface{}) (common.
 		event["state_since"] = time.Unix(0, timeSince)
 	}
 
-	//only prints status data if we have a PID that has exited
+	//only prints PID data if we have a PID
 	if props["ExecMainPID"].(uint32) > 0 {
 		event["main_pid"] = props["ExecMainPID"].(uint32)
 	}
@@ -97,13 +97,13 @@ func getMetricsFromServivce(props map[string]interface{}) common.MapStr {
 
 	if ip, ok := props["IPAccounting"]; ok && ip.(bool) {
 		metrics["network"] = common.MapStr{
-			"bytes": common.MapStr{
-				"in":  props["IPIngressBytes"],
-				"out": props["IPEgressBytes"],
+			"in": common.MapStr{
+				"packets": props["IPIngressPackets"],
+				"bytes":   props["IPIngressBytes"],
 			},
-			"packets": common.MapStr{
-				"in":  props["IPIngressPackets"],
-				"out": props["IPEgressPackets"],
+			"out": common.MapStr{
+				"packets": props["IPEgressPackets"],
+				"bytes":   props["IPEgressBytes"],
 			},
 		}
 	}
@@ -136,8 +136,10 @@ func translateChild(code int32) string {
 		return "stopped"
 	case 6:
 		return "continued"
+	default:
+		return "unknown"
 	}
-	return "unknown"
+
 }
 
 // timeSince emulates the behavior of `systemctl status` with regards to reporting time:

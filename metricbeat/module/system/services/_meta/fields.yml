@@ -45,18 +45,18 @@
           type: group
           description: network resource usage
           fields:
-            - name: bytes.in
+            - name: in.bytes
               type: long
               format: bytes
               description: bytes in
-            - name: bytes.out
+            - name: in.packets
               type: long
               format: bytes
-              description: bytes out
-            - name: packets.in
-              type: long
               description: packets in
-            - name: packets.out
+            - name: out.packets
               type: long
               description: packets out
+            - name: out.bytes
+              type: long
+              description: bytes out
 

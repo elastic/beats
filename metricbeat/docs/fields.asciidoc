@@ -30951,7 +30951,7 @@ type: long
 network resource usage
 
 
-*`system.services.resources.network.bytes.in`*::
+*`system.services.resources.network.in.bytes`*::
 +
 --
 bytes in
@@ -30962,10 +30962,10 @@ format: bytes
 
 --
 
-*`system.services.resources.network.bytes.out`*::
+*`system.services.resources.network.in.packets`*::
 +
 --
-bytes out
+packets in
 
 type: long
 
@@ -30973,19 +30973,19 @@ format: bytes
 
 --
 
-*`system.services.resources.network.packets.in`*::
+*`system.services.resources.network.out.packets`*::
 +
 --
-packets in
+packets out
 
 type: long
 
 --
 
-*`system.services.resources.network.packets.out`*::
+*`system.services.resources.network.out.bytes`*::
 +
 --
-packets out
+bytes out
 
 type: long
 

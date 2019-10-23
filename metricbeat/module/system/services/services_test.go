@@ -25,7 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestFormProps(t *testing.T) {
@@ -57,20 +56,4 @@ func TestFormProps(t *testing.T) {
 	}
 
 	assert.Equal(t, testOut, event)
-}
-
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":                "system",
-		"metricsets":            []string{"services"},
-		"services.state_filter": []string{"active"},
-	}
 }
