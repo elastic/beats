@@ -26,13 +26,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// getProperties gets properties for the systemd service and returns a MapStr with useful data
-func getProperties(unit dbus.UnitStatus, conn *dbus.Conn) (common.MapStr, error) {
-	props, err := conn.GetAllProperties(unit.Name)
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting properties for service")
-	}
-
+// formProperties gets properties for the systemd service and returns a MapStr with useful data
+func formProperties(unit dbus.UnitStatus, props map[string]interface{}) (common.MapStr, error) {
 	timeSince, err := timeSince(props, unit.ActiveState)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting timestamp")

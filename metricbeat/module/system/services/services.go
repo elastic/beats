@@ -85,7 +85,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		event, err := getProperties(unit, m.conn)
+		props, err := m.conn.GetAllProperties(unit.Name)
+		if err != nil {
+			m.Logger().Errorf("error getting properties for service: %s", err)
+			continue
+		}
+
+		event, err := formProperties(unit, props)
 		if err != nil {
 			m.Logger().Errorf("Error getting properties for systemd service %s: %s", unit.Name, err)
 			continue

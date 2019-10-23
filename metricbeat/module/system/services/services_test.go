@@ -19,26 +19,44 @@ package services
 
 import (
 	"testing"
+	"time"
 
+	"github.com/coreos/go-systemd/dbus"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestDbus(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2Error(f)
+func TestFormProps(t *testing.T) {
+	testUnit := dbus.UnitStatus{
+		Name:        "test.service",
+		LoadState:   "loaded",
+		ActiveState: "active",
+		SubState:    "running",
+	}
+	testprops := map[string]interface{}{
+		"ExecMainPID":          uint32(0),
+		"ExecMainStatus":       int32(0),
+		"ExecMainCode":         int32(1),
+		"ActiveEnterTimestamp": uint64(1571850129000000),
+	}
+	event, err := formProperties(testUnit, testprops)
+	assert.NoError(t, err)
+	//t.Logf("Event: %s", event)
 
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
+	testOut := common.MapStr{
+		"active_state": "active",
+		"exec_code":    "exited",
+		"exec_rc":      int32(0),
+		"load_state":   "loaded",
+		"name":         "test.service",
+		"resources":    common.MapStr{},
+		"state_since":  time.Unix(0, 1571850129000000*1000),
+		"sub_state":    "running",
 	}
 
-	for _, evt := range events {
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-			evt.BeatEvent("system", "services").Fields.StringToPrint())
-	}
-
+	assert.Equal(t, testOut, event)
 }
 
 func TestData(t *testing.T) {
