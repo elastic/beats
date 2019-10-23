@@ -89,11 +89,6 @@ func GetProcessors(hints common.MapStr, key string) []common.MapStr {
 	return GetConfigs(hints, key, "processors")
 }
 
-// GetJsonOptions gets json-option definitions from the hints and returns a list of configs as a MapStr
-func GetJsonOptions(hints common.MapStr, key string) []common.MapStr {
-	return GetConfigs(hints, key, "json")
-}
-
 // GetConfigs takes in a key and returns a list of configs as a slice of MapStr
 func GetConfigs(hints common.MapStr, key, name string) []common.MapStr {
 	raw := GetHintMapStr(hints, key, name)

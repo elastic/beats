@@ -40,7 +40,7 @@ const (
 	includeLines = "include_lines"
 	excludeLines = "exclude_lines"
 	processors   = "processors"
-	json = "json"
+	json         = "json"
 )
 
 // validModuleNames to sanitize user input
@@ -127,7 +127,7 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		tempCfg.Put(processors, procs)
 	}
 
-	if jsonOpts := l.getJsonOptions(hints); len(jsonOpts) != 0 {
+	if jsonOpts := l.getJSONOptions(hints); len(jsonOpts) != 0 {
 		tempCfg.Put(json, jsonOpts)
 	}
 	// Merge config template with the configs from the annotations
@@ -191,7 +191,7 @@ func (l *logHints) getProcessors(hints common.MapStr) []common.MapStr {
 	return builder.GetProcessors(hints, l.config.Key)
 }
 
-func (l *logHints) getJsonOptions(hints common.MapStr) common.MapStr {
+func (l *logHints) getJSONOptions(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, l.config.Key, json)
 }
 
