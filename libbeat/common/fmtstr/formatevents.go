@@ -49,6 +49,14 @@ type EventFormatString struct {
 	timestamp  bool
 }
 
+// StaticEventFormatString is a wrapper around EventFormatString for the
+// common special case where the format expression should only have access to
+// shared static fields (typically agent / version) and the event timestamp.
+type StaticEventFormatString struct {
+	eventFormatString *EventFormatString
+	cachedFields      common.MapStr
+}
+
 type eventFieldEvaler struct {
 	index int
 }
@@ -149,6 +157,47 @@ func CompileEvent(in string) (*EventFormatString, error) {
 		timestamp:  efComp.timestamp,
 	}
 	return efs, nil
+}
+
+// NewStaticEventFormatString creates from the given expression a
+// StaticEventFormatString that can refer only to the given static fields and
+// the event timestamp.
+func NewStaticEventFormatString(
+	expression string, staticFields common.MapStr,
+) (*StaticEventFormatString, error) {
+	efs, err := CompileEvent(expression)
+	if err != nil {
+		return nil, err
+	}
+	return &StaticEventFormatString{
+		eventFormatString: efs,
+		cachedFields:      staticFields.Clone(),
+	}, nil
+}
+
+// MinimalStaticEventFormatString creates a formatter that has access only
+// to the agent name / version and event timestamp. This was adapted from
+// applyStaticFmtstr in libbeat/idxmgmt/ilm/ilm.go.
+func MinimalStaticEventFormatString(
+	expression string, beatInfo beat.Info,
+) (*StaticEventFormatString, error) {
+	staticFields := common.MapStr{
+		// beat object was left in for backward compatibility reason for older configs.
+		"beat": common.MapStr{
+			"name":    beatInfo.Beat,
+			"version": beatInfo.Version,
+		},
+		"agent": common.MapStr{
+			"name":    beatInfo.Beat,
+			"version": beatInfo.Version,
+		},
+		// For the Beats that have an observer role
+		"observer": common.MapStr{
+			"name":    beatInfo.Beat,
+			"version": beatInfo.Version,
+		},
+	}
+	return NewStaticEventFormatString(expression, staticFields)
 }
 
 // Unpack tries to initialize the EventFormatString from provided value
@@ -272,6 +321,16 @@ func (fs *EventFormatString) collectFields(
 // when validating to make defining a string mandatory.
 func (fs *EventFormatString) IsEmpty() bool {
 	return len(fs.expression) == 0
+}
+
+// Run executes the format string returning a new expanded string or an error
+// if execution or event field expansion fails.
+func (fs *StaticEventFormatString) Run(event *beat.Event) (string, error) {
+	placeholderEvent := &beat.Event{
+		Fields:    fs.cachedFields,
+		Timestamp: event.Timestamp,
+	}
+	return fs.eventFormatString.Run(placeholderEvent)
 }
 
 func (e *eventFieldCompiler) compileExpression(

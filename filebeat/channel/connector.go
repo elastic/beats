@@ -19,7 +19,6 @@ package channel
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -124,59 +123,41 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	return outlet, nil
 }
 
+//////////////////////////////
+// addIndexPattern is a Processor to add an index pattern (specified by the
+// input configuration) to event metadata in the "raw-index" field.
+
 type addIndexPattern struct {
 	pattern      string
-	beatInfo     beat.Info
-	formatString *fmtstr.EventFormatString
+	formatString *fmtstr.StaticEventFormatString
 }
 
 func newAddIndexPattern(
 	beatInfo beat.Info, pattern string,
 ) (processors.Processor, error) {
-	formatString, err := fmtstr.CompileEvent(pattern)
+	formatString, err := fmtstr.MinimalStaticEventFormatString(pattern, beatInfo)
 	if err != nil {
 		return nil, err
 	}
 	return &addIndexPattern{
 		pattern:      pattern,
-		beatInfo:     beatInfo,
 		formatString: formatString,
 	}, nil
 }
 
 func (aip *addIndexPattern) Run(event *beat.Event) (*beat.Event, error) {
-	if event.Meta == nil {
-		event.Meta = common.MapStr{}
-	}
-	index, err := expandIndexPattern(
-		aip.formatString, event.Timestamp, aip.beatInfo)
+	index, err := aip.formatString.Run(event)
 	if err != nil {
 		return nil, err
 	}
 
+	if event.Meta == nil {
+		event.Meta = common.MapStr{}
+	}
 	event.Meta["raw-index"] = index
 	return event, nil
 }
 
 func (aip *addIndexPattern) String() string {
 	return fmt.Sprintf("add_index_pattern=%s", aip.pattern)
-}
-
-// Expand the given pattern string as a formatted text field with access to
-// the event's agent and timestamp.
-// This helper mimicks applyStaticFmtstr in ilm.go, creating a placeholder
-// event for the restricted set of fields we allow here. It might be worth
-// making this a shared helper function or otherwise specializing for this case.
-func expandIndexPattern(
-	pattern *fmtstr.EventFormatString, timestamp time.Time, info beat.Info,
-) (string, error) {
-	return pattern.Run(&beat.Event{
-		Fields: common.MapStr{
-			"agent": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-		},
-		Timestamp: time.Now(),
-	})
 }
