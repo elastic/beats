@@ -19,6 +19,7 @@ package fingerprint
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -45,6 +46,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack %v processor configuration", processorName)
 	}
+
+	sort.Strings(config.Fields)
 
 	p := &fingerprint{
 		config: config,
