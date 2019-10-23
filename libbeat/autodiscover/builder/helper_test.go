@@ -38,12 +38,14 @@ func TestGenerateHints(t *testing.T) {
 
 		// Scenarios being tested:
 		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/json.keys_under_root must be a nested common.MapStr under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
 			annotations: map[string]string{
 				"co.elastic.logs/multiline.pattern": "^test",
+				"co.elastic.logs/json.keys_under_root": "true",
 				"co.elastic.metrics/module":         "prometheus",
 				"co.elastic.metrics/period":         "10s",
 				"co.elastic.metrics.foobar/period":  "15s",
@@ -54,6 +56,9 @@ func TestGenerateHints(t *testing.T) {
 				"logs": common.MapStr{
 					"multiline": common.MapStr{
 						"pattern": "^test",
+					},
+					"json": common.MapStr{
+						"keys_under_root": "true",
 					},
 				},
 				"metrics": common.MapStr{
