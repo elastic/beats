@@ -260,9 +260,12 @@ func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
 		return response, err
 	}
 
-	_, err = io.Copy(response, conn)
+	recv, err := io.Copy(response, conn)
 	if err != nil {
 		return response, err
+	}
+	if recv == 0 {
+		return response, errors.New("Got empty response from HAProxy")
 	}
 
 	if strings.HasPrefix(response.String(), "Unknown command") {
