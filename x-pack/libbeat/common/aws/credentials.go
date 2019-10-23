@@ -45,20 +45,21 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	// If accessKeyID, secretAccessKey or sessionToken is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
+	// If credential_profile_name is empty, then default profile is used.
+	var options []external.Config
 	if config.ProfileName != "" {
-		if config.SharedCredentialFile != "" {
-			// If shared_credential_file is empty, then external.LoadDefaultAWSConfig
-			// function will load AWS config from current user's home directory.
-			// Linux/OSX: "$HOME/.aws/credentials"
-			// Windows:   "%USERPROFILE%\.aws\credentials"
-			return external.LoadDefaultAWSConfig(
-				external.WithSharedConfigProfile(config.ProfileName),
-				external.WithSharedConfigFiles([]string{config.SharedCredentialFile}),
-			)
-		}
-		return external.LoadDefaultAWSConfig(
-			external.WithSharedConfigProfile(config.ProfileName),
-		)
+		options = append(options, external.WithSharedConfigProfile(config.ProfileName))
+	}
+	// If shared_credential_file is empty, then external.LoadDefaultAWSConfig
+	// function will load AWS config from current user's home directory.
+	// Linux/OSX: "$HOME/.aws/credentials"
+	// Windows:   "%USERPROFILE%\.aws\credentials"
+	if config.SharedCredentialFile != "" {
+		options = append(options, external.WithSharedConfigFiles([]string{config.SharedCredentialFile}))
+	}
+
+	if options != nil {
+		return external.LoadDefaultAWSConfig(options...)
 	}
 	return external.LoadDefaultAWSConfig()
 }
