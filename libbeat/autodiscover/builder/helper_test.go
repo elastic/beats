@@ -44,13 +44,13 @@ func TestGenerateHints(t *testing.T) {
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
 			annotations: map[string]string{
-				"co.elastic.logs/multiline.pattern": "^test",
+				"co.elastic.logs/multiline.pattern":    "^test",
 				"co.elastic.logs/json.keys_under_root": "true",
-				"co.elastic.metrics/module":         "prometheus",
-				"co.elastic.metrics/period":         "10s",
-				"co.elastic.metrics.foobar/period":  "15s",
-				"co.elastic.metrics.foobar1/period": "15s",
-				"not.to.include":                    "true",
+				"co.elastic.metrics/module":            "prometheus",
+				"co.elastic.metrics/period":            "10s",
+				"co.elastic.metrics.foobar/period":     "15s",
+				"co.elastic.metrics.foobar1/period":    "15s",
+				"not.to.include":                       "true",
 			},
 			result: common.MapStr{
 				"logs": common.MapStr{

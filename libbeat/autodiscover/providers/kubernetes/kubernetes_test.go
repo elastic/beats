@@ -97,12 +97,12 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"kubernetes": common.MapStr{
 					"annotations": getNestedAnnotations(common.MapStr{
-						"co.elastic.logs/multiline.pattern": "^test",
+						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
-						"co.elastic.metrics/module":         "prometheus",
-						"co.elastic.metrics/period":         "10s",
-						"co.elastic.metrics.foobar/period":  "15s",
-						"not.to.include":                    "true",
+						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/period":            "10s",
+						"co.elastic.metrics.foobar/period":     "15s",
+						"not.to.include":                       "true",
 					}),
 					"container": common.MapStr{
 						"name":    "foobar",
@@ -114,12 +114,12 @@ func TestGenerateHints(t *testing.T) {
 			result: bus.Event{
 				"kubernetes": common.MapStr{
 					"annotations": getNestedAnnotations(common.MapStr{
-						"co.elastic.logs/multiline.pattern": "^test",
+						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
-						"co.elastic.metrics/module":         "prometheus",
-						"not.to.include":                    "true",
-						"co.elastic.metrics/period":         "10s",
-						"co.elastic.metrics.foobar/period":  "15s",
+						"co.elastic.metrics/module":            "prometheus",
+						"not.to.include":                       "true",
+						"co.elastic.metrics/period":            "10s",
+						"co.elastic.metrics.foobar/period":     "15s",
 					}),
 					"container": common.MapStr{
 						"name":    "foobar",
