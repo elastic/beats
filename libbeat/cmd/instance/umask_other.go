@@ -15,30 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mapval
+// +build !windows
 
-import "github.com/elastic/beats/libbeat/common"
+package instance
 
-type flatValidator struct {
-	path  path
-	isDef IsDef
-}
+import (
+	"errors"
+	"syscall"
+)
 
-// CompiledSchema represents a compiled definition for driving a Validator.
-type CompiledSchema []flatValidator
+var errNotImplemented = errors.New("not implemented on platform")
 
-// Check executes the the checks within the CompiledSchema
-func (cs CompiledSchema) Check(actual common.MapStr) *Results {
-	results := NewResults()
-	for _, pv := range cs {
-		actualV, actualKeyExists := pv.path.getFrom(actual)
-
-		if !pv.isDef.optional || pv.isDef.optional && actualKeyExists {
-			var checkRes *Results
-			checkRes = pv.isDef.check(pv.path, actualV, actualKeyExists)
-			results.merge(checkRes)
-		}
-	}
-
-	return results
+func setUmask(newmask int) error {
+	syscall.Umask(newmask)
+	return nil // the umask syscall always succeeds: http://man7.org/linux/man-pages/man2/umask.2.html#RETURN_VALUE
 }
