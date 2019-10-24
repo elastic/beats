@@ -28,13 +28,6 @@ heartbeat.monitors:
 
   # Configure task schedule
   schedule: '@every 10s'
-  check.response:
-    status: 200
-    json:
-      - description: check status
-        condition:
-          equals:
-            foobar: ok
 
   # Total test connection and data exchange timeout
   #timeout: 16s
