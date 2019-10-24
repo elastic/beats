@@ -31,18 +31,20 @@ type Properties struct {
 	ExecMainCode   int32
 	ExecMainStatus int32
 	ExecMainPID    uint32
-	//Accounting
-	CPUAccounting          bool
-	MemoryAccounting       bool
-	TasksAccounting        bool
-	IPAccounting           bool
-	CPUUsageNSec           int64
-	MemoryCurrent          int64
-	TasksCurrent           int64
-	IPIngressPackets       int64
-	IPIngressBytes         int64
-	IPEgressPackets        int64
-	IPEgressBytes          int64
+	// accounting
+	CPUAccounting    bool
+	MemoryAccounting bool
+	TasksAccounting  bool
+	IPAccounting     bool
+	// metrics
+	CPUUsageNSec     int64
+	MemoryCurrent    int64
+	TasksCurrent     int64
+	IPIngressPackets int64
+	IPIngressBytes   int64
+	IPEgressPackets  int64
+	IPEgressBytes    int64
+	// timestamps
 	ActiveEnterTimestamp   uint64
 	InactiveEnterTimestamp uint64
 	InactiveExitTimestamp  uint64

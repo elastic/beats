@@ -117,7 +117,7 @@ func getProps(conn *dbus.Conn, unit string) (Properties, error) {
 	}
 	parsed := Properties{}
 	if err := mapstructure.Decode(rawProps, &parsed); err != nil {
-		return parsed, errors.Wrap(err, "Error decoding properties")
+		return parsed, errors.Wrap(err, "error decoding properties")
 	}
 	return parsed, nil
 }
