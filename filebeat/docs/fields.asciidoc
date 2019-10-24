@@ -19455,7 +19455,7 @@ Fields exported by the Zeek Connection log
 *`zeek.connection.local_orig`*::
 +
 --
-Indicates whether the session is originated locally
+Indicates whether the session is originated locally.
 
 
 type: boolean
@@ -19465,7 +19465,7 @@ type: boolean
 *`zeek.connection.local_resp`*::
 +
 --
-Indicates whether the session is responded locally
+Indicates whether the session is responded locally.
 
 
 type: boolean
@@ -19475,7 +19475,7 @@ type: boolean
 *`zeek.connection.missed_bytes`*::
 +
 --
-Missed bytes for the session
+Missed bytes for the session.
 
 
 type: long
@@ -19486,7 +19486,7 @@ type: long
 *`zeek.connection.state.code`*::
 +
 --
-Code indicating the state of the session
+Code indicating the state of the session.
 
 
 type: keyword
@@ -19496,7 +19496,7 @@ type: keyword
 *`zeek.connection.state.msg`*::
 +
 --
-The meaning of the state code
+The meaning of the state code.
 
 
 type: keyword
@@ -19507,7 +19507,7 @@ type: keyword
 *`zeek.connection.icmp.type`*::
 +
 --
-ICMP message type
+ICMP message type.
 
 
 type: integer
@@ -19517,7 +19517,7 @@ type: integer
 *`zeek.connection.icmp.code`*::
 +
 --
-ICMP message code
+ICMP message code.
 
 
 type: integer
@@ -19527,7 +19527,7 @@ type: integer
 *`zeek.connection.history`*::
 +
 --
-Flags indicating the history of the session
+Flags indicating the history of the session.
 
 
 type: keyword
@@ -19537,7 +19537,7 @@ type: keyword
 *`zeek.connection.vlan`*::
 +
 --
-VLAN identifier
+VLAN identifier.
 
 
 type: integer
@@ -19547,7 +19547,7 @@ type: integer
 *`zeek.connection.inner_vlan`*::
 +
 --
-VLAN identifier
+VLAN identifier.
 
 
 type: integer
@@ -19611,7 +19611,7 @@ Fields exported by the Zeek DHCP log
 *`zeek.dhcp.domain`*::
 +
 --
-Domain given by the server in option 15
+Domain given by the server in option 15.
 
 
 type: keyword
@@ -19622,17 +19622,17 @@ type: keyword
 +
 --
 Duration of the DHCP session representing the time from the first
-message to the last
+message to the last, in seconds.
 
 
-type: float
+type: double
 
 --
 
 *`zeek.dhcp.hostname`*::
 +
 --
-Name given by client in Hostname option 12
+Name given by client in Hostname option 12.
 
 
 type: keyword
@@ -19642,7 +19642,7 @@ type: keyword
 *`zeek.dhcp.client_fqdn`*::
 +
 --
-FQDN given by client in Client FQDN option 81
+FQDN given by client in Client FQDN option 81.
 
 
 type: keyword
@@ -19652,7 +19652,7 @@ type: keyword
 *`zeek.dhcp.lease_time`*::
 +
 --
-IP address lease interval in seconds
+IP address lease interval in seconds.
 
 
 type: integer
@@ -19662,14 +19662,14 @@ type: integer
 [float]
 === address
 
-Addresses seen in this DHCP exchange
+Addresses seen in this DHCP exchange.
 
 
 
 *`zeek.dhcp.address.assigned`*::
 +
 --
-IP address assigned by the server
+IP address assigned by the server.
 
 
 type: ip
@@ -19693,7 +19693,7 @@ type: ip
 *`zeek.dhcp.address.mac`*::
 +
 --
-Client's hardware address
+Client's hardware address.
 
 
 type: keyword
@@ -19703,7 +19703,7 @@ type: keyword
 *`zeek.dhcp.address.requested`*::
 +
 --
-IP address requested by the client
+IP address requested by the client.
 
 
 type: ip
@@ -19713,7 +19713,7 @@ type: ip
 *`zeek.dhcp.address.server`*::
 +
 --
-IP address of the DHCP server
+IP address of the DHCP server.
 
 
 type: ip
@@ -19724,7 +19724,7 @@ type: ip
 *`zeek.dhcp.msg.types`*::
 +
 --
-List of DHCP message types seen in this exchange
+List of DHCP message types seen in this exchange.
 
 
 type: keyword
@@ -19746,7 +19746,7 @@ type: ip
 +
 --
 Message typically accompanied with a DHCP_DECLINE so the client can
-tell the server why it rejected an address
+tell the server why it rejected an address.
 
 
 type: keyword
@@ -19757,7 +19757,7 @@ type: keyword
 +
 --
 Message typically accompanied with a DHCP_NAK to let the client know
-why it rejected the request
+why it rejected the request.
 
 
 type: keyword
@@ -19875,7 +19875,7 @@ Fields exported by the Zeek DNS log
 *`zeek.dns.trans_id`*::
 +
 --
-DNS transaction identifier
+DNS transaction identifier.
 
 
 type: keyword
@@ -19885,7 +19885,7 @@ type: keyword
 *`zeek.dns.rtt`*::
 +
 --
-Round trip time for the query and response
+Round trip time for the query and response.
 
 
 type: double
@@ -19895,7 +19895,7 @@ type: double
 *`zeek.dns.query`*::
 +
 --
-The domain name that is the subject of the DNS query
+The domain name that is the subject of the DNS query.
 
 
 type: keyword
@@ -19905,7 +19905,7 @@ type: keyword
 *`zeek.dns.qclass`*::
 +
 --
-The QCLASS value specifying the class of the query
+The QCLASS value specifying the class of the query.
 
 
 type: long
@@ -19915,7 +19915,7 @@ type: long
 *`zeek.dns.qclass_name`*::
 +
 --
-A descriptive name for the class of the query
+A descriptive name for the class of the query.
 
 
 type: keyword
@@ -19925,7 +19925,7 @@ type: keyword
 *`zeek.dns.qtype`*::
 +
 --
-A QTYPE value specifying the type of the query
+A QTYPE value specifying the type of the query.
 
 
 type: long
@@ -19935,7 +19935,7 @@ type: long
 *`zeek.dns.qtype_name`*::
 +
 --
-A descriptive name for the type of the query
+A descriptive name for the type of the query.
 
 
 type: keyword
@@ -19945,7 +19945,7 @@ type: keyword
 *`zeek.dns.rcode`*::
 +
 --
-The response code value in DNS response messages
+The response code value in DNS response messages.
 
 
 type: long
@@ -19955,7 +19955,7 @@ type: long
 *`zeek.dns.rcode_name`*::
 +
 --
-A descriptive name for the response code value
+A descriptive name for the response code value.
 
 
 type: keyword
@@ -19966,7 +19966,7 @@ type: keyword
 +
 --
 The Authoritative Answer bit for response messages specifies that the responding
-name server is an authority for the domain name in the question section
+name server is an authority for the domain name in the question section.
 
 
 type: boolean
@@ -19976,7 +19976,7 @@ type: boolean
 *`zeek.dns.TC`*::
 +
 --
-The Truncation bit specifies that the message was truncated
+The Truncation bit specifies that the message was truncated.
 
 
 type: boolean
@@ -19987,7 +19987,7 @@ type: boolean
 +
 --
 The Recursion Desired bit in a request message indicates that the client
-wants recursive service for this query
+wants recursive service for this query.
 
 
 type: boolean
@@ -20008,7 +20008,7 @@ type: boolean
 *`zeek.dns.answers`*::
 +
 --
-The set of resource descriptions in the query answer
+The set of resource descriptions in the query answer.
 
 
 type: keyword
@@ -20018,7 +20018,7 @@ type: keyword
 *`zeek.dns.TTLs`*::
 +
 --
-The caching intervals of the associated RRs described by the answers field
+The caching intervals of the associated RRs described by the answers field.
 
 
 type: double
@@ -20028,7 +20028,7 @@ type: double
 *`zeek.dns.rejected`*::
 +
 --
-Indicates whether the DNS query was rejected by the server
+Indicates whether the DNS query was rejected by the server.
 
 
 type: boolean
@@ -20038,7 +20038,7 @@ type: boolean
 *`zeek.dns.total_answers`*::
 +
 --
-The total number of resource records in the reply
+The total number of resource records in the reply.
 
 
 type: integer
@@ -20048,7 +20048,7 @@ type: integer
 *`zeek.dns.total_replies`*::
 +
 --
-The total number of resource records in the reply message
+The total number of resource records in the reply message.
 
 
 type: integer
@@ -20058,7 +20058,7 @@ type: integer
 *`zeek.dns.saw_query`*::
 +
 --
-Whether the full DNS query has been seen
+Whether the full DNS query has been seen.
 
 
 type: boolean
@@ -20068,7 +20068,7 @@ type: boolean
 *`zeek.dns.saw_reply`*::
 +
 --
-Whether the full DNS reply has been seen
+Whether the full DNS reply has been seen.
 
 
 type: boolean
@@ -20116,14 +20116,14 @@ type: keyword
 [float]
 === files
 
-Fields exported by the Zeek Files log
+Fields exported by the Zeek Files log.
 
 
 
 *`zeek.files.fuid`*::
 +
 --
-A file unique identifier
+A file unique identifier.
 
 
 type: keyword
@@ -20133,7 +20133,7 @@ type: keyword
 *`zeek.files.tx_host`*::
 +
 --
-The host that transferred the file
+The host that transferred the file.
 
 
 type: ip
@@ -20143,7 +20143,7 @@ type: ip
 *`zeek.files.rx_host`*::
 +
 --
-The host that received the file
+The host that received the file.
 
 
 type: ip
@@ -20153,7 +20153,7 @@ type: ip
 *`zeek.files.session_ids`*::
 +
 --
-The sessions that have this file
+The sessions that have this file.
 
 
 type: keyword
@@ -20165,7 +20165,7 @@ type: keyword
 --
 An identification of the source of the file data. E.g. it may be a network protocol
 over which it was transferred, or a local file path which was read, or some other
-input source
+input source.
 
 
 type: keyword
@@ -20177,7 +20177,7 @@ type: keyword
 --
 A value to represent the depth of this file in relation to its source. In SMTP, it
 is the depth of the MIME attachment on the message. In HTTP, it is the depth of the
-request within the TCP connection
+request within the TCP connection.
 
 
 type: long
@@ -20187,7 +20187,7 @@ type: long
 *`zeek.files.analyzers`*::
 +
 --
-A set of analysis types done during the file analysis
+A set of analysis types done during the file analysis.
 
 
 type: keyword
@@ -20197,7 +20197,7 @@ type: keyword
 *`zeek.files.mime_type`*::
 +
 --
-Mime type of the file
+Mime type of the file.
 
 
 type: keyword
@@ -20207,7 +20207,7 @@ type: keyword
 *`zeek.files.filename`*::
 +
 --
-Name of the file if available
+Name of the file if available.
 
 
 type: keyword
@@ -20218,7 +20218,7 @@ type: keyword
 +
 --
 If the source of this file is a network connection, this field indicates if the data
-originated from the local network or not
+originated from the local network or not.
 
 
 type: boolean
@@ -20229,7 +20229,7 @@ type: boolean
 +
 --
 If the source of this file is a network connection, this field indicates if the file is
-being sent by the originator of the connection or the responder
+being sent by the originator of the connection or the responder.
 
 
 type: boolean
@@ -20249,7 +20249,7 @@ type: double
 *`zeek.files.seen_bytes`*::
 +
 --
-Number of bytes provided to the file analysis engine for the file
+Number of bytes provided to the file analysis engine for the file.
 
 
 type: long
@@ -20259,7 +20259,7 @@ type: long
 *`zeek.files.total_bytes`*::
 +
 --
-Total number of bytes that are supposed to comprise the full file
+Total number of bytes that are supposed to comprise the full file.
 
 
 type: long
@@ -20270,7 +20270,7 @@ type: long
 +
 --
 The number of bytes in the file stream that were completely missed during the process
-of analysis
+of analysis.
 
 
 type: long
@@ -20281,7 +20281,7 @@ type: long
 +
 --
 The number of bytes in the file stream that were not delivered to stream file analyzers.
-This could be overlapping bytes or bytes that couldn't be reassembled
+This could be overlapping bytes or bytes that couldn't be reassembled.
 
 
 type: long
@@ -20291,7 +20291,7 @@ type: long
 *`zeek.files.timedout`*::
 +
 --
-Whether the file analysis timed out at least once for the file
+Whether the file analysis timed out at least once for the file.
 
 
 type: boolean
@@ -20302,7 +20302,7 @@ type: boolean
 +
 --
 Identifier associated with a container file from which this one was extracted as part of
-the file analysis
+the file analysis.
 
 
 type: keyword
@@ -20312,7 +20312,7 @@ type: keyword
 *`zeek.files.md5`*::
 +
 --
-An MD5 digest of the file contents
+An MD5 digest of the file contents.
 
 
 type: keyword
@@ -20322,7 +20322,7 @@ type: keyword
 *`zeek.files.sha1`*::
 +
 --
-A SHA1 digest of the file contents
+A SHA1 digest of the file contents.
 
 
 type: keyword
@@ -20342,7 +20342,7 @@ type: keyword
 *`zeek.files.extracted`*::
 +
 --
-Local filename of extracted file
+Local filename of extracted file.
 
 
 type: keyword
@@ -20352,7 +20352,7 @@ type: keyword
 *`zeek.files.extracted_cutoff`*::
 +
 --
-Indicate whether the file being extracted was cut off hence not extracted completely
+Indicate whether the file being extracted was cut off hence not extracted completely.
 
 
 type: boolean
@@ -20362,7 +20362,7 @@ type: boolean
 *`zeek.files.extracted_size`*::
 +
 --
-The number of bytes extracted to disk
+The number of bytes extracted to disk.
 
 
 type: long
@@ -20372,7 +20372,7 @@ type: long
 *`zeek.files.entropy`*::
 +
 --
-The information density of the contents of the file
+The information density of the contents of the file.
 
 
 type: double
@@ -20433,7 +20433,7 @@ type: keyword
 Size of the file if the command indicates a file transfer.
 
 
-type: integer
+type: long
 
 --
 
@@ -20606,7 +20606,8 @@ type: boolean
 *`zeek.ftp.last_auth_requested`*::
 +
 --
-(present if base/protocols/ftp/gridftp.bro is loaded)
+present if base/protocols/ftp/gridftp.bro is loaded.
+Last authentication/security mechanism that was used.
 
 
 type: keyword
@@ -20623,7 +20624,7 @@ Fields exported by the Zeek HTTP log
 *`zeek.http.trans_depth`*::
 +
 --
-Represents the pipelined depth into the connection of this request/response transaction
+Represents the pipelined depth into the connection of this request/response transaction.
 
 
 type: integer
@@ -20633,7 +20634,7 @@ type: integer
 *`zeek.http.status_msg`*::
 +
 --
-Status message returned by the server
+Status message returned by the server.
 
 
 type: keyword
@@ -20674,7 +20675,7 @@ type: keyword
 *`zeek.http.password`*::
 +
 --
-Password if basic-auth is performed for the request
+Password if basic-auth is performed for the request.
 
 
 type: keyword
@@ -20684,7 +20685,7 @@ type: keyword
 *`zeek.http.captured_password`*::
 +
 --
-Determines if the password will be captured for this request
+Determines if the password will be captured for this request.
 
 
 type: boolean
@@ -20694,7 +20695,7 @@ type: boolean
 *`zeek.http.proxied`*::
 +
 --
-All of the headers that may indicate if the HTTP request was proxied
+All of the headers that may indicate if the HTTP request was proxied.
 
 
 type: keyword
@@ -20704,7 +20705,7 @@ type: keyword
 *`zeek.http.range_request`*::
 +
 --
-Indicates if this request can assume 206 partial content in response
+Indicates if this request can assume 206 partial content in response.
 
 
 type: boolean
@@ -20726,7 +20727,7 @@ type: keyword
 +
 --
 The vector of HTTP header names sent by the server. No header values
-are included here, just the header names
+are included here, just the header names.
 
 
 type: keyword
@@ -20736,7 +20737,7 @@ type: keyword
 *`zeek.http.orig_fuids`*::
 +
 --
-An ordered vector of file unique IDs from the originator
+An ordered vector of file unique IDs from the originator.
 
 
 type: keyword
@@ -20746,7 +20747,7 @@ type: keyword
 *`zeek.http.orig_mime_types`*::
 +
 --
-An ordered vector of mime types from the originator
+An ordered vector of mime types from the originator.
 
 
 type: keyword
@@ -20756,7 +20757,7 @@ type: keyword
 *`zeek.http.orig_filenames`*::
 +
 --
-An ordered vector of filenames from the originator
+An ordered vector of filenames from the originator.
 
 
 type: keyword
@@ -20766,7 +20767,7 @@ type: keyword
 *`zeek.http.resp_fuids`*::
 +
 --
-An ordered vector of file unique IDs from the responder
+An ordered vector of file unique IDs from the responder.
 
 
 type: keyword
@@ -20776,7 +20777,7 @@ type: keyword
 *`zeek.http.resp_mime_types`*::
 +
 --
-An ordered vector of mime types from the responder
+An ordered vector of mime types from the responder.
 
 
 type: keyword
@@ -20786,7 +20787,7 @@ type: keyword
 *`zeek.http.resp_filenames`*::
 +
 --
-An ordered vector of filenames from the responder
+An ordered vector of filenames from the responder.
 
 
 type: keyword
@@ -20796,7 +20797,7 @@ type: keyword
 *`zeek.http.orig_mime_depth`*::
 +
 --
-Current number of MIME entities in the HTTP request message body
+Current number of MIME entities in the HTTP request message body.
 
 
 type: integer
@@ -20806,7 +20807,7 @@ type: integer
 *`zeek.http.resp_mime_depth`*::
 +
 --
-Current number of MIME entities in the HTTP response message body
+Current number of MIME entities in the HTTP response message body.
 
 
 type: integer
@@ -20875,7 +20876,7 @@ type: keyword
 *`zeek.irc.dcc.file.name`*::
 +
 --
-(present if base/protocols/irc/dcc-send.bro is loaded)
+Present if base/protocols/irc/dcc-send.bro is loaded.
 DCC filename requested.
 
 
@@ -20886,18 +20887,18 @@ type: keyword
 *`zeek.irc.dcc.file.size`*::
 +
 --
-(present if base/protocols/irc/dcc-send.bro is loaded)
+Present if base/protocols/irc/dcc-send.bro is loaded.
 Size of the DCC transfer as indicated by the sender.
 
 
-type: integer
+type: long
 
 --
 
 *`zeek.irc.dcc.mime_type`*::
 +
 --
-(present if base/protocols/irc/dcc-send.bro is loaded)
+present if base/protocols/irc/dcc-send.bro is loaded.
 Sniffed mime type of the file.
 
 
@@ -20908,7 +20909,7 @@ type: keyword
 *`zeek.irc.fuid`*::
 +
 --
-(present if base/protocols/irc/files.bro is loaded)
+present if base/protocols/irc/files.bro is loaded.
 File unique ID.
 
 
@@ -20926,7 +20927,7 @@ Fields exported by the Zeek Kerberos log
 *`zeek.kerberos.request_type`*::
 +
 --
-Request type - Authentication Service (AS) or Ticket Granting Service (TGS)
+Request type - Authentication Service (AS) or Ticket Granting Service (TGS).
 
 
 type: keyword
@@ -20936,7 +20937,7 @@ type: keyword
 *`zeek.kerberos.client`*::
 +
 --
-Client
+Client name.
 
 
 type: keyword
@@ -20946,7 +20947,7 @@ type: keyword
 *`zeek.kerberos.service`*::
 +
 --
-Service
+Service name.
 
 
 type: keyword
@@ -20956,7 +20957,7 @@ type: keyword
 *`zeek.kerberos.success`*::
 +
 --
-Request result
+Request result.
 
 
 type: boolean
@@ -20967,7 +20968,7 @@ type: boolean
 *`zeek.kerberos.error.code`*::
 +
 --
-Error code
+Error code.
 
 
 type: integer
@@ -20977,7 +20978,7 @@ type: integer
 *`zeek.kerberos.error.msg`*::
 +
 --
-Error message
+Error message.
 
 
 type: keyword
@@ -20988,7 +20989,7 @@ type: keyword
 *`zeek.kerberos.valid.from`*::
 +
 --
-Ticket valid from
+Ticket valid from.
 
 
 type: date
@@ -20998,7 +20999,7 @@ type: date
 *`zeek.kerberos.valid.until`*::
 +
 --
-Ticket valid until
+Ticket valid until.
 
 
 type: date
@@ -21008,7 +21009,7 @@ type: date
 *`zeek.kerberos.valid.days`*::
 +
 --
-Number of days the ticket is valid for
+Number of days the ticket is valid for.
 
 
 type: integer
@@ -21018,7 +21019,7 @@ type: integer
 *`zeek.kerberos.cipher`*::
 +
 --
-Ticket encryption type
+Ticket encryption type.
 
 
 type: keyword
@@ -21028,7 +21029,7 @@ type: keyword
 *`zeek.kerberos.forwardable`*::
 +
 --
-Forwardable ticket requested
+Forwardable ticket requested.
 
 
 type: boolean
@@ -21038,7 +21039,7 @@ type: boolean
 *`zeek.kerberos.renewable`*::
 +
 --
-Renewable ticket requested
+Renewable ticket requested.
 
 
 type: boolean
@@ -21049,7 +21050,7 @@ type: boolean
 *`zeek.kerberos.ticket.auth`*::
 +
 --
-Hash of ticket used to authorize request/transaction
+Hash of ticket used to authorize request/transaction.
 
 
 type: keyword
@@ -21059,7 +21060,7 @@ type: keyword
 *`zeek.kerberos.ticket.new`*::
 +
 --
-Hash of ticket returned by the KDC
+Hash of ticket returned by the KDC.
 
 
 type: keyword
@@ -21071,7 +21072,7 @@ type: keyword
 *`zeek.kerberos.cert.client.value`*::
 +
 --
-Client certificate
+Client certificate.
 
 
 type: keyword
@@ -21081,7 +21082,7 @@ type: keyword
 *`zeek.kerberos.cert.client.fuid`*::
 +
 --
-File unique ID of client cert
+File unique ID of client cert.
 
 
 type: keyword
@@ -21091,7 +21092,7 @@ type: keyword
 *`zeek.kerberos.cert.client.subject`*::
 +
 --
-Subject of client certificate
+Subject of client certificate.
 
 
 type: keyword
@@ -21102,7 +21103,7 @@ type: keyword
 *`zeek.kerberos.cert.server.value`*::
 +
 --
-Server certificate
+Server certificate.
 
 
 type: keyword
@@ -21112,7 +21113,7 @@ type: keyword
 *`zeek.kerberos.cert.server.fuid`*::
 +
 --
-File unique ID of server cert
+File unique ID of server certificate.
 
 
 type: keyword
@@ -21122,7 +21123,7 @@ type: keyword
 *`zeek.kerberos.cert.server.subject`*::
 +
 --
-Subject of server certificate
+Subject of server certificate.
 
 
 type: keyword
@@ -21132,7 +21133,7 @@ type: keyword
 [float]
 === modbus
 
-Fields exported by the Zeek SSH log
+Fields exported by the Zeek modbus log.
 
 
 
@@ -21159,7 +21160,8 @@ type: keyword
 *`zeek.modbus.track_address`*::
 +
 --
-(present if policy/protocols/modbus/track-memmap.bro is loaded)
+Present if policy/protocols/modbus/track-memmap.bro is loaded.
+Modbus track address.
 
 
 type: integer
@@ -21169,14 +21171,14 @@ type: integer
 [float]
 === mysql
 
-Fields exported by the Zeek MySQL log
+Fields exported by the Zeek MySQL log.
 
 
 
 *`zeek.mysql.cmd`*::
 +
 --
-The command that was issued
+The command that was issued.
 
 
 type: keyword
@@ -21186,7 +21188,7 @@ type: keyword
 *`zeek.mysql.arg`*::
 +
 --
-The argument issued to the command
+The argument issued to the command.
 
 
 type: keyword
@@ -21196,7 +21198,7 @@ type: keyword
 *`zeek.mysql.success`*::
 +
 --
-Did the server tell us that the command succeeded?
+Whether the command succeeded.
 
 
 type: boolean
@@ -21206,7 +21208,7 @@ type: boolean
 *`zeek.mysql.rows`*::
 +
 --
-The number of affected rows, if any
+The number of affected rows, if any.
 
 
 type: integer
@@ -21216,7 +21218,7 @@ type: integer
 *`zeek.mysql.response`*::
 +
 --
-Server message, if any
+Server message, if any.
 
 
 type: keyword
@@ -21226,14 +21228,14 @@ type: keyword
 [float]
 === notice
 
-Fields exported by the Zeek Notice log
+Fields exported by the Zeek Notice log.
 
 
 
 *`zeek.notice.connection_id`*::
 +
 --
-Identifier of the related connection session
+Identifier of the related connection session.
 
 
 type: keyword
@@ -21243,7 +21245,7 @@ type: keyword
 *`zeek.notice.icmp_id`*::
 +
 --
-Identifier of the related ICMP session
+Identifier of the related ICMP session.
 
 
 type: keyword
@@ -21253,7 +21255,7 @@ type: keyword
 *`zeek.notice.file.id`*::
 +
 --
-An identifier associated with a single file that is related to this notice
+An identifier associated with a single file that is related to this notice.
 
 
 type: keyword
@@ -21263,7 +21265,7 @@ type: keyword
 *`zeek.notice.file.parent_id`*::
 +
 --
-Identifier associated with a container file from which this one was extracted
+Identifier associated with a container file from which this one was extracted.
 
 
 type: keyword
@@ -21275,7 +21277,7 @@ type: keyword
 --
 An identification of the source of the file data. E.g. it may be a network protocol
 over which it was transferred, or a local file path which was read, or some other
-input source
+input source.
 
 
 type: keyword
@@ -21285,7 +21287,7 @@ type: keyword
 *`zeek.notice.file.mime_type`*::
 +
 --
-A mime type if the notice is related to a file
+A mime type if the notice is related to a file.
 
 
 type: keyword
@@ -21296,7 +21298,7 @@ type: keyword
 +
 --
 If the source of this file is a network connection, this field indicates if the file is
-being sent by the originator of the connection or the responder
+being sent by the originator of the connection or the responder.
 
 
 type: boolean
@@ -21306,7 +21308,7 @@ type: boolean
 *`zeek.notice.file.seen_bytes`*::
 +
 --
-Number of bytes provided to the file analysis engine for the file
+Number of bytes provided to the file analysis engine for the file.
 
 
 type: long
@@ -21316,7 +21318,7 @@ type: long
 *`zeek.notice.ffile.total_bytes`*::
 +
 --
-Total number of bytes that are supposed to comprise the full file
+Total number of bytes that are supposed to comprise the full file.
 
 
 type: long
@@ -21327,7 +21329,7 @@ type: long
 +
 --
 The number of bytes in the file stream that were completely missed during the process
-of analysis
+of analysis.
 
 
 type: long
@@ -21338,7 +21340,7 @@ type: long
 +
 --
 The number of bytes in the file stream that were not delivered to stream file analyzers.
-This could be overlapping bytes or bytes that couldn't be reassembled
+This could be overlapping bytes or bytes that couldn't be reassembled.
 
 
 type: long
@@ -21348,7 +21350,7 @@ type: long
 *`zeek.notice.fuid`*::
 +
 --
-A file unique ID if this notice is related to a file
+A file unique ID if this notice is related to a file.
 
 
 type: keyword
@@ -21358,7 +21360,7 @@ type: keyword
 *`zeek.notice.note`*::
 +
 --
-The type of the notice
+The type of the notice.
 
 
 type: keyword
@@ -21368,7 +21370,7 @@ type: keyword
 *`zeek.notice.msg`*::
 +
 --
-The human readable message for the
+The human readable message for the notice.
 
 
 type: keyword
@@ -21378,7 +21380,7 @@ type: keyword
 *`zeek.notice.sub`*::
 +
 --
-The human readable sub-message
+The human readable sub-message.
 
 
 type: keyword
@@ -21388,7 +21390,7 @@ type: keyword
 *`zeek.notice.n`*::
 +
 --
-Associated count, or a status code
+Associated count, or a status code.
 
 
 type: long
@@ -21398,7 +21400,7 @@ type: long
 *`zeek.notice.peer_name`*::
 +
 --
-Name of remote peer that raised this notice
+Name of remote peer that raised this notice.
 
 
 type: keyword
@@ -21408,7 +21410,7 @@ type: keyword
 *`zeek.notice.peer_descr`*::
 +
 --
-Textual description for the peer that raised this notice
+Textual description for the peer that raised this notice.
 
 
 type: text
@@ -21418,7 +21420,7 @@ type: text
 *`zeek.notice.actions`*::
 +
 --
-The actions which have been applied to this notice
+The actions which have been applied to this notice.
 
 
 type: keyword
@@ -21429,7 +21431,7 @@ type: keyword
 +
 --
 By adding chunks of text into this element, other scripts can expand on notices
-that are being emailed
+that are being emailed.
 
 
 type: text
@@ -21441,7 +21443,7 @@ type: text
 --
 Adding a string token to this set will cause the built-in emailing functionality
 to delay sending the email either the token has been removed or the email
-has been delayed for the specified time duration
+has been delayed for the specified time duration.
 
 
 type: keyword
@@ -21451,7 +21453,7 @@ type: keyword
 *`zeek.notice.identifier`*::
 +
 --
-This field is provided when a notice is generated for the purpose of deduplicating notices
+This field is provided when a notice is generated for the purpose of deduplicating notices.
 
 
 type: keyword
@@ -21461,7 +21463,7 @@ type: keyword
 *`zeek.notice.suppress_for`*::
 +
 --
-This field indicates the length of time that this unique notice should be suppressed
+This field indicates the length of time that this unique notice should be suppressed.
 
 
 type: double
@@ -21471,7 +21473,7 @@ type: double
 *`zeek.notice.dropped`*::
 +
 --
-Indicate if the source IP address was dropped and denied network access
+Indicate if the source IP address was dropped and denied network access.
 
 
 type: boolean
@@ -21481,14 +21483,14 @@ type: boolean
 [float]
 === ntlm
 
-Fields exported by the Zeek NTLM log
+Fields exported by the Zeek NTLM log.
 
 
 
 *`zeek.ntlm.domain`*::
 +
 --
-Domain name given by the client
+Domain name given by the client.
 
 
 type: keyword
@@ -21498,7 +21500,7 @@ type: keyword
 *`zeek.ntlm.hostname`*::
 +
 --
-Hostname given by the client
+Hostname given by the client.
 
 
 type: keyword
@@ -21508,7 +21510,7 @@ type: keyword
 *`zeek.ntlm.success`*::
 +
 --
-Indicate whether or not the authentication was successful
+Indicate whether or not the authentication was successful.
 
 
 type: boolean
@@ -21518,7 +21520,7 @@ type: boolean
 *`zeek.ntlm.username`*::
 +
 --
-Username given by the client
+Username given by the client.
 
 
 type: keyword
@@ -21530,7 +21532,7 @@ type: keyword
 *`zeek.ntlm.server.name.dns`*::
 +
 --
-DNS name given by the server in a CHALLENGE
+DNS name given by the server in a CHALLENGE.
 
 
 type: keyword
@@ -21540,7 +21542,7 @@ type: keyword
 *`zeek.ntlm.server.name.netbios`*::
 +
 --
-NetBIOS name given by the server in a CHALLENGE
+NetBIOS name given by the server in a CHALLENGE.
 
 
 type: keyword
@@ -21550,7 +21552,7 @@ type: keyword
 *`zeek.ntlm.server.name.tree`*::
 +
 --
-Tree name given by the server in a CHALLENGE
+Tree name given by the server in a CHALLENGE.
 
 
 type: keyword
@@ -21672,14 +21674,14 @@ type: date
 [float]
 === pe
 
-Fields exported by the Zeek pe log
+Fields exported by the Zeek pe log.
 
 
 
 *`zeek.pe.client`*::
 +
 --
-The client's version string
+The client's version string.
 
 
 type: keyword
@@ -21849,7 +21851,7 @@ type: keyword
 [float]
 === radius
 
-Fields exported by the Zeek Radius log
+Fields exported by the Zeek Radius log.
 
 
 
@@ -21946,7 +21948,7 @@ type: boolean
 [float]
 === rdp
 
-Fields exported by the Zeek RDP log
+Fields exported by the Zeek RDP log.
 
 
 
@@ -22128,7 +22130,7 @@ type: boolean
 [float]
 === rfb
 
-Fields exported by the Zeek RFB log
+Fields exported by the Zeek RFB log.
 
 
 
@@ -22239,7 +22241,7 @@ type: integer
 [float]
 === sip
 
-Fields exported by the Zeek SIP log
+Fields exported by the Zeek SIP log.
 
 
 
@@ -22267,7 +22269,7 @@ type: keyword
 *`zeek.sip.sequence.number`*::
 +
 --
-Contents of the CSeq: header from the client
+Contents of the CSeq: header from the client.
 
 
 type: keyword
@@ -22287,7 +22289,7 @@ type: keyword
 *`zeek.sip.date`*::
 +
 --
-Contents of the Date: header from the client
+Contents of the Date: header from the client.
 
 
 type: keyword
@@ -22308,7 +22310,7 @@ type: keyword
 *`zeek.sip.request.to`*::
 +
 --
-Contents of the To: header
+Contents of the To: header.
 
 
 type: keyword
@@ -22328,10 +22330,10 @@ type: keyword
 *`zeek.sip.request.body_length`*::
 +
 --
-Contents of the Content-Length: header from the client
+Contents of the Content-Length: header from the client.
 
 
-type: integer
+type: long
 
 --
 
@@ -22349,7 +22351,7 @@ type: keyword
 *`zeek.sip.response.to`*::
 +
 --
-Contents of the response To: header
+Contents of the response To: header.
 
 
 type: keyword
@@ -22369,17 +22371,17 @@ type: keyword
 *`zeek.sip.response.body_length`*::
 +
 --
-Contents of the Content-Length: header from the server
+Contents of the Content-Length: header from the server.
 
 
-type: integer
+type: long
 
 --
 
 *`zeek.sip.reply_to`*::
 +
 --
-Contents of the Reply-To: header
+Contents of the Reply-To: header.
 
 
 type: keyword
@@ -22389,7 +22391,7 @@ type: keyword
 *`zeek.sip.call_id`*::
 +
 --
-Contents of the Call-ID: header from the client
+Contents of the Call-ID: header from the client.
 
 
 type: keyword
@@ -22399,7 +22401,7 @@ type: keyword
 *`zeek.sip.subject`*::
 +
 --
-Contents of the Subject: header from the client
+Contents of the Subject: header from the client.
 
 
 type: keyword
@@ -22409,7 +22411,7 @@ type: keyword
 *`zeek.sip.user_agent`*::
 +
 --
-Contents of the User-Agent: header from the client
+Contents of the User-Agent: header from the client.
 
 
 type: keyword
@@ -22440,7 +22442,7 @@ type: keyword
 *`zeek.sip.warning`*::
 +
 --
-Contents of the Warning: header
+Contents of the Warning: header.
 
 
 type: keyword
@@ -22450,7 +22452,7 @@ type: keyword
 *`zeek.sip.content_type`*::
 +
 --
-Contents of the Content-Type: header from the server
+Contents of the Content-Type: header from the server.
 
 
 type: keyword
@@ -22460,7 +22462,7 @@ type: keyword
 [float]
 === smb_cmd
 
-Fields exported by the Zeek smb_cmd log
+Fields exported by the Zeek smb_cmd log.
 
 
 
@@ -22510,7 +22512,7 @@ type: keyword
 Round trip time from the request to the response.
 
 
-type: integer
+type: double
 
 --
 
@@ -22564,7 +22566,7 @@ If the command referenced a file, store it here.
 *`zeek.smb_cmd.file.name`*::
 +
 --
-Filename if one was seen
+Filename if one was seen.
 
 
 type: keyword
@@ -22574,7 +22576,7 @@ type: keyword
 *`zeek.smb_cmd.file.action`*::
 +
 --
-Action this log record represents
+Action this log record represents.
 
 
 type: keyword
@@ -22584,7 +22586,7 @@ type: keyword
 *`zeek.smb_cmd.file.uid`*::
 +
 --
-UID of the referenced file
+UID of the referenced file.
 
 
 type: keyword
@@ -22595,7 +22597,7 @@ type: keyword
 *`zeek.smb_cmd.file.host.tx`*::
 +
 --
-Address of the transmitting host
+Address of the transmitting host.
 
 
 type: ip
@@ -22605,7 +22607,7 @@ type: ip
 *`zeek.smb_cmd.file.host.rx`*::
 +
 --
-Address of the receiving host
+Address of the receiving host.
 
 
 type: ip
@@ -22615,7 +22617,7 @@ type: ip
 *`zeek.smb_cmd.smb1_offered_dialects`*::
 +
 --
-(present if base/protocols/smb/smb1-main.bro is loaded)
+Present if base/protocols/smb/smb1-main.bro is loaded.
 Dialects offered by the client.
 
 
@@ -22626,7 +22628,7 @@ type: keyword
 *`zeek.smb_cmd.smb2_offered_dialects`*::
 +
 --
-(present if base/protocols/smb/smb2-main.bro is loaded)
+Present if base/protocols/smb/smb2-main.bro is loaded.
 Dialects offered by the client.
 
 
@@ -22637,14 +22639,14 @@ type: integer
 [float]
 === smb_files
 
-Fields exported by the Zeek SMB Files log
+Fields exported by the Zeek SMB Files log.
 
 
 
 *`zeek.smb_files.action`*::
 +
 --
-Action this log record represents
+Action this log record represents.
 
 
 type: keyword
@@ -22654,7 +22656,7 @@ type: keyword
 *`zeek.smb_files.fid`*::
 +
 --
-ID referencing this file
+ID referencing this file.
 
 
 type: integer
@@ -22664,7 +22666,7 @@ type: integer
 *`zeek.smb_files.name`*::
 +
 --
-Filename if one was seen
+Filename if one was seen.
 
 
 type: keyword
@@ -22674,7 +22676,7 @@ type: keyword
 *`zeek.smb_files.path`*::
 +
 --
-Path pulled from the tree this file was transferred to or from
+Path pulled from the tree this file was transferred to or from.
 
 
 type: keyword
@@ -22684,7 +22686,7 @@ type: keyword
 *`zeek.smb_files.previous_name`*::
 +
 --
-If the rename action was seen, this will be the file's previous name
+If the rename action was seen, this will be the file's previous name.
 
 
 type: keyword
@@ -22694,7 +22696,7 @@ type: keyword
 *`zeek.smb_files.size`*::
 +
 --
-Byte size of the file
+Byte size of the file.
 
 
 type: long
@@ -22704,14 +22706,14 @@ type: long
 [float]
 === times
 
-Timestamps of the file
+Timestamps of the file.
 
 
 
 *`zeek.smb_files.times.accessed`*::
 +
 --
-The file's access time
+The file's access time.
 
 
 type: date
@@ -22721,7 +22723,7 @@ type: date
 *`zeek.smb_files.times.changed`*::
 +
 --
-The file's change time
+The file's change time.
 
 
 type: date
@@ -22731,7 +22733,7 @@ type: date
 *`zeek.smb_files.times.created`*::
 +
 --
-The file's create time
+The file's create time.
 
 
 type: date
@@ -22741,7 +22743,7 @@ type: date
 *`zeek.smb_files.times.modified`*::
 +
 --
-The file's modify time
+The file's modify time.
 
 
 type: date
@@ -22751,7 +22753,7 @@ type: date
 *`zeek.smb_files.uuid`*::
 +
 --
-UUID referencing this file if DCE/RPC
+UUID referencing this file if DCE/RPC.
 
 
 type: keyword
@@ -22761,14 +22763,14 @@ type: keyword
 [float]
 === smb_mapping
 
-Fields exported by the Zeek SMB_Mapping log
+Fields exported by the Zeek SMB_Mapping log.
 
 
 
 *`zeek.smb_mapping.path`*::
 +
 --
-Name of the tree path
+Name of the tree path.
 
 
 type: keyword
@@ -22778,7 +22780,7 @@ type: keyword
 *`zeek.smb_mapping.service`*::
 +
 --
-The type of resource of the tree (disk share, printer share, named pipe, etc.)
+The type of resource of the tree (disk share, printer share, named pipe, etc.).
 
 
 type: keyword
@@ -22788,7 +22790,7 @@ type: keyword
 *`zeek.smb_mapping.native_file_system`*::
 +
 --
-File system of the tree
+File system of the tree.
 
 
 type: keyword
@@ -22809,7 +22811,7 @@ type: keyword
 [float]
 === smtp
 
-Fields exported by the Zeek SMTP log
+Fields exported by the Zeek SMTP log.
 
 
 
@@ -23047,7 +23049,7 @@ type: boolean
 [float]
 === snmp
 
-Fields exported by the Zeek SNMP log
+Fields exported by the Zeek SNMP log.
 
 
 
@@ -23057,7 +23059,7 @@ Fields exported by the Zeek SNMP log
 The amount of time between the first packet beloning to the SNMP session and the latest one seen.
 
 
-type: integer
+type: double
 
 --
 
@@ -23146,7 +23148,7 @@ type: date
 [float]
 === socks
 
-Fields exported by the Zeek SOCKS log
+Fields exported by the Zeek SOCKS log.
 
 
 
@@ -23245,14 +23247,14 @@ type: boolean
 [float]
 === ssh
 
-Fields exported by the Zeek SSH log
+Fields exported by the Zeek SSH log.
 
 
 
 *`zeek.ssh.client`*::
 +
 --
-The client's version string
+The client's version string.
 
 
 type: keyword
@@ -23274,7 +23276,7 @@ type: keyword
 *`zeek.ssh.host_key`*::
 +
 --
-The server's key thumbprint
+The server's key thumbprint.
 
 
 type: keyword
@@ -23284,7 +23286,7 @@ type: keyword
 *`zeek.ssh.server`*::
 +
 --
-The server's version string
+The server's version string.
 
 
 type: keyword
@@ -23294,7 +23296,7 @@ type: keyword
 *`zeek.ssh.version`*::
 +
 --
-SSH major version (1 or 2)
+SSH major version (1 or 2).
 
 
 type: integer
@@ -23304,14 +23306,14 @@ type: integer
 [float]
 === algorithm
 
-Cipher algorithms used in this session
+Cipher algorithms used in this session.
 
 
 
 *`zeek.ssh.algorithm.cipher`*::
 +
 --
-The encryption algorithm in use
+The encryption algorithm in use.
 
 
 type: keyword
@@ -23321,7 +23323,7 @@ type: keyword
 *`zeek.ssh.algorithm.compression`*::
 +
 --
-The compression algorithm in use
+The compression algorithm in use.
 
 
 type: keyword
@@ -23331,7 +23333,7 @@ type: keyword
 *`zeek.ssh.algorithm.host_key`*::
 +
 --
-The server host key's algorithm
+The server host key's algorithm.
 
 
 type: keyword
@@ -23341,7 +23343,7 @@ type: keyword
 *`zeek.ssh.algorithm.key_exchange`*::
 +
 --
-The key exchange algorithm in use
+The key exchange algorithm in use.
 
 
 type: keyword
@@ -23351,7 +23353,7 @@ type: keyword
 *`zeek.ssh.algorithm.mac`*::
 +
 --
-The signing (MAC) algorithm in use
+The signing (MAC) algorithm in use.
 
 
 type: keyword
@@ -23365,7 +23367,7 @@ type: keyword
 The number of authentication attemps we observed. There's always at
 least one, since some servers might support no authentication at all.
 It's important to note that not all of these are failures, since some
-servers require two-factor auth (e.g. password AND pubkey)
+servers require two-factor auth (e.g. password AND pubkey).
 
 
 type: integer
@@ -23375,7 +23377,7 @@ type: integer
 *`zeek.ssh.auth.success`*::
 +
 --
-Authentication result (T=success, F=failure, unset=unknown)
+Authentication result.
 
 
 type: boolean
@@ -23385,14 +23387,14 @@ type: boolean
 [float]
 === ssl
 
-Fields exported by the Zeek SSL log
+Fields exported by the Zeek SSL log.
 
 
 
 *`zeek.ssl.version`*::
 +
 --
-SSL/TLS version that was logged
+SSL/TLS version that was logged.
 
 
 type: keyword
@@ -23402,7 +23404,7 @@ type: keyword
 *`zeek.ssl.cipher`*::
 +
 --
-SSL/TLS cipher suite that was logged
+SSL/TLS cipher suite that was logged.
 
 
 type: keyword
@@ -23412,7 +23414,7 @@ type: keyword
 *`zeek.ssl.curve`*::
 +
 --
-Elliptic curve that was logged when using ECDH/ECDHE
+Elliptic curve that was logged when using ECDH/ECDHE.
 
 
 type: keyword
@@ -23423,7 +23425,7 @@ type: keyword
 +
 --
 Flag to indicate if the session was resumed reusing the key material exchanged in an
-earlier connection
+earlier connection.
 
 
 type: boolean
@@ -23433,7 +23435,7 @@ type: boolean
 *`zeek.ssl.next_protocol`*::
 +
 --
-Next protocol the server chose using the application layer next protocol extension
+Next protocol the server chose using the application layer next protocol extension.
 
 
 type: keyword
@@ -23443,7 +23445,7 @@ type: keyword
 *`zeek.ssl.established`*::
 +
 --
-Flag to indicate if this ssl session has been established successfully
+Flag to indicate if this ssl session has been established successfully.
 
 
 type: boolean
@@ -23454,7 +23456,7 @@ type: boolean
 *`zeek.ssl.validation.status`*::
 +
 --
-Result of certificate validation for this connection
+Result of certificate validation for this connection.
 
 
 type: keyword
@@ -23464,7 +23466,7 @@ type: keyword
 *`zeek.ssl.validation.code`*::
 +
 --
-Result of certificate validation for this connection, given as OpenSSL validation code
+Result of certificate validation for this connection, given as OpenSSL validation code.
 
 
 type: keyword
@@ -23474,7 +23476,7 @@ type: keyword
 *`zeek.ssl.last_alert`*::
 +
 --
-Last alert that was seen during the connection
+Last alert that was seen during the connection.
 
 
 type: keyword
@@ -23486,7 +23488,7 @@ type: keyword
 +
 --
 Value of the Server Name Indicator SSL/TLS extension. It indicates the server name
-that the client was requesting
+that the client was requesting.
 
 
 type: keyword
@@ -23496,7 +23498,7 @@ type: keyword
 *`zeek.ssl.server.cert_chain`*::
 +
 --
-Chain of certificates offered by the server to validate its complete signing chain
+Chain of certificates offered by the server to validate its complete signing chain.
 
 
 type: keyword
@@ -23506,7 +23508,7 @@ type: keyword
 *`zeek.ssl.server.cert_chain_fuids`*::
 +
 --
-An ordered vector of certificate file identifiers for the certificates offered by the server
+An ordered vector of certificate file identifiers for the certificates offered by the server.
 
 
 type: keyword
@@ -23516,14 +23518,14 @@ type: keyword
 [float]
 === issuer
 
-Subject of the signer of the X.509 certificate offered by the server
+Subject of the signer of the X.509 certificate offered by the server.
 
 
 
 *`zeek.ssl.server.issuer.common_name`*::
 +
 --
-Common name of the signer of the X.509 certificate offered by the server
+Common name of the signer of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23533,7 +23535,7 @@ type: keyword
 *`zeek.ssl.server.issuer.country`*::
 +
 --
-Country code of the signer of the X.509 certificate offered by the server
+Country code of the signer of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23543,7 +23545,7 @@ type: keyword
 *`zeek.ssl.server.issuer.locality`*::
 +
 --
-Locality of the signer of the X.509 certificate offered by the server
+Locality of the signer of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23553,7 +23555,7 @@ type: keyword
 *`zeek.ssl.server.issuer.organization`*::
 +
 --
-Organization of the signer of the X.509 certificate offered by the server
+Organization of the signer of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23563,7 +23565,7 @@ type: keyword
 *`zeek.ssl.server.issuer.organizational_unit`*::
 +
 --
-Organizational unit of the signer of the X.509 certificate offered by the server
+Organizational unit of the signer of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23573,7 +23575,7 @@ type: keyword
 *`zeek.ssl.server.issuer.state`*::
 +
 --
-State or province name of the signer of the X.509 certificate offered by the server
+State or province name of the signer of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23583,14 +23585,14 @@ type: keyword
 [float]
 === subject
 
-Subject of the X.509 certificate offered by the server
+Subject of the X.509 certificate offered by the server.
 
 
 
 *`zeek.ssl.server.subject.common_name`*::
 +
 --
-Common name of the X.509 certificate offered by the server
+Common name of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23600,7 +23602,7 @@ type: keyword
 *`zeek.ssl.server.subject.country`*::
 +
 --
-Country code of the X.509 certificate offered by the server
+Country code of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23610,7 +23612,7 @@ type: keyword
 *`zeek.ssl.server.subject.locality`*::
 +
 --
-Locality of the X.509 certificate offered by the server
+Locality of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23620,7 +23622,7 @@ type: keyword
 *`zeek.ssl.server.subject.organization`*::
 +
 --
-Organization of the X.509 certificate offered by the server
+Organization of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23630,7 +23632,7 @@ type: keyword
 *`zeek.ssl.server.subject.organizational_unit`*::
 +
 --
-Organizational unit of the X.509 certificate offered by the server
+Organizational unit of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23640,7 +23642,7 @@ type: keyword
 *`zeek.ssl.server.subject.state`*::
 +
 --
-State or province name of the X.509 certificate offered by the server
+State or province name of the X.509 certificate offered by the server.
 
 
 type: keyword
@@ -23651,7 +23653,7 @@ type: keyword
 *`zeek.ssl.client.cert_chain`*::
 +
 --
-Chain of certificates offered by the client to validate its complete signing chain
+Chain of certificates offered by the client to validate its complete signing chain.
 
 
 type: keyword
@@ -23661,7 +23663,7 @@ type: keyword
 *`zeek.ssl.client.cert_chain_fuids`*::
 +
 --
-An ordered vector of certificate file identifiers for the certificates offered by the client
+An ordered vector of certificate file identifiers for the certificates offered by the client.
 
 
 type: keyword
@@ -23671,14 +23673,14 @@ type: keyword
 [float]
 === issuer
 
-Subject of the signer of the X.509 certificate offered by the client
+Subject of the signer of the X.509 certificate offered by the client.
 
 
 
 *`zeek.ssl.client.issuer.common_name`*::
 +
 --
-Common name of the signer of the X.509 certificate offered by the client
+Common name of the signer of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23688,7 +23690,7 @@ type: keyword
 *`zeek.ssl.client.issuer.country`*::
 +
 --
-Country code of the signer of the X.509 certificate offered by the client
+Country code of the signer of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23698,7 +23700,7 @@ type: keyword
 *`zeek.ssl.client.issuer.locality`*::
 +
 --
-Locality of the signer of the X.509 certificate offered by the client
+Locality of the signer of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23708,7 +23710,7 @@ type: keyword
 *`zeek.ssl.client.issuer.organization`*::
 +
 --
-Organization of the signer of the X.509 certificate offered by the client
+Organization of the signer of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23718,7 +23720,7 @@ type: keyword
 *`zeek.ssl.client.issuer.organizational_unit`*::
 +
 --
-Organizational unit of the signer of the X.509 certificate offered by the client
+Organizational unit of the signer of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23728,7 +23730,7 @@ type: keyword
 *`zeek.ssl.client.issuer.state`*::
 +
 --
-State or province name of the signer of the X.509 certificate offered by the client
+State or province name of the signer of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23738,14 +23740,14 @@ type: keyword
 [float]
 === subject
 
-Subject of the X.509 certificate offered by the client
+Subject of the X.509 certificate offered by the client.
 
 
 
 *`zeek.ssl.client.subject.common_name`*::
 +
 --
-Common name of the X.509 certificate offered by the client
+Common name of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23755,7 +23757,7 @@ type: keyword
 *`zeek.ssl.client.subject.country`*::
 +
 --
-Country code of the X.509 certificate offered by the client
+Country code of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23765,7 +23767,7 @@ type: keyword
 *`zeek.ssl.client.subject.locality`*::
 +
 --
-Locality of the X.509 certificate offered by the client
+Locality of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23775,7 +23777,7 @@ type: keyword
 *`zeek.ssl.client.subject.organization`*::
 +
 --
-Organization of the X.509 certificate offered by the client
+Organization of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23785,7 +23787,7 @@ type: keyword
 *`zeek.ssl.client.subject.organizational_unit`*::
 +
 --
-Organizational unit of the X.509 certificate offered by the client
+Organizational unit of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23795,7 +23797,7 @@ type: keyword
 *`zeek.ssl.client.subject.state`*::
 +
 --
-State or province name of the X.509 certificate offered by the client
+State or province name of the X.509 certificate offered by the client.
 
 
 type: keyword
@@ -23805,7 +23807,7 @@ type: keyword
 [float]
 === stats
 
-Fields exported by the Zeek stats log
+Fields exported by the Zeek stats log.
 
 
 
@@ -23836,7 +23838,7 @@ type: integer
 Number of packets processed since the last stats interval.
 
 
-type: integer
+type: long
 
 --
 
@@ -23846,7 +23848,7 @@ type: integer
 Number of packets dropped since the last stats interval if reading live traffic.
 
 
-type: integer
+type: long
 
 --
 
@@ -23856,7 +23858,7 @@ type: integer
 Number of packets seen on the link since the last stats interval if reading live traffic.
 
 
-type: integer
+type: long
 
 --
 
@@ -23867,7 +23869,7 @@ type: integer
 Number of bytes received since the last stats interval if reading live traffic.
 
 
-type: integer
+type: long
 
 --
 
@@ -24073,7 +24075,7 @@ type: integer
 [float]
 === syslog
 
-Fields exported by the Zeek syslog log
+Fields exported by the Zeek syslog log.
 
 
 
@@ -24110,7 +24112,7 @@ type: keyword
 [float]
 === tunnel
 
-Fields exported by the Zeek SSH log
+Fields exported by the Zeek SSH log.
 
 
 
@@ -24137,7 +24139,7 @@ type: keyword
 [float]
 === weird
 
-Fields exported by the Zeek Weird log
+Fields exported by the Zeek Weird log.
 
 
 
@@ -24194,7 +24196,7 @@ type: keyword
 [float]
 === x509
 
-Fields exported by the Zeek x509 log
+Fields exported by the Zeek x509 log.
 
 
 
@@ -24410,7 +24412,7 @@ type: date
 *`zeek.x509.certificate.key.algorithm`*::
 +
 --
-Name of the key algorithm
+Name of the key algorithm.
 
 
 type: keyword
@@ -24420,7 +24422,7 @@ type: keyword
 *`zeek.x509.certificate.key.type`*::
 +
 --
-Key type, if key parseable by openssl (either rsa, dsa or ec)
+Key type, if key parseable by openssl (either rsa, dsa or ec).
 
 
 type: keyword
@@ -24430,7 +24432,7 @@ type: keyword
 *`zeek.x509.certificate.key.length`*::
 +
 --
-Key length in bits
+Key length in bits.
 
 
 type: integer
@@ -24440,7 +24442,7 @@ type: integer
 *`zeek.x509.certificate.signature_algorithm`*::
 +
 --
-Name of the signature algorithm
+Name of the signature algorithm.
 
 
 type: keyword
@@ -24450,7 +24452,7 @@ type: keyword
 *`zeek.x509.certificate.exponent`*::
 +
 --
-Exponent, if RSA-certificate
+Exponent, if RSA-certificate.
 
 
 type: keyword
@@ -24460,7 +24462,7 @@ type: keyword
 *`zeek.x509.certificate.curve`*::
 +
 --
-Curve, if EC-certificate
+Curve, if EC-certificate.
 
 
 type: keyword
@@ -24477,7 +24479,7 @@ Subject alternative name extension of the certificate.
 *`zeek.x509.san.dns`*::
 +
 --
-List of DNS entries in SAN
+List of DNS entries in SAN.
 
 
 type: keyword
@@ -24487,7 +24489,7 @@ type: keyword
 *`zeek.x509.san.uri`*::
 +
 --
-List of URI entries in SAN
+List of URI entries in SAN.
 
 
 type: keyword
@@ -24497,7 +24499,7 @@ type: keyword
 *`zeek.x509.san.email`*::
 +
 --
-List of email entries in SAN
+List of email entries in SAN.
 
 
 type: keyword
@@ -24507,7 +24509,7 @@ type: keyword
 *`zeek.x509.san.ip`*::
 +
 --
-List of IP entries in SAN
+List of IP entries in SAN.
 
 
 type: ip
@@ -24517,7 +24519,7 @@ type: ip
 *`zeek.x509.san.other_fields`*::
 +
 --
-True if the certificate contained other, not recognized or parsed name fields
+True if the certificate contained other, not recognized or parsed name fields.
 
 
 type: boolean
@@ -24534,7 +24536,7 @@ Basic constraints extension of the certificate.
 *`zeek.x509.basic_constraints.certificate_authority`*::
 +
 --
-CA flag set?
+CA flag set or not.
 
 
 type: boolean
@@ -24544,7 +24546,7 @@ type: boolean
 *`zeek.x509.basic_constraints.path_length`*::
 +
 --
-Maximum path length
+Maximum path length.
 
 
 type: integer
@@ -24554,8 +24556,8 @@ type: integer
 *`zeek.x509.log_cert`*::
 +
 --
-(present if policy/protocols/ssl/log-hostcerts-only.bro is loaded)
-Logging of certificate is suppressed if set to F
+Present if policy/protocols/ssl/log-hostcerts-only.bro is loaded
+Logging of certificate is suppressed if set to F.
 
 
 type: boolean
