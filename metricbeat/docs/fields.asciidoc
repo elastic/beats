@@ -30918,7 +30918,7 @@ type: long
 system metrics associated with the service
 
 
-*`system.services.resources.cpu.usage.nsec`*::
+*`system.services.resources.cpu.usage.ns`*::
 +
 --
 CPU usage in nanoseconds

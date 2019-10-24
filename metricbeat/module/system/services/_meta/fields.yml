@@ -32,7 +32,7 @@
       type: group
       description: system metrics associated with the service
       fields:
-        - name: cpu.usage.nsec
+        - name: cpu.usage.ns
           type: long
           description: CPU usage in nanoseconds
         - name: memory.usage.bytes
