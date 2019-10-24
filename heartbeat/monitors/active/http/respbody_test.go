@@ -27,22 +27,26 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common/match"
+
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/beat"
 )
 
 func Test_handleRespBody(t *testing.T) {
+	matchingBodyValidator := checkBody([]match.Matcher{match.MustCompile("hello")})
+	failingBodyValidator := checkBody([]match.Matcher{match.MustCompile("goodbye")})
+
+	matchingComboValidator := comboValidator{bodyValidators: []bodyValidator{matchingBodyValidator}}
+	failingComboValidator := comboValidator{bodyValidators: []bodyValidator{failingBodyValidator}}
+
 	type args struct {
-		event          *beat.Event
 		resp           *http.Response
 		responseConfig responseConfig
-		errReason      reason.Reason
+		validator      comboValidator
 	}
 	tests := []struct {
 		name          string
@@ -53,10 +57,9 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"on_error with error",
 			args{
-				&beat.Event{},
 				simpleHTTPResponse("hello"),
 				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
-				reason.IOFailed(fmt.Errorf("something happened")),
+				failingComboValidator,
 			},
 			false,
 			true,
@@ -64,10 +67,9 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"on_error with success",
 			args{
-				&beat.Event{},
 				simpleHTTPResponse("hello"),
 				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
-				nil,
+				matchingComboValidator,
 			},
 			false,
 			false,
@@ -75,10 +77,9 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"always with error",
 			args{
-				&beat.Event{},
 				simpleHTTPResponse("hello"),
 				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
-				reason.IOFailed(fmt.Errorf("something happened")),
+				failingComboValidator,
 			},
 			false,
 			true,
@@ -86,10 +87,9 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"always with success",
 			args{
-				&beat.Event{},
 				simpleHTTPResponse("hello"),
 				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
-				nil,
+				matchingComboValidator,
 			},
 			false,
 			true,
@@ -97,10 +97,9 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"never with error",
 			args{
-				&beat.Event{},
 				simpleHTTPResponse("hello"),
 				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
-				reason.IOFailed(fmt.Errorf("something happened")),
+				failingComboValidator,
 			},
 			false,
 			false,
@@ -108,10 +107,9 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"never with success",
 			args{
-				&beat.Event{},
 				simpleHTTPResponse("hello"),
 				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
-				nil,
+				matchingComboValidator,
 			},
 			false,
 			false,
@@ -120,8 +118,8 @@ func Test_handleRespBody(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			event := tt.args.event
-			if err := handleRespBody(tt.args.event, tt.args.resp, tt.args.responseConfig, tt.args.errReason); (err != nil) != tt.wantErr {
+			fields, err := processBody(tt.args.resp, tt.args.responseConfig, tt.args.validator)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("handleRespBody() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
@@ -133,12 +131,7 @@ func Test_handleRespBody(t *testing.T) {
 				bodyMatch["content"] = "hel"
 			}
 
-			testslike.Test(t,
-				lookslike.MustCompile(
-					map[string]interface{}{
-						"http.response.body": bodyMatch,
-					}),
-				event.Fields)
+			testslike.Test(t, lookslike.MustCompile(bodyMatch), fields)
 		})
 	}
 }
@@ -181,19 +174,19 @@ func Test_readResp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotBodySample, gotBodySize, gotHashStr, err := readResp(tt.args.resp, tt.args.maxSampleBytes)
+			gotBodySample, gotBodySize, gotHashStr, err := readBody(tt.args.resp, tt.args.maxSampleBytes)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("readResp() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("readBody() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotBodySample != tt.wantBodySample {
-				t.Errorf("readResp() gotBodySample = %v, want %v", gotBodySample, tt.wantBodySample)
+				t.Errorf("readBody() gotBodySample = %v, want %v", gotBodySample, tt.wantBodySample)
 			}
 			if gotBodySize != tt.wantBodySize {
-				t.Errorf("readResp() gotBodySize = %v, want %v", gotBodySize, tt.wantBodySize)
+				t.Errorf("readBody() gotBodySize = %v, want %v", gotBodySize, tt.wantBodySize)
 			}
 			if gotHashStr != tt.wantHashStr {
-				t.Errorf("readResp() gotHashStr = %v, want %v", gotHashStr, tt.wantHashStr)
+				t.Errorf("readBody() gotHashStr = %v, want %v", gotHashStr, tt.wantHashStr)
 			}
 		})
 	}

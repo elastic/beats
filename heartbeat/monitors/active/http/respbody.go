@@ -20,23 +20,72 @@ package http
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"net/http"
 	"unicode/utf8"
+
+	"github.com/elastic/beats/heartbeat/reason"
+	"github.com/elastic/beats/libbeat/common"
 )
 
-// readResp reads the first sampleSize bytes from the httpResponse,
+// If we have a validator we must buffer the entire body
+// since the validators are not streaming
+// We set a limit here of 100MiB to prevent excessive memory usage
+// in unusual conditions.
+const MaxBufferBodyBytes = 100 * 1024 * 1024
+
+func processBody(resp *http.Response, config responseConfig, validator comboValidator) (common.MapStr, reason.Reason) {
+	// Determine how much of the body to actually buffer in memory
+	var bufferBodyBytes int
+	if validator.wantsBody() {
+		bufferBodyBytes = MaxBufferBodyBytes
+	} else if config.IncludeBody == "always" || config.IncludeBody == "on_error" {
+		// If the user has asked for bodies to be recorded we only need to buffer that much
+		bufferBodyBytes = config.IncludeBodyMaxBytes
+	} else {
+		// Otherwise, we buffer nothing
+		bufferBodyBytes = 0
+	}
+
+	respBody, bodyLenBytes, bodyHash, respErr := readBody(resp, bufferBodyBytes)
+	// If we encounter an error while reading the body just fail early
+	if respErr != nil {
+		return nil, reason.IOFailed(respErr)
+	}
+
+	// Run any validations
+	errReason := validator.validate(resp, respBody)
+
+	bodyFields := common.MapStr{
+		"hash":  bodyHash,
+		"bytes": bodyLenBytes,
+	}
+	if config.IncludeBody == "always" ||
+		(config.IncludeBody == "on_error" && errReason != nil) {
+
+		// Do not store more bytes than the config specifies. We may
+		// have read extra bytes for the validators
+		sampleNumBytes := len(respBody)
+		if bodyLenBytes < sampleNumBytes {
+			sampleNumBytes = bodyLenBytes
+		}
+		if config.IncludeBodyMaxBytes < sampleNumBytes {
+			sampleNumBytes = config.IncludeBodyMaxBytes
+		}
+
+		bodyFields["content"] = respBody[0:sampleNumBytes]
+	}
+
+	return bodyFields, errReason
+}
+
+// readBody reads the first sampleSize bytes from the httpResponse,
 // then closes the body (which closes the connection). It doesn't return any errors
 // but does log them. During an error case the return values will be (nil, -1).
 // The maxBytes params controls how many bytes will be returned in a string, not how many will be read.
 // We always read the full response here since we want to time downloading the full thing.
 // This may return a nil body if the response is not valid UTF-8
-func readResp(resp *http.Response, maxSampleBytes int) (bodySample string, bodySize int, hashStr string, err error) {
-	if resp == nil {
-		return "", -1, "", fmt.Errorf("cannot readResp of nil HTTP response")
-	}
-
+func readBody(resp *http.Response, maxSampleBytes int) (bodySample string, bodySize int, hashStr string, err error) {
 	defer resp.Body.Close()
 
 	respSize, bodySample, hash, err := readPrefixAndHash(resp.Body, maxSampleBytes)

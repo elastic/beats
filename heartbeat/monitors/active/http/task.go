@@ -225,71 +225,26 @@ func execPing(
 	// we may want to add additional fields to contextualize the error.
 	start, resp, errReason := execRequest(client, req)
 
-	// If we have no response object there probably was an IO error, we can skip the rest of the logic
+	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
-	if resp == nil {
+	if resp == nil || errReason != nil {
 		return start, time.Now(), errReason
 	}
 
-	// Determine if we read the none, some, or all of the body
-	var bufferBodyBytes int
-	if validator.wantsBody() {
-		// If we have a validator we must buffer the entire body
-		// since the validators are not streaming
-		// We set a limit here of 100MiB to prevent excessive memory usage
-		// in unusual conditions.
-		bufferBodyBytes = 100 * 1024 * 1024
-	} else if responseConfig.IncludeBody == "always" || responseConfig.IncludeBody == "on_error" {
-		// If the user has asked for bodies to be recorded we only need to buffer that much
-		bufferBodyBytes = responseConfig.IncludeBodyMaxBytes
-	} else {
-		// Otherwise, we buffer nothing
-		bufferBodyBytes = 0
+	bodyFields, errReason := processBody(resp, responseConfig, validator)
+
+	responseFields := common.MapStr{
+		"status_code": resp.StatusCode,
+		"body":        bodyFields,
 	}
 
-	var respErr error
-	respBody, bodyLenBytes, bodyHash, respErr := readResp(resp, bufferBodyBytes)
-	if respErr != nil {
-		return start, time.Now(), reason.IOFailed(respErr)
-	}
+	httpFields := common.MapStr{"response": responseFields}
 
-	errReason = validator.validate(resp, respBody)
-
-	evtBodyMap := common.MapStr{
-		"hash":  bodyHash,
-		"bytes": bodyLenBytes,
-	}
-
-	if responseConfig.IncludeBody == "always" ||
-		(responseConfig.IncludeBody == "on_error" && errReason != nil) {
-
-		// Do not store more bytes than the config specifies. We may
-		// have read extra bytes for the validators
-		sampleNumBytes := len(respBody)
-		if bodyLenBytes < sampleNumBytes {
-			sampleNumBytes = bodyLenBytes
-		}
-		if responseConfig.IncludeBodyMaxBytes < sampleNumBytes {
-			sampleNumBytes = responseConfig.IncludeBodyMaxBytes
-		}
-
-		fmt.Printf("END IDX %v || %v\n", sampleNumBytes, len(respBody))
-		evtBodyMap["content"] = respBody[0:sampleNumBytes]
-	}
-
-	eventext.MergeEventFields(event, common.MapStr{
-		"http": common.MapStr{
-			"response": common.MapStr{"body": evtBodyMap},
-		},
-	})
-
-	// Add response.status_code and redirects
-	response := common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}
 	if redirects != nil && len(*redirects) > 0 {
-		response["redirects"] = redirects
+		httpFields["redirects"] = redirects
 	}
-	eventext.MergeEventFields(event, common.MapStr{"http": response})
+	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
