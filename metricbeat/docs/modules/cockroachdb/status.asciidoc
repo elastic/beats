@@ -9,7 +9,6 @@ beta[]
 
 include::../../../../x-pack/metricbeat/module/cockroachdb/status/_meta/docs.asciidoc[]
 
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
 ==== Fields
 
