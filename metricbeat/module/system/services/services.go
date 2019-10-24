@@ -28,7 +28,7 @@ import (
 
 // Config stores the config object
 type Config struct {
-	StateFilter []string `config:"filesystem.state_filter"`
+	StateFilter []string `config:"services.state_filter"`
 }
 
 // init registers the MetricSet with the central registry as soon as the program
