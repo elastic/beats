@@ -1,6 +1,6 @@
-The `services` module reports on the status of systemd services.
+The `services` metricset reports on the status of systemd services.
 
-This metricset is available on
+This metricset is available on:
 
 - Linux
 
