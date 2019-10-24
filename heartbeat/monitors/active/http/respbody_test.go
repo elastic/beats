@@ -38,13 +38,13 @@ func Test_handleRespBody(t *testing.T) {
 	matchingBodyValidator := checkBody([]match.Matcher{match.MustCompile("hello")})
 	failingBodyValidator := checkBody([]match.Matcher{match.MustCompile("goodbye")})
 
-	matchingComboValidator := comboValidator{bodyValidators: []bodyValidator{matchingBodyValidator}}
-	failingComboValidator := comboValidator{bodyValidators: []bodyValidator{failingBodyValidator}}
+	matchingComboValidator := multiValidator{bodyValidators: []bodyValidator{matchingBodyValidator}}
+	failingComboValidator := multiValidator{bodyValidators: []bodyValidator{failingBodyValidator}}
 
 	type args struct {
 		resp           *http.Response
 		responseConfig responseConfig
-		validator      comboValidator
+		validator      multiValidator
 	}
 	tests := []struct {
 		name          string

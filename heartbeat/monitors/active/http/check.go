@@ -33,16 +33,17 @@ import (
 	pkgerrors "github.com/pkg/errors"
 )
 
-type comboValidator struct {
+// multiValidator combines multiple validations of each type into a single easy to use object.
+type multiValidator struct {
 	respValidators []respValidator
 	bodyValidators []bodyValidator
 }
 
-func (rv comboValidator) wantsBody() bool {
+func (rv multiValidator) wantsBody() bool {
 	return len(rv.bodyValidators) > 0
 }
 
-func (rv comboValidator) validate(resp *http.Response, body string) reason.Reason {
+func (rv multiValidator) validate(resp *http.Response, body string) reason.Reason {
 	for _, respValidator := range rv.respValidators {
 		if err := respValidator(resp); err != nil {
 			return reason.ValidateFailed(err)
@@ -58,15 +59,20 @@ func (rv comboValidator) validate(resp *http.Response, body string) reason.Reaso
 	return nil
 }
 
+// respValidator is used for validating using only the non-body fields of the *http.Response.
+// Accessing the body of the response in such a validator should not be done due, use bodyValidator
+// for those purposes instead.
 type respValidator func(*http.Response) error
 
+// bodyValidator lets you validate a stringified version of the body along with other metadata in
+// *http.Response.
 type bodyValidator func(*http.Response, string) error
 
 var (
 	errBodyMismatch = errors.New("body mismatch")
 )
 
-func makeValidateResponse(config *responseParameters) (comboValidator, error) {
+func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	var respValidators []respValidator
 	var bodyValidators []bodyValidator
 
@@ -87,12 +93,12 @@ func makeValidateResponse(config *responseParameters) (comboValidator, error) {
 	if len(config.RecvJSON) > 0 {
 		jsonChecks, err := checkJSON(config.RecvJSON)
 		if err != nil {
-			return comboValidator{}, err
+			return multiValidator{}, err
 		}
 		bodyValidators = append(bodyValidators, jsonChecks)
 	}
 
-	return comboValidator{respValidators, bodyValidators}, nil
+	return multiValidator{respValidators, bodyValidators}, nil
 }
 
 func checkStatus(status uint16) respValidator {

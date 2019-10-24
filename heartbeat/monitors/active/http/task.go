@@ -46,7 +46,7 @@ func newHTTPMonitorHostJob(
 	transport *http.Transport,
 	enc contentEncoder,
 	body []byte,
-	validator comboValidator,
+	validator multiValidator,
 ) (jobs.Job, error) {
 
 	// Trace visited URLs when redirects occur
@@ -76,7 +76,7 @@ func newHTTPMonitorIPsJob(
 	tls *transport.TLSConfig,
 	enc contentEncoder,
 	body []byte,
-	validator comboValidator,
+	validator multiValidator,
 ) (jobs.Job, error) {
 
 	req, err := buildRequest(addr, config, enc)
@@ -103,7 +103,7 @@ func createPingFactory(
 	tls *transport.TLSConfig,
 	request *http.Request,
 	body []byte,
-	validator comboValidator,
+	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
@@ -212,7 +212,7 @@ func execPing(
 	req *http.Request,
 	reqBody []byte,
 	timeout time.Duration,
-	validator comboValidator,
+	validator multiValidator,
 	responseConfig responseConfig,
 	redirects *[]string,
 ) (start, end time.Time, err reason.Reason) {

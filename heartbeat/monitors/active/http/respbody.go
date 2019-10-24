@@ -33,7 +33,7 @@ import (
 // 100MiB out to be enough for everybody.
 const maxBufferBodyBytes = 100 * 1024 * 1024
 
-func processBody(resp *http.Response, config responseConfig, validator comboValidator) (common.MapStr, reason.Reason) {
+func processBody(resp *http.Response, config responseConfig, validator multiValidator) (common.MapStr, reason.Reason) {
 	// Determine how much of the body to actually buffer in memory
 	var bufferBodyBytes int
 	if validator.wantsBody() {
