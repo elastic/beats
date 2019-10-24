@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
 - Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
 - Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
+- By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
 
 *Auditbeat*
 
