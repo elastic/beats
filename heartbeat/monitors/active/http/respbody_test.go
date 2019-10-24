@@ -61,7 +61,7 @@ func Test_handleRespBody(t *testing.T) {
 				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
 			},
-			false,
+			true,
 			true,
 		},
 		{
@@ -81,7 +81,7 @@ func Test_handleRespBody(t *testing.T) {
 				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
 			},
-			false,
+			true,
 			true,
 		},
 		{
@@ -101,7 +101,7 @@ func Test_handleRespBody(t *testing.T) {
 				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
 			},
-			false,
+			true,
 			false,
 		},
 		{
@@ -159,17 +159,6 @@ func Test_readResp(t *testing.T) {
 			wantBodySize:   5,
 			wantHashStr:    "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
 			wantErr:        false,
-		},
-		{
-			name: "no resp",
-			args: args{
-				resp:           nil,
-				maxSampleBytes: 3,
-			},
-			wantBodySample: "",
-			wantBodySize:   -1,
-			wantHashStr:    "",
-			wantErr:        true,
 		},
 	}
 	for _, tt := range tests {
