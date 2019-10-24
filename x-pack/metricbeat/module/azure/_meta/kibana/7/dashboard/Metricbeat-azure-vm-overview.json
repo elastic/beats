@@ -213,8 +213,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-11T06:25:28.771Z",
-      "version": "WzE0NzEsMV0="
+      "updated_at": "2019-10-15T11:53:03.300Z",
+      "version": "WzMxOTAsMV0="
     },
     {
       "attributes": {
@@ -344,7 +344,7 @@
             },
             "id": "4f6c1610-ea8e-11e9-8c73-71740bcf3d8b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=60s",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -391,8 +391,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:27:01.167Z",
-      "version": "WzE0MTksMV0="
+      "updated_at": "2019-10-15T11:52:01.637Z",
+      "version": "WzMxODQsMV0="
     },
     {
       "attributes": {
@@ -424,7 +424,7 @@
             },
             "id": "c7e12030-ea94-11e9-bf06-bfc27258c9ad",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -466,8 +466,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:27:17.064Z",
-      "version": "WzE0MjAsMV0="
+      "updated_at": "2019-10-15T11:52:22.085Z",
+      "version": "WzMxODYsMV0="
     },
     {
       "attributes": {
@@ -499,7 +499,7 @@
             },
             "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -542,8 +542,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T14:03:59.835Z",
-      "version": "WzE0MzcsMV0="
+      "updated_at": "2019-10-15T11:50:30.820Z",
+      "version": "WzMxNzgsMV0="
     },
     {
       "attributes": {
@@ -575,7 +575,7 @@
             },
             "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -617,8 +617,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:28:22.044Z",
-      "version": "WzE0MjQsMV0="
+      "updated_at": "2019-10-15T11:52:40.578Z",
+      "version": "WzMxODgsMV0="
     },
     {
       "attributes": {
@@ -650,7 +650,7 @@
             },
             "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -693,8 +693,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:27:55.869Z",
-      "version": "WzE0MjIsMV0="
+      "updated_at": "2019-10-15T11:49:45.582Z",
+      "version": "WzMxNzQsMV0="
     },
     {
       "attributes": {
@@ -726,7 +726,7 @@
             },
             "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -769,8 +769,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T14:04:19.809Z",
-      "version": "WzE0MzgsMV0="
+      "updated_at": "2019-10-15T11:50:07.876Z",
+      "version": "WzMxNzYsMV0="
     },
     {
       "attributes": {
@@ -802,7 +802,7 @@
             },
             "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -845,8 +845,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:28:53.708Z",
-      "version": "WzE0MjYsMV0="
+      "updated_at": "2019-10-15T11:50:55.337Z",
+      "version": "WzMxODAsMV0="
     },
     {
       "attributes": {
@@ -878,7 +878,7 @@
             },
             "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -921,8 +921,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:28:34.591Z",
-      "version": "WzE0MjUsMV0="
+      "updated_at": "2019-10-15T11:51:33.545Z",
+      "version": "WzMxODIsMV0="
     }
   ],
   "version": "7.4.0"

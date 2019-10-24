@@ -15,9 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-/*
-Package mapval is used to validate JSON-like nested map data-structure against a set of expectations. Its key features are allowing custom, function defined validators  for values, and allowing the composition of multiple validation specs.
+package instance
 
-See the example below for more details. Most key functions include detailed examples of their use within this documentation.
-*/
-package mapval
+import "errors"
+
+var errNotImplemented = errors.New("not implemented on windows")
+
+func setUmask(newmask int) error {
+	// No way to set umask on Windows
+	return errNotImplemented
+}

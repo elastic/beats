@@ -198,8 +198,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-11T06:37:20.491Z",
-      "version": "WzE0ODcsMV0="
+      "updated_at": "2019-10-15T11:58:39.685Z",
+      "version": "WzMyMjQsMV0="
     },
     {
       "attributes": {
@@ -347,7 +347,7 @@
             "gauge_width": 10,
             "id": "d1acb8f0-eaa2-11e9-a229-c9171499dcc6",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -389,8 +389,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:29:55.108Z",
-      "version": "WzE0MzAsMV0="
+      "updated_at": "2019-10-15T11:56:33.857Z",
+      "version": "WzMyMTEsMV0="
     },
     {
       "attributes": {
@@ -422,7 +422,7 @@
             },
             "id": "da495db0-eaa7-11e9-a88b-4b683ca3087b",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -463,8 +463,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:30:56.351Z",
-      "version": "WzE0MzQsMV0="
+      "updated_at": "2019-10-15T11:56:54.774Z",
+      "version": "WzMyMTMsMV0="
     },
     {
       "attributes": {
@@ -496,7 +496,7 @@
             },
             "id": "be74e9e0-eaa4-11e9-8923-850d87d8e766",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -603,8 +603,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:29:31.133Z",
-      "version": "WzE0MjgsMV0="
+      "updated_at": "2019-10-15T11:57:11.237Z",
+      "version": "WzMyMTUsMV0="
     },
     {
       "attributes": {
@@ -636,7 +636,7 @@
             },
             "id": "29576400-eaa4-11e9-a2d3-e7a00bbd3c18",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -681,8 +681,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:29:16.193Z",
-      "version": "WzE0MjcsMV0="
+      "updated_at": "2019-10-15T11:57:29.302Z",
+      "version": "WzMyMTcsMV0="
     },
     {
       "attributes": {
@@ -714,7 +714,7 @@
             },
             "id": "94af6a00-eaa8-11e9-9269-d92e2d3f77fd",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -755,8 +755,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:30:43.799Z",
-      "version": "WzE0MzMsMV0="
+      "updated_at": "2019-10-15T11:57:45.878Z",
+      "version": "WzMyMTksMV0="
     },
     {
       "attributes": {
@@ -788,7 +788,7 @@
             },
             "id": "6d6575a0-eaa5-11e9-84ad-5919a47b8f34",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -895,8 +895,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:29:42.801Z",
-      "version": "WzE0MjksMV0="
+      "updated_at": "2019-10-15T11:58:04.891Z",
+      "version": "WzMyMjEsMV0="
     },
     {
       "attributes": {
@@ -928,7 +928,7 @@
             },
             "id": "35459a30-eaa8-11e9-a379-c33a712c0373",
             "index_pattern": "metricbeat-*",
-            "interval": "\u003e=1m",
+            "interval": "\u003e=5m",
             "isModelInvalid": false,
             "series": [
               {
@@ -991,8 +991,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-10T13:30:29.692Z",
-      "version": "WzE0MzIsMV0="
+      "updated_at": "2019-10-15T11:58:24.951Z",
+      "version": "WzMyMjMsMV0="
     }
   ],
   "version": "7.4.0"
