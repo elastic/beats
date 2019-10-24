@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-10-09T16:13:19.590Z",
+        "client.address": "192.168.10.31",
         "destination.address": "192.168.10.10",
         "destination.ip": "192.168.10.10",
         "destination.port": 88,
@@ -13,6 +14,7 @@
         "network.community_id": "1:DW/lSsosl8gZ8pqO9kKMm7cZheQ=",
         "network.protocol": "kerberos",
         "network.transport": "tcp",
+        "server.address": "192.168.10.10",
         "service.type": "zeek",
         "source.address": "192.168.10.31",
         "source.ip": "192.168.10.31",
