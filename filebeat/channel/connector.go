@@ -129,13 +129,13 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 
 type addIndexPattern struct {
 	pattern      string
-	formatString *fmtstr.StaticEventFormatString
+	formatString *fmtstr.TimestampFormatString
 }
 
 func newAddIndexPattern(
 	beatInfo beat.Info, pattern string,
 ) (processors.Processor, error) {
-	formatString, err := fmtstr.MinimalStaticEventFormatString(pattern, beatInfo)
+	formatString, err := fmtstr.MinimalTimestampFormatString(pattern, beatInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func newAddIndexPattern(
 }
 
 func (aip *addIndexPattern) Run(event *beat.Event) (*beat.Event, error) {
-	index, err := aip.formatString.Run(event)
+	index, err := aip.formatString.Run(event.Timestamp)
 	if err != nil {
 		return nil, err
 	}
