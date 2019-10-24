@@ -121,14 +121,13 @@ func Test_handleRespBody(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			event := tt.args.event
-			// TODO: FIX THIS TEST BEFORE MERGE
-			//if err := handleRespBody(tt.args.event, tt.args.resp, tt.args.responseConfig, tt.args.errReason); (err != nil) != tt.wantErr {
-			//t.Errorf("handleRespBody() error = %v, wantErr %v", err, tt.wantErr)
-			//}
+			if err := handleRespBody(tt.args.event, tt.args.resp, tt.args.responseConfig, tt.args.errReason); (err != nil) != tt.wantErr {
+				t.Errorf("handleRespBody() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
 			bodyMatch := map[string]interface{}{
 				"hash":  "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
-				"bytes": int64(5),
+				"bytes": 5,
 			}
 			if tt.wantFieldsSet {
 				bodyMatch["content"] = "hel"
@@ -153,7 +152,7 @@ func Test_readResp(t *testing.T) {
 		name           string
 		args           args
 		wantBodySample string
-		wantBodySize   int64
+		wantBodySize   int
 		wantHashStr    string
 		wantErr        bool
 	}{
@@ -256,7 +255,7 @@ func Test_readPrefixAndHash(t *testing.T) {
 				require.Error(t, err)
 			}
 
-			assert.Equal(t, int64(len(tt.body)), gotRespSize)
+			assert.Equal(t, len(tt.body), gotRespSize)
 			if tt.len <= len(tt.body) {
 				assert.Equal(t, tt.body[0:tt.len], gotPrefix)
 			} else {

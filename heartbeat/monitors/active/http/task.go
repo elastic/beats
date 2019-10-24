@@ -250,14 +250,11 @@ func execPing(
 
 	var respErr error
 	respBody, bodyLenBytes, bodyHash, respErr := readResp(resp, bufferBodyBytes)
-	if err != nil {
+	if respErr != nil {
 		return start, time.Now(), reason.IOFailed(respErr)
 	}
 
-	validatorErr := validator.validate(resp, respBody)
-	if err != nil {
-		return start, time.Now(), reason.ValidateFailed(validatorErr)
-	}
+	errReason = validator.validate(resp, respBody)
 
 	evtBodyMap := common.MapStr{
 		"hash":  bodyHash,
@@ -265,16 +262,20 @@ func execPing(
 	}
 
 	if responseConfig.IncludeBody == "always" ||
-		(responseConfig.IncludeBody == "on_error" && respErr != nil) {
+		(responseConfig.IncludeBody == "on_error" && errReason != nil) {
 
 		// Do not store more bytes than the config specifies. We may
 		// have read extra bytes for the validators
-		sampleEndIndex := bodyLenBytes
-		if bodyLenBytes < int64(responseConfig.IncludeBodyMaxBytes) {
-			sampleEndIndex = int64(responseConfig.IncludeBodyMaxBytes)
+		sampleNumBytes := len(respBody)
+		if bodyLenBytes < sampleNumBytes {
+			sampleNumBytes = bodyLenBytes
+		}
+		if responseConfig.IncludeBodyMaxBytes < sampleNumBytes {
+			sampleNumBytes = responseConfig.IncludeBodyMaxBytes
 		}
 
-		evtBodyMap["content"] = respBody[0:sampleEndIndex]
+		fmt.Printf("END IDX %v || %v\n", sampleNumBytes, len(respBody))
+		evtBodyMap["content"] = respBody[0:sampleNumBytes]
 	}
 
 	eventext.MergeEventFields(event, common.MapStr{

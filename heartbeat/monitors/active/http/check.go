@@ -25,6 +25,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/reason"
+
 	pkgerrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -42,16 +44,16 @@ func (rv comboValidator) wantsBody() bool {
 	return len(rv.bodyValidators) > 0
 }
 
-func (rv comboValidator) validate(resp *http.Response, body string) error {
+func (rv comboValidator) validate(resp *http.Response, body string) reason.Reason {
 	for _, respValidator := range rv.respValidators {
 		if err := respValidator(resp); err != nil {
-			return err
+			return reason.ValidateFailed(err)
 		}
 	}
 
 	for _, bodyValidator := range rv.bodyValidators {
 		if err := bodyValidator(resp, body); err != nil {
-			return err
+			return reason.ValidateFailed(err)
 		}
 	}
 

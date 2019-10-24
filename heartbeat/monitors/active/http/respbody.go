@@ -32,19 +32,19 @@ import (
 // The maxBytes params controls how many bytes will be returned in a string, not how many will be read.
 // We always read the full response here since we want to time downloading the full thing.
 // This may return a nil body if the response is not valid UTF-8
-func readResp(resp *http.Response, maxSampleBytes int) (bodySample string, bodySize int64, hashStr string, err error) {
-	defer resp.Body.Close()
-
+func readResp(resp *http.Response, maxSampleBytes int) (bodySample string, bodySize int, hashStr string, err error) {
 	if resp == nil {
 		return "", -1, "", fmt.Errorf("cannot readResp of nil HTTP response")
 	}
+
+	defer resp.Body.Close()
 
 	respSize, bodySample, hash, err := readPrefixAndHash(resp.Body, maxSampleBytes)
 
 	return bodySample, respSize, hash, err
 }
 
-func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int64, prefix string, hashStr string, err error) {
+func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, prefix string, hashStr string, err error) {
 	hash := sha256.New()
 	// Function to lazily get the body of the response
 	rawBuf := make([]byte, 1024)
@@ -55,9 +55,8 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int64, p
 	prefixWriteOffset := 0
 	for {
 		readSize, readErr := body.Read(rawBuf)
-		fmt.Printf("READBUF %v:%v\n", readSize, readErr)
 
-		respSize += int64(readSize)
+		respSize += readSize
 		hash.Write(rawBuf[:readSize])
 
 		if prefixRemainingBytes > 0 {
