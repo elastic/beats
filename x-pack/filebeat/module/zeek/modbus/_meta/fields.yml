@@ -1,7 +1,7 @@
 - name: modbus
   type: group
   description: >
-    Fields exported by the Zeek SSH log
+    Fields exported by the Zeek modbus log.
   fields:
     - name: function
       type: keyword
@@ -16,5 +16,5 @@
     - name: track_address
       type: integer
       description: |
-        (present if policy/protocols/modbus/track-memmap.bro is loaded)
-
+        Present if policy/protocols/modbus/track-memmap.bro is loaded.
+        Modbus track address.

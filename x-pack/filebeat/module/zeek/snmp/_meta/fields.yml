@@ -1,10 +1,10 @@
 - name: snmp
   type: group
   description: >
-    Fields exported by the Zeek SNMP log
+    Fields exported by the Zeek SNMP log.
   fields:
     - name: duration
-      type: integer
+      type: double
       description: >
         The amount of time between the first packet beloning to the SNMP session and the latest one seen.
 

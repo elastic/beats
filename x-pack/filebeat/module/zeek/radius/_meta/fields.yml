@@ -1,7 +1,7 @@
 - name: radius
   type: group
   description: >
-    Fields exported by the Zeek Radius log
+    Fields exported by the Zeek Radius log.
   fields:
     - name: username
       type: keyword

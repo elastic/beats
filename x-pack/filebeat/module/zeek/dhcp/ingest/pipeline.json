@@ -34,7 +34,21 @@
     },
     {
       "set": {
+        "field": "client.address",
+        "value": "{{zeek.dhcp.address.client}}",
+        "if": "ctx.zeek.dhcp.address?.client != null"
+      }
+    },
+    {
+      "set": {
         "field": "destination.address",
+        "value": "{{zeek.dhcp.address.server}}",
+        "if": "ctx.zeek.dhcp.address?.server != null"
+      }
+    },
+    {
+      "set": {
+        "field": "server.address",
         "value": "{{zeek.dhcp.address.server}}",
         "if": "ctx.zeek.dhcp.address?.server != null"
       }

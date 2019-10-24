@@ -1,7 +1,7 @@
 - name: weird
   type: group
   description: >
-    Fields exported by the Zeek Weird log
+    Fields exported by the Zeek Weird log.
   fields:
     - name: name
       type: keyword

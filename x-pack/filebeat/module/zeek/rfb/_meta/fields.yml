@@ -1,7 +1,7 @@
 - name: rfb
   type: group
   description: >
-    Fields exported by the Zeek RFB log
+    Fields exported by the Zeek RFB log.
   fields:
     - name: version
       type: group

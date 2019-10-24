@@ -1,7 +1,7 @@
 - name: syslog
   type: group
   description: >
-    Fields exported by the Zeek syslog log
+    Fields exported by the Zeek syslog log.
   fields:
     - name: facility
       type: keyword

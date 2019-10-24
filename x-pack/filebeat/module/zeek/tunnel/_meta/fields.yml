@@ -1,7 +1,7 @@
 - name: tunnel
   type: group
   description: >
-    Fields exported by the Zeek SSH log
+    Fields exported by the Zeek SSH log.
   fields:
     - name: type
       type: keyword

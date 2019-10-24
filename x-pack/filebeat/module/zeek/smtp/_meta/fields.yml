@@ -1,7 +1,7 @@
 - name: smtp
   type: group
   description: >
-    Fields exported by the Zeek SMTP log
+    Fields exported by the Zeek SMTP log.
   fields:
     - name: transaction_depth
       type: integer

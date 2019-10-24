@@ -33,6 +33,18 @@
     },
     {
       "set": {
+        "field": "client.address",
+        "value": "{{source.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "server.address",
+        "value": "{{destination.address}}"
+      }
+    },
+    {
+      "set": {
         "field": "destination.ip",
         "value": "{{destination.address}}"
       }

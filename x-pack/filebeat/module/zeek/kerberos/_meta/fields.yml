@@ -6,22 +6,22 @@
     - name: request_type
       type: keyword
       description: >
-        Request type - Authentication Service (AS) or Ticket Granting Service (TGS)
+        Request type - Authentication Service (AS) or Ticket Granting Service (TGS).
 
     - name: client
       type: keyword
       description: >
-        Client
+        Client name.
 
     - name: service
       type: keyword
       description: >
-        Service
+        Service name.
 
     - name: success
       type: boolean
       description: >
-        Request result
+        Request result.
 
     - name: error
       type: group
@@ -29,12 +29,12 @@
         - name: code
           type: integer
           description: >
-            Error code
+            Error code.
 
         - name: msg
           type: keyword
           description: >
-            Error message
+            Error message.
 
     - name: valid
       type: group
@@ -42,32 +42,32 @@
         - name: from
           type: date
           description: >
-            Ticket valid from
+            Ticket valid from.
 
         - name: until
           type: date
           description: >
-            Ticket valid until
+            Ticket valid until.
 
         - name: days
           type: integer
           description: >
-            Number of days the ticket is valid for
+            Number of days the ticket is valid for.
 
     - name: cipher
       type: keyword
       description: >
-        Ticket encryption type
+        Ticket encryption type.
 
     - name: forwardable
       type: boolean
       description: >
-        Forwardable ticket requested
+        Forwardable ticket requested.
 
     - name: renewable
       type: boolean
       description: >
-        Renewable ticket requested
+        Renewable ticket requested.
 
     - name: ticket
       type: group
@@ -75,12 +75,12 @@
         - name: auth
           type: keyword
           description: >
-            Hash of ticket used to authorize request/transaction
+            Hash of ticket used to authorize request/transaction.
 
         - name: new
           type: keyword
           description: >
-            Hash of ticket returned by the KDC
+            Hash of ticket returned by the KDC.
 
     - name: cert
       type: group
@@ -91,17 +91,17 @@
             - name: value
               type: keyword
               description: >
-                Client certificate
+                Client certificate.
 
             - name: fuid
               type: keyword
               description: >
-                File unique ID of client cert
+                File unique ID of client cert.
 
             - name: subject
               type: keyword
               description: >
-                Subject of client certificate
+                Subject of client certificate.
 
         - name: server
           type: group
@@ -109,14 +109,14 @@
             - name: value
               type: keyword
               description: >
-                Server certificate
+                Server certificate.
 
             - name: fuid
               type: keyword
               description: >
-                File unique ID of server cert
+                File unique ID of server certificate.
 
             - name: subject
               type: keyword
               description: >
-                Subject of server certificate
+                Subject of server certificate.

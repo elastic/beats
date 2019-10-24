@@ -1,7 +1,7 @@
 - name: stats
   type: group
   description: >
-    Fields exported by the Zeek stats log
+    Fields exported by the Zeek stats log.
   fields:
     - name: peer
       type: keyword
@@ -17,17 +17,17 @@
       type: group
       fields:
         - name: processed
-          type: integer
+          type: long
           description: |
             Number of packets processed since the last stats interval.
 
         - name: dropped
-          type: integer
+          type: long
           description: |
             Number of packets dropped since the last stats interval if reading live traffic.
 
         - name: received
-          type: integer
+          type: long
           description: |
             Number of packets seen on the link since the last stats interval if reading live traffic.
 
@@ -35,7 +35,7 @@
       type: group
       fields:
         - name: received
-          type: integer
+          type: long
           description: |
             Number of bytes received since the last stats interval if reading live traffic.
 

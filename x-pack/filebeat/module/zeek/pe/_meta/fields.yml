@@ -1,12 +1,12 @@
 - name: pe
   type: group
   description: >
-    Fields exported by the Zeek pe log
+    Fields exported by the Zeek pe log.
   fields:
     - name: client
       type: keyword
       description: >
-        The client's version string
+        The client's version string.
 
     - name: id
       type: keyword

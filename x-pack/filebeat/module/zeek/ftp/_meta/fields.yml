@@ -27,7 +27,7 @@
       type: group
       fields:
         - name: size
-          type: integer
+          type: long
           description: |
             Size of the file if the command indicates a file transfer.
 
@@ -123,4 +123,5 @@
     - name: last_auth_requested
       type: keyword
       description: |
-        (present if base/protocols/ftp/gridftp.bro is loaded)
+        present if base/protocols/ftp/gridftp.bro is loaded.
+        Last authentication/security mechanism that was used.

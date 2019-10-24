@@ -1,7 +1,7 @@
 - name: socks
   type: group
   description: >
-    Fields exported by the Zeek SOCKS log
+    Fields exported by the Zeek SOCKS log.
   fields:
     - name: version
       type: integer

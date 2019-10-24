@@ -37,23 +37,23 @@
             - name: name
               type: keyword
               description: |
-                (present if base/protocols/irc/dcc-send.bro is loaded)
+                Present if base/protocols/irc/dcc-send.bro is loaded.
                 DCC filename requested.
 
             - name: size
-              type: integer
+              type: long
               description: |
-                (present if base/protocols/irc/dcc-send.bro is loaded)
+                Present if base/protocols/irc/dcc-send.bro is loaded.
                 Size of the DCC transfer as indicated by the sender.
 
         - name: mime_type
           type: keyword
           description: |
-            (present if base/protocols/irc/dcc-send.bro is loaded)
+            present if base/protocols/irc/dcc-send.bro is loaded.
             Sniffed mime type of the file.
 
     - name: fuid
       type: keyword
       description: |
-        (present if base/protocols/irc/files.bro is loaded)
+        present if base/protocols/irc/files.bro is loaded.
         File unique ID.

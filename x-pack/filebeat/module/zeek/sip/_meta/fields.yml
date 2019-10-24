@@ -1,7 +1,7 @@
 - name: sip
   type: group
   description: >
-    Fields exported by the Zeek SIP log
+    Fields exported by the Zeek SIP log.
   fields:
     - name: transaction_depth
       type: integer
@@ -19,7 +19,7 @@
         - name: number
           type: keyword
           description: >
-            Contents of the CSeq: header from the client
+            Contents of the CSeq: header from the client.
 
     - name: uri
       type: keyword
@@ -29,7 +29,7 @@
     - name: date
       type: keyword
       description: >
-        Contents of the Date: header from the client
+        Contents of the Date: header from the client.
 
     - name: request
       type: group
@@ -42,7 +42,7 @@
         - name: to
           type: keyword
           description: >
-            Contents of the To: header
+            Contents of the To: header.
 
         - name: path
           type: keyword
@@ -50,9 +50,9 @@
             The client message transmission path, as extracted from the headers.
 
         - name: body_length
-          type: integer
+          type: long
           description: >
-            Contents of the Content-Length: header from the client
+            Contents of the Content-Length: header from the client.
 
     - name: response
       type: group
@@ -65,7 +65,7 @@
         - name: to
           type: keyword
           description: >
-            Contents of the response To: header
+            Contents of the response To: header.
 
         - name: path
           type: keyword
@@ -73,29 +73,29 @@
             The server message transmission path, as extracted from the headers.
 
         - name: body_length
-          type: integer
+          type: long
           description: >
-            Contents of the Content-Length: header from the server
+            Contents of the Content-Length: header from the server.
 
     - name: reply_to
       type: keyword
       description: >
-        Contents of the Reply-To: header
+        Contents of the Reply-To: header.
 
     - name: call_id
       type: keyword
       description: >
-        Contents of the Call-ID: header from the client
+        Contents of the Call-ID: header from the client.
 
     - name: subject
       type: keyword
       description: >
-        Contents of the Subject: header from the client
+        Contents of the Subject: header from the client.
 
     - name: user_agent
       type: keyword
       description: >
-        Contents of the User-Agent: header from the client
+        Contents of the User-Agent: header from the client.
 
     - name: status
       type: group
@@ -113,9 +113,9 @@
     - name: warning
       type: keyword
       description: >
-        Contents of the Warning: header
+        Contents of the Warning: header.
 
     - name: content_type
       type: keyword
       description: >
-        Contents of the Content-Type: header from the server
+        Contents of the Content-Type: header from the server.

@@ -6,38 +6,38 @@
     - name: domain
       type: keyword
       description: >
-        Domain given by the server in option 15
+        Domain given by the server in option 15.
 
     - name: duration
-      type: float
+      type: double
       description: |
         Duration of the DHCP session representing the time from the first
-        message to the last
+        message to the last, in seconds.
 
     - name: hostname
       type: keyword
       description: >
-        Name given by client in Hostname option 12
+        Name given by client in Hostname option 12.
 
     - name: client_fqdn
       type: keyword
       description: >
-        FQDN given by client in Client FQDN option 81
+        FQDN given by client in Client FQDN option 81.
 
     - name: lease_time
       type: integer
       description: >
-        IP address lease interval in seconds
+        IP address lease interval in seconds.
 
     - name: address
       type: group
       description: >
-        Addresses seen in this DHCP exchange
+        Addresses seen in this DHCP exchange.
       fields:
         - name: assigned
           type: ip
           description: >
-            IP address assigned by the server
+            IP address assigned by the server.
 
         - name: client
           type: ip
@@ -51,17 +51,17 @@
         - name: mac
           type: keyword
           description: >
-            Client's hardware address
+            Client's hardware address.
 
         - name: requested
           type: ip
           description: >
-            IP address requested by the client
+            IP address requested by the client.
 
         - name: server
           type: ip
           description: >
-            IP address of the DHCP server
+            IP address of the DHCP server.
 
     - name: msg
       type: group
@@ -69,7 +69,7 @@
         - name: types
           type: keyword
           description: >
-            List of DHCP message types seen in this exchange
+            List of DHCP message types seen in this exchange.
 
         - name: origin
           type: ip
@@ -81,13 +81,13 @@
           type: keyword
           description: |
             Message typically accompanied with a DHCP_DECLINE so the client can
-            tell the server why it rejected an address
+            tell the server why it rejected an address.
 
         - name: server
           type: keyword
           description: |
             Message typically accompanied with a DHCP_NAK to let the client know
-            why it rejected the request
+            why it rejected the request.
 
     - name: software
       type: group

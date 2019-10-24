@@ -1,7 +1,7 @@
 - name: smb_cmd
   type: group
   description: >
-    Fields exported by the Zeek smb_cmd log
+    Fields exported by the Zeek smb_cmd log.
   fields:
     - name: command
       type: keyword
@@ -24,7 +24,7 @@
         Server reply to the client's command.
 
     - name: rtt
-      type: integer
+      type: double
       description: |
         Round trip time from the request to the response.
 
@@ -56,17 +56,17 @@
         - name: name
           type: keyword
           description: |
-            Filename if one was seen
+            Filename if one was seen.
 
         - name: action
           type: keyword
           description: |
-            Action this log record represents
+            Action this log record represents.
 
         - name: uid
           type: keyword
           description: |
-            UID of the referenced file
+            UID of the referenced file.
 
         - name: host
           type: group
@@ -74,21 +74,21 @@
             - name: tx
               type: ip
               description: |
-                Address of the transmitting host
+                Address of the transmitting host.
 
             - name: rx
               type: ip
               description: |
-                Address of the receiving host
+                Address of the receiving host.
 
     - name: smb1_offered_dialects
       type: keyword
       description: |
-        (present if base/protocols/smb/smb1-main.bro is loaded)
+        Present if base/protocols/smb/smb1-main.bro is loaded.
         Dialects offered by the client.
 
     - name: smb2_offered_dialects
       type:  integer
       description: |
-        (present if base/protocols/smb/smb2-main.bro is loaded)
+        Present if base/protocols/smb/smb2-main.bro is loaded.
         Dialects offered by the client.
