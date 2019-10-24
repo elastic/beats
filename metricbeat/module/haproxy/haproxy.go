@@ -253,13 +253,13 @@ func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
 
 	conn, err := net.Dial(p.Network, p.Address)
 	if err != nil {
-		return response, errors.Wrap(err, "Error connecting")
+		return response, errors.Wrapf(err, "error connecting to %s", p.Address)
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(cmd + "\n"))
 	if err != nil {
-		return response, errors.Wrap(err, "Error writing to connection")
+		return response, errors.Wrap(err, "error writing to connection")
 	}
 
 	recv, err := io.Copy(response, conn)
@@ -267,7 +267,7 @@ func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
 		return response, errors.Wrap(err, "error reading response")
 	}
 	if recv == 0 {
-		return response, errors.New("Got empty response from HAProxy")
+		return response, errors.New("got empty response from HAProxy")
 	}
 
 	if strings.HasPrefix(response.String(), "Unknown command") {
