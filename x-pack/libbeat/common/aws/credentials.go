@@ -57,9 +57,5 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	if config.SharedCredentialFile != "" {
 		options = append(options, external.WithSharedConfigFiles([]string{config.SharedCredentialFile}))
 	}
-
-	if options != nil {
-		return external.LoadDefaultAWSConfig(options...)
-	}
-	return external.LoadDefaultAWSConfig()
+	return external.LoadDefaultAWSConfig(options...)
 }
