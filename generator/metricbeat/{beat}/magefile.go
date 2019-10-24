@@ -38,7 +38,7 @@ func init() {
 	devtools.BeatDescription = "One sentence description of the Beat."
 }
 
-//CollectAll generates the docs and the fields.
+// CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)
 }
