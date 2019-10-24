@@ -1730,6 +1730,16 @@ func TestHttpParser_hostHeader(t *testing.T) {
 			},
 		},
 		{
+			title: "non boxed ipv6",
+			// This one is now illegal but it seems at some point the RFC
+			// didn't enforce the brackets when the port was omitted.
+			host: "fd00::1234",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[fd00::1234]/_cat/shards",
+			},
+		},
+		{
 			title: "non-matching port",
 			port:  80,
 			host:  "myhost:9200",

@@ -713,14 +713,13 @@ func extractHostHeader(header string) (host string, port int) {
 	}
 	// Split :port trailer
 	if pos := strings.LastIndexByte(header, ':'); pos != -1 {
-		var err error
-		if port, err = strconv.Atoi(header[pos+1:]); err == nil && port > 0 && port < 65535 {
-			header = header[:pos]
+		if num, err := strconv.Atoi(header[pos+1:]); err == nil && num > 0 && num < 65536 {
+			header, port = header[:pos], num
 		}
 	}
 	// Remove square bracket boxing of IPv6 address.
 	if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
-		return header[1:last], port
+		header = header[1:last]
 	}
 	return header, port
 }
