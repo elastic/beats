@@ -19,6 +19,7 @@ package services
 
 import (
 	"github.com/coreos/go-systemd/dbus"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -85,7 +86,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		props, err := m.conn.GetAllProperties(unit.Name)
+		props, err := getProps(m.conn, unit.Name)
 		if err != nil {
 			m.Logger().Errorf("error getting properties for service: %s", err)
 			continue
@@ -106,4 +107,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	}
 	return nil
+}
+
+// Get Properties for a given unit, cast to a struct
+func getProps(conn *dbus.Conn, unit string) (Properties, error) {
+	rawProps, err := conn.GetAllProperties(unit)
+	if err != nil {
+		return Properties{}, errors.Wrap(err, "error getting list of running units")
+	}
+	parsed := Properties{}
+	if err := mapstructure.Decode(rawProps, &parsed); err != nil {
+		return parsed, errors.Wrap(err, "Error decoding properties")
+	}
+	return parsed, nil
 }

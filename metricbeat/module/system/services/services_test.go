@@ -34,11 +34,11 @@ func TestFormProps(t *testing.T) {
 		ActiveState: "active",
 		SubState:    "running",
 	}
-	testprops := map[string]interface{}{
-		"ExecMainPID":          uint32(0),
-		"ExecMainStatus":       int32(0),
-		"ExecMainCode":         int32(1),
-		"ActiveEnterTimestamp": uint64(1571850129000000),
+	testprops := Properties{
+		ExecMainPID:          0,
+		ExecMainStatus:       0,
+		ExecMainCode:         1,
+		ActiveEnterTimestamp: 1571850129000000,
 	}
 	event, err := formProperties(testUnit, testprops)
 	assert.NoError(t, err)

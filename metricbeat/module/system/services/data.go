@@ -26,8 +26,31 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Properties is a struct representation of the dbus returns from GetAllProperties
+type Properties struct {
+	ExecMainCode   int32
+	ExecMainStatus int32
+	ExecMainPID    uint32
+	//Accounting
+	CPUAccounting          bool
+	MemoryAccounting       bool
+	TasksAccounting        bool
+	IPAccounting           bool
+	CPUUsageNSec           int64
+	MemoryCurrent          int64
+	TasksCurrent           int64
+	IPIngressPackets       int64
+	IPIngressBytes         int64
+	IPEgressPackets        int64
+	IPEgressBytes          int64
+	ActiveEnterTimestamp   uint64
+	InactiveEnterTimestamp uint64
+	InactiveExitTimestamp  uint64
+	ActiveExitTimestamp    uint64
+}
+
 // formProperties gets properties for the systemd service and returns a MapStr with useful data
-func formProperties(unit dbus.UnitStatus, props map[string]interface{}) (common.MapStr, error) {
+func formProperties(unit dbus.UnitStatus, props Properties) (common.MapStr, error) {
 	timeSince, err := timeSince(props, unit.ActiveState)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting timestamp")
@@ -51,9 +74,9 @@ func formProperties(unit dbus.UnitStatus, props map[string]interface{}) (common.
 	}
 
 	//anything less than 1 isn't a valid SIGCHLD code
-	if props["ExecMainCode"].(int32) > 0 {
-		event["exec_code"] = translateChild(props["ExecMainCode"].(int32))
-		event["exec_rc"] = props["ExecMainStatus"].(int32)
+	if props.ExecMainCode > 0 {
+		event["exec_code"] = translateChild(props.ExecMainCode)
+		event["exec_rc"] = props.ExecMainStatus
 	}
 
 	//only send timestamp if it's valid
@@ -62,48 +85,48 @@ func formProperties(unit dbus.UnitStatus, props map[string]interface{}) (common.
 	}
 
 	//only prints PID data if we have a PID
-	if props["ExecMainPID"].(uint32) > 0 {
-		event["main_pid"] = props["ExecMainPID"].(uint32)
+	if props.ExecMainPID > 0 {
+		event["main_pid"] = props.ExecMainPID
 	}
 
 	return event, nil
 }
 
 // getMetricsFromServivce checks what accounting we have enabled and uses that to determine what metrics we can send back to the user
-func getMetricsFromServivce(props map[string]interface{}) common.MapStr {
+func getMetricsFromServivce(props Properties) common.MapStr {
 	metrics := common.MapStr{}
 	//This error checking is because we don't _quite_ trust the maps we get back from the API.
-	if cpu, ok := props["CPUAccounting"]; ok && cpu.(bool) {
+	if props.CPUAccounting {
 		metrics["cpu"] = common.MapStr{
 			"usage": common.MapStr{
-				"nsec": props["CPUUsageNSec"],
+				"nsec": props.CPUUsageNSec,
 			},
 		}
 	}
 
-	if mem, ok := props["MemoryAccounting"]; ok && mem.(bool) {
+	if props.MemoryAccounting {
 		metrics["memory"] = common.MapStr{
 			"usage": common.MapStr{
-				"bytes": props["MemoryCurrent"],
+				"bytes": props.MemoryCurrent,
 			},
 		}
 	}
 
-	if tasks, ok := props["TasksAccounting"]; ok && tasks.(bool) {
+	if props.TasksAccounting {
 		metrics["tasks"] = common.MapStr{
-			"count": props["TasksCurrent"],
+			"count": props.TasksCurrent,
 		}
 	}
 
-	if ip, ok := props["IPAccounting"]; ok && ip.(bool) {
+	if props.IPAccounting {
 		metrics["network"] = common.MapStr{
 			"in": common.MapStr{
-				"packets": props["IPIngressPackets"],
-				"bytes":   props["IPIngressBytes"],
+				"packets": props.IPIngressPackets,
+				"bytes":   props.IPIngressBytes,
 			},
 			"out": common.MapStr{
-				"packets": props["IPEgressPackets"],
-				"bytes":   props["IPEgressBytes"],
+				"packets": props.IPEgressPackets,
+				"bytes":   props.IPEgressBytes,
 			},
 		}
 	}
@@ -145,19 +168,19 @@ func translateChild(code int32) string {
 // timeSince emulates the behavior of `systemctl status` with regards to reporting time:
 // "Active: inactive (dead) since Sat 2019-10-19 16:31:25 PDT;""
 // The dbus properties data contains a number of different timestamps, which one systemd reports depends on the unit state
-func timeSince(props map[string]interface{}, state string) (int64, error) {
+func timeSince(props Properties, state string) (int64, error) {
 
 	var ts uint64
 	//normally we would want to check these values before we cast,
 	//but checking the state before we access `props` insures the values will be there.
 	if state == "active" || state == "reloading" {
-		ts = props["ActiveEnterTimestamp"].(uint64)
+		ts = props.ActiveEnterTimestamp
 	} else if state == "inactive" || state == "failed" {
-		ts = props["InactiveEnterTimestamp"].(uint64)
+		ts = props.InactiveEnterTimestamp
 	} else if state == "activating" {
-		ts = props["InactiveExitTimestamp"].(uint64)
+		ts = props.InactiveExitTimestamp
 	} else {
-		ts = props["ActiveExitTimestamp"].(uint64)
+		ts = props.ActiveExitTimestamp
 	}
 
 	//That second number is "USEC_INFINITY" which seems to a thing systemd cares about
