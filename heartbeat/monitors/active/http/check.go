@@ -26,13 +26,11 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/heartbeat/reason"
-
-	pkgerrors "github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/conditions"
+	pkgerrors "github.com/pkg/errors"
 )
 
 type comboValidator struct {

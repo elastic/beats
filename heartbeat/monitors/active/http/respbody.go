@@ -28,17 +28,16 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// If we have a validator we must buffer the entire body
-// since the validators are not streaming
-// We set a limit here of 100MiB to prevent excessive memory usage
-// in unusual conditions.
-const MaxBufferBodyBytes = 100 * 1024 * 1024
+// maxBufferBodyBytes sets a hard limit on how much we're willing to buffer for any reason internally.
+// since we must buffer the whole body for body validators this is effectively a cap on that.
+// 100MiB out to be enough for everybody.
+const maxBufferBodyBytes = 100 * 1024 * 1024
 
 func processBody(resp *http.Response, config responseConfig, validator comboValidator) (common.MapStr, reason.Reason) {
 	// Determine how much of the body to actually buffer in memory
 	var bufferBodyBytes int
 	if validator.wantsBody() {
-		bufferBodyBytes = MaxBufferBodyBytes
+		bufferBodyBytes = maxBufferBodyBytes
 	} else if config.IncludeBody == "always" || config.IncludeBody == "on_error" {
 		// If the user has asked for bodies to be recorded we only need to buffer that much
 		bufferBodyBytes = config.IncludeBodyMaxBytes
