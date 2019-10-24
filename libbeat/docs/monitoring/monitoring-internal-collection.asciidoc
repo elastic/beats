@@ -70,6 +70,27 @@ Stack Monitoring UI. To get a cluster's `cluster_uuid`,
 call the `GET /` API against that cluster.
 <2> This setting identifies the hosts and port numbers of {es} nodes
 that are part of the monitoring cluster.
++
+If you want to use PKI authentication to send monitoring events to
+{es}, you must specify a different set of configuration options. For
+example:
++
+["source","yml",subs="attributes"]
+--------------------
+monitoring:
+  enabled: true
+  cluster_uuid: PRODUCTION_ES_CLUSTER_UUID <1>
+  elasticsearch:
+    hosts: ["https://example.com:9200", "https://example2.com:9200"] <2>
+    username: "" <1>
+    ssl: <2>
+      ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+      ssl.certificate: "/etc/pki/client/cert.pem"
+      ssl.key: "/etc/pki/client/cert.key"
+--------------------
+<1> This setting must be explicitly specified so that the username from
+the client certificate (`CN`) is used.
+<2> See See <<configuration-ssl>> for more information.
 
 ifndef::serverless[]
 . Start {beatname_uc}.
