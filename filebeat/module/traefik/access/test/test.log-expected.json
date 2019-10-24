@@ -25,7 +25,7 @@
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
         "user_agent.os.name": "Linux",
-        "user_agent.version": "61.0.3163"
+        "user_agent.version": "61.0.3163.100"
     },
     {
         "@timestamp": "2017-10-02T20:22:08.000Z",
@@ -62,7 +62,7 @@
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
         "user_agent.os.name": "Linux",
-        "user_agent.version": "61.0.3163"
+        "user_agent.version": "61.0.3163.100"
     },
     {
         "@timestamp": "2018-02-28T17:30:33.000Z",

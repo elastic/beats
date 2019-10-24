@@ -409,11 +409,6 @@ filebeat.modules:
   threat:
     enabled: true
 
-    # MISP Configuration
-    var.api_key: "XXXXXXXXXXXXXX" # API key for MISP
-    var.json_objects_array: "response.Attribute"
-    var.url: "http://X.X.X.X/attributes/restSearch" # X.X.X.X is the IP address of the MISP server
-
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
   # Logs
