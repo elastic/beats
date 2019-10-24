@@ -262,26 +262,23 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		revPkts, hasRevPkts = getKeyUint64(flow.Fields, "reversePacketTotalCount")
 	}
 
-	if hasRevBytes || hasRevPkts {
-		if hasBytes {
-			ecsSource["bytes"] = countBytes
-			ecsDest["bytes"] = revBytes
-		}
-		if hasPkts {
-			ecsSource["packets"] = revBytes
-			ecsDest["packets"] = revPkts
-		}
-		countBytes += revBytes
-		countPkts += revPkts
+	if hasRevBytes {
+		ecsDest["bytes"] = revBytes
+	}
+
+	if hasRevPkts {
+		ecsDest["packets"] = revPkts
 	}
 
 	if hasBytes {
+		ecsSource["bytes"] = countBytes
 		if hasRevBytes {
 			countBytes += revBytes
 		}
 		ecsNetwork["bytes"] = countBytes
 	}
 	if hasPkts {
+		ecsSource["packets"] = countPkts
 		if hasRevPkts {
 			countPkts += revPkts
 		}

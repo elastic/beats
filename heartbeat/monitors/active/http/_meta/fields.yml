@@ -23,6 +23,11 @@
                   type: keyword
                   description: >
                     Hash of the full response body. Can be used to group responses with identical hashes.
+            - name: redirects
+              type: keyword
+              description: >
+                List of redirects followed to arrive at final content. Last item on the list is the URL for which
+                body content is shown.
         - name: rtt
           type: group
           description: >

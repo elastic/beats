@@ -66,13 +66,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 156,
           "ip": "37.122.1.226",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",
+          "packets": 3,
           "port": 27622
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -139,13 +142,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 48,
           "ip": "5.141.231.166",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",
+          "packets": 1,
           "port": 31178
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -212,13 +218,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 584,
           "ip": "10.233.128.4",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
+          "packets": 11,
           "port": 53688
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -285,13 +294,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 577,
           "ip": "193.151.192.46",
           "locality": "public",
           "mac": "00:1a:4a:16:01:81",
+          "packets": 4,
           "port": 80
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -358,13 +370,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 152,
           "ip": "10.235.197.6",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
+          "packets": 3,
           "port": 57505
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -431,13 +446,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 152,
           "ip": "10.236.31.7",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
+          "packets": 3,
           "port": 61471
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -504,13 +522,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 1809,
           "ip": "10.233.151.8",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
+          "packets": 15,
           "port": 58044
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -577,13 +598,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 234,
           "ip": "10.234.22.4",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
+          "packets": 3,
           "port": 60583
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -650,13 +674,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 1681,
           "ip": "10.233.36.7",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
+          "packets": 22,
           "port": 51399
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -723,13 +750,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 152,
           "ip": "10.233.200.7",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
+          "packets": 3,
           "port": 61820
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -796,13 +826,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 1866,
           "ip": "23.43.139.27",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",
+          "packets": 3,
           "port": 80
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-02-18T05:47:09Z",
@@ -869,13 +902,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 187,
           "ip": "2.17.140.47",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",
+          "packets": 3,
           "port": 443
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

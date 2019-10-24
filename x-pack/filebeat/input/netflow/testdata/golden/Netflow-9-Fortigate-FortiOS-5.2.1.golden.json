@@ -37,7 +37,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-07-18T05:41:59Z",
@@ -93,12 +94,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 152,
           "ip": "192.168.99.7",
           "locality": "private",
+          "packets": 3,
           "port": 61910
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

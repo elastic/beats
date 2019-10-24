@@ -147,6 +147,11 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
+	err := setUmaskWithSettings(settings)
+	if err != nil && err != errNotImplemented {
+		return errw.Wrap(err, "could not set umask")
+	}
+
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
 	version := settings.Version
@@ -365,6 +370,15 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if err != nil {
 		return err
 	}
+
+	// Try to acquire exclusive lock on data path to prevent another beat instance
+	// sharing same data path.
+	bl := newLocker(b)
+	err = bl.lock()
+	if err != nil {
+		return err
+	}
+	defer bl.unlock()
 
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
@@ -1036,4 +1050,11 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
+}
+
+func setUmaskWithSettings(settings Settings) error {
+	if settings.Umask != nil {
+		return setUmask(*settings.Umask)
+	}
+	return setUmask(0027) // 0640 for files | 0750 for dirs
 }
