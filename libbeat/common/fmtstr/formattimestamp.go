@@ -29,56 +29,52 @@ import (
 // shared static fields (typically agent / version) and the event timestamp.
 type TimestampFormatString struct {
 	eventFormatString *EventFormatString
-	cachedFields      common.MapStr
+	fields            common.MapStr
 }
 
-// NewTimestampFormatString creates from the given expression a
-// TimestampFormatString that can refer only to the given static fields and
-// the event timestamp.
+// NewTimestampFormatString creates from the given event format string a
+// TimestampFormatString that includes only the given static fields and
+// a timestamp.
 func NewTimestampFormatString(
-	expression string, staticFields common.MapStr,
+	eventFormatString *EventFormatString, staticFields common.MapStr,
 ) (*TimestampFormatString, error) {
-	efs, err := CompileEvent(expression)
-	if err != nil {
-		return nil, err
-	}
 	return &TimestampFormatString{
-		eventFormatString: efs,
-		cachedFields:      staticFields.Clone(),
+		eventFormatString: eventFormatString,
+		fields:            staticFields.Clone(),
 	}, nil
 }
 
-// MinimalTimestampFormatString creates a formatter that has access only
-// to the agent name / version and event timestamp. This was adapted from
-// applyStaticFmtstr in libbeat/idxmgmt/ilm/ilm.go.
-func MinimalTimestampFormatString(
-	expression string, beatInfo beat.Info,
-) (*TimestampFormatString, error) {
-	staticFields := common.MapStr{
+// FieldsForBeat returns a common.MapStr with the given beat name and
+// version assigned to their standard field names.
+func FieldsForBeat(beat string, version string) common.MapStr {
+	return common.MapStr{
 		// beat object was left in for backward compatibility reason for older configs.
 		"beat": common.MapStr{
-			"name":    beatInfo.Beat,
-			"version": beatInfo.Version,
+			"name":    beat,
+			"version": version,
 		},
 		"agent": common.MapStr{
-			"name":    beatInfo.Beat,
-			"version": beatInfo.Version,
+			"name":    beat,
+			"version": version,
 		},
 		// For the Beats that have an observer role
 		"observer": common.MapStr{
-			"name":    beatInfo.Beat,
-			"version": beatInfo.Version,
+			"name":    beat,
+			"version": version,
 		},
 	}
-	return NewTimestampFormatString(expression, staticFields)
 }
 
 // Run executes the format string returning a new expanded string or an error
 // if execution or event field expansion fails.
 func (fs *TimestampFormatString) Run(timestamp time.Time) (string, error) {
 	placeholderEvent := &beat.Event{
-		Fields:    fs.cachedFields,
+		Fields:    fs.fields,
 		Timestamp: timestamp,
 	}
 	return fs.eventFormatString.Run(placeholderEvent)
+}
+
+func (fs *TimestampFormatString) String() string {
+	return fs.eventFormatString.expression
 }

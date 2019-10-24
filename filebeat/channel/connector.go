@@ -62,11 +62,15 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	}
 	procs.List = append(procs.List, userProcessors)
 
-	if config.Index != "" {
-		indexProcessor, err := newAddIndexPattern(c.parent.beatInfo, config.Index)
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(
+			c.parent.beatInfo.Beat, c.parent.beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
 		if err != nil {
 			return nil, err
 		}
+		indexProcessor := &addFormattedIndex{timestampFormat}
 		procs.List = append(procs.List, indexProcessor)
 	}
 
@@ -124,29 +128,17 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 }
 
 //////////////////////////////
-// addIndexPattern is a Processor to add an index pattern (specified by the
-// input configuration) to event metadata in the "raw-index" field.
+// addFormattedIndex is a Processor to set an event's "raw-index" metadata field
+// with a given TimestampFormatString. The elasticsearch output interprets
+// that field as specifying the (raw string) index the event should be sent to;
+// in other outputs it is just included in the metadata.
 
-type addIndexPattern struct {
-	pattern      string
+type addFormattedIndex struct {
 	formatString *fmtstr.TimestampFormatString
 }
 
-func newAddIndexPattern(
-	beatInfo beat.Info, pattern string,
-) (processors.Processor, error) {
-	formatString, err := fmtstr.MinimalTimestampFormatString(pattern, beatInfo)
-	if err != nil {
-		return nil, err
-	}
-	return &addIndexPattern{
-		pattern:      pattern,
-		formatString: formatString,
-	}, nil
-}
-
-func (aip *addIndexPattern) Run(event *beat.Event) (*beat.Event, error) {
-	index, err := aip.formatString.Run(event.Timestamp)
+func (p *addFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
+	index, err := p.formatString.Run(event.Timestamp)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +150,6 @@ func (aip *addIndexPattern) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (aip *addIndexPattern) String() string {
-	return fmt.Sprintf("add_index_pattern=%s", aip.pattern)
+func (p *addFormattedIndex) String() string {
+	return fmt.Sprintf("add_index_pattern=%v", p.formatString)
 }

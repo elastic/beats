@@ -87,7 +87,13 @@ func TestTimestampFormatString(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("test(%v): %v", i, test.title)
 
-		fs, err := NewTimestampFormatString(test.format, test.staticFields)
+		efs, err := CompileEvent(test.format)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		fs, err := NewTimestampFormatString(efs, test.staticFields)
 		if err != nil {
 			t.Error(err)
 			continue

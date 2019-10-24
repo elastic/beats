@@ -20,6 +20,7 @@ package channel
 import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
@@ -57,8 +58,8 @@ type inputOutletConfig struct {
 	Fileset string `config:"_fileset_name"` // hidden setting
 
 	// Output meta data settings
-	Pipeline string `config:"pipeline"` // ES Ingest pipeline name
-	Index    string `config:"index"`    // ES output index pattern
+	Pipeline string                   `config:"pipeline"` // ES Ingest pipeline name
+	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
 }
 
 // NewOutletFactory creates a new outlet factory for
