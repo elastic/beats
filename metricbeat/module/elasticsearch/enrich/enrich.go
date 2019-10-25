@@ -71,8 +71,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	// Enrich is only available in Trial or Platinum license of Elasticsearch. So we check
-	// the license first.
 	enrichUnavailableMessage, err := m.checkEnrichAvailability(info.Version.Number)
 	if err != nil {
 		return errors.Wrap(err, "error determining if Enrich is available")
@@ -92,14 +90,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	if m.XPack {
-		//err = eventsMappingXPack(r, m, *info, content)
-		//if err != nil {
-		//	// Since this is an x-pack code path, we log the error but don't
-		//	// return it. Otherwise it would get reported into `metricbeat-*`
-		//	// indices.
-		//	m.Logger().Error(err)
-		//	return nil
-		//}
+		err = eventsMappingXPack(r, m, *info, content)
+		if err != nil {
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
+			m.Logger().Error(err)
+			return nil
+		}
 	} else {
 		return eventsMapping(r, *info, content)
 	}
@@ -108,17 +106,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) checkEnrichAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
-	license, err := elasticsearch.GetLicense(m.HTTP, m.GetServiceURI())
-	if err != nil {
-		return "", errors.Wrap(err, "error determining Elasticsearch license")
-	}
-
-	if !license.IsOneOf("trial", "platinum") {
-		message = "the Enrich feature is available with a platinum Elasticsearch license. You " +
-			"currently have a " + license.Type + " license so Enrich stats are not being collected."
-		return
-	}
-
 	isAvailable := elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.EnrichStatsAPIAvailableVersion)
 
 	if !isAvailable {
