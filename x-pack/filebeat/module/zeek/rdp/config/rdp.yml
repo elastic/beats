@@ -1,0 +1,78 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: rdp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.rdp"
+
+        - from: "zeek.rdp.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.rdp.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.rdp.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.rdp.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.rdp.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.rdp.client_build"
+          to: "zeek.rdp.client.build"
+
+        - from: "zeek.rdp.client_name"
+          to: "zeek.rdp.client.name"
+
+        - from: "zeek.rdp.client_dig_product_id"
+          to: "zeek.rdp.client.product_id"
+
+        - from: "zeek.rdp.desktop_width"
+          to: "zeek.rdp.desktop.width"
+
+        - from: "zeek.rdp.desktop_height"
+          to: "zeek.rdp.desktop.height"
+
+        - from: "zeek.rdp.requested_color_depth"
+          to: "zeek.rdp.desktop.color_depth"
+
+        - from: "zeek.rdp.cert_type"
+          to: "zeek.rdp.cert.type"
+
+        - from: "zeek.rdp.cert_count"
+          to: "zeek.rdp.cert.count"
+
+        - from: "zeek.rdp.cert_permanent"
+          to: "zeek.rdp.cert.permanent"
+
+        - from: "zeek.rdp.encryption_level"
+          to: "zeek.rdp.encryption.level"
+
+        - from: "zeek.rdp.encryption_method"
+          to: "zeek.rdp.encryption.method"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

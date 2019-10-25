@@ -91,12 +91,12 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	output, err := req.Send(context.TODO())
 	if err != nil {
 		base.Logger().Warn("failed to list account aliases, please check permission setting: ", err)
-	}
-
-	// There can be more than one aliases for each account, for now we are only
-	// collecting the first one.
-	if output.AccountAliases != nil {
-		metricSet.AccountName = output.AccountAliases[0]
+	} else {
+		// There can be more than one aliases for each account, for now we are only
+		// collecting the first one.
+		if output.AccountAliases != nil {
+			metricSet.AccountName = output.AccountAliases[0]
+		}
 	}
 
 	// Get IAM account id
@@ -105,8 +105,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	outputIdentity, err := reqIdentity.Send(context.TODO())
 	if err != nil {
 		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
+	} else {
+		metricSet.AccountID = *outputIdentity.Account
 	}
-	metricSet.AccountID = *outputIdentity.Account
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {

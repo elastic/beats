@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/smb_mapping.log
+    os.linux:
+      - /var/log/bro/current/smb_mapping.log
+    os.darwin:
+      - /usr/local/var/logs/current/smb_mapping.log
+  - name: tags
+    default: [zeek.smb_mapping]
+  - name: community_id
+    default: true
+
+ingest_pipeline: ingest/pipeline.json
+input: config/smb_mapping.yml
