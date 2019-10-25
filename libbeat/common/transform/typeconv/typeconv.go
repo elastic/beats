@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memlog
+package typeconv
 
 import (
 	"errors"
@@ -23,26 +23,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	structform "github.com/elastic/go-structform"
 	"github.com/elastic/go-structform/gotype"
 )
 
-// typeConv can convert structured data between arbitrary typed (serializable)
+// Converter converts structured data between arbitrary typed (serializable)
 // go structures and maps/slices/arrays. It uses go-structform/gotype for input
 // and output values each, such that any arbitrary structures can be used.
 //
-// Internally typeConv is used by the ValueDecoder for (de-)serializing an
-// users value into common.MapStr, which is used to store objects in the memory
-// store.
-type typeConv struct {
+// The converter computes and caches mapping operations for go structures it
+// has visited.
+type Converter struct {
 	fold   *gotype.Iterator
 	unfold *gotype.Unfolder
-}
-
-type valueDecoder struct {
-	tx    memTxParent
-	value common.MapStr
 }
 
 type timeUnfolder struct {
@@ -62,26 +55,20 @@ const (
 	timeUnfoldWaitDone
 )
 
-var typeConvPool = sync.Pool{
+var convPool = sync.Pool{
 	New: func() interface{} {
-		t := &typeConv{}
-		t.init()
-		return t
+		return &Converter{}
 	},
 }
 
-func newTypeConv() *typeConv {
-	tc := typeConvPool.Get().(*typeConv)
-	return tc
+// NewConverter creates a new converter with local state for tracking known
+// type conversations.
+func NewConverter() *Converter {
+	c := &Converter{}
+	return c
 }
 
-func (t *typeConv) release() {
-	if t != nil {
-		typeConvPool.Put(t)
-	}
-}
-
-func (t *typeConv) init() {
+func (c *Converter) init() {
 	unfold, _ := gotype.NewUnfolder(nil, gotype.Unfolders(
 		unfoldTimestamp,
 	))
@@ -92,32 +79,44 @@ func (t *typeConv) init() {
 		panic(err)
 	}
 
-	t.unfold = unfold
-	t.fold = fold
+	c.unfold = unfold
+	c.fold = fold
 }
 
-func (t *typeConv) Convert(to, from interface{}) error {
-	err := t.unfold.SetTarget(to)
-	if err != nil {
+// Convert transforms the value of from into to, by translating the structure
+// from into a set of events (go-structform.Visitor) that can applied to the
+// value given by to.
+// The operation fails if the values are not compatible (for example trying to
+// convert an object into an int), or `to` is no pointer.
+func (c *Converter) Convert(to, from interface{}) (err error) {
+	if c.unfold == nil || c.fold == nil {
+		c.init()
+	}
+
+	defer func() {
+		if err != nil {
+			c.fold = nil
+			c.unfold = nil
+		}
+	}()
+
+	if err = c.unfold.SetTarget(to); err != nil {
 		return err
 	}
 
-	defer t.unfold.Reset()
-	return t.fold.Fold(from)
+	defer c.unfold.Reset()
+	return c.fold.Fold(from)
 }
 
-func newValueDecoder(tx memTxParent, value common.MapStr) *valueDecoder {
-	return &valueDecoder{
-		tx:    tx,
-		value: value,
-	}
-}
-
-func (d *valueDecoder) Decode(to interface{}) (err error) {
-	if err = d.tx.checkRead(); err == nil {
-		err = d.tx.getTypeConv().Convert(to, d.value)
-	}
-	return
+// Convert transforms the value of from into to, by translating the structure
+// from into a set of events (go-structform.Visitor) that can applied to the
+// value given by to.
+// The operation fails if the values are not compatible (for example trying to
+// convert an object into an int), or `to` is no pointer.
+func Convert(to, from interface{}) (err error) {
+	c := convPool.Get().(*Converter)
+	defer convPool.Put(c)
+	return c.Convert(to, from)
 }
 
 func foldTimestamp(in *time.Time, v structform.ExtVisitor) error {

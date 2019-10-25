@@ -18,6 +18,7 @@
 package memlog
 
 import (
+	"github.com/elastic/beats/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
@@ -26,7 +27,7 @@ type transaction struct {
 	state txState
 	mem   memTx
 
-	typeConv *typeConv
+	typeConv *typeconv.Converter
 
 	active   bool
 	readonly bool
@@ -51,7 +52,6 @@ func (tx *transaction) close() {
 		tx.active = false
 
 		if tx.typeConv != nil {
-			tx.typeConv.release()
 			tx.typeConv = nil
 		}
 	}
@@ -408,10 +408,10 @@ func (tx *transaction) checkRead() error {
 	return tx.checkActive()
 }
 
-func (tx *transaction) getTypeConv() *typeConv {
+func (tx *transaction) getTypeConv() *typeconv.Converter {
 	tc := tx.typeConv
 	if tc == nil {
-		tc = newTypeConv()
+		tc = typeconv.NewConverter()
 		tx.typeConv = tc
 	}
 	return tc

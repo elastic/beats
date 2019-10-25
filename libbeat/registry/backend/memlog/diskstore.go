@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cleanup"
+	"github.com/elastic/beats/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/registry/backend"
 )
@@ -51,7 +52,7 @@ type diskStore struct {
 }
 
 type diskLoader struct {
-	typeConv *typeConv
+	typeConv *typeconv.Converter
 }
 
 type logAction struct {
@@ -418,14 +419,14 @@ func (s *diskStore) commitOps(st *txState) error {
 
 func newDiskLoader() *diskLoader {
 	return &diskLoader{
-		typeConv: newTypeConv(),
+		typeConv: typeconv.NewConverter(),
 	}
 }
 
-func (l *diskLoader) IsReadonly() bool       { return false }
-func (l *diskLoader) checkRead() error       { return nil }
-func (l *diskLoader) checkWrite() error      { return nil }
-func (l *diskLoader) getTypeConv() *typeConv { return l.typeConv }
+func (l *diskLoader) IsReadonly() bool                 { return false }
+func (l *diskLoader) checkRead() error                 { return nil }
+func (l *diskLoader) checkWrite() error                { return nil }
+func (l *diskLoader) getTypeConv() *typeconv.Converter { return l.typeConv }
 
 // loadDataFile create a new hashtable with all key/value pairs found.
 func loadDataFile(path string) (hashtable, error) {
