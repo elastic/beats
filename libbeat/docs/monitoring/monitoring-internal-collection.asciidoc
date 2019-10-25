@@ -89,7 +89,7 @@ monitoring:
       ssl.key: "/etc/pki/client/cert.key"
 --------------------
 +
-You must specify the `cluster_uuid` and `username` explicitly so that
+You must specify the `username` as `""` explicitly so that
 the username from the client certificate (`CN`) is used. See
 <<configuration-ssl>> for more information about SSL settings.
 
