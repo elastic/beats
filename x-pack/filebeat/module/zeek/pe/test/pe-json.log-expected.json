@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": "2017-10-09T16:13:19.578Z",
+        "event.dataset": "zeek.pe",
+        "event.module": "zeek",
+        "fileset.name": "pe",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "tags": [
+            "zeek.pe"
+        ],
+        "zeek.pe.compile_time": "2016-06-28T18:41:54.000Z",
+        "zeek.pe.has_cert_table": true,
+        "zeek.pe.has_debug_data": false,
+        "zeek.pe.has_export_table": false,
+        "zeek.pe.has_import_table": true,
+        "zeek.pe.id": "FtIFnm3ZqI1s96P74l",
+        "zeek.pe.is_64bit": false,
+        "zeek.pe.is_exe": true,
+        "zeek.pe.machine": "I386",
+        "zeek.pe.os": "Windows XP",
+        "zeek.pe.section_names": [
+            ".text",
+            ".rdata",
+            ".data",
+            ".rsrc",
+            ".reloc"
+        ],
+        "zeek.pe.subsystem": "WINDOWS_CUI",
+        "zeek.pe.uses_aslr": true,
+        "zeek.pe.uses_code_integrity": false,
+        "zeek.pe.uses_dep": true,
+        "zeek.pe.uses_seh": true
+    }
+]
