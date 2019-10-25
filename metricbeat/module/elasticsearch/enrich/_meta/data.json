@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "elasticsearch": {
+        "cluster": {
+            "id": "7x8_9pBFRnuy-ic-c931Dw",
+            "name": "es800"
+        },
+        "enrich": {
+            "executed_searches": {
+                "total": 0
+            },
+            "queue": {
+                "size": 0
+            },
+            "remote_requests": {
+                "current": 0,
+                "total": 0
+            }
+        },
+        "node": {
+            "id": "XiVMblvrTayL3S7ticwb9A"
+        }
+    },
+    "event": {
+        "dataset": "elasticsearch.enrich",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
+    "metricset": {
+        "name": "enrich",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:9200",
+        "name": "elasticsearch",
+        "type": "elasticsearch"
+    }
+}
