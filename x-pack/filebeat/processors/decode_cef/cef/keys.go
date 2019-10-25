@@ -478,7 +478,7 @@ var extensionMapping = map[string]mappedField{
 		Type:   StringType,
 	},
 	"flexString1Label": {
-		Target: "flexString2Label",
+		Target: "flexString1Label",
 		Type:   StringType,
 	},
 	"flexString2Label": {
@@ -651,5 +651,9 @@ var extensionMapping = map[string]mappedField{
 	"catdt": {
 		Target: "categoryDeviceType",
 		Type:   StringType,
+	},
+	"mrt": {
+		Target: "managerReceiptTime",
+		Type: TimestampType,
 	},
 }

@@ -3834,7 +3834,7 @@ type: keyword
 
 --
 
-*`cef.extensions.flexString2Label`*::
+*`cef.extensions.flexString1Label`*::
 +
 --
 The label field is a string and describes the purpose of the flex field.
@@ -4212,6 +4212,78 @@ type: keyword
 0 means base event, 1 means aggregated, 2 means correlation, and 3 means action. This field can be omitted for base events (type 0).
 
 type: long
+
+--
+
+*`cef.extensions.categoryDeviceType`*::
++
+--
+Device type. Examples - Proxy, IDS, Web Server
+
+type: keyword
+
+--
+
+*`cef.extensions.categoryObject`*::
++
+--
+Object that the event is about. For example it can be an operating sytem, database, file, etc.
+
+type: keyword
+
+--
+
+*`cef.extensions.categoryBehavior`*::
++
+--
+Action or a behavior associated with an event. It's what is being done to the object.
+
+type: keyword
+
+--
+
+*`cef.extensions.categoryTechnique`*::
++
+--
+Technique being used (e.g. /DoS).
+
+type: keyword
+
+--
+
+*`cef.extensions.categoryDeviceGroup`*::
++
+--
+General device group like Firewall.
+
+type: keyword
+
+--
+
+*`cef.extensions.categorySignificance`*::
++
+--
+Characterization of the importance of the event.
+
+type: keyword
+
+--
+
+*`cef.extensions.categoryOutcome`*::
++
+--
+Outcome of the event (e.g. sucess, failure, or attempt).
+
+type: keyword
+
+--
+
+*`cef.extensions.managerReceiptTime`*::
++
+--
+When the Arcsight ESM received the event.
+
+type: date
 
 --
 

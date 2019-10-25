@@ -517,7 +517,7 @@
               type: keyword
               description: One of four floating point fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible. These fields are typically reserved for customer use and should not be set by vendors unless necessary.
 
-            - name: flexString2Label
+            - name: flexString1Label
               type: keyword
               description: The label field is a string and describes the purpose of the flex field.
 
@@ -688,6 +688,39 @@
             - name: type
               type: long
               description: 0 means base event, 1 means aggregated, 2 means correlation, and 3 means action. This field can be omitted for base events (type 0).
+
+            # ArcSight fields.
+            - name: categoryDeviceType
+              type: keyword
+              description: Device type. Examples - Proxy, IDS, Web Server
+
+            - name: categoryObject
+              type: keyword
+              description: Object that the event is about. For example it can be an operating sytem, database, file, etc.
+
+            - name: categoryBehavior
+              type: keyword
+              description: Action or a behavior associated with an event. It's what is being done to the object.
+
+            - name: categoryTechnique
+              type: keyword
+              description: Technique being used (e.g. /DoS).
+
+            - name: categoryDeviceGroup
+              type: keyword
+              description: General device group like Firewall.
+
+            - name: categorySignificance
+              type: keyword
+              description: Characterization of the importance of the event.
+
+            - name: categoryOutcome
+              type: keyword
+              description: Outcome of the event (e.g. sucess, failure, or attempt).
+
+            - name: managerReceiptTime
+              type: date
+              description: When the Arcsight ESM received the event.
 
     - name: source.service.name
       type: keyword

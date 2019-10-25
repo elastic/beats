@@ -894,8 +894,8 @@
         "customerID": "124",
         "customerURI": "/XXX",
         "eventId": 23985829654,
+        "managerReceiptTime": "2016-03-30T19:45:45.678Z",
         "modelConfidence": "0",
-        "mrt": "1459367145678",
         "priority": "High",
         "relevance": "10",
         "severity": "5",
@@ -986,8 +986,8 @@
         "eventAnnotationVersion": "1",
         "eventId": 56265798504,
         "locality": "1",
+        "managerReceiptTime": "2017-01-10T23:58:03.471Z",
         "modelConfidence": "0",
-        "mrt": "1484092683471",
         "originalAgentAddress": "10.2.88.3",
         "originalAgentHostName": "host",
         "originalAgentId": "6q0sfHVcBABCcSDFvMpvc1w==",
@@ -1084,8 +1084,8 @@
         "eventId": 1,
         "fileType": "Agent",
         "filename": "C:\\Documents and Settings\\XPMUser\\Desktop\\Logs\\NAT_Log",
-        "message": "File Opened",
-        "mrt": "1410524600502"
+        "managerReceiptTime": "2014-09-12T12:23:20.502Z",
+        "message": "File Opened"
       },
       "name": "Device connection up",
       "severity": "Low",
@@ -1154,7 +1154,7 @@
         "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
         "eventId": 2,
         "fileType": "Agent",
-        "mrt": "1410524500493"
+        "managerReceiptTime": "2014-09-12T12:21:40.493Z"
       },
       "name": "Agent [NAT] type [sdkrfilereader] started",
       "severity": "Low",
@@ -1215,7 +1215,7 @@
         "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
         "eventId": 6,
         "filename": "C:\\Documents and Settings\\XPMUser\\Desktop\\Logs\\NAT_Log",
-        "mrt": "1410524500502"
+        "managerReceiptTime": "2014-09-12T12:21:40.502Z"
       },
       "name": "File processing started",
       "severity": "Low",
@@ -1283,8 +1283,8 @@
         "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
         "eventId": 7,
         "fileType": "Agent",
-        "message": "Process Stopped by User",
-        "mrt": "1410524535833"
+        "managerReceiptTime": "2014-09-12T12:22:15.833Z",
+        "message": "Process Stopped by User"
       },
       "name": "Agent [NAT] type [sdkrfilereader] shutting down",
       "severity": "Very-High",
