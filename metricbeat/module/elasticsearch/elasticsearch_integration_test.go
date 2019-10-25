@@ -370,14 +370,18 @@ func checkExists(url string) bool {
 }
 
 func checkSkip(t *testing.T, metricset string, version *common.Version) {
-	if metricset != "ccr" {
-		return
+	checkSkipFeature := func(name string, availableVersion *common.Version) {
+		isAPIAvailable := elastic.IsFeatureAvailable(version, availableVersion)
+		if !isAPIAvailable {
+			t.Skipf("elasticsearch %s stats API is not available until %s", name, availableVersion)
+		}
 	}
 
-	isCCRStatsAPIAvailable := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)
-
-	if !isCCRStatsAPIAvailable {
-		t.Skip("elasticsearch CCR stats API is not available until " + elasticsearch.CCRStatsAPIAvailableVersion.String())
+	switch metricset {
+	case "ccr":
+		checkSkipFeature("CCR", elasticsearch.CCRStatsAPIAvailableVersion)
+	case "enrich":
+		checkSkipFeature("Enrich", elasticsearch.EnrichStatsAPIAvailableVersion)
 	}
 }
 
