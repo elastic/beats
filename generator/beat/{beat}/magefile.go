@@ -28,9 +28,7 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
-
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
@@ -64,6 +62,11 @@ func CrossBuild() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
+}
+
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -112,4 +115,15 @@ func GoTestIntegration(ctx context.Context) error {
 // Config generates both the short/reference/docker configs.
 func Config() error {
 	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+}
+
+// Check formats code, updates generated content, check for common errors, and
+// checks for any modified files.
+func Check() {
+	common.Check()
+}
+
+// Fmt formats source code (.go and .py) and adds license headers.
+func Fmt() {
+	common.Fmt()
 }
