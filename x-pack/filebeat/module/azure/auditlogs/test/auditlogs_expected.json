@@ -1,16 +1,4 @@
 {
-    "_index" : "filebeat-8.0.0-2019.10.10",
-    "_type" : "_doc",
-    "_id" : "2a7e2503-d7e2-405",
-    "_score" : null,
-    "_source" : {
-        "agent" : {
-            "hostname" : "DESKTOP-RFOOE09",
-            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-            "type" : "filebeat",
-            "ephemeral_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-            "version" : "8.0.0"
-        },
         "log" : {
             "level" : "Informational"
         },
@@ -36,20 +24,6 @@
             "offset" : 48,
             "topic" : "insights-logs-auditlogs",
             "key" : ""
-        },
-        "host" : {
-            "hostname" : "DESKTOP-RFOOE09",
-            "os" : {
-                "build" : "18362.388",
-                "kernel" : "10.0.18362.388 (WinBuild.160101.0800)",
-                "name" : "Windows 10 Pro",
-                "family" : "windows",
-                "version" : "10.0",
-                "platform" : "windows"
-            },
-            "name" : "DESKTOP-RFOOE09",
-            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-            "architecture" : "x86_64"
         },
         "event" : {
             "duration" : 0.0,
@@ -123,8 +97,4 @@
                 "id" : "/tenants/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/providers/Microsoft.aadiam"
             }
         }
-    },
-    "sort" : [
-        1570694260301
-    ]
-}
+    }

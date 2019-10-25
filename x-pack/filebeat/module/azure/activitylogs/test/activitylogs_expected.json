@@ -1,16 +1,4 @@
-{
-    "_index" : "filebeat-8.0.0-2019.10.15-000001",
-    "_type" : "_doc",
-    "_id" : "2a7e2503",
-    "_score" : null,
-    "_source" : {
-        "agent" : {
-            "hostname" : "DESKTOP-RFOOE09",
-            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-            "type" : "filebeat",
-            "ephemeral_id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-            "version" : "8.0.0"
-        },
+ {
         "log" : {
             "level" : "Error"
         },
@@ -46,20 +34,6 @@
             "topic" : "insights-operational-logs",
             "key" : ""
         },
-        "host" : {
-            "hostname" : "DESKTOP-RFOOE09",
-            "os" : {
-                "build" : "18362.388",
-                "kernel" : "10.0.18362.388 (WinBuild.160101.0800)",
-                "name" : "Windows 10 Pro",
-                "family" : "windows",
-                "version" : "10.0",
-                "platform" : "windows"
-            },
-            "name" : "DESKTOP-RFOOE09",
-            "id" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-            "architecture" : "x86_64"
-        },
         "event" : {
             "duration" : 1.2E7,
             "module" : "azure",
@@ -93,21 +67,21 @@
                         "scope" : "/subscriptions/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/resourceGroups/sa-hemant/providers/Microsoft.EventHub/namespaces/azurelsevents/authorizationRules/RootManageSharedAccessKey",
                         "action" : "Microsoft.EventHub/namespaces/authorizationRules/listKeys/action"
                     },
-                    "claims" : {
-                        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-                        "ver" : "1.0",
-                        "http://schemas.microsoft.com/identity/claims/identityprovider" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
-                        "aio" : "2a7e2503-d7e2-40",
-                        "iss" : "https://sts.windows.net/2a7e2503-d7e2-405a-a84c-c333b9f7cb73/",
-                        "uti" : "2a7e2503-d7e2-405a",
-                        "aud" : "https://management.core.windows.net/",
-                        "nbf" : "1571164495",
-                        "appidacr" : "2",
-                        "http://schemas.microsoft.com/identity/claims/tenantid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-                        "appid" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-                        "http://schemas.microsoft.com/identity/claims/objectidentifier" : "2a7e2503-d7e2-405a-a84c-c333b9f7cb73",
-                        "exp" : "1571193595",
-                        "iat" : "1571164495"
+                    "claims":{
+                        "aio":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                        "appid":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                        "appidacr":"2",
+                        "aud":"https://management.core.windows.net/",
+                        "exp":"1571904826",
+                        "http://schemas.microsoft.com/identity/claims/identityprovider":"https://sts.windows.net/8a4de8b5-095c-47d0-a96f-a75130c61d53/",
+                        "http://schemas.microsoft.com/identity/claims/objectidentifier":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                        "http://schemas.microsoft.com/identity/claims/tenantid":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                        "iat":"1571875726",
+                        "iss":"https://sts.windows.net/8a4de8b5-095c-47d0-a96f-a75130c61d53/",
+                        "nbf":"1571875726",
+                        "uti":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                        "ver":"1.0"
                     }
                 },
                 "category" : "Action",
@@ -117,8 +91,4 @@
                 }
             }
         }
-    },
-    "sort" : [
-        1571164795390
-    ]
-}
+    }
