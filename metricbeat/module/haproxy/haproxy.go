@@ -320,6 +320,9 @@ func (p *httpProto) Stat() (*bytes.Buffer, error) {
 	if err != nil {
 		return nil, errors.Errorf("couldn't read response body: %v", err)
 	}
+	if len(d) == 0 {
+		return nil, errors.New("got empty response from HAProxy")
+	}
 	return bytes.NewBuffer(d), nil
 }
 
