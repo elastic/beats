@@ -1,0 +1,249 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package application
+
+import (
+	"crypto/tls"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"os"
+	"strconv"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/agent/kibana"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/authority"
+)
+
+type mockStore struct {
+	Config fleetConfig
+	Err    error
+	Called bool
+}
+
+func (m *mockStore) Save(c fleetConfig) error {
+	m.Called = true
+	if m.Err != nil {
+		return m.Err
+	}
+
+	m.Config = c
+	return nil
+}
+
+func TestEnroll(t *testing.T) {
+	log, _ := logger.New()
+
+	t.Run("succesfully enroll with TLS and save access token in the store", withTLSServer(
+		func(t *testing.T) *http.ServeMux {
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(`
+{
+    "action": "created",
+    "success": true,
+    "item": {
+       "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
+        "active": true,
+        "policy_id": "69f3f5a0-ec52-11e9-93c4-d72ab8a69391",
+        "type": "PERMANENT",
+        "enrolled_at": "2019-10-11T18:26:37.158Z",
+        "user_provided_metadata": {
+						"custom": "customize"
+				},
+        "local_metadata": {
+            "platform": "linux",
+            "version": "8.0.0"
+        },
+        "actions": [],
+        "access_token": "my-access-token"
+    }
+}`))
+			})
+			return mux
+		}, func(t *testing.T, caBytes []byte, host string) {
+			caFile, err := bytesToTMPFile(caBytes)
+			require.NoError(t, err)
+			defer os.Remove(caFile)
+
+			url := "https://" + host
+			store := &mockStore{}
+			cmd, err := NewEnrollCmd(
+				log,
+				url,
+				[]string{caFile},
+				"my-enrollment-token",
+				"my-id",
+				map[string]interface{}{"custom": "customize"},
+				store,
+			)
+			require.NoError(t, err)
+
+			err = cmd.Execute()
+			require.NoError(t, err)
+
+			require.True(t, store.Called)
+			require.Equal(t, store.Config.AccessToken, "my-access-token")
+			require.Equal(t, store.Config.Kibana.Host, host)
+			require.Equal(t, store.Config.Kibana.Protocol, kibana.Protocol("https"))
+			require.Equal(t, store.Config.Kibana.Username, "")
+			require.Equal(t, store.Config.Kibana.Password, "")
+		},
+	))
+
+	t.Run("succesfully enroll without TLS and save access token in the store", withServer(
+		func(t *testing.T) *http.ServeMux {
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(`
+{
+    "action": "created",
+    "success": true,
+    "item": {
+        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
+        "active": true,
+        "policy_id": "69f3f5a0-ec52-11e9-93c4-d72ab8a69391",
+        "type": "PERMANENT",
+        "enrolled_at": "2019-10-11T18:26:37.158Z",
+        "user_provided_metadata": {
+						"custom": "customize"
+				},
+        "local_metadata": {
+            "platform": "linux",
+            "version": "8.0.0"
+        },
+        "actions": [],
+        "access_token": "my-access-token"
+    }
+}`))
+			})
+			return mux
+		}, func(t *testing.T, host string) {
+			url := "http://" + host
+			store := &mockStore{}
+			cmd, err := NewEnrollCmd(
+				log,
+				url,
+				make([]string, 0),
+				"my-enrollment-token",
+				"my-id",
+				map[string]interface{}{"custom": "customize"},
+				store,
+			)
+			require.NoError(t, err)
+
+			err = cmd.Execute()
+			require.NoError(t, err)
+
+			require.True(t, store.Called)
+			require.Equal(t, store.Config.AccessToken, "my-access-token")
+			require.Equal(t, store.Config.Kibana.Host, host)
+			require.Equal(t, store.Config.Kibana.Protocol, kibana.Protocol("http"))
+			require.Equal(t, store.Config.Kibana.Username, "")
+			require.Equal(t, store.Config.Kibana.Password, "")
+		},
+	))
+
+	t.Run("fail to enroll without TLS", withServer(
+		func(t *testing.T) *http.ServeMux {
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`
+{
+		"statusCode": 500,
+		"error": "Internal Server Error"
+}`))
+			})
+			return mux
+		}, func(t *testing.T, host string) {
+			url := "http://" + host
+			store := &mockStore{}
+			cmd, err := NewEnrollCmd(
+				log,
+				url,
+				make([]string, 0),
+				"my-enrollment-token",
+				"my-id",
+				map[string]interface{}{"custom": "customize"},
+				store,
+			)
+			require.NoError(t, err)
+
+			err = cmd.Execute()
+			require.Error(t, err)
+			require.False(t, store.Called)
+		},
+	))
+}
+
+func withServer(
+	m func(t *testing.T) *http.ServeMux,
+	test func(t *testing.T, host string),
+) func(t *testing.T) {
+	return func(t *testing.T) {
+		listener, err := net.Listen("tcp", ":0")
+		require.NoError(t, err)
+		defer listener.Close()
+
+		port := listener.Addr().(*net.TCPAddr).Port
+
+		go http.Serve(listener, m(t))
+
+		test(t, "localhost:"+strconv.Itoa(port))
+	}
+}
+
+func withTLSServer(
+	m func(t *testing.T) *http.ServeMux,
+	test func(t *testing.T, caBytes []byte, host string),
+) func(t *testing.T) {
+	return func(t *testing.T) {
+
+		ca, err := authority.NewCA()
+		require.NoError(t, err)
+		pair, err := ca.GeneratePair()
+		require.NoError(t, err)
+
+		serverCert, err := tls.X509KeyPair(pair.Crt, pair.Key)
+		require.NoError(t, err)
+
+		listener, err := net.Listen("tcp", ":0")
+		require.NoError(t, err)
+		defer listener.Close()
+
+		port := listener.Addr().(*net.TCPAddr).Port
+
+		s := http.Server{
+			Handler: m(t),
+			TLSConfig: &tls.Config{
+				Certificates: []tls.Certificate{serverCert},
+			},
+		}
+
+		// Uses the X509KeyPair pair defined in the TLSConfig struct instead of file on disk.
+		go s.ServeTLS(listener, "", "")
+
+		test(t, ca.Crt(), "localhost:"+strconv.Itoa(port))
+	}
+}
+
+func bytesToTMPFile(b []byte) (string, error) {
+	f, err := ioutil.TempFile("", "prefix")
+	if err != nil {
+		return "", err
+	}
+	f.Write(b)
+	if err := f.Close(); err != nil {
+		return "", err
+	}
+
+	return f.Name(), nil
+}

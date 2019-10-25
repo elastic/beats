@@ -1,0 +1,37 @@
+name: Filebeat
+cmd: filebeat
+rules:
+- map:
+    path: inputs
+    rules:
+    - translate:
+        path: type
+        mapper:
+          event/file: log
+          event/stdin: stdin
+          event/tcp: tcp
+          event/udp: udp
+          log/docker: docker
+          log/redis_slowlog: redis
+          log/syslog: syslog
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - log
+    - stdin
+    - udp
+    - tcp
+    - docker
+    - redis
+    - syslog
+- copy:
+    from: inputs
+    to: filebeat
+- filter:
+    selectors:
+    - filebeat
+    - output
+    - keystore
+when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+  'kafka', 'logstash')

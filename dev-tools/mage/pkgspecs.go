@@ -39,6 +39,12 @@ func UseCommunityBeatPackaging() {
 	MustUsePackaging("community_beat", packageSpecFile)
 }
 
+// UseElasticBeatAgentPackaging configures the package target to build packages for
+// an Elastic Beat Agent.
+func UseElasticBeatAgentPackaging() {
+	MustUsePackaging("elastic_beat_agent_binaries", packageSpecFile)
+}
+
 // UseElasticBeatPackaging configures the package target to build packages for
 // an Elastic Beat. This means it will generate two sets of packages -- one
 // that is purely OSS under Apache 2.0 and one that is licensed under the
