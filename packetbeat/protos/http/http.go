@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -532,10 +533,15 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 			logp.Warn("Fail to parse HTTP parameters: %v", err)
 		}
 
-		host := string(requ.host)
 		pbf.Source.Bytes = int64(requ.size)
+		host, port := extractHostHeader(string(requ.host))
 		if net.ParseIP(host) == nil {
 			pbf.Destination.Domain = host
+		}
+		if port == 0 {
+			port = int(pbf.Destination.Port)
+		} else if port != int(pbf.Destination.Port) {
+			requ.notes = append(requ.notes, "Host header port number mismatch")
 		}
 		pbf.Event.Start = requ.ts
 		pbf.Network.ForwardedIP = string(requ.realIP)
@@ -554,7 +560,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		httpFields.RequestHeaders = http.collectHeaders(requ)
 
 		// url
-		u := newURL(host, int64(pbf.Destination.Port), path, params)
+		u := newURL(host, int64(port), path, params)
 		pb.MarshalStruct(evt.Fields, "url", u)
 
 		// user-agent
@@ -699,6 +705,23 @@ func parseCookieValue(raw string) string {
 		raw = raw[1 : len(raw)-1]
 	}
 	return raw
+}
+
+func extractHostHeader(header string) (host string, port int) {
+	if len(header) == 0 || net.ParseIP(header) != nil {
+		return header, port
+	}
+	// Split :port trailer
+	if pos := strings.LastIndexByte(header, ':'); pos != -1 {
+		if num, err := strconv.Atoi(header[pos+1:]); err == nil && num > 0 && num < 65536 {
+			header, port = header[:pos], num
+		}
+	}
+	// Remove square bracket boxing of IPv6 address.
+	if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
+		header = header[1:last]
+	}
+	return header, port
 }
 
 func (http *httpPlugin) hideHeaders(m *message) {

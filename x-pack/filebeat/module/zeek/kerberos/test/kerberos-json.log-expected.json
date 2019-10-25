@@ -1,0 +1,35 @@
+[
+    {
+        "@timestamp": "2017-10-09T16:13:19.590Z",
+        "client.address": "192.168.10.31",
+        "destination.address": "192.168.10.10",
+        "destination.ip": "192.168.10.10",
+        "destination.port": 88,
+        "event.dataset": "zeek.kerberos",
+        "event.id": "C56Flhb4WQBNkfMOl",
+        "event.module": "zeek",
+        "fileset.name": "kerberos",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:DW/lSsosl8gZ8pqO9kKMm7cZheQ=",
+        "network.protocol": "kerberos",
+        "network.transport": "tcp",
+        "server.address": "192.168.10.10",
+        "service.type": "zeek",
+        "source.address": "192.168.10.31",
+        "source.ip": "192.168.10.31",
+        "source.port": 49242,
+        "tags": [
+            "zeek.kerberos"
+        ],
+        "zeek.kerberos.cipher": "aes256-cts-hmac-sha1-96",
+        "zeek.kerberos.client": "RonHD/CONTOSO.LOCAL",
+        "zeek.kerberos.forwardable": true,
+        "zeek.kerberos.renewable": true,
+        "zeek.kerberos.request_type": "TGS",
+        "zeek.kerberos.service": "HOST/admin-pc",
+        "zeek.kerberos.success": true,
+        "zeek.kerberos.valid.until": "2037-09-13T02:48:05.000Z",
+        "zeek.session_id": "C56Flhb4WQBNkfMOl"
+    }
+]

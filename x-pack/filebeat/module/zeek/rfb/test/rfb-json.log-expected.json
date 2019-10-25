@@ -1,0 +1,35 @@
+[
+    {
+        "@timestamp": "2012-02-07T16:35:34.517Z",
+        "destination.address": "192.168.1.10",
+        "destination.ip": "192.168.1.10",
+        "destination.port": 5900,
+        "event.dataset": "zeek.rfb",
+        "event.id": "CXoIzM3wH3fUwXtKN1",
+        "event.module": "zeek",
+        "fileset.name": "rfb",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:AtPVA5phuztnwqMfO/2142WXVdY=",
+        "network.protocol": "rfb",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.1.123",
+        "source.ip": "192.168.1.123",
+        "source.port": 58102,
+        "tags": [
+            "zeek.rfb"
+        ],
+        "zeek.rfb.auth.method": "VNC",
+        "zeek.rfb.auth.success": true,
+        "zeek.rfb.desktop_name": "\u00a0",
+        "zeek.rfb.height": 600,
+        "zeek.rfb.share_flag": false,
+        "zeek.rfb.version.client.major": "003",
+        "zeek.rfb.version.client.minor": "008",
+        "zeek.rfb.version.server.major": "003",
+        "zeek.rfb.version.server.minor": "008",
+        "zeek.rfb.width": 800,
+        "zeek.session_id": "CXoIzM3wH3fUwXtKN1"
+    }
+]

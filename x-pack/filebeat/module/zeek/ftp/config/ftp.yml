@@ -1,0 +1,69 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: ftp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.ftp"
+
+        - from: "zeek.ftp.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.ftp.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.ftp.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.ftp.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.ftp.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.ftp.file_size"
+          to: "zeek.ftp.file.size"
+
+        - from: "zeek.ftp.mime_type"
+          to: "zeek.ftp.file.mime_type"
+
+        - from: "zeek.ftp.fuid"
+          to: "zeek.ftp.file.uid"
+
+        - from: "zeek.ftp.reply_code"
+          to: "zeek.ftp.reply.code"
+
+        - from: "zeek.ftp.reply_msg"
+          to: "zeek.ftp.reply.msg"
+
+        - from: "zeek.ftp.data_channel.orig_h"
+          to: "zeek.ftp.data_channel.originating_host"
+
+        - from: "zeek.ftp.data_channel.resp_h"
+          to: "zeek.ftp.data_channel.response_host"
+
+        - from: "zeek.ftp.data_channel.resp_p"
+          to: "zeek.ftp.data_channel.response_port"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}
