@@ -79,6 +79,66 @@
 			"revisionTime": "2019-07-18T21:44:46Z"
 		},
 		{
+			"path": "github.com/Azure/azure-amqp-common-go/v2/aad",
+			"revision": ""
+		},
+		{
+			"path": "github.com/Azure/azure-amqp-common-go/v2/auth",
+			"revision": ""
+		},
+		{
+			"path": "github.com/Azure/azure-amqp-common-go/v2/conn",
+			"revision": ""
+		},
+		{
+			"path": "github.com/Azure/azure-amqp-common-go/v2/sas",
+			"revision": ""
+		},
+		{
+			"path": "github.com/Azure/azure-amqp-common-go/v2/uuid",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "hfkHLbX25BM4t9kYB707Hrry1KQ=",
+			"path": "github.com/Azure/azure-event-hubs-go",
+			"revision": "6db72644efc98b562b8f6a6e332ec56ef5ffb124",
+			"revisionTime": "2019-10-03T17:50:50Z"
+		},
+		{
+			"checksumSHA1": "CO+TERG7OPcR9vFbskSk60+xpeI=",
+			"path": "github.com/Azure/azure-event-hubs-go/eph",
+			"revision": "6db72644efc98b562b8f6a6e332ec56ef5ffb124",
+			"revisionTime": "2019-10-03T17:50:50Z"
+		},
+		{
+			"checksumSHA1": "z4ak1THutmbcxu7RzPWaSC3H4ao=",
+			"path": "github.com/Azure/azure-event-hubs-go/storage",
+			"revision": "6db72644efc98b562b8f6a6e332ec56ef5ffb124",
+			"revisionTime": "2019-10-03T17:50:50Z"
+		},
+		{
+			"path": "github.com/Azure/azure-event-hubs-go/v2",
+			"revision": "6db72644efc98b562b8f6a6e332ec56ef5ffb124"
+		},
+		{
+			"path": "github.com/Azure/azure-event-hubs-go/v2/eph",
+			"revision": "6db72644efc98b562b8f6a6e332ec56ef5ffb124"
+		},
+		{
+			"path": "github.com/Azure/azure-event-hubs-go/v2/persist",
+			"revision": "6db72644efc98b562b8f6a6e332ec56ef5ffb124"
+		},
+		{
+			"path": "github.com/Azure/azure-event-hubs-go/y",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "+CFHyOnLCFbA9hDyzQ7Ncpsbnvs=",
+			"path": "github.com/Azure/azure-pipeline-go/pipeline",
+			"revision": "232aee85e8e3a6223a11c0943f7df2ae0fac00e4",
+			"revisionTime": "2019-07-08T20:54:13Z"
+		},
+		{
 			"checksumSHA1": "ngNSB6sT1BYbWf0U6wuld3pIRXM=",
 			"path": "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights",
 			"revision": "7a9d2769e4a581b0b1bc609c71b59af043e05c98",
@@ -91,10 +151,22 @@
 			"revisionTime": "2019-08-05T17:15:50Z"
 		},
 		{
+			"checksumSHA1": "Ln7B+8ZONKNLC5ZnC2WzN/tsIiY=",
+			"path": "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2017-10-01/storage",
+			"revision": "2c877ba7838edeb336a1317b39d6874d4f9c72d1",
+			"revisionTime": "2019-10-18T02:42:43Z"
+		},
+		{
 			"checksumSHA1": "jgptrp19Ok9B8BS04S8Xb3Y8Yl8=",
 			"path": "github.com/Azure/azure-sdk-for-go/version",
 			"revision": "7a9d2769e4a581b0b1bc609c71b59af043e05c98",
 			"revisionTime": "2019-07-30T02:56:09Z"
+		},
+		{
+			"checksumSHA1": "l8CNXq+SzyzHiZNHWmLQGPrX0tI=",
+			"path": "github.com/Azure/azure-storage-blob-go/azblob",
+			"revision": "fc700035fe4a7020f50d49f420b3c088aed57e03",
+			"revisionTime": "2019-08-17T00:43:51Z"
 		},
 		{
 			"checksumSHA1": "dl0zIyJAk/XSTO7F7g8AKh0quCo=",
@@ -870,6 +942,12 @@
 			"path": "github.com/denisenkom/go-mssqldb/internal/cp",
 			"revision": "4e0d7dc8888fbb59764060e99b7b68e77a6f9698",
 			"revisionTime": "2018-10-14T14:49:52Z"
+		},
+		{
+			"checksumSHA1": "9JQRv6+pOd3p+594rtCqIn5tYLM=",
+			"path": "github.com/devigned/tab",
+			"revision": "0c15cf42f9a213a393bbc9ddbd13c231c7a36af0",
+			"revisionTime": "2019-06-07T22:24:03Z"
 		},
 		{
 			"checksumSHA1": "0cytTxS0qPVjtknc7OrfuNmxvBE=",
@@ -2549,6 +2627,12 @@
 			"revisionTime": "2017-06-15T03:49:14Z"
 		},
 		{
+			"checksumSHA1": "/yPjvnVkQax+0zsMsqA+Y7Llx9I=",
+			"path": "github.com/mattn/go-ieproxy",
+			"revision": "f9202b1cfdeb0c82ddd3dc1e8e9cd94b3c0c1b13",
+			"revisionTime": "2019-08-05T05:50:40Z"
+		},
+		{
 			"checksumSHA1": "U6lX43KDDlNOn+Z0Yyww+ZzHfFo=",
 			"path": "github.com/mattn/go-isatty",
 			"revision": "fc9e8d8ef48496124e79ae0df75490096eccf6fe",
@@ -3286,6 +3370,12 @@
 			"revisionTime": "2017-10-22T17:59:00Z",
 			"version": "release-branch.go1.9",
 			"versionExact": "release-branch.go1.9"
+		},
+		{
+			"checksumSHA1": "yNR4RokwDc+lYbCL/yOB3ENuKH8=",
+			"path": "golang.org/x/net/http/httpproxy",
+			"revision": "ec77196f6094c3492a8b61f2c11cf937f78992ae",
+			"revisionTime": "2019-10-21T13:46:03Z"
 		},
 		{
 			"checksumSHA1": "TWcqN2+KUWtdqnu18rruwn14UEQ=",
