@@ -1,0 +1,52 @@
+{
+  "description": "Pipeline for normalizing Zeek ocsp.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.ocsp.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.ocsp.ts"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.ocsp.revoke.date",
+        "target_field": "zeek.ocsp.revoke.date",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.ocsp.revoke?.date != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.ocsp.update.this",
+        "target_field": "zeek.ocsp.update.this",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.ocsp.update?.this != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.ocsp.update.next",
+        "target_field": "zeek.ocsp.update.next",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.ocsp.update?.next != null"
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}
