@@ -43,6 +43,7 @@ class Test(metricbeat.BaseTest):
 
     @parameterized.expand([
         "ccr",
+        "enrich",
         "index",
         "index_summary",
         "ml_job",

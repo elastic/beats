@@ -74,7 +74,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// the license first.
 	enrichUnavailableMessage, err := m.checkEnrichAvailability(info.Version.Number)
 	if err != nil {
-		return errors.Wrap(err, "error determining if CCR is available")
+		return errors.Wrap(err, "error determining if Enrich is available")
 	}
 
 	if enrichUnavailableMessage != "" {
@@ -91,14 +91,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	if m.XPack {
-		err = eventsMappingXPack(r, m, *info, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
+		//err = eventsMappingXPack(r, m, *info, content)
+		//if err != nil {
+		//	// Since this is an x-pack code path, we log the error but don't
+		//	// return it. Otherwise it would get reported into `metricbeat-*`
+		//	// indices.
+		//	m.Logger().Error(err)
+		//	return nil
+		//}
 	} else {
 		return eventsMapping(r, *info, content)
 	}

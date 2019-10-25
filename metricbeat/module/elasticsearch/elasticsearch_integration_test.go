@@ -51,6 +51,7 @@ import (
 var metricSets = []string{
 	"ccr",
 	"cluster_stats",
+	"enrich",
 	"index",
 	"index_recovery",
 	"index_summary",

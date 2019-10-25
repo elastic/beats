@@ -67,6 +67,7 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 
 	expectedXPackMetricsets := []string{
 		"ccr",
+		"enrich",
 		"cluster_stats",
 		"index",
 		"index_recovery",
