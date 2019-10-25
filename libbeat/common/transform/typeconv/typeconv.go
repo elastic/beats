@@ -30,6 +30,9 @@ import (
 // Converter converts structured data between arbitrary typed (serializable)
 // go structures and maps/slices/arrays. It uses go-structform/gotype for input
 // and output values each, such that any arbitrary structures can be used.
+//
+// The converter computes and caches mapping operations for go structures it
+// has visited.
 type Converter struct {
 	fold   *gotype.Iterator
 	unfold *gotype.Unfolder
@@ -58,6 +61,8 @@ var convPool = sync.Pool{
 	},
 }
 
+// NewConverter creates a new converter with local state for tracking known
+// type conversations.
 func NewConverter() *Converter {
 	c := &Converter{}
 	return c
