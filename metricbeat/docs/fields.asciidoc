@@ -32047,20 +32047,10 @@ virtualmachine
 
 
 
-*`vsphere.virtualmachine.host.id`*::
+*`vsphere.virtualmachine.host`*::
 +
 --
-Host id
-
-
-type: keyword
-
---
-
-*`vsphere.virtualmachine.host.hostname`*::
-+
---
-Host name of the host
+Host name
 
 
 type: keyword
