@@ -1,0 +1,19 @@
+[
+    {
+        "@timestamp": "2013-02-26T22:02:38.650Z",
+        "destination.address": "8.8.8.8",
+        "destination.ip": "8.8.8.8",
+        "event.dataset": "zeek.traceroute",
+        "event.module": "zeek",
+        "fileset.name": "traceroute",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "tags": [
+            "zeek.traceroute"
+        ]
+    }
+]
