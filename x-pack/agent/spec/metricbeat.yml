@@ -1,0 +1,24 @@
+name: Metricbeat
+cmd: metricbeat
+rules:
+- filter_values_with_regexp:
+    key: type
+    re: ^metric/.+
+    selector: inputs
+- map:
+    path: inputs
+    rules:
+    - translate_with_regexp:
+        path: type
+        re: ^metric/(?P<type>.+)
+        with: $type
+- copy:
+    from: inputs
+    to: metricbeat
+- filter:
+    selectors:
+    - metricbeat
+    - output
+    - keystore
+when: HasItems(%{[metricbeat.inputs]}) && HasNamespace('output', 'elasticsearch',
+  'redis', 'kafka', 'logstash')

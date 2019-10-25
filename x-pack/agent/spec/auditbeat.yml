@@ -1,0 +1,33 @@
+name: Auditbeat
+cmd: auditbeat
+rules:
+- filter_values_with_regexp:
+    key: type
+    re: ^audit/.+
+    selector: inputs
+- map:
+    path: inputs
+    rules:
+    - translate_with_regexp:
+        path: type
+        re: ^audit/(.+)
+        with: $1
+- copy:
+    from: inputs
+    to: auditbeat
+- map:
+    path: auditbeat.inputs
+    rules:
+    - rename:
+        from: type
+        to: module
+- rename:
+    from: auditbeat.inputs
+    to: modules
+- filter:
+    selectors:
+    - auditbeat
+    - output
+    - keystore
+when: HasItems(%{[auditbeat.modules]}) && HasNamespace('output', 'elasticsearch',
+  'redis', 'kafka', 'logstash')
