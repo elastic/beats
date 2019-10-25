@@ -19,6 +19,7 @@ package memlog
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
@@ -34,7 +35,12 @@ type memTxParent interface {
 	IsReadonly() bool
 	checkRead() error
 	checkWrite() error
-	getTypeConv() *typeConv
+	getTypeConv() *typeconv.Converter
+}
+
+type valueDecoder struct {
+	tx    memTxParent
+	value common.MapStr
 }
 
 func (tx *memTx) init(parent memTxParent, store *memStore, state *txState) {
@@ -252,4 +258,15 @@ func (tx *memTx) decodeOpValue(in interface{}) (common.MapStr, error) {
 	var opVal map[string]interface{}
 	tc := tx.parent.getTypeConv()
 	return common.MapStr(opVal), tc.Convert(&opVal, in)
+}
+
+func newValueDecoder(tx memTxParent, value common.MapStr) *valueDecoder {
+	return &valueDecoder{tx: tx, value: value}
+}
+
+func (d *valueDecoder) Decode(to interface{}) (err error) {
+	if err = d.tx.checkRead(); err == nil {
+		err = d.tx.getTypeConv().Convert(to, d.value)
+	}
+	return
 }
