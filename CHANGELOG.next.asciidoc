@@ -17,7 +17,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Add Filebeat Azure Dashboards {pull}14127[14127]
 
 *Heartbeat*
 
@@ -41,17 +40,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
-- Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over
-  TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Fix azure fields names. {pull}14098[14098] {pull}14132[14132]
-- Fix calculation of `network.bytes` and `network.packets` for bi-directional netflow events. {pull}14111[14111]
-- Accept '-' as http.response.body.bytes in apache module. {pull}14137[14137]
 
 *Heartbeat*
 
@@ -61,8 +55,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Fix performance counter values for windows/perfmon metricset.{issue}14036[14036] {pull}14039[14039] {pull}14108[14108]
-- Add FailOnRequired when applying schema and fix metric names in mongodb metrics metricset. {pull}14143[14143]
 
 *Packetbeat*
 
@@ -77,7 +69,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Add shared_credential_file option in aws related config for specifying credential file directory. {issue}14157[14157] {pull}14178[14178]
 
 *Auditbeat*
 
@@ -85,10 +76,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
-- Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776] {pull}14033[14033] {pull}14107[14107]
-- Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
-- Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
-- Add Kibana Dashboard for MISP module. {pull}14147[14147]
 
 *Heartbeat*
 
@@ -97,7 +84,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 
 *Packetbeat*
 
