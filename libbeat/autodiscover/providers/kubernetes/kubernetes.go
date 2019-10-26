@@ -139,7 +139,7 @@ func (p *Provider) handleAdd(obj interface{}) {
 
 // handleUpdate emits events for a given pod depending on the state of the pod,
 // if it is terminating, a stop event is scheduled, if not, a stop and a start
-// events are sents sequentially to recreate the resources assotiated to the pod.
+// events are sent sequentially to recreate the resources assotiated to the pod.
 func (p *Provider) handleUpdate(obj interface{}) {
 	pod := obj.(*kubernetes.Pod)
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
@@ -154,8 +154,8 @@ func (p *Provider) handleUpdate(obj interface{}) {
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 	} else {
 		p.logger.Debugf("Watcher Pod update: %+v", obj)
-		p.emit(obj.(*kubernetes.Pod), "stop")
-		p.emit(obj.(*kubernetes.Pod), "start")
+		p.emit(pod, "stop")
+		p.emit(pod, "start")
 	}
 }
 
