@@ -17,8 +17,8 @@
                     "mhz": 0
                 }
             },
-            "host": "ha-host",
-            "hostname": "localhost.localdomain",
+            "host.id": "ha-host",
+            "host.hostname": "localhost.localdomain",
             "memory": {
                 "free": {
                     "guest": {
