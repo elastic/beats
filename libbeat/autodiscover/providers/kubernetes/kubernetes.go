@@ -128,9 +128,19 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		UpdateFunc: func(obj interface{}) {
-			p.logger.Debugf("Watcher Pod update: %+v", obj)
-			p.emit(obj.(*kubernetes.Pod), "stop")
-			p.emit(obj.(*kubernetes.Pod), "start")
+			meta := obj.(*kubernetes.Pod).GetObjectMeta()
+			if meta.GetDeletionTimestamp() != nil {
+				delay := config.CleanupTimeout
+				if gracePeriod := meta.GetDeletionGracePeriodSeconds(); gracePeriod != nil {
+					delay += time.Duration(*gracePeriod) * time.Second
+				}
+				p.logger.Debugf("Watcher Pod delete (delay: %+v): %+v", delay, obj)
+				time.AfterFunc(delay, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
+			} else {
+				p.logger.Debugf("Watcher Pod update: %+v", obj)
+				p.emit(obj.(*kubernetes.Pod), "stop")
+				p.emit(obj.(*kubernetes.Pod), "start")
+			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			p.logger.Debugf("Watcher Pod delete: %+v", obj)
