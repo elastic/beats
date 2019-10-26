@@ -63,12 +63,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 363,
           "ip": "134.220.2.6",
           "locality": "public",
+          "packets": 3,
           "port": 88
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

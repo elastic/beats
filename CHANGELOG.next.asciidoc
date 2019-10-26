@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix timezone parsing of MySQL module ingest pipelines. {pull}14130[14130]
+- Improve error message in s3 input when handleSQSMessage failed. {pull}14113[14113]
 
 *Heartbeat*
 
@@ -56,7 +57,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Fix performance counter values for windows/perfmon metricset.{issue}14036[14036] {pull}14039[14039] {pull}14108[14108]
 
 *Packetbeat*
 
@@ -78,8 +78,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
-- Add filebeat azure module with activitylogs, auditlogs, signinlogs filesets. {pull}13776[13776] {pull}14033[14033] {pull}14107[14107]
-- Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
 
 *Heartbeat*
 
