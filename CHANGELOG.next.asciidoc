@@ -61,7 +61,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 - Add statistic option into cloudwatch metricset. If there is no statistic method specified, default is to collect Average, Sum, Maximum, Minimum and SampleCount. {issue}12370[12370] {pull}12840[12840]
-- Change `server_status_path` default setting for nginx module {issue}13806[13806], {pull}14099[14099]
 
 *Packetbeat*
 
@@ -235,6 +234,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change kubernetes.event.message to text. {pull}13964[13964]
 - Fix performance counter values for windows/perfmon metricset. {issue}14036[14036] {pull}14039[14039]
 - Add FailOnRequired when applying schema and fix metric names in mongodb metrics metricset. {pull}14143[14143]
+- Change `server_status_path` default setting for nginx module {issue}13806[13806], {pull}14099[14099]
 
 *Packetbeat*
 
