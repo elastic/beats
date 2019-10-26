@@ -182,7 +182,7 @@ class Test(metricbeat.BaseTest):
             print "Trial already enabled. Error: {}".format(e)
 
     def check_skip(self, metricset):
-        if metricset != "ccr":
+        if metricset != "ccr" and metricset != "enrich":
             return
 
         es_version = self.get_version()
@@ -190,6 +190,11 @@ class Test(metricbeat.BaseTest):
             # Skip CCR metricset system test for Elasticsearch versions < 6.5.0 as CCR Stats
             # API endpoint is not available
             raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
+
+        if es_version["major"] <= 7 and es_version["minor"] < 5:
+            # Skip Enrich metricset system test for Elasticsearch versions < 7.5.0 as Enrich Stats
+            # API endpoint is not available
+            raise SkipTest("elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
 
     def get_version(self):
         es_info = self.es.info()
