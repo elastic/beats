@@ -145,7 +145,8 @@ func (p *Provider) handleUpdate(obj interface{}) {
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
 		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
 		// Pod is terminating, don't reload its configuration and ignore the event
-		// if some pod is still running
+		// if some pod is still running, we will receive more events when containers
+		// terminate.
 		for _, container := range pod.Status.ContainerStatuses {
 			if container.State.Running != nil {
 				return
