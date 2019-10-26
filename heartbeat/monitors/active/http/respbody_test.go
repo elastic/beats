@@ -27,11 +27,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_handleRespBody(t *testing.T) {
