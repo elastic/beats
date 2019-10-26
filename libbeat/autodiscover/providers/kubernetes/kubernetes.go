@@ -152,7 +152,7 @@ func (p *Provider) handleUpdate(obj interface{}) {
 				return
 			}
 		}
-		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
+		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
 	} else {
 		p.logger.Debugf("Watcher Pod update: %+v", obj)
 		p.emit(pod, "stop")
