@@ -21,6 +21,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 
@@ -37,6 +38,19 @@ type MetricMap interface {
 
 	// GetValue returns the resulting value
 	GetValue(m *dto.Metric) interface{}
+
+	// GetConfiguration returns the configuration for the metric
+	GetConfiguration() Configuration
+}
+
+// Configuration for mappings that needs extended treatment
+type Configuration struct {
+	// StoreNonMappedLables indicates if labels found at the metric that are
+	// not found at the label map should be part of the resulting event
+	StoreNonMappedLabels bool
+	// NonMappedLabelsPlacement is used when StoreNonMappedLabels is set to true, and
+	// defines the key at the event to store labels
+	NonMappedLabelsPlacement string
 }
 
 // MetricOption adds settings to Metric objects behavior
@@ -55,6 +69,11 @@ func OpFilter(filter map[string]string) MetricOption {
 // OpLowercaseValue lowercases the value if it's a string
 func OpLowercaseValue() MetricOption {
 	return opLowercaseValue{}
+}
+
+// OpUnixTimestampValue parses a value into a Unix timestamp
+func OpUnixTimestampValue() MetricOption {
+	return opUnixTimestampValue{}
 }
 
 // OpMultiplyBuckets multiplies bucket labels in histograms, useful to change units
@@ -116,9 +135,20 @@ func InfoMetric(options ...MetricOption) MetricMap {
 	}
 }
 
+// ExtendedMetric is a metric item that allows extended behaviour
+// through configuration
+func ExtendedMetric(field string, configuration Configuration, options ...MetricOption) MetricMap {
+	return &commonMetric{
+		field:   field,
+		options: options,
+		config:  configuration,
+	}
+}
+
 type commonMetric struct {
 	field   string
 	options []MetricOption
+	config  Configuration
 }
 
 // GetOptions returns the list of metric options
@@ -129,6 +159,11 @@ func (m *commonMetric) GetOptions() []MetricOption {
 // GetField returns the resulting field name
 func (m *commonMetric) GetField() string {
 	return m.field
+}
+
+// GetConfiguration returns the configuration for the metric
+func (m *commonMetric) GetConfiguration() Configuration {
+	return m.config
 }
 
 // GetValue returns the resulting value
@@ -314,4 +349,12 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 	histogram["bucket"] = multiplied
 	histogram["sum"] = sum * o.multiplier
 	return field, histogram, labels
+}
+
+type opUnixTimestampValue struct {
+}
+
+// Process converts a value in seconds into an unix time
+func (o opUnixTimestampValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	return field, time.Unix(int64(value.(float64)), 0), labels
 }

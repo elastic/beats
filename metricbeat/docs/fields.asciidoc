@@ -18452,6 +18452,71 @@ type: long
 --
 
 [float]
+=== statemetrics
+
+kubernetes state metrics data
+
+
+
+*`kubernetes.statemetrics.certificatesigningrequest.cert.length`*::
++
+--
+type: long
+
+--
+
+*`kubernetes.statemetrics.certificatesigningrequest.labels`*::
++
+--
+type: long
+
+--
+
+*`kubernetes.statemetrics.certificatesigningrequest.condition`*::
++
+--
+type: long
+
+--
+
+*`kubernetes.statemetrics.certificatesigningrequest.created`*::
++
+--
+type: date
+
+--
+
+*`kubernetes.statemetrics.name`*::
++
+--
+type: keyword
+
+--
+
+*`kubernetes.statemetrics.label_rotting`*::
++
+--
+type: keyword
+
+--
+
+*`kubernetes.statemetrics.condition`*::
++
+--
+type: keyword
+
+--
+
+*`kubernetes.statemetrics.labels.*`*::
++
+--
+each label found at the certificate signing request
+
+type: object
+
+--
+
+[float]
 === system
 
 kubernetes system containers metrics

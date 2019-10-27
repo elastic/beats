@@ -146,6 +146,14 @@ metricbeat.modules:
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
+
+# State metrics from kube-state-metrics service:
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - statemetrics
+  period: 10s
+  hosts: ["kube-state-metrics:8080"]
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

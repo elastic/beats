@@ -119,6 +119,17 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
 			m, ok := mapping.Metrics[family.GetName()]
+			if m == nil {
+				continue
+			}
+
+			storeAllLabels := false
+			labelsLocation := ""
+			if m != nil {
+				c := m.GetConfiguration()
+				storeAllLabels = c.StoreNonMappedLabels
+				labelsLocation = c.NonMappedLabelsPlacement
+			}
 
 			// Ignore unknown metrics
 			if !ok {
@@ -142,6 +153,7 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			// Convert labels
 			labels := common.MapStr{}
 			keyLabels := common.MapStr{}
+
 			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
@@ -149,6 +161,10 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 					} else {
 						labels.Put(l.GetField(), v)
 					}
+				} else if storeAllLabels {
+					// if label for this metric is not found at the label mappings but
+					// it is configured to store any labels found, make it so
+					labels.Put(labelsLocation+"."+k, v)
 				}
 			}
 

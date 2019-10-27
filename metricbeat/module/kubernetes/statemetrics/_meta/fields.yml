@@ -1,0 +1,27 @@
+- name: statemetrics
+  type: group
+  description: >
+    kubernetes state metrics data
+  release: experimental
+  fields:
+
+    # certificatesigningrequest
+    - name: certificatesigningrequest.cert.length
+      type: long
+    - name: certificatesigningrequest.labels
+      type: long
+    - name: certificatesigningrequest.condition
+      type: long
+    - name: certificatesigningrequest.created
+      type: date
+    - name: name
+      type: keyword
+    - name: label_rotting
+      type: keyword
+    - name: condition
+      type: keyword
+    - name: labels.*
+      type: object
+      object_type: keyword
+      description: each label found at the certificate signing request
+
