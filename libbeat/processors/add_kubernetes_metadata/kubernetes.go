@@ -111,9 +111,9 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		if kubernetes.IsInCluster(config.KubeConfig) {
 			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config: %v", "add_kubernetes_metadata", err)
 		} else if config.KubeConfig == "" {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", os.Getenv("KUBECONFIG"), err)
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", os.Getenv("KUBECONFIG"), err)
 		} else {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig, err)
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", config.KubeConfig, err)
 		}
 		return processor, nil
 	}
