@@ -18465,14 +18465,7 @@ type: long
 
 --
 
-*`kubernetes.statemetrics.certificatesigningrequest.labels`*::
-+
---
-type: long
-
---
-
-*`kubernetes.statemetrics.certificatesigningrequest.condition`*::
+*`kubernetes.statemetrics.certificatesigningrequest.condition.count`*::
 +
 --
 type: long
@@ -18486,33 +18479,24 @@ type: date
 
 --
 
-*`kubernetes.statemetrics.name`*::
+*`kubernetes.statemetrics.certificatesigningrequest.name`*::
 +
 --
 type: keyword
 
 --
 
-*`kubernetes.statemetrics.label_rotting`*::
+*`kubernetes.statemetrics.certificatesigningrequest.label_rotting`*::
 +
 --
 type: keyword
 
 --
 
-*`kubernetes.statemetrics.condition`*::
+*`kubernetes.statemetrics.certificatesigningrequest.condition.status`*::
 +
 --
 type: keyword
-
---
-
-*`kubernetes.statemetrics.labels.*`*::
-+
---
-each label found at the certificate signing request
-
-type: object
 
 --
 

@@ -51,6 +51,9 @@ type Configuration struct {
 	// NonMappedLabelsPlacement is used when StoreNonMappedLabels is set to true, and
 	// defines the key at the event to store labels
 	NonMappedLabelsPlacement string
+	// MetricProcessing options are a set of functions that will be
+	// applied to metrics after they are retrieved
+	MetricProcessingOptions []MetricOption
 }
 
 // MetricOption adds settings to Metric objects behavior
@@ -86,8 +89,8 @@ func OpMultiplyBuckets(multiplier float64) MetricOption {
 // Metric directly maps a Prometheus metric to a Metricbeat field
 func Metric(field string, options ...MetricOption) MetricMap {
 	return &commonMetric{
-		field:   field,
-		options: options,
+		field:  field,
+		config: Configuration{MetricProcessingOptions: options},
 	}
 }
 
@@ -96,8 +99,8 @@ func Metric(field string, options ...MetricOption) MetricMap {
 func KeywordMetric(field, keyword string, options ...MetricOption) MetricMap {
 	return &keywordMetric{
 		commonMetric{
-			field:   field,
-			options: options,
+			field:  field,
+			config: Configuration{MetricProcessingOptions: options},
 		},
 		keyword,
 	}
@@ -107,8 +110,8 @@ func KeywordMetric(field, keyword string, options ...MetricOption) MetricMap {
 func BooleanMetric(field string, options ...MetricOption) MetricMap {
 	return &booleanMetric{
 		commonMetric{
-			field:   field,
-			options: options,
+			field:  field,
+			config: Configuration{MetricProcessingOptions: options},
 		},
 	}
 }
@@ -118,8 +121,8 @@ func BooleanMetric(field string, options ...MetricOption) MetricMap {
 func LabelMetric(field, label string, options ...MetricOption) MetricMap {
 	return &labelMetric{
 		commonMetric{
-			field:   field,
-			options: options,
+			field:  field,
+			config: Configuration{MetricProcessingOptions: options},
 		},
 		label,
 	}
@@ -130,30 +133,38 @@ func LabelMetric(field, label string, options ...MetricOption) MetricMap {
 func InfoMetric(options ...MetricOption) MetricMap {
 	return &infoMetric{
 		commonMetric{
-			options: options,
+			config: Configuration{MetricProcessingOptions: options},
+		},
+	}
+}
+
+// ExtendedInfoMetric obtains info labels from the given metric and puts them
+// into events matching all the key labels present in the metric
+func ExtendedInfoMetric(configuration Configuration) MetricMap {
+	return &infoMetric{
+		commonMetric{
+			config: configuration,
 		},
 	}
 }
 
 // ExtendedMetric is a metric item that allows extended behaviour
 // through configuration
-func ExtendedMetric(field string, configuration Configuration, options ...MetricOption) MetricMap {
+func ExtendedMetric(field string, configuration Configuration) MetricMap {
 	return &commonMetric{
-		field:   field,
-		options: options,
-		config:  configuration,
+		field:  field,
+		config: configuration,
 	}
 }
 
 type commonMetric struct {
-	field   string
-	options []MetricOption
-	config  Configuration
+	field  string
+	config Configuration
 }
 
 // GetOptions returns the list of metric options
 func (m *commonMetric) GetOptions() []MetricOption {
-	return m.options
+	return m.config.MetricProcessingOptions
 }
 
 // GetField returns the resulting field name

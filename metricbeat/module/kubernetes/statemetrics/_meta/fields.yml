@@ -8,20 +8,14 @@
     # certificatesigningrequest
     - name: certificatesigningrequest.cert.length
       type: long
-    - name: certificatesigningrequest.labels
-      type: long
-    - name: certificatesigningrequest.condition
+    - name: certificatesigningrequest.condition.count
       type: long
     - name: certificatesigningrequest.created
       type: date
-    - name: name
+    - name: certificatesigningrequest.name
       type: keyword
-    - name: label_rotting
+    - name: certificatesigningrequest.label_rotting
       type: keyword
-    - name: condition
+    - name: certificatesigningrequest.condition.status
       type: keyword
-    - name: labels.*
-      type: object
-      object_type: keyword
-      description: each label found at the certificate signing request
 

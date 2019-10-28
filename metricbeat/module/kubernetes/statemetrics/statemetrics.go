@@ -108,8 +108,27 @@ func (s *stateMetricsMetricSet) Fetch(reporter mb.ReporterV2) error {
 			if !ok {
 				s.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
 			}
+			delete(event, mb.ModuleDataKey)
 		}
-		delete(event, mb.ModuleDataKey)
+
+		// moving labels from kubernetes.statemetrics.labels to kubernetes.labels
+		// should make aggregation by labels easier for all kubernetes objects,
+		// not only the ones found at kube state metrics
+		labels, err := event.GetValue("labels")
+		if err == nil {
+			if moduleFieldsMapStr == nil {
+				moduleFieldsMapStr = common.MapStr{}
+			}
+			_, err = moduleFieldsMapStr.Put("labels", labels)
+			if err != nil {
+				s.Logger().Errorf("error moving labels from kubernetes.statemetrics.labels to kubernetes.labels: %s", err.Error())
+			} else {
+				err = event.Delete("labels")
+				if err != nil {
+					s.Logger().Errorf("error deleting labels from kubernetes.statemetrics.labels: %s", err.Error())
+				}
+			}
+		}
 
 		if reported := reporter.Event(mb.Event{
 			MetricSetFields: event,

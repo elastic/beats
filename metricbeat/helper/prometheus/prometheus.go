@@ -164,6 +164,7 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				} else if storeAllLabels {
 					// if label for this metric is not found at the label mappings but
 					// it is configured to store any labels found, make it so
+					// TODO dedot
 					labels.Put(labelsLocation+"."+k, v)
 				}
 			}
