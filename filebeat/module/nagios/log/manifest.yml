@@ -1,0 +1,12 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      # See https://assets.nagios.com/downloads/nagiosxi/docs/Nagios-XI-Log-Locations-And-Descriptions.pdf
+      # GNU/Linux distribution store nagios log in /var/log/nagios/nagios.log
+      - /usr/local/nagios/var/nagios.log*
+      - /var/log/nagios/nagios.log*
+
+ingest_pipeline: ingest/pipeline.json
+input: config/log.yml

@@ -1,0 +1,11 @@
+[1572296732] Warning: Check of service 'uptime' on host 'fake.lab.local' timed out after 20.015s!
+[1572296732] wproc: Core Worker 12707: job 7913 (pid=2729): Dormant child reaped
+[1572296845] EXTERNAL COMMAND: PROCESS_HOST_CHECK_RESULT;dc01.lab.local;1;down|
+[1572296845] PASSIVE HOST CHECK: dc01.lab.local;0;PING OK - Packet loss = 0%, RTA = 0.49 ms
+[1572296845] HOST NOTIFICATION: admin;dc01.lab.local;DOWN;notify-by-email-host;down
+[1572296845] HOST ALERT: dc01.lab.local;DOWN;HARD;1;down
+[1572296845] GLOBAL HOST EVENT HANDLER: dc01.lab.local;DOWN;HARD;1;event-browser-host
+[1572296877] HOST NOTIFICATION: admin;dc01.lab.local;UP;notify-by-email-host;PING OK - Packet loss = 0%, RTA = 0.40 ms
+[1572296877] HOST ALERT: dc01.lab.local;UP;HARD;1;PING OK - Packet loss = 0%, RTA = 0.40 ms
+[1572296877] GLOBAL HOST EVENT HANDLER: dc01.lab.local;UP;HARD;1;event-browser-host
+

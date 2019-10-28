@@ -1,0 +1,9 @@
+- key: nagios
+  title: "nagios"
+  description: >
+    nagios Module
+  fields:
+    - name: nagios
+      type: group
+      description: >
+      fields:

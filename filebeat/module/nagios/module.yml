@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-nagios-log-Dashboard
+  file: Filebeat-nagios-log.json

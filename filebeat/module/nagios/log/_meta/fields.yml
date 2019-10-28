@@ -1,0 +1,29 @@
+- name: log
+  description: Please add description
+  example: Please add example
+  type: group
+  fields:
+  - name: type
+    description: Nagios log type (alert, notification, etc.)
+    example: HOST ALERT
+    type: text
+  - name: hostname
+    description: Nagios host name
+    example: server.company.com
+    type: text
+  - name: state
+    description: Nagios state
+    example: DOWN
+    type: text
+  - name: state_level
+    description: Nagios state level
+    example: SOFT
+    type: text
+  - name: attempt
+    description: Nagios number of attempts
+    example: 1
+    type: long
+  - name: message
+    description: Nagios message
+    example: server is unreachable
+    type: text
