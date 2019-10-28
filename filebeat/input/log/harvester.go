@@ -360,7 +360,12 @@ func (h *Harvester) onMessage(
 		jsonFields = f.(common.MapStr)
 	}
 
-	var meta common.MapStr
+	// Add meta.created in all messages from Elastic Common Schema Reference:
+	// https://www.elastic.co/guide/en/ecs/current/ecs-event.html#_event_field_details
+	meta := common.MapStr{
+		"created": message.Ts,
+	}
+
 	timestamp := message.Ts
 	if h.config.JSON != nil && len(jsonFields) > 0 {
 		id, ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
@@ -371,9 +376,7 @@ func (h *Harvester) onMessage(
 		}
 
 		if id != "" {
-			meta = common.MapStr{
-				"id": id,
-			}
+			meta["id"] = id
 		}
 	} else if &text != nil {
 		if fields == nil {
