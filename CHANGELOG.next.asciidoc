@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
 - Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
 - By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
+- Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
 - Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 
 *Auditbeat*
