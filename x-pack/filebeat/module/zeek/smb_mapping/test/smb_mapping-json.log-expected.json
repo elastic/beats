@@ -1,0 +1,27 @@
+[
+    {
+        "@timestamp": "2017-10-09T16:13:19.576Z",
+        "destination.address": "192.168.10.30",
+        "destination.ip": "192.168.10.30",
+        "destination.port": 445,
+        "event.dataset": "zeek.smb_mapping",
+        "event.id": "C9YAaEzWLL62yWMn5",
+        "event.module": "zeek",
+        "fileset.name": "smb_mapping",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:k308wDxRMx/FIEzeh+YwD86zgoA=",
+        "network.protocol": "smb",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.10.31",
+        "source.ip": "192.168.10.31",
+        "source.port": 49239,
+        "tags": [
+            "zeek.smb_mapping"
+        ],
+        "zeek.session_id": "C9YAaEzWLL62yWMn5",
+        "zeek.smb_mapping.path": "\\\\admin-pc\\ADMIN$",
+        "zeek.smb_mapping.share_type": "DISK"
+    }
+]

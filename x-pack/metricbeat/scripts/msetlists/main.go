@@ -18,6 +18,9 @@ import (
 )
 
 func main() {
+	// Disable permission checks so it reads light modules in any case
+	os.Setenv("BEAT_STRICT_PERMS", "false")
+
 	path := paths.Resolve(paths.Home, "../x-pack/metricbeat/module")
 	lm := xpackmb.NewLightModulesSource(path)
 	mb.Registry.SetSecondarySource(lm)
