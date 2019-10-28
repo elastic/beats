@@ -1,0 +1,417 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-public",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-15T15:02:51+02:00",
+                    "name": "cluster-info",
+                    "resource_version": "106186"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "statemetrics": {
+                "certificatesigningrequest": {
+                    "cert": {
+                        "length": 904
+                    },
+                    "created": "2019-10-26T11:38:31+02:00",
+                    "name": "mycsr"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "statemetrics": {
+                "certificatesigningrequest": {
+                    "condition": {
+                        "count": 1,
+                        "status": "denied"
+                    },
+                    "name": "mycsr"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "labels": {
+                "label_rotting": "yes"
+            },
+            "statemetrics": {
+                "certificatesigningrequest": {
+                    "condition": {
+                        "count": 0,
+                        "status": "denied"
+                    },
+                    "name": "my-svc.my-namespace-2"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "default",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-28T15:46:59+01:00",
+                    "name": "myconfig",
+                    "resource_version": "1383460"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-15T15:02:48+02:00",
+                    "name": "extension-apiserver-authentication",
+                    "resource_version": "41"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-15T15:02:50+02:00",
+                    "name": "kubeadm-config",
+                    "resource_version": "149"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "statemetrics": {
+                "certificatesigningrequest": {
+                    "condition": {
+                        "count": 1,
+                        "status": "approved"
+                    },
+                    "name": "mycsr"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "labels": {
+                "label_rotting": "yes"
+            },
+            "statemetrics": {
+                "certificatesigningrequest": {
+                    "cert": {
+                        "length": 0
+                    },
+                    "created": "2019-10-26T08:53:04+02:00",
+                    "name": "my-svc.my-namespace-2"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-15T15:02:52+02:00",
+                    "name": "kube-proxy",
+                    "resource_version": "210"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "sonobuoy",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-25T16:59:36+02:00",
+                    "name": "sonobuoy-config-cm",
+                    "resource_version": "1064273"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "labels": {
+                "label_rotting": "yes"
+            },
+            "statemetrics": {
+                "certificatesigningrequest": {
+                    "condition": {
+                        "count": 0,
+                        "status": "approved"
+                    },
+                    "name": "my-svc.my-namespace-2"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-15T15:02:51+02:00",
+                    "name": "coredns",
+                    "resource_version": "176"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "sonobuoy",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-25T16:59:36+02:00",
+                    "name": "sonobuoy-plugins-cm",
+                    "resource_version": "1064274"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "elastic-system",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-21T15:16:44+02:00",
+                    "name": "elastic-operator-uuid",
+                    "resource_version": "635968"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.statemetrics",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "statemetrics": {
+                "configmap": {
+                    "created": "2019-10-15T15:02:50+02:00",
+                    "name": "kubelet-config-1.16",
+                    "resource_version": "152"
+                }
+            }
+        },
+        "metricset": {
+            "name": "statemetrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

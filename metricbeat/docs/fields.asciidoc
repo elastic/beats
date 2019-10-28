@@ -18493,6 +18493,27 @@ type: keyword
 
 --
 
+*`kubernetes.statemetrics.configmap.created`*::
++
+--
+type: date
+
+--
+
+*`kubernetes.statemetrics.configmap.name`*::
++
+--
+type: keyword
+
+--
+
+*`kubernetes.statemetrics.configmap.resource_version`*::
++
+--
+type: long
+
+--
+
 [float]
 === system
 

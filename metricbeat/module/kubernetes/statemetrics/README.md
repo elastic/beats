@@ -19,7 +19,7 @@ See the metricset documentation for the configuration reference.
 
 ## Resources
 
-### Certificate signing requests
+### Certificate signing request
 
 - Make sure kube controller manager uses `--cluster-signing-cert` and `--cluster-signing-key`.
 - Create a CSR with your tool of choice. Base64 encode the file and remove carriage return.
@@ -52,3 +52,25 @@ kubectl certificate approve testcert
 - Add labels to the CSR (they will be reported by the metricset)
 - Launch metricbeat enabling this metricset
 
+### Configmap
+
+- Create configmap objects at kubernetes at different namespaces
+
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: kube-system
+  name: myconfig
+data:
+  set1: /
+    item1.1=one
+    item1.2=two
+  set2: /
+    item2.1=uno
+    item2.2=dos
+EOF
+```
+
+- There is only one event type being pushed to elasticsearch which includes creation date, namespace, name and resource version

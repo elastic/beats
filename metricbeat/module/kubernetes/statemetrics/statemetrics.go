@@ -44,8 +44,6 @@ type Config struct {
 	BlackList  []string `config:"filter.blacklist"`
 	WhiteList  []string `config:"filter.whitelist"`
 	LabelDedot bool     `config:"labels.dedot"`
-	// BlackList blackListFilter `config:"blacklist_filter"`
-	// WhiteList whiteListFilter `config:"whitelist_filter"`
 }
 
 // getGroupMappingsFn function instances can be found at this package to feed the

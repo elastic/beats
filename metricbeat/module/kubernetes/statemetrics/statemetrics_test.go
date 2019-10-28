@@ -15,22 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build !integration
+
 package statemetrics
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
+	"testing"
+
+	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
 )
 
-func getConfigMapMapping() (mm map[string]prometheus.MetricMap, lm map[string]prometheus.LabelMap) {
-	return map[string]prometheus.MetricMap{
-			"kube_configmap_info":                      prometheus.InfoMetric(),
-			"kube_configmap_metadata_resource_version": prometheus.InfoMetric(),
-			"kube_configmap_created":                   prometheus.Metric("configmap.created", prometheus.OpUnixTimestampValue()),
+func TestEventMapping(t *testing.T) {
+	ptest.TestMetricSet(t, "kubernetes", "statemetrics",
+		ptest.TestCases{
+			{
+				MetricsFile:  "./_meta/test/kube-state-metrics-v1.7.0.txt",
+				ExpectedFile: "./_meta/test/kube-state-metrics-v1.7.0.txt.expected",
+			},
 		},
-		map[string]prometheus.LabelMap{
-			"namespace":        prometheus.KeyLabel(mb.ModuleDataKey + ".namespace"),
-			"configmap":        prometheus.KeyLabel("configmap.name"),
-			"resource_version": prometheus.Label("configmap.resource_version"),
-		}
+	)
 }

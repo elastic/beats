@@ -1,0 +1,382 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"labels": {
+				"label_rotting": "yes"
+			}
+		},
+		"MetricSetFields": {
+			"certificatesigningrequest": {
+				"cert": {
+					"length": 0
+				},
+				"created": "2019-10-26T08:53:04+02:00",
+				"name": "my-svc.my-namespace-2"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-15T15:02:48+02:00",
+				"name": "extension-apiserver-authentication",
+				"resource_version": "41"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-15T15:02:52+02:00",
+				"name": "kube-proxy",
+				"resource_version": "210"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-public"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-15T15:02:51+02:00",
+				"name": "cluster-info",
+				"resource_version": "106186"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-28T15:46:59+01:00",
+				"name": "myconfig",
+				"resource_version": "1383460"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"certificatesigningrequest": {
+				"cert": {
+					"length": 904
+				},
+				"created": "2019-10-26T11:38:31+02:00",
+				"name": "mycsr"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "sonobuoy"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-25T16:59:36+02:00",
+				"name": "sonobuoy-config-cm",
+				"resource_version": "1064273"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"labels": {
+				"label_rotting": "yes"
+			}
+		},
+		"MetricSetFields": {
+			"certificatesigningrequest": {
+				"condition": {
+					"count": 0,
+					"status": "denied"
+				},
+				"name": "my-svc.my-namespace-2"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "sonobuoy"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-25T16:59:36+02:00",
+				"name": "sonobuoy-plugins-cm",
+				"resource_version": "1064274"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-15T15:02:50+02:00",
+				"name": "kubelet-config-1.16",
+				"resource_version": "152"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"certificatesigningrequest": {
+				"condition": {
+					"count": 1,
+					"status": "approved"
+				},
+				"name": "mycsr"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "elastic-system"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-21T15:16:44+02:00",
+				"name": "elastic-operator-uuid",
+				"resource_version": "635968"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-15T15:02:51+02:00",
+				"name": "coredns",
+				"resource_version": "176"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"configmap": {
+				"created": "2019-10-15T15:02:50+02:00",
+				"name": "kubeadm-config",
+				"resource_version": "149"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"certificatesigningrequest": {
+				"condition": {
+					"count": 1,
+					"status": "denied"
+				},
+				"name": "mycsr"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"labels": {
+				"label_rotting": "yes"
+			}
+		},
+		"MetricSetFields": {
+			"certificatesigningrequest": {
+				"condition": {
+					"count": 0,
+					"status": "approved"
+				},
+				"name": "my-svc.my-namespace-2"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.statemetrics",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

@@ -17,3 +17,11 @@
     - name: certificatesigningrequest.condition.status
       type: keyword
 
+    # configmap
+    - name: configmap.created
+      type: date
+    - name: configmap.name
+      type: keyword
+    - name: configmap.resource_version
+      type: long
+

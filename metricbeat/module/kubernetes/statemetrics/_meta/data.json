@@ -1,0 +1,56 @@
+{
+    "@timestamp": "2019-10-28T17:29:40.794Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "_doc",
+      "version": "8.0.0"
+    },
+    "host": {
+      "containerized": false,
+      "hostname": "pl51",
+      "architecture": "x86_64",
+      "os": {
+        "name": "Ubuntu",
+        "kernel": "4.15.0-65-generic",
+        "codename": "bionic",
+        "platform": "ubuntu",
+        "version": "18.04.3 LTS (Bionic Beaver)",
+        "family": "debian"
+      },
+      "name": "pl51",
+      "id": "07ed8f34c84f4e6aa92e212a931f2efa"
+    },
+    "agent": {
+      "id": "1f638f88-b01a-476c-8e44-eb7ec78afa39",
+      "version": "8.0.0",
+      "type": "metricbeat",
+      "ephemeral_id": "966454aa-aa72-4770-8dfc-d9a6133b478e",
+      "hostname": "pl51"
+    },
+    "metricset": {
+      "name": "statemetrics",
+      "period": 10000
+    },
+    "service": {
+      "address": "192.168.39.89:31932",
+      "type": "kubernetes"
+    },
+    "kubernetes": {
+      "statemetrics": {
+        "configmap": {
+          "resource_version": "1064273",
+          "name": "elastic-config-cm",
+          "created": "2019-10-25T14:59:36.000Z"
+        }
+      },
+      "namespace": "elastic"
+    },
+    "event": {
+      "module": "kubernetes",
+      "duration": 31104899,
+      "dataset": "kubernetes.statemetrics"
+    },
+    "ecs": {
+      "version": "1.2.0"
+    }
+}
