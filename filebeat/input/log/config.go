@@ -56,9 +56,10 @@ var (
 		RecursiveGlob:  true,
 
 		// Harvester
-		BufferSize:     16 * humanize.KiByte,
-		MaxBytes:       10 * humanize.MiByte,
-		LineTerminator: readfile.AutoLineTerminator,
+		BufferSize:       16 * humanize.KiByte,
+		MaxBytes:         10 * humanize.MiByte,
+		LineTerminator:   readfile.AutoLineTerminator,
+		AddEventMetadata: false,
 		LogConfig: LogConfig{
 			Backoff:       1 * time.Second,
 			BackoffFactor: 2,
@@ -93,10 +94,11 @@ type config struct {
 	RecursiveGlob  bool            `config:"recursive_glob.enabled"`
 
 	// Harvester
-	BufferSize int    `config:"harvester_buffer_size"`
-	Encoding   string `config:"encoding"`
-	ScanOrder  string `config:"scan.order"`
-	ScanSort   string `config:"scan.sort"`
+	BufferSize       int    `config:"harvester_buffer_size"`
+	Encoding         string `config:"encoding"`
+	ScanOrder        string `config:"scan.order"`
+	ScanSort         string `config:"scan.sort"`
+	AddEventMetadata bool   `config:"add_event_metadata"`
 
 	LineTerminator readfile.LineTerminator `config:"line_terminator"`
 	ExcludeLines   []match.Matcher         `config:"exclude_lines"`

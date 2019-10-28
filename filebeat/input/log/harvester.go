@@ -360,10 +360,14 @@ func (h *Harvester) onMessage(
 		jsonFields = f.(common.MapStr)
 	}
 
-	// Add meta.created in all messages from Elastic Common Schema Reference:
+	// Add meta.created in all messages when `add_event_metadata` is enabled
+	// from Elastic Common Schema Reference:
 	// https://www.elastic.co/guide/en/ecs/current/ecs-event.html#_event_field_details
-	meta := common.MapStr{
-		"created": message.Ts,
+	var meta common.MapStr
+	if h.config.AddEventMetadata {
+		meta = common.MapStr{
+			"created": message.Ts,
+		}
 	}
 
 	timestamp := message.Ts
@@ -376,6 +380,9 @@ func (h *Harvester) onMessage(
 		}
 
 		if id != "" {
+			if meta == nil {
+				meta = common.MapStr{}
+			}
 			meta["id"] = id
 		}
 	} else if &text != nil {
