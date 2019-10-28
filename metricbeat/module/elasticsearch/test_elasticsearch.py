@@ -82,6 +82,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": [
                 "ccr",
                 "cluster_stats",
+                "enrich",
                 "index",
                 "index_recovery",
                 "index_summary",
@@ -167,6 +168,58 @@ class Test(metricbeat.BaseTest):
         self.es.transport.perform_request('POST', '/rats/_ccr/pause_follow')
         self.es.indices.close('rats')
         self.es.transport.perform_request('POST', '/rats/_ccr/unfollow')
+
+    def create_enrich_stats(self):
+        self.create_enrich_source_index()
+        self.create_enrich_policy()
+        self.execute_enrich_policy()
+        self.create_enrich_ingest_pipeline()
+        self.ingest_and_enrich_doc()
+
+    def create_enrich_source_index(self):
+        file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
+                            '_meta', 'test', 'source_doc.json')
+
+        source_doc = {}
+        with open(file, 'r') as f:
+            source_doc = json.load(f)
+
+        self.es.index(index='users', id=1, body=source_doc, refresh='wait_for')
+
+    def create_enrich_policy(self):
+        file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
+                            '_meta', 'test', 'policy.json')
+
+        policy = {}
+        with open(file, 'r') as f:
+            policy = json.load(f)
+
+        policy_url = '/_enrich/policy/users-policy'
+        self.es.transport.perform_request('PUT', policy_url, policy)
+
+    def execute_enrich_policy(self):
+        execute_url = '/_enrich/policy/users-policy/_execute'
+        self.es.transport.perform_request('POST', execute_url)
+
+    def create_enrich_ingest_pipeline(self):
+        file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
+                            '_meta', 'test', 'ingest_pipeline.json')
+
+        pipeline = {}
+        with open(file, 'r') as f:
+            pipeline = json.load(f)
+
+        self.es.ingest.put_pipeline(id='user_lookup', body=pipeline)
+
+    def ingest_and_enrich_doc(self):
+        file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
+                            '_meta', 'test', 'target_doc.json')
+
+        target_doc = {}
+        with open(file, 'r') as f:
+            target_doc = json.load(f)
+
+        self.es.index(index='my_index', id='my_id', body=target_doc, pipeline='user_lookup')
 
     def start_trial(self):
         # Check if trial is already enabled
