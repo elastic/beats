@@ -39,6 +39,9 @@ class Test(metricbeat.BaseTest):
         self.ccr_unfollow_index()
         self.es.indices.delete(index='test_index,pied_piper,rats', ignore_unavailable=True)
         self.delete_ml_job()
+        self.delete_enrich_ingest_pipeline()
+        self.delete_enrich_policy()
+        self.es.indices.delete(index='users,my_index', ignore_unavailable=True)
         super(Test, self).tearDown()
 
     @parameterized.expand([
@@ -223,6 +226,20 @@ class Test(metricbeat.BaseTest):
             target_doc = json.load(f)
 
         self.es.index(index='my_index', id='my_id', doc_type='_doc', body=target_doc, pipeline='user_lookup')
+
+    def delete_enrich_policy(self):
+        exists = self.es.indices.exists('my_index')
+        if not exists:
+            return
+
+        self.es.transport.perform_request('DELETE', '/_enrich/policy/users-policy')
+
+    def delete_enrich_ingest_pipeline(self):
+        exists = self.es.indices.exists('my_index')
+        if not exists:
+            return
+
+        self.es.ingest.delete_pipeline(id='user_lookup')
 
     def start_trial(self):
         # Check if trial is already enabled
