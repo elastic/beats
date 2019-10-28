@@ -63,6 +63,8 @@ class Test(metricbeat.BaseTest):
             self.create_ml_job()
         if metricset == "ccr":
             self.create_ccr_stats()
+        if metricset == "enrich":
+            self.create_enrich_stats()
 
         self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS +
                              ["service"], extras={"index_recovery.active_only": "false"})
@@ -76,6 +78,7 @@ class Test(metricbeat.BaseTest):
 
         self.create_ml_job()
         self.create_ccr_stats()
+        self.create_enrich_stats()
 
         self.render_config_template(modules=[{
             "name": "elasticsearch",
@@ -184,7 +187,7 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             source_doc = json.load(f)
 
-        self.es.index(index='users', id=1, body=source_doc, refresh='wait_for')
+        self.es.index(index='users', id='1', doc_type='_doc', body=source_doc, refresh='wait_for')
 
     def create_enrich_policy(self):
         file = os.path.join(self.beat_path, 'module', 'elasticsearch', 'enrich',
@@ -195,7 +198,7 @@ class Test(metricbeat.BaseTest):
             policy = json.load(f)
 
         policy_url = '/_enrich/policy/users-policy'
-        self.es.transport.perform_request('PUT', policy_url, policy)
+        self.es.transport.perform_request(method='PUT', url=policy_url, body=policy)
 
     def execute_enrich_policy(self):
         execute_url = '/_enrich/policy/users-policy/_execute'
@@ -219,7 +222,7 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             target_doc = json.load(f)
 
-        self.es.index(index='my_index', id='my_id', body=target_doc, pipeline='user_lookup')
+        self.es.index(index='my_index', id='my_id', doc_type='_doc', body=target_doc, pipeline='user_lookup')
 
     def start_trial(self):
         # Check if trial is already enabled
