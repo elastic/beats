@@ -62,6 +62,9 @@ output:
     path: {{ output_file_path|default(beat.working_dir + "/output") }}
     filename: "{{ output_file_filename|default("mockbeat") }}"
     rotate_every_kb: 1000
+    {% if output_file_permissions %}
+    permissions: {{ output_file_permissions }}
+    {% endif %}
     #number_of_files: 7
   {%- endif %}
 

@@ -15,34 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build !windows
+
 package instance
 
 import (
-	"github.com/spf13/pflag"
-
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/elastic/beats/libbeat/publisher/processing"
+	"errors"
+	"syscall"
 )
 
-// Settings contains basic settings for any beat to pass into GenRootCmd
-type Settings struct {
-	Name            string
-	IndexPrefix     string
-	Version         string
-	Monitoring      report.Settings
-	RunFlags        *pflag.FlagSet
-	ConfigOverrides []cfgfile.ConditionalOverride
+var errNotImplemented = errors.New("not implemented on platform")
 
-	DisableConfigResolver bool
-
-	// load custom index manager. The config object will be the Beats root configuration.
-	IndexManagement idxmgmt.SupportFactory
-	ILM             ilm.SupportFactory
-
-	Processing processing.SupportFactory
-
-	Umask *int
+func setUmask(newmask int) error {
+	syscall.Umask(newmask)
+	return nil // the umask syscall always succeeds: http://man7.org/linux/man-pages/man2/umask.2.html#RETURN_VALUE
 }

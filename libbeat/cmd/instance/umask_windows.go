@@ -17,32 +17,11 @@
 
 package instance
 
-import (
-	"github.com/spf13/pflag"
+import "errors"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/elastic/beats/libbeat/publisher/processing"
-)
+var errNotImplemented = errors.New("not implemented on windows")
 
-// Settings contains basic settings for any beat to pass into GenRootCmd
-type Settings struct {
-	Name            string
-	IndexPrefix     string
-	Version         string
-	Monitoring      report.Settings
-	RunFlags        *pflag.FlagSet
-	ConfigOverrides []cfgfile.ConditionalOverride
-
-	DisableConfigResolver bool
-
-	// load custom index manager. The config object will be the Beats root configuration.
-	IndexManagement idxmgmt.SupportFactory
-	ILM             ilm.SupportFactory
-
-	Processing processing.SupportFactory
-
-	Umask *int
+func setUmask(newmask int) error {
+	// No way to set umask on Windows
+	return errNotImplemented
 }
