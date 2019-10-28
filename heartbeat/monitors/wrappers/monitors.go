@@ -22,18 +22,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/scheduler"
-
-	"github.com/gofrs/uuid"
-	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/gofrs/uuid"
+	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
@@ -51,7 +50,7 @@ func WrapCommon(js []jobs.Job, id string, name string, typ string, schedule sche
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(id string, name string, typ string, isMulti bool, schedule scheduler.Schedule) jobs.JobWrapper {
+func addMonitorMeta(id string, name string, typ string, isMulti bool, sched scheduler.Schedule) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, e := job(event)
@@ -68,7 +67,17 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, schedule s
 			}
 
 			now := time.Now()
-			nextRun := schedule.Next(now)
+			nextRun := sched.Next(now)
+
+			var quantizedRangeStart time.Time
+
+			if isched, ok := sched.(schedule.IntervalScheduler); ok {
+				quantizedRangeStart, _ = isched.QuantizedPeriod(now)
+			} else {
+				// TODO actually calculate the correct start time accurately for cron.
+				quantizedRangeStart = now
+			}
+
 			eventext.MergeEventFields(
 				event,
 				common.MapStr{
@@ -78,6 +87,14 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, schedule s
 						"type":        typ,
 						"next_run":    nextRun,
 						"next_run_in": common.MapStr{"us": nextRun.Sub(now)},
+						"quantized_range": common.MapStr{
+							"gte": quantizedRangeStart,
+							"lt":  nextRun,
+						},
+						"quantized_grace_range": common.MapStr{
+							"gte": quantizedRangeStart,
+							"lt":  sched.Next(nextRun),
+						},
 					},
 				},
 			)

@@ -313,6 +313,26 @@ type: keyword
 
 --
 
+*`monitor.quantized_range`*::
++
+--
+Time range this ping reported on quantized based on timestamp
+
+
+type: date_range
+
+--
+
+*`monitor.quantized_grace_range`*::
++
+--
+Same as start time as quantized range but twice as long. This should overlap with the next check. Useful in queries where you want the latest value.
+
+
+type: date_range
+
+--
+
 *`monitor.next_run`*::
 +
 --
