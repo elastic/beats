@@ -20,6 +20,7 @@
 package kubernetes
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -50,9 +51,15 @@ func defaultConfig() *Config {
 }
 
 // Validate ensures correctness of config
-func (c *Config) Validate() {
+func (c *Config) Validate() error {
 	// Make sure that prefix doesn't ends with a '.'
 	if c.Prefix[len(c.Prefix)-1] == '.' && c.Prefix != "." {
 		c.Prefix = c.Prefix[:len(c.Prefix)-2]
 	}
+
+	if len(c.Templates) == 0 && !c.Hints.Enabled() && len(c.Builders) == 0 {
+		return fmt.Errorf("no configs or hints defined for autodiscover provider")
+	}
+
+	return nil
 }
