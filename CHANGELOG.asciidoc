@@ -3,6 +3,16 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.4.2]]
+=== Beats version 7.4.2
+https://github.com/elastic/beats/compare/v7.4.1...v7.4.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- panw module: Use geo.name instead of geo.country_iso_code for free-form location. {issue}13272[13272]
+
 [[release-notes-7.4.1]]
 === Beats version 7.4.1
 https://github.com/elastic/beats/compare/v7.4.0...v7.4.1[View commits]
