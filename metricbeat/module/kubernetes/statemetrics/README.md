@@ -13,6 +13,10 @@ https://github.com/kubernetes/kube-state-metrics
 
 Test environments use minikube, but any kubernetes provisioner should be ok for this metricset.
 
+## Configuration
+
+See the metricset documentation for the configuration reference.
+
 ## Resources
 
 ### Certificate signing requests
@@ -45,5 +49,6 @@ kubectl certificate approve testcert
 ```
 
 - Create a number of CSRs (pending, approved, denied, labeled ...)
+- Add labels to the CSR (they will be reported by the metricset)
 - Launch metricbeat enabling this metricset
 

@@ -18,11 +18,12 @@
 package statemetrics
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -38,16 +39,13 @@ type stateMetricsMetricSet struct {
 	mapping    *prometheus.MetricsMapping
 }
 
-type blackListFilter struct {
-}
-
-type whiteListFilter struct {
-}
-
 // Config for StateMetrics metricset
 type Config struct {
-	BlackList blackListFilter `config:"blacklist_filter"`
-	WhiteList whiteListFilter `config:"whitelist_filter"`
+	BlackList  []string `config:"filter.blacklist"`
+	WhiteList  []string `config:"filter.whitelist"`
+	LabelDedot bool     `config:"labels.dedot"`
+	// BlackList blackListFilter `config:"blacklist_filter"`
+	// WhiteList whiteListFilter `config:"whitelist_filter"`
 }
 
 // getGroupMappingsFn function instances can be found at this package to feed the
@@ -57,14 +55,49 @@ type getGroupMappingsFn func() (mm map[string]prometheus.MetricMap, lm map[strin
 // new returns a mb.MetricSet object that can fetch and report
 // kube-state-metrics metrics
 func new(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	// Read user config on top of default configuration
+	c := Config{LabelDedot: true}
+	if err := base.Module().UnpackConfig(&c); err != nil {
+		return nil, err
+	}
 
-	// TODO config filters
+	if len(c.BlackList) != 0 && len(c.WhiteList) != 0 {
+		return nil, errors.New("kubernetes statemetrics cannot do whitelist and blacklist filtering at the same time, please use only one")
+	}
 
 	// ksmGroups maps configuration item strings that identify each
 	// kubernetes state metrics group with the function that returns
 	// metrics and label mappings for that group
 	ksmGroups := map[string]getGroupMappingsFn{
 		"certificatesigningrequest": getCertificateSigningRequestMapping,
+		"configmap":                 getConfigMapMapping,
+	}
+
+	tempKsmGroups := map[string]getGroupMappingsFn{}
+	if len(c.WhiteList) != 0 {
+		// do whitelist filtering
+		for _, wl := range c.WhiteList {
+			v, ok := ksmGroups[wl]
+			if !ok {
+				base.Logger().Errorf("whitelist filter element %q is not valid", wl)
+				continue
+			}
+			tempKsmGroups[wl] = v
+		}
+		ksmGroups = tempKsmGroups
+	} else {
+		// do blacklist filtering
+		for _, bl := range c.BlackList {
+			if _, ok := ksmGroups[bl]; !ok {
+				base.Logger().Errorf("blacklist filter element %q is not valid", bl)
+				continue
+			}
+			delete(ksmGroups, bl)
+		}
+	}
+
+	if len(ksmGroups) == 0 {
+		return nil, errors.New("kubernetes statemetrics group filtering returned an empty set. Please your config filtering to allow at least one group")
 	}
 
 	metricsMap := map[string]prometheus.MetricMap{}

@@ -14,8 +14,6 @@
       type: date
     - name: certificatesigningrequest.name
       type: keyword
-    - name: certificatesigningrequest.label_rotting
-      type: keyword
     - name: certificatesigningrequest.condition.status
       type: keyword
 

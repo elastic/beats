@@ -1,0 +1,94 @@
+The `statemetrics` metricset for Kubernetes module fetches metrics from `kube-state-metrics` prometheus endpoint and pushes formated events to the configured output.
+
+It has been tested using `kube-state-metrics` `v1.7.0`. When tested with other versions it should still work with all unchanged metrics while ignoring those that do not match.
+
+[float]
+=== Configuration
+
+When configuring this metricset make sure that you have permissions to reach the `kube-state-metrics` endpoint.
+
+```yaml
+# State metrics from kube-state-metrics service:
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - statemetrics
+  period: 50s
+  hosts: [http://kube-state-metrics.kube-system:8080]
+```
+
+[float]
+=== Filtering
+
+By default all groups data is retrieved. Due to the considerable ammount of metrics retrieved filtering is recommended when not using all of the data retrieved. Filtering can be specified pre-process and post-process.
+Post-process filtering is done via the `drop_event` processors. Pre-process filtering on the other hand is managed at the metricset configuration.
+
+This metricset data is classified in the following groups, as defined at `kube-state-metrics`:
+
+- `certificatessigningrequest`
+- `configmap`
+- `cronjob`
+- `daemonset`
+- `deployment`
+- `endpoint`
+- `horizontalpodautoscaler`
+- `ingress`
+- `job`
+- `limitrange`
+- `namespace`
+- `node`
+- `persistentvolume`
+- `persistentvolumeclaim`
+- `pod`
+- `poddisruptionbudget`
+- `replicaset`
+- `replicationcontroller`
+- `resourcequota`
+- `secret`
+- `service`
+- `statefulset`
+- `storageclass`
+- `verticalpodautoscaler`
+
+We use the group names above to specify pre-process filtering. You can choose one of blacklist or whitelist filter strategies.
+When using blacklabel, all groups but the ones specified in the filter list will be added:
+
+[source,yaml]
+----
+# State metrics from kube-state-metrics service:
+- module: kubernetes
+  enabled: true
+  filter:
+    blacklist:
+    - certificatessigningrequest
+    - horizontalpodautoscaler
+    - limitrange
+    - poddisruptionbudget
+    - verticalpodautoscaler
+  metricsets:
+    - statemetrics
+  period: 50s
+  hosts: [http://kube-state-metrics.kube-system:8080]
+----
+
+Whitelable filtering does the opposite, only those groups included in the list will be processed
+
+[source,yaml]
+----
+# State metrics from kube-state-metrics service:
+- module: kubernetes
+  enabled: true
+  filter:
+    whitelist:
+    - pod
+    - service
+  metricsets:
+    - statemetrics
+  period: 50s
+  hosts: [http://kube-state-metrics.kube-system:8080]
+----
+
+It is not possible to use both pre-process filters at the same time, doing so will make metricbeat fail.
+
+
+

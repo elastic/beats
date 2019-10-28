@@ -18486,13 +18486,6 @@ type: keyword
 
 --
 
-*`kubernetes.statemetrics.certificatesigningrequest.label_rotting`*::
-+
---
-type: keyword
-
---
-
 *`kubernetes.statemetrics.certificatesigningrequest.condition.status`*::
 +
 --
