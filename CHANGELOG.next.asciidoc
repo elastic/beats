@@ -455,6 +455,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ability to filter by tags for cloudwatch metricset. {pull}13758[13758] {issue}13145[13145]
 - Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 - Add Oracle overview dashboard {pull}14021[14021]
+- Release CouchDB module as GA. {pull}14300[14300]
 - Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
 
 *Packetbeat*
