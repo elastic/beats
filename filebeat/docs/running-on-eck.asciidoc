@@ -1,0 +1,124 @@
+[[running-on-kubernetes]]
+=== Running Filebeat on Elastic Cloud on Kubernetes (ECK)
+
+We already know how to run Filebeat on Kubernetes. However, since Elasticsearch and Kibana can also run on Kubernetes
+by leveraging the ECK (Elastic Cloud on Kubernetes), a user would like to deploy Metrcibeat along with ECK managed clucters.
+ECK is based on the Kubernetes Operator pattern and it is built for managing Elasticsearch and Kibana on Kubernetes.
+
+In this section we cover the process of:
+
+1. Deploying ECK
+2. Deploying a monitoring ES+Kibana cluster
+3. Deploying Filebeat reporting k8s metrics to the monitoring cluster
+
+
+endif::[]
+
+
+[float]
+==== Preparing Minikube
+If you are going to use Minikube, configure it with the resources needed and start it up:
+["source", "sh", subs="attributes"]
+------------------------------------------------
+minikube delete
+minikube config set memory 16384
+minikube config set cpus 4
+minikube start
+------------------------------------------------
+
+[float]
+==== Deploying ECK
+
+First of all we need to deploy the operator:
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl apply -f https://download.elastic.co/downloads/eck/1.0.1/all-in-one.yaml
+------------------------------------------------
+
+Once deployed, you can use the following command to monitor logs from the operator and make sure everything goes well.
+It just takes a few moments for ECK to be up and running.
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl -n elastic-system logs -f statefulset.apps/elastic-operator
+------------------------------------------------
+
+
+[float]
+==== Deploying a monitoring ES+Kibana cluster
+Now that ECK is running, we are ready to deploy an Elasticsearch+Kibana cluster.
+
+Deploy the stack with the following commands:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl apply -f https://raw.githubusercontent.com/elastic/cloud-on-k8s/master/config/recipes/beats/0_ns.yaml
+kubectl apply -f https://raw.githubusercontent.com/elastic/cloud-on-k8s/master/config/recipes/beats/1_monitor.yaml
+kubectl get elasticsearch,kibana
+------------------------------------------------
+
+Once both components become green, your Elasticsearch cluster is up and running and ready for data to come in.
+
+
+[float]
+==== Accessing Kibana
+
+By default, Kibana is exposed as a service with a cluster IP accessible from within the cluster but is not exposed to the internet.
+However, you can use the following port forwarding command to make Kibana accessible from your laptop:
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl port-forward -n beats service/monitor-kb-http 5601
+------------------------------------------------
+
+Before we can log into Kibana, we need to get the default elastic user’s credentials.
+You can run kubectl get secrets and then inspect the secret to find the JSON path of the secret.
+Here is the correct secret and path for our case:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl port-forward -n beats service/monitor-kb-http 5601
+------------------------------------------------
+
+The password for the elastic user is displayed. Copy and save it into a notepad.
+
+Now, open a browser and connect to https://localhost:5601. Since we are using a self-signed certificate, you will need
+to accept the browser’s security warning. Log into Kibana using the elastic user and the password you just retrieved.
+You’ll be taken to the homepage of Kibana. Our cluster is totally ready!
+
+
+[float]
+==== Deploy kube-state-metrics
+["source", "sh", subs="attributes"]
+------------------------------------------------
+git clone https://github.com/kubernetes/kube-state-metrics.git kube-state-metrics
+kubectl create -f kube-state-metrics/kubernetes
+------------------------------------------------
+
+
+[float]
+==== Deploy Filebeat
+Filebeat in order to connect to Elasticsearch will use `elasticsearch-monitoring-es-elastic-user` and `elasticsearch-monitoring-es-http-certs-public`
+secrets that are already created by the Operator.
+
+
+The following command will deploy Filebeat:
+
+[float]
+==== Deploy kube-state-metrics
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl apply -f https://raw.githubusercontent.com/elastic/cloud-on-k8s/master/config/recipes/beats/2_filebeat-kubernetes.yaml
+------------------------------------------------
+
+
+
+[float]
+====  Explore your Logs
+Now that everything is set up, navigate to Infrastructure panel of Kibana and see the overview of your Kubernetes cluster.
+In addition, one can explore your logs in real time in Logs panel.
+
+
+[float]
+====  Add more insigths
+Now that Filebeat is collecting logs, one can go to the next step and add Metricbeat (see <<running-metricbeat-on-eck>>)
+to enrich the insights.
