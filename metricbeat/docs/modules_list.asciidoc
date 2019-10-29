@@ -12,14 +12,14 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-appsearch,appsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-appsearch-stats,stats>> beta[]  
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>> beta[]  
+.8+| .8+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-ebs,ebs>> beta[]  
 |<<metricbeat-metricset-aws-ec2,ec2>>   
 |<<metricbeat-metricset-aws-elb,elb>> beta[]  
-|<<metricbeat-metricset-aws-rds,rds>> beta[]  
-|<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]  
-|<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
-|<<metricbeat-metricset-aws-sqs,sqs>> beta[]  
+|<<metricbeat-metricset-aws-rds,rds>>   
+|<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>   
+|<<metricbeat-metricset-aws-s3_request,s3_request>>   
+|<<metricbeat-metricset-aws-sqs,sqs>>   
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
@@ -45,8 +45,8 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
 |<<metricbeat-metricset-couchbase-node,node>>   
-|<<metricbeat-module-couchdb,couchdb>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>> beta[]  
+|<<metricbeat-module-couchdb,couchdb>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>>   
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .9+| .9+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   
@@ -60,8 +60,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-dropwizard,Dropwizard>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>>   
 |<<metricbeat-module-elasticsearch,Elasticsearch>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.10+| .10+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
+.11+| .11+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
 |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>   
+|<<metricbeat-metricset-elasticsearch-enrich,enrich>>   
 |<<metricbeat-metricset-elasticsearch-index,index>>   
 |<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>   
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>>   

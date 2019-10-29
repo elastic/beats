@@ -11082,6 +11082,54 @@ type: long
 --
 
 [float]
+=== enrich
+
+Enrich stats
+
+
+
+*`elasticsearch.enrich.queue.size`*::
++
+--
+Number of search requests in the queue.
+
+
+type: long
+
+--
+
+
+*`elasticsearch.enrich.remote_requests.current`*::
++
+--
+Current number of outstanding remote requests.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.remote_requests.total`*::
++
+--
+Number of outstanding remote requests executed since node startup.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.executed_searches.total`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
+
+
+type: long
+
+--
+
+[float]
 === index
 
 index
@@ -20014,7 +20062,7 @@ Reports data from the query execution system.
 
 
 
-*`mongodb.metrics.query_executor.scanned_indexes`*::
+*`mongodb.metrics.query_executor.scanned_indexes.count`*::
 +
 --
 The total number of index items scanned during queries and query-plan evaluation.
@@ -20024,7 +20072,7 @@ type: long
 
 --
 
-*`mongodb.metrics.query_executor.scanned_documents`*::
+*`mongodb.metrics.query_executor.scanned_documents.count`*::
 +
 --
 The total number of documents scanned during queries and query-plan evaluation.
@@ -20468,7 +20516,7 @@ Reports on the operation of the resource use of the ttl index process.
 
 
 
-*`mongodb.metrics.ttl.deleted_documents`*::
+*`mongodb.metrics.ttl.deleted_documents.count`*::
 +
 --
 The total number of documents deleted from collections with a ttl index.
@@ -20478,7 +20526,7 @@ type: long
 
 --
 
-*`mongodb.metrics.ttl.passes`*::
+*`mongodb.metrics.ttl.passes.count`*::
 +
 --
 The number of times the background process removes documents from collections with a ttl index.
@@ -24603,7 +24651,7 @@ type: keyword
 *`oracle.performance.io_reloads`*::
 +
 --
-Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are tumber of times a PIN was requested for objects of this namespace
+Reloads / Pins ratio. A Reload is any PIN of an object that is not the first PIN performed since the object handle was created, and which requires loading the object from disk. Pins are the number of times a PIN was requested for objects of this namespace
 
 type: double
 

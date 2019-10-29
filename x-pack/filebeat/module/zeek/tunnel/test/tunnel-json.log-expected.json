@@ -1,0 +1,22 @@
+[
+    {
+        "@timestamp": "2018-12-10T01:34:26.743Z",
+        "destination.address": "132.16.110.133",
+        "destination.ip": "132.16.110.133",
+        "destination.port": 8080,
+        "event.dataset": "zeek.tunnel",
+        "event.module": "zeek",
+        "fileset.name": "tunnel",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "source.address": "132.16.146.79",
+        "source.ip": "132.16.146.79",
+        "source.port": 0,
+        "tags": [
+            "zeek.tunnel"
+        ],
+        "zeek.tunnel.action": "Tunnel::DISCOVER",
+        "zeek.tunnel.type": "Tunnel::HTTP"
+    }
+]

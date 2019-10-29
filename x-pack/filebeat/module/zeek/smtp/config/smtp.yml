@@ -1,0 +1,54 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: smtp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.smtp"
+
+        - from: "zeek.smtp.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.smtp.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.smtp.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.smtp.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.smtp.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.smtp.trans_depth"
+          to: "zeek.smtp.transaction_depth"
+
+        - from: "zeek.smtp.mailfrom"
+          to: "zeek.smtp.mail_from"
+
+        - from: "zeek.smtp.rcptto"
+          to: "zeek.smtp.rcpt_to"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

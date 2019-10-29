@@ -28,6 +28,7 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/generator/common/beatgen"
 	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
 
 	// mage:import
@@ -40,6 +41,11 @@ func init() {
 	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
 	devtools.BeatServiceName = "heartbeat-elastic"
+}
+
+// VendorUpdate updates elastic/beats in the vendor dir
+func VendorUpdate() error {
+	return beatgen.VendorUpdate()
 }
 
 // Build builds the Beat binary.

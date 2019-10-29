@@ -1,0 +1,29 @@
+[
+    {
+        "@timestamp": "2019-09-10T16:18:59.668Z",
+        "destination.address": "192.168.131.131",
+        "destination.ip": "192.168.131.131",
+        "destination.port": 3389,
+        "event.dataset": "zeek.rdp",
+        "event.id": "C2PcYV7D3ntaHm056",
+        "event.module": "zeek",
+        "fileset.name": "rdp",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:PsQu6lSZioPVi0A5K7UaeGsVqS0=",
+        "network.protocol": "rdp",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.131.1",
+        "source.ip": "192.168.131.1",
+        "source.port": 33872,
+        "tags": [
+            "zeek.rdp"
+        ],
+        "zeek.rdp.cert.count": 0,
+        "zeek.rdp.result": "encrypted",
+        "zeek.rdp.security_protocol": "HYBRID",
+        "zeek.rdp.ssl": true,
+        "zeek.session_id": "C2PcYV7D3ntaHm056"
+    }
+]
