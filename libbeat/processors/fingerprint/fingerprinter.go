@@ -17,18 +17,32 @@
 
 package fingerprint
 
-// Config for fingerprint processor.
-type Config struct {
-	Method      fingerprinter `config:"method"`                     // Algorithm to use for fingerprinting
-	Fields      []string      `config:"fields" validate:"required"` // Source fields to compute fingerprint from
-	TargetField string        `config:"target_field"`               // Target field for the fingerprint
-	Encoding    encoder       `config:"encoding"`
+import (
+	"crypto/sha1"
+	"crypto/sha256"
+	"errors"
+	"hash"
+	"strings"
+)
+
+var errMethodUnknown = errors.New("unknown fingerprinting method")
+
+type fingerprinter func() hash.Hash
+
+var methods = map[string]fingerprinter{
+	"sha1":   sha1.New,
+	"sha256": sha256.New,
 }
 
-func defaultConfig() Config {
-	return Config{
-		Method:      methods["sha256"],
-		TargetField: "fingerprint",
-		Encoding:    encodings["hex"],
+// Unpack creates the Method enumeration value from the given string
+func (f *fingerprinter) Unpack(str string) error {
+	str = strings.ToLower(str)
+
+	m, found := methods[str]
+	if !found {
+		return errMethodUnknown
 	}
+
+	*f = m
+	return nil
 }

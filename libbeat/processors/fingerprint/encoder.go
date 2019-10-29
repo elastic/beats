@@ -18,59 +18,32 @@
 package fingerprint
 
 import (
-	"crypto/sha1"
-	"crypto/sha256"
+	"encoding/base32"
+	"encoding/base64"
+	"encoding/hex"
 	"errors"
-	"fmt"
 	"strings"
 )
 
-var errMethodUnknown = errors.New("unknown method")
+var errEncoderUnknown = errors.New("unknown encoding method")
 
-type Method uint8
+type encoder func([]byte) string
 
-const (
-	MethodSHA1 Method = iota
-	MethodSHA256
-)
+var encodings = map[string]encoder{
+	"hex":    hex.EncodeToString,
+	"base32": base32.StdEncoding.EncodeToString,
+	"base64": base64.StdEncoding.EncodeToString,
+}
 
 // Unpack creates the Method enumeration value from the given string
-func (m *Method) Unpack(str string) error {
+func (e *encoder) Unpack(str string) error {
 	str = strings.ToLower(str)
 
-	switch str {
-	case "sha1":
-		*m = MethodSHA1
-	case "sha256":
-		*m = MethodSHA256
-	default:
-		return errMethodUnknown
+	m, found := encodings[str]
+	if !found {
+		return errEncoderUnknown
 	}
 
+	*e = m
 	return nil
-}
-
-type fingerprinter func([]byte) (string, error)
-
-func (m *Method) factory() (fingerprinter, error) {
-	var f fingerprinter
-	switch *m {
-	case MethodSHA1:
-		f = sha1Fingerprinter
-	case MethodSHA256:
-		f = sha256Fingerprinter
-	default:
-		return nil, errMethodUnknown
-	}
-
-	return f, nil
-}
-
-func sha1Fingerprinter(in []byte) (string, error) {
-	return fmt.Sprintf("%x", sha1.Sum(in)), nil
-}
-
-func sha256Fingerprinter(in []byte) (string, error) {
-	return fmt.Sprintf("%x", sha256.Sum256(in)), nil
-
 }

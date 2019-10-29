@@ -63,17 +63,11 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, makeComputeFingerprintError(err)
 	}
 
-	makeFingerprint, err := p.config.Method.factory()
-	if err != nil {
-		return nil, makeComputeFingerprintError(err)
-	}
+	f := p.config.Method()
+	s := f.Sum(source)
+	v := p.config.Encoding(s)
 
-	f, err := makeFingerprint(source)
-	if err != nil {
-		return nil, makeComputeFingerprintError(err)
-	}
-
-	if _, err = event.PutValue(p.config.TargetField, f); err != nil {
+	if _, err = event.PutValue(p.config.TargetField, v); err != nil {
 		return nil, makeComputeFingerprintError(err)
 	}
 
