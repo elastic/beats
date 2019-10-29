@@ -25,17 +25,22 @@ input:
                "HTTPCode_ELB_504_Count", "IPv6ProcessedBytes", "IPv6RequestCount",
                "NewConnectionCount", "ProcessedBytes", "RejectedConnectionCount",
                "RequestCount", "RuleEvaluations"]
+        tags.resource_type_filter: elasticloadbalancing
       - namespace: AWS/ApplicationELB
         statistic: ["Average"]
         name: ["ConsumedLCUs"]
+        tags.resource_type_filter: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Average"]
         name: ["ActiveFlowCount", "ActiveFlowCount_TLS", "ConsumedLCUs"]
+        tags.resource_type_filter: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Sum"]
         name: ["ClientTLSNegotiationErrorCount", "NewFlowCount", "NewFlowCount_TLS",
                "ProcessedBytes", "ProcessedBytes_TLS", "TargetTLSNegotiationErrorCount",
                "TCP_Client_Reset_Count", "TCP_ELB_Reset_Count", "TCP_Target_Reset_Count"]
+        tags.resource_type_filter: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Maximum"]
         name: ["HealthyHostCount", "UnHealthyHostCount"]
+        tags.resource_type_filter: elasticloadbalancing
