@@ -46,7 +46,7 @@ func newHTTPMonitorHostJob(
 	transport *http.Transport,
 	enc contentEncoder,
 	body []byte,
-	validator RespCheck,
+	validator multiValidator,
 ) (jobs.Job, error) {
 
 	// Trace visited URLs when redirects occur
@@ -76,7 +76,7 @@ func newHTTPMonitorIPsJob(
 	tls *transport.TLSConfig,
 	enc contentEncoder,
 	body []byte,
-	validator RespCheck,
+	validator multiValidator,
 ) (jobs.Job, error) {
 
 	req, err := buildRequest(addr, config, enc)
@@ -103,7 +103,7 @@ func createPingFactory(
 	tls *transport.TLSConfig,
 	request *http.Request,
 	body []byte,
-	validator RespCheck,
+	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
@@ -212,10 +212,10 @@ func execPing(
 	req *http.Request,
 	reqBody []byte,
 	timeout time.Duration,
-	validator func(*http.Response) error,
+	validator multiValidator,
 	responseConfig responseConfig,
 	redirects *[]string,
-) (start, end time.Time, errReason reason.Reason) {
+) (start, end time.Time, err reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -223,26 +223,28 @@ func execPing(
 
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
-	start, resp, errReason := execRequest(client, req, validator)
+	start, resp, errReason := execRequest(client, req)
 
-	// If we have no response object there probably was an IO error, we can skip the rest of the logic
+	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
-	if resp == nil {
+	if resp == nil || errReason != nil {
 		return start, time.Now(), errReason
 	}
 
-	// Add response.status_code and redirects
-	response := common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}
+	bodyFields, errReason := processBody(resp, responseConfig, validator)
+
+	responseFields := common.MapStr{
+		"status_code": resp.StatusCode,
+		"body":        bodyFields,
+	}
+
+	httpFields := common.MapStr{"response": responseFields}
+
 	if redirects != nil && len(*redirects) > 0 {
-		response["redirects"] = redirects
+		httpFields["redirects"] = redirects
 	}
-	eventext.MergeEventFields(event, common.MapStr{"http": response})
-	// Download the body, close the response body, then attach all fields
-	err := handleRespBody(event, resp, responseConfig, errReason)
-	if err != nil {
-		return start, time.Now(), reason.IOFailed(err)
-	}
+	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
@@ -268,17 +270,12 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 }
 
 // execute the request. Note that this does not close the resp body, which should be done by caller
-func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, resp *http.Response, errReason reason.Reason) {
+func execRequest(client *http.Client, req *http.Request) (start time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
 
 	if err != nil {
 		return start, nil, reason.IOFailed(err)
-	}
-
-	err = validator(resp)
-	if err != nil {
-		return start, resp, reason.ValidateFailed(err)
 	}
 
 	return start, resp, nil
