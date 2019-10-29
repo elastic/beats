@@ -24,6 +24,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common/useragent"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
@@ -176,7 +178,7 @@ func TestRequestBuildingWithNoUserAgent(t *testing.T) {
 	request, err := buildRequest("localhost", &Config{}, nilEncoder{})
 
 	require.Nil(t, err)
-	assert.Equal(t, "elastic_heartbeat", request.Header.Get("User-Agent"))
+	assert.Equal(t, useragent.UserAgent("Heartbeat"), request.Header.Get("User-Agent"))
 }
 
 func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {

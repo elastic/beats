@@ -8,10 +8,10 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
-	"runtime"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/useragent"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/version"
 )
 
 const (
@@ -130,7 +129,7 @@ func (in *pubsubInput) run() error {
 	defer cancel()
 
 	// Make pubsub client.
-	opts := []option.ClientOption{option.WithUserAgent(userAgent())}
+	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat"))}
 	if in.CredentialsFile != "" {
 		opts = append(opts, option.WithCredentialsFile(in.CredentialsFile))
 	} else if len(in.CredentialsJSON) > 0 {
@@ -175,12 +174,6 @@ func (in *pubsubInput) Stop() {
 // Wait is an alias for Stop.
 func (in *pubsubInput) Wait() {
 	in.Stop()
-}
-
-func userAgent() string {
-	return fmt.Sprintf("Elastic Filebeat/%s (%s; %s; %s; %s)",
-		version.GetDefaultVersion(), runtime.GOOS, runtime.GOARCH,
-		version.Commit(), version.BuildTime())
 }
 
 // makeTopicID returns a short sha256 hash of the project ID plus topic name.
