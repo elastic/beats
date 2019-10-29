@@ -80,7 +80,7 @@ var security = (function () {
         "4781": "renamed-user-account",
         "4798": "group-membership-enumerated",
         "4799": "user-member-enumerated",        
-    }
+    };
     
     
     // Descriptions of failure status codes.
@@ -1103,7 +1103,7 @@ var security = (function () {
         if (eventActionDescription) {
           evt.Put("event.action", eventActionDescription);
         }
-    }
+    };
 
     var addLogonType = function(evt) {
         var code = evt.Get("winlog.event_data.LogonType");
