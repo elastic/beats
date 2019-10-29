@@ -24,6 +24,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -168,4 +170,30 @@ func TestRequestBuildingWithCustomHost(t *testing.T) {
 		assert.Equal(t, "custom-host", request.Host)
 		assert.Equal(t, "custom-host", request.Header.Get("Host"))
 	}
+}
+
+func TestRequestBuildingWithNoUserAgent(t *testing.T) {
+	request, err := buildRequest("localhost", &Config{}, nilEncoder{})
+
+	require.Nil(t, err)
+	assert.Equal(t, "elastic_heartbeat", request.Header.Get("User-Agent"))
+}
+
+func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {
+	expectedUserAgent := "some-user-agent"
+
+	var config = Config{
+		Check: checkConfig{
+			Request: requestParameters{
+				SendHeaders: map[string]string{
+					"User-Agent": expectedUserAgent,
+				},
+			},
+		},
+	}
+
+	request, err := buildRequest("localhost", &config, nilEncoder{})
+
+	require.Nil(t, err)
+	assert.Equal(t, expectedUserAgent, request.Header.Get("User-Agent"))
 }

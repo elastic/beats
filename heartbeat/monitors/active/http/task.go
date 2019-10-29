@@ -198,6 +198,9 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 
 		request.Header.Add(k, v)
 	}
+	if ua := request.Header.Get("User-Agent"); ua == "" {
+		request.Header.Set("User-Agent", "elastic_heartbeat")
+	}
 
 	if enc != nil {
 		enc.AddHeaders(&request.Header)
