@@ -20,7 +20,7 @@ package fingerprint
 import (
 	"fmt"
 	"sort"
-	"strconv"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -95,17 +95,16 @@ func makeSourceString(sourceFields []string, eventFields common.MapStr) (string,
 			return "", errors.Wrapf(err, "failed when finding field [%v] in event", k)
 		}
 
-		var s string
-		switch v := v.(type) {
+		i := v
+		switch vv := v.(type) {
 		case map[string]interface{}, []interface{}:
 			return "", errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
-		case string:
-			s = v
-		case int:
-			s = strconv.Itoa(v)
+		case time.Time:
+			// Ensure we consistently hash times in UTC.
+			i = vv.UTC()
 		}
 
-		str += fmt.Sprintf("|%v|%v", k, s)
+		str += fmt.Sprintf("|%v|%v", k, i)
 	}
 	str += "|"
 	return str, nil

@@ -78,6 +78,8 @@ func TestMethodSHA256(t *testing.T) {
 
 // TODO: other fingerprinting methods
 // TODO: Order of source fields doesn't matter
-// TODO: Missing source fields?
+// TODO: Missing source fields
 // TODO: non-scalar fields
+// TODO: hashing time fields
 // TODO: invalid fingerprinting method in config
+// TODO: encoding
