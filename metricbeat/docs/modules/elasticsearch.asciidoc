@@ -66,6 +66,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>
 
+* <<metricbeat-metricset-elasticsearch-enrich,enrich>>
+
 * <<metricbeat-metricset-elasticsearch-index,index>>
 
 * <<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>
@@ -85,6 +87,8 @@ The following metricsets are available:
 include::elasticsearch/ccr.asciidoc[]
 
 include::elasticsearch/cluster_stats.asciidoc[]
+
+include::elasticsearch/enrich.asciidoc[]
 
 include::elasticsearch/index.asciidoc[]
 
