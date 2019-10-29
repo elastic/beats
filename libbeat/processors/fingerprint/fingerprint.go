@@ -110,15 +110,6 @@ func makeSourceString(sourceFields []string, eventFields common.MapStr) (string,
 	return str, nil
 }
 
-func contains(haystack []string, needle string) bool {
-	for _, item := range haystack {
-		if item == needle {
-			return true
-		}
-	}
-	return false
-}
-
 func makeComputeFingerprintError(err error) error {
 	return errors.Wrap(err, "failed to compute fingerprint")
 }
