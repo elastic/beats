@@ -8,12 +8,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"runtime"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/useragent"
 
 	"github.com/pkg/errors"
 
@@ -24,12 +24,13 @@ import (
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/version"
 )
 
 const (
 	inputName = "httpjson"
 )
+
+var userAgent = useragent.UserAgent("Filebeat")
 
 func init() {
 	err := input.Register(inputName, NewInput)
@@ -135,7 +136,7 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 	req = req.WithContext(ctx)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", userAgent())
+	req.Header.Set("User-Agent", userAgent)
 	if in.config.APIKey != "" {
 		req.Header.Set("Authorization", in.config.APIKey)
 	}
@@ -320,10 +321,4 @@ func makeEvent(body string) beat.Event {
 		Timestamp: time.Now().UTC(),
 		Fields:    fields,
 	}
-}
-
-func userAgent() string {
-	return fmt.Sprintf("Elastic Filebeat/%s (%s; %s; %s; %s)",
-		version.GetDefaultVersion(), runtime.GOOS, runtime.GOARCH,
-		version.Commit(), version.BuildTime())
 }
