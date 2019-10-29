@@ -30245,7 +30245,7 @@ Number of pending messages from / to the subscriber
 *`stan.subscriptions.offline`*::
 +
 --
-type: bool
+type: boolean
 
 Is the subscriber marked as offline?
 
@@ -30255,7 +30255,7 @@ Is the subscriber marked as offline?
 *`stan.subscriptions.stalled`*::
 +
 --
-type: bool
+type: boolean
 
 Is the subscriber known to be stalled?
 
