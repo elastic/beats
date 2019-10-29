@@ -30834,31 +30834,31 @@ type: long
 --
 
 [float]
-=== services
+=== service
 
 metrics for system services
 
 
 
-*`system.services.name`*::
+*`system.service.name`*::
 +
 --
-The name of the systemd service
+The name of the service
 
 type: keyword
 
 --
 
-*`system.services.load_state`*::
+*`system.service.load_state`*::
 +
 --
-The load state of the unit
+The load state of the service
 
 type: keyword
 
 --
 
-*`system.services.active_state`*::
+*`system.service.state`*::
 +
 --
 The activity state of the service
@@ -30867,7 +30867,7 @@ type: keyword
 
 --
 
-*`system.services.sub_state`*::
+*`system.service.sub_state`*::
 +
 --
 The sub-state of the service
@@ -30876,7 +30876,7 @@ type: keyword
 
 --
 
-*`system.services.exec_code`*::
+*`system.service.exec_code`*::
 +
 --
 The SIGCHLD code from the service's main process
@@ -30885,7 +30885,7 @@ type: keyword
 
 --
 
-*`system.services.exec_rc`*::
+*`system.service.exec_rc`*::
 +
 --
 The exit code of the service's main process
@@ -30894,7 +30894,7 @@ type: long
 
 --
 
-*`system.services.state_since`*::
+*`system.service.state_since`*::
 +
 --
 The timestamp of the last state change. If the service is active and running, this is its uptime.
@@ -30903,7 +30903,7 @@ type: date
 
 --
 
-*`system.services.main_pid`*::
+*`system.service.main_pid`*::
 +
 --
 the main PID of the service.
@@ -30918,7 +30918,7 @@ type: long
 system metrics associated with the service
 
 
-*`system.services.resources.cpu.usage.ns`*::
+*`system.service.resources.cpu.usage.ns`*::
 +
 --
 CPU usage in nanoseconds
@@ -30927,7 +30927,7 @@ type: long
 
 --
 
-*`system.services.resources.memory.usage.bytes`*::
+*`system.service.resources.memory.usage.bytes`*::
 +
 --
 memory usage in bytes
@@ -30936,7 +30936,7 @@ type: long
 
 --
 
-*`system.services.resources.tasks.count`*::
+*`system.service.resources.tasks.count`*::
 +
 --
 number of tasks associated with the service
@@ -30951,7 +30951,7 @@ type: long
 network resource usage
 
 
-*`system.services.resources.network.in.bytes`*::
+*`system.service.resources.network.in.bytes`*::
 +
 --
 bytes in
@@ -30962,7 +30962,7 @@ format: bytes
 
 --
 
-*`system.services.resources.network.in.packets`*::
+*`system.service.resources.network.in.packets`*::
 +
 --
 packets in
@@ -30973,7 +30973,7 @@ format: bytes
 
 --
 
-*`system.services.resources.network.out.packets`*::
+*`system.service.resources.network.out.packets`*::
 +
 --
 packets out
@@ -30982,7 +30982,7 @@ type: long
 
 --
 
-*`system.services.resources.network.out.bytes`*::
+*`system.service.resources.network.out.bytes`*::
 +
 --
 bytes out

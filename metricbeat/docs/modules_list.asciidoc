@@ -180,7 +180,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-system-process,process>>   
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
 |<<metricbeat-metricset-system-raid,raid>>   
-|<<metricbeat-metricset-system-services,services>> beta[]  
+|<<metricbeat-metricset-system-service,service>> beta[]  
 |<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-socket_summary,socket_summary>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
