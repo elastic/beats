@@ -43,6 +43,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nagios>>
 * <<exported-fields-nats>>
 * <<exported-fields-netflow>>
 * <<exported-fields-netflow-module>>
@@ -12857,6 +12858,91 @@ alias to: source.domain
 type: alias
 
 alias to: source.ip
+
+--
+
+[[exported-fields-nagios]]
+== nagios fields
+
+Nagios Module
+
+
+
+[float]
+=== nagios
+
+
+
+
+[float]
+=== log
+
+Please add description
+
+
+*`nagios.log.type`*::
++
+--
+Nagios log type (alert, notification, etc.)
+
+type: text
+
+example: HOST ALERT
+
+--
+
+*`nagios.log.hostname`*::
++
+--
+Nagios host name
+
+type: text
+
+example: server.company.com
+
+--
+
+*`nagios.log.state`*::
++
+--
+Nagios state
+
+type: text
+
+example: DOWN
+
+--
+
+*`nagios.log.state_level`*::
++
+--
+Nagios state level
+
+type: text
+
+example: SOFT
+
+--
+
+*`nagios.log.attempt`*::
++
+--
+Nagios number of attempts
+
+type: long
+
+example: 1
+
+--
+
+*`nagios.log.message`*::
++
+--
+Nagios message
+
+type: text
+
+example: server is unreachable
 
 --
 

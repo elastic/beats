@@ -41,6 +41,7 @@ import (
 	_ "github.com/elastic/beats/filebeat/module/logstash"
 	_ "github.com/elastic/beats/filebeat/module/mongodb"
 	_ "github.com/elastic/beats/filebeat/module/mysql"
+	_ "github.com/elastic/beats/filebeat/module/nagios"
 	_ "github.com/elastic/beats/filebeat/module/nats"
 	_ "github.com/elastic/beats/filebeat/module/nginx"
 	_ "github.com/elastic/beats/filebeat/module/osquery"
