@@ -4,7 +4,9 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "\\[%{NUMBER:nagios.log.epoch}\\] %{DATA:nagios.log.type}: %{DATA:nagios.log.hostname};%{DATA:nagios.log.state};%{DATA:nagios.log.state_level};%{NUMBER:nagios.log.attempt};%{GREEDYDATA:nagios.log.message}"
+        "\\[%{NUMBER:nagios.log.epoch}\\] %{DATA:nagios.log.type}: %{DATA:nagios.log.hostname};%{DATA:nagios.log.state};%{DATA:nagios.log.state_level};%{NUMBER:nagios.log.attempt};%{GREEDYDATA:nagios.log.message}",
+        "\\[%{NUMBER:nagios.log.epoch}\\] %{DATA:nagios.log.type}: %{DATA:nagios.log.hostname};%{DATA:nagios.log.state};%{GREEDYDATA:nagios.log.message}",
+        "\\[%{NUMBER:nagios.log.epoch}\\] %{DATA:nagios.log.type}: %{DATA:nagios.log.contact};%{DATA:nagios.log.hostname};%{DATA:nagios.log.state};%{DATA:nagios.log.notification_type};%{GREEDYDATA:nagios.log.message}",
       ],
       "ignore_missing": true
     }
