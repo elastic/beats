@@ -18,32 +18,31 @@
 package fingerprint
 
 import (
-	"encoding/base32"
-	"encoding/base64"
-	"encoding/hex"
+	"crypto/sha1"
+	"crypto/sha256"
 	"errors"
+	"hash"
 	"strings"
 )
 
-var errEncoderUnknown = errors.New("unknown encoding method")
+var errFingerprintingMethodUnknown = errors.New("unknown fingerprinting method")
 
-type encoder func([]byte) string
+type hashMethod func() hash.Hash
 
-var encodings = map[string]encoder{
-	"hex":    hex.EncodeToString,
-	"base32": base32.StdEncoding.EncodeToString,
-	"base64": base64.StdEncoding.EncodeToString,
+var hashes = map[string]hashMethod{
+	"sha1":   sha1.New,
+	"sha256": sha256.New,
 }
 
-// Unpack creates the Method enumeration value from the given string
-func (e *encoder) Unpack(str string) error {
+// Unpack creates the hashMethod from the given string
+func (f *hashMethod) Unpack(str string) error {
 	str = strings.ToLower(str)
 
-	m, found := encodings[str]
+	m, found := hashes[str]
 	if !found {
-		return errEncoderUnknown
+		return errFingerprintingMethodUnknown
 	}
 
-	*e = m
+	*f = m
 	return nil
 }

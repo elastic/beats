@@ -19,6 +19,7 @@ package fingerprint
 
 import (
 	"fmt"
+	"hash"
 	"sort"
 	"time"
 
@@ -38,6 +39,7 @@ const processorName = "fingerprint"
 
 type fingerprint struct {
 	config Config
+	hash   hash.Hash
 }
 
 // New constructs a new fingerprint processor.
@@ -51,6 +53,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	p := &fingerprint{
 		config: config,
+		hash:   config.Method(),
 	}
 
 	return p, nil
@@ -63,11 +66,15 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, makeComputeFingerprintError(err)
 	}
 
-	f := p.config.Method()
-	s := f.Sum(source)
-	v := p.config.Encoding(s)
+	hashFn := p.hash
+	hashFn.Reset()
 
-	if _, err = event.PutValue(p.config.TargetField, v); err != nil {
+	hashFn.Write([]byte(source))
+	hash := hashFn.Sum(nil)
+
+	encodedHash := p.config.Encoding(hash)
+
+	if _, err = event.PutValue(p.config.TargetField, encodedHash); err != nil {
 		return nil, makeComputeFingerprintError(err)
 	}
 
@@ -78,21 +85,21 @@ func (p *fingerprint) String() string {
 	return fmt.Sprintf("%v=[method=[%v]]", processorName, p.config.Method)
 }
 
-func makeSource(sourceFields []string, eventFields common.MapStr) ([]byte, error) {
+func makeSource(sourceFields []string, eventFields common.MapStr) (string, error) {
 	var str string
 	for _, k := range sourceFields {
 		v, err := eventFields.GetValue(k)
 		if err == common.ErrKeyNotFound {
-			return nil, errors.Wrapf(err, "failed to find field [%v] in event", k)
+			return "", errors.Wrapf(err, "failed to find field [%v] in event", k)
 		}
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed when finding field [%v] in event", k)
+			return "", errors.Wrapf(err, "failed when finding field [%v] in event", k)
 		}
 
 		i := v
 		switch vv := v.(type) {
 		case map[string]interface{}, []interface{}:
-			return nil, errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
+			return "", errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.
 			i = vv.UTC()
@@ -101,7 +108,7 @@ func makeSource(sourceFields []string, eventFields common.MapStr) ([]byte, error
 		str += fmt.Sprintf("|%v|%v", k, i)
 	}
 	str += "|"
-	return []byte(str), nil
+	return str, nil
 }
 
 func makeComputeFingerprintError(err error) error {
