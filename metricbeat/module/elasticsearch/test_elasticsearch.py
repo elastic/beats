@@ -77,7 +77,6 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch-xpack module tests
         """
-        self.check_skip(metricset)
 
         self.create_ml_job()
         if self.is_ccr_available():
@@ -257,15 +256,10 @@ class Test(metricbeat.BaseTest):
             print "Trial already enabled. Error: {}".format(e)
 
     def check_skip(self, metricset):
-        if metricset != "ccr" and metricset != "enrich":
-            return
-
-        if not self.is_ccr_available()
-            # Skip CCR metricset system test for Elasticsearch versions < 6.5.0 as CCR Stats
-            # API endpoint is not available
+        if metricset == 'ccr' and not self.is_ccr_available():
             raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
 
-        if not self.is_enrich_available()
+        if metricset == 'enrich' and not self.is_enrich_available():
             raise SkipTest("elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
 
     def is_ccr_available(self):
