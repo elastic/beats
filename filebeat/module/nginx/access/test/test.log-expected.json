@@ -28,7 +28,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
@@ -54,7 +54,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.name": "Windows 7",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
         "user_agent.version": "15.0.a2"
     },
     {
@@ -95,7 +97,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
@@ -133,7 +135,7 @@
         "user_agent.os.full": "Mac OS X 10.14.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.0",
-        "user_agent.version": "70.0.3538"
+        "user_agent.version": "70.0.3538.102"
     },
     {
         "@timestamp": "2016-01-22T13:18:29.000Z",
@@ -266,7 +268,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.name": "Windows 7",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
         "user_agent.version": "15.0.a2"
     },
     {
@@ -289,7 +293,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.name": "Windows 7",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
         "user_agent.version": "15.0.a2"
     }
 ]

@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "2019-08-22T21:08:13.094Z",
+        "destination.address": "127.0.0.1",
+        "destination.ip": "127.0.0.1",
+        "destination.port": 8080,
+        "event.dataset": "zeek.socks",
+        "event.id": "Cmz4Cb4qCw1hGqYw1c",
+        "event.module": "zeek",
+        "fileset.name": "socks",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:1Hp/o0hOC62lAwrV+a0ZKDE3rrs=",
+        "network.protocol": "socks",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "source.port": 35368,
+        "tags": [
+            "zeek.socks"
+        ],
+        "zeek.session_id": "Cmz4Cb4qCw1hGqYw1c",
+        "zeek.socks.bound.host": "0.0.0.0",
+        "zeek.socks.bound.port": 0,
+        "zeek.socks.request.host": "www.google.com",
+        "zeek.socks.request.port": 443,
+        "zeek.socks.status": "succeeded",
+        "zeek.socks.version": 5
+    }
+]
