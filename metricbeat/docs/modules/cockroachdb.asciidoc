@@ -6,8 +6,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == CockroachDB module
 
-beta[]
-
 This module periodically fetches metrics from CockroachDB.
 
 [float]
