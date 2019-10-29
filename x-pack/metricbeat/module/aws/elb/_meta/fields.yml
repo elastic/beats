@@ -2,5 +2,5 @@
   type: group
   description: >
     `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
-  release: beta
+  release: ga
   fields:
