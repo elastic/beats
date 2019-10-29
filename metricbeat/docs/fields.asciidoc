@@ -3830,6 +3830,24 @@ required: True
 
 --
 
+*`process.exit_code`*::
++
+--
+the exit code of a process
+
+type: long
+
+--
+
+*`fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
 [[exported-fields-consul]]
 == consul fields
 
@@ -30885,36 +30903,12 @@ type: date
 
 --
 
-[float]
-=== process
-
-The process associated with the service. For systemd, this is the main pid spawned by systemd itself.
-
-
-*`system.service.process.pid`*::
-+
---
-the main PID of the service
-
-type: long
-
---
-
-*`system.service.process.exec_code`*::
+*`system.service.exec_code`*::
 +
 --
 The SIGCHLD code from the service's main process
 
 type: keyword
-
---
-
-*`system.service.process.exec_rc`*::
-+
---
-The exit code of the service's main process
-
-type: long
 
 --
 

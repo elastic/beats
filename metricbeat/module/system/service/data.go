@@ -26,6 +26,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 // Properties is a struct representation of the dbus returns from GetAllProperties
@@ -51,16 +52,21 @@ type Properties struct {
 	InactiveEnterTimestamp uint64
 	InactiveExitTimestamp  uint64
 	ActiveExitTimestamp    uint64
+	// Meta
+	FragmentPath string
 }
 
 // formProperties gets properties for the systemd service and returns a MapStr with useful data
-func formProperties(unit dbus.UnitStatus, props Properties) (common.MapStr, error) {
+func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 	timeSince, err := timeSince(props, unit.ActiveState)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting timestamp")
+		return mb.Event{}, errors.Wrap(err, "error getting timestamp")
 	}
 
-	event := common.MapStr{
+	event := mb.Event{
+		RootFields: common.MapStr{},
+	}
+	msData := common.MapStr{
 		"name":       unit.Name,
 		"load_state": unit.LoadState,
 		"state":      unit.ActiveState,
@@ -73,7 +79,7 @@ func formProperties(unit dbus.UnitStatus, props Properties) (common.MapStr, erro
 	//Even systemd doesn't check the substate, leading to a lot of odd `Memory: 0B` lines in `systemctl status`
 	//Ignore the resource accounting if a service has exited
 	if unit.ActiveState == "active" && unit.SubState != "exited" {
-		event["resources"] = getMetricsFromServivce(props)
+		msData["resources"] = getMetricsFromServivce(props)
 
 	}
 
@@ -82,13 +88,13 @@ func formProperties(unit dbus.UnitStatus, props Properties) (common.MapStr, erro
 	//anything less than 1 isn't a valid SIGCHLD code
 	if props.ExecMainCode > 0 {
 		childData = true
-		childProc["exec_code"] = translateChild(props.ExecMainCode)
-		childProc["exec_rc"] = props.ExecMainStatus
+		msData["exec_code"] = translateChild(props.ExecMainCode)
+		childProc["exit_code"] = props.ExecMainStatus
 	}
 
 	//only send timestamp if it's valid
 	if timeSince != 0 {
-		event["state_since"] = time.Unix(0, timeSince)
+		msData["state_since"] = time.Unix(0, timeSince)
 	}
 
 	//only prints PID data if we have a PID
@@ -98,7 +104,11 @@ func formProperties(unit dbus.UnitStatus, props Properties) (common.MapStr, erro
 	}
 
 	if childData {
-		event["process"] = childProc
+		event.RootFields["process"] = childProc
+	}
+	event.RootFields["systemd"] = common.MapStr{
+		"unit":          unit.Name,
+		"fragment_path": props.FragmentPath,
 	}
 
 	return event, nil

@@ -100,9 +100,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		isOpen := report.Event(mb.Event{
-			MetricSetFields: event,
-		})
+		isOpen := report.Event(event)
 		if !isOpen {
 			return nil
 		}
