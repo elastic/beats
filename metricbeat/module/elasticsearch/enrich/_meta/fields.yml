@@ -1,0 +1,25 @@
+- name: enrich
+  type: group
+  description: >
+    Enrich stats
+  release: ga
+  fields:
+    - name: queue.size
+      type: long
+      description: >
+        Number of search requests in the queue.
+    - name: remote_requests
+      type: group
+      fields:
+        - name: current
+          type: long
+          description: >
+            Current number of outstanding remote requests.
+        - name: total
+          type: long
+          description: >
+            Number of outstanding remote requests executed since node startup.
+    - name: executed_searches.total
+      type: long
+      description: >
+        Number of search requests that enrich processors have executed since node startup.
