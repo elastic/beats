@@ -95,7 +95,6 @@ func (c *splitHandler) Handle(closer CloseRef, conn net.Conn) error {
 	buffer := make([]byte, c.maxMessageSize/16)
 	scanner.Buffer(buffer, int(c.maxMessageSize))
 	for {
-		// we are forcing a Close on the socket, lets ignore any error that could happen.
 		select {
 		case <-closer.Done():
 			break
