@@ -3,18 +3,6 @@
 	"ignore": "test github.com/elastic/beats",
 	"package": [
 		{
-			"checksumSHA1": "WF6GR2/MTAreZskxw9rvh+HCQc4=",
-			"path": "github.com/coreos/go-systemd/dbus",
-			"revision": "fd7a80b32e1fc73e890fde45604ed5009dc817a3",
-			"revisionTime": "2019-07-19T11:48:52Z"
-		},
-		{
-			"checksumSHA1": "KSgw53WGLfdZpEMm8It5H0yedV0=",
-			"path": "github.com/godbus/dbus",
-			"revision": "37bf87eef99d69c4f1d3528bd66e3a87dc201472",
-			"revisionTime": "2019-09-30T11:59:46Z"
-		},
-		{
 			"checksumSHA1": "GYschMPw/Zi5C4QnGKRfgljnx/c=",
 			"path": "github.com/gogo/protobuf/proto",
 			"revision": "636bf0302bc95575d69441b25a2603156ffdddf1",
