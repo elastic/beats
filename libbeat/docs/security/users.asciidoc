@@ -141,12 +141,10 @@ If you don't use the +{beat_monitoring_user}+ user:
 |Cluster
 |`monitor`
 |Retrieve cluster details (e.g. version)
-|====
 
 |Index
 |`create_index` on `.monitoring-beats-*` indices
 |Create monitoring indices in {es}
-|====
 
 |Index
 |`create` on `.monitoring-beats-*` indices
