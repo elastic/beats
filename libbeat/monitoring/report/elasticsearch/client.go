@@ -192,7 +192,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 		meta["_type"] = "doc"
 	}
 
-	var action common.MapStr
+	action := common.MapStr{}
 	var opType string
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
 		opType = "index"
