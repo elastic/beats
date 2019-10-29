@@ -18,6 +18,7 @@
 package fingerprint
 
 import (
+	"crypto/sha1"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -49,7 +50,7 @@ func (m *Method) Unpack(str string) error {
 	return nil
 }
 
-type fingerprinter func(string) (string, error)
+type fingerprinter func([]byte) (string, error)
 
 func (m *Method) factory() (fingerprinter, error) {
 	var f fingerprinter
@@ -65,11 +66,11 @@ func (m *Method) factory() (fingerprinter, error) {
 	return f, nil
 }
 
-func sha1Fingerprinter(in string) (string, error) {
-	return in, nil
+func sha1Fingerprinter(in []byte) (string, error) {
+	return fmt.Sprintf("%x", sha1.Sum(in)), nil
 }
 
-func sha256Fingerprinter(in string) (string, error) {
-	return fmt.Sprintf("%x", sha256.Sum256([]byte(in))), nil
+func sha256Fingerprinter(in []byte) (string, error) {
+	return fmt.Sprintf("%x", sha256.Sum256(in)), nil
 
 }

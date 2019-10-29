@@ -51,6 +51,31 @@ func TestMethodDefault(t *testing.T) {
 	assert.Equal(t, "4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144", v)
 }
 
+func TestMethodSHA1(t *testing.T) {
+	testConfig, err := common.NewConfigFrom(common.MapStr{
+		"fields": []string{"field1"},
+		"method": "sha1",
+	})
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	assert.NoError(t, err)
+
+	testEvent := &beat.Event{
+		Fields: common.MapStr{
+			"field1": "foo",
+		},
+		Timestamp: time.Now(),
+	}
+
+	newEvent, err := p.Run(testEvent)
+	assert.NoError(t, err)
+
+	v, err := newEvent.GetValue("fingerprint")
+	assert.NoError(t, err)
+	assert.Equal(t, "46de5d8225e75aeedd559c953f100dca41612b18", v)
+}
+
 func TestMethodSHA256(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(common.MapStr{
 		"fields": []string{"field1"},

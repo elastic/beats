@@ -58,7 +58,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with fingerprint information
 func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
-	str, err := makeSourceString(p.config.Fields, event.Fields)
+	source, err := makeSource(p.config.Fields, event.Fields)
 	if err != nil {
 		return nil, makeComputeFingerprintError(err)
 	}
@@ -68,7 +68,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, makeComputeFingerprintError(err)
 	}
 
-	f, err := makeFingerprint(str)
+	f, err := makeFingerprint(source)
 	if err != nil {
 		return nil, makeComputeFingerprintError(err)
 	}
@@ -84,21 +84,21 @@ func (p *fingerprint) String() string {
 	return fmt.Sprintf("%v=[method=[%v]]", processorName, p.config.Method)
 }
 
-func makeSourceString(sourceFields []string, eventFields common.MapStr) (string, error) {
+func makeSource(sourceFields []string, eventFields common.MapStr) ([]byte, error) {
 	var str string
 	for _, k := range sourceFields {
 		v, err := eventFields.GetValue(k)
 		if err == common.ErrKeyNotFound {
-			return "", errors.Wrapf(err, "failed to find field [%v] in event", k)
+			return nil, errors.Wrapf(err, "failed to find field [%v] in event", k)
 		}
 		if err != nil {
-			return "", errors.Wrapf(err, "failed when finding field [%v] in event", k)
+			return nil, errors.Wrapf(err, "failed when finding field [%v] in event", k)
 		}
 
 		i := v
 		switch vv := v.(type) {
 		case map[string]interface{}, []interface{}:
-			return "", errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
+			return nil, errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.
 			i = vv.UTC()
@@ -107,7 +107,7 @@ func makeSourceString(sourceFields []string, eventFields common.MapStr) (string,
 		str += fmt.Sprintf("|%v|%v", k, i)
 	}
 	str += "|"
-	return str, nil
+	return []byte(str), nil
 }
 
 func makeComputeFingerprintError(err error) error {
