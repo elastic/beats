@@ -1,15 +1,14 @@
 [role="xpack"]
 [[securing-beats]]
-== Configure {beatname_uc} to use {security}
+== Configure {beatname_uc} to use {security-features}
 
 [subs="attributes"]
 ++++
-<titleabbrev>Use {security}</titleabbrev>
+<titleabbrev>Use {security-features}</titleabbrev>
 ++++
 
 If you want {beatname_uc} to connect to a cluster that has
-{ref}/elasticsearch-security.html[{security}] enabled, there are extra
-configuration steps:
+{security-features} enabled, there are extra configuration steps:
 
 . <<feature-roles>>.
 +
@@ -26,8 +25,8 @@ authentication credentials or present a client certificate.
 If encryption is enabled on the cluster, you need to enable HTTPS in the
 {beatname_uc} configuration.
 
-For more information about {security}, see
-{xpack-ref}/elasticsearch-security.html[Securing the {stack}].
+For more information about {security-features}, see
+{ref}/secure-cluster.html[Secure a cluster].
 
 include::users.asciidoc[]
 
