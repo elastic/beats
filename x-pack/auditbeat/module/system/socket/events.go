@@ -656,6 +656,15 @@ func validIPv6Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {
 }
 
 func (e *udpQueueRcvSkb) asFlow() flow {
+	f := flow{
+		sock:     e.Sock,
+		pid:      e.Meta.PID,
+		inetType: inetTypeIPv4,
+		proto:    protoUDP,
+		dir:      directionInbound,
+		lastSeen: kernelTime(e.Meta.Timestamp),
+		local:    newEndpointIPv4(e.LAddr, e.LPort, 0, 0),
+	}
 	if valid := validIPv4Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
 		// Check if we're dealing with pointers
 		// TODO: This should check for SK_BUFF_HAS_POINTERS. Instead is just
@@ -678,7 +687,7 @@ func (e *udpQueueRcvSkb) asFlow() flow {
 			}
 		}
 		if !valid {
-			return flow{}
+			return f
 		}
 	}
 	var raddr uint32
@@ -686,16 +695,8 @@ func (e *udpQueueRcvSkb) asFlow() flow {
 	// the remote is this packet's source
 	raddr = tracing.MachineEndian.Uint32(e.Packet[e.IPHdr+12:])
 	rport = tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
-	return flow{
-		sock:     e.Sock,
-		pid:      e.Meta.PID,
-		inetType: inetTypeIPv4,
-		proto:    protoUDP,
-		dir:      directionInbound,
-		lastSeen: kernelTime(e.Meta.Timestamp),
-		local:    newEndpointIPv4(e.LAddr, e.LPort, 0, 0),
-		remote:   newEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minIPv4UdpPacketSize),
-	}
+	f.remote = newEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minIPv4UdpPacketSize)
+	return f
 }
 
 // String returns a representation of the event.
@@ -729,6 +730,15 @@ type udpv6QueueRcvSkb struct {
 }
 
 func (e *udpv6QueueRcvSkb) asFlow() flow {
+	f := flow{
+		sock:     e.Sock,
+		pid:      e.Meta.PID,
+		inetType: inetTypeIPv6,
+		proto:    protoUDP,
+		dir:      directionInbound,
+		lastSeen: kernelTime(e.Meta.Timestamp),
+		local:    newEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
+	}
 	if valid := validIPv6Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
 		// Check if we're dealing with pointers
 		// TODO: This only works in little-endian, same as in udpQueueRcvSkb
@@ -743,7 +753,7 @@ func (e *udpv6QueueRcvSkb) asFlow() flow {
 			}
 		}
 		if !valid {
-			return flow{}
+			return f
 		}
 	}
 	var raddrA, raddrB uint64
@@ -752,16 +762,8 @@ func (e *udpv6QueueRcvSkb) asFlow() flow {
 	raddrA = tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+8:])
 	raddrB = tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+16:])
 	rport = tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
-	return flow{
-		sock:     e.Sock,
-		pid:      e.Meta.PID,
-		inetType: inetTypeIPv6,
-		proto:    protoUDP,
-		dir:      directionInbound,
-		lastSeen: kernelTime(e.Meta.Timestamp),
-		local:    newEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
-		remote:   newEndpointIPv6(raddrA, raddrB, rport, 1, uint64(e.Size)+minIPv6UdpPacketSize),
-	}
+	f.remote = newEndpointIPv6(raddrA, raddrB, rport, 1, uint64(e.Size)+minIPv6UdpPacketSize)
+	return f
 }
 
 // String returns a representation of the event.
