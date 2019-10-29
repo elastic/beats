@@ -29,6 +29,7 @@ services:
       context: ./module/beat/_meta
       args:
         BEAT_VERSION: ${BEAT_VERSION:-7.3.0}
+    command: '-e'
     ports:
       - 5066
 

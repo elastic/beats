@@ -1,0 +1,138 @@
+- name: files
+  type: group
+  description: >
+    Fields exported by the Zeek Files log.
+  fields:
+    - name: fuid
+      type: keyword
+      description: >
+        A file unique identifier.
+
+    - name: tx_host
+      type: ip
+      description: >
+        The host that transferred the file.
+
+    - name: rx_host
+      type: ip
+      description: >
+        The host that received the file.
+
+    - name: session_ids
+      type: keyword
+      description: >
+        The sessions that have this file.
+
+    - name: source
+      type: keyword
+      description: |
+        An identification of the source of the file data. E.g. it may be a network protocol
+        over which it was transferred, or a local file path which was read, or some other
+        input source.
+
+    - name: depth
+      type: long
+      description: |
+        A value to represent the depth of this file in relation to its source. In SMTP, it
+        is the depth of the MIME attachment on the message. In HTTP, it is the depth of the
+        request within the TCP connection.
+
+    - name: analyzers
+      type: keyword
+      description: >
+        A set of analysis types done during the file analysis.
+
+    - name: mime_type
+      type: keyword
+      description: >
+        Mime type of the file.
+
+    - name: filename
+      type: keyword
+      description: >
+        Name of the file if available.
+
+    - name: local_orig
+      type: boolean
+      description: |
+        If the source of this file is a network connection, this field indicates if the data
+        originated from the local network or not.
+
+    - name: is_orig
+      type: boolean
+      description: |
+        If the source of this file is a network connection, this field indicates if the file is
+        being sent by the originator of the connection or the responder.
+
+    - name: duration
+      type: double
+      description: >
+        The duration the file was analyzed for. Not the duration of the session.
+
+    - name: seen_bytes
+      type: long
+      description: >
+        Number of bytes provided to the file analysis engine for the file.
+
+    - name: total_bytes
+      type: long
+      description: >
+        Total number of bytes that are supposed to comprise the full file.
+
+    - name: missing_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were completely missed during the process
+        of analysis.
+
+    - name: overflow_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were not delivered to stream file analyzers.
+        This could be overlapping bytes or bytes that couldn't be reassembled.
+
+    - name: timedout
+      type: boolean
+      description: >
+        Whether the file analysis timed out at least once for the file.
+
+    - name: parent_fuid
+      type: keyword
+      description: |
+        Identifier associated with a container file from which this one was extracted as part of
+        the file analysis.
+
+    - name: md5
+      type: keyword
+      description: >
+        An MD5 digest of the file contents.
+
+    - name: sha1
+      type: keyword
+      description: >
+        A SHA1 digest of the file contents.
+
+    - name: sha256
+      type: keyword
+      description: >
+        A SHA256 digest of the file contents.
+
+    - name: extracted
+      type: keyword
+      description: >
+        Local filename of extracted file.
+
+    - name: extracted_cutoff
+      type: boolean
+      description: >
+        Indicate whether the file being extracted was cut off hence not extracted completely.
+
+    - name: extracted_size
+      type: long
+      description: >
+        The number of bytes extracted to disk.
+
+    - name: entropy
+      type: double
+      description: >
+        The information density of the contents of the file.

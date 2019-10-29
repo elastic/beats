@@ -132,7 +132,7 @@ func makeTestHTTPRequest(t *testing.T) *http.Request {
 }
 
 func TestZeroMaxRedirectShouldError(t *testing.T) {
-	checker := makeCheckRedirect(0)
+	checker := makeCheckRedirect(0, nil)
 	req := makeTestHTTPRequest(t)
 
 	res := checker(req, nil)
@@ -141,7 +141,7 @@ func TestZeroMaxRedirectShouldError(t *testing.T) {
 
 func TestNonZeroRedirect(t *testing.T) {
 	limit := 5
-	checker := makeCheckRedirect(limit)
+	checker := makeCheckRedirect(limit, nil)
 
 	var via []*http.Request
 	// Test requests within the limit

@@ -1,0 +1,45 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: udp
+  network.protocol: radius
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.radius"
+
+        - from: "zeek.radius.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.radius.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.radius.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.radius.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.radius.uid"
+          to: "zeek.session_id"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}
