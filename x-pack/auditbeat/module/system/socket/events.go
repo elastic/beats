@@ -628,15 +628,15 @@ func (e *udpv6SendMsgCall) Update(s *state) error {
 }
 
 type udpQueueRcvSkb struct {
-	Meta   tracing.Metadata         `kprobe:"metadata"`
-	Sock   uintptr                  `kprobe:"sock"`
-	Size   uint32                   `kprobe:"size"`
-	LAddr  uint32                   `kprobe:"laddr"`
-	LPort  uint16                   `kprobe:"lport"`
-	IPHdr  uint16                   `kprobe:"iphdr"`
-	UDPHdr uint16                   `kprobe:"udphdr"`
-	Base   uintptr                  `kprobe:"base"`
-	Packet [pktHeaderDumpBytes]byte `kprobe:"packet,greedy"`
+	Meta   tracing.Metadata          `kprobe:"metadata"`
+	Sock   uintptr                   `kprobe:"sock"`
+	Size   uint32                    `kprobe:"size"`
+	LAddr  uint32                    `kprobe:"laddr"`
+	LPort  uint16                    `kprobe:"lport"`
+	IPHdr  uint16                    `kprobe:"iphdr"`
+	UDPHdr uint16                    `kprobe:"udphdr"`
+	Base   uintptr                   `kprobe:"base"`
+	Packet [skBuffDataDumpBytes]byte `kprobe:"packet,greedy"`
 }
 
 func validIPv4Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {
@@ -716,16 +716,16 @@ func (e *udpQueueRcvSkb) Update(s *state) error {
 }
 
 type udpv6QueueRcvSkb struct {
-	Meta   tracing.Metadata         `kprobe:"metadata"`
-	Sock   uintptr                  `kprobe:"sock"`
-	Size   uint32                   `kprobe:"size"`
-	LAddrA uint64                   `kprobe:"laddra"`
-	LAddrB uint64                   `kprobe:"laddrb"`
-	LPort  uint16                   `kprobe:"lport"`
-	IPHdr  uint16                   `kprobe:"iphdr"`
-	UDPHdr uint16                   `kprobe:"udphdr"`
-	Base   uintptr                  `kprobe:"base"`
-	Packet [pktHeaderDumpBytes]byte `kprobe:"packet,greedy"`
+	Meta   tracing.Metadata          `kprobe:"metadata"`
+	Sock   uintptr                   `kprobe:"sock"`
+	Size   uint32                    `kprobe:"size"`
+	LAddrA uint64                    `kprobe:"laddra"`
+	LAddrB uint64                    `kprobe:"laddrb"`
+	LPort  uint16                    `kprobe:"lport"`
+	IPHdr  uint16                    `kprobe:"iphdr"`
+	UDPHdr uint16                    `kprobe:"udphdr"`
+	Base   uintptr                   `kprobe:"base"`
+	Packet [skBuffDataDumpBytes]byte `kprobe:"packet,greedy"`
 }
 
 func (e *udpv6QueueRcvSkb) asFlow() flow {
