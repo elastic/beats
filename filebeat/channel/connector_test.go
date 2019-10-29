@@ -18,76 +18,178 @@
 package channel
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestThing(t *testing.T) {
-	done := make(chan struct{})
-	beatInfo := beat.Info{Beat: "TestBeat", Version: "3.9.27"}
-	outletFactory := NewOutletFactory(done, emptyCounter{}, beatInfo)
-	pipeline := newChannelPipeline()
-	connector := outletFactory.Create(pipeline)
-	config, err := common.NewConfigFrom("index: 'test'")
+func TestBuildProcessorList(t *testing.T) {
+	testCases := []struct {
+		description    string
+		beatInfo       beat.Info
+		configStr      string
+		clientCfg      beat.ClientConfig
+		event          beat.Event
+		expectedFields map[string]string
+	}{
+		{
+			description: "Simple static index",
+			configStr:   "index: 'test'",
+			expectedFields: map[string]string{
+				"@metadata.raw-index": "test",
+			},
+		},
+		{
+			description: "Index with agent info + timestamp",
+			beatInfo:    beat.Info{Beat: "TestBeat", Version: "3.9.27"},
+			configStr:   "index: 'beat-%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}'",
+			event:       beat.Event{Timestamp: time.Date(1999, time.December, 31, 23, 0, 0, 0, time.UTC)},
+			expectedFields: map[string]string{
+				"@metadata.raw-index": "beat-TestBeat-3.9.27-1999.12.31",
+			},
+		},
+		{
+			description: "Set index in ClientConfig",
+			clientCfg: beat.ClientConfig{
+				Processing: beat.ProcessingConfig{
+					Processor: makeProcessors(&setRawIndex{"clientCfgIndex"}),
+				},
+			},
+			expectedFields: map[string]string{
+				"@metadata.raw-index": "clientCfgIndex",
+			},
+		},
+		{
+			description: "ClientConfig processor runs after beat input Index",
+			configStr:   "index: 'test'",
+			clientCfg: beat.ClientConfig{
+				Processing: beat.ProcessingConfig{
+					Processor: makeProcessors(&setRawIndex{"clientCfgIndex"}),
+				},
+			},
+			expectedFields: map[string]string{
+				"@metadata.raw-index": "clientCfgIndex",
+			},
+		},
+		{
+			description: "Set field in input config",
+			configStr: `processors:
+- add_fields: {fields: {testField: inputConfig}}`,
+			expectedFields: map[string]string{
+				"fields.testField": "inputConfig",
+			},
+		},
+		{
+			description: "Set field in ClientConfig",
+			clientCfg: beat.ClientConfig{
+				Processing: beat.ProcessingConfig{
+					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
+						"fields": common.MapStr{"testField": "clientConfig"},
+					}, false)),
+				},
+			},
+			expectedFields: map[string]string{
+				"fields.testField": "clientConfig",
+			},
+		},
+		{
+			description: "Input config processors run after ClientConfig",
+			configStr: `processors:
+- add_fields: {fields: {testField: inputConfig}}`,
+			clientCfg: beat.ClientConfig{
+				Processing: beat.ProcessingConfig{
+					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
+						"fields": common.MapStr{"testField": "clientConfig"},
+					}, false)),
+				},
+			},
+			expectedFields: map[string]string{
+				"fields.testField": "inputConfig",
+			},
+		},
+	}
+	for _, test := range testCases {
+		if test.event.Fields == nil {
+			test.event.Fields = common.MapStr{}
+		}
+		config, err := outletConfigFromString(test.configStr)
+		if err != nil {
+			t.Errorf("[%s] %v", test.description, err)
+			continue
+		}
+		processors, err := buildProcessorList(test.beatInfo, config, test.clientCfg)
+		if err != nil {
+			t.Errorf("[%s] %v", test.description, err)
+			continue
+		}
+		processedEvent, err := processors.Run(&test.event)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		for key, value := range test.expectedFields {
+			field, err := processedEvent.GetValue(key)
+			if err != nil {
+				t.Errorf("[%s] Couldn't get field %s from event: %v", test.description, key, err)
+				continue
+			}
+			assert.Equal(t, field, value)
+			fieldStr, ok := field.(string)
+			if !ok {
+				// Note that requiring a string here is just to simplify the test setup,
+				// not a requirement of the underlying api.
+				t.Errorf("[%s] Field [%s] should be a string", test.description, key)
+				continue
+			}
+			if fieldStr != value {
+				t.Errorf("[%s] Event field [%s]: expected [%s], got [%s]", test.description, key, value, fieldStr)
+			}
+		}
+	}
+}
+
+// setRawIndex is a bare-bones processor to set the raw-index field to a
+// constant string in the event metadata. It is used to test order of operations
+// for buildProcessorList.
+type setRawIndex struct {
+	indexStr string
+}
+
+func (p *setRawIndex) Run(event *beat.Event) (*beat.Event, error) {
+	if event.Meta == nil {
+		event.Meta = common.MapStr{}
+	}
+	event.Meta["raw-index"] = p.indexStr
+	return event, nil
+}
+
+func (p *setRawIndex) String() string {
+	return fmt.Sprintf("set_raw_index=%v", p.indexStr)
+}
+
+// Helper function to convert from YML input string to an unpacked
+// inputOutletConfig
+func outletConfigFromString(s string) (inputOutletConfig, error) {
+	config := inputOutletConfig{}
+	cfg, err := common.NewConfigFrom(s)
 	if err != nil {
-		t.Error(err)
+		return config, err
 	}
-	//field, _ := config.String("index", -1)
-	//fmt.Printf("config index: %v\n", field)
-	//config := common.NewConfig()
-	outleter, err := connector.ConnectWith(
-		config,
-		beat.ClientConfig{},
-	)
-	outleter.OnEvent(beat.Event{})
-	if err != nil {
-		t.Error(err)
+	if err := cfg.Unpack(&config); err != nil {
+		return config, err
 	}
-	processedEvent := <-pipeline.events
-	if processedEvent.Meta == nil {
-		//t.Error("Event Meta shouldn't be empty")
-	}
+	return config, nil
 }
 
-type emptyCounter struct{}
-
-func (c emptyCounter) Add(n int) {}
-func (c emptyCounter) Done()     {}
-
-// channelPipeline is a Pipeline (and Client) whose connections just echo their
-// events to a shared events channel for testing.
-type channelPipeline struct {
-	events chan beat.Event
-}
-
-func newChannelPipeline() *channelPipeline {
-	return &channelPipeline{make(chan beat.Event, 100)}
-}
-
-func (cp *channelPipeline) SetACKHandler(h beat.PipelineACKHandler) error {
-	return nil
-}
-
-func (cp *channelPipeline) ConnectWith(conf beat.ClientConfig) (beat.Client, error) {
-	return cp, nil
-}
-
-func (cp *channelPipeline) Connect() (beat.Client, error) {
-	return cp, nil
-}
-
-func (cp *channelPipeline) Publish(event beat.Event) {
-	cp.events <- event
-}
-
-func (cp *channelPipeline) PublishAll(events []beat.Event) {
-	for _, event := range events {
-		cp.Publish(event)
-	}
-}
-
-func (cp *channelPipeline) Close() error {
-	return nil
+// makeProcessors wraps one or more bare Processor objects in Processors.
+func makeProcessors(procs ...processors.Processor) *processors.Processors {
+	procList := processors.NewList(nil)
+	procList.List = procs
+	return procList
 }

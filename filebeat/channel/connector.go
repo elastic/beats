@@ -54,28 +54,9 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return nil, err
 	}
 
-	procs := processors.NewList(nil)
-
-	userProcessors, err := processors.New(config.Processors)
+	procs, err := buildProcessorList(c.parent.beatInfo, config, clientCfg)
 	if err != nil {
 		return nil, err
-	}
-	procs.List = append(procs.List, userProcessors)
-
-	if !config.Index.IsEmpty() {
-		staticFields := fmtstr.FieldsForBeat(
-			c.parent.beatInfo.Beat, c.parent.beatInfo.Version)
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
-		if err != nil {
-			return nil, err
-		}
-		indexProcessor := &addFormattedIndex{timestampFormat}
-		procs.List = append(procs.List, indexProcessor)
-	}
-
-	if lst := clientCfg.Processing.Processor; lst != nil {
-		procs.List = append(procs.List, lst)
 	}
 
 	setOptional := func(to common.MapStr, key string, value string) {
@@ -125,6 +106,39 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return CloseOnSignal(outlet, c.parent.done), nil
 	}
 	return outlet, nil
+}
+
+// buildProcessorList assembles the Processors for a pipelineConnector.
+func buildProcessorList(
+	beatInfo beat.Info, config inputOutletConfig, clientCfg beat.ClientConfig,
+) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor ordering is important:
+	// 1. Index configuration
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := &addFormattedIndex{timestampFormat}
+		procs.List = append(procs.List, indexProcessor)
+	}
+
+	// 2. ClientConfig processors
+	if lst := clientCfg.Processing.Processor; lst != nil {
+		procs.List = append(procs.List, lst)
+	}
+
+	// 3. User processors
+	userProcessors, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	procs.List = append(procs.List, userProcessors)
+	return procs, nil
 }
 
 //////////////////////////////
