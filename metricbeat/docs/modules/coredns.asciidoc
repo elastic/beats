@@ -6,8 +6,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == coredns module
 
-beta[]
-
 This is the coredns module.
 
 
