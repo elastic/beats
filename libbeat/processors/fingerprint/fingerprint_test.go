@@ -18,6 +18,7 @@
 package fingerprint
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -27,81 +28,67 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func TestMethodDefault(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(common.MapStr{
-		"fields": []string{"field1"},
-	})
-	assert.NoError(t, err)
-
-	p, err := New(testConfig)
-	assert.NoError(t, err)
-
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1": "foo",
+func TestHashMethods(t *testing.T) {
+	tests := []struct {
+		method   string
+		expected string
+	}{
+		{
+			"md5",
+			"3455d980d9c2a5a1c2c0b090a929aa3a",
 		},
-		Timestamp: time.Now(),
+		{
+			"sha1",
+			"46de5d8225e75aeedd559c953f100dca41612b18",
+		},
+		{
+			"sha256",
+			"4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144",
+		},
+		{
+			"sha384",
+			"251b4d77ceea8ad64bf5ed906b5760f9b758af3b30e8f9de5d0d70ec6a2745d25b1be00c5317dc7859256de2d416b179",
+		},
+		{
+			"sha512",
+			"903a7f492a22015c89a8e00c40a85da814c2ff42c28cdf1a29495faa8a849eba00449921a75b12c9c212169f100ebf6b05ac8389a8fbfd61cba6026e86a6e2c1",
+		},
 	}
 
-	newEvent, err := p.Run(testEvent)
-	assert.NoError(t, err)
+	for _, test := range tests {
+		name := test.method
+		if name == "" {
+			name = "default"
+		}
 
-	v, err := newEvent.GetValue("fingerprint")
-	assert.NoError(t, err)
-	assert.Equal(t, "4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144", v)
-}
+		name = fmt.Sprintf("testing %v method", name)
+		t.Run(name, func(t *testing.T) {
+			testEvent := &beat.Event{
+				Fields: common.MapStr{
+					"field1": "foo",
+				},
+				Timestamp: time.Now(),
+			}
 
-func TestMethodSHA1(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(common.MapStr{
-		"fields": []string{"field1"},
-		"method": "sha1",
-	})
-	assert.NoError(t, err)
+			testConfig, err := common.NewConfigFrom(common.MapStr{
+				"fields": []string{"field1"},
+				"method": test.method,
+			})
+			assert.NoError(t, err)
 
-	p, err := New(testConfig)
-	assert.NoError(t, err)
+			p, err := New(testConfig)
+			assert.NoError(t, err)
 
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1": "foo",
-		},
-		Timestamp: time.Now(),
+			newEvent, err := p.Run(testEvent)
+			assert.NoError(t, err)
+
+			v, err := newEvent.GetValue("fingerprint")
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected, v)
+		})
 	}
-
-	newEvent, err := p.Run(testEvent)
-	assert.NoError(t, err)
-
-	v, err := newEvent.GetValue("fingerprint")
-	assert.NoError(t, err)
-	assert.Equal(t, "46de5d8225e75aeedd559c953f100dca41612b18", v)
 }
 
-func TestMethodSHA256(t *testing.T) {
-	testConfig, err := common.NewConfigFrom(common.MapStr{
-		"fields": []string{"field1"},
-		"method": "sha256",
-	})
-	assert.NoError(t, err)
-
-	p, err := New(testConfig)
-	assert.NoError(t, err)
-
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1": "foo",
-		},
-		Timestamp: time.Now(),
-	}
-
-	newEvent, err := p.Run(testEvent)
-	assert.NoError(t, err)
-
-	v, err := newEvent.GetValue("fingerprint")
-	assert.NoError(t, err)
-	assert.Equal(t, "4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144", v)
-}
-
-// TODO: other fingerprinting methods
 // TODO: Order of source fields doesn't matter
 // TODO: Missing source fields
 // TODO: non-scalar fields

@@ -18,8 +18,10 @@
 package fingerprint
 
 import (
+	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 	"errors"
 	"hash"
 	"strings"
@@ -30,8 +32,11 @@ var errFingerprintingMethodUnknown = errors.New("unknown fingerprinting method")
 type hashMethod func() hash.Hash
 
 var hashes = map[string]hashMethod{
+	"md5":    md5.New,
 	"sha1":   sha1.New,
 	"sha256": sha256.New,
+	"sha384": sha512.New384,
+	"sha512": sha512.New,
 }
 
 // Unpack creates the hashMethod from the given string
