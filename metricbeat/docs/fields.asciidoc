@@ -30876,24 +30876,6 @@ type: keyword
 
 --
 
-*`system.service.exec_code`*::
-+
---
-The SIGCHLD code from the service's main process
-
-type: keyword
-
---
-
-*`system.service.exec_rc`*::
-+
---
-The exit code of the service's main process
-
-type: long
-
---
-
 *`system.service.state_since`*::
 +
 --
@@ -30903,10 +30885,34 @@ type: date
 
 --
 
-*`system.service.main_pid`*::
+[float]
+=== process
+
+The process associated with the service. For systemd, this is the main pid spawned by systemd itself.
+
+
+*`system.service.process.pid`*::
 +
 --
-the main PID of the service.
+the main PID of the service
+
+type: long
+
+--
+
+*`system.service.process.exec_code`*::
++
+--
+The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+*`system.service.process.exec_rc`*::
++
+--
+The exit code of the service's main process
 
 type: long
 

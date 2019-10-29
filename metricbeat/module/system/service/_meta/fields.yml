@@ -16,18 +16,22 @@
     - name: sub_state
       type: keyword
       description: The sub-state of the service
-    - name: exec_code
-      type: keyword
-      description: The SIGCHLD code from the service's main process
-    - name: exec_rc
-      type: long
-      description: The exit code of the service's main process
     - name: state_since
       type: date
       description: The timestamp of the last state change. If the service is active and running, this is its uptime.
-    - name: main_pid
-      type: long
-      description: the main PID of the service.
+    - name: process
+      type: group
+      description: The process associated with the service. For systemd, this is the main pid spawned by systemd itself.
+      fields:
+        - name: pid
+          type: long
+          description: the main PID of the service
+        - name: exec_code
+          type: keyword
+          description: The SIGCHLD code from the service's main process
+        - name: exec_rc
+          type: long
+          description: The exit code of the service's main process
     - name: resources
       type: group
       description: system metrics associated with the service

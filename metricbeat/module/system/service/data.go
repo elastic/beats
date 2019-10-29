@@ -77,10 +77,13 @@ func formProperties(unit dbus.UnitStatus, props Properties) (common.MapStr, erro
 
 	}
 
+	var childProc = common.MapStr{}
+	childData := false
 	//anything less than 1 isn't a valid SIGCHLD code
 	if props.ExecMainCode > 0 {
-		event["exec_code"] = translateChild(props.ExecMainCode)
-		event["exec_rc"] = props.ExecMainStatus
+		childData = true
+		childProc["exec_code"] = translateChild(props.ExecMainCode)
+		childProc["exec_rc"] = props.ExecMainStatus
 	}
 
 	//only send timestamp if it's valid
@@ -90,7 +93,12 @@ func formProperties(unit dbus.UnitStatus, props Properties) (common.MapStr, erro
 
 	//only prints PID data if we have a PID
 	if props.ExecMainPID > 0 {
-		event["main_pid"] = props.ExecMainPID
+		childData = true
+		childProc["pid"] = props.ExecMainPID
+	}
+
+	if childData {
+		event["process"] = childProc
 	}
 
 	return event, nil
