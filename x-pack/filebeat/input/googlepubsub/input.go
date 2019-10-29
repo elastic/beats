@@ -11,8 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/useragent"
-
 	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
 	"google.golang.org/api/option"
@@ -22,6 +20,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/common/useragent"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
