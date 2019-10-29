@@ -1154,7 +1154,7 @@ var security = (function () {
         if (!code) {
             return;
         }
-        var uac_code=parseInt(code)
+        var uac_code=parseInt(code);
         var uac_result = [];
         for (var i=0; i<uac_flags.length; i++) {
             if ((uac_code | uac_flags[i][0]) === uac_code) {
