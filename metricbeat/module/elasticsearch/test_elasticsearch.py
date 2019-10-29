@@ -77,11 +77,13 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch-xpack module tests
         """
-        es = Elasticsearch(self.get_hosts())
+        self.check_skip(metricset)
 
         self.create_ml_job()
-        self.create_ccr_stats()
-        self.create_enrich_stats()
+        if self.is_ccr_available():
+            self.create_ccr_stats()
+        if self.is_enrich_available():
+            self.create_enrich_stats()
 
         self.render_config_template(modules=[{
             "name": "elasticsearch",
@@ -258,16 +260,27 @@ class Test(metricbeat.BaseTest):
         if metricset != "ccr" and metricset != "enrich":
             return
 
-        es_version = self.get_version()
-        if es_version["major"] <= 6 and es_version["minor"] < 5:
+        if not self.is_ccr_available()
             # Skip CCR metricset system test for Elasticsearch versions < 6.5.0 as CCR Stats
             # API endpoint is not available
             raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
 
-        if es_version["major"] <= 7 and es_version["minor"] < 5:
-            # Skip Enrich metricset system test for Elasticsearch versions < 7.5.0 as Enrich Stats
-            # API endpoint is not available
+        if not self.is_enrich_available()
             raise SkipTest("elasticsearch/enrich metricset system test only valid with Elasticsearch versions >= 7.5.0")
+
+    def is_ccr_available(self):
+        es_version = self.get_version()
+        major = es_version["major"]
+        minor = es_version["minor"]
+
+        return major > 6 or (major == 6 and minor >= 5)
+
+    def is_enrich_available(self):
+        es_version = self.get_version()
+        major = es_version["major"]
+        minor = es_version["minor"]
+
+        return major > 7 or (major == 7 and minor >= 5)
 
     def get_version(self):
         es_info = self.es.info()
