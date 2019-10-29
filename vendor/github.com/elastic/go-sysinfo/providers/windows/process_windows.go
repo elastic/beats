@@ -304,18 +304,18 @@ func (p *process) User() (types.UserInfo, error) {
 		return types.UserInfo{}, errors.Wrap(err, "GetTokenUser failed")
 	}
 
-	sid, err := tokenUser.User.Sid.String()
-	if err != nil {
-		return types.UserInfo{}, errors.Wrap(err, "failed to look up user SID")
+	sid := tokenUser.User.Sid.String()
+	if sid == "" {
+		return types.UserInfo{}, errors.New("failed to look up user SID")
 	}
 
 	tokenGroup, err := accessToken.GetTokenPrimaryGroup()
 	if err != nil {
 		return types.UserInfo{}, errors.Wrap(err, "GetTokenPrimaryGroup failed")
 	}
-	gsid, err := tokenGroup.PrimaryGroup.String()
-	if err != nil {
-		return types.UserInfo{}, errors.Wrap(err, "failed to look up primary group SID")
+	gsid := tokenGroup.PrimaryGroup.String()
+	if gsid == "" {
+		return types.UserInfo{}, errors.New("failed to look up primary group SID")
 	}
 
 	return types.UserInfo{
