@@ -206,7 +206,7 @@ func findIdentifierFromARN(resourceARN string) (string, error) {
 	}
 
 	if len(resourceARNSplit) <= 1 {
-		return strings.Join(resourceARNSplit, "/"), nil
+		return resourceARNSplit[0], nil
 	}
 	return strings.Join(resourceARNSplit[1:], "/"), nil
 }
