@@ -3,20 +3,32 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "AvailabilityZone": "us-east-1c"
+                "LoadBalancer": "net/ece-es-clusters-nlb/0c5bdb3b96cf1552"
             },
-            "namespace": "AWS/ELB"
+            "namespace": "AWS/NetworkELB"
         },
         "metrics": {
-            "BackendConnectionErrors": {
-                "sum": 10
+            "ConsumedLCUs": {
+                "avg": 0
             },
-            "HealthyHostCount": {
-                "max": 2
+            "NewFlowCount": {
+                "sum": 0
             },
-            "UnHealthyHostCount": {
-                "max": 1
+            "ProcessedBytes": {
+                "sum": 0
+            },
+            "TCP_Client_Reset_Count": {
+                "sum": 0
+            },
+            "TCP_ELB_Reset_Count": {
+                "sum": 3
+            },
+            "TCP_Target_Reset_Count": {
+                "sum": 0
             }
+        },
+        "tags": {
+            "dept": "ece-es"
         }
     },
     "cloud": {
@@ -25,7 +37,7 @@
             "name": "elastic-test"
         },
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "eu-central-1"
     },
     "event": {
         "dataset": "aws.elb",
