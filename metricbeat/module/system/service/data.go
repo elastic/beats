@@ -106,6 +106,12 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 	if childData {
 		event.RootFields["process"] = childProc
 	}
+	if props.IPAccounting {
+		event.RootFields["network"] = common.MapStr{
+			"packets": props.IPIngressPackets + props.IPEgressPackets,
+			"bytes":   props.IPIngressBytes + props.IPEgressBytes,
+		}
+	}
 	event.RootFields["systemd"] = common.MapStr{
 		"unit":          unit.Name,
 		"fragment_path": props.FragmentPath,
@@ -119,7 +125,7 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 // getMetricsFromServivce checks what accounting we have enabled and uses that to determine what metrics we can send back to the user
 func getMetricsFromServivce(props Properties) common.MapStr {
 	metrics := common.MapStr{}
-	//This error checking is because we don't _quite_ trust the maps we get back from the API.
+
 	if props.CPUAccounting {
 		metrics["cpu"] = common.MapStr{
 			"usage": common.MapStr{
