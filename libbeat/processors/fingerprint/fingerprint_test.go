@@ -374,7 +374,7 @@ func TestInvalidConfig(t *testing.T) {
 				"fields":   []string{"doesnt", "matter"},
 				"encoding": "non_existent",
 			},
-			"failed to unpack fingerprint processor configuration: invalid encoding method [non_existent]",
+			"failed to unpack fingerprint processor configuration: invalid encoding [non_existent] accessing 'encoding'",
 		},
 	}
 
