@@ -20,6 +20,8 @@ package main
 import (
 	"flag"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/tests/system/template"
 )
 
 var systemTest *bool
@@ -36,4 +38,8 @@ func TestSystem(t *testing.T) {
 	if *systemTest {
 		main()
 	}
+}
+
+func TestTemplate(t *testing.T) {
+	template.TestTemplate(t, "mockbeat")
 }

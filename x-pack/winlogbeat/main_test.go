@@ -1,26 +1,26 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-
 package main
 
+// This file is mandatory as otherwise the winlogbeat.test binary is not generated correctly.
 import (
 	"flag"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/tests/system/template"
+	"github.com/elastic/beats/x-pack/winlogbeat/cmd"
 )
 
 var systemTest *bool
 
 func init() {
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-
-	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 }
 
-// Test started when the test binary is started
+// Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
 	if *systemTest {
 		main()
@@ -28,5 +28,5 @@ func TestSystem(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, "mockbeat")
+	template.TestTemplate(t, cmd.Name)
 }
