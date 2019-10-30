@@ -124,6 +124,10 @@ class Test(BaseTest):
                 proc.check_kill_and_wait()
 
             self.assert_last_status(expected_status)
+            if expected_status == "down":
+                nose.tools.eq_(self.last_output_line()["http.response.body.content"], body)
+            else:
+                assert not self.last_output_line().has_key("http.response.body.content")
         finally:
             server.shutdown()
 

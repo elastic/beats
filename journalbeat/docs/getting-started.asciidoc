@@ -128,12 +128,12 @@ If no paths are specified, {beatname_uc} reads from the default journal.
 {beatname_uc} starts reading at the beginning of the file, but continues reading
 at the last known position after a reload or restart. For more detail about
 the settings, see the reference docs for the
-<<seek,`seek` option>>. 
+<<seek,`seek` option>>.
 
 . (Optional) Set the <<include-matches,`include_matches`>> option
 to filter entries in journald before collecting any log events. This reduces the
 number of events that {beatname_uc} needs to process. For example, to fetch only
-Redis events from a Docker container tagged as `redis`, use: 
+Redis events from a Docker container tagged as `redis`, use:
 +
 ["source","sh",subs="attributes"]
 ----
@@ -206,9 +206,12 @@ _{kibana-ref}/index.html[{kib} User Guide]_.
 [role="xpack"]
 ==== Want to tail logs in real time?
 
-Use the {infra-guide}/logs-ui-overview.html[Logs UI] in {kib}. The UI shows logs
+Use the Logs app in {kib}.
+For more details, see the {logs-guide}[Logs Monitoring Guide].
+
+The Logs app shows logs
 from `filebeat-*` indices by default. To show {beatname_uc} indices, configure
-the source to include `journalbeat-*`. You can do this in the Logs UI when you
+the source to include `journalbeat-*`. You can do this in the Logs app when you
 configure the source, or you can modify the {kib} configuration. For example:
 
 [source,yaml]

@@ -40,6 +40,7 @@ const (
 	includeLines = "include_lines"
 	excludeLines = "exclude_lines"
 	processors   = "processors"
+	json         = "json"
 )
 
 // validModuleNames to sanitize user input
@@ -126,6 +127,9 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		tempCfg.Put(processors, procs)
 	}
 
+	if jsonOpts := l.getJSONOptions(hints); len(jsonOpts) != 0 {
+		tempCfg.Put(json, jsonOpts)
+	}
 	// Merge config template with the configs from the annotations
 	if err := config.Merge(tempCfg); err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
@@ -185,6 +189,10 @@ func (l *logHints) getInputs(hints common.MapStr) []common.MapStr {
 
 func (l *logHints) getProcessors(hints common.MapStr) []common.MapStr {
 	return builder.GetProcessors(hints, l.config.Key)
+}
+
+func (l *logHints) getJSONOptions(hints common.MapStr) common.MapStr {
+	return builder.GetHintMapStr(hints, l.config.Key, json)
 }
 
 type filesetConfig struct {

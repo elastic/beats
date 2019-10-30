@@ -11,8 +11,8 @@ beta[]
 =======================================
 When you use central management, configurations are stored centrally in {es}. To
 prevent an attacker from leveraging the configurations to attack your
-infrastructure, you must {es}/elasticsearch-security.html[secure {es} and
-{kib}] before using central management.
+infrastructure, you must secure {es} and {kib} before using central management.
+See {ref}/secure-cluster.html[Secure a cluster].
 =======================================
 
 {beats} central management provides a way to define and manage configurations in
