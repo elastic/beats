@@ -238,6 +238,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change kubernetes.event.message to text. {pull}13964[13964]
 - Fix performance counter values for windows/perfmon metricset. {issue}14036[14036] {pull}14039[14039]
 - Add FailOnRequired when applying schema and fix metric names in mongodb metrics metricset. {pull}14143[14143]
+- Limit some of the error messages to the logs only {issue}14317[14317] {pull}14327[14327]
 - Convert indexed ms-since-epoch timestamp fields in `elasticsearch/ml_job` metricset to ints from float64s. {issue}14220[14220] {pull}14222[14222]
 - Fix ARN parsing function to work for ELB ARNs. {pull}14316[14316]
 
