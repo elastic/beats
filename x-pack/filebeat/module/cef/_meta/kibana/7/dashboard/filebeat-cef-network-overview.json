@@ -421,8 +421,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzIwLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMDcsMV0="
     },
     {
       "attributes": {
@@ -472,18 +472,18 @@
       },
       "id": "f5258de9-71f7-410f-b713-201007f77470",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzIxLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMDgsMV0="
     },
     {
       "attributes": {
@@ -595,12 +595,12 @@
       },
       "id": "0abfc226-535b-45a2-b534-e9bc87e5584f",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzIyLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMDksMV0="
     },
     {
       "attributes": {
@@ -766,12 +766,12 @@
       },
       "id": "a97e3628-022b-46cf-8f29-a73cf9bb4e26",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzIzLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTAsMV0="
     },
     {
       "attributes": {
@@ -928,12 +928,12 @@
       },
       "id": "499f50ba-2f84-4f7c-9021-73a4efc47921",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI0LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTEsMV0="
     },
     {
       "attributes": {
@@ -1056,18 +1056,18 @@
       },
       "id": "d061c7a9-7f92-4bf4-b35c-499b9f4b987a",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI1LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTIsMV0="
     },
     {
       "attributes": {
@@ -1207,18 +1207,18 @@
       },
       "id": "b1002b5c-08fc-4bbe-b9a0-6243a8637e60",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI2LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTMsMV0="
     },
     {
       "attributes": {
@@ -1358,18 +1358,18 @@
       },
       "id": "df056709-2deb-4363-ae7a-b0148ea456c6",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI3LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTQsMV0="
     },
     {
       "attributes": {
@@ -1476,18 +1476,18 @@
       },
       "id": "e89a64e8-928c-41fc-8745-3c8157b21cdb",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI4LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTUsMV0="
     },
     {
       "attributes": {
@@ -1584,18 +1584,18 @@
       },
       "id": "a729c249-8d34-4eb1-bbb0-5d25cf224114",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI5LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTYsMV0="
     },
     {
       "attributes": {
@@ -1645,18 +1645,18 @@
       },
       "id": "3c19f138-2ab3-4ecb-bb1b-86fb90158042",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzMwLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTcsMV0="
     },
     {
       "attributes": {
@@ -1797,12 +1797,12 @@
       },
       "id": "e513c269-350c-40c3-ac20-16c5782103b8",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzMxLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTgsMV0="
     },
     {
       "attributes": {
@@ -1898,18 +1898,18 @@
       },
       "id": "8f6075c5-f525-4173-92a4-3a56e96e362d",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzMyLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMTksMV0="
     },
     {
       "attributes": {
@@ -1959,18 +1959,18 @@
       },
       "id": "013ff153-7b80-490b-8fec-6e56cba785ed",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzMzLDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMjAsMV0="
     },
     {
       "attributes": {
@@ -2001,7 +2001,7 @@
             ],
             "bar_color_rules": [
               {
-                "id": "be3536c4-439c-480c-a097-058621109c1e"
+                "id": "8d4596c5-49ad-429b-af54-5451b1c2e8d4"
               }
             ],
             "filter": {
@@ -2034,11 +2034,11 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "id": "f3f94178-9925-4dca-8a75-d25677614574",
+                    "id": "ba1830b9-9ce3-4bf1-8f4d-f7478b7f1bba",
                     "type": "count"
                   },
                   {
-                    "field": "f3f94178-9925-4dca-8a75-d25677614574",
+                    "field": "ba1830b9-9ce3-4bf1-8f4d-f7478b7f1bba",
                     "id": "ca3a65d0-9f3d-42a9-9f4e-16f9e24cba19",
                     "type": "cumulative_sum"
                   },
@@ -2053,7 +2053,7 @@
                     "beta": 0.1,
                     "field": "6db67bc1-7fff-47e7-a931-f797b1f76732",
                     "gamma": 0.3,
-                    "id": "2044cbae-1a0f-4106-87f8-8ab9a8d8179e",
+                    "id": "92bc1447-2b30-498c-ae8a-c67904fc82b2",
                     "model_type": "simple",
                     "multiplicative": false,
                     "period": 1,
@@ -2078,12 +2078,12 @@
       },
       "id": "33747d52-ec4c-4d91-86d8-fbdf9b9c82db",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzM0LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzgsMV0="
     },
     {
       "attributes": {
@@ -2113,12 +2113,12 @@
       },
       "id": "c394e650-b16c-407c-b305-bd409d69d433",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzE0LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMjIsMV0="
     },
     {
       "attributes": {
@@ -2192,18 +2192,18 @@
       },
       "id": "8b31af8b-522e-41fe-b9d6-9a3451b54108",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzM1LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMjMsMV0="
     },
     {
       "attributes": {
@@ -2277,18 +2277,18 @@
       },
       "id": "4fccee0c-7193-4aa8-919f-0b0b0a16d013",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
-          "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+          "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
           "name": "search_0",
           "type": "search"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzM2LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMjQsMV0="
     },
     {
       "attributes": {
@@ -2334,7 +2334,7 @@
         "title": "Network Events [Filebeat CEF]",
         "version": 1
       },
-      "id": "082f151f-c9e5-4203-8180-77629fe8e5c3",
+      "id": "68202a5c-c8f2-432f-8c08-04fbfacb95c8",
       "migrationVersion": {
         "search": "7.4.0"
       },
@@ -2346,9 +2346,9 @@
         }
       ],
       "type": "search",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "Wzc3LDFd"
+      "updated_at": "2019-10-25T16:30:05.361Z",
+      "version": "WzEzMjUsMV0="
     }
   ],
-  "version": "8.0.0-SNAPSHOT"
+  "version": "7.4.1"
 }

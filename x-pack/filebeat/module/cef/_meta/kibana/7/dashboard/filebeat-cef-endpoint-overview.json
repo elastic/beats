@@ -376,8 +376,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzYyLDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyNzcsMV0="
     },
     {
       "attributes": {
@@ -477,12 +477,12 @@
       },
       "id": "9457ee67-895f-4b78-a543-268f9687a745",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzYzLDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyNzgsMV0="
     },
     {
       "attributes": {
@@ -613,7 +613,7 @@
       },
       "id": "fe7b63d1-dbc7-4376-af7f-ace97a9f2e60",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -623,8 +623,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzY0LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyNzksMV0="
     },
     {
       "attributes": {
@@ -763,7 +763,7 @@
       },
       "id": "89998099-9a39-44cf-beba-5b97f0524cf9",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -773,8 +773,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzY1LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODAsMV0="
     },
     {
       "attributes": {
@@ -902,12 +902,12 @@
       },
       "id": "718b074e-3dd1-4d03-ba11-7f869cdcd703",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzY2LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODEsMV0="
     },
     {
       "attributes": {
@@ -956,7 +956,7 @@
       },
       "id": "c5120e27-1f8c-41e3-83ee-78ec4d470c2f",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -966,8 +966,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzY3LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODIsMV0="
     },
     {
       "attributes": {
@@ -1090,7 +1090,7 @@
       },
       "id": "7454c034-c5f3-48fe-8fce-ef4385c80350",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1100,8 +1100,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzY4LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODMsMV0="
     },
     {
       "attributes": {
@@ -1239,7 +1239,7 @@
       },
       "id": "118af639-1f37-4541-a960-5a3ff0613e0e",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1249,8 +1249,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzY5LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODQsMV0="
     },
     {
       "attributes": {
@@ -1300,8 +1300,8 @@
         }
       ],
       "type": "search",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzcwLDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODUsMV0="
     },
     {
       "attributes": {
@@ -1350,7 +1350,7 @@
       },
       "id": "74d2c072-6dfd-4249-8e63-dc7b0cf3c960",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1360,8 +1360,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzcxLDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODYsMV0="
     },
     {
       "attributes": {
@@ -1424,7 +1424,7 @@
       },
       "id": "f57734dd-0f32-42b4-94dd-5d597f6735e1",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1434,8 +1434,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzcyLDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODcsMV0="
     },
     {
       "attributes": {
@@ -1530,7 +1530,7 @@
       },
       "id": "295986d4-d2ea-4541-8e82-7dc95c0cd830",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1540,8 +1540,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzczLDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODgsMV0="
     },
     {
       "attributes": {
@@ -1630,7 +1630,7 @@
       },
       "id": "5bf6e4dc-4273-4e1e-a803-04347eebeb53",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1640,8 +1640,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "Wzc0LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyODksMV0="
     },
     {
       "attributes": {
@@ -1671,12 +1671,12 @@
       },
       "id": "677891a1-90c4-4273-b126-f0e54689bd76",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzE0LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzYsMV0="
     },
     {
       "attributes": {
@@ -1747,7 +1747,7 @@
       },
       "id": "aaa80503-6d96-4a33-806f-b8a10aefe696",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1757,9 +1757,9 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "Wzc1LDFd"
+      "updated_at": "2019-10-25T16:30:03.318Z",
+      "version": "WzEyOTEsMV0="
     }
   ],
-  "version": "8.0.0-SNAPSHOT"
+  "version": "7.4.1"
 }

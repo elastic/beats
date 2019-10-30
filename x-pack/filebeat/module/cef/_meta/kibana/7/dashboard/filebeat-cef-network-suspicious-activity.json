@@ -304,8 +304,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzUzLDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMjYsMV0="
     },
     {
       "attributes": {
@@ -473,7 +473,7 @@
       },
       "id": "fa8b26c1-6973-4381-adb3-bcde0d03a520",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -483,8 +483,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzU0LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMjcsMV0="
     },
     {
       "attributes": {
@@ -560,7 +560,7 @@
       },
       "id": "82f3fae3-1189-4f04-8ea5-47fde1d2e7b1",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -570,8 +570,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzU1LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMjgsMV0="
     },
     {
       "attributes": {
@@ -647,7 +647,7 @@
       },
       "id": "f03d734b-b85c-4e99-9c0e-9c89716a81f3",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -657,8 +657,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzU2LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMjksMV0="
     },
     {
       "attributes": {
@@ -758,12 +758,12 @@
       },
       "id": "9bef4db9-a8b2-4be8-b2b0-6ea02fab424d",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzU3LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzAsMV0="
     },
     {
       "attributes": {
@@ -903,7 +903,7 @@
       },
       "id": "fff249b2-18b6-4b48-bcf7-dd4595d111e7",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -913,8 +913,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI2LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzEsMV0="
     },
     {
       "attributes": {
@@ -1051,12 +1051,12 @@
       },
       "id": "d02dd523-ce91-40e9-9209-83797f80ed45",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzU4LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzIsMV0="
     },
     {
       "attributes": {
@@ -1106,7 +1106,7 @@
       },
       "id": "589fec8c-336e-4122-8fef-a450bddf84f6",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1116,8 +1116,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzU5LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzMsMV0="
     },
     {
       "attributes": {
@@ -1167,7 +1167,7 @@
       },
       "id": "86bd5f13-ca6b-43fa-b209-54e7460344bb",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1177,8 +1177,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzYwLDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzQsMV0="
     },
     {
       "attributes": {
@@ -1228,7 +1228,7 @@
       },
       "id": "1204cf27-05e0-4905-bfa1-688aaaaaa840",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1238,8 +1238,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzYxLDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzUsMV0="
     },
     {
       "attributes": {
@@ -1269,12 +1269,12 @@
       },
       "id": "677891a1-90c4-4273-b126-f0e54689bd76",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzE0LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzYsMV0="
     },
     {
       "attributes": {
@@ -1397,7 +1397,7 @@
       },
       "id": "01c3618c-9962-4fe9-b9c5-f73dfecc6eba",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [
         {
@@ -1407,8 +1407,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzI1LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzcsMV0="
     },
     {
       "attributes": {
@@ -1516,12 +1516,12 @@
       },
       "id": "33747d52-ec4c-4d91-86d8-fbdf9b9c82db",
       "migrationVersion": {
-        "visualization": "7.3.0"
+        "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "WzM0LDFd"
+      "updated_at": "2019-10-25T16:30:06.345Z",
+      "version": "WzEzMzgsMV0="
     },
     {
       "attributes": {
@@ -1546,14 +1546,36 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [],
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "query",
+                  "negate": false,
+                  "type": "custom",
+                  "value": "{\"terms\":{\"cef.extensions.categoryDeviceGroup\":[\"/VPN\",\"/IDS/Network\",\"/Firewall\"]}}"
+                },
+                "query": {
+                  "terms": {
+                    "cef.extensions.categoryDeviceGroup": [
+                      "/VPN",
+                      "/IDS/Network",
+                      "/Firewall"
+                    ]
+                  }
+                }
+              }
+            ],
             "highlightAll": true,
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\""
-              }
+              "language": "lucene",
+              "query": ""
             },
             "version": true
           }
@@ -1576,12 +1598,17 @@
           "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
         }
       ],
       "type": "search",
-      "updated_at": "2019-09-06T00:51:22.848Z",
-      "version": "Wzc3LDFd"
+      "updated_at": "2019-10-25T16:31:42.748Z",
+      "version": "WzE0NzMsMV0="
     }
   ],
-  "version": "8.0.0-SNAPSHOT"
+  "version": "7.4.1"
 }

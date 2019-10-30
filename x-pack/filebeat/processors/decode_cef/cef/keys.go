@@ -654,6 +654,6 @@ var extensionMapping = map[string]mappedField{
 	},
 	"mrt": {
 		Target: "managerReceiptTime",
-		Type: TimestampType,
+		Type:   TimestampType,
 	},
 }
