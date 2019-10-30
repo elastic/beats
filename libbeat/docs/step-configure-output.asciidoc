@@ -14,8 +14,8 @@ ifdef::no-output-logstash[]
 endif::[]
 endif::has_module_steps[]
 * If you're running our
-https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service]
-on Elastic Cloud, specify your <<configure-cloud-id,Cloud ID>>. For example:
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}]
+on {ecloud}, specify your <<configure-cloud-id,Cloud ID>>. For example:
 +
 [source,yaml]
 ----------------------------------------------------------------------

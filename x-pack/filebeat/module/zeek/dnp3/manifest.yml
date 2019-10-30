@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/dnp3.log
+    os.linux:
+      - /var/log/bro/current/dnp3.log
+    os.darwin:
+      - /usr/local/var/logs/current/dnp3.log
+  - name: tags
+    default: [zeek.dnp3]
+  - name: community_id
+    default: true
+
+ingest_pipeline: ingest/pipeline.json
+input: config/dnp3.yml

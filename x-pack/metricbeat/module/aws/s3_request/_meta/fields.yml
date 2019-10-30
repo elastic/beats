@@ -2,7 +2,7 @@
   type: group
   description: >
     `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
-  release: beta
+  release: ga
   fields:
     - name: requests.total
       type: long

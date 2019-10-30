@@ -65,7 +65,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -131,7 +132,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -197,7 +199,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -263,7 +266,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -329,7 +333,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -395,7 +400,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -461,7 +467,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -527,7 +534,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -593,7 +601,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -659,7 +668,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -725,7 +735,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -791,7 +802,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -857,7 +869,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -923,7 +936,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -989,7 +1003,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1055,7 +1070,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1121,7 +1137,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1187,7 +1204,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1253,7 +1271,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1319,7 +1338,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1385,7 +1405,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1451,7 +1472,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1517,7 +1539,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1583,7 +1606,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1649,7 +1673,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1715,7 +1740,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1781,7 +1807,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1847,7 +1874,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
@@ -1913,7 +1941,8 @@
           "ip": "10.101.255.2"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }
