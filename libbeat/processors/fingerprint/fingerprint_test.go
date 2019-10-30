@@ -247,6 +247,58 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 	}
 }
 
+func TestTargetField(t *testing.T) {
+	testEvent := &beat.Event{
+		Fields: common.MapStr{
+			"field1": "foo",
+			"nested": common.MapStr{
+				"field": "bar",
+			},
+			"unused_field": "baz",
+		},
+		Timestamp: time.Now(),
+	}
+
+	expectedFingerprint := "4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144"
+
+	tests := []struct {
+		name        string
+		targetField string
+	}{
+		{
+			"root-level target field",
+			"target_field",
+		},
+		{
+			"nested target field",
+			"nested.target_field",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testConfig, err := common.NewConfigFrom(common.MapStr{
+				"fields":       []string{"field1"},
+				"target_field": test.targetField,
+			})
+			assert.NoError(t, err)
+
+			p, err := New(testConfig)
+			assert.NoError(t, err)
+
+			newEvent, err := p.Run(testEvent)
+			assert.NoError(t, err)
+
+			v, err := newEvent.GetValue(test.targetField)
+			assert.NoError(t, err)
+			assert.Equal(t, expectedFingerprint, v)
+
+			_, err = newEvent.GetValue("fingerprint")
+			assert.EqualError(t, err, common.ErrKeyNotFound.Error())
+		})
+	}
+}
+
 func TestSourceFieldErrors(t *testing.T) {
 	testEvent := &beat.Event{
 		Fields: common.MapStr{
