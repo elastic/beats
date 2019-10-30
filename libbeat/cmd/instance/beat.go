@@ -882,7 +882,7 @@ func (b *Beat) setupMonitoring(settings Settings) error {
 		return err
 	}
 
-	monitoringClusterUUID, err := monitoring.GetMonitoringClusterUUID(monitoringCfg)
+	monitoringClusterUUID, err := monitoring.GetClusterUUID(monitoringCfg)
 	if err != nil {
 		return err
 	}

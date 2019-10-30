@@ -102,8 +102,8 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 	}
 }
 
-// GetMonitoringClusterUUID returns the value of the monitoring.cluster_uuid setting, if it is set.
-func GetMonitoringClusterUUID(monitoringCfg *common.Config) (string, error) {
+// GetClusterUUID returns the value of the monitoring.cluster_uuid setting, if it is set.
+func GetClusterUUID(monitoringCfg *common.Config) (string, error) {
 	if monitoringCfg == nil {
 		return "", nil
 	}
