@@ -1,3 +1,5 @@
+{{ if eq .input "kafka" }}
+
 type: kafka
 hosts: {{ .namespace }}
 topics: {{ .eventhub }}
@@ -7,3 +9,15 @@ expand_event_list_from_field: "records"
 username: "$ConnectionString"
 password: {{ .connection_string }}
 ssl.enabled: true
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+    {{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
