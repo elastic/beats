@@ -45,16 +45,15 @@ func TestFormProps(t *testing.T) {
 	event, err := formProperties(testUnit, testprops)
 	assert.NoError(t, err)
 
-	testOut := common.MapStr{
-		"active_state": "active",
-		"exec_code":    "exited",
-		"exec_rc":      int32(0),
-		"load_state":   "loaded",
-		"name":         "test.service",
-		"resources":    common.MapStr{},
-		"state_since":  time.Unix(0, 1571850129000000*1000),
-		"sub_state":    "running",
+	testEvent := common.MapStr{
+		"state":       "active",
+		"exec_code":   "exited",
+		"load_state":  "loaded",
+		"name":        "test.service",
+		"resources":   common.MapStr{},
+		"state_since": time.Unix(0, 1571850129000000*1000),
+		"sub_state":   "running",
 	}
 
-	assert.Equal(t, testOut, event)
+	assert.Equal(t, testEvent, event.MetricSetFields)
 }

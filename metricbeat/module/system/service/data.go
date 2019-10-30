@@ -111,6 +111,8 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 		"fragment_path": props.FragmentPath,
 	}
 
+	event.MetricSetFields = msData
+
 	return event, nil
 }
 
