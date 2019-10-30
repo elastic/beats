@@ -111,7 +111,7 @@
       {
           "rename": {
               "field": "azure.signinlogs.correlationId",
-              "target_field": "azure.signinlogs.correlation_id",
+              "target_field": "azure.correlation_id",
               "ignore_missing": true
           }
       },

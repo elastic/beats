@@ -103,7 +103,7 @@
       {
           "rename": {
               "field": "azure.auditlogs.correlationId",
-              "target_field": "azure.auditlogs.correlation_id",
+              "target_field": "azure.correlation_id",
               "ignore_missing": true
           }
       },
