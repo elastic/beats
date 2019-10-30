@@ -30,63 +30,55 @@ import (
 )
 
 func TestBuildProcessorList(t *testing.T) {
-	testCases := []struct {
-		description    string
+	testCases := map[string]struct {
 		beatInfo       beat.Info
 		configStr      string
 		clientCfg      beat.ClientConfig
 		event          beat.Event
 		expectedFields map[string]string
 	}{
-		{
-			description: "Simple static index",
-			configStr:   "index: 'test'",
+		"Simple static index": {
+			configStr: "index: 'test'",
 			expectedFields: map[string]string{
-				"@metadata.raw-index": "test",
+				"@metadata.raw_index": "test",
 			},
 		},
-		{
-			description: "Index with agent info + timestamp",
-			beatInfo:    beat.Info{Beat: "TestBeat", Version: "3.9.27"},
-			configStr:   "index: 'beat-%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}'",
-			event:       beat.Event{Timestamp: time.Date(1999, time.December, 31, 23, 0, 0, 0, time.UTC)},
+		"Index with agent info + timestamp": {
+			beatInfo:  beat.Info{Beat: "TestBeat", Version: "3.9.27"},
+			configStr: "index: 'beat-%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}'",
+			event:     beat.Event{Timestamp: time.Date(1999, time.December, 31, 23, 0, 0, 0, time.UTC)},
 			expectedFields: map[string]string{
-				"@metadata.raw-index": "beat-TestBeat-3.9.27-1999.12.31",
+				"@metadata.raw_index": "beat-TestBeat-3.9.27-1999.12.31",
 			},
 		},
-		{
-			description: "Set index in ClientConfig",
+		"Set index in ClientConfig": {
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(&setRawIndex{"clientCfgIndex"}),
 				},
 			},
 			expectedFields: map[string]string{
-				"@metadata.raw-index": "clientCfgIndex",
+				"@metadata.raw_index": "clientCfgIndex",
 			},
 		},
-		{
-			description: "ClientConfig processor runs after beat input Index",
-			configStr:   "index: 'test'",
+		"ClientConfig processor runs after beat input Index": {
+			configStr: "index: 'test'",
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(&setRawIndex{"clientCfgIndex"}),
 				},
 			},
 			expectedFields: map[string]string{
-				"@metadata.raw-index": "clientCfgIndex",
+				"@metadata.raw_index": "clientCfgIndex",
 			},
 		},
-		{
-			description: "Set field in input config",
-			configStr: `processors:
-- add_fields: {fields: {testField: inputConfig}}`,
+		"Set field in input config": {
+			configStr: `processors: [add_fields: {fields: {testField: inputConfig}}]`,
 			expectedFields: map[string]string{
 				"fields.testField": "inputConfig",
 			},
 		},
-		{
-			description: "Set field in ClientConfig",
+		"Set field in ClientConfig": {
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
@@ -98,10 +90,8 @@ func TestBuildProcessorList(t *testing.T) {
 				"fields.testField": "clientConfig",
 			},
 		},
-		{
-			description: "Input config processors run after ClientConfig",
-			configStr: `processors:
-- add_fields: {fields: {testField: inputConfig}}`,
+		"Input config processors run after ClientConfig": {
+			configStr: `processors: [add_fields: {fields: {testField: inputConfig}}]`,
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
@@ -114,18 +104,18 @@ func TestBuildProcessorList(t *testing.T) {
 			},
 		},
 	}
-	for _, test := range testCases {
+	for description, test := range testCases {
 		if test.event.Fields == nil {
 			test.event.Fields = common.MapStr{}
 		}
 		config, err := outletConfigFromString(test.configStr)
 		if err != nil {
-			t.Errorf("[%s] %v", test.description, err)
+			t.Errorf("[%s] %v", description, err)
 			continue
 		}
 		processors, err := buildProcessorList(test.beatInfo, config, test.clientCfg)
 		if err != nil {
-			t.Errorf("[%s] %v", test.description, err)
+			t.Errorf("[%s] %v", description, err)
 			continue
 		}
 		processedEvent, err := processors.Run(&test.event)
@@ -136,7 +126,7 @@ func TestBuildProcessorList(t *testing.T) {
 		for key, value := range test.expectedFields {
 			field, err := processedEvent.GetValue(key)
 			if err != nil {
-				t.Errorf("[%s] Couldn't get field %s from event: %v", test.description, key, err)
+				t.Errorf("[%s] Couldn't get field %s from event: %v", description, key, err)
 				continue
 			}
 			assert.Equal(t, field, value)
@@ -144,17 +134,17 @@ func TestBuildProcessorList(t *testing.T) {
 			if !ok {
 				// Note that requiring a string here is just to simplify the test setup,
 				// not a requirement of the underlying api.
-				t.Errorf("[%s] Field [%s] should be a string", test.description, key)
+				t.Errorf("[%s] Field [%s] should be a string", description, key)
 				continue
 			}
 			if fieldStr != value {
-				t.Errorf("[%s] Event field [%s]: expected [%s], got [%s]", test.description, key, value, fieldStr)
+				t.Errorf("[%s] Event field [%s]: expected [%s], got [%s]", description, key, value, fieldStr)
 			}
 		}
 	}
 }
 
-// setRawIndex is a bare-bones processor to set the raw-index field to a
+// setRawIndex is a bare-bones processor to set the raw_index field to a
 // constant string in the event metadata. It is used to test order of operations
 // for buildProcessorList.
 type setRawIndex struct {
@@ -165,7 +155,7 @@ func (p *setRawIndex) Run(event *beat.Event) (*beat.Event, error) {
 	if event.Meta == nil {
 		event.Meta = common.MapStr{}
 	}
-	event.Meta["raw-index"] = p.indexStr
+	event.Meta["raw_index"] = p.indexStr
 	return event, nil
 }
 

@@ -367,8 +367,8 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	// This is functionally identical to Meta["alias"], returning the overriding
 	// metadata as the index name if present. It is currently used by Filebeat
 	// to send the index for particular inputs to formatted string templates,
-	// which are then expanded by a processor to the "raw-index" field.
-	if tmp := evt.Meta["raw-index"]; tmp != nil {
+	// which are then expanded by a processor to the "raw_index" field.
+	if tmp := evt.Meta["raw_index"]; tmp != nil {
 		if idx, ok := tmp.(string); ok {
 			return idx
 		}

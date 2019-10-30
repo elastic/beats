@@ -34,6 +34,14 @@ type pipelineConnector struct {
 	pipeline beat.Pipeline
 }
 
+// addFormattedIndex is a Processor to set an event's "raw_index" metadata field
+// with a given TimestampFormatString. The elasticsearch output interprets
+// that field as specifying the (raw string) index the event should be sent to;
+// in other outputs it is just included in the metadata.
+type addFormattedIndex struct {
+	formatString *fmtstr.TimestampFormatString
+}
+
 // Connect passes the cfg and the zero value of beat.ClientConfig to the underlying function.
 func (fn ConnectorFunc) Connect(cfg *common.Config) (Outleter, error) {
 	return fn(cfg, beat.ClientConfig{})
@@ -141,16 +149,6 @@ func buildProcessorList(
 	return procs, nil
 }
 
-//////////////////////////////
-// addFormattedIndex is a Processor to set an event's "raw-index" metadata field
-// with a given TimestampFormatString. The elasticsearch output interprets
-// that field as specifying the (raw string) index the event should be sent to;
-// in other outputs it is just included in the metadata.
-
-type addFormattedIndex struct {
-	formatString *fmtstr.TimestampFormatString
-}
-
 func (p *addFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 	index, err := p.formatString.Run(event.Timestamp)
 	if err != nil {
@@ -160,7 +158,7 @@ func (p *addFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 	if event.Meta == nil {
 		event.Meta = common.MapStr{}
 	}
-	event.Meta["raw-index"] = index
+	event.Meta["raw_index"] = index
 	return event, nil
 }
 
