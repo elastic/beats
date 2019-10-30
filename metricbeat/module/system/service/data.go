@@ -196,13 +196,9 @@ func timeSince(props Properties, state string) (int64, error) {
 	//normally we would want to check these values before we cast,
 	//but checking the state before we access `props` insures the values will be there.
 	switch state {
-	case "active":
-		fallthrough
-	case "reloading":
+	case "reloading", "active":
 		ts = props.ActiveEnterTimestamp
-	case "inactive":
-		fallthrough
-	case "failed":
+	case "failed", "inactive":
 		ts = props.InactiveEnterTimestamp
 	case "activating":
 		ts = props.InactiveExitTimestamp
