@@ -102,6 +102,7 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 	}
 }
 
+// GetMonitoringClusterUUID returns the value of the monitoring.cluster_uuid setting, if it is set.
 func GetMonitoringClusterUUID(monitoringCfg *common.Config) (string, error) {
 	if monitoringCfg == nil {
 		return "", nil
@@ -117,6 +118,7 @@ func GetMonitoringClusterUUID(monitoringCfg *common.Config) (string, error) {
 	return config.ClusterUUID, nil
 }
 
+// IsEnabled returns whether the monitoring reporter is enabled or not.
 func IsEnabled(monitoringCfg *common.Config) bool {
 	if monitoringCfg == nil {
 		return false
