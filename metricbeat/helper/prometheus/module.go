@@ -56,6 +56,6 @@ type prometheusMetricSet struct {
 	mapping    *MetricsMapping
 }
 
-func (m *prometheusMetricSet) Fetch(r mb.ReporterV2) {
-	m.prometheus.ReportProcessedMetrics(m.mapping, r)
+func (m *prometheusMetricSet) Fetch(r mb.ReporterV2) error {
+	return m.prometheus.ReportProcessedMetrics(m.mapping, r)
 }

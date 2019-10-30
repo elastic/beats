@@ -76,6 +76,7 @@ filebeat.{{input_config | default("inputs")}}:
     {% if json.overwrite_keys %}overwrite_keys: true{% endif %}
     {% if json.add_error_key %}add_error_key: true{% endif %}
     {% if json.ignore_decoding_error %}ignore_decoding_error: true{% endif %}
+    {% if json.document_id %}document_id: {{json.document_id}}{% endif %}
   {% endif %}
 
   {% if multiline %}

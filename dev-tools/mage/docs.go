@@ -122,14 +122,14 @@ func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {
 
 	// Render HTML.
 	htmlDir := CWD("build/html_docs", params.name)
+	buildDocsScript := filepath.Join(cloneDir, "build_docs")
 	args := []string{
-		filepath.Join(cloneDir, "build_docs.pl"),
 		"--chunk=1",
 		"--doc", params.indexFile,
 		"--out", htmlDir,
 	}
 	fmt.Println(">> Building HTML docs at", filepath.Join(htmlDir, "index.html"))
-	if err := sh.Run("perl", args...); err != nil {
+	if err := sh.Run(buildDocsScript, args...); err != nil {
 		return err
 	}
 

@@ -18,6 +18,8 @@
 package state_cronjob
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -74,12 +76,10 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // module rooted fields at the event that gets reported
 //
 // Copied from other kube state metrics.
-func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
 	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error getting metrics")
 	}
 
 	for _, event := range events {
@@ -98,10 +98,9 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
 			ModuleFields:    moduleFieldsMapStr,
 			Namespace:       "kubernetes.cronjob",
 		}); !reported {
-			m.Logger().Debug("error trying to emit event")
-			return
+			return nil
 		}
 	}
 
-	return
+	return nil
 }

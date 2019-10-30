@@ -736,5 +736,580 @@
         "name": "httpd"
       }
     }
+  },
+  {
+    "agent": {
+      "id": "NpLHzDMCABCBBTXAZqYDUA==",
+      "ip": "10.2.3.4",
+      "name": "arcagt1",
+      "type": "dns_tracelog_file"
+    },
+    "cef": {
+      "device": {
+        "event_class_id": "Response:A",
+        "product": "DNS Trace Log",
+        "vendor": "Microsoft"
+      },
+      "extensions": {
+        "_cefVer": "0.1",
+        "agentAddress": "10.2.3.4",
+        "agentHostName": "arcagt1",
+        "agentId": "NpLHzDMCABCBBTXAZqYDUA==",
+        "agentReceiptTime": "1322022474516",
+        "agentTimeZone": "America/New York",
+        "agentType": "dns_tracelog_file",
+        "baseEventCount": "2",
+        "destinationHostName": "www.google.com",
+        "deviceReceiptTime": "1322005087000",
+        "deviceTimeZone": "America/New York",
+        "eventId": "12345678",
+        "requestUrl": "(3)www(6)google(3)com(0)",
+        "requestUrlFileName": "(3)www(6)google(3)com(0)",
+        "sourceAddress": "10.0.0.2",
+        "startTime": "1322004689000",
+        "type": "1"
+      },
+      "name": "Response",
+      "severity": "Unknown",
+      "version": "0"
+    },
+    "destination": {
+      "domain": "www.google.com"
+    },
+    "event": {
+      "code": "Response:A",
+      "created": "2011-11-23T04:27:54.516Z",
+      "id": 12345678,
+      "kind": 1,
+      "original": "CEF:0|Microsoft|DNS Trace Log||Response:A|Response|Unknown| eventId=12345678 type=1 start=1322004689000 art=1322022474516 rt=1322005087000 src=10.0.0.2 dhost=www.google.com request=(3)www(6)google(3)com(0) cnt=2 ahost=arcagt1 agt=10.2.3.4 atz=America/New York aid=NpLHzDMCABCBBTXAZqYDUA\\=\\= at=dns_tracelog_file dtz=America/New York requestUrlFileName=(3)www(6)google(3)com(0) _cefVer=0.1",
+      "start": "2011-11-22T23:31:29.000Z",
+      "timezone": "America/New York"
+    },
+    "message": "Response",
+    "observer": {
+      "product": "DNS Trace Log",
+      "vendor": "Microsoft"
+    },
+    "source": {
+      "ip": "10.0.0.2"
+    },
+    "url": {
+      "original": "(3)www(6)google(3)com(0)"
+    }
+  },
+  {
+    "agent": {
+      "id": "4SNQXV30BABCAIi+-ZH3gxT==",
+      "ip": "10.2.3.4",
+      "mac": "00-50-56-8E-C0-90",
+      "name": "centos7.as",
+      "type": "syslog",
+      "version": "7.6.0.8009.0"
+    },
+    "cef": {
+      "device": {
+        "event_class_id": "arcsight:143:1",
+        "product": "Unix",
+        "vendor": "Unix"
+      },
+      "extensions": {
+        "_cefVer": "0.1",
+        "agentAddress": "10.2.3.4",
+        "agentHostName": "centos7.as",
+        "agentId": "4SNQXV30BABCAIi+-ZH3gxT==",
+        "agentMacAddress": "00-50-56-8E-C0-90",
+        "agentReceiptTime": "1500404470493",
+        "agentTimeZone": "America/Argentina/Buenos_Aires",
+        "agentType": "syslog",
+        "agentVersion": "7.6.0.8009.0",
+        "agentZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 10.0.0.0-10.255.255.255",
+        "categoryBehavior": "/Access/Start",
+        "categoryDeviceGroup": "/Operating System",
+        "categoryDeviceType": "Operating System",
+        "categoryObject": "/Host/Application/Service",
+        "categoryOutcome": "/Success",
+        "categorySignificance": "/Informational",
+        "destinationHostName": "centos7",
+        "deviceAction": "Started",
+        "deviceCustomNumber1Label": "File Descriptor",
+        "deviceCustomString1": "systemd",
+        "deviceCustomString1Label": "Module",
+        "deviceCustomString2": "daemon",
+        "deviceCustomString2Label": "Facility",
+        "deviceFacility": "daemon",
+        "deviceHostName": "centos7",
+        "deviceProcessName": "systemd",
+        "deviceReceiptTime": "1500404461000",
+        "deviceSeverity": "info",
+        "deviceTimeZone": "America/Argentina/Buenos_Aires",
+        "eventId": "31",
+        "message": "Started Session 21 of user root",
+        "sourceUserName": "root"
+      },
+      "name": "Started Session",
+      "severity": "Low",
+      "version": "0"
+    },
+    "destination": {
+      "domain": "centos7"
+    },
+    "event": {
+      "action": "Started",
+      "code": "arcsight:143:1",
+      "created": "2017-07-18T19:01:10.493Z",
+      "id": 31,
+      "original": "CEF:0|Unix|Unix||arcsight:143:1|Started Session|Low| eventId=31 msg=Started Session 21 of user root categorySignificance=/Informational categoryBehavior=/Access/Start categoryDeviceGroup=/Operating System catdt=Operating System categoryOutcome=/Success categoryObject=/Host/Application/Service art=1500404470493 deviceSeverity=info act=Started rt=1500404461000 suser=root dhost=centos7 cs1=systemd cs2=daemon cs1Label=Module cs2Label=Facility cn1Label=File Descriptor ahost=centos7.as agt=10.2.3.4 agentZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 10.0.0.0-10.255.255.255 amac=00-50-56-8E-C0-90 av=7.6.0.8009.0 atz=America/Argentina/Buenos_Aires at=syslog dvchost=centos7 dtz=America/Argentina/Buenos_Aires deviceFacility=daemon deviceProcessName=systemd _cefVer=0.1 aid=4SNQXV30BABCAIi+-ZH3gxT\\=\\=",
+      "severity": 0,
+      "timezone": "America/Argentina/Buenos_Aires"
+    },
+    "message": "Started Session 21 of user root",
+    "observer": {
+      "hostname": "centos7",
+      "product": "Unix",
+      "vendor": "Unix"
+    },
+    "process": {
+      "name": "systemd"
+    },
+    "source": {
+      "user": {
+        "name": "root"
+      }
+    }
+  },
+  {
+    "cef": {
+      "device": {
+        "event_class_id": "drop",
+        "product": "VPN-1 \u0026 FireWall-1",
+        "vendor": "Check Point"
+      },
+      "extensions": {
+        "assetCriticality": "0",
+        "categoryBehavior": "/Access",
+        "categoryDeviceGroup": "/Firewall",
+        "categoryDeviceType": "Firewall",
+        "categoryObject": "/Host/Application/Service",
+        "categoryOutcome": "/Failure",
+        "categorySignificance": "/Informational/Warning",
+        "customerID": "124",
+        "customerURI": "/XXX",
+        "eventId": "23985829654",
+        "modelConfidence": "0",
+        "mrt": "1459367145678",
+        "priority": "High",
+        "relevance": "10",
+        "severity": "5",
+        "transportProtocol": "TCP"
+      },
+      "name": "drop",
+      "severity": "High",
+      "version": "0"
+    },
+    "event": {
+      "code": "drop",
+      "id": 23985829654,
+      "original": "CEF:0|Check Point|VPN-1 \u0026 FireWall-1||drop|drop|High| eventId=23985829654 mrt=1459367145678 proto=TCP customerID=124 customerURI=/XXX modelConfidence=0.6 relevance=high categorySignificance=/Informational/Warning categoryBehavior=/Access categoryDeviceGroup=/Firewall catdt=Firewall categoryOutcome=/Failure categoryObject=/Host/Application/Service modelConfidence=0 severity=5 relevance=10 assetCriticality=0 priority=High",
+      "severity": 7
+    },
+    "message": "drop",
+    "network": {
+      "transport": "tcp"
+    },
+    "observer": {
+      "product": "VPN-1 \u0026 FireWall-1",
+      "vendor": "Check Point"
+    },
+    "organization": {
+      "name": "/XXX"
+    }
+  },
+  {
+    "agent": {
+      "id": "4p9IZi1kBABCq5RFPFdJWYUw==",
+      "name": "host.gtr.gtr",
+      "type": "agent_ac",
+      "version": "7.1.7.7602.0"
+    },
+    "cef": {
+      "device": {
+        "event_class_id": "305012",
+        "product": "ASA",
+        "vendor": "CISCO"
+      },
+      "extensions": {
+        "_cefVer": "0.1",
+        "ad": {
+          "arcSightEventPath": "7q0sfHVcBABCcMZVvMSDFc1w=="
+        },
+        "agentAddress": "100.222.333.55",
+        "agentHostName": "host.gtr.gtr",
+        "agentId": "4p9IZi1kBABCq5RFPFdJWYUw==",
+        "agentReceiptTime": "1484096108163",
+        "agentTimeZone": "LA/la",
+        "agentType": "agent_ac",
+        "agentVersion": "7.1.7.7602.0",
+        "assetCriticality": "0",
+        "c6a4Label": "Agent IPv6 Address",
+        "categoryBehavior": "/Access/Stop",
+        "categoryDeviceGroup": "/Firewall",
+        "categoryDeviceType": "Firewall",
+        "categoryObject": "/Host/Application/Service",
+        "categoryOutcome": "/Success",
+        "categorySignificance": "/Informational",
+        "deviceAddress": "111.111.111.99",
+        "deviceAssetId": "5Wa8hHVSDFBCc-t56wI7mTw==",
+        "deviceCustomIPv6Address4": "ffff:0:0:0:222:5555:ffff:5555",
+        "deviceCustomNumber1Label": "ICMP Type",
+        "deviceCustomNumber2Label": "ICMP Code",
+        "deviceCustomNumber3Label": "DurationInSeconds",
+        "deviceCustomString1Label": "ACL",
+        "deviceCustomString2Label": "Unit",
+        "deviceCustomString3Label": "TCP Flags",
+        "deviceCustomString4Label": "Order",
+        "deviceCustomString5": "dynamic",
+        "deviceCustomString5Label": "Connection Type",
+        "deviceCustomString6": "0:00:00",
+        "deviceCustomString6Label": "Duration",
+        "deviceHostName": "super",
+        "deviceInboundInterface": "eth0",
+        "deviceOutboundInterface": "eth1",
+        "deviceReceiptTime": "1484096094000",
+        "deviceSeverity": "6",
+        "deviceTimeZone": "LA/LA",
+        "deviceZoneID": "K-fU33AAOGVdfFpYAT3UdQ==",
+        "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "eventAnnotationAuditTrail": "1,1484012146095,root,Queued,,,,\\n",
+        "eventAnnotationEndTime": "1484096094000",
+        "eventAnnotationFlags": "0",
+        "eventAnnotationManagerReceiptTime": "1484097686471",
+        "eventAnnotationModificationTime": "1484097686475",
+        "eventAnnotationStageUpdateTime": "1484097686473",
+        "eventAnnotationVersion": "1",
+        "eventId": "56265798504",
+        "locality": "1",
+        "modelConfidence": "0",
+        "mrt": "1484092683471",
+        "originalAgentAddress": "10.2.88.3",
+        "originalAgentHostName": "host",
+        "originalAgentId": "6q0sfHVcBABCcSDFvMpvc1w==",
+        "originalAgentType": "syslog_file",
+        "originalAgentVersion": "7.3.0.7885.0",
+        "originalAgentZoneURI": "/All Zones/GR/GR/GR",
+        "priority": "4",
+        "relevance": "10",
+        "severity": "4",
+        "sourceAddress": "1.2.3.4",
+        "sourcePort": "5260",
+        "sourceTranslatedAddress": "4.3.2.1",
+        "sourceTranslatedPort": "5260",
+        "sourceTranslatedZoneID": "P84KXXTYDFYYFwwHq40BQcd==",
+        "sourceTranslatedZoneURI": "/All Zones/GTR/GTR Internet Primary",
+        "sourceZoneID": "GqtK3G9YBABCadQ465CqVeW==",
+        "sourceZoneURI": "/All Zones/GTR/GTR/GTR/GTR",
+        "transportProtocol": "UDP"
+      },
+      "name": "Teardown dynamic UDP translation",
+      "severity": "Low",
+      "version": "0"
+    },
+    "error": {
+      "message": "agentAddress: value is not a valid IP address"
+    },
+    "event": {
+      "code": "305012",
+      "created": "2017-01-11T00:55:08.163Z",
+      "id": 56265798504,
+      "original": "CEF:0|CISCO|ASA||305012|Teardown dynamic UDP translation|Low| eventId=56265798504 mrt=1484092683471 proto=UDP categorySignificance=/Informational categoryBehavior=/Access/Stop categoryDeviceGroup=/Firewall catdt=Firewall categoryOutcome=/Success categoryObject=/Host/Application/Service modelConfidence=0 severity=4 relevance=10 assetCriticality=0 priority=4 art=1484096108163 deviceSeverity=6 rt=1484096094000 src=1.2.3.4 sourceZoneID=GqtK3G9YBABCadQ465CqVeW\\=\\= sourceZoneURI=/All Zones/GTR/GTR/GTR/GTR sourceTranslatedAddress=4.3.2.1 sourceTranslatedZoneID=P84KXXTYDFYYFwwHq40BQcd\\=\\= sourceTranslatedZoneURI=/All Zones/GTR/GTR Internet Primary spt=5260 sourceTranslatedPort=5260 cs5=dynamic cs6=0:00:00 c6a4=ffff:0:0:0:222:5555:ffff:5555 locality=1 cs1Label=ACL cs2Label=Unit cs3Label=TCP Flags cs4Label=Order cs5Label=Connection Type cs6Label=Duration cn1Label=ICMP Type cn2Label=ICMP Code cn3Label=DurationInSeconds c6a4Label=Agent IPv6 Address ahost=host.gtr.gtr agt=100.222.333.55 av=7.1.7.7602.0 atz=LA/la aid=4p9IZi1kBABCq5RFPFdJWYUw\\=\\= at=agent_ac dvchost=super dvc=111.111.111.99 deviceZoneID=K-fU33AAOGVdfFpYAT3UdQ\\=\\= deviceZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 deviceAssetId=5Wa8hHVSDFBCc-t56wI7mTw\\=\\= dtz=LA/LA deviceInboundInterface=eth0 deviceOutboundInterface=eth1 eventAnnotationStageUpdateTime=1484097686473 eventAnnotationModificationTime=1484097686475 eventAnnotationAuditTrail=1,1484012146095,root,Queued,,,,\\\\n eventAnnotationVersion=1 eventAnnotationFlags=0 eventAnnotationEndTime=1484096094000 eventAnnotationManagerReceiptTime=1484097686471 originalAgentHostName=host originalAgentAddress=10.2.88.3 originalAgentZoneURI=/All Zones/GR/GR/GR originalAgentVersion=7.3.0.7885.0 originalAgentId=6q0sfHVcBABCcSDFvMpvc1w\\=\\= originalAgentType=syslog_file _cefVer=0.1 ad.arcSightEventPath=7q0sfHVcBABCcMZVvMSDFc1w\\=\\=",
+      "severity": 0,
+      "timezone": "LA/LA"
+    },
+    "message": "Teardown dynamic UDP translation",
+    "network": {
+      "transport": "udp"
+    },
+    "observer": {
+      "hostname": "super",
+      "ip": "111.111.111.99",
+      "product": "ASA",
+      "vendor": "CISCO"
+    },
+    "source": {
+      "ip": "1.2.3.4",
+      "nat": {
+        "ip": "4.3.2.1",
+        "port": 5260
+      },
+      "port": 5260
+    }
+  },
+  {
+    "agent": {
+      "id": "3Pz6paUgBABCAAudQNx1w0w==",
+      "ip": "192.168.131.65",
+      "name": "VirtualXP",
+      "type": "sdkrfilereader",
+      "version": "7.0.5.7132.0"
+    },
+    "cef": {
+      "device": {
+        "event_class_id": "agent:016",
+        "product": "ArcSight",
+        "vendor": "ArcSight",
+        "version": "7.0.5.7132.1"
+      },
+      "extensions": {
+        "_cefVer": "0.1",
+        "agentAddress": "192.168.131.65",
+        "agentHostName": "VirtualXP",
+        "agentId": "3Pz6paUgBABCAAudQNx1w0w==",
+        "agentReceiptTime": "1410524502535",
+        "agentTimeZone": "Europe/Prague",
+        "agentType": "sdkrfilereader",
+        "agentVersion": "7.0.5.7132.0",
+        "agentZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "categoryBehavior": "/Access/Start",
+        "categoryDeviceGroup": "/Application",
+        "categoryDeviceType": "Security Mangement",
+        "categoryObject": "/Host/Application",
+        "categoryOutcome": "/Success",
+        "categorySignificance": "/Normal",
+        "deviceAddress": "192.168.131.65",
+        "deviceCustomString2": "\u003cResource ID=\"3Qg5paUgBABCAAwIZ-kC0dw==\"/\u003e",
+        "deviceCustomString2Label": "Configuration Resource",
+        "deviceEventCategory": "/Agent/Connection/Device?Success",
+        "deviceHostName": "VirtualXP",
+        "deviceReceiptTime": "1410524500502",
+        "deviceSeverity": "Warning",
+        "deviceTimeZone": "Europe/Prague",
+        "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "eventId": "1",
+        "fileType": "Agent",
+        "filename": "C:\\Documents and Settings\\XPMUser\\Desktop\\Logs\\NAT_Log",
+        "message": "File Opened",
+        "mrt": "1410524600502"
+      },
+      "name": "Device connection up",
+      "severity": "Low",
+      "version": "0"
+    },
+    "event": {
+      "code": "agent:016",
+      "created": "2014-09-12T12:21:42.535Z",
+      "id": 1,
+      "original": "CEF:0|ArcSight|ArcSight|7.0.5.7132.1|agent:016|Device connection up|Low| eventId=1 msg=File Opened mrt=1410524600502 categorySignificance=/Normal categoryBehavior=/Access/Start categoryDeviceGroup=/Application catdt=Security Mangement categoryOutcome=/Success categoryObject=/Host/Application art=1410524502535 cat=/Agent/Connection/Device?Success deviceSeverity=Warning rt=1410524500502 fname=C:\\\\Documents and Settings\\\\XPMUser\\\\Desktop\\\\Logs\\\\NAT_Log fileType=Agent cs2=\u003cResource ID\\=\"3Qg5paUgBABCAAwIZ-kC0dw\\=\\=\"/\u003e cs2Label=Configuration Resource ahost=VirtualXP agt=192.168.131.65 agentZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 av=7.0.5.7132.0 atz=Europe/Prague aid=3Pz6paUgBABCAAudQNx1w0w\\=\\= at=sdkrfilereader dvchost=VirtualXP dvc=192.168.131.65 deviceZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 dtz=Europe/Prague _cefVer=0.1",
+      "severity": 0,
+      "timezone": "Europe/Prague"
+    },
+    "file": {
+      "name": "C:\\Documents and Settings\\XPMUser\\Desktop\\Logs\\NAT_Log",
+      "type": "Agent"
+    },
+    "message": "File Opened",
+    "observer": {
+      "hostname": "VirtualXP",
+      "ip": "192.168.131.65",
+      "product": "ArcSight",
+      "vendor": "ArcSight",
+      "version": "7.0.5.7132.1"
+    }
+  },
+  {
+    "agent": {
+      "id": "4Pz6paUgBABCAAudQNx1w0w==",
+      "ip": "192.168.1.56",
+      "name": "VirtualXP",
+      "type": "sdkrfilereader",
+      "version": "7.0.5.7132.1"
+    },
+    "cef": {
+      "device": {
+        "event_class_id": "agent:030",
+        "product": "ArcSight",
+        "vendor": "ArcSight",
+        "version": "7.0.5.7132.1"
+      },
+      "extensions": {
+        "_cefVer": "0.1",
+        "agentAddress": "192.168.1.56",
+        "agentHostName": "VirtualXP",
+        "agentId": "4Pz6paUgBABCAAudQNx1w0w==",
+        "agentReceiptTime": "1410624402535",
+        "agentTimeZone": "Europe/Prague",
+        "agentType": "sdkrfilereader",
+        "agentVersion": "7.0.5.7132.1",
+        "agentZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "categoryBehavior": "/Execute/Start",
+        "categoryDeviceGroup": "/Application",
+        "categoryDeviceType": "Security Mangement",
+        "categoryObject": "/Host/Application/Service",
+        "categoryOutcome": "/Success",
+        "categorySignificance": "/Normal",
+        "deviceAddress": "192.168.0.65",
+        "deviceCustomString2": "\u003cResource ID=\"3Tg5paUgBABCAAwIZ-kC0dw==\"/\u003e",
+        "deviceCustomString2Label": "Configuration Resource",
+        "deviceEventCategory": "/Agent/Started",
+        "deviceHostName": "VirtualXP",
+        "deviceReceiptTime": "1410543500432",
+        "deviceSeverity": "Warning",
+        "deviceTimeZone": "Europe/Prague",
+        "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "eventId": "2",
+        "fileType": "Agent",
+        "mrt": "1410524500493"
+      },
+      "name": "Agent [NAT] type [sdkrfilereader] started",
+      "severity": "Low",
+      "version": "0"
+    },
+    "event": {
+      "code": "agent:030",
+      "created": "2014-09-13T16:06:42.535Z",
+      "id": 2,
+      "original": "CEF:0|ArcSight|ArcSight|7.0.5.7132.1|agent:030|Agent [NAT] type [sdkrfilereader] started|Low| eventId=2 mrt=1410524500493 categorySignificance=/Normal categoryBehavior=/Execute/Start categoryDeviceGroup=/Application catdt=Security Mangement categoryOutcome=/Success categoryObject=/Host/Application/Service art=1410624402535 cat=/Agent/Started deviceSeverity=Warning rt=1410543500432 fileType=Agent cs2=\u003cResource ID\\=\"3Tg5paUgBABCAAwIZ-kC0dw\\=\\=\"/\u003e cs2Label=Configuration Resource ahost=VirtualXP agt=192.168.1.56 agentZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 av=7.0.5.7132.1 atz=Europe/Prague aid=4Pz6paUgBABCAAudQNx1w0w\\=\\= at=sdkrfilereader dvchost=VirtualXP dvc=192.168.0.65 deviceZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 dtz=Europe/Prague _cefVer=0.1",
+      "severity": 0,
+      "timezone": "Europe/Prague"
+    },
+    "file": {
+      "type": "Agent"
+    },
+    "message": "Agent [NAT] type [sdkrfilereader] started",
+    "observer": {
+      "hostname": "VirtualXP",
+      "ip": "192.168.0.65",
+      "product": "ArcSight",
+      "vendor": "ArcSight",
+      "version": "7.0.5.7132.1"
+    }
+  },
+  {
+    "agent": {
+      "id": "3Pz6paUgBABCAAudQNx1w0w==",
+      "ip": "192.168.131.65",
+      "name": "VirtualXP",
+      "type": "sdkrfilereader",
+      "version": "7.0.5.7132.0"
+    },
+    "cef": {
+      "device": {
+        "event_class_id": "agent:044",
+        "product": "ArcSight",
+        "vendor": "ArcSight",
+        "version": "7.0.5.7132.1"
+      },
+      "extensions": {
+        "_cefVer": "0.1",
+        "agentAddress": "192.168.131.65",
+        "agentHostName": "VirtualXP",
+        "agentId": "3Pz6paUgBABCAAudQNx1w0w==",
+        "agentReceiptTime": "1410524502535",
+        "agentTimeZone": "Europe/Prague",
+        "agentType": "sdkrfilereader",
+        "agentVersion": "7.0.5.7132.0",
+        "agentZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "categoryDeviceType": "Security Mangement",
+        "deviceAddress": "192.168.131.65",
+        "deviceEventCategory": "/LogFile/Processing/Started",
+        "deviceHostName": "VirtualXP",
+        "deviceReceiptTime": "1410524500502",
+        "deviceSeverity": "Warning",
+        "deviceTimeZone": "Europe/Prague",
+        "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "eventId": "6",
+        "filename": "C:\\Documents and Settings\\XPMUser\\Desktop\\Logs\\NAT_Log",
+        "mrt": "1410524500502"
+      },
+      "name": "File processing started",
+      "severity": "Low",
+      "version": "0"
+    },
+    "event": {
+      "code": "agent:044",
+      "created": "2014-09-12T12:21:42.535Z",
+      "id": 6,
+      "original": "CEF:0|ArcSight|ArcSight|7.0.5.7132.1|agent:044|File processing started|Low| eventId=6 mrt=1410524500502 catdt=Security Mangement art=1410524502535 cat=/LogFile/Processing/Started deviceSeverity=Warning rt=1410524500502 fname=C:\\\\Documents and Settings\\\\XPMUser\\\\Desktop\\\\Logs\\\\NAT_Log ahost=VirtualXP agt=192.168.131.65 agentZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 av=7.0.5.7132.0 atz=Europe/Prague aid=3Pz6paUgBABCAAudQNx1w0w\\=\\= at=sdkrfilereader dvchost=VirtualXP dvc=192.168.131.65 deviceZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 dtz=Europe/Prague _cefVer=0.1",
+      "severity": 0,
+      "timezone": "Europe/Prague"
+    },
+    "file": {
+      "name": "C:\\Documents and Settings\\XPMUser\\Desktop\\Logs\\NAT_Log"
+    },
+    "message": "File processing started",
+    "observer": {
+      "hostname": "VirtualXP",
+      "ip": "192.168.131.65",
+      "product": "ArcSight",
+      "vendor": "ArcSight",
+      "version": "7.0.5.7132.1"
+    }
+  },
+  {
+    "agent": {
+      "id": "3Pz6paUgBABCAAudQNx1w0w==",
+      "ip": "192.168.131.65",
+      "name": "VirtualXP",
+      "type": "sdkrfilereader",
+      "version": "7.0.5.7132.0"
+    },
+    "cef": {
+      "device": {
+        "event_class_id": "agent:031",
+        "product": "ArcSight",
+        "vendor": "ArcSight",
+        "version": "7.0.5.7132.1"
+      },
+      "extensions": {
+        "_cefVer": "0.1",
+        "agentAddress": "192.168.131.65",
+        "agentHostName": "VirtualXP",
+        "agentId": "3Pz6paUgBABCAAudQNx1w0w==",
+        "agentReceiptTime": "1410524535843",
+        "agentTimeZone": "Europe/Prague",
+        "agentType": "sdkrfilereader",
+        "agentVersion": "7.0.5.7132.0",
+        "agentZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "categoryBehavior": "/Execute/Stop",
+        "categoryDeviceGroup": "/Application",
+        "categoryDeviceType": "Security Mangement",
+        "categoryObject": "/Host/Application/Service",
+        "categoryOutcome": "/Success",
+        "categorySignificance": "/Normal",
+        "deviceAddress": "192.168.131.65",
+        "deviceCustomString2": "\u003cResource ID=\"3Qg5paUgBABCAAwIZ-kC0dw==\"/\u003e",
+        "deviceCustomString2Label": "Configuration Resource",
+        "deviceEventCategory": "/Agent/ShuttingDown",
+        "deviceHostName": "VirtualXP",
+        "deviceReceiptTime": "1410524535833",
+        "deviceSeverity": "Warning",
+        "deviceTimeZone": "Europe/Prague",
+        "deviceZoneURI": "/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255",
+        "eventId": "7",
+        "fileType": "Agent",
+        "message": "Process Stopped by User",
+        "mrt": "1410524535833"
+      },
+      "name": "Agent [NAT] type [sdkrfilereader] shutting down",
+      "severity": "Very-High",
+      "version": "0"
+    },
+    "event": {
+      "code": "agent:031",
+      "created": "2014-09-12T12:22:15.843Z",
+      "id": 7,
+      "original": "CEF:0|ArcSight|ArcSight|7.0.5.7132.1|agent:031|Agent [NAT] type [sdkrfilereader] shutting down|Very-High| eventId=7 msg=Process Stopped by User mrt=1410524535833 categorySignificance=/Normal categoryBehavior=/Execute/Stop categoryDeviceGroup=/Application catdt=Security Mangement categoryOutcome=/Success categoryObject=/Host/Application/Service art=1410524535843 cat=/Agent/ShuttingDown deviceSeverity=Warning rt=1410524535833 fileType=Agent cs2=\u003cResource ID\\=\"3Qg5paUgBABCAAwIZ-kC0dw\\=\\=\"/\u003e cs2Label=Configuration Resource ahost=VirtualXP agt=192.168.131.65 agentZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 av=7.0.5.7132.0 atz=Europe/Prague aid=3Pz6paUgBABCAAudQNx1w0w\\=\\= at=sdkrfilereader dvchost=VirtualXP dvc=192.168.131.65 deviceZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 192.168.0.0-192.168.255.255 dtz=Europe/Prague _cefVer=0.1",
+      "severity": 9,
+      "timezone": "Europe/Prague"
+    },
+    "file": {
+      "type": "Agent"
+    },
+    "message": "Process Stopped by User",
+    "observer": {
+      "hostname": "VirtualXP",
+      "ip": "192.168.131.65",
+      "product": "ArcSight",
+      "vendor": "ArcSight",
+      "version": "7.0.5.7132.1"
+    }
   }
 ]

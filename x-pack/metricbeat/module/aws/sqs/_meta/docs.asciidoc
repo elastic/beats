@@ -10,6 +10,8 @@ cloudwatch:GetMetricData
 cloudwatch:ListMetrics
 ec2:DescribeRegions
 sqs:ListQueues
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]

@@ -166,4 +166,8 @@ var fullNameMapping = map[string]string{
 	"start":                               "startTime",
 	"proto":                               "transportProtocol",
 	"type":                                "type",
+
+	// This is an ArcSight categorization field that is commonly used, but its
+	// short name is not contained in the documentation used for the above list.
+	"catdt": "categoryDeviceType",
 }

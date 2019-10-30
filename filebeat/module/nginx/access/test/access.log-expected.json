@@ -3,7 +3,7 @@
         "@timestamp": "2016-10-25T12:49:33.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -32,13 +32,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.59"
     },
     {
         "@timestamp": "2016-10-25T12:49:34.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "http://localhost:8080/",
@@ -67,13 +67,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.59"
     },
     {
         "@timestamp": "2016-10-25T12:50:44.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -102,13 +102,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.59"
     },
     {
         "@timestamp": "2016-12-07T09:34:43.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -137,13 +137,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:34:43.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "http://localhost:8080/",
@@ -172,13 +172,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:43:18.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -207,13 +207,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:43:21.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -242,13 +242,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:43:23.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -277,13 +277,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T10:04:37.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -306,13 +306,13 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T10:04:58.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -335,13 +335,13 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2016-12-07T10:04:59.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -364,13 +364,13 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -393,6 +393,6 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     }
 ]

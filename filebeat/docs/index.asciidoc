@@ -1,12 +1,13 @@
 = Filebeat Reference
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
 
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
+
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 :beatname_pkg: {beatname_lc}

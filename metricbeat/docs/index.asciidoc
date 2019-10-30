@@ -1,20 +1,21 @@
 = Metricbeat Reference
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat
+
 :libbeat-xpack-dir: ../../../x-pack/libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
 
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
+
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:version: {stack-version}
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
 :beatname_pkg: {beatname_lc}
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
-:has_ml_jobs: yes
 :has_central_config:
 :has_solutions:
 :has_docker_label_ex:

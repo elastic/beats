@@ -23,4 +23,5 @@ CloudFormation template:
 .{backslash}{beatname_lc}.exe export function FUNCTION_NAME
 ----------------------------------------------------------------------
 
-{beatname_uc} writes the CloudFormation template to stdout.
+{beatname_uc} writes the CloudFormation template to stdout. Modify the template
+to work with your infrastructure.

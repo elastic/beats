@@ -15,7 +15,7 @@
   schedule: '@every 5s' # every 5 seconds from start of beat
 
   # Configure URLs to ping
-  urls: ["http://localhost:9200"]
+  hosts: ["http://localhost:9200"]
 
   # Configure IP protocol types to ping on if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.

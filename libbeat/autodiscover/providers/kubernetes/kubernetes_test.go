@@ -89,6 +89,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Scenarios being tested:
 		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/json.keys_under_root must be a nested common.MapStr under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
@@ -96,11 +97,12 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"kubernetes": common.MapStr{
 					"annotations": getNestedAnnotations(common.MapStr{
-						"co.elastic.logs/multiline.pattern": "^test",
-						"co.elastic.metrics/module":         "prometheus",
-						"co.elastic.metrics/period":         "10s",
-						"co.elastic.metrics.foobar/period":  "15s",
-						"not.to.include":                    "true",
+						"co.elastic.logs/multiline.pattern":    "^test",
+						"co.elastic.logs/json.keys_under_root": "true",
+						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/period":            "10s",
+						"co.elastic.metrics.foobar/period":     "15s",
+						"not.to.include":                       "true",
 					}),
 					"container": common.MapStr{
 						"name":    "foobar",
@@ -112,11 +114,12 @@ func TestGenerateHints(t *testing.T) {
 			result: bus.Event{
 				"kubernetes": common.MapStr{
 					"annotations": getNestedAnnotations(common.MapStr{
-						"co.elastic.logs/multiline.pattern": "^test",
-						"co.elastic.metrics/module":         "prometheus",
-						"not.to.include":                    "true",
-						"co.elastic.metrics/period":         "10s",
-						"co.elastic.metrics.foobar/period":  "15s",
+						"co.elastic.logs/multiline.pattern":    "^test",
+						"co.elastic.logs/json.keys_under_root": "true",
+						"co.elastic.metrics/module":            "prometheus",
+						"not.to.include":                       "true",
+						"co.elastic.metrics/period":            "10s",
+						"co.elastic.metrics.foobar/period":     "15s",
 					}),
 					"container": common.MapStr{
 						"name":    "foobar",
@@ -128,6 +131,9 @@ func TestGenerateHints(t *testing.T) {
 					"logs": common.MapStr{
 						"multiline": common.MapStr{
 							"pattern": "^test",
+						},
+						"json": common.MapStr{
+							"keys_under_root": "true",
 						},
 					},
 					"metrics": common.MapStr{

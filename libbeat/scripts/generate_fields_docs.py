@@ -53,7 +53,7 @@ def document_field(output, field, field_path):
     output.write("*`{}`*::\n+\n--\n".format(field["field_path"]))
 
     if "deprecated" in field:
-        output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
+        output.write("\ndeprecated:[{}]\n\n".format(field["deprecated"]))
 
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))

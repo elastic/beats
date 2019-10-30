@@ -107,6 +107,9 @@ type ProcessingConfig struct {
 	// the pipeline processors.
 	Processor ProcessorList
 
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool
+
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}

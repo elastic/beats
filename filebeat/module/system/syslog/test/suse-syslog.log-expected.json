@@ -2,7 +2,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",
@@ -15,7 +15,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "linux-sqrz",
         "input.type": "log",

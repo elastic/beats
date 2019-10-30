@@ -183,6 +183,15 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
+	// Try to pull the image before building it
+	var stderr bytes.Buffer
+	pull := d.cmd(ctx, "pull", "--ignore-pull-failures", service)
+	pull.Stdout = nil
+	pull.Stderr = &stderr
+	if err := pull.Run(); err != nil {
+		return errors.Wrapf(err, "failed to pull images using docker-compose: %s", stderr.String())
+	}
+
 	err := d.cmd(ctx, "up", args...).Run()
 	if err != nil {
 		return err
@@ -300,19 +309,42 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 		}
 	}
 
+	serviceNames, err := d.serviceNames(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get container list")
+	}
+
 	var containers []types.Container
 	for _, f := range serviceFilters {
-		c, err := d.client.ContainerList(ctx, types.ContainerListOptions{
+		list, err := d.client.ContainerList(ctx, types.ContainerListOptions{
 			All:     true,
 			Filters: f,
 		})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to get container list")
 		}
-		containers = append(containers, c...)
+		for _, container := range list {
+			serviceName, ok := container.Labels[labelComposeService]
+			if !ok || !contains(serviceNames, serviceName) {
+				// Service is not defined in current docker compose file, ignore it
+				continue
+			}
+			containers = append(containers, container)
+		}
 	}
 
 	return containers, nil
+}
+
+func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
+	var stdout bytes.Buffer
+	cmd := d.cmd(ctx, "config", "--services")
+	cmd.Stdout = &stdout
+	err := cmd.Run()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get list of service names")
+	}
+	return strings.Fields(stdout.String()), nil
 }
 
 func makeFilter(project, service string, projectFilter Filter) filters.Args {

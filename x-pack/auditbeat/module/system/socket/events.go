@@ -221,6 +221,45 @@ func (e *tcpAcceptResult) Update(s *state) error {
 	return nil
 }
 
+type tcpAcceptResult4 struct {
+	Meta  tracing.Metadata `kprobe:"metadata"`
+	Sock  uintptr          `kprobe:"sock"`
+	LAddr uint32           `kprobe:"laddr"`
+	RAddr uint32           `kprobe:"raddr"`
+	LPort uint16           `kprobe:"lport"`
+	RPort uint16           `kprobe:"rport"`
+	Af    uint16           `kprobe:"family"`
+}
+
+func (e *tcpAcceptResult4) asFlow() flow {
+	f := flow{
+		sock:     e.Sock,
+		pid:      e.Meta.PID,
+		inetType: inetType(e.Af),
+		proto:    protoTCP,
+		dir:      directionInbound,
+		complete: true,
+		lastSeen: kernelTime(e.Meta.Timestamp),
+	}
+	f.local = newEndpointIPv4(e.LAddr, e.LPort, 0, 0)
+	f.remote = newEndpointIPv4(e.RAddr, e.RPort, 0, 0)
+	return f
+}
+
+// String returns a representation of the event.
+func (e *tcpAcceptResult4) String() string {
+	f := e.asFlow()
+	return fmt.Sprintf("%s <- accept(sock=0x%x, af=%s, %s <- %s)", header(e.Meta), e.Sock, inetType(e.Af), f.local.String(), f.remote.String())
+}
+
+// Update the state with the contents of this event.
+func (e *tcpAcceptResult4) Update(s *state) error {
+	if e.Sock != 0 {
+		return s.UpdateFlow(e.asFlow())
+	}
+	return nil
+}
+
 type tcpSendMsgCall struct {
 	Meta    tracing.Metadata `kprobe:"metadata"`
 	Sock    uintptr          `kprobe:"sock"`
@@ -269,6 +308,48 @@ func (e *tcpSendMsgCall) String() string {
 
 // Update the state with the contents of this event.
 func (e *tcpSendMsgCall) Update(s *state) error {
+	return s.UpdateFlow(e.asFlow())
+}
+
+type tcpSendMsgCall4 struct {
+	Meta  tracing.Metadata `kprobe:"metadata"`
+	Sock  uintptr          `kprobe:"sock"`
+	Size  uintptr          `kprobe:"size"`
+	LAddr uint32           `kprobe:"laddr"`
+	RAddr uint32           `kprobe:"raddr"`
+	LPort uint16           `kprobe:"lport"`
+	RPort uint16           `kprobe:"rport"`
+	Af    uint16           `kprobe:"family"`
+}
+
+func (e *tcpSendMsgCall4) asFlow() flow {
+	f := flow{
+		sock:     e.Sock,
+		pid:      e.Meta.PID,
+		inetType: inetType(e.Af),
+		proto:    protoTCP,
+		lastSeen: kernelTime(e.Meta.Timestamp),
+	}
+	f.local = newEndpointIPv4(e.LAddr, e.LPort, 0, 0)
+	f.remote = newEndpointIPv4(e.RAddr, e.RPort, 0, 0)
+	return f
+}
+
+// String returns a representation of the event.
+func (e *tcpSendMsgCall4) String() string {
+	flow := e.asFlow()
+	return fmt.Sprintf(
+		"%s tcp_sendmsg(sock=0x%x, size=%d, af=%s, %s -> %s)",
+		header(e.Meta),
+		flow.sock,
+		e.Size,
+		inetType(e.Af),
+		flow.local.String(),
+		flow.remote.String())
+}
+
+// Update the state with the contents of this event.
+func (e *tcpSendMsgCall4) Update(s *state) error {
 	return s.UpdateFlow(e.asFlow())
 }
 

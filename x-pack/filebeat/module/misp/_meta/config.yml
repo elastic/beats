@@ -1,0 +1,3 @@
+- module: misp
+  threat:
+    enabled: true
