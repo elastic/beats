@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of services on an individual host.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -132,7 +132,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Services] Host Services Overview",
+        "title": "[Metricbeat System] Host Services Overview",
         "version": 1
       },
       "id": "c431f410-f9ac-11e9-90e8-1fb18e796788",
@@ -177,8 +177,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-30T13:57:23.392Z",
-      "version": "WzE0MjQsMV0="
+      "updated_at": "2019-10-30T14:14:27.074Z",
+      "version": "WzE0NDAsMV0="
     },
     {
       "attributes": {
@@ -193,7 +193,7 @@
             }
           }
         },
-        "title": "Running Services [Metricbeat Services]",
+        "title": "Running Services [Metricbeat System]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -250,7 +250,7 @@
             },
             "type": "metric"
           },
-          "title": "Running Services [Metricbeat Services]",
+          "title": "Running Services [Metricbeat System]",
           "type": "metric"
         }
       },
@@ -266,8 +266,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-28T14:31:32.236Z",
-      "version": "WzEzOTgsMV0="
+      "updated_at": "2019-10-30T14:11:04.761Z",
+      "version": "WzE0MjUsMV0="
     },
     {
       "attributes": {
@@ -282,7 +282,7 @@
             }
           }
         },
-        "title": "Service States [Metricbeat Services]",
+        "title": "Service States [Metricbeat System]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -351,7 +351,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Service States [Metricbeat Services]",
+          "title": "Service States [Metricbeat System]",
           "type": "pie"
         }
       },
@@ -367,8 +367,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-28T14:46:31.825Z",
-      "version": "WzEzOTksMV0="
+      "updated_at": "2019-10-30T14:11:22.932Z",
+      "version": "WzE0MjcsMV0="
     },
     {
       "attributes": {
@@ -383,7 +383,7 @@
             }
           }
         },
-        "title": "Service Sub-State [Metricbeat Services]",
+        "title": "Service Sub-State [Metricbeat System]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -452,7 +452,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Service Sub-State [Metricbeat Services]",
+          "title": "Service Sub-State [Metricbeat System]",
           "type": "pie"
         }
       },
@@ -468,8 +468,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-28T14:54:54.590Z",
-      "version": "WzE0MDAsMV0="
+      "updated_at": "2019-10-30T14:11:38.830Z",
+      "version": "WzE0MjksMV0="
     },
     {
       "attributes": {
@@ -484,7 +484,7 @@
             }
           }
         },
-        "title": "Return Codes Of Exited Services [Metricbeat Services]",
+        "title": "Return Codes Of Exited Services [Metricbeat System]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -553,7 +553,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Return Codes Of Exited Services [Metricbeat Services]",
+          "title": "Return Codes Of Exited Services [Metricbeat System]",
           "type": "pie"
         }
       },
@@ -569,8 +569,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-28T18:27:34.525Z",
-      "version": "WzE0MDgsMV0="
+      "updated_at": "2019-10-30T14:12:05.399Z",
+      "version": "WzE0MzIsMV0="
     },
     {
       "attributes": {
@@ -584,7 +584,7 @@
             }
           }
         },
-        "title": "Top Services By Memory Usage [Metricbeat Services]",
+        "title": "Top Services By Memory Usage [Metricbeat System]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -633,7 +633,7 @@
             "time_field": "",
             "type": "top_n"
           },
-          "title": "Top Services By Memory Usage [Metricbeat Services]",
+          "title": "Top Services By Memory Usage [Metricbeat System]",
           "type": "metrics"
         }
       },
@@ -643,8 +643,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-29T13:39:07.952Z",
-      "version": "WzE0MTYsMV0="
+      "updated_at": "2019-10-30T14:12:22.089Z",
+      "version": "WzE0MzQsMV0="
     },
     {
       "attributes": {
@@ -658,7 +658,7 @@
             }
           }
         },
-        "title": "Top Services By Task Count [Metricbeat Services]",
+        "title": "Top Services By Task Count [Metricbeat System]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -709,7 +709,7 @@
             "time_field": "",
             "type": "top_n"
           },
-          "title": "Top Services By Task Count [Metricbeat Services]",
+          "title": "Top Services By Task Count [Metricbeat System]",
           "type": "metrics"
         }
       },
@@ -719,8 +719,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-28T15:33:30.258Z",
-      "version": "WzE0MDEsMV0="
+      "updated_at": "2019-10-30T14:12:36.318Z",
+      "version": "WzE0MzYsMV0="
     },
     {
       "attributes": {
@@ -734,7 +734,7 @@
             }
           }
         },
-        "title": "Service Memory Use Over Time [Metricbeat Services]",
+        "title": "Service Memory Use Over Time [Metricbeat System]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -782,7 +782,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Service Memory Use Over Time [Metricbeat Services]",
+          "title": "Service Memory Use Over Time [Metricbeat System]",
           "type": "metrics"
         }
       },
@@ -792,8 +792,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-29T13:36:07.872Z",
-      "version": "WzE0MTQsMV0="
+      "updated_at": "2019-10-30T14:12:51.463Z",
+      "version": "WzE0MzgsMV0="
     }
   ],
   "version": "7.4.0"
