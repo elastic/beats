@@ -1,62 +1,58 @@
-- name: timestamp_epoch
-  description: Please add description
-  example: Please add example
-  type: long
 - name: host
-  description: Please add description
-  example: Please add example
+  description: Nagios monitored host 
+  example: N/A
   type: group
   fields:
   - name: name
-    description: Please add description
-    example: Please add example
+    description: Host name
+    example: server.company.com
     type: text
   - name: status
-    description: Please add description
-    example: Please add example
+    description: Host status
+    example: UP
     type: text
 - name: state
-  description: Please add description
-  example: Please add example
+  description: Nagios state of the monitored service and host
+  example: SOFT, HARD
   type: text
 - name: attempt
-  description: Please add description
-  example: Please add example
+  description: Number of nagios check attempts
+  example: 1, 4
   type: long
 - name: output
-  description: Please add description
-  example: Please add example
+  description: Message output
+  example: "ERROR: netsnmp : No response from remote host"
   type: text
 - name: contact
-  description: Please add description
-  example: Please add example
+  description: Nagios contact
+  example: admin
   type: text
 - name: handler
-  description: Please add description
-  example: Please add example
+  description: Nagios notification handler
+  example: notify-by-email-service
   type: text
 - name: service
-  description: Please add description
-  example: Please add example
+  description: Nagios monitored service
+  example: N/A
   type: group
   fields:
   - name: name
-    description: Please add description
-    example: Please add example
+    description: Service name
+    example: processor
     type: text
   - name: status
-    description: Please add description
-    example: Please add example
+    description: Service status
+    example: CRITICAL, OK
     type: text
 - name: message
-  description: Please add description
-  example: Please add example
+  description: Nagios message
+  example: N/A
   type: text
 - name: timeout
-  description: Please add description
-  example: Please add example
+  description: Nagios timeout
+  example: 20.001s!
   type: text
 - name: outcome
-  description: Please add description
-  example: Please add example
+  description: Nagios aut-save result 
+  example: complete successfully
   type: text

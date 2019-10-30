@@ -19,7 +19,7 @@
         "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.level>Error):%{SPACE}%{GREEDYDATA:error.message}",
         "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.level>Warning):%{SPACE}Check of service '%{DATA:nagios.service.name}' on host '%{DATA:nagios.host.name}' (?<event.kind>timed out) after %{GREEDYDATA:nagios.timeout}",
         "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.level>Warning):%{SPACE}%{GREEDYDATA:error.message}",
-        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.action>Auto-save of retention data) %{DATA:event.outcome}.Z"
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.action>Auto-save of retention data) %{DATA:event.outcome}$"
       ],
       "pattern_definitions" : {
         "NAGIOS_TYPE" : "(HOST ALERT|HOST DOWNTIME ALERT|HOST FLAPPING ALERT|HOST NOTIFICATION|SERVICE ALERT|SERVICE DOWNTIME ALERT|SERVICE FLAPPING ALERT|SERVICE NOTIFICATION|)"

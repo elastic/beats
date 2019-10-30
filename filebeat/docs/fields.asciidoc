@@ -12874,158 +12874,147 @@ Nagios Module
 
 
 
-*`nagios.timestamp_epoch`*::
-+
---
-Please add description
-
-type: long
-
-example: Please add example
-
---
-
 [float]
 === host
 
-Please add description
+Nagios monitored host
 
 
 *`nagios.host.name`*::
 +
 --
-Please add description
+Host name
 
 type: text
 
-example: Please add example
+example: server.company.com
 
 --
 
 *`nagios.host.status`*::
 +
 --
-Please add description
+Host status
 
 type: text
 
-example: Please add example
+example: UP
 
 --
 
 *`nagios.state`*::
 +
 --
-Please add description
+Nagios state of the monitored service and host
 
 type: text
 
-example: Please add example
+example: SOFT, HARD
 
 --
 
 *`nagios.attempt`*::
 +
 --
-Please add description
+Number of nagios check attempts
 
 type: long
 
-example: Please add example
+example: 1, 4
 
 --
 
 *`nagios.output`*::
 +
 --
-Please add description
+Message output
 
 type: text
 
-example: Please add example
+example: ERROR: netsnmp : No response from remote host
 
 --
 
 *`nagios.contact`*::
 +
 --
-Please add description
+Nagios contact
 
 type: text
 
-example: Please add example
+example: admin
 
 --
 
 *`nagios.handler`*::
 +
 --
-Please add description
+Nagios notification handler
 
 type: text
 
-example: Please add example
+example: notify-by-email-service
 
 --
 
 [float]
 === service
 
-Please add description
+Nagios monitored service
 
 
 *`nagios.service.name`*::
 +
 --
-Please add description
+Service name
 
 type: text
 
-example: Please add example
+example: processor
 
 --
 
 *`nagios.service.status`*::
 +
 --
-Please add description
+Service status
 
 type: text
 
-example: Please add example
+example: CRITICAL, OK
 
 --
 
 *`nagios.message`*::
 +
 --
-Please add description
+Nagios message
 
 type: text
 
-example: Please add example
+example: N/A
 
 --
 
 *`nagios.timeout`*::
 +
 --
-Please add description
+Nagios timeout
 
 type: text
 
-example: Please add example
+example: 20.001s!
 
 --
 
 *`nagios.outcome`*::
 +
 --
-Please add description
+Nagios aut-save result
 
 type: text
 
-example: Please add example
+example: complete successfully
 
 --
 
