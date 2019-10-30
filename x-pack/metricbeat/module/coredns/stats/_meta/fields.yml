@@ -2,7 +2,7 @@
   type: group
   description: >
     Contains statistics related to the coreDNS service
-  release: beta
+  release: ga
   fields:
     - name: panic.count
       type: long
