@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over
   TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Support usage of custom builders without hints and mappers {pull}13839[13839]
+- Fix kubernetes `metaGenerator.ResourceMetadata` when parent reference controller is nil {issue}14320[14320] {pull}14329[14329]
 
 *Auditbeat*
 
