@@ -1,0 +1,51 @@
+{
+  "description": "Pipeline for parsing nagios core",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>HOST) (?<event.action>ALERT): %{DATA:nagios.host.name};%{DATA:nagios.host.status};%{DATA:nagios.state};%{NUMBER:nagios.attempt};%{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>HOST) (?<event.action>DOWNTIME ALERT): %{DATA:nagios.host.name};%{DATA:nagios.host.status}; %{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>HOST) (?<event.action>FLAPPING ALERT): %{DATA:nagios.host.name};%{DATA:nagios.host.status}; %{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>HOST) (?<event.action>NOTIFICATION): %{DATA:nagios.contact};%{DATA:nagios.host.name};%{DATA:nagios.host.status};%{DATA:nagios.handler};%{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>SERVICE) (?<event.action>ALERT): %{DATA:nagios.host.name};%{DATA:nagios.service.name};%{DATA:nagios.service.status};%{DATA:nagios.state};%{NUMBER:nagios.attempt};%{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>SERVICE) (?<event.action>DOWNTIME ALERT): %{DATA:nagios.host.name};%{DATA:nagios.service.name};%{DATA:nagios.service.status}; %{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>SERVICE) (?<event.action>FLAPPING ALERT): %{DATA:nagios.host.name};%{DATA:nagios.service.name};%{DATA:nagios.service.status}; %{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>SERVICE) (?<event.action>NOTIFICATION): %{DATA:nagios.contact};%{DATA:nagios.host.name};%{DATA:nagios.service.name};%{DATA:nagios.service.status};%{DATA:nagios.handler};%{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>External command)%{SPACE}(?<event.level>error): %{DATA:error.message}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>wproc):%{SPACE}%{GREEDYDATA:error.message}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>CURRENT SERVICE STATE): %{DATA:nagios.host.name};%{DATA:nagios.service.name};%{DATA:nagios.service.status};%{DATA:nagios.state};%{NUMBER:nagios.attempt};%{GREEDYDATA:nagios.output}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<nagios.type>External command) (?<event.level>error):%{SPACE}%{GREEDYDATA:error.message}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.level>Error):%{SPACE}%{GREEDYDATA:error.message}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.level>Warning):%{SPACE}Check of service '%{DATA:nagios.service.name}' on host '%{DATA:nagios.host.name}' (?<event.kind>timed out) after %{GREEDYDATA:nagios.timeout}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.level>Warning):%{SPACE}%{GREEDYDATA:error.message}",
+        "\\[%{NUMBER:nagios.timestamp_epoch}] (?<event.action>Auto-save of retention data) %{DATA:event.outcome}.Z"
+      ],
+      "pattern_definitions" : {
+        "NAGIOS_TYPE" : "(HOST ALERT|HOST DOWNTIME ALERT|HOST FLAPPING ALERT|HOST NOTIFICATION|SERVICE ALERT|SERVICE DOWNTIME ALERT|SERVICE FLAPPING ALERT|SERVICE NOTIFICATION|)"
+      },
+      "ignore_missing": true
+    }
+  },
+  {
+    "date": {
+      "field": "nagios.timestamp_epoch",
+      "target_field": "@timestamp",
+      "formats": [
+        "UNIX"
+      ],
+      "ignore_failure": true
+    }
+  },
+  {
+    "remove": {
+      "field": "nagios.log.epoch"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

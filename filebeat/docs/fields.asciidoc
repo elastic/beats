@@ -12874,75 +12874,158 @@ Nagios Module
 
 
 
+*`nagios.timestamp_epoch`*::
++
+--
+Please add description
+
+type: long
+
+example: Please add example
+
+--
+
 [float]
-=== log
+=== host
 
 Please add description
 
 
-*`nagios.log.type`*::
+*`nagios.host.name`*::
 +
 --
-Nagios log type (alert, notification, etc.)
+Please add description
 
 type: text
 
-example: HOST ALERT
+example: Please add example
 
 --
 
-*`nagios.log.hostname`*::
+*`nagios.host.status`*::
 +
 --
-Nagios host name
+Please add description
 
 type: text
 
-example: server.company.com
+example: Please add example
 
 --
 
-*`nagios.log.state`*::
+*`nagios.state`*::
 +
 --
-Nagios state
+Please add description
 
 type: text
 
-example: DOWN
+example: Please add example
 
 --
 
-*`nagios.log.state_level`*::
+*`nagios.attempt`*::
 +
 --
-Nagios state level
-
-type: text
-
-example: SOFT
-
---
-
-*`nagios.log.attempt`*::
-+
---
-Nagios number of attempts
+Please add description
 
 type: long
 
-example: 1
+example: Please add example
 
 --
 
-*`nagios.log.message`*::
+*`nagios.output`*::
 +
 --
-Nagios message
+Please add description
 
 type: text
 
-example: server is unreachable
+example: Please add example
+
+--
+
+*`nagios.contact`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`nagios.handler`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+[float]
+=== service
+
+Please add description
+
+
+*`nagios.service.name`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`nagios.service.status`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`nagios.message`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`nagios.timeout`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
+
+--
+
+*`nagios.outcome`*::
++
+--
+Please add description
+
+type: text
+
+example: Please add example
 
 --
 

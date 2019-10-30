@@ -1,0 +1,62 @@
+- name: timestamp_epoch
+  description: Please add description
+  example: Please add example
+  type: long
+- name: host
+  description: Please add description
+  example: Please add example
+  type: group
+  fields:
+  - name: name
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: status
+    description: Please add description
+    example: Please add example
+    type: text
+- name: state
+  description: Please add description
+  example: Please add example
+  type: text
+- name: attempt
+  description: Please add description
+  example: Please add example
+  type: long
+- name: output
+  description: Please add description
+  example: Please add example
+  type: text
+- name: contact
+  description: Please add description
+  example: Please add example
+  type: text
+- name: handler
+  description: Please add description
+  example: Please add example
+  type: text
+- name: service
+  description: Please add description
+  example: Please add example
+  type: group
+  fields:
+  - name: name
+    description: Please add description
+    example: Please add example
+    type: text
+  - name: status
+    description: Please add description
+    example: Please add example
+    type: text
+- name: message
+  description: Please add description
+  example: Please add example
+  type: text
+- name: timeout
+  description: Please add description
+  example: Please add example
+  type: text
+- name: outcome
+  description: Please add description
+  example: Please add example
+  type: text

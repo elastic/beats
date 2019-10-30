@@ -9,4 +9,4 @@ var:
       - /var/log/nagios/nagios.log*
 
 ingest_pipeline: ingest/pipeline.json
-input: config/log.yml
+input: config/core.yml

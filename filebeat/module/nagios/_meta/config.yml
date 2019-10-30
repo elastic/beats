@@ -1,6 +1,6 @@
 - module: nagios
-  # All logs
-  log:
+  # core logs
+  core:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
