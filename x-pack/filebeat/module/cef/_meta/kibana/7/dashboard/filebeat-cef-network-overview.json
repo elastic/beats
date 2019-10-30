@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Network data overview.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

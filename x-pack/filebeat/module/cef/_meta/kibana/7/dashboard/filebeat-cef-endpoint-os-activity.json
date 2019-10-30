@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Operating system activity from endpoints.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

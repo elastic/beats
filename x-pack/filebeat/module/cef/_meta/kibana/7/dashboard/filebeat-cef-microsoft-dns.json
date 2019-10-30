@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of Microsoft DNS activity.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

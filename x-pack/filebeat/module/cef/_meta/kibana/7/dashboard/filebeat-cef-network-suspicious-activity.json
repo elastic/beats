@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Suspicious network activity overview",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

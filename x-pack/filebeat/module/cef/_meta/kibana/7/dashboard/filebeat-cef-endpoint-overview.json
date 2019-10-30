@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Summary of endpoint event data.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
