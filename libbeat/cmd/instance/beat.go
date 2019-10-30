@@ -875,7 +875,6 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 	return callback, nil
 }
 
-
 func (b *Beat) setupMonitoring(settings Settings) error {
 	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
 	if err != nil {

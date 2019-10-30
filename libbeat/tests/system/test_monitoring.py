@@ -163,7 +163,7 @@ class Test(BaseTest):
         self.render_config_template(
             "mockbeat",
             monitoring={
-                    "cluster_uuid": test_cluster_uuid
+                "cluster_uuid": test_cluster_uuid
             },
             http_enabled="true"
         )
@@ -271,7 +271,6 @@ class Test(BaseTest):
     def get_beat_state(self):
         url = "http://localhost:5066/state"
         return requests.get(url).json()
-
 
     def random_string(self, size):
         char_pool = string.ascii_letters + string.digits

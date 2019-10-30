@@ -19,6 +19,7 @@ package monitoring
 
 import (
 	"errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/monitoring/report"
