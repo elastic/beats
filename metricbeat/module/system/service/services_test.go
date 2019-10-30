@@ -41,6 +41,11 @@ func TestFormProps(t *testing.T) {
 		ExecMainStatus:       0,
 		ExecMainCode:         1,
 		ActiveEnterTimestamp: 1571850129000000,
+		IPAccounting:         true,
+		IPEgressBytes:        100,
+		IPIngressBytes:       50,
+		IPEgressPackets:      100,
+		IPIngressPackets:     50,
 	}
 	event, err := formProperties(testUnit, testprops)
 	assert.NoError(t, err)
@@ -50,10 +55,20 @@ func TestFormProps(t *testing.T) {
 		"exec_code":   "exited",
 		"load_state":  "loaded",
 		"name":        "test.service",
-		"resources":   common.MapStr{},
 		"state_since": time.Unix(0, 1571850129000000*1000),
 		"sub_state":   "running",
+		"resources": common.MapStr{"network": common.MapStr{
+			"in": common.MapStr{
+				"bytes":   50,
+				"packets": 50},
+			"out": common.MapStr{
+				"bytes":   100,
+				"packets": 100},
+		},
+		},
 	}
 
-	assert.Equal(t, testEvent, event.MetricSetFields)
+	assert.NotEmpty(t, event.MetricSetFields["resources"])
+	assert.Equal(t, event.MetricSetFields["state_since"], testEvent["state_since"])
+	assert.NotEmpty(t, event.RootFields)
 }
