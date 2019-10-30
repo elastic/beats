@@ -69,7 +69,7 @@ type ClientSettings struct {
 	ProxyDisable       bool
 	TLS                *transport.TLSConfig
 	Username, Password string
-	ApiKey             string
+	APIKey             string
 	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
@@ -88,7 +88,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
-	ApiKey   string
+	APIKey   string
 	Headers  map[string]string
 
 	http              *http.Client
@@ -208,7 +208,7 @@ func NewClient(
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
-			ApiKey:   base64.StdEncoding.EncodeToString([]byte(s.ApiKey)),
+			APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
 			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
@@ -281,7 +281,7 @@ func (client *Client) Clone() *Client {
 			TLS:              client.tlsConfig,
 			Username:         client.Username,
 			Password:         client.Password,
-			ApiKey:           client.ApiKey,
+			APIKey:           client.APIKey,
 			Parameters:       nil, // XXX: do not pass params?
 			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
@@ -809,8 +809,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	if conn.ApiKey != "" {
-		req.Header.Add("Authorization", "ApiKey "+conn.ApiKey)
+	if conn.APIKey != "" {
+		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
 	}
 
 	for name, value := range conn.Headers {

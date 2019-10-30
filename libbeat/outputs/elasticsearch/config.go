@@ -31,7 +31,7 @@ type elasticsearchConfig struct {
 	Headers          map[string]string `config:"headers"`
 	Username         string            `config:"username"`
 	Password         string            `config:"password"`
-	ApiKey           string            `config:"api_key"`
+	APIKey           string            `config:"api_key"`
 	ProxyURL         string            `config:"proxy_url"`
 	ProxyDisable     bool              `config:"proxy_disable"`
 	LoadBalance      bool              `config:"loadbalance"`
@@ -62,7 +62,7 @@ var (
 		Params:           nil,
 		Username:         "",
 		Password:         "",
-		ApiKey:           "",
+		APIKey:           "",
 		Timeout:          90 * time.Second,
 		MaxRetries:       3,
 		CompressionLevel: 0,
@@ -83,7 +83,7 @@ func (c *elasticsearchConfig) Validate() error {
 		}
 	}
 
-	if c.ApiKey != "" && (c.Username != "" || c.Password != "") {
+	if c.APIKey != "" && (c.Username != "" || c.Password != "") {
 		return fmt.Errorf("cannot set both api_key and username/password")
 	}
 

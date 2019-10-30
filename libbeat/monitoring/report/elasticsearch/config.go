@@ -34,7 +34,7 @@ type config struct {
 	Headers          map[string]string `config:"headers"`
 	Username         string            `config:"username"`
 	Password         string            `config:"password"`
-	ApiKey           string            `config:"api_key"`
+	APIKey           string            `config:"api_key"`
 	ProxyURL         string            `config:"proxy_url"`
 	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
 	TLS              *tlscommon.Config `config:"ssl"`
@@ -56,7 +56,7 @@ type backoff struct {
 }
 
 func (c *config) Validate() error {
-	if c.ApiKey != "" && (c.Username != "" && c.Password != "") {
+	if c.APIKey != "" && (c.Username != "" && c.Password != "") {
 		return fmt.Errorf("cannot set both api_key and username/password for monitoring client")
 	}
 

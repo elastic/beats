@@ -84,7 +84,7 @@ func defaultConfig(settings report.Settings) config {
 		Headers:          nil,
 		Username:         "beats_system",
 		Password:         "",
-		ApiKey:           "",
+		APIKey:           "",
 		ProxyURL:         "",
 		CompressionLevel: 0,
 		TLS:              nil,
@@ -122,7 +122,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	}
 
 	// Unset username which is set by default, even if no password is set
-	if config.ApiKey != "" {
+	if config.APIKey != "" {
 		config.Username = ""
 		config.Password = ""
 	}
@@ -346,7 +346,7 @@ func makeClient(
 		TLS:              tlsConfig,
 		Username:         config.Username,
 		Password:         config.Password,
-		ApiKey:           config.ApiKey,
+		APIKey:           config.APIKey,
 		Parameters:       params,
 		Headers:          config.Headers,
 		Index:            outil.MakeSelector(outil.ConstSelectorExpr("_xpack")),
