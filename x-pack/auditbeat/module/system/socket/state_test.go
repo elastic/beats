@@ -126,12 +126,145 @@ func TestTCPConnWithProcess(t *testing.T) {
 	}
 }
 
+func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 53
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	evs := []event{
+		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			Sock:     sock,
+			Size:     123,
+			LAddr:    lAddr,
+			RAddr:    rAddr,
+			AltRAddr: 0,
+			LPort:    lPort,
+			RPort:    rPort,
+			AltRPort: 0,
+		},
+		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
+		&doExit{Meta: meta(1234, 1234, 18)},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
+	flow := flows[0]
+	t.Log("read flow", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":           localIP,
+		"source.port":         localPort,
+		"source.packets":      uint64(1),
+		"source.bytes":        uint64(151),
+		"client.ip":           localIP,
+		"client.port":         localPort,
+		"destination.ip":      remoteIP,
+		"destination.port":    remotePort,
+		"destination.packets": uint64(0),
+		"destination.bytes":   uint64(0),
+		"server.ip":           remoteIP,
+		"server.port":         remotePort,
+		"network.direction":   "outbound",
+		"network.transport":   "udp",
+		"network.type":        "ipv4",
+		"process.pid":         1234,
+		"process.name":        "exfil-udp",
+		"user.id":             "501",
+	} {
+		assertValue(t, flow, expected, field)
+	}
+}
+
+func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 53
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	var packet [256]byte
+	var ipHdr, udpHdr uint16 = 2, 64
+	packet[ipHdr] = 0x45
+	tracing.MachineEndian.PutUint32(packet[ipHdr+12:], rAddr)
+	tracing.MachineEndian.PutUint16(packet[udpHdr:], rPort)
+	evs := []event{
+		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/exfil-udp"}),
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpQueueRcvSkb{
+			Meta:   meta(1234, 1235, 5),
+			Sock:   sock,
+			Size:   123,
+			LAddr:  lAddr,
+			LPort:  lPort,
+			IPHdr:  ipHdr,
+			UDPHdr: udpHdr,
+			Packet: packet,
+		},
+		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
+		&doExit{Meta: meta(1234, 1234, 18)},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
+	flow := flows[0]
+	t.Log("read flow", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":           remoteIP,
+		"source.port":         remotePort,
+		"source.packets":      uint64(1),
+		"source.bytes":        uint64(151),
+		"client.ip":           remoteIP,
+		"client.port":         remotePort,
+		"destination.ip":      localIP,
+		"destination.port":    localPort,
+		"destination.packets": uint64(0),
+		"destination.bytes":   uint64(0),
+		"server.ip":           localIP,
+		"server.port":         localPort,
+		"network.direction":   "inbound",
+		"network.transport":   "udp",
+		"network.type":        "ipv4",
+		"process.pid":         1234,
+		"process.name":        "exfil-udp",
+		"user.id":             "501",
+	} {
+		assertValue(t, flow, expected, field)
+	}
+}
+
 func assertValue(t *testing.T, ev beat.Event, expected interface{}, field string) bool {
 	value, err := ev.GetValue(field)
-	if err != nil {
-		t.Fatal(err, "field", field)
-	}
-	return assert.Equal(t, expected, value)
+	return assert.Nil(t, err, field) && assert.Equal(t, expected, value, field)
 }
 
 func be16(val uint16) uint16 {
