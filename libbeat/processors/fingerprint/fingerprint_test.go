@@ -29,49 +29,46 @@ import (
 )
 
 func TestHashMethods(t *testing.T) {
+	testEvent := &beat.Event{
+		Fields: common.MapStr{
+			"field1":       "foo",
+			"field2":       "bar",
+			"unused_field": "baz",
+		},
+		Timestamp: time.Now(),
+	}
+
 	tests := []struct {
 		method   string
 		expected string
 	}{
 		{
 			"md5",
-			"3455d980d9c2a5a1c2c0b090a929aa3a",
+			"4c45df4792f3ef850c928ec5f5232538",
 		},
 		{
 			"sha1",
-			"46de5d8225e75aeedd559c953f100dca41612b18",
+			"22f76427d626516d3f7a05785165b99617683b22",
 		},
 		{
 			"sha256",
-			"4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144",
+			"1208288932231e313b369bae587ff574cd3016a408e52e7128d7bee752674003",
 		},
 		{
 			"sha384",
-			"251b4d77ceea8ad64bf5ed906b5760f9b758af3b30e8f9de5d0d70ec6a2745d25b1be00c5317dc7859256de2d416b179",
+			"295adfe0bc03908948e4b0b6a54f441767867e426dda590430459c8a147fbba242a38cba282adee78335b9e08877b86c",
 		},
 		{
 			"sha512",
-			"903a7f492a22015c89a8e00c40a85da814c2ff42c28cdf1a29495faa8a849eba00449921a75b12c9c212169f100ebf6b05ac8389a8fbfd61cba6026e86a6e2c1",
+			"f50ad51b63c92a0ed0c910527119b81806f3110f0afaa1dcb93506a78371ea761e50c0fc09b08c441d832dd2da1b45e5d8361adfb240e1fffc2695122a23e183",
 		},
 	}
 
 	for _, test := range tests {
-		name := test.method
-		if name == "" {
-			name = "default"
-		}
-
-		name = fmt.Sprintf("testing %v method", name)
+		name := fmt.Sprintf("testing %v fingerprinting method", test.method)
 		t.Run(name, func(t *testing.T) {
-			testEvent := &beat.Event{
-				Fields: common.MapStr{
-					"field1": "foo",
-				},
-				Timestamp: time.Now(),
-			}
-
 			testConfig, err := common.NewConfigFrom(common.MapStr{
-				"fields": []string{"field1"},
+				"fields": []string{"field1", "field2"},
 				"method": test.method,
 			})
 			assert.NoError(t, err)
@@ -89,9 +86,253 @@ func TestHashMethods(t *testing.T) {
 	}
 }
 
-// TODO: Order of source fields doesn't matter
-// TODO: Missing source fields
-// TODO: non-scalar fields
-// TODO: hashing time fields
-// TODO: invalid fingerprinting method in config
-// TODO: encoding
+func TestSourceFields(t *testing.T) {
+	testEvent := &beat.Event{
+		Fields: common.MapStr{
+			"field1": "foo",
+			"field2": "bar",
+			"nested": common.MapStr{
+				"field": "qux",
+			},
+			"unused_field": "baz",
+		},
+		Timestamp: time.Now(),
+	}
+	expectedFingerprint := "3d51237d384215a6e731f2cc67ead6d7d9a5138377897c8f542a915be3c25bcf"
+
+	tests := []struct {
+		name   string
+		fields []string
+	}{
+		{
+			"order is insignificant",
+			[]string{"field1", "nested.field"},
+		},
+		{
+			"order is insignificant",
+			[]string{"nested.field", "field1"},
+		},
+		{
+			"duplicates are ignored",
+			[]string{"nested.field", "field1", "nested.field"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testConfig, err := common.NewConfigFrom(common.MapStr{
+				"fields": test.fields,
+				"method": "sha256",
+			})
+			assert.NoError(t, err)
+
+			p, err := New(testConfig)
+			assert.NoError(t, err)
+
+			newEvent, err := p.Run(testEvent)
+			assert.NoError(t, err)
+
+			v, err := newEvent.GetValue("fingerprint")
+			assert.NoError(t, err)
+			assert.Equal(t, expectedFingerprint, v)
+		})
+	}
+}
+
+func TestEncoding(t *testing.T) {
+	testEvent := &beat.Event{
+		Fields: common.MapStr{
+			"field1": "foo",
+			"field2": "bar",
+			"nested": common.MapStr{
+				"field": "qux",
+			},
+			"unused_field": "baz",
+		},
+		Timestamp: time.Now(),
+	}
+
+	tests := []struct {
+		encoding            string
+		expectedFingerprint string
+	}{
+		{
+			"hex",
+			"8934ca639027aab1ee9f3944d4d6bd1e",
+		},
+		{
+			"base32",
+			"RE2MUY4QE6VLD3U7HFCNJVV5DY======",
+		},
+		{
+			"base64",
+			"iTTKY5AnqrHunzlE1Na9Hg==",
+		},
+	}
+
+	for _, test := range tests {
+		name := fmt.Sprintf("testing %v encoding", test.encoding)
+		t.Run(name, func(t *testing.T) {
+			testConfig, err := common.NewConfigFrom(common.MapStr{
+				"fields":   []string{"field2", "nested.field"},
+				"method":   "md5",
+				"encoding": test.encoding,
+			})
+			assert.NoError(t, err)
+
+			p, err := New(testConfig)
+			assert.NoError(t, err)
+
+			newEvent, err := p.Run(testEvent)
+			assert.NoError(t, err)
+
+			v, err := newEvent.GetValue("fingerprint")
+			assert.NoError(t, err)
+			assert.Equal(t, test.expectedFingerprint, v)
+		})
+	}
+}
+
+func TestConsistentHashingTimeFields(t *testing.T) {
+	tzUTC := time.UTC
+	tzMTV := time.FixedZone("Mountain View, California, USA", int((-8 * time.Hour).Seconds()))
+	tzBOM := time.FixedZone("Bombay, Maharashtra, India", int((5*time.Hour + 30*time.Minute).Seconds()))
+
+	expectedFingerprint := "4534d56a673c2da41df32db5da87cf47e639e84fe82907f2c015c8dfcac5d4f5"
+
+	tests := []struct {
+		name  string
+		event common.MapStr
+	}{
+		{
+			"time field in UTC",
+			common.MapStr{
+				"timestamp": time.Date(2019, 10, 29, 0, 0, 0, 0, tzUTC),
+			},
+		},
+		{
+			"time field in Mountain View time",
+			common.MapStr{
+				"timestamp": time.Date(2019, 10, 28, 16, 0, 0, 0, tzMTV),
+			},
+		},
+		{
+			"time field in Bombay time",
+			common.MapStr{
+				"timestamp": time.Date(2019, 10, 29, 5, 30, 0, 0, tzBOM),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testConfig, err := common.NewConfigFrom(common.MapStr{
+				"fields": []string{"timestamp"},
+			})
+			assert.NoError(t, err)
+
+			p, err := New(testConfig)
+			assert.NoError(t, err)
+
+			testEvent := &beat.Event{
+				Fields: test.event,
+			}
+			newEvent, err := p.Run(testEvent)
+			assert.NoError(t, err)
+
+			v, err := newEvent.GetValue("fingerprint")
+			assert.NoError(t, err)
+			assert.Equal(t, expectedFingerprint, v)
+		})
+	}
+}
+
+func TestSourceFieldErrors(t *testing.T) {
+	testEvent := &beat.Event{
+		Fields: common.MapStr{
+			"field1": "foo",
+			"field2": "bar",
+			"complex_field": map[string]interface{}{
+				"child": "qux",
+			},
+			"unused_field": "baz",
+		},
+		Timestamp: time.Now(),
+	}
+
+	tests := []struct {
+		name           string
+		fields         []string
+		expectedErrMsg string
+	}{
+		{
+			"missing field",
+			[]string{"field1", "missing_field"},
+			"failed to compute fingerprint: failed to find field [missing_field] in event: key not found",
+		},
+		{
+			"non-scalar field",
+			[]string{"field1", "complex_field"},
+			"failed to compute fingerprint: cannot compute fingerprint using non-scalar field [complex_field]",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testConfig, err := common.NewConfigFrom(common.MapStr{
+				"fields": test.fields,
+				"method": "sha256",
+			})
+			assert.NoError(t, err)
+
+			p, err := New(testConfig)
+			assert.NoError(t, err)
+
+			_, err = p.Run(testEvent)
+			assert.EqualError(t, err, test.expectedErrMsg)
+		})
+	}
+}
+
+func TestInvalidConfig(t *testing.T) {
+	tests := []struct {
+		name           string
+		config         common.MapStr
+		expectedErrMsg string
+	}{
+		{
+			"no fields",
+			common.MapStr{
+				"fields": []string{},
+				"method": "sha256",
+			},
+			"failed to unpack fingerprint processor configuration: empty field accessing 'fields'",
+		},
+		{
+			"invalid fingerprinting method",
+			common.MapStr{
+				"fields": []string{"doesnt", "matter"},
+				"method": "non_existent",
+			},
+			"failed to unpack fingerprint processor configuration: invalid fingerprinting method [non_existent] accessing 'method'",
+		},
+		{
+			"invalid encoding",
+			common.MapStr{
+				"fields":   []string{"doesnt", "matter"},
+				"encoding": "non_existent",
+			},
+			"failed to unpack fingerprint processor configuration: invalid encoding method [non_existent]",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			testConfig, err := common.NewConfigFrom(test.config)
+			assert.NoError(t, err)
+
+			_, err = New(testConfig)
+			assert.EqualError(t, err, test.expectedErrMsg)
+		})
+	}
+}

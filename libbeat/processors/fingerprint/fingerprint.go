@@ -38,8 +38,11 @@ func init() {
 
 const processorName = "fingerprint"
 
+var errNoFields = errors.New("must specify at least one field")
+
 type fingerprint struct {
 	config Config
+	fields []string
 	hash   hash.Hash
 }
 
@@ -55,6 +58,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	p := &fingerprint{
 		config: config,
 		hash:   config.Method(),
+		fields: unique(config.Fields),
 	}
 
 	return p, nil
@@ -62,7 +66,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with fingerprint information
 func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
-	source, err := makeSource(p.config.Fields, event.Fields)
+	source, err := makeSource(p.fields, event.Fields)
 	if err != nil {
 		return nil, makeComputeFingerprintError(err)
 	}
@@ -114,4 +118,17 @@ func makeSource(sourceFields []string, eventFields common.MapStr) (string, error
 
 func makeComputeFingerprintError(err error) error {
 	return errors.Wrap(err, "failed to compute fingerprint")
+}
+
+func unique(in []string) []string {
+	seen := map[string]bool{}
+	var out = make([]string, 0, len(in))
+	for _, item := range in {
+		if _, found := seen[item]; !found {
+			seen[item] = true
+			out = append(out, item)
+		}
+	}
+
+	return out
 }

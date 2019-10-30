@@ -21,11 +21,9 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/hex"
-	"errors"
+	"fmt"
 	"strings"
 )
-
-var errEncodingMethodUnknown = errors.New("unknown encoding method")
 
 type encodingMethod func([]byte) string
 
@@ -41,9 +39,13 @@ func (e *encodingMethod) Unpack(str string) error {
 
 	m, found := encodings[str]
 	if !found {
-		return errEncodingMethodUnknown
+		return makeUnknownEncodingError(str)
 	}
 
 	*e = m
 	return nil
+}
+
+func makeUnknownEncodingError(encoding string) error {
+	return fmt.Errorf("invalid encoding [%s]", encoding)
 }
