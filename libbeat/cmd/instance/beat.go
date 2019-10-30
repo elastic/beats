@@ -887,6 +887,7 @@ func (b *Beat) setupMonitoring(settings Settings) error {
 		return err
 	}
 
+	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
 		monitoringRegistry := stateRegistry.NewRegistry("monitoring")
