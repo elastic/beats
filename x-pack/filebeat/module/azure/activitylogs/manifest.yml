@@ -8,5 +8,7 @@ var:
   - name: consumer_group
     default: "$Default"
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ../azure-shared-pipeline.json
 input: config/activitylogs.yml

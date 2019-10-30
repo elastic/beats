@@ -1,0 +1,44 @@
+[
+    {
+        "@timestamp": "2016-10-16T08:11:38.771Z",
+        "client.address": "192.168.199.132",
+        "destination.address": "192.168.199.254",
+        "destination.ip": "192.168.199.254",
+        "destination.port": 67,
+        "event.dataset": "zeek.dhcp",
+        "event.id": "{0=CmWOt6VWaNGqXYcH6, 1=CLObLo4YHn0u23Tp8a}",
+        "event.module": "zeek",
+        "fileset.name": "dhcp",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.name": "localdomain",
+        "network.protocol": "dhcp",
+        "network.transport": "udp",
+        "server.address": "192.168.199.254",
+        "service.type": "zeek",
+        "source.address": "192.168.199.132",
+        "source.ip": "192.168.199.132",
+        "source.port": 68,
+        "tags": [
+            "zeek.dhcp"
+        ],
+        "zeek.dhcp.address.assigned": "192.168.199.132",
+        "zeek.dhcp.address.client": "192.168.199.132",
+        "zeek.dhcp.address.mac": "00:0c:29:03:df:ad",
+        "zeek.dhcp.address.requested": "192.168.199.132",
+        "zeek.dhcp.address.server": "192.168.199.254",
+        "zeek.dhcp.client_fqdn": "DESKTOP-2AEFM7G",
+        "zeek.dhcp.domain": "localdomain",
+        "zeek.dhcp.duration": 0.000161,
+        "zeek.dhcp.hostname": "DESKTOP-2AEFM7G",
+        "zeek.dhcp.lease_time": 1800,
+        "zeek.dhcp.msg.types": [
+            "REQUEST",
+            "ACK"
+        ],
+        "zeek.session_id": [
+            "CmWOt6VWaNGqXYcH6",
+            "CLObLo4YHn0u23Tp8a"
+        ]
+    }
+]

@@ -1,0 +1,25 @@
+[
+    {
+        "@timestamp": "2018-12-03T22:59:59.993Z",
+        "destination.address": "192.168.1.2",
+        "destination.ip": "192.168.1.2",
+        "destination.port": 53,
+        "event.dataset": "zeek.weird",
+        "event.id": "C1ralPp062bkwWt4e",
+        "event.module": "zeek",
+        "fileset.name": "weird",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "source.port": 64521,
+        "tags": [
+            "zeek.weird"
+        ],
+        "zeek.session_id": "C1ralPp062bkwWt4e",
+        "zeek.weird.name": "dns_unmatched_reply",
+        "zeek.weird.notice": false,
+        "zeek.weird.peer": "worker-6"
+    }
+]

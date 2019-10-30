@@ -1,0 +1,83 @@
+[
+    {
+        "@timestamp": "2013-12-20T15:44:10.647Z",
+        "destination.address": "38.229.70.20",
+        "destination.ip": "38.229.70.20",
+        "destination.port": 8000,
+        "event.dataset": "zeek.irc",
+        "event.id": "CNJBX5FQdL62VUUP1",
+        "event.module": "zeek",
+        "fileset.name": "irc",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.protocol": "irc",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "10.180.156.249",
+        "source.ip": "10.180.156.249",
+        "source.port": 45921,
+        "tags": [
+            "zeek.irc"
+        ],
+        "zeek.irc.addl": "+iw xxxxx XxxxxxXxxx ",
+        "zeek.irc.command": "USER",
+        "zeek.irc.value": "xxxxx",
+        "zeek.session_id": "CNJBX5FQdL62VUUP1"
+    },
+    {
+        "@timestamp": "2013-12-20T15:44:10.647Z",
+        "destination.address": "38.229.70.20",
+        "destination.ip": "38.229.70.20",
+        "destination.port": 8000,
+        "event.dataset": "zeek.irc",
+        "event.id": "CNJBX5FQdL62VUUP1",
+        "event.module": "zeek",
+        "fileset.name": "irc",
+        "input.type": "log",
+        "log.offset": 206,
+        "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.protocol": "irc",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "10.180.156.249",
+        "source.ip": "10.180.156.249",
+        "source.port": 45921,
+        "tags": [
+            "zeek.irc"
+        ],
+        "zeek.irc.addl": "+iw xxxxx XxxxxxXxxx ",
+        "zeek.irc.command": "NICK",
+        "zeek.irc.user": "xxxxx",
+        "zeek.irc.value": "molochtest",
+        "zeek.session_id": "CNJBX5FQdL62VUUP1"
+    },
+    {
+        "@timestamp": "2013-12-20T15:44:10.706Z",
+        "destination.address": "38.229.70.20",
+        "destination.ip": "38.229.70.20",
+        "destination.port": 8000,
+        "event.dataset": "zeek.irc",
+        "event.id": "CNJBX5FQdL62VUUP1",
+        "event.module": "zeek",
+        "fileset.name": "irc",
+        "input.type": "log",
+        "log.offset": 432,
+        "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.protocol": "irc",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "10.180.156.249",
+        "source.ip": "10.180.156.249",
+        "source.port": 45921,
+        "tags": [
+            "zeek.irc"
+        ],
+        "zeek.irc.addl": " with channel key: '-'",
+        "zeek.irc.command": "JOIN",
+        "zeek.irc.nick": "molochtest",
+        "zeek.irc.user": "xxxxx",
+        "zeek.irc.value": "#moloch-fpc",
+        "zeek.session_id": "CNJBX5FQdL62VUUP1"
+    }
+]

@@ -92,7 +92,7 @@ type compressionConfig struct {
 
 var defaultConfig = Config{
 	Timeout:      16 * time.Second,
-	MaxRedirects: 10,
+	MaxRedirects: 0,
 	Response: responseConfig{
 		IncludeBody:         "on_error",
 		IncludeBodyMaxBytes: 2048,
