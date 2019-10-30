@@ -65,7 +65,7 @@ You can now use this API key in your {beatname_uc}.yml configuration file like t
 output.elasticsearch:
   api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA <1>
 --------------------
-<1> format is `id:api_key` (note the colon in the middles)
+<1> format is `id:api_key` (note the colon in the middle)
 
 [[beats-api-key-monitor]]
 ==== Create an API key for monitoring
