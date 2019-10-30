@@ -39,7 +39,7 @@
   },
   {
     "remove": {
-      "field": "nagios.log.epoch"
+      "field": "nagios.timestamp_epoch"
     }
   }],
   "on_failure" : [{
