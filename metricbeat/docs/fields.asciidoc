@@ -3839,10 +3839,19 @@ type: long
 
 --
 
-*`fragment_path`*::
+*`systemd.fragment_path`*::
 +
 --
 the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
 
 type: keyword
 
