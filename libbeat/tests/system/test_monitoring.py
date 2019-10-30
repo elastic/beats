@@ -272,6 +272,10 @@ class Test(BaseTest):
         url = "http://localhost:5066/state"
         return requests.get(url).json()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Adding system test
     def random_string(self, size):
         char_pool = string.ascii_letters + string.digits
         return ''.join(random.choice(char_pool) for i in range(size))
