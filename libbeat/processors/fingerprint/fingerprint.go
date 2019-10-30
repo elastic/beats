@@ -20,6 +20,7 @@ package fingerprint
 import (
 	"fmt"
 	"hash"
+	"io"
 	"sort"
 	"time"
 
@@ -66,17 +67,15 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with fingerprint information
 func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
-	source, err := makeSource(p.fields, event.Fields)
+	hashFn := p.hash
+	hashFn.Reset()
+
+	err := writeFields(hashFn, p.fields, event.Fields)
 	if err != nil {
 		return nil, makeComputeFingerprintError(err)
 	}
 
-	hashFn := p.hash
-	hashFn.Reset()
-
-	hashFn.Write([]byte(source))
 	hash := hashFn.Sum(nil)
-
 	encodedHash := p.config.Encoding(hash)
 
 	if _, err = event.PutValue(p.config.TargetField, encodedHash); err != nil {
@@ -90,30 +89,30 @@ func (p *fingerprint) String() string {
 	return fmt.Sprintf("%v=[method=[%v]]", processorName, p.config.Method)
 }
 
-func makeSource(sourceFields []string, eventFields common.MapStr) (string, error) {
-	var str string
+func writeFields(to io.Writer, sourceFields []string, eventFields common.MapStr) error {
 	for _, k := range sourceFields {
 		v, err := eventFields.GetValue(k)
 		if err == common.ErrKeyNotFound {
-			return "", errors.Wrapf(err, "failed to find field [%v] in event", k)
+			return errors.Wrapf(err, "failed to find field [%v] in event", k)
 		}
 		if err != nil {
-			return "", errors.Wrapf(err, "failed when finding field [%v] in event", k)
+			return errors.Wrapf(err, "failed when finding field [%v] in event", k)
 		}
 
 		i := v
 		switch vv := v.(type) {
 		case map[string]interface{}, []interface{}, common.MapStr:
-			return "", errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
+			return errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.
 			i = vv.UTC()
 		}
 
-		str += fmt.Sprintf("|%v|%v", k, i)
+		io.WriteString(to, fmt.Sprintf("|%v|%v", k, i))
 	}
-	str += "|"
-	return str, nil
+
+	io.WriteString(to, "|")
+	return nil
 }
 
 func makeComputeFingerprintError(err error) error {
