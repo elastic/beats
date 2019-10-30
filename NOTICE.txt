@@ -422,6 +422,7 @@ This product includes software developed at CoreOS, Inc.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
+Version: v20
 Revision: fd7a80b32e1fc73e890fde45604ed5009dc817a3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
