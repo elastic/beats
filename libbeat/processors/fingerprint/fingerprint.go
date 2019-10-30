@@ -103,7 +103,7 @@ func makeSource(sourceFields []string, eventFields common.MapStr) (string, error
 
 		i := v
 		switch vv := v.(type) {
-		case map[string]interface{}, []interface{}:
+		case map[string]interface{}, []interface{}, common.MapStr:
 			return "", errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.

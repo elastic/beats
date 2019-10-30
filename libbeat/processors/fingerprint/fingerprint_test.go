@@ -28,13 +28,10 @@ import (
 )
 
 func TestHashMethods(t *testing.T) {
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1":       "foo",
-			"field2":       "bar",
-			"unused_field": "baz",
-		},
-		Timestamp: time.Now(),
+	testFields := common.MapStr{
+		"field1":       "foo",
+		"field2":       "bar",
+		"unused_field": "baz",
 	}
 
 	tests := map[string]struct {
@@ -58,6 +55,11 @@ func TestHashMethods(t *testing.T) {
 			p, err := New(testConfig)
 			assert.NoError(t, err)
 
+			testEvent := &beat.Event{
+				Fields:    testFields.Clone(),
+				Timestamp: time.Now(),
+			}
+
 			newEvent, err := p.Run(testEvent)
 			assert.NoError(t, err)
 
@@ -69,16 +71,13 @@ func TestHashMethods(t *testing.T) {
 }
 
 func TestSourceFields(t *testing.T) {
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1": "foo",
-			"field2": "bar",
-			"nested": common.MapStr{
-				"field": "qux",
-			},
-			"unused_field": "baz",
+	testFields := common.MapStr{
+		"field1": "foo",
+		"field2": "bar",
+		"nested": common.MapStr{
+			"field": "qux",
 		},
-		Timestamp: time.Now(),
+		"unused_field": "baz",
 	}
 	expectedFingerprint := "3d51237d384215a6e731f2cc67ead6d7d9a5138377897c8f542a915be3c25bcf"
 
@@ -101,6 +100,10 @@ func TestSourceFields(t *testing.T) {
 			p, err := New(testConfig)
 			assert.NoError(t, err)
 
+			testEvent := &beat.Event{
+				Fields:    testFields.Clone(),
+				Timestamp: time.Now(),
+			}
 			newEvent, err := p.Run(testEvent)
 			assert.NoError(t, err)
 
@@ -112,16 +115,13 @@ func TestSourceFields(t *testing.T) {
 }
 
 func TestEncoding(t *testing.T) {
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1": "foo",
-			"field2": "bar",
-			"nested": common.MapStr{
-				"field": "qux",
-			},
-			"unused_field": "baz",
+	testFields := common.MapStr{
+		"field1": "foo",
+		"field2": "bar",
+		"nested": common.MapStr{
+			"field": "qux",
 		},
-		Timestamp: time.Now(),
+		"unused_field": "baz",
 	}
 
 	tests := map[string]struct {
@@ -144,6 +144,10 @@ func TestEncoding(t *testing.T) {
 			p, err := New(testConfig)
 			assert.NoError(t, err)
 
+			testEvent := &beat.Event{
+				Fields:    testFields.Clone(),
+				Timestamp: time.Now(),
+			}
 			newEvent, err := p.Run(testEvent)
 			assert.NoError(t, err)
 
@@ -205,17 +209,13 @@ func TestConsistentHashingTimeFields(t *testing.T) {
 }
 
 func TestTargetField(t *testing.T) {
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1": "foo",
-			"nested": common.MapStr{
-				"field": "bar",
-			},
-			"unused_field": "baz",
+	testFields := common.MapStr{
+		"field1": "foo",
+		"nested": common.MapStr{
+			"field": "bar",
 		},
-		Timestamp: time.Now(),
+		"unused_field": "baz",
 	}
-
 	expectedFingerprint := "4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144"
 
 	tests := map[string]struct {
@@ -236,6 +236,10 @@ func TestTargetField(t *testing.T) {
 			p, err := New(testConfig)
 			assert.NoError(t, err)
 
+			testEvent := &beat.Event{
+				Fields:    testFields.Clone(),
+				Timestamp: time.Now(),
+			}
 			newEvent, err := p.Run(testEvent)
 			assert.NoError(t, err)
 
@@ -250,16 +254,13 @@ func TestTargetField(t *testing.T) {
 }
 
 func TestSourceFieldErrors(t *testing.T) {
-	testEvent := &beat.Event{
-		Fields: common.MapStr{
-			"field1": "foo",
-			"field2": "bar",
-			"complex_field": map[string]interface{}{
-				"child": "qux",
-			},
-			"unused_field": "baz",
+	testFields := common.MapStr{
+		"field1": "foo",
+		"field2": "bar",
+		"complex_field": map[string]interface{}{
+			"child": "qux",
 		},
-		Timestamp: time.Now(),
+		"unused_field": "baz",
 	}
 
 	tests := map[string]struct {
@@ -287,6 +288,10 @@ func TestSourceFieldErrors(t *testing.T) {
 			p, err := New(testConfig)
 			assert.NoError(t, err)
 
+			testEvent := &beat.Event{
+				Fields:    testFields.Clone(),
+				Timestamp: time.Now(),
+			}
 			_, err = p.Run(testEvent)
 			assert.EqualError(t, err, test.expectedErrMsg)
 		})
