@@ -1,7 +1,7 @@
 - module: kafka
   metricsets: ["broker", "consumergroup", "partition"]
   period: 10s
-  hosts: ["localhost:9092"]
+  hosts: ["localhost:8779"]
   enabled: true
 
   #client_id: metricbeat

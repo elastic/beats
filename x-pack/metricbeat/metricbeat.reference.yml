@@ -446,18 +446,14 @@ metricbeat.modules:
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia
-  metricsets: ["jmx"]
+  #metricsets: ["jmx"]
   period: 10s
-  hosts: ["localhost:8779"]
+  hosts: ["localhost"]
   namespace: "metrics"
   #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
   #username: "user"
   #password: "secret"
   jmx.mappings:
-    - mbean: 'kafka.network:type=RequestChannel,name=RequestQueueSize'
-        attributes:
-          - attr: Value
-            field: request.channel.queue.size
     #- mbean: 'java.lang:type=Runtime'
     #  attributes:
     #    - attr: Uptime
@@ -481,7 +477,7 @@ metricbeat.modules:
 
 #-------------------------------- Kafka Module --------------------------------
 - module: kafka
-  metricsets: ["broker", "consumergroup", "partition"]
+  metricsets: ["consumergroup", "partition"]
   period: 10s
   hosts: ["localhost:9092"]
   enabled: true
@@ -511,7 +507,7 @@ metricbeat.modules:
 - module: kafka
   metricsets: ["broker", "consumergroup", "partition"]
   period: 10s
-  hosts: ["localhost:9092"]
+  hosts: ["localhost:8779"]
   enabled: true
 
   #client_id: metricbeat
