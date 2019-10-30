@@ -19,7 +19,6 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Wget",
         "user_agent.original": "Wget/1.13.4 (linux-gnu)",
-        "user_agent.os.name": "Linux",
         "user_agent.version": "1.13.4"
     },
     {
@@ -45,7 +44,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840.98"
+        "user_agent.version": "54.0.2840"
     },
     {
         "@timestamp": "2016-12-26T16:22:00.000Z",
@@ -70,7 +69,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840.98"
+        "user_agent.version": "54.0.2840"
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000Z",
@@ -95,7 +94,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000Z",
@@ -120,7 +119,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000Z",
@@ -145,7 +144,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     },
     {
         "@timestamp": "2016-12-26T16:22:10.000Z",
@@ -170,7 +169,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     },
     {
         "@timestamp": "2016-12-26T16:22:13.000Z",
@@ -195,7 +194,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     },
     {
         "@timestamp": "2016-12-26T16:22:17.000Z",
@@ -220,6 +219,6 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "50.0."
+        "user_agent.version": "50.0"
     }
 ]
