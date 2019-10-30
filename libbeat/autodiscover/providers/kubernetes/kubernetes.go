@@ -96,9 +96,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	if err != nil {
 		return nil, errWrap(err)
 	}
-	if len(mapper) == 0 && !config.Hints.Enabled() {
-		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
-	}
 
 	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
@@ -123,22 +120,47 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			p.logger.Debugf("Watcher Pod add: %+v", obj)
-			p.emit(obj.(*kubernetes.Pod), "start")
-		},
-		UpdateFunc: func(obj interface{}) {
-			p.logger.Debugf("Watcher Pod update: %+v", obj)
-			p.emit(obj.(*kubernetes.Pod), "stop")
-			p.emit(obj.(*kubernetes.Pod), "start")
-		},
-		DeleteFunc: func(obj interface{}) {
-			p.logger.Debugf("Watcher Pod delete: %+v", obj)
-			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
-		},
+		AddFunc:    p.handleAdd,
+		UpdateFunc: p.handleUpdate,
+		DeleteFunc: p.handleDelete,
 	})
 
 	return p, nil
+}
+
+// handleAdd emits a start event for the given pod
+func (p *Provider) handleAdd(obj interface{}) {
+	p.logger.Debugf("Watcher Pod add: %+v", obj)
+	p.emit(obj.(*kubernetes.Pod), "start")
+}
+
+// handleUpdate emits events for a given pod depending on the state of the pod,
+// if it is terminating, a stop event is scheduled, if not, a stop and a start
+// events are sent sequentially to recreate the resources assotiated to the pod.
+func (p *Provider) handleUpdate(obj interface{}) {
+	pod := obj.(*kubernetes.Pod)
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
+		// Pod is terminating, don't reload its configuration and ignore the event
+		// if some pod is still running, we will receive more events when containers
+		// terminate.
+		for _, container := range pod.Status.ContainerStatuses {
+			if container.State.Running != nil {
+				return
+			}
+		}
+		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
+	} else {
+		p.logger.Debugf("Watcher Pod update: %+v", obj)
+		p.emit(pod, "stop")
+		p.emit(pod, "start")
+	}
+}
+
+// handleDelete emits a stop event for the given pod
+func (p *Provider) handleDelete(obj interface{}) {
+	p.logger.Debugf("Watcher Pod delete: %+v", obj)
+	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 }
 
 // Start for Runner interface.

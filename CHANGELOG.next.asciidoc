@@ -21,6 +21,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
 - Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
 - By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
+- Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
+- Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 
 *Auditbeat*
 
@@ -43,6 +45,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removed the `add_host_metadata` and `add_cloud_metadata` processors from the default config. These don't fit well with ECS for Heartbeat and were rarely used.
 - Fixed/altered redirect behavior. `max_redirects` now defaults to 0 (no redirects). Following redirects now works across hosts, but some timing fields will not be reported. {pull}14125[14125]
 - Removed `host.name` field that should never have been included. Heartbeat uses `observer.*` fields instead. {pull}14140[14140]
+- JSON/Regex checks against HTTP bodies will only consider the first 100MiB of the HTTP body to prevent excessive memory usage. {pull}14223[pull]
 
 *Journalbeat*
 
@@ -116,6 +119,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Kubernetes watcher at `add_kubernetes_metadata` fails with StatefulSets {pull}13905[13905]
 - Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over
   TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
+- Support usage of custom builders without hints and mappers {pull}13839[13839]
 
 *Auditbeat*
 
@@ -186,6 +190,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
 - Fix integer comparison on JSON responses. {pull}13348[13348]
+- Fix storage of HTTP bodies to work when JSON/Regex body checks are enabled. {pull}14223[14223]
 
 *Journalbeat*
 
@@ -234,6 +239,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix performance counter values for windows/perfmon metricset. {issue}14036[14036] {pull}14039[14039]
 - Add FailOnRequired when applying schema and fix metric names in mongodb metrics metricset. {pull}14143[14143]
 - Limit some of the error messages to the logs only {issue}14317[14317]
+- Convert indexed ms-since-epoch timestamp fields in `elasticsearch/ml_job` metricset to ints from float64s. {issue}14220[14220] {pull}14222[14222]
+- Fix ARN parsing function to work for ELB ARNs. {pull}14316[14316]
 
 *Packetbeat*
 
@@ -450,6 +457,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ability to filter by tags for cloudwatch metricset. {pull}13758[13758] {issue}13145[13145]
 - Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 - Add Oracle overview dashboard {pull}14021[14021]
+- Release CoreDNS module as GA. {pull}14308[14308]
+- Release CouchDB module as GA. {pull}14300[14300]
+- Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
 
 *Packetbeat*
 
