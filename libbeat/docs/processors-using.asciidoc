@@ -1184,6 +1184,28 @@ The following settings are supported:
                   empty array (`[]`) or an empty object (`{}`) are considered
                   empty values. Default is `false`.
 
+[[fingerprint]]
+=== Generate a fingerprint of an event
+
+The `fingerprint` processor generates a fingerprint of an event based on a
+specified subset of its fields.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - fingerprint:
+     fields: ["field1", "field2", ...]
+-----------------------------------------------------
+
+.Fingerprint options
+[options="header"]
+|======
+| `fields`          | yes       |               | List of fields to use as the source for the fingerprint.                                                               |
+| `target_field`    | no        | `fingerprint` | Field in which the generated fingerprint should be stored.                                                             |
+| `method`          | no        | `sha256`      | Algorithm to use for computing the fingerprint. Must be one of: `md5`, `sha1`, `sha256` (default), `sha384`, `sha512`. |
+| `encoding`        | no        | `hex`         | Encoding to use on the fingerprint value. Must be one of `hex` (default), `base32`, or `base64`.                       |
+|======
+
 [[include-fields]]
 === Keep fields from events
 
