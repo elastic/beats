@@ -4,8 +4,7 @@
   #  - partition
   #  - consumergroup
   period: 10s
-  hosts: ["localhost:9092"]
-
+  hosts: ["localhost:8779"]
   #client_id: metricbeat
   #retries: 3
   #backoff: 250ms

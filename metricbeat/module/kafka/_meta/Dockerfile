@@ -8,7 +8,7 @@ ENV KAFKA_LOGS_DIR="/kafka-logs"
 ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
 ENV TERM=linux
 
-RUN apt-get update && apt-get install -y curl openjdk-8-jre-headless netcat dnsutils
+RUN apt-get update && apt-get install -y curl openjdk-8-jre-headless netcat dnsutils wget
 
 RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
     curl -J -L -s -f -o - https://github.com/kadwanev/retry/releases/download/1.0.1/retry-1.0.1.tar.gz | tar xfz - -C /usr/local/bin && \
@@ -16,12 +16,16 @@ RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
         "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
     tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1
 
+RUN wget -O /opt/jolokia-jvm-1.5.0-agent.jar http://search.maven.org/remotecontent\?filepath\=org/jolokia/jolokia-jvm/1.5.0/jolokia-jvm-1.5.0-agent.jar
+# RUN mv jolokia-jvm-1.5.0-agent.jar /opt/jolokia-jvm-1.5.0-agent.jar
+
 ADD kafka_server_jaas.conf /etc/kafka/server_jaas.conf
 ADD run.sh /run.sh
 ADD healthcheck.sh /healthcheck.sh
 
 EXPOSE 9092
 EXPOSE 2181
+EXPOSE 8779
 
 # Healthcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available
 HEALTHCHECK --interval=1s --retries=90 CMD /healthcheck.sh

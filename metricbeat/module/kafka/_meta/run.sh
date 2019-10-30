@@ -1,5 +1,7 @@
 #!/bin/bash
 
+KAFKA_ADVERTISED_HOST_AUTO=True
+
 if [ -n "$KAFKA_ADVERTISED_HOST_AUTO" ]; then
 	KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME):9092
 fi
@@ -41,7 +43,7 @@ wait_for_port 2181
 
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
-export KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf
+export KAFKA_OPTS="-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8779,host=0.0.0.0"
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer \
     --override super.users=User:admin \
@@ -55,6 +57,7 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override logs.dir=${KAFKA_LOGS_DIR} &
 
 wait_for_port 9092
+wait_for_port 8779
 
 echo "Kafka load status code $?"
 
