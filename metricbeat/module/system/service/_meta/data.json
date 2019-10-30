@@ -9,27 +9,33 @@
         "name": "service",
         "period": 10000
     },
+    "process": {
+        "pid": 811
+    },
     "service": {
         "type": "system"
     },
     "system": {
         "service": {
-            "active_state": "active",
             "load_state": "loaded",
-            "main_pid": 811,
             "name": "NetworkManager.service",
             "resources": {
                 "memory": {
                     "usage": {
-                        "bytes": 15384576
+                        "bytes": 15646720
                     }
                 },
                 "tasks": {
                     "count": 4
                 }
             },
+            "state": "active",
             "state_since": "2019-10-18T21:24:57.581561-07:00",
             "sub_state": "running"
         }
+    },
+    "systemd": {
+        "fragment_path": "/usr/lib/systemd/system/NetworkManager.service",
+        "unit": "NetworkManager.service"
     }
 }
