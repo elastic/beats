@@ -253,7 +253,7 @@ func logBulkFailures(result esout.BulkResult, events []report.Event) {
 		return
 	}
 
-	for i, _ := range events {
+	for i := range events {
 		status, msg, err := esout.BulkReadItemStatus(reader)
 		if err != nil {
 			logp.Err("failed to parse item status: %v", err)
