@@ -99,12 +99,9 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 				}
 			}
 
-			groupState := &fieldState{Path: field.Name, DefaultField: true}
+			groupState := &fieldState{Path: field.Name, DefaultField: *field.DefaultField}
 			if state.Path != "" {
 				groupState.Path = state.Path + "." + field.Name
-			}
-			if field.DefaultField != nil {
-				groupState.DefaultField = *field.DefaultField
 			}
 			if err := p.Process(field.Fields, groupState, properties); err != nil {
 				return err
