@@ -111,7 +111,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.other(&field)
 		}
 
-		if field.DefaultField == nil || *field.DefaultField {
+		if *field.DefaultField {
 			switch field.Type {
 			case "", "keyword", "text":
 				addToDefaultFields(&field)
