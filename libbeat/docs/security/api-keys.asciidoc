@@ -2,10 +2,10 @@
 [[beats-api-keys]]
 === Grant access using API keys
 
-Instead of using usernames and passwords you can use API keys to grant
-access to {es} resources. API keys can be set to expire at a certain time
-and explicitly invalidated. Any user with the `manage_api_key` or `manage_own_api_key`
-cluster privilege can create API keys.
+Instead of using usernames and passwords, you can use API keys to grant
+access to {es} resources. You can set API keys to expire at a certain time,
+and you can explicitly invalidate them. Any user with the `manage_api_key`
+or `manage_own_api_key` cluster privilege can create API keys.
 
 See the {es} API key documentation for more information:
 
@@ -13,9 +13,9 @@ See the {es} API key documentation for more information:
 * {ref}/security-api-get-api-key.html[Get API key information]
 * {ref}/security-api-invalidate-api-key.html[Invalidate API key]
 
-Every {beatname_uc} instance is typically sending both collected data and monitoring
+{beatname_uc} instances typically send both collected data and monitoring
 information to {es}. If you are sending both to the same cluster, you can use the same
-API key. For different clusters, you will need an API key per cluster.
+API key. For different clusters, you need to use an API key per cluster.
 
 NOTE: For security reasons, we recommend using a unique API key per Beat instance.
 You can create as many API keys per user as necessary.
@@ -43,8 +43,8 @@ POST /_security/api_key
   }
 }
 ------------------------------------------------------------
-<1> name of the API key
-<2> granted privileges, see <<feature-roles>>
+<1> Name of the API key
+<2> Granted privileges, see <<feature-roles>>
 
 The return value will look something like this:
 
@@ -56,16 +56,16 @@ The return value will look something like this:
   "api_key":"KnR6yE41RrSowb0kQ0HWoA" <2>
 }
 --------------------------------------------------
-<1> unique id for this API key
-<2> generated API key
+<1> Unique id for this API key
+<2> Generated API key
 
-You can now use this API key in your {beatname_uc}.yml configuration file like this:
-["source","yml",subs="attributes"]
+You can now use this API key in your +{beatname_lc}.yml+ configuration file like this:
+["source","yaml"]
 --------------------
 output.elasticsearch:
   api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA <1>
 --------------------
-<1> format is `id:api_key` (note the colon in the middle)
+<1> Format is `id:api_key` (note the colon in the middle)
 
 [[beats-api-key-monitor]]
 ==== Create an API key for monitoring
@@ -90,8 +90,8 @@ POST /_security/api_key
   }
 }
 ------------------------------------------------------------
-<1> name of the API key
-<2> granted privileges, see <<feature-roles>>
+<1> Name of the API key
+<2> Granted privileges, see <<feature-roles>>
 
 The return value will look something like this:
 
@@ -103,14 +103,14 @@ The return value will look something like this:
   "api_key":"KnR6yE41RrSowb0kQ0HWoA" <2>
 }
 --------------------------------------------------
-<1> unique id for this API key
-<2> generated API key
+<1> Unique id for this API key
+<2> Generated API key
 
-You can now use this API key in your {beatname_uc}.yml configuration file like this:
+You can now use this API key in your +{beatname_lc}.yml+ configuration file like this:
 ["source","yml",subs="attributes"]
 --------------------
 monitoring.elasticsearch:
   api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA <1>
 --------------------
-<1> format is `id:api_key` (note the colon in the middles)
+<1> Format is `id:api_key` (note the colon in the middle)
 
