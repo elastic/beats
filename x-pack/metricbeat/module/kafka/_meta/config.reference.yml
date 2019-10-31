@@ -1,5 +1,5 @@
 - module: kafka
-  metricsets: ["broker", "consumergroup", "partition"]
+  metricsets: ["broker", "consumergroup", "partition", "producer"]
   period: 10s
   hosts: ["localhost:8779"]
   enabled: true
