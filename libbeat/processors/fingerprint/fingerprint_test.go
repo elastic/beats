@@ -18,6 +18,7 @@
 package fingerprint
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -333,6 +334,52 @@ func TestInvalidConfig(t *testing.T) {
 
 			_, err = New(testConfig)
 			assert.EqualError(t, err, test.expectedErrMsg)
+		})
+	}
+}
+
+func TestIgnoreMissing(t *testing.T) {
+	testFields := common.MapStr{
+		"field1": "foo",
+	}
+
+	tests := map[string]struct {
+		assertErr           assert.ErrorAssertionFunc
+		expectedFingerprint string
+	}{
+		"true": {
+			assert.NoError,
+			"4cf8b768ad20266c348d63a6d1ff5d6f6f9ed0f59f5c68ae031b78e3e04c5144",
+		},
+		"false": {
+			assertErr: assert.Error,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			ignoreMissing, _ := strconv.ParseBool(name)
+			testConfig, err := common.NewConfigFrom(common.MapStr{
+				"fields":         []string{"field1", "missing_field"},
+				"ignore_missing": ignoreMissing,
+			})
+			assert.NoError(t, err)
+
+			p, err := New(testConfig)
+			assert.NoError(t, err)
+
+			testEvent := &beat.Event{
+				Fields:    testFields.Clone(),
+				Timestamp: time.Now(),
+			}
+			newEvent, err := p.Run(testEvent)
+			test.assertErr(t, err)
+
+			if err == nil {
+				v, err := newEvent.GetValue("fingerprint")
+				assert.NoError(t, err)
+				assert.Equal(t, test.expectedFingerprint, v)
+			}
 		})
 	}
 }

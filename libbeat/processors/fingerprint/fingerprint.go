@@ -70,7 +70,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 	hashFn := p.hash
 	hashFn.Reset()
 
-	err := writeFields(hashFn, p.fields, event.Fields)
+	err := p.writeFields(hashFn, event.Fields)
 	if err != nil {
 		return nil, makeComputeFingerprintError(err)
 	}
@@ -89,14 +89,14 @@ func (p *fingerprint) String() string {
 	return fmt.Sprintf("%v=[method=[%v]]", processorName, p.config.Method)
 }
 
-func writeFields(to io.Writer, sourceFields []string, eventFields common.MapStr) error {
-	for _, k := range sourceFields {
+func (p *fingerprint) writeFields(to io.Writer, eventFields common.MapStr) error {
+	for _, k := range p.fields {
 		v, err := eventFields.GetValue(k)
-		if err == common.ErrKeyNotFound {
-			return errors.Wrapf(err, "failed to find field [%v] in event", k)
-		}
 		if err != nil {
-			return errors.Wrapf(err, "failed when finding field [%v] in event", k)
+			if p.config.IgnoreMissing {
+				continue
+			}
+			return errors.Wrapf(err, "failed to find field [%v] in event", k)
 		}
 
 		i := v

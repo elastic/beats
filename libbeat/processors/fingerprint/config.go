@@ -19,16 +19,18 @@ package fingerprint
 
 // Config for fingerprint processor.
 type Config struct {
-	Method      hashMethod     `config:"method"`                     // Hash function to use for fingerprinting
-	Fields      []string       `config:"fields" validate:"required"` // Source fields to compute fingerprint from
-	TargetField string         `config:"target_field"`               // Target field for the fingerprint
-	Encoding    encodingMethod `config:"encoding"`                   // Encoding to use for target field value
+	Method        hashMethod     `config:"method"`                     // Hash function to use for fingerprinting
+	Fields        []string       `config:"fields" validate:"required"` // Source fields to compute fingerprint from
+	TargetField   string         `config:"target_field"`               // Target field for the fingerprint
+	Encoding      encodingMethod `config:"encoding"`                   // Encoding to use for target field value
+	IgnoreMissing bool           `config:"ignore_missing"`             // Ignore missing fields?
 }
 
 func defaultConfig() Config {
 	return Config{
-		Method:      hashes["sha256"],
-		TargetField: "fingerprint",
-		Encoding:    encodings["hex"],
+		Method:        hashes["sha256"],
+		TargetField:   "fingerprint",
+		Encoding:      encodings["hex"],
+		IgnoreMissing: false,
 	}
 }
