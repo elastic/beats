@@ -235,7 +235,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 		return err
 	}
 
-	handleBulkResult(result, []report.Event{document})
+	logBulkFailures(result, []report.Event{document})
 	return err
 }
 
@@ -245,7 +245,7 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func handleBulkResult(result *esout.BulkResult, events []report.Event) {
+func logBulkFailures(result *esout.BulkResult, events []report.Event) {
 	items := result.Items
 
 	reader := esout.NewJSONReader(items)
