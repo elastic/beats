@@ -1489,6 +1489,153 @@ type: keyword
 
 --
 
+[float]
+=== vpc
+
+Fields for AWS VPC flow logs.
+
+
+
+*`aws.vpc.version`*::
++
+--
+The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.
+
+
+type: keyword
+
+--
+
+*`aws.vpc.account_id`*::
++
+--
+The AWS account ID for the flow log.
+
+
+type: keyword
+
+--
+
+*`aws.vpc.interface_id`*::
++
+--
+The ID of the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpc.srcaddr`*::
++
+--
+The source address for incoming traffic, or the IPv4 or IPv6 address of the network interface for outgoing traffic on the network interface.
+
+
+type: ip
+
+--
+
+*`aws.vpc.dstaddr`*::
++
+--
+The destination address for outgoing traffic, or the IPv4 or IPv6 address of the network interface for incoming traffic on the network interface.
+
+
+type: ip
+
+--
+
+*`aws.vpc.srcport`*::
++
+--
+The source port of the traffic.
+
+
+type: long
+
+--
+
+*`aws.vpc.dstport`*::
++
+--
+The destination port of the traffic.
+
+
+type: long
+
+--
+
+*`aws.vpc.protocol`*::
++
+--
+The IANA protocol number of the traffic.
+
+
+type: long
+
+--
+
+*`aws.vpc.packets`*::
++
+--
+The number of packets transferred during the flow.
+
+
+type: long
+
+--
+
+*`aws.vpc.bytes`*::
++
+--
+The number of bytes transferred during the flow.
+
+
+type: long
+
+--
+
+*`aws.vpc.start`*::
++
+--
+The time, in Unix seconds, of the start of the flow.
+
+
+type: long
+
+--
+
+*`aws.vpc.end`*::
++
+--
+The time, in Unix seconds, of the end of the flow.
+
+
+type: long
+
+--
+
+*`aws.vpc.action`*::
++
+--
+The action that is associated with the traffic, ACCEPT or REJECT.
+
+
+type: keyword
+
+--
+
+*`aws.vpc.log_status`*::
++
+--
+The logging status of the flow log, OK, NODATA or SKIPDATA.
+
+
+type: keyword
+
+--
+
 [[exported-fields-azure]]
 == Azure fields
 
