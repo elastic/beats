@@ -221,12 +221,29 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
 	// FIXME: index name (first param below)
-	_, err = c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
-	return err
+	result, err := c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
+	if err != nil {
+		return err
+	}
+
+	handleBulkResult(result, document)
+	return nil
 }
 
 func getMonitoringIndexName() string {
 	version := 7
 	date := time.Now().Format("2006.01.02")
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
+}
+
+func handleBulkResult(result *esout.BulkResult, doc report.Event) {
+	for _, i := range result.Items {
+		item := i.Item
+		switch {
+		case item.Status < 300, item.Status == 409:
+			continue // ok value
+		default:
+			logp.Warn("could not publish monitoring event %#v (status=%v): %s", item, item.Status, doc)
+		}
+	}
 }
