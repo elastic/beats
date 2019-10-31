@@ -11,4 +11,4 @@ var:
 ingest_pipeline:
 - ingest/pipeline.json
 - ../azure-shared-pipeline.json
-input: config/auditlogs.yml
+input: config/{{.input}}.yml
