@@ -166,9 +166,9 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go get ${COVERAGE_TOOL_REPO}
+	GO111MODULE=off go get ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
-	go get ${TESTIFY_TOOL_REPO}
+	GO111MODULE=off go get ${TESTIFY_TOOL_REPO}
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.

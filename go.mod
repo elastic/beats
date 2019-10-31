@@ -2,27 +2,29 @@ module github.com/elastic/beats
 
 go 1.13
 
-replace github.com/google/gopacket v1.1.17 => github.com/adriansr/gopacket v1.1.17
+replace (
+	github.com/awslabs/goformation v1.2.1 => github.com/awslabs/goformation v1.2.1
 
-replace github.com/docker/docker v1.4.2-0.20190822205725-ed20165a37b4 => github.com/docker/engine v1.4.2-0.20190822205725-ed20165a37b4
+	github.com/docker/docker v1.4.2-0.20190822205725-ed20165a37b4 => github.com/docker/engine v1.4.2-0.20190822205725-ed20165a37b4
 
-replace github.com/dop251/goja v0.0.0-20190912223329-aa89e6a4c733 => github.com/andrewkroh/goja v0.0.0-20190912223329-aa89e6a4c733
+	github.com/dop251/goja v0.0.0-20190912223329-aa89e6a4c733 => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 
-replace github.com/awslabs/goformation v1.2.1 => github.com/awslabs/goformation v1.2.1
+	github.com/elastic/go-perf v0.0.0-20190822174212-9bc9b58a3de9 => github.com/michalpristas/go-perf v0.0.0-20191031073750-9e95cbdc2071
 
-replace github.com/fsnotify/fsevents v0.0.0-20181029231046-e1d381a4d270 => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
+	github.com/fsnotify/fsevents v0.0.0-20181029231046-e1d381a4d270 => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 
-replace github.com/fsnotify/fsnotify v1.4.7 => github.com/adriansr/fsnotify v1.4.7
+	github.com/fsnotify/fsnotify v1.4.7 => github.com/adriansr/fsnotify v1.4.7
+
+	github.com/google/gopacket v1.1.17 => github.com/adriansr/gopacket v1.1.17
+)
 
 require (
 	4d63.com/tz v1.1.0
 	cloud.google.com/go/pubsub v1.0.1
 	github.com/Azure/azure-sdk-for-go v35.0.0+incompatible
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
-	github.com/Azure/go-autorest/autorest/azure/auth v0.4.0
-	github.com/Azure/go-autorest/autorest/date v0.2.0
-	github.com/Azure/go-autorest/autorest/to v0.3.0 // indirect
-	github.com/Azure/go-autorest/autorest/validation v0.2.0 // indirect
+	github.com/Azure/go-autorest v11.1.2+incompatible
+	github.com/Azure/go-autorest/tracing v0.5.0 // indirect
 	github.com/Microsoft/go-winio v0.4.14
 	github.com/OneOfOne/xxhash v1.2.5
 	github.com/Shopify/sarama v1.24.0
@@ -44,10 +46,13 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0
 	github.com/digitalocean/go-libvirt v0.0.0-20190715144809-7b622097a793
+	github.com/dimchansky/utfbom v1.1.0 // indirect
+	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.4.2-0.20190822205725-ed20165a37b4
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.4.0 // indirect
+	github.com/dop251/goja v0.0.0-20190912223329-aa89e6a4c733
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elastic/ecs v1.2.0
@@ -66,6 +71,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/garyburd/redigo v1.6.0
 	github.com/go-ole/go-ole v1.2.4 // indirect
+	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gocarina/gocsv v0.0.0-20190927101021-3ecffd272576
 	github.com/gofrs/flock v0.7.1 // indirect
@@ -78,7 +84,6 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/hashicorp/go-multierror v1.0.0
-	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20191025184527-fe3f5c4e2b53
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/jstemmer/go-junit-report v0.9.1
@@ -132,6 +137,5 @@ require (
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 	k8s.io/api v0.0.0-20191025225708-5524a3672fbb
 	k8s.io/apimachinery v0.0.0-20191025225532-af6325b3a843
-	k8s.io/client-go v11.0.0+incompatible
-	k8s.io/utils v0.0.0-20191010214722-8d271d903fe4 // indirect
+	k8s.io/client-go v12.0.0+incompatible
 )
