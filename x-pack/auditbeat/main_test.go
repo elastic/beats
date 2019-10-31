@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/auditbeat/cmd"
+	"github.com/elastic/beats/libbeat/tests/system/template"
 )
 
 var systemTest *bool
@@ -27,4 +28,8 @@ func TestSystem(t *testing.T) {
 	if *systemTest {
 		main()
 	}
+}
+
+func TestTemplate(t *testing.T) {
+	template.TestTemplate(t, cmd.Name)
 }

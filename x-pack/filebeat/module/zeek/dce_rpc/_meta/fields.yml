@@ -1,5 +1,6 @@
 - name: dce_rpc
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek DCE_RPC log
   fields:
