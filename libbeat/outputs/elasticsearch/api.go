@@ -27,6 +27,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+var (
+	ErrInvalidBulkResultItem = errors.New("invalid bulk result item")
+	ErrInvalidBulkOpType     = errors.New("invalid bulk optype in bulk result item")
+)
+
 // QueryResult contains the result of a query.
 type QueryResult struct {
 	Ok           bool            `json:"ok"`
@@ -56,10 +61,13 @@ type BulkResultItem struct {
 	Item   BulkResultItemInner
 }
 
-var ErrInvalidBulkResultItem = errors.New("invalid bulk result item")
+// BulkOpType represents a valid bulk request op type
+type BulkOpType string
+
+var bulkOpTypes = map[string]bool{"create": true, "index": true, "update": true, "delete": true}
 
 func (b *BulkResultItem) UnmarshalJSON(j []byte) error {
-	var m map[BulkOpType]json.RawMessage
+	var m map[string]json.RawMessage
 	if err := json.Unmarshal(j, &m); err != nil {
 		return err
 	}
@@ -68,11 +76,15 @@ func (b *BulkResultItem) UnmarshalJSON(j []byte) error {
 		return ErrInvalidBulkResultItem
 	}
 
-	var opType BulkOpType
+	var opType string
 	var innerRaw json.RawMessage
 	for k, v := range m {
 		opType = k
 		innerRaw = v
+	}
+
+	if _, found := bulkOpTypes[opType]; !found {
+		return ErrInvalidBulkOpType
 	}
 
 	var inner BulkResultItemInner
@@ -81,29 +93,9 @@ func (b *BulkResultItem) UnmarshalJSON(j []byte) error {
 	}
 
 	*b = BulkResultItem{
-		opType,
+		BulkOpType(opType),
 		inner,
 	}
-	return nil
-}
-
-// BulkOpType represents a valid bulk request op type
-type BulkOpType string
-
-var ErrInvalidBulkOpType = errors.New("invalid bulk optype in bulk result item")
-var bulkOpTypes = map[string]bool{"create": true, "index": true, "update": true, "delete": true}
-
-func (b *BulkOpType) UnmarshalJSON(j []byte) error {
-	var str string
-	if err := json.Unmarshal(j, &str); err != nil {
-		return err
-	}
-
-	if _, found := bulkOpTypes[str]; !found {
-		return ErrInvalidBulkOpType
-	}
-
-	*b = BulkOpType(str)
 	return nil
 }
 

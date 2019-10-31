@@ -438,6 +438,26 @@ func TestBulkEncodeEvents(t *testing.T) {
 	}
 }
 
+func TestBulkOpTypes(t *testing.T) {
+	tests := map[string]struct {
+		assertErr assert.ErrorAssertionFunc
+	}{
+		"create":  {assert.NoError},
+		"index":   {assert.NoError},
+		"update":  {assert.NoError},
+		"delete":  {assert.NoError},
+		"invalid": {assert.Error},
+	}
+	for opType, test := range tests {
+		t.Run(opType, func(t *testing.T) {
+			item := `{"` + opType + `":{}}`
+			var r BulkResultItem
+			err := json.Unmarshal([]byte(item), &r)
+			test.assertErr(t, err)
+		})
+	}
+}
+
 func (r *testBulkRecorder) Add(meta, obj interface{}) error {
 	if r.inAction {
 		panic("can not add a new action if other action is active")
