@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"sort"
 	"time"
 
 	"github.com/pkg/errors"
@@ -54,12 +53,12 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrapf(err, "failed to unpack %v processor configuration", processorName)
 	}
 
-	sort.Strings(config.Fields)
+	fields := common.MakeStringSet(config.Fields...)
 
 	p := &fingerprint{
 		config: config,
 		hash:   config.Method(),
-		fields: unique(config.Fields),
+		fields: fields.ToSlice(),
 	}
 
 	return p, nil
@@ -117,17 +116,4 @@ func (p *fingerprint) writeFields(to io.Writer, eventFields common.MapStr) error
 
 func makeComputeFingerprintError(err error) error {
 	return errors.Wrap(err, "failed to compute fingerprint")
-}
-
-func unique(in []string) []string {
-	seen := map[string]bool{}
-	var out = make([]string, 0, len(in))
-	for _, item := range in {
-		if _, found := seen[item]; !found {
-			seen[item] = true
-			out = append(out, item)
-		}
-	}
-
-	return out
 }
