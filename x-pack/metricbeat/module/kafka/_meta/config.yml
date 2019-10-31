@@ -2,8 +2,10 @@
   #metricsets:
   #  - broker
   #  - partition
+  #  - consumer
   #  - consumergroup
   #  - producer
+
   period: 10s
   hosts: ["localhost:8779"]
   #client_id: metricbeat
