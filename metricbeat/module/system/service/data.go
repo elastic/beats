@@ -80,7 +80,6 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 	//Ignore the resource accounting if a service has exited
 	if unit.ActiveState == "active" && unit.SubState != "exited" {
 		msData["resources"] = getMetricsFromServivce(props)
-
 	}
 
 	var childProc = common.MapStr{}
