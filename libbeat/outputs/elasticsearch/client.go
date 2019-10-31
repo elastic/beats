@@ -50,9 +50,6 @@ type Client struct {
 	// buffered bulk requests
 	bulkRequ *bulkRequest
 
-	// buffered json response reader
-	json jsonReader
-
 	// additional configs
 	compressionLevel int
 	proxyURL         *url.URL
