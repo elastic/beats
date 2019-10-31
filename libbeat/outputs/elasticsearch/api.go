@@ -108,10 +108,23 @@ func (b *BulkOpType) UnmarshalJSON(j []byte) error {
 }
 
 type BulkResultItemInner struct {
-	ID     string `json:"_id"`
-	Index  string `json:"_index"`
-	Status int    `json:"status"`
-	Error  string `json:"error"`
+	ID     string           `json:"_id"`
+	Index  string           `json:"_index"`
+	Status int              `json:"status"`
+	Error  BulkItemErrorMsg `json:"error"`
+}
+
+type BulkItemErrorMsg string
+
+func (b *BulkItemErrorMsg) UnmarshalJSON(j []byte) error {
+	var str string
+	err := json.Unmarshal(j, &str)
+	if err != nil {
+		str = string(j)
+	}
+
+	*b = BulkItemErrorMsg(str)
+	return nil
 }
 
 // SearchResults contains the results of a search.

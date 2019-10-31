@@ -20,6 +20,7 @@
 package elasticsearch
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -40,37 +41,37 @@ import (
 	"github.com/elastic/beats/libbeat/version"
 )
 
-func readStatusItem(in []byte) (int, string, error) {
-	reader := newJSONReader(in)
-	code, msg, err := itemStatus(reader)
-	return code, string(msg), err
-}
-
 func TestESNoErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
-	code, msg, err := readStatusItem(response)
 
-	assert.Nil(t, err)
-	assert.Equal(t, 200, code)
-	assert.Equal(t, "", msg)
+	var item BulkResultItem
+	err := json.Unmarshal(response, &item)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 200, item.Item.Status)
+	assert.EqualValues(t, "", item.Item.Error)
 }
 
 func TestES1StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": "test error"}}`)
-	code, msg, err := readStatusItem(response)
 
-	assert.Nil(t, err)
-	assert.Equal(t, 400, code)
-	assert.Equal(t, `"test error"`, msg)
+	var item BulkResultItem
+	err := json.Unmarshal(response, &item)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 400, item.Item.Status)
+	assert.EqualValues(t, "test error", item.Item.Error)
 }
 
 func TestES2StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
-	code, msg, err := readStatusItem(response)
 
-	assert.Nil(t, err)
-	assert.Equal(t, 400, code)
-	assert.Equal(t, `{"reason": "test_error"}`, msg)
+	var item BulkResultItem
+	err := json.Unmarshal(response, &item)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 400, item.Item.Status)
+	assert.EqualValues(t, `{"reason": "test_error"}`, item.Item.Error)
 }
 
 func TestES2StyleExtendedErrorStatus(t *testing.T) {
@@ -85,16 +86,19 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
         }
       }
     }`)
-	code, _, err := readStatusItem(response)
+
+	var item BulkResultItem
+	err := json.Unmarshal(response, &item)
 
 	assert.Nil(t, err)
-	assert.Equal(t, 400, code)
+	assert.Equal(t, 400, item.Item.Status)
 }
 
 func TestCollectPublishFailsNone(t *testing.T) {
 	N := 100
 	item := `{"create": {"status": 200}},`
-	response := []byte(`{"items": [` + strings.Repeat(item, N) + `]}`)
+	items := strings.Repeat(item, N)
+	response := []byte(`{"items": [` + items[:len(items)-1] + `]}`)
 
 	event := common.MapStr{"field": 1}
 	events := make([]publisher.Event, N)
@@ -102,8 +106,11 @@ func TestCollectPublishFailsNone(t *testing.T) {
 		events[i] = publisher.Event{Content: beat.Event{Fields: event}}
 	}
 
-	reader := newJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	var result BulkResult
+	err := json.Unmarshal(response, &result)
+	assert.NoError(t, err)
+
+	res, _ := bulkCollectPublishFails(&result, events)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -120,8 +127,11 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	reader := newJSONReader(response)
-	res, stats := bulkCollectPublishFails(reader, events)
+	var result BulkResult
+	err := json.Unmarshal(response, &result)
+	assert.NoError(t, err)
+
+	res, stats := bulkCollectPublishFails(&result, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
@@ -141,8 +151,11 @@ func TestCollectPublishFailAll(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := newJSONReader(response)
-	res, stats := bulkCollectPublishFails(reader, events)
+	var result BulkResult
+	err := json.Unmarshal(response, &result)
+	assert.NoError(t, err)
+
+	res, stats := bulkCollectPublishFails(&result, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
 	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
@@ -183,8 +196,11 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event}
 
-	reader := newJSONReader(response)
-	res, _ := bulkCollectPublishFails(reader, events)
+	var result BulkResult
+	err := json.Unmarshal(response, &result)
+	assert.NoError(t, err)
+
+	res, _ := bulkCollectPublishFails(&result, events)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
 }
@@ -201,10 +217,13 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := newJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(response)
-		res, _ := bulkCollectPublishFails(reader, events)
+
+		var result BulkResult
+		err := json.Unmarshal(response, &result)
+		assert.NoError(b, err)
+
+		res, _ := bulkCollectPublishFails(&result, events)
 		if len(res) != 0 {
 			b.Fail()
 		}
@@ -224,10 +243,12 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	reader := newJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(response)
-		res, _ := bulkCollectPublishFails(reader, events)
+		var result BulkResult
+		err := json.Unmarshal(response, &result)
+		assert.NoError(b, err)
+
+		res, _ := bulkCollectPublishFails(&result, events)
 		if len(res) != 1 {
 			b.Fail()
 		}
@@ -246,10 +267,12 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	reader := newJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(response)
-		res, _ := bulkCollectPublishFails(reader, events)
+		var result BulkResult
+		err := json.Unmarshal(response, &result)
+		assert.NoError(b, err)
+
+		res, _ := bulkCollectPublishFails(&result, events)
 		if len(res) != 3 {
 			b.Fail()
 		}
@@ -265,7 +288,9 @@ func TestClientWithHeaders(t *testing.T) {
 		// For incoming requests, the Host header is promoted to the
 		// Request.Host field and removed from the Header map.
 		assert.Equal(t, "myhost.local", r.Host)
-		fmt.Fprintln(w, "Hello, client")
+
+		bulkResponse := `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
+		fmt.Fprintln(w, bulkResponse)
 		requestCount++
 	}))
 	defer ts.Close()

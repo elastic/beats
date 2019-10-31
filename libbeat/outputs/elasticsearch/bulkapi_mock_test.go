@@ -65,8 +65,8 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	if err != nil {
 		t.Errorf("Bulk() returns error: %s", err)
 	}
-	if !resp.Created {
-		t.Errorf("Bulk() fails: %s", resp)
+	if resp.Errors {
+		t.Errorf("Bulk() fails: %v", *resp)
 	}
 }
 
