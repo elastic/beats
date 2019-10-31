@@ -34,16 +34,12 @@ type bulkRequest struct {
 	requ *http.Request
 }
 
-type bulkResult struct {
-	raw []byte
-}
-
 // Bulk performs many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 func (conn *Connection) Bulk(
 	index, docType string,
 	params map[string]string, body []interface{},
-) (*QueryResult, error) {
+) (*BulkResult, error) {
 	return conn.BulkWith(index, docType, params, nil, body)
 }
 
@@ -56,7 +52,7 @@ func (conn *Connection) BulkWith(
 	params map[string]string,
 	metaBuilder MetaBuilder,
 	body []interface{},
-) (*QueryResult, error) {
+) (*BulkResult, error) {
 	if len(body) == 0 {
 		return nil, nil
 	}
@@ -73,10 +69,7 @@ func (conn *Connection) BulkWith(
 	}
 
 	_, result, err := conn.sendBulkRequest(requ)
-	if err != nil {
-		return nil, err
-	}
-	return readQueryResult(result.raw)
+	return result, err
 }
 
 // SendMonitoringBulk creates a HTTP request to the X-Pack Monitoring API containing a bunch of
@@ -85,7 +78,7 @@ func (conn *Connection) BulkWith(
 func (conn *Connection) SendMonitoringBulk(
 	params map[string]string,
 	body []interface{},
-) (*QueryResult, error) {
+) (*BulkResult, error) {
 	if len(body) == 0 {
 		return nil, nil
 	}
@@ -108,10 +101,7 @@ func (conn *Connection) SendMonitoringBulk(
 	}
 
 	_, result, err := conn.sendBulkRequest(requ)
-	if err != nil {
-		return nil, err
-	}
-	return readQueryResult(result.raw)
+	return result, err
 }
 
 func newBulkRequest(
@@ -199,18 +189,14 @@ func (r *bulkRequest) Reset(body bodyEncoder) {
 	body.AddHeader(&r.requ.Header)
 }
 
-func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, bulkResult, error) {
+func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, *BulkResult, error) {
 	status, resp, err := conn.execHTTPRequest(requ.requ)
 	if err != nil {
-		return status, bulkResult{}, err
+		return status, nil, err
 	}
 
 	result, err := readBulkResult(resp)
 	return status, result, err
-}
-
-func readBulkResult(obj []byte) (bulkResult, error) {
-	return bulkResult{obj}, nil
 }
 
 func bulkEncode(out bulkWriter, metaBuilder MetaBuilder, body []interface{}) error {

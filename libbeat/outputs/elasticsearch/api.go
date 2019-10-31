@@ -43,6 +43,77 @@ type QueryResult struct {
 	Matches      []string        `json:"matches"`
 }
 
+// BulkResult contains the result of a bulk indexing request.
+type BulkResult struct {
+	Took   int              `json:"took"`
+	Errors bool             `json:"errors"`
+	Items  []BulkResultItem `json:"items"`
+}
+
+// BulkResultItem is an individual item in BulkResult.Items
+type BulkResultItem struct {
+	OpType BulkOpType
+	Item   BulkResultItemInner
+}
+
+var ErrInvalidBulkResultItem = errors.New("invalid bulk result item")
+
+func (b *BulkResultItem) UnmarshalJSON(j []byte) error {
+	var m map[BulkOpType]json.RawMessage
+	if err := json.Unmarshal(j, &m); err != nil {
+		return err
+	}
+
+	if len(m) != 1 {
+		return ErrInvalidBulkResultItem
+	}
+
+	var opType BulkOpType
+	var innerRaw json.RawMessage
+	for k, v := range m {
+		opType = k
+		innerRaw = v
+	}
+
+	var inner BulkResultItemInner
+	if err := json.Unmarshal(innerRaw, &inner); err != nil {
+		return err
+	}
+
+	*b = BulkResultItem{
+		opType,
+		inner,
+	}
+	return nil
+}
+
+// BulkOpType represents a valid bulk request op type
+type BulkOpType string
+
+var ErrInvalidBulkOpType = errors.New("invalid bulk optype in bulk result item")
+var bulkOpTypes = map[string]bool{"create": true, "index": true, "update": true, "delete": true}
+
+func (b *BulkOpType) UnmarshalJSON(j []byte) error {
+	var str string
+	if err := json.Unmarshal(j, &str); err != nil {
+		return err
+	}
+
+	if _, found := bulkOpTypes[str]; !found {
+		return ErrInvalidBulkOpType
+	}
+
+	*b = BulkOpType(str)
+	return nil
+}
+
+type BulkResultItemInner struct {
+	ID     string `json:"_id"`
+	Index  string `json:"_index"`
+	Status int    `json:"status"`
+	Error  string `json:"error"`
+}
+
 // SearchResults contains the results of a search.
 type SearchResults struct {
 	Took   int                        `json:"took"`
@@ -134,6 +205,20 @@ func readCountResult(obj []byte) (*CountResults, error) {
 	if err != nil {
 		return nil, err
 	}
+	return &result, err
+}
+
+func readBulkResult(obj []byte) (*BulkResult, error) {
+	if obj == nil {
+		return nil, nil
+	}
+
+	var result BulkResult
+	err := json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+
 	return &result, err
 }
 
