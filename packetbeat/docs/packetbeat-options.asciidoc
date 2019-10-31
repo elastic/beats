@@ -288,7 +288,7 @@ Here’s an example of a flow information sent by Packetbeat. See
   "agent": {
     "hostname": "host.example.com",
     "name": "host.example.com",
-    "version": "{stack-version}"
+    "version": "{version}"
   },
   "destination": {
     "bytes": 460,
