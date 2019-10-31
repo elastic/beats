@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/docker/docker/client"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"

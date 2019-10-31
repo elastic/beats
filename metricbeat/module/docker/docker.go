@@ -26,8 +26,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/go-connections/tlsconfig"
 
 	"github.com/elastic/beats/libbeat/common/docker"

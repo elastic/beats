@@ -22,8 +22,8 @@ package container
 import (
 	"context"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
