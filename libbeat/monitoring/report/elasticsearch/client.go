@@ -20,6 +20,7 @@ package elasticsearch
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/pkg/errors"
@@ -229,7 +230,12 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
 	// FIXME: index name (first param below)
-	_, err = c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
+	result, err := c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
+	if err != nil {
+		return err
+	}
+
+	handleBulkResult(result, []report.Event{document})
 	return err
 }
 
@@ -237,4 +243,30 @@ func getMonitoringIndexName() string {
 	version := 7
 	date := time.Now().Format("2006.01.02")
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
+}
+
+func handleBulkResult(result *esout.BulkResult, events []report.Event) {
+	items := result.Items
+
+	reader := esout.NewJSONReader(items)
+
+	// check items field is an array
+	if err := reader.ExpectArray(); err != nil {
+		logp.Err("failed to parse bulk response: expected items array")
+		return
+	}
+
+	for i, _ := range events {
+		status, msg, err := esout.ItemStatus(reader)
+		if err != nil {
+			logp.Err("failed to parse item status: %v", err)
+			return
+		}
+		switch {
+		case status < 300, status == http.StatusConflict:
+			continue
+		default:
+			logp.Warn("bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		}
+	}
 }

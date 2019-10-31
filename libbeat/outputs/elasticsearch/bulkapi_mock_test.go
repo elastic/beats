@@ -34,7 +34,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "type1", ID: "1", Version: 1, Created: true})
+	expectedResp, err := json.Marshal(BulkResult{7, false, []byte(`[]`)})
 
 	ops := []map[string]interface{}{
 		{
@@ -65,8 +65,8 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	if err != nil {
 		t.Errorf("Bulk() returns error: %s", err)
 	}
-	if !resp.Created {
-		t.Errorf("Bulk() fails: %s", resp)
+	if resp.Errors {
+		t.Errorf("Bulk() fails: %v", resp)
 	}
 }
 
