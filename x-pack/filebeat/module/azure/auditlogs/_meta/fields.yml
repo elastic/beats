@@ -52,7 +52,7 @@
           type: keyword
           description: >
             ID
-        - name: activityDateTime
+        - name: activity_datetime
           type: keyword
           description: >
             Activity timestamp
@@ -90,15 +90,15 @@
               description: >
                 Modified properties
               fields:
-                - name: newValue
+                - name: new_value
                   type: keyword
                   description: >
                     New value
-                - name: displayName
+                - name: display_name
                   type: keyword
                   description: >
                     Display value
-                - name: oldValue
+                - name: old_value
                   type: keyword
                   description: >
                     Old value

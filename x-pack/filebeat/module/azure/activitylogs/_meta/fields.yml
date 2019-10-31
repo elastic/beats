@@ -39,6 +39,14 @@
           description: >
             Authorization
           fields:
+            - name: scope
+              type: keyword
+              description: >
+                Scope
+            - name: action
+              type: keyword
+              description: >
+                Action
             - name: evidence
               type: group
               description: >
@@ -68,14 +76,6 @@
                   type: keyword
                   description: >
                     Principal type
-        - name: scope
-          type: keyword
-          description: >
-            Scope
-        - name: action
-          type: keyword
-          description: >
-            Action
     - name: operation_name
       type: keyword
       description: >

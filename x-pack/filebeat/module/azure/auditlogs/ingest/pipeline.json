@@ -116,6 +116,20 @@
       },
       {
           "rename": {
+              "field": "azure.auditlogs.properties.activityDateTime",
+              "target_field": "azure.auditlogs.properties.activity_datetime",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
+              "field": "azure.auditlogs.properties.additionalDetails",
+              "target_field": "azure.auditlogs.properties.additional_details",
+              "ignore_missing": true
+          }
+      },
+      {
+          "rename": {
               "field": "azure.auditlogs.properties.resultReason",
               "target_field": "azure.auditlogs.properties.result_reason",
               "ignore_missing": true
@@ -150,31 +164,102 @@
           }
       },
       {
-          "rename": {
-              "field": "azure.auditlogs.properties.target_resources.displayName",
-              "target_field": "azure.auditlogs.properties.target_resources.display_name",
-              "ignore_missing": true
+          "foreach": {
+              "field": "azure.auditlogs.properties.target_resources",
+              "processor": {
+                  "rename": {
+                      "field": "_ingest._value.displayName",
+                      "target_field": "_ingest._value.display_name",
+                      "ignore_missing": true
+                  }
+              }
           }
       },
       {
-          "rename": {
-              "field": "azure.auditlogs.properties.target_resources.ipAddress",
-              "target_field": "azure.auditlogs.properties.target_resources.ip_address",
-              "ignore_missing": true
+          "foreach": {
+              "field": "azure.auditlogs.properties.target_resources",
+              "processor": {
+                  "rename": {
+                      "field": "_ingest._value.ipAddress",
+                      "target_field": "_ingest._value.ip_address",
+                      "ignore_missing": true
+                  }
+              }
           }
       },
       {
-          "rename": {
-              "field": "azure.auditlogs.properties.target_resources.userPrincipalName",
-              "target_field": "azure.auditlogs.properties.target_resources.user_principal_name",
-              "ignore_missing": true
+          "foreach": {
+              "field": "azure.auditlogs.properties.target_resources",
+              "processor": {
+                  "rename": {
+                      "field": "_ingest._value.userPrincipalName",
+                      "target_field": "_ingest._value.user_principal_name",
+                      "ignore_missing": true
+                  }
+              }
           }
       },
       {
-          "rename": {
-              "field": "azure.auditlogs.properties.target_resources.modifiedProperties",
-              "target_field": "azure.auditlogs.properties.target_resources.modified_properties",
-              "ignore_missing": true
+          "foreach": {
+              "field": "azure.auditlogs.properties.target_resources",
+              "processor": {
+                  "rename": {
+                      "field": "_ingest._value.modifiedProperties",
+                      "target_field": "_ingest._value.modified_properties",
+                      "ignore_missing": true
+                  }
+              }
+          }
+      },
+      {
+          "foreach": {
+              "field": "azure.auditlogs.properties.target_resources",
+              "processor": {
+                  "foreach": {
+                      "field": "_ingest._value.modified_properties",
+                      "processor": {
+                          "rename": {
+                              "field": "_ingest._value.displayName",
+                              "target_field": "_ingest._value.display_name",
+                              "ignore_missing": true
+                          }
+                      }
+                  }
+              }
+          }
+      },
+      {
+          "foreach": {
+              "field": "azure.auditlogs.properties.target_resources",
+              "processor": {
+                  "foreach": {
+                      "field": "_ingest._value.modified_properties",
+                      "processor": {
+                          "rename": {
+                              "field": "_ingest._value.oldValue",
+                              "target_field": "_ingest._value.old_value",
+                              "ignore_missing": true
+                          }
+                      }
+                  }
+              }
+          }
+      },
+      {
+          "foreach": {
+              "field": "azure.auditlogs.properties.target_resources",
+              "processor": {
+                  "foreach": {
+                      "field": "_ingest._value.modified_properties",
+                      "processor": {
+                          "rename": {
+                              "field": "_ingest._value.newValue",
+                              "target_field": "_ingest._value.new_value",
+                              "ignore_missing": true
+                          }
+                      }
+                  }
+              }
           }
       },
       {
