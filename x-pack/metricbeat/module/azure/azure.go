@@ -121,6 +121,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
+	if len(m.Client.Resources.Metrics) == 0 {
+		// error message is previously logged in the InitResources, no error event should be created
+		return nil
+	}
 	// retrieve metrics
 	err = m.Client.GetMetricValues(report)
 	if err != nil {
