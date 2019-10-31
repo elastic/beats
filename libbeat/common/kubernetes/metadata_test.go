@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -37,10 +37,12 @@ func TestPodMetadata(t *testing.T) {
 	True := true
 	False := false
 	tests := []struct {
+		name string
 		pod  *Pod
 		meta common.MapStr
 	}{
 		{
+			name: "standalone Pod",
 			pod: &Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels:    map[string]string{"a.key": "foo", "a": "bar"},
@@ -62,6 +64,7 @@ func TestPodMetadata(t *testing.T) {
 			},
 		},
 		{
+			name: "Deployment + Replicaset owned Pod",
 			pod: &Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
@@ -94,6 +97,7 @@ func TestPodMetadata(t *testing.T) {
 			},
 		},
 		{
+			name: "StatefulSet + Deployment owned Pod",
 			pod: &Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
@@ -131,6 +135,29 @@ func TestPodMetadata(t *testing.T) {
 				"statefulset": common.MapStr{"name": "StatefulSet"},
 			},
 		},
+		{
+			name: "empty owner reference Pod",
+			pod: &Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:          map[string]string{"a.key": "foo", "a": "bar"},
+					UID:             types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{{}},
+					Namespace:       test,
+				},
+				Spec: v1.PodSpec{
+					NodeName: test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":      common.MapStr{"name": "test"},
+				"namespace": "test",
+				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -142,9 +169,9 @@ func TestPodMetadata(t *testing.T) {
 
 		metaGen, err := NewMetaGenerator(config)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("case %q failed: %s", test.name, err.Error())
 		}
-		assert.Equal(t, metaGen.PodMetadata(test.pod), test.meta)
+		assert.Equal(t, metaGen.PodMetadata(test.pod), test.meta, "test failed for case %q", test.name)
 	}
 }
 
