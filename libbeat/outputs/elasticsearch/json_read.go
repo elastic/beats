@@ -133,6 +133,7 @@ func (s state) String() string {
 	return "unknown"
 }
 
+// NewJSONReader returns a new JSONReader initialized with in
 func NewJSONReader(in []byte) *JSONReader {
 	r := &JSONReader{}
 	r.init(in)
@@ -168,6 +169,7 @@ func (r *JSONReader) popState() {
 	}
 }
 
+// ExpectDict checks if the next entity is a json object
 func (r *JSONReader) ExpectDict() error {
 	e, _, err := r.step()
 
@@ -182,6 +184,7 @@ func (r *JSONReader) ExpectDict() error {
 	return nil
 }
 
+// ExpectArray checks if the next entity is a json array
 func (r *JSONReader) ExpectArray() error {
 	e, _, err := r.step()
 	if err != nil {

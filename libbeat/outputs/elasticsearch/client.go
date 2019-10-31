@@ -527,6 +527,7 @@ func bulkCollectPublishFails(
 	return failed, stats
 }
 
+// BulkReadToItems reads the bulk response up to (but not including) items
 func BulkReadToItems(reader *JSONReader) error {
 	if err := reader.ExpectDict(); err != nil {
 		return errExpectedObject
@@ -559,6 +560,7 @@ func BulkReadToItems(reader *JSONReader) error {
 	return nil
 }
 
+// BulkReadItemStatus reads the status and error fields from the bulk item
 func BulkReadItemStatus(reader *JSONReader) (int, []byte, error) {
 	// skip outer dictionary
 	if err := reader.ExpectDict(); err != nil {
