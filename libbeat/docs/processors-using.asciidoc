@@ -1197,14 +1197,12 @@ processors:
      fields: ["field1", "field2", ...]
 -----------------------------------------------------
 
-.Fingerprint options
-[options="header"]
-|======
-| `fields`          | yes       |               | List of fields to use as the source for the fingerprint.                                                               |
-| `target_field`    | no        | `fingerprint` | Field in which the generated fingerprint should be stored.                                                             |
-| `method`          | no        | `sha256`      | Algorithm to use for computing the fingerprint. Must be one of: `md5`, `sha1`, `sha256` (default), `sha384`, `sha512`. |
-| `encoding`        | no        | `hex`         | Encoding to use on the fingerprint value. Must be one of `hex` (default), `base32`, or `base64`.                       |
-|======
+The following settings are supported:
+
+`fields`:: List of fields to use as the source for the fingerprint.
+`target_field`:: (Optional) Field in which the generated fingerprint should be stored. Default is `fingerprint`.
+`method`:: (Optional) Algorithm to use for computing the fingerprint. Must be one of: `md5`, `sha1`, `sha256`, `sha384`, `sha512`. Default is `sha256`.
+`encoding`:: (Optional) Encoding to use on the fingerprint value. Must be one of `hex`, `base32`, or `base64`. Default is `hex`.
 
 [[include-fields]]
 === Keep fields from events
