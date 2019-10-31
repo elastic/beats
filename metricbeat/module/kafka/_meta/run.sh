@@ -1,7 +1,5 @@
 #!/bin/bash
 
-KAFKA_ADVERTISED_HOST_AUTO=True
-
 if [ -n "$KAFKA_ADVERTISED_HOST_AUTO" ]; then
 	KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME):9092
 fi
