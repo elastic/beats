@@ -108,7 +108,7 @@ func (p *fingerprint) writeFields(to io.Writer, eventFields common.MapStr) error
 			i = vv.UTC()
 		}
 
-		io.WriteString(to, fmt.Sprintf("|%v|%v", k, i))
+		fmt.Fprintf(to, "|%v|%v", k, i)
 	}
 
 	io.WriteString(to, "|")
