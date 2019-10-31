@@ -531,6 +531,8 @@ func (c *s3Context) Fail(err error) {
 }
 
 func (c *s3Context) done() {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	c.refs--
 	if c.refs == 0 {
 		c.errC <- c.err
