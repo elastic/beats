@@ -1,24 +1,50 @@
-description: "Pipeline for s3 server access logs"
+description: Pipeline for AWS VPC Flow Logs
 
 processors:
-  - grok:
-      field: message
-      # flow log records documented in https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html#flow-log-records
-      patterns:
-        - >-
-          %{BASE16NUM:aws.vpc.version} %{ACCOUNTID:aws.vpc.account_id} %{INTERFACEID:aws.vpc.interface_id}
-          %{IP:aws.vpc.srcaddr} %{IP:aws.vpc.dstaddr} %{NUMBER:aws.vpc.srcport}
-          %{NUMBER:aws.vpc.dstport} %{NUMBER:aws.vpc.protocol} %{NUMBER:aws.vpc.packets}
-          %{NUMBER:aws.vpc.bytes} %{NUMBER:aws.vpc.start} %{NUMBER:aws.vpc.end}
-          %{WORD:aws.vpc.action} %{WORD:aws.vpc.log_status}
+  # IP Geolocation Lookup
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  - geoip:
+      field: destination.ip
+      target_field: destination.geo
+      ignore_missing: true
 
-      pattern_definitions:
-        ACCOUNTID: "[a-zA-Z0-9]+"
-        INTERFACEID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
+  # IP Autonomous System (AS) Lookup
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: destination.ip
+      target_field: destination.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - rename:
+      field: destination.as.asn
+      target_field: destination.as.number
+      ignore_missing: true
+  - rename:
+      field: destination.as.organization_name
+      target_field: destination.as.organization.name
+      ignore_missing: true
 
-  #
-  # Remove message fields
-  #
   - remove:
       field:
         - message

@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-10-31T02:43:03.508Z",
+        "@timestamp": "2019-10-31T22:25:52.412Z",
         "aws.vpc.account_id": "123456789010",
         "aws.vpc.action": "ACCEPT",
         "aws.vpc.bytes": "4249",
@@ -15,15 +15,27 @@
         "aws.vpc.srcport": "20641",
         "aws.vpc.start": "1418530010",
         "aws.vpc.version": "2",
+        "destination.address": "172.31.16.21",
+        "destination.ip": "172.31.16.21",
+        "destination.port": 22,
         "event.dataset": "aws.vpc",
         "event.module": "aws",
+        "event.outcome": "allow",
         "fileset.name": "vpc",
         "input.type": "log",
         "log.offset": 0,
-        "service.type": "aws"
+        "network.bytes": 4249,
+        "network.iana_number": 6,
+        "network.packets": 20,
+        "service.type": "aws",
+        "source.address": "172.31.16.139",
+        "source.bytes": 4249,
+        "source.ip": "172.31.16.139",
+        "source.packets": 20,
+        "source.port": 20641
     },
     {
-        "@timestamp": "2019-10-31T02:43:03.515Z",
+        "@timestamp": "2019-10-31T22:25:52.427Z",
         "aws.vpc.account_id": "123456789010",
         "aws.vpc.action": "REJECT",
         "aws.vpc.bytes": "4249",
@@ -38,11 +50,23 @@
         "aws.vpc.srcport": "49761",
         "aws.vpc.start": "1418530010",
         "aws.vpc.version": "2",
+        "destination.address": "172.31.9.12",
+        "destination.ip": "172.31.9.12",
+        "destination.port": 3389,
         "event.dataset": "aws.vpc",
         "event.module": "aws",
+        "event.outcome": "deny",
         "fileset.name": "vpc",
         "input.type": "log",
         "log.offset": 115,
-        "service.type": "aws"
+        "network.bytes": 4249,
+        "network.iana_number": 6,
+        "network.packets": 20,
+        "service.type": "aws",
+        "source.address": "172.31.9.69",
+        "source.bytes": 4249,
+        "source.ip": "172.31.9.69",
+        "source.packets": 20,
+        "source.port": 49761
     }
 ]

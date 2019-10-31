@@ -4,3 +4,51 @@ paths:
   - {{$path}}
     {{ end }}
 exclude_files: [".gz$"]
+
+processors:
+  - dissect:
+      field: message
+      target_prefix: aws.vpc
+      tokenizer: '%{version} %{account_id} %{interface_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{packets} %{bytes} %{start} %{end} %{action} %{log_status}'
+  - convert:
+      ignore_missing: true
+      fields:
+        - {from: aws.vpc.srcaddr, to: source.address}
+        - {from: aws.vpc.srcaddr, to: source.ip, type: ip}
+        - {from: aws.vpc.srcport, to: source.port, type: long}
+        - {from: aws.vpc.dstaddr, to: destination.address}
+        - {from: aws.vpc.dstaddr, to: destination.ip, type: ip}
+        - {from: aws.vpc.dstport, to: destination.port, type: long}
+        - {from: aws.vpc.protocol, to: network.iana_number, type: long}
+        - {from: aws.vpc.packets, to: source.packets, type: long}
+        - {from: aws.vpc.bytes, to: source.bytes, type: long}
+        - {from: aws.vpc.packets, to: network.packets, type: long}
+        - {from: aws.vpc.bytes, to: network.bytes, type: long}
+
+  {{ if .community_id }}
+  - community_id: ~
+  {{ end }}
+
+  # Convert Unix epoch to timestamp
+  - timestamp:
+      ignore_missing: true
+      field: aws.vpc.start
+      target_field: event.start
+      layouts:
+        - UNIX
+  - timestamp:
+      ignore_missing: true
+      field: aws.vpc.end
+      target_field: event.end
+      layouts:
+        - UNIX
+
+  # Use the aws.vpc.action value to set the event.outcome value to either "allow" or "deny".
+  - add_fields:
+      when.equals.aws.vpc.action: ACCEPT
+      target: event
+      fields: {outcome: allow}
+  - add_fields:
+      when.equals.aws.vpc.action: REJECT
+      target: event
+      fields: {outcome: deny}
