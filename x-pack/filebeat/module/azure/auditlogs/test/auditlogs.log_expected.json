@@ -5,9 +5,9 @@
         "azure.auditlogs.identity": "Device Registration Service",
         "azure.auditlogs.operation_name": "Update device",
         "azure.auditlogs.operation_version": "1.0",
-        "azure.auditlogs.properties.activityDateTime": "2019-10-18T15:30:51.0273716+00:00",
+        "azure.auditlogs.properties.activity_datetime": "2019-10-18T15:30:51.0273716+00:00",
         "azure.auditlogs.properties.activity_display_name": "Update device",
-        "azure.auditlogs.properties.additionalDetails": [],
+        "azure.auditlogs.properties.additional_details": [],
         "azure.auditlogs.properties.category": "Device",
         "azure.auditlogs.properties.correlation_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "azure.auditlogs.properties.id": "Directory_ESQ",
@@ -20,13 +20,13 @@
         "azure.auditlogs.properties.result_reason": "",
         "azure.auditlogs.properties.target_resources": [
             {
-                "displayName": "LAPTOP-12",
+                "display_name": "LAPTOP-12",
                 "id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-                "modifiedProperties": [
+                "modified_properties": [
                     {
-                        "displayName": "Included Updated Properties",
-                        "newValue": "\"\"",
-                        "oldValue": null
+                        "display_name": "Included Updated Properties",
+                        "new_value": "\"\"",
+                        "old_value": null
                     }
                 ],
                 "type": "Device"

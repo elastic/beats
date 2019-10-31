@@ -40,9 +40,9 @@
                 "result": "notEnabled"
             }
         ],
-        "azure.signinlogs.properties.authenticationDetails": [],
-        "azure.signinlogs.properties.authenticationProcessingDetails": [],
-        "azure.signinlogs.properties.authenticationRequirementPolicies": [],
+        "azure.signinlogs.properties.authentication_details": [],
+        "azure.signinlogs.properties.authentication_processing_details": [],
+        "azure.signinlogs.properties.authentication_requirement_policies": [],
         "azure.signinlogs.properties.client_app_used": "Browser",
         "azure.signinlogs.properties.conditional_access_status": "notApplied",
         "azure.signinlogs.properties.correlation_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
@@ -63,13 +63,12 @@
         "azure.signinlogs.properties.risk_state": "none",
         "azure.signinlogs.properties.service_principal_id": "",
         "azure.signinlogs.properties.status.error_code": 50140,
-        "azure.signinlogs.properties.status.failureReason": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
         "azure.signinlogs.properties.token_issuer_name": "",
         "azure.signinlogs.properties.token_issuer_type": "AzureAD",
         "azure.signinlogs.properties.user_display_name": "Test LTest",
         "azure.signinlogs.properties.user_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "azure.signinlogs.properties.user_principal_name": "test@elastic.co",
-        "azure.signinlogs.resultDescription": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
+        "azure.signinlogs.result_description": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
         "azure.signinlogs.result_signature": "None",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
         "cloud.provider": "azure",
@@ -88,6 +87,7 @@
         "log.level": 4,
         "log.offset": 0,
         "service.type": "azure",
-        "source.ip": "81.171.241.231"
+        "source.ip": "81.171.241.231",
+        "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in."
     }
 ] 
