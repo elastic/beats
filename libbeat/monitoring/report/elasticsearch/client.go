@@ -245,19 +245,16 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(result *esout.BulkResult, events []report.Event) {
-	items := result.Items
-
-	reader := esout.NewJSONReader(items)
-
-	// check items field is an array
-	if err := reader.ExpectArray(); err != nil {
-		logp.Err("failed to parse bulk response: expected items array")
+func logBulkFailures(result esout.BulkResult, events []report.Event) {
+	reader := esout.NewJSONReader(result)
+	err := esout.BulkReadToItems(reader)
+	if err != nil {
+		logp.Err("failed to parse bulk items: %v", err)
 		return
 	}
 
 	for i, _ := range events {
-		status, msg, err := esout.ItemStatus(reader)
+		status, msg, err := esout.BulkReadItemStatus(reader)
 		if err != nil {
 			logp.Err("failed to parse item status: %v", err)
 			return

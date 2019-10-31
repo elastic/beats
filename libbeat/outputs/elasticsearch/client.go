@@ -128,6 +128,7 @@ var (
 )
 
 var (
+	errExpectedItemsArray    = errors.New("expected items array")
 	errExpectedItemObject    = errors.New("expected item response object")
 	errExpectedStatusCode    = errors.New("expected item status code")
 	errUnexpectedEmptyObject = errors.New("empty object")
@@ -360,7 +361,7 @@ func (client *Client) publishEvents(
 		failedEvents = data
 		stats.fails = len(failedEvents)
 	} else {
-		client.json.init(result.Items)
+		client.json.init(result)
 		failedEvents, stats = bulkCollectPublishFails(&client.json, data)
 	}
 
@@ -481,9 +482,8 @@ func bulkCollectPublishFails(
 	reader *JSONReader,
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
-	// check items field is an array
-	if err := reader.ExpectArray(); err != nil {
-		logp.Err("Failed to parse bulk response: expected items array")
+	if err := BulkReadToItems(reader); err != nil {
+		logp.Err("failed to parse bulk response: %v", err.Error())
 		return nil, bulkResultStats{}
 	}
 
@@ -491,7 +491,7 @@ func bulkCollectPublishFails(
 	failed := data[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		status, msg, err := ItemStatus(reader)
+		status, msg, err := BulkReadItemStatus(reader)
 		if err != nil {
 			return nil, bulkResultStats{}
 		}
@@ -527,7 +527,39 @@ func bulkCollectPublishFails(
 	return failed, stats
 }
 
-func ItemStatus(reader *JSONReader) (int, []byte, error) {
+func BulkReadToItems(reader *JSONReader) error {
+	if err := reader.ExpectDict(); err != nil {
+		return errExpectedObject
+	}
+
+	// find 'items' field in response
+	for {
+		kind, name, err := reader.nextFieldName()
+		if err != nil {
+			return err
+		}
+
+		if kind == dictEnd {
+			return errExpectedItemsArray
+		}
+
+		// found items array -> continue
+		if bytes.Equal(name, nameItems) {
+			break
+		}
+
+		reader.ignoreNext()
+	}
+
+	// check items field is an array
+	if err := reader.ExpectArray(); err != nil {
+		return errExpectedItemsArray
+	}
+
+	return nil
+}
+
+func BulkReadItemStatus(reader *JSONReader) (int, []byte, error) {
 	// skip outer dictionary
 	if err := reader.ExpectDict(); err != nil {
 		return 0, nil, errExpectedItemObject

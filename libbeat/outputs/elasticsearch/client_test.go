@@ -20,7 +20,6 @@
 package elasticsearch
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -43,7 +42,7 @@ import (
 
 func readStatusItem(in []byte) (int, string, error) {
 	reader := NewJSONReader(in)
-	code, msg, err := itemStatus(reader)
+	code, msg, err := BulkReadItemStatus(reader)
 	return code, string(msg), err
 }
 
@@ -121,10 +120,7 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	var r BulkResult
-	json.Unmarshal(response, &r)
-
-	reader := NewJSONReader(r.Items)
+	reader := NewJSONReader(response)
 	res, stats := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
@@ -145,10 +141,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	var r BulkResult
-	json.Unmarshal(response, &r)
-
-	reader := NewJSONReader(r.Items)
+	reader := NewJSONReader(response)
 	res, stats := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
@@ -190,10 +183,7 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event}
 
-	var r BulkResult
-	json.Unmarshal(response, &r)
-
-	reader := NewJSONReader(r.Items)
+	reader := NewJSONReader(response)
 	res, _ := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
@@ -211,12 +201,9 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 1}}}
 	events := []publisher.Event{event, event, event}
 
-	var r BulkResult
-	json.Unmarshal(response, &r)
-
 	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(r.Items)
+		reader.init(response)
 		res, _ := bulkCollectPublishFails(reader, events)
 		if len(res) != 0 {
 			b.Fail()
@@ -237,12 +224,9 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	var r BulkResult
-	json.Unmarshal(response, &r)
-
 	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(r.Items)
+		reader.init(response)
 		res, _ := bulkCollectPublishFails(reader, events)
 		if len(res) != 1 {
 			b.Fail()
@@ -262,12 +246,9 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	var r BulkResult
-	json.Unmarshal(response, &r)
-
 	reader := NewJSONReader(nil)
 	for i := 0; i < b.N; i++ {
-		reader.init(r.Items)
+		reader.init(response)
 		res, _ := bulkCollectPublishFails(reader, events)
 		if len(res) != 3 {
 			b.Fail()
