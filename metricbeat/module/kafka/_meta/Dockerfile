@@ -20,12 +20,15 @@ RUN wget -O /opt/jolokia-jvm-1.5.0-agent.jar http://search.maven.org/remoteconte
 # RUN mv jolokia-jvm-1.5.0-agent.jar /opt/jolokia-jvm-1.5.0-agent.jar
 
 ADD kafka_server_jaas.conf /etc/kafka/server_jaas.conf
+ADD jaas-kafka-client-producer.conf /kafka/bin/jaas-kafka-client-producer.conf
+ADD sasl-producer.properties /kafka/bin/sasl-producer.properties
 ADD run.sh /run.sh
 ADD healthcheck.sh /healthcheck.sh
 
 EXPOSE 9092
 EXPOSE 2181
 EXPOSE 8779
+EXPOSE 8775
 
 # Healthcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available
 HEALTHCHECK --interval=1s --retries=90 CMD /healthcheck.sh
