@@ -147,7 +147,7 @@ If you don't use the +{beat_monitoring_user}+ user:
 |Create monitoring indices in {es}
 
 |Index
-|`create` on `.monitoring-beats-*` indices
+|`create_doc` on `.monitoring-beats-*` indices
 |Write monitoring events into {es}
 |====
 
