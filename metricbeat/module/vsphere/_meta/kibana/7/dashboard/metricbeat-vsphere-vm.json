@@ -656,7 +656,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "VM running on what ESXi host [Metricbeat VSphere] ECS",
+        "title": "VM placements on ESXi Hosts[Metricbeat VSphere] ECS",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
