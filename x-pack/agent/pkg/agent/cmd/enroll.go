@@ -32,7 +32,7 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 		},
 	}
 
-	cmd.Flags().StringP("", "ca", "", "Comma separated list of root certificate for server verifications")
+	cmd.Flags().StringP("ca", "", "", "Comma separated list of root certificate for server verifications")
 
 	return cmd
 }
