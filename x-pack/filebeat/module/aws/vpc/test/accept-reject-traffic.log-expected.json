@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-10-31T22:25:52.412Z",
+        "@timestamp": "2014-12-14T04:07:50.000Z",
         "aws.vpc.account_id": "123456789010",
         "aws.vpc.action": "ACCEPT",
         "aws.vpc.bytes": "4249",
@@ -19,8 +19,10 @@
         "destination.ip": "172.31.16.21",
         "destination.port": 22,
         "event.dataset": "aws.vpc",
+        "event.end": "2014-12-14T04:07:50.000Z",
         "event.module": "aws",
         "event.outcome": "allow",
+        "event.start": "2014-12-14T04:06:50.000Z",
         "fileset.name": "vpc",
         "input.type": "log",
         "log.offset": 0,
@@ -35,7 +37,7 @@
         "source.port": 20641
     },
     {
-        "@timestamp": "2019-10-31T22:25:52.427Z",
+        "@timestamp": "2014-12-14T04:07:50.000Z",
         "aws.vpc.account_id": "123456789010",
         "aws.vpc.action": "REJECT",
         "aws.vpc.bytes": "4249",
@@ -54,8 +56,10 @@
         "destination.ip": "172.31.9.12",
         "destination.port": 3389,
         "event.dataset": "aws.vpc",
+        "event.end": "2014-12-14T04:07:50.000Z",
         "event.module": "aws",
         "event.outcome": "deny",
+        "event.start": "2014-12-14T04:06:50.000Z",
         "fileset.name": "vpc",
         "input.type": "log",
         "log.offset": 115,

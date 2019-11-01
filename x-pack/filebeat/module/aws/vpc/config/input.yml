@@ -1,9 +1,19 @@
+{{ if eq .input "s3" }}
+
+type: s3
+queue_url: {{ .queue_url }}
+credential_profile_name: {{ .credential_profile_name }}
+
+{{ else if eq .input "file" }}
+
 type: log
 paths:
   {{ range $i, $path := .paths }}
   - {{$path}}
     {{ end }}
 exclude_files: [".gz$"]
+
+{{ end }}
 
 processors:
   - dissect:
@@ -28,20 +38,6 @@ processors:
   {{ if .community_id }}
   - community_id: ~
   {{ end }}
-
-  # Convert Unix epoch to timestamp
-  - timestamp:
-      ignore_missing: true
-      field: aws.vpc.start
-      target_field: event.start
-      layouts:
-        - UNIX
-  - timestamp:
-      ignore_missing: true
-      field: aws.vpc.end
-      target_field: event.end
-      layouts:
-        - UNIX
 
   # Use the aws.vpc.action value to set the event.outcome value to either "allow" or "deny".
   - add_fields:

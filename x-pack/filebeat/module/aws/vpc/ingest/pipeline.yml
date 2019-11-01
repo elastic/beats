@@ -1,6 +1,26 @@
 description: Pipeline for AWS VPC Flow Logs
 
 processors:
+  # Convert Unix epoch to timestamp
+  - date:
+      field: "aws.vpc.end"
+      target_field: "@timestamp"
+      ignore_failure: true
+      formats:
+        - UNIX
+  - date:
+      field: "aws.vpc.start"
+      target_field: "event.start"
+      ignore_failure: true
+      formats:
+        - UNIX
+  - date:
+      field: "aws.vpc.end"
+      target_field: "event.end"
+      ignore_failure: true
+      formats:
+        - UNIX
+
   # IP Geolocation Lookup
   - geoip:
       field: source.ip
