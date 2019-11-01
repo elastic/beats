@@ -20,7 +20,6 @@
 package file_integrity
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 	"strings"
@@ -33,10 +32,6 @@ import (
 )
 
 var underTest = false
-
-func init() {
-	underTest = flag.Lookup("test.v") != nil
-}
 
 type fsreader struct {
 	stream      *fsevents.EventStream
