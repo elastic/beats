@@ -1,0 +1,9 @@
+This metricset periodically fetches JMX metrics from Kafka Producers JMX.
+
+[float]
+=== Compatibility
+The module has been tested with Kafka 2.1.1. Other versions are expected to work.
+
+[float]
+=== Usage
+The Consumer metricset requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
