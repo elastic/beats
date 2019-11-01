@@ -427,3 +427,22 @@ func (r *testBulkRecorder) AddRaw(raw interface{}) error {
 	r.inAction = !r.inAction
 	return nil
 }
+
+func TestClientWithAPIKey(t *testing.T) {
+	var headers http.Header
+
+	// Start a mock HTTP server, save request headers
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		headers = r.Header
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(ClientSettings{
+		URL:    ts.URL,
+		APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
+	}, nil)
+	assert.NoError(t, err)
+
+	client.Ping()
+	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
+}
