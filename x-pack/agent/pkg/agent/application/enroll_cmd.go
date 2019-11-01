@@ -5,34 +5,29 @@
 package application
 
 import (
+	"bytes"
 	"io"
-	"net/http"
-	"net/url"
 	"runtime"
 
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/agent/release"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
 
-type clienter interface {
-	Send(
-		method string,
-		path string,
-		params url.Values,
-		headers http.Header,
-		body io.Reader,
-	) (*http.Response, error)
+type store interface {
+	Save(io.Reader) error
 }
 
 // EnrollCmd is an enroll subcommand that interacts between the Kibana API and the Agent.
 type EnrollCmd struct {
 	log                  *logger.Logger
 	enrollmentToken      string
-	client               clienter
+	client               apiClient
 	id                   string
 	userProvidedMetadata map[string]interface{}
 	configStore          store
@@ -48,7 +43,37 @@ func NewEnrollCmd(
 	enrollmentToken string,
 	id string,
 	userProvidedMetadata map[string]interface{},
-	configStore store,
+	configPath string,
+) (*EnrollCmd, error) {
+
+	store := storage.NewReplaceOnSuccessStore(
+		configPath,
+		DefaultAgentFleetConfig,
+		storage.NewDiskStore(fleetAgentConfigPath()),
+	)
+
+	return NewEnrollCmdWithStore(
+		log,
+		url,
+		CAs,
+		enrollmentToken,
+		id,
+		userProvidedMetadata,
+		configPath,
+		store,
+	)
+}
+
+//NewEnrollCmdWithStore creates an new enrollment and accept a custom store.
+func NewEnrollCmdWithStore(
+	log *logger.Logger,
+	url string,
+	CAs []string,
+	enrollmentToken string,
+	id string,
+	userProvidedMetadata map[string]interface{},
+	configPath string,
+	store store,
 ) (*EnrollCmd, error) {
 
 	cfg, err := kibana.NewConfigFromURL(url, CAs)
@@ -74,7 +99,7 @@ func NewEnrollCmd(
 		id:                   id,
 		userProvidedMetadata: userProvidedMetadata,
 		kibanaConfig:         cfg,
-		configStore:          configStore,
+		configStore:          store,
 	}, nil
 }
 
@@ -97,11 +122,18 @@ func (c *EnrollCmd) Execute() error {
 		return errors.Wrap(err, "fail to execute request to Kibana")
 	}
 
-	if err := c.configStore.Save(fleetConfig{
+	fleetConfig, err := createFleetConfigFromEnroll(&APIAccess{
 		AccessToken: resp.Item.AccessToken,
 		Kibana:      c.kibanaConfig,
-	}); err != nil {
-		return errors.Wrap(err, "could not save credentials")
+	})
+
+	reader, err := yamlToReader(fleetConfig)
+	if err != nil {
+		return err
+	}
+
+	if err := c.configStore.Save(reader); err != nil {
+		return errors.Wrap(err, "could not save enroll credentials")
 	}
 
 	return nil
@@ -114,4 +146,27 @@ func metadata() map[string]interface{} {
 	}
 }
 
-// info Enrollment token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiRU5ST0xNRU5UX1RPS0VOIiwicG9saWN5Ijp7ImlkIjoiNjlmM2Y1YTAtZWM1Mi0xMWU5LTkzYzQtZDcyYWI4YTY5MzkxIn0sImlhdCI6MTU3MDgxNzQzMn0.tVxm4JY9gAcd14YlQTmi_y-8AqbGtKyS_PXXI2gdLBY
+type enrollOptions struct {
+	AccessToken string
+	Kibana      *kibana.Config
+}
+
+func (e *enrollOptions) Validate() error {
+	if len(e.AccessToken) == 0 {
+		return errors.New("empty access token")
+	}
+
+	if e.Kibana == nil || len(e.Kibana.Host) == 0 {
+		return errors.New("missing kibana host configuration")
+	}
+
+	return nil
+}
+
+func yamlToReader(in interface{}) (io.Reader, error) {
+	data, err := yaml.Marshal(in)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not marshal to YAML")
+	}
+	return bytes.NewReader(data), nil
+}

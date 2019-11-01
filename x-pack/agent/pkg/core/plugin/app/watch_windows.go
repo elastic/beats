@@ -36,8 +36,8 @@ func (a *Application) externalProcess(proc *os.Process) {
 }
 
 func isWindowsProcessExited(pid int) bool {
-	const desiredAccess = syscall.STANDARD_RIGHTS_READ | syscall.PROCESS_QUERY_INFORMATION | syscall.SYNCHRONIZE
-	h, err := syscall.OpenProcess(desiredAccess, false, uint32(pid))
+	const desired_access = syscall.STANDARD_RIGHTS_READ | syscall.PROCESS_QUERY_INFORMATION | syscall.SYNCHRONIZE
+	h, err := syscall.OpenProcess(desired_access, false, uint32(pid))
 	if err != nil {
 		// failed to open handle, report exited
 		return true

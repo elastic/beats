@@ -53,7 +53,7 @@ func (b *operatorPipeline) Execute(cfg *configRequest) error {
 	return b.configHandler.HandleConfig(cfg)
 }
 
-func pipelineFactory(cfg *config.Config, client sender, r reporter) func(*logger.Logger, routingKey) (pipeline, error) {
+func pipelineFactory(cfg *config.Config, r reporter) func(*logger.Logger, routingKey) (pipeline, error) {
 	return func(log *logger.Logger, id routingKey) (pipeline, error) {
 		// new operator per pipeline to isolate processes without using tags
 		operator, err := newOperator(log, cfg, r)

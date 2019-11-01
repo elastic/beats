@@ -57,13 +57,38 @@ func init() {
 	}
 }
 
-// NewAuthWithConfig returns a Kibana client that will:
+// NewAuthWithRawConfig returns a Kibana client that will:
 //
 // - Send the AccessToken on every HTTP request.
 // - Ensure a minimun version of Kibana is required.
 // - Send the Fleet User Agent on every HTTP request.
-func NewAuthWithConfig(log *logger.Logger, config *config.Config, accessToken string) (*kibana.Client, error) {
+func NewAuthWithRawConfig(
+	log *logger.Logger,
+	accessToken string,
+	config *config.Config,
+) (*kibana.Client, error) {
 	return kibana.NewWithRawConfig(log, config, func(rt http.RoundTripper) (http.RoundTripper, error) {
+		rt, err := baseRoundTrippers(rt)
+		if err != nil {
+			return nil, err
+		}
+
+		rt, err = NewFleetAccessTokenRoundTripper(rt, accessToken)
+		if err != nil {
+			return nil, err
+		}
+
+		return rt, nil
+	})
+}
+
+// NewAuthWithConfig takes an accesToken and A Kibana configuration and return an authenticated client.
+func NewAuthWithConfig(
+	log *logger.Logger,
+	accessToken string,
+	cfg *kibana.Config,
+) (*kibana.Client, error) {
+	return kibana.NewWithConfig(log, cfg, func(rt http.RoundTripper) (http.RoundTripper, error) {
 		rt, err := baseRoundTrippers(rt)
 		if err != nil {
 			return nil, err

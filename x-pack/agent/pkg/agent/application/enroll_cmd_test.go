@@ -5,7 +5,9 @@
 package application
 
 import (
+	"bytes"
 	"crypto/tls"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -13,31 +15,87 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/agent/kibana"
+	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/authority"
 )
 
 type mockStore struct {
-	Config fleetConfig
-	Err    error
-	Called bool
+	Err     error
+	Called  bool
+	Content []byte
 }
 
-func (m *mockStore) Save(c fleetConfig) error {
+func (m *mockStore) Save(in io.Reader) error {
 	m.Called = true
 	if m.Err != nil {
 		return m.Err
 	}
 
-	m.Config = c
+	buf := new(bytes.Buffer)
+	io.Copy(buf, in)
+	m.Content = buf.Bytes()
 	return nil
 }
 
 func TestEnroll(t *testing.T) {
 	log, _ := logger.New()
+
+	t.Run("fail to save is propagated", withTLSServer(
+		func(t *testing.T) *http.ServeMux {
+			mux := http.NewServeMux()
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(`
+{
+    "action": "created",
+    "success": true,
+    "item": {
+       "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
+        "active": true,
+        "policy_id": "69f3f5a0-ec52-11e9-93c4-d72ab8a69391",
+        "type": "PERMANENT",
+        "enrolled_at": "2019-10-11T18:26:37.158Z",
+        "user_provided_metadata": {
+						"custom": "customize"
+				},
+        "local_metadata": {
+            "platform": "linux",
+            "version": "8.0.0"
+        },
+        "actions": [],
+        "access_token": "my-access-token"
+    }
+}`))
+			})
+			return mux
+		}, func(t *testing.T, caBytes []byte, host string) {
+			caFile, err := bytesToTMPFile(caBytes)
+			require.NoError(t, err)
+			defer os.Remove(caFile)
+
+			url := "https://" + host
+			store := &mockStore{Err: errors.New("fail to save")}
+			cmd, err := NewEnrollCmdWithStore(
+				log,
+				url,
+				[]string{caFile},
+				"my-enrollment-token",
+				"my-id",
+				map[string]interface{}{"custom": "customize"},
+				"",
+				store,
+			)
+			require.NoError(t, err)
+
+			err = cmd.Execute()
+			require.Error(t, err)
+		},
+	))
 
 	t.Run("succesfully enroll with TLS and save access token in the store", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
@@ -74,13 +132,14 @@ func TestEnroll(t *testing.T) {
 
 			url := "https://" + host
 			store := &mockStore{}
-			cmd, err := NewEnrollCmd(
+			cmd, err := NewEnrollCmdWithStore(
 				log,
 				url,
 				[]string{caFile},
 				"my-enrollment-token",
 				"my-id",
 				map[string]interface{}{"custom": "customize"},
+				"",
 				store,
 			)
 			require.NoError(t, err)
@@ -89,11 +148,15 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
-			require.Equal(t, store.Config.AccessToken, "my-access-token")
-			require.Equal(t, store.Config.Kibana.Host, host)
-			require.Equal(t, store.Config.Kibana.Protocol, kibana.Protocol("https"))
-			require.Equal(t, store.Config.Kibana.Username, "")
-			require.Equal(t, store.Config.Kibana.Password, "")
+
+			config, err := readConfig(store.Content)
+
+			require.NoError(t, err)
+			require.Equal(t, "my-access-token", config.API.AccessToken)
+			require.Equal(t, host, config.API.Kibana.Host)
+			require.Equal(t, "", config.API.Kibana.Username)
+			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, kibana.Protocol("https"), config.API.Kibana.Protocol)
 		},
 	))
 
@@ -119,22 +182,21 @@ func TestEnroll(t *testing.T) {
             "platform": "linux",
             "version": "8.0.0"
         },
-        "actions": [],
-        "access_token": "my-access-token"
-    }
+        "actions": [], "access_token": "my-access-token" }
 }`))
 			})
 			return mux
 		}, func(t *testing.T, host string) {
 			url := "http://" + host
 			store := &mockStore{}
-			cmd, err := NewEnrollCmd(
+			cmd, err := NewEnrollCmdWithStore(
 				log,
 				url,
 				make([]string, 0),
 				"my-enrollment-token",
 				"my-id",
 				map[string]interface{}{"custom": "customize"},
+				"",
 				store,
 			)
 			require.NoError(t, err)
@@ -143,11 +205,15 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
-			require.Equal(t, store.Config.AccessToken, "my-access-token")
-			require.Equal(t, store.Config.Kibana.Host, host)
-			require.Equal(t, store.Config.Kibana.Protocol, kibana.Protocol("http"))
-			require.Equal(t, store.Config.Kibana.Username, "")
-			require.Equal(t, store.Config.Kibana.Password, "")
+
+			config, err := readConfig(store.Content)
+
+			require.NoError(t, err)
+			require.Equal(t, "my-access-token", config.API.AccessToken)
+			require.Equal(t, host, config.API.Kibana.Host)
+			require.Equal(t, "", config.API.Kibana.Username)
+			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, kibana.Protocol("http"), config.API.Kibana.Protocol)
 		},
 	))
 
@@ -166,13 +232,14 @@ func TestEnroll(t *testing.T) {
 		}, func(t *testing.T, host string) {
 			url := "http://" + host
 			store := &mockStore{}
-			cmd, err := NewEnrollCmd(
+			cmd, err := NewEnrollCmdWithStore(
 				log,
 				url,
 				make([]string, 0),
 				"my-enrollment-token",
 				"my-id",
 				map[string]interface{}{"custom": "customize"},
+				"",
 				store,
 			)
 			require.NoError(t, err)
@@ -246,4 +313,18 @@ func bytesToTMPFile(b []byte) (string, error) {
 	}
 
 	return f.Name(), nil
+}
+
+func readConfig(raw []byte) (*FleetAgentConfig, error) {
+	r := bytes.NewReader(raw)
+	config, err := config.NewConfigFrom(r)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := &FleetAgentConfig{}
+	if err := config.Unpack(cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }

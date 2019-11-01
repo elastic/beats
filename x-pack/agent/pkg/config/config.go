@@ -6,6 +6,8 @@ package config
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
@@ -43,6 +45,15 @@ func LoadYAML(path string, opts ...ucfg.Option) (*Config, error) {
 func NewConfigFrom(from interface{}) (*Config, error) {
 	if str, ok := from.(string); ok {
 		c, err := yaml.NewConfig([]byte(str), DefaultOptions...)
+		return newConfigFrom(c), err
+	}
+
+	if in, ok := from.(io.Reader); ok {
+		content, err := ioutil.ReadAll(in)
+		if err != nil {
+			return nil, err
+		}
+		c, err := yaml.NewConfig(content, DefaultOptions...)
 		return newConfigFrom(c), err
 	}
 
