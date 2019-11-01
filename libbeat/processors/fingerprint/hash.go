@@ -22,7 +22,6 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"fmt"
 	"hash"
 	"strings"
 )
@@ -43,13 +42,9 @@ func (f *hashMethod) Unpack(str string) error {
 
 	m, found := hashes[str]
 	if !found {
-		return makeUnknownMethodError(str)
+		return makeErrUnknownMethod(str)
 	}
 
 	*f = m
 	return nil
-}
-
-func makeUnknownMethodError(method string) error {
-	return fmt.Errorf("invalid fingerprinting method [%s]", method)
 }

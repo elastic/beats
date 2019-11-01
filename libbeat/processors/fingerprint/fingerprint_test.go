@@ -265,16 +265,13 @@ func TestSourceFieldErrors(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		fields         []string
-		expectedErrMsg string
+		fields []string
 	}{
 		"missing": {
 			[]string{"field1", "missing_field"},
-			"failed to compute fingerprint: failed to find field [missing_field] in event: key not found",
 		},
 		"non-scalar": {
 			[]string{"field1", "complex_field"},
-			"failed to compute fingerprint: cannot compute fingerprint using non-scalar field [complex_field]",
 		},
 	}
 
@@ -294,36 +291,32 @@ func TestSourceFieldErrors(t *testing.T) {
 				Timestamp: time.Now(),
 			}
 			_, err = p.Run(testEvent)
-			assert.EqualError(t, err, test.expectedErrMsg)
+			assert.IsType(t, errComputeFingerprint{}, err)
 		})
 	}
 }
 
 func TestInvalidConfig(t *testing.T) {
 	tests := map[string]struct {
-		config         common.MapStr
-		expectedErrMsg string
+		config common.MapStr
 	}{
 		"no fields": {
 			common.MapStr{
 				"fields": []string{},
 				"method": "sha256",
 			},
-			"failed to unpack fingerprint processor configuration: empty field accessing 'fields'",
 		},
 		"invalid fingerprinting method": {
 			common.MapStr{
 				"fields": []string{"doesnt", "matter"},
 				"method": "non_existent",
 			},
-			"failed to unpack fingerprint processor configuration: invalid fingerprinting method [non_existent] accessing 'method'",
 		},
 		"invalid encoding": {
 			common.MapStr{
 				"fields":   []string{"doesnt", "matter"},
 				"encoding": "non_existent",
 			},
-			"failed to unpack fingerprint processor configuration: invalid encoding [non_existent] accessing 'encoding'",
 		},
 	}
 
@@ -333,7 +326,7 @@ func TestInvalidConfig(t *testing.T) {
 			assert.NoError(t, err)
 
 			_, err = New(testConfig)
-			assert.EqualError(t, err, test.expectedErrMsg)
+			assert.IsType(t, errConfigUnpack{}, err)
 		})
 	}
 }

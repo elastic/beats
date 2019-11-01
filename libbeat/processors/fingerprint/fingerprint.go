@@ -38,8 +38,6 @@ func init() {
 
 const processorName = "fingerprint"
 
-var errNoFields = errors.New("must specify at least one field")
-
 type fingerprint struct {
 	config Config
 	fields []string
@@ -50,7 +48,7 @@ type fingerprint struct {
 func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack %v processor configuration", processorName)
+		return nil, makeErrConfigUnpack(err)
 	}
 
 	fields := common.MakeStringSet(config.Fields...)
@@ -71,14 +69,14 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 
 	err := p.writeFields(hashFn, event.Fields)
 	if err != nil {
-		return nil, makeComputeFingerprintError(err)
+		return nil, makeErrComputeFingerprint(err)
 	}
 
 	hash := hashFn.Sum(nil)
 	encodedHash := p.config.Encoding(hash)
 
 	if _, err = event.PutValue(p.config.TargetField, encodedHash); err != nil {
-		return nil, makeComputeFingerprintError(err)
+		return nil, makeErrComputeFingerprint(err)
 	}
 
 	return event, nil
@@ -112,8 +110,4 @@ func (p *fingerprint) writeFields(to io.Writer, eventFields common.MapStr) error
 
 	io.WriteString(to, "|")
 	return nil
-}
-
-func makeComputeFingerprintError(err error) error {
-	return errors.Wrap(err, "failed to compute fingerprint")
 }
