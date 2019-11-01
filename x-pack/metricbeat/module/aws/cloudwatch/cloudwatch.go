@@ -265,10 +265,12 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 		if config.MetricName != nil && config.Dimensions != nil {
 			namespace := config.Namespace
 			for _, metricName := range config.MetricName {
+				metricNameAddr := new(string)
+				*metricNameAddr = metricName
 				metricsWithStats := metricsWithStatistics{
 					cloudwatchMetric: cloudwatch.Metric{
 						Namespace:  &namespace,
-						MetricName: &metricName,
+						MetricName: metricNameAddr,
 						Dimensions: cloudwatchDimensions,
 					},
 					statistic: config.Statistic,
