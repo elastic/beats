@@ -12,6 +12,11 @@ type (
 	errUnknownMethod      struct{ method string }
 	errConfigUnpack       struct{ cause error }
 	errComputeFingerprint struct{ cause error }
+	errMissingField       struct {
+		field string
+		cause error
+	}
+	errNonScalarField struct{ field string }
 )
 
 func makeErrUnknownEncoding(encoding string) errUnknownEncoding {
@@ -40,4 +45,18 @@ func makeErrComputeFingerprint(cause error) errComputeFingerprint {
 }
 func (e errComputeFingerprint) Error() string {
 	return fmt.Sprintf("failed to compute fingerprint: %v", e.cause)
+}
+
+func makeErrMissingField(field string, cause error) errMissingField {
+	return errMissingField{field, cause}
+}
+func (e errMissingField) Error() string {
+	return fmt.Sprintf("failed to find field [%v] in event: %v", e.field, e.cause)
+}
+
+func makeErrNonScalarField(field string) errNonScalarField {
+	return errNonScalarField{field}
+}
+func (e errNonScalarField) Error() string {
+	return fmt.Sprintf("cannot compute fingerprint using non-scalar field [%v]", e.field)
 }

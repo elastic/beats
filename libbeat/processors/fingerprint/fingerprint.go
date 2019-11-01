@@ -23,8 +23,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
@@ -93,13 +91,13 @@ func (p *fingerprint) writeFields(to io.Writer, eventFields common.MapStr) error
 			if p.config.IgnoreMissing {
 				continue
 			}
-			return errors.Wrapf(err, "failed to find field [%v] in event", k)
+			return makeErrMissingField(k, err)
 		}
 
 		i := v
 		switch vv := v.(type) {
 		case map[string]interface{}, []interface{}, common.MapStr:
-			return errors.Errorf("cannot compute fingerprint using non-scalar field [%v]", k)
+			return makeErrNonScalarField(k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.
 			i = vv.UTC()
