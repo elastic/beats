@@ -68,35 +68,32 @@ management:
     # period define how frequent we should look for changes in the configuration.
     period: 10s
 
-# reattach collection is a way of tracking started processes by agent.
-reattachCollectionPath: "/home/elastic/reattach"
-
 download:
   # operating system [linux, windows, darwin]
-  operatingSystem: "linux"
+  operating_system: "linux"
   # target architecture [32, 64]
   arch: "32"
   # source of the artifacts, requires elastic like structure and naming of the binaries
   # e.g /windows-x86.zip
   sourceURI: "https://artifacts.elastic.co/downloads/beats/"
   # path to the directory containing downloaded packages
-  targetDirectory: "/home/elastic/downloads"
+  target_directory: "/home/elastic/downloads"
   # timeout for downloading package
   timeout: 30s
   # file path to a public key used for verifying downloaded artifacts
   # if not file is present agent will try to load public key from elastic.co website.
   pgpfile: "/home/elastic/elastic.pgp"# install describes the location of installed packages/programs. It is also used
   # for reading program specifications.
-  installPath: "/"
+  install_path: "/"
 
 process:
   # minimal port number for spawned processes
-  minPort: 10000
+  min_port: 10000
   # maximum port number for spawned processes
-  maxPort: 30000
+  max_port: 30000
   # timeout for creating new processes. when process is not successfully created by this timeout
   # start operation is considered a failure
-  spawnTimeout: 30s
+  spawn_timeout: 30s
 
 retry:
   # Enabled determines whether retry is possible. Default is false.
