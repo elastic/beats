@@ -524,7 +524,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "networks from virtualmachine [Metricbeat VSphere] ECS",
+          "title": "Networks from virtualmachine [Metricbeat VSphere] ECS",
           "type": "pie"
         }
       },
