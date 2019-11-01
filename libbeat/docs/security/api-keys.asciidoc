@@ -65,7 +65,7 @@ You can now use this API key in your +{beatname_lc}.yml+ configuration file like
 output.elasticsearch:
   api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA <1>
 --------------------
-<1> Format is `id:api_key` (note the colon in the middle)
+<1> Format is `id:api_key` (as returned by {ref}/security-api-create-api-key.html[Create API key])
 
 [[beats-api-key-monitor]]
 ==== Create an API key for monitoring
@@ -112,5 +112,5 @@ You can now use this API key in your +{beatname_lc}.yml+ configuration file like
 monitoring.elasticsearch:
   api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA <1>
 --------------------
-<1> Format is `id:api_key` (note the colon in the middle)
+<1> Format is `id:api_key` (as returned by {ref}/security-api-create-api-key.html[Create API key])
 
