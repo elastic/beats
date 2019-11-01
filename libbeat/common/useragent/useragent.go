@@ -15,33 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
-
-// This file is mandatory as otherwise the packetbeat.test binary is not generated correctly.
+package useragent
 
 import (
-	"flag"
-	"testing"
+	"fmt"
+	"runtime"
 
-	"github.com/elastic/beats/filebeat/cmd"
-	"github.com/elastic/beats/libbeat/tests/system/template"
+	"github.com/elastic/beats/libbeat/version"
 )
 
-var systemTest *bool
-
-func init() {
-	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
-}
-
-// Test started when the test binary is started. Only calls main.
-func TestSystem(t *testing.T) {
-	if *systemTest {
-		main()
-	}
-}
-
-func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name)
+// UserAgent takes the capitalized name of the current beat and returns
+// an RFC compliant user agent string for that beat.
+func UserAgent(beatNameCapitalized string) string {
+	return fmt.Sprintf("Elastic %s/%s (%s; %s; %s; %s)",
+		beatNameCapitalized,
+		version.GetDefaultVersion(), runtime.GOOS, runtime.GOARCH,
+		version.Commit(), version.BuildTime())
 }
