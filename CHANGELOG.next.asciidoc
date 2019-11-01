@@ -313,6 +313,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Marking Central Management deprecated. {pull}14018[14018]
 - Add `keep_null` setting to allow Beats to publish null values in events. {issue}5522[5522] {pull}13928[13928]
 - Add shared_credential_file option in aws related config for specifying credential file directory. {issue}14157[14157] {pull}14178[14178]
+- GA the `script` processor. {pull}14325[14325]
 
 *Auditbeat*
 
