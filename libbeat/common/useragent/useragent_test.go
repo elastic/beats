@@ -15,33 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
-
-// This file is mandatory as otherwise the packetbeat.test binary is not generated correctly.
+package useragent
 
 import (
-	"flag"
+	"regexp"
 	"testing"
 
-	"github.com/elastic/beats/filebeat/cmd"
-	"github.com/elastic/beats/libbeat/tests/system/template"
+	"github.com/stretchr/testify/assert"
 )
 
-var systemTest *bool
-
-func init() {
-	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
-}
-
-// Test started when the test binary is started. Only calls main.
-func TestSystem(t *testing.T) {
-	if *systemTest {
-		main()
-	}
-}
-
-func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name)
+func TestUserAgent(t *testing.T) {
+	ua := UserAgent("FakeBeat")
+	assert.Regexp(t, regexp.MustCompile("^Elastic FakeBeat"), ua)
 }

@@ -22,6 +22,7 @@ import (
 	"flag"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/system/template"
 	"github.com/elastic/beats/winlogbeat/cmd"
 )
 
@@ -39,4 +40,8 @@ func TestSystem(t *testing.T) {
 	if *systemTest {
 		main()
 	}
+}
+
+func TestTemplate(t *testing.T) {
+	template.TestTemplate(t, cmd.Name)
 }
