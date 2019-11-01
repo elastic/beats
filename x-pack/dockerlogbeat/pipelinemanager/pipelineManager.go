@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	"github.com/pkg/errors"
 )
 
 // containerConfig is the common.Config unpacking type

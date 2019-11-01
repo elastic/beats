@@ -5,32 +5,28 @@
 package pipelinemanager
 
 import (
-	"context"
-	"encoding/binary"
 	"fmt"
-	"io"
 	"os"
-	"strings"
-	"syscall"
 	"time"
 
 	"github.com/docker/engine/api/types/plugins/logdriver"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	pb "github.com/gogo/protobuf/io"
-	"github.com/pkg/errors"
-	"github.com/tonistiigi/fifo"
+	"github.com/elastic/beats/x-pack/dockerlogbeat/pipereader"
 )
 
 // ClientLogger is an instance of a pipeline logger client meant for reading from a single log stream
 // There's a many-to-one relationship between clients and pipelines.
 // Each container with the same config will get its own client to the same pipeline.
 type ClientLogger struct {
-	logFile      io.ReadWriteCloser
+	logFile      *pipereader.PipeReader
 	client       beat.Client
 	pipelineHash string
+	closer       chan struct{}
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
@@ -49,28 +45,61 @@ func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string)
 	}
 
 	// Create the FIFO reader client from the FIPO pipe
-	inputFile, err := fifo.OpenFifo(context.Background(), file, syscall.O_RDONLY, 0700)
+	inputFile, err := pipereader.NewReaderFromPath(file)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening logger fifo: %q", file)
 	}
 	logp.Info("Created new logger for %s", file)
 
-	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring}, nil
+	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{})}, nil
 }
 
 // Close closes the pipeline client and reader
 func (cl *ClientLogger) Close() error {
 	logp.Info("Closing ClientLogger")
-	cl.client.Close()
+	cl.logFile.Close()
+	return cl.client.Close()
 
-	return cl.logFile.Close()
 }
 
 // ConsumeAndSendLogs reads from the FIFO file and sends to the pipeline client. This will block and should be called in its own goroutine
 // TODO: Publish() can block, which is a problem. This whole thing should be two goroutines.
-func (cl *ClientLogger) ConsumeAndSendLogs() {
-	reader := pb.NewUint32DelimitedReader(cl.logFile, binary.BigEndian, 2e6)
+// func (cl *ClientLogger) ConsumeAndSendLogs() {
+// 	reader := pb.NewUint32DelimitedReader(cl.logFile, binary.BigEndian, 2e6)
 
+// 	publishWriter := make(chan logdriver.LogEntry, 500)
+
+// 	go cl.publishLoop(publishWriter)
+// 	// Clean up the reader after we're done
+// 	defer func() {
+
+// 		close(publishWriter)
+
+// 		err := reader.Close()
+// 		if err != nil {
+// 			fmt.Fprintf(os.Stderr, "Error closing FIFO reader: %s", err)
+// 		}
+// 	}()
+
+// 	var log logdriver.LogEntry
+// 	for {
+// 		err := reader.ReadMsg(&log)
+// 		if err != nil {
+// 			if err == io.EOF || err == os.ErrClosed || strings.Contains(err.Error(), "file already closed") {
+// 				cl.logFile.Close()
+// 				return
+// 			}
+// 			// I am...not sure why we do this
+// 			reader = pb.NewUint32DelimitedReader(cl.logFile, binary.BigEndian, 2e6)
+// 		}
+// 		publishWriter <- log
+// 		log.Reset()
+
+// 	}
+// }
+
+// ConsumePipelineAndSend consumes events from the FIFO pipe and sends them to the pipeline client
+func (cl *ClientLogger) ConsumePipelineAndSend() {
 	publishWriter := make(chan logdriver.LogEntry, 500)
 
 	go cl.publishLoop(publishWriter)
@@ -79,22 +108,18 @@ func (cl *ClientLogger) ConsumeAndSendLogs() {
 
 		close(publishWriter)
 
-		err := reader.Close()
+		err := cl.logFile.Close()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error closing FIFO reader: %s", err)
+			fmt.Fprintf(os.Stderr, "Error closing FIFO reader: %s\n", err)
 		}
 	}()
 
 	var log logdriver.LogEntry
 	for {
-		err := reader.ReadMsg(&log)
+		err := cl.logFile.ReadMessage(log)
 		if err != nil {
-			if err == io.EOF || err == os.ErrClosed || strings.Contains(err.Error(), "file already closed") {
-				cl.logFile.Close()
-				return
-			}
-			// I am...not sure why we do this
-			reader = pb.NewUint32DelimitedReader(cl.logFile, binary.BigEndian, 2e6)
+			fmt.Fprintf(os.Stderr, "Error getting message: %s\n", err)
+			return
 		}
 		publishWriter <- log
 		log.Reset()
