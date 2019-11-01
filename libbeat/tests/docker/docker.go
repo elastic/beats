@@ -19,6 +19,7 @@ package docker
 
 import (
 	"context"
+	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -32,7 +33,14 @@ type Client struct {
 
 // NewClient builds and returns a docker Client
 func NewClient() (Client, error) {
-	c, err := client.NewEnvClient()
+	opts := []client.Opt{
+		client.FromEnv,
+	}
+	version := os.Getenv("DOCKER_API_VERSION")
+	if version == "" {
+		opts = append(opts, client.WithAPIVersionNegotiation())
+	}
+	c, err := client.NewClientWithOpts(opts...)
 	return Client{cli: c}, err
 }
 

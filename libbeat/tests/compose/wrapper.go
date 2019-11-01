@@ -53,7 +53,14 @@ type wrapperDriver struct {
 }
 
 func newWrapperDriver() (*wrapperDriver, error) {
-	c, err := client.NewEnvClient()
+	opts := []client.Opt{
+		client.FromEnv,
+	}
+	version := os.Getenv("DOCKER_API_VERSION")
+	if version == "" {
+		opts = append(opts, client.WithAPIVersionNegotiation())
+	}
+	c, err := client.NewClientWithOpts(opts...)
 	if err != nil {
 		return nil, err
 	}

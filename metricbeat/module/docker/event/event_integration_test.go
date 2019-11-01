@@ -69,7 +69,14 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	client, err := client.NewEnvClient()
+	opts := []client.Opt{
+		client.FromEnv,
+	}
+	version := os.Getenv("DOCKER_API_VERSION")
+	if version == "" {
+		opts = append(opts, client.WithAPIVersionNegotiation())
+	}
+	client, err := client.NewClientWithOpts(opts...)
 	if err != nil {
 		t.Fatal(err)
 	}
