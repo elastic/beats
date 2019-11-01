@@ -1141,7 +1141,7 @@
             "time_field": "",
             "type": "gauge"
           },
-          "title": "top datastore used [Metricbeat VSphere] ECS",
+          "title": "Top Datastore Used [Metricbeat VSphere] ECS",
           "type": "metrics"
         }
       },
