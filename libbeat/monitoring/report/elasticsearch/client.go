@@ -249,21 +249,21 @@ func logBulkFailures(result esout.BulkResult, events []report.Event) {
 	reader := esout.NewJSONReader(result)
 	err := esout.BulkReadToItems(reader)
 	if err != nil {
-		logp.Err("failed to parse bulk items: %v", err)
+		logp.Err("failed to parse monitoring bulk items: %v", err)
 		return
 	}
 
 	for i := range events {
 		status, msg, err := esout.BulkReadItemStatus(reader)
 		if err != nil {
-			logp.Err("failed to parse item status: %v", err)
+			logp.Err("failed to parse monitoring bulk item status: %v", err)
 			return
 		}
 		switch {
 		case status < 300, status == http.StatusConflict:
 			continue
 		default:
-			logp.Warn("bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+			logp.Warn("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
 		}
 	}
 }
