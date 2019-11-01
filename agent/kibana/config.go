@@ -26,14 +26,14 @@ import (
 
 // Config is the configuration for the Kibana client.
 type Config struct {
-	Protocol Protocol          `config:"protocol"`
-	SpaceID  string            `config:"space.id"`
-	Username string            `config:"username"`
-	Password string            `config:"password"`
-	Path     string            `config:"path"`
-	Host     string            `config:"host"`
-	Timeout  time.Duration     `config:"timeout"`
-	TLS      *tlscommon.Config `config:"ssl"`
+	Protocol Protocol          `config:"protocol" yaml:"protocol"`
+	SpaceID  string            `config:"space.id" yaml:"space.id,omitempty"`
+	Username string            `config:"username" yaml:"username,omitempty"`
+	Password string            `config:"password" yaml:"password,omitempty"`
+	Path     string            `config:"path" yaml:"path,omitempty"`
+	Host     string            `config:"host" yaml:"host,omitempty"`
+	Timeout  time.Duration     `config:"timeout" yaml:"timeout,omitempty"`
+	TLS      *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
 }
 
 // Protocol define the protocol to use to make the connection. (Either HTTPS or HTTP)

@@ -30,15 +30,30 @@ var formatMap = map[string]Format{
 	"json":    JSONFormat,
 }
 
+var reverseMap = map[bool]string{
+	true:  "default",
+	false: "json",
+}
+
 // Unpack enables using of string values in config
 func (m *Format) Unpack(v string) error {
 	mgt, ok := formatMap[v]
 	if !ok {
 		return fmt.Errorf(
-			"unknown format, received '%s' and valid values are local or fleet",
+			"unknown format, received '%s' and valid values are default or json",
 			v,
 		)
 	}
 	*m = mgt
 	return nil
+}
+
+// MarshalYAML marshal into a string.
+func (m Format) MarshalYAML() (interface{}, error) {
+	s, ok := reverseMap[bool(m)]
+	if !ok {
+		return nil, fmt.Errorf("cannot marshal value of %+v", m)
+	}
+
+	return s, nil
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/dir"
+	reporting "github.com/elastic/beats/x-pack/agent/pkg/reporter"
+	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
 )
 
 type emitterFunc func([]string) error
@@ -42,7 +44,6 @@ func newLocal(
 	log *logger.Logger,
 	pathConfigFile string,
 	config *config.Config,
-	router *router,
 ) (*Local, error) {
 	var err error
 	if log == nil {
@@ -52,9 +53,20 @@ func newLocal(
 		}
 	}
 
+	agentID := getAgentID()
+
 	c := localConfigDefault()
 	if err := config.Unpack(c); err != nil {
 		return nil, errors.Wrap(err, "initialize local mode")
+	}
+
+	logR := logreporter.NewReporter(log, c.Reporting)
+
+	reporter := reporting.NewReporter(log, agentID, logR)
+
+	router, err := newRouter(log, streamFactory(config, nil, reporter))
+	if err != nil {
+		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
 
 	discover := discoverer(pathConfigFile, c.Path)
