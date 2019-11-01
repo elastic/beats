@@ -35,9 +35,7 @@ processors:
         - {from: aws.vpc.packets, to: network.packets, type: long}
         - {from: aws.vpc.bytes, to: network.bytes, type: long}
 
-  {{ if .community_id }}
   - community_id: ~
-  {{ end }}
 
   # Use the aws.vpc.action value to set the event.outcome value to either "allow" or "deny".
   - add_fields:

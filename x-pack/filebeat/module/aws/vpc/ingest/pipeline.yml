@@ -64,10 +64,9 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
-
-  - remove:
-      field:
-        - message
+  - rename:
+      field: message
+      target_field: event.original
       ignore_missing: true
 
 on_failure:
