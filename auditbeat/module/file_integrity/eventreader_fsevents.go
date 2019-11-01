@@ -31,8 +31,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var underTest = false
-
 type fsreader struct {
 	stream      *fsevents.EventStream
 	config      Config
