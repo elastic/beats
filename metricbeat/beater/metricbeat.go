@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"github.com/elastic/beats/libbeat/paths"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common/reload"
@@ -69,6 +70,14 @@ func WithModuleOptions(options ...module.Option) Option {
 	}
 }
 
+// WithLightModules enables light modules support
+func WithLightModules() Option {
+	return func(*Metricbeat) {
+		path := paths.Resolve(paths.Home, "module")
+		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(path))
+	}
+}
+
 // Creator returns a beat.Creator for instantiating a new instance of the
 // Metricbeat framework with the given options.
 func Creator(options ...Option) beat.Creator {
@@ -90,6 +99,7 @@ func Creator(options ...Option) beat.Creator {
 //     )
 func DefaultCreator() beat.Creator {
 	return Creator(
+		WithLightModules(),
 		WithModuleOptions(
 			module.WithMetricSetInfo(),
 			module.WithServiceName(),

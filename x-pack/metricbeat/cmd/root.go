@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/beats/metricbeat/cmd/test"
 	"github.com/elastic/beats/metricbeat/mb/module"
 	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
-	xpackbeater "github.com/elastic/beats/x-pack/metricbeat/beater"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/x-pack/metricbeat/include"
@@ -34,7 +33,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 var (
 	rootCreator = beater.Creator(
-		xpackbeater.WithLightModules(),
+		beater.WithLightModules(),
 		beater.WithModuleOptions(
 			module.WithMetricSetInfo(),
 			module.WithServiceName(),
@@ -45,7 +44,7 @@ var (
 	// been disabled to workaround the fact that Modules() will return
 	// the static modules (not the dynamic ones) with a start delay.
 	testModulesCreator = beater.Creator(
-		xpackbeater.WithLightModules(),
+		beater.WithLightModules(),
 		beater.WithModuleOptions(
 			module.WithMetricSetInfo(),
 			module.WithMaxStartDelay(0),

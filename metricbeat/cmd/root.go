@@ -44,6 +44,7 @@ var (
 	// been disabled to workaround the fact that Modules() will return
 	// the static modules (not the dynamic ones) with a start delay.
 	testModulesCreator = beater.Creator(
+		beater.WithLightModules(),
 		beater.WithModuleOptions(
 			module.WithMetricSetInfo(),
 			module.WithMaxStartDelay(0),
