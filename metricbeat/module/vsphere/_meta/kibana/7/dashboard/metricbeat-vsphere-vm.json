@@ -456,7 +456,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "networks from virtualmachine [Metricbeat VSphere] ECS",
+        "title": "Networks from virtualmachine [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
