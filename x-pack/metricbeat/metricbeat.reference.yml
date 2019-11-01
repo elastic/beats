@@ -503,7 +503,7 @@ metricbeat.modules:
   #username: ""
   #password: ""
 
-#-------------------------------- Kafka Module --------------------------------
+#------------------------------- KafkaJmx Module -------------------------------
 - module: kafka
   metricsets: ["broker", "consumer", "consumergroup", "partition", "producer"]
   period: 10s

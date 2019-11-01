@@ -1,0 +1,9 @@
+- key: kafkajmx
+  title: 'KafkaJmx'
+  release: beta
+  description: >
+    KafkaJmx module
+  fields:
+    - name: KafkaJmx
+      type: group
+      fields:

@@ -59,10 +59,6 @@ input:
         attributes:
           - attr: MeanRate
             field: topic.net.bytes_out
-      - mbean: 'kafka.server:name=MessagesInPerSec,type=BrokerTopicMetrics'
-        attributes:
-          - attr: MeanRate
-            field: topic.net.bytes_rejected
       - mbean: 'kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec'
         attributes:
           - attr: MeanRate
