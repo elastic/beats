@@ -1034,7 +1034,7 @@
             }
           }
         },
-        "title": "Top datastore used [Metricbeat VSphere] ECS",
+        "title": "Top Datastore Used [Metricbeat VSphere] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
