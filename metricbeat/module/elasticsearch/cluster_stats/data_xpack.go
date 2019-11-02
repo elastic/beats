@@ -200,10 +200,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		return errors.Wrap(err, "failed to determine if cluster needs TLS enabled")
 	}
 
-	l := common.MapStr{
-		"license":           license.ToMapStr(),
-		"cluster_needs_tls": clusterNeedsTLS,
-	}
+	l := license.ToMapStr()
+	l["cluster_needs_tls"] = clusterNeedsTLS
 
 	isAPMFound, err := apmIndicesExist(clusterState)
 	if err != nil {
