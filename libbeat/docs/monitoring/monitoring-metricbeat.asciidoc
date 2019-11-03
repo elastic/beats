@@ -220,11 +220,13 @@ output.elasticsearch:
   
   # Optional protocol and basic auth credentials.
   #protocol: "https"
+  #api_key:  "id:api_key" <2>
   #username: "elastic"
   #password: "changeme"
 ----------------------------------
 <1> In this example, the data is stored on a monitoring cluster with nodes 
 `es-mon-1` and `es-mon-2`.
+<2> Specify one of `api_key` or `username`/`password`.
 
 If you configured the monitoring cluster to use encrypted communications, you
 must access it via HTTPS. For example, use a `hosts` setting like

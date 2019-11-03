@@ -1,5 +1,6 @@
 - name: dnp3
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek SSH log
   fields:
