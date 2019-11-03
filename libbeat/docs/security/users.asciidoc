@@ -118,19 +118,19 @@ on {ecloud}. To send monitoring data securely, create a monitoring user and
 grant it the roles described in the following sections.
 ====
 
-===== Internal collection
-
-For <<monitoring-internal-collection,internal collection>>, {security} provides
-the +{beat_monitoring_user}+ {ref}/built-in-users.html[built-in
-user] and +{beat_monitoring_user}+
-{ref}/built-in-roles.html[built-in role] for sending monitoring information. You
-can use the built-in user, if it's available in your environment, or create a
-user who has the privileges needed to send monitoring information.
-
+* If you're using <<monitoring-internal-collection,internal collection>> to
+collect metrics about {beatname_uc}, {security} provides
+the +{beat_monitoring_user}+ {ref}/built-in-users.html[built-in user] and
++{beat_monitoring_user}+ {ref}/built-in-roles.html[built-in role] to send
+monitoring information. You can use the built-in user, if it's available in your
+environment, or create a user who has the privileges needed to send monitoring
+information.
++
 If you use the +{beat_monitoring_user}+ user, make sure you set the password.
-
++
 If you don't use the +{beat_monitoring_user}+ user:
-
++
+--
 . Create a *monitoring role*, called something like
 +{beat_default_index_prefix}_monitoring+, that has the following privileges:
 +
@@ -156,22 +156,23 @@ users who need to monitor {beatname_uc}:
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
+--
 
 ifndef::serverless[]
-===== {metricbeat} collection
 
-For <<monitoring-metricbeat-collection,{metricbeat} collection>>, {security}
-provides the `remote_monitoring_user` {ref}/built-in-users.html[built-in
-user], and the `remote_monitoring_collector` and `remote_monitoring_agent`
-{ref}/built-in-roles.html[built-in roles] for collecting and sending
-monitoring information. You can use the built-in user, if it's available in your
-environment, or create a user who has the privileges needed to collect and send
-monitoring information.
-
+* If you're <<monitoring-metricbeat-collection,using {metricbeat}>> to collect
+metrics about {beatname_uc}, {security} provides the `remote_monitoring_user`
+{ref}/built-in-users.html[built-in user], and the `remote_monitoring_collector`
+and `remote_monitoring_agent` {ref}/built-in-roles.html[built-in roles] for
+collecting and sending monitoring information. You can use the built-in user, if
+it's available in your environment, or create a user who has the privileges
+needed to collect and send monitoring information.
++
 If you use the `remote_monitoring_user` user, make sure you set the password.
-
++
 If you don't use the `remote_monitoring_user` user:
-
++
+--
 . Create a user on the production cluster who will collect and send monitoring
 information.
 
@@ -198,6 +199,7 @@ information.
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
+--
 endif::serverless[]
 
 [[privileges-to-publish-events]]
