@@ -15,34 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
-
-// This file is mandatory as otherwise the packetbeat.test binary is not generated correctly.
+package fingerprint
 
 import (
-	"flag"
-	"testing"
-
-	"github.com/elastic/beats/filebeat/cmd"
-	"github.com/elastic/beats/libbeat/tests/system/template"
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
+	"hash"
+	"strings"
 )
 
-var systemTest *bool
+type hashMethod func() hash.Hash
 
-func init() {
-	testing.Init()
-	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+var hashes = map[string]hashMethod{
+	"md5":    md5.New,
+	"sha1":   sha1.New,
+	"sha256": sha256.New,
+	"sha384": sha512.New384,
+	"sha512": sha512.New,
 }
 
-// Test started when the test binary is started. Only calls main.
-func TestSystem(t *testing.T) {
-	if *systemTest {
-		main()
+// Unpack creates the hashMethod from the given string
+func (f *hashMethod) Unpack(str string) error {
+	str = strings.ToLower(str)
+
+	m, found := hashes[str]
+	if !found {
+		return makeErrUnknownMethod(str)
 	}
-}
 
-func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name)
+	*f = m
+	return nil
 }
