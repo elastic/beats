@@ -41,8 +41,6 @@ import (
 	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/llpath"
-	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -136,27 +134,15 @@ func minimalRespondingHTTPChecks(url string, statusCode int) validator.Validator
 
 func httpBodyChecks() validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
-		// TODO add this isdef to lookslike in a robust way
-		"http.response.body.bytes": isdef.Is("an int64 greater than 0", func(path llpath.Path, v interface{}) *llresult.Results {
-			raw, ok := v.(int64)
-			if !ok {
-				return llresult.SimpleResult(path, false, "%s is not an int64", reflect.TypeOf(v))
-			}
-			if raw >= 0 {
-				return llresult.ValidResult(path)
-			}
-
-			return llresult.SimpleResult(path, false, "value %v not >= 0 ", raw)
-
-		}),
-		"http.response.body.hash": isdef.IsString,
+		"http.response.body.bytes": isdef.IsIntGt(-1),
+		"http.response.body.hash":  isdef.IsString,
 	})
 }
 
 func respondingHTTPBodyChecks(body string) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"http.response.body.content": body,
-		"http.response.body.bytes":   int64(len(body)),
+		"http.response.body.bytes":   len(body),
 	})
 }
 
