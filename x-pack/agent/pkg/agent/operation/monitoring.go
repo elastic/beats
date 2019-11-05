@@ -5,11 +5,12 @@
 package operation
 
 import (
+	"github.com/hashicorp/go-multierror"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
-	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 )
 
 const (
