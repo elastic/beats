@@ -1,0 +1,656 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Includes Visual Builder Metric\nBucket size 90 days",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":20,\"i\":\"22\",\"w\":17,\"x\":0,\"y\":0},\"panelIndex\":\"22\",\"title\":\"\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_0\"},{\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"gridData\":{\"h\":20,\"i\":\"23\",\"w\":21,\"x\":17,\"y\":0},\"panelIndex\":\"23\",\"title\":\"Group Managment Actions\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_1\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":20,\"i\":\"25\",\"w\":10,\"x\":38,\"y\":0},\"panelIndex\":\"25\",\"title\":\"Event Codes\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_2\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":7,\"i\":\"29\",\"w\":16,\"x\":0,\"y\":61},\"panelIndex\":\"29\",\"title\":\"\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_3\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":7,\"i\":\"30\",\"w\":9,\"x\":18,\"y\":41},\"panelIndex\":\"30\",\"title\":\"\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_4\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":7,\"i\":\"31\",\"w\":9,\"x\":0,\"y\":41},\"panelIndex\":\"31\",\"title\":\"\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_5\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":7,\"i\":\"32\",\"w\":9,\"x\":9,\"y\":41},\"panelIndex\":\"32\",\"title\":\"\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_6\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":7,\"i\":\"33\",\"w\":17,\"x\":16,\"y\":61},\"panelIndex\":\"33\",\"title\":\"\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_7\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":7,\"i\":\"34\",\"w\":15,\"x\":33,\"y\":61},\"panelIndex\":\"34\",\"title\":\"\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_8\"},{\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 1\":\"rgb(247,251,255)\",\"1 - 2\":\"rgb(198,219,239)\",\"2 - 3\":\"rgb(107,174,214)\",\"3 - 4\":\"rgb(33,113,181)\"},\"legendOpen\":false}},\"gridData\":{\"h\":21,\"i\":\"35\",\"w\":27,\"x\":0,\"y\":20},\"panelIndex\":\"35\",\"title\":\"Actions performed over Groups\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_9\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":13,\"i\":\"36\",\"w\":9,\"x\":0,\"y\":48},\"panelIndex\":\"36\",\"title\":\"Group Creation Summary\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_10\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":13,\"i\":\"37\",\"w\":9,\"x\":9,\"y\":48},\"panelIndex\":\"37\",\"title\":\"Group Changes Summary\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_11\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":13,\"i\":\"38\",\"w\":9,\"x\":18,\"y\":48},\"panelIndex\":\"38\",\"title\":\"Group Deletion Summary\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_12\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":14,\"i\":\"39\",\"w\":16,\"x\":0,\"y\":68},\"panelIndex\":\"39\",\"title\":\"Users Added to Group  Summary\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_13\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":14,\"i\":\"40\",\"w\":17,\"x\":16,\"y\":68},\"panelIndex\":\"40\",\"title\":\"Users Removed From Group Summary\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_14\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":14,\"i\":\"42\",\"w\":15,\"x\":33,\"y\":68},\"panelIndex\":\"42\",\"title\":\"Group Enumeration - Table\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_15\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":20,\"i\":\"43\",\"w\":21,\"x\":27,\"y\":41},\"panelIndex\":\"43\",\"title\":\"Logon Details \",\"version\":\"7.3.1\",\"panelRefName\":\"panel_16\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":21,\"i\":\"44\",\"w\":21,\"x\":27,\"y\":20},\"panelIndex\":\"44\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_17\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":22,\"i\":\"45\",\"w\":48,\"x\":0,\"y\":82},\"panelIndex\":\"45\",\"title\":\"Group Management Operations Details\",\"version\":\"7.3.1\",\"panelRefName\":\"panel_18\"}]",
+        "timeRestore": false,
+        "title": "[winlogbeat] Group Management Events",
+        "version": 1
+      },
+      "id": "bb858830-f412-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "b01aaea0-f415-11e9-8405-516218e3d268",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "11b5c0e0-f417-11e9-8405-516218e3d268",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "ffebe440-f419-11e9-8405-516218e3d268",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "e22c6f40-f498-11e9-8405-516218e3d268",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "ee292bc0-f499-11e9-8405-516218e3d268",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "400b63e0-f49a-11e9-8405-516218e3d268",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "a5f664c0-f49a-11e9-8405-516218e3d268",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "546febc0-f49b-11e9-8405-516218e3d268",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "b948eaf0-f49c-11e9-8405-516218e3d268",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "98884120-f49d-11e9-8405-516218e3d268",
+          "name": "panel_10",
+          "type": "visualization"
+        },
+        {
+          "id": "9e534190-f49d-11e9-8405-516218e3d268",
+          "name": "panel_11",
+          "type": "visualization"
+        },
+        {
+          "id": "bb9cf7a0-f49d-11e9-8405-516218e3d268",
+          "name": "panel_12",
+          "type": "visualization"
+        },
+        {
+          "id": "ce867840-f49e-11e9-8405-516218e3d268",
+          "name": "panel_13",
+          "type": "visualization"
+        },
+        {
+          "id": "fee83900-f49f-11e9-8405-516218e3d268",
+          "name": "panel_14",
+          "type": "visualization"
+        },
+        {
+          "id": "bc165210-f4b8-11e9-8405-516218e3d268",
+          "name": "panel_15",
+          "type": "visualization"
+        },
+        {
+          "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+          "name": "panel_16",
+          "type": "search"
+        },
+        {
+          "id": "24954800-fef0-11e9-8405-516218e3d268",
+          "name": "panel_17",
+          "type": "visualization"
+        },
+        {
+          "id": "9066d5b0-fef2-11e9-8405-516218e3d268",
+          "name": "panel_18",
+          "type": "search"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-11-04T14:33:22.241Z",
+      "version": "WzQ4MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "title": "Group Management Events - Description",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Group Management Events - Description\",\"type\":\"markdown\",\"params\":{\"markdown\":\"# **Group Management Events**\\n\\n#### This dashboard shows information about Group Management Events collected by winlogbeat\\n#\\n#\\n#\\nEvent | Description|Event | Description\\n-- | --|--|--\\n|4727|A security-enabled global group was created.|4728|A member was added to a security-enabled global group.| \\n|4729|A member was removed from a security-enabled global group.|4730|A security-enabled global group was deleted.| \\n|4731|A security-enabled local group was created.|4732|A member was added to a security-enabled local group.|\\n|4733|A member was removed from a security-enabled local group.|4734|A security-enabled local group was deleted.|\\n|4735|A security-enabled local group was changed.|4737|A security-enabled global group was changed.|\\n|4754|A security-enabled universal group was created.| 4755|A security-enabled universal group was changed.| \\n|4756|A member was added to a security-enabled universal group.|4757|A member was removed from a security-enabled universal group.| \\n|4758|A security-enabled universal group was deleted.| 4764|A group\\\\'s type was changed.|\\n|4799|A security-enabled local group membership was enumerated.|\",\"openLinksInNewTab\":false,\"fontSize\":10},\"aggs\":[]}"
+      },
+      "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-04T08:28:57.594Z",
+      "version": "WzM0MywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4731, 4732, 4733, 4734, 4735, 4764, 4799, 4727, 4737, 4728, 4729, 4730, 4754, 4755, 4756, 4757, 4758\",\"params\":[\"4731\",\"4732\",\"4733\",\"4734\",\"4735\",\"4764\",\"4799\",\"4727\",\"4737\",\"4728\",\"4729\",\"4730\",\"4754\",\"4755\",\"4756\",\"4757\",\"4758\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4731\"}},{\"match_phrase\":{\"event.code\":\"4732\"}},{\"match_phrase\":{\"event.code\":\"4733\"}},{\"match_phrase\":{\"event.code\":\"4734\"}},{\"match_phrase\":{\"event.code\":\"4735\"}},{\"match_phrase\":{\"event.code\":\"4764\"}},{\"match_phrase\":{\"event.code\":\"4799\"}},{\"match_phrase\":{\"event.code\":\"4727\"}},{\"match_phrase\":{\"event.code\":\"4737\"}},{\"match_phrase\":{\"event.code\":\"4728\"}},{\"match_phrase\":{\"event.code\":\"4729\"}},{\"match_phrase\":{\"event.code\":\"4730\"}},{\"match_phrase\":{\"event.code\":\"4754\"}},{\"match_phrase\":{\"event.code\":\"4755\"}},{\"match_phrase\":{\"event.code\":\"4756\"}},{\"match_phrase\":{\"event.code\":\"4757\"}},{\"match_phrase\":{\"event.code\":\"4758\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Group Management Events - Event Actions - Donut",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Group Management Events - Event Actions - Donut\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":true,\"values\":true,\"last_level\":true,\"truncate\":100},\"dimensions\":{\"metric\":{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"},\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"event.action\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+      },
+      "id": "b01aaea0-f415-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T08:29:51.022Z",
+      "version": "WzM0NCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4727, 4728, 4729, 4730, 4731, 4732, 4733, 4734, 4735, 4737, 4754, 4755, 4756, 4757, 4758, 4764, 4799\",\"params\":[\"4727\",\"4728\",\"4729\",\"4730\",\"4731\",\"4732\",\"4733\",\"4734\",\"4735\",\"4737\",\"4754\",\"4755\",\"4756\",\"4757\",\"4758\",\"4764\",\"4799\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4727\"}},{\"match_phrase\":{\"event.code\":\"4728\"}},{\"match_phrase\":{\"event.code\":\"4729\"}},{\"match_phrase\":{\"event.code\":\"4730\"}},{\"match_phrase\":{\"event.code\":\"4731\"}},{\"match_phrase\":{\"event.code\":\"4732\"}},{\"match_phrase\":{\"event.code\":\"4733\"}},{\"match_phrase\":{\"event.code\":\"4734\"}},{\"match_phrase\":{\"event.code\":\"4735\"}},{\"match_phrase\":{\"event.code\":\"4737\"}},{\"match_phrase\":{\"event.code\":\"4754\"}},{\"match_phrase\":{\"event.code\":\"4755\"}},{\"match_phrase\":{\"event.code\":\"4756\"}},{\"match_phrase\":{\"event.code\":\"4757\"}},{\"match_phrase\":{\"event.code\":\"4758\"}},{\"match_phrase\":{\"event.code\":\"4764\"}},{\"match_phrase\":{\"event.code\":\"4799\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Group Management Events - Event Actions - Table",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Group Management Events - Event Actions - Table\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"event.action\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":20,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Event Action\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"event.code\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":10,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Event Code\"}}]}"
+      },
+      "id": "11b5c0e0-f417-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T10:51:18.570Z",
+      "version": "WzQ0OSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+        },
+        "title": "Users Added - Metric",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Users Added - Metric\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"background_color_rules\":[{\"background_color\":\"rgba(128,137,0,1)\",\"id\":\"bfcaced0-f419-11e9-928e-8f5fd2b6c66e\",\"operator\":\"gt\",\"value\":1},{\"background_color\":\"rgba(211,49,21,1)\",\"id\":\"a7d935e0-f497-11e9-928e-8f5fd2b6c66e\",\"operator\":\"gte\",\"value\":3}],\"default_index_pattern\":\"winlogbeat-*\",\"default_timefield\":\"@timestamp\",\"drop_last_bucket\":0,\"filter\":{\"language\":\"kuery\",\"query\":\"event.code:4732 OR event.code:4728 OR event.code:4756\"},\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"\",\"interval\":\"90d\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Users Added to Group\",\"line_width\":1,\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"count\"}],\"point_size\":1,\"separate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"\",\"type\":\"metric\"},\"aggs\":[]}"
+      },
+      "id": "ffebe440-f419-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-04T09:06:18.059Z",
+      "version": "WzM2NCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "title": "Groups Deleted - Metric",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Groups Deleted - Metric\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"background_color_rules\":[{\"background_color\":\"rgba(200,201,197,1)\",\"id\":\"bfcaced0-f419-11e9-928e-8f5fd2b6c66e\",\"operator\":\"lte\",\"value\":0},{\"value\":0,\"background_color\":\"rgba(153,172,99,1)\",\"id\":\"a7d935e0-f497-11e9-928e-8f5fd2b6c66e\",\"operator\":\"gt\"}],\"default_index_pattern\":\"winlogbeat-*\",\"default_timefield\":\"@timestamp\",\"drop_last_bucket\":0,\"filter\":{\"query\":\"event.code:4734 OR event.code:4730 OR event.code:4758\",\"language\":\"kuery\"},\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"\",\"interval\":\"90d\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Groups Deleted\",\"line_width\":1,\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"count\"}],\"point_size\":1,\"separate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"\",\"type\":\"metric\"},\"aggs\":[]}"
+      },
+      "id": "e22c6f40-f498-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-04T08:35:35.777Z",
+      "version": "WzM1MywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "title": "Groups Created - Metric",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Groups Created - Metric\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"background_color_rules\":[{\"background_color\":\"rgba(200,201,197,1)\",\"id\":\"bfcaced0-f419-11e9-928e-8f5fd2b6c66e\",\"operator\":\"lte\",\"value\":0},{\"value\":0,\"background_color\":\"rgba(244,78,59,1)\",\"id\":\"a7d935e0-f497-11e9-928e-8f5fd2b6c66e\",\"operator\":\"gt\"}],\"default_index_pattern\":\"winlogbeat-*\",\"default_timefield\":\"@timestamp\",\"drop_last_bucket\":0,\"filter\":{\"query\":\"event.code:4731 OR event.code:4727 OR event.code:\\\"4754\\\" \",\"language\":\"kuery\"},\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"\",\"interval\":\"90d\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Groups Created\",\"line_width\":1,\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"count\"}],\"point_size\":1,\"separate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"\",\"type\":\"metric\"},\"aggs\":[]}"
+      },
+      "id": "ee292bc0-f499-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-04T09:26:31.457Z",
+      "version": "WzM3NywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "title": "Groups Changed - Metric",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Groups Changed - Metric\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"background_color_rules\":[{\"background_color\":\"rgba(200,201,197,1)\",\"id\":\"bfcaced0-f419-11e9-928e-8f5fd2b6c66e\",\"operator\":\"lte\",\"value\":0},{\"value\":0,\"background_color\":\"rgba(252,196,0,1)\",\"id\":\"a7d935e0-f497-11e9-928e-8f5fd2b6c66e\",\"operator\":\"gt\"}],\"default_index_pattern\":\"winlogbeat-*\",\"default_timefield\":\"@timestamp\",\"drop_last_bucket\":0,\"filter\":{\"query\":\"event.code:4735 OR event.code:4737 OR event.code:\\\"4755\\\" OR event.code:\\\"4764\\\"  \",\"language\":\"kuery\"},\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"\",\"interval\":\"60d\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Groups Changed\",\"line_width\":1,\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"count\"}],\"point_size\":1,\"separate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"\",\"type\":\"metric\"},\"aggs\":[]}"
+      },
+      "id": "400b63e0-f49a-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-04T09:21:17.132Z",
+      "version": "WzM3MSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+        },
+        "title": "Users Removed - Table",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Users Removed - Table\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"metric\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"count\"}],\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Users Removed from Group\"}],\"time_field\":\"\",\"index_pattern\":\"\",\"interval\":\"90d\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"axis_scale\":\"normal\",\"show_legend\":1,\"show_grid\":1,\"default_index_pattern\":\"winlogbeat-*\",\"default_timefield\":\"@timestamp\",\"background_color_rules\":[{\"value\":0,\"id\":\"bfcaced0-f419-11e9-928e-8f5fd2b6c66e\",\"operator\":\"gt\",\"background_color\":\"rgba(176,188,0,1)\"}],\"filter\":{\"query\":\"event.code:4733 OR event.code:4727 OR event.code:4729\",\"language\":\"kuery\"},\"drop_last_bucket\":0},\"aggs\":[]}"
+      },
+      "id": "a5f664c0-f49a-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-04T09:06:43.461Z",
+      "version": "WzM2NSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "title": "Groups Enumeration - Metric",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Groups Enumeration - Metric\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"background_color_rules\":[{\"value\":0,\"background_color\":\"rgba(159,5,0,1)\",\"id\":\"bfcaced0-f419-11e9-928e-8f5fd2b6c66e\",\"operator\":\"gt\"}],\"default_index_pattern\":\"winlogbeat-*\",\"default_timefield\":\"@timestamp\",\"drop_last_bucket\":0,\"filter\":{\"query\":\"event.code:4799\",\"language\":\"kuery\"},\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"\",\"interval\":\"90d\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Group Membership Enumeration\",\"line_width\":1,\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"count\"}],\"point_size\":1,\"separate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"\",\"type\":\"metric\"},\"aggs\":[]}"
+      },
+      "id": "546febc0-f49b-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-04T09:08:11.959Z",
+      "version": "WzM2NiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4727, 4728, 4729, 4730, 4731, 4732, 4733, 4734, 4735, 4737, 4754, 4755, 4756, 4757, 4758, 4764, 4799\",\"params\":[\"4727\",\"4728\",\"4729\",\"4730\",\"4731\",\"4732\",\"4733\",\"4734\",\"4735\",\"4737\",\"4754\",\"4755\",\"4756\",\"4757\",\"4758\",\"4764\",\"4799\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4727\"}},{\"match_phrase\":{\"event.code\":\"4728\"}},{\"match_phrase\":{\"event.code\":\"4729\"}},{\"match_phrase\":{\"event.code\":\"4730\"}},{\"match_phrase\":{\"event.code\":\"4731\"}},{\"match_phrase\":{\"event.code\":\"4732\"}},{\"match_phrase\":{\"event.code\":\"4733\"}},{\"match_phrase\":{\"event.code\":\"4734\"}},{\"match_phrase\":{\"event.code\":\"4735\"}},{\"match_phrase\":{\"event.code\":\"4737\"}},{\"match_phrase\":{\"event.code\":\"4754\"}},{\"match_phrase\":{\"event.code\":\"4755\"}},{\"match_phrase\":{\"event.code\":\"4756\"}},{\"match_phrase\":{\"event.code\":\"4757\"}},{\"match_phrase\":{\"event.code\":\"4758\"}},{\"match_phrase\":{\"event.code\":\"4764\"}},{\"match_phrase\":{\"event.code\":\"4799\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Group Management Events - Groups vs Actions - Heatmap",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 1\":\"rgb(247,251,255)\",\"1 - 2\":\"rgb(198,219,239)\",\"2 - 3\":\"rgb(107,174,214)\",\"3 - 4\":\"rgb(33,113,181)\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Group Management Events - Groups vs Actions - Heatmap\",\"type\":\"heatmap\",\"params\":{\"type\":\"heatmap\",\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":4,\"colorSchema\":\"Blues\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"overwriteColor\":false,\"color\":\"black\"}}],\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},\"y\":[{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"series\":[{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"group.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":15,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Group\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"event.action\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+      },
+      "id": "b948eaf0-f49c-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T08:32:05.540Z",
+      "version": "WzM0NywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4731, 4727, 4754\",\"params\":[\"4731\",\"4727\",\"4754\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4731\"}},{\"match_phrase\":{\"event.code\":\"4727\"}},{\"match_phrase\":{\"event.code\":\"4754\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Groups Created - Table",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Groups Created - Table\",\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":4,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":2,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":3,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":20,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Group\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.domain\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Domain\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"user.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performed by\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.logon.id\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performer LogonID\"}}]}"
+      },
+      "id": "98884120-f49d-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T14:31:28.971Z",
+      "version": "WzQ3OSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4735, 4737, 4755\",\"params\":[\"4735\",\"4737\",\"4755\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4735\"}},{\"match_phrase\":{\"event.code\":\"4737\"}},{\"match_phrase\":{\"event.code\":\"4755\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Group Changes - Table",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Group Changes - Table\",\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":4,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":2,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":3,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":20,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Group\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.domain\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Domain\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"user.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performed by\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.logon.id\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performer LogonID\"}}]}"
+      },
+      "id": "9e534190-f49d-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T14:32:06.806Z",
+      "version": "WzQ4MCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4734, 4730, 4758\",\"params\":[\"4734\",\"4730\",\"4758\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4734\"}},{\"match_phrase\":{\"event.code\":\"4730\"}},{\"match_phrase\":{\"event.code\":\"4758\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Groups Deleted - Table",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Groups Deleted - Table\",\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":4,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":2,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":3,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":20,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Group\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.domain\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Domain\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"user.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performed by\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.logon.id\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performer LogonID\"}}]}"
+      },
+      "id": "bb9cf7a0-f49d-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T14:32:43.899Z",
+      "version": "WzQ4MSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4732, 4728, 4756\",\"params\":[\"4732\",\"4728\",\"4756\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4732\"}},{\"match_phrase\":{\"event.code\":\"4728\"}},{\"match_phrase\":{\"event.code\":\"4756\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Users Added - Table",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Users Added - Table\",\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":5,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":2,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":3,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":4,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.event_data.MemberName\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"User\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":10,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Group\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.domain\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Domain\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"user.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performed by\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.logon.id\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performed by Logon ID\"}}]}"
+      },
+      "id": "ce867840-f49e-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T09:09:21.781Z",
+      "version": "WzM2NywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4733, 4729, 4757\",\"params\":[\"4733\",\"4729\",\"4757\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4733\"}},{\"match_phrase\":{\"event.code\":\"4729\"}},{\"match_phrase\":{\"event.code\":\"4757\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Users Removed from Group - Table",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Users Removed from Group - Table\",\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":5,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":2,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":3,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":4,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.event_data.MemberName\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"User\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":10,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Group\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.domain\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Domain\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"user.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performed by\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.logon.id\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Performed by Logon ID\"}}]}"
+      },
+      "id": "fee83900-f49f-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T09:11:21.532Z",
+      "version": "WzM2OCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4799\",\"params\":[\"4799\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4799\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "5_Group_Enum",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"5_Group_Enum\",\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":4,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":2,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":3,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":20,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Group\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"group.domain\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Domain\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"user.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Creator\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.logon.id\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Creator LogonID\"}}]}"
+      },
+      "id": "bc165210-f4b8-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-10-22T10:43:29.024Z",
+      "version": "WzI2MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "columns": [
+          "user.name",
+          "source.domain",
+          "source.ip",
+          "winlog.logon.id",
+          "winlog.logon.type"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4624\",\"params\":[\"4624\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4624\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Logon Details",
+        "version": 1
+      },
+      "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-11-04T09:00:36.878Z",
+      "version": "WzM2MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4731, 4732, 4733, 4734, 4735, 4737, 4764, 4799, 4727, 4728, 4729, 4730, 4754, 4755, 4756, 4757, 4758\",\"params\":[\"4731\",\"4732\",\"4733\",\"4734\",\"4735\",\"4737\",\"4764\",\"4799\",\"4727\",\"4728\",\"4729\",\"4730\",\"4754\",\"4755\",\"4756\",\"4757\",\"4758\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4731\"}},{\"match_phrase\":{\"event.code\":\"4732\"}},{\"match_phrase\":{\"event.code\":\"4733\"}},{\"match_phrase\":{\"event.code\":\"4734\"}},{\"match_phrase\":{\"event.code\":\"4735\"}},{\"match_phrase\":{\"event.code\":\"4737\"}},{\"match_phrase\":{\"event.code\":\"4764\"}},{\"match_phrase\":{\"event.code\":\"4799\"}},{\"match_phrase\":{\"event.code\":\"4727\"}},{\"match_phrase\":{\"event.code\":\"4728\"}},{\"match_phrase\":{\"event.code\":\"4729\"}},{\"match_phrase\":{\"event.code\":\"4730\"}},{\"match_phrase\":{\"event.code\":\"4754\"}},{\"match_phrase\":{\"event.code\":\"4755\"}},{\"match_phrase\":{\"event.code\":\"4756\"}},{\"match_phrase\":{\"event.code\":\"4757\"}},{\"match_phrase\":{\"event.code\":\"4758\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Group Management Action Distribution over Time",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Group Management Action Distribution over Time\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"times\":[],\"addTimeMarker\":false,\"labels\":{\"show\":true},\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"YYYY-MM-DD HH:mm\"}},\"params\":{\"date\":true,\"interval\":\"PT12H\",\"format\":\"YYYY-MM-DD HH:mm\",\"bounds\":{\"min\":\"2019-10-05T09:56:42.142Z\",\"max\":\"2019-11-04T10:56:42.142Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":3,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"series\":[{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"},{\"accessor\":2,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-30d\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"event.action\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+      },
+      "id": "24954800-fef0-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-11-04T10:56:51.856Z",
+      "version": "WzQ1MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "columns": [
+          "event.action",
+          "group.name",
+          "group.domain",
+          "user.name",
+          "user.domain",
+          "host.name"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"meta\":{\"type\":\"phrases\",\"key\":\"event.code\",\"value\":\"4731, 4732, 4733, 4734, 4735, 4737, 4764, 4799, 4727, 4728, 4729, 4730, 4754, 4755, 4756, 4757, 4758\",\"params\":[\"4731\",\"4732\",\"4733\",\"4734\",\"4735\",\"4737\",\"4764\",\"4799\",\"4727\",\"4728\",\"4729\",\"4730\",\"4754\",\"4755\",\"4756\",\"4757\",\"4758\"],\"alias\":null,\"negate\":false,\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"event.code\":\"4731\"}},{\"match_phrase\":{\"event.code\":\"4732\"}},{\"match_phrase\":{\"event.code\":\"4733\"}},{\"match_phrase\":{\"event.code\":\"4734\"}},{\"match_phrase\":{\"event.code\":\"4735\"}},{\"match_phrase\":{\"event.code\":\"4737\"}},{\"match_phrase\":{\"event.code\":\"4764\"}},{\"match_phrase\":{\"event.code\":\"4799\"}},{\"match_phrase\":{\"event.code\":\"4727\"}},{\"match_phrase\":{\"event.code\":\"4728\"}},{\"match_phrase\":{\"event.code\":\"4729\"}},{\"match_phrase\":{\"event.code\":\"4730\"}},{\"match_phrase\":{\"event.code\":\"4754\"}},{\"match_phrase\":{\"event.code\":\"4755\"}},{\"match_phrase\":{\"event.code\":\"4756\"}},{\"match_phrase\":{\"event.code\":\"4757\"}},{\"match_phrase\":{\"event.code\":\"4758\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Group Management Details - Search View",
+        "version": 1
+      },
+      "id": "9066d5b0-fef2-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-11-04T11:02:16.971Z",
+      "version": "WzQ2MCwxXQ=="
+    }
+  ],
+  "version": "7.3.1"
+}
