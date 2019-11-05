@@ -314,6 +314,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `keep_null` setting to allow Beats to publish null values in events. {issue}5522[5522] {pull}13928[13928]
 - Add shared_credential_file option in aws related config for specifying credential file directory. {issue}14157[14157] {pull}14178[14178]
 - GA the `script` processor. {pull}14325[14325]
+- Add `fingerprint` processor. {issue}11173[11173] {pull}14205[14205]
+- Add support for API keys in Elasticsearch outputs. {pull}14324[14324]
 
 *Auditbeat*
 
@@ -492,6 +494,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add certain winlog.event_data.* fields to the index template. {issue}13700[13700] {pull}13704[13704]
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
+- GA the Winlogbeat `sysmon` module. {pull}14326[14326]
 
 ==== Deprecated
 

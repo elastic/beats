@@ -15,34 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
-
-// This file is mandatory as otherwise the packetbeat.test binary is not generated correctly.
+package fingerprint
 
 import (
-	"flag"
-	"testing"
-
-	"github.com/elastic/beats/filebeat/cmd"
-	"github.com/elastic/beats/libbeat/tests/system/template"
+	"encoding/base32"
+	"encoding/base64"
+	"encoding/hex"
+	"strings"
 )
 
-var systemTest *bool
+type encodingMethod func([]byte) string
 
-func init() {
-	testing.Init()
-	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+var encodings = map[string]encodingMethod{
+	"hex":    hex.EncodeToString,
+	"base32": base32.StdEncoding.EncodeToString,
+	"base64": base64.StdEncoding.EncodeToString,
 }
 
-// Test started when the test binary is started. Only calls main.
-func TestSystem(t *testing.T) {
-	if *systemTest {
-		main()
+// Unpack creates the encodingMethod from the given string
+func (e *encodingMethod) Unpack(str string) error {
+	str = strings.ToLower(str)
+
+	m, found := encodings[str]
+	if !found {
+		return makeErrUnknownEncoding(str)
 	}
-}
 
-func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name)
+	*e = m
+	return nil
 }
