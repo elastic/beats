@@ -1,0 +1,1287 @@
+[
+    {
+        "@timestamp": "2019-11-12T12:35:17.214Z",
+        "destination.address": "8.8.8.8",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "8.8.8.8",
+        "destination.port": 53,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"4zuj4nfn4llkb\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"8.8.8.8\",\"dest_port\":53,\"protocol\":17,\"src_ip\":\"10.128.0.16\",\"src_port\":60094},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"continent\":\"America\",\"country\":\"usa\"},\"rule_details\":{\"action\":\"DENY\",\"destination_range\":[\"8.8.8.0/24\"],\"direction\":\"EGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"ALL\"}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-1\",\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-12T12:35:24.466374097Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-12T12:35:17.214711274Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.destination_range": [
+            "8.8.8.0/24"
+        ],
+        "googlecloud.firewall.rule_details.direction": "EGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "ALL"
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-1",
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-central1",
+        "googlecloud.firewall.source.instance.zone": "us-central1-a",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 0,
+        "network.community_id": "1:iiDdIEXnxwSiz/hJbVnseQ4SZVE=",
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.name": "default",
+        "network.transport": "udp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.128.0.16",
+            "8.8.8.8"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "10.128.0.16",
+        "source.domain": "adrian-test",
+        "source.ip": "10.128.0.16",
+        "source.port": 60094
+    },
+    {
+        "@timestamp": "2019-10-30T13:52:42.191Z",
+        "destination.address": "10.42.0.2",
+        "destination.domain": "test-windows",
+        "destination.ip": "10.42.0.2",
+        "destination.port": 3389,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1f21ciqfpfssuo\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.42.0.2\",\"dest_port\":3389,\"protocol\":6,\"src_ip\":\"192.0.2.126\",\"src_port\":64853},\"disposition\":\"ALLOWED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-windows\",\"zone\":\"us-east1-b\"},\"remote_location\":{\"continent\":\"Asia\",\"country\":\"omn\"},\"rule_details\":{\"action\":\"ALLOW\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"3389\"]}],\"priority\":1000,\"reference\":\"network:windows-isolated/firewall:windows-isolated-allow-rdp\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"allow-rdp\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"windows-isolated\",\"vpc_name\":\"windows-isolated\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-10-30T13:52:54.473174731Z\",\"resource\":{\"labels\":{\"location\":\"us-east1-b\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"3238409883146034900\",\"subnetwork_name\":\"windows-isolated\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-10-30T13:52:42.191988835Z\"}",
+        "event.outcome": "allow",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-east1",
+        "googlecloud.firewall.destination.instance.zone": "us-east1-b",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "windows-isolated",
+        "googlecloud.firewall.destination.vpc.vpc_name": "windows-isolated",
+        "googlecloud.firewall.rule_details.action": "ALLOW",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "3389"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:windows-isolated/firewall:windows-isolated-allow-rdp",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "allow-rdp"
+        ],
+        "input.type": "log",
+        "labels.location": "us-east1-b",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "3238409883146034900",
+        "labels.subnetwork_name": "windows-isolated",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 983,
+        "network.community_id": "1:I+YM7Ru3rl0RVZt/y+F/hkoY0Zc=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "windows-isolated",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.126",
+            "10.42.0.2"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.126",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_name": "omn",
+        "source.ip": "192.0.2.126",
+        "source.port": 64853
+    },
+    {
+        "@timestamp": "2019-11-11T12:31:19.421Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 8080,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"8vcfeailjd\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":8080,\"protocol\":6,\"src_ip\":\"192.0.2.219\",\"src_port\":2897},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"Krasnodar\",\"continent\":\"Europe\",\"country\":\"rus\",\"region\":\"Krasnodar Krai\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:31:22.738796433Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:31:19.421478847Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 2025,
+        "network.community_id": "1:I0VuqgaYU1tgaECjlzIRuPzILlg=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.219",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.219",
+        "source.geo.city_name": "Krasnodar",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "rus",
+        "source.geo.region_name": "Krasnodar Krai",
+        "source.ip": "192.0.2.219",
+        "source.port": 2897
+    },
+    {
+        "@timestamp": "2019-11-11T12:41:31.079Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1bqgmw9feiabij\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"192.0.2.14\",\"src_port\":61000},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"continent\":\"Europe\",\"country\":\"deu\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:41:35.727004321Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:41:31.079508196Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 3074,
+        "network.community_id": "1:JXppP0Oqm+g33JYC0DKoWKxP1GI=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.14",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.14",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "deu",
+        "source.ip": "192.0.2.14",
+        "source.port": 61000
+    },
+    {
+        "@timestamp": "2019-11-11T12:41:34.190Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1jrxaqbfe48bir\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"192.0.2.14\",\"src_port\":61000},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"continent\":\"Europe\",\"country\":\"deu\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:41:40.791816098Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:41:34.190831607Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 4080,
+        "network.community_id": "1:JXppP0Oqm+g33JYC0DKoWKxP1GI=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.14",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.14",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "deu",
+        "source.ip": "192.0.2.14",
+        "source.port": 61000
+    },
+    {
+        "@timestamp": "2019-11-11T12:48:41.449Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 8080,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1fw7drlfe2ty27\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":8080,\"protocol\":6,\"src_ip\":\"192.0.2.151\",\"src_port\":62551},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"Berdychiv\",\"continent\":\"Europe\",\"country\":\"ukr\",\"region\":\"Zhytomyr Oblast\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:48:47.038820509Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:48:41.449552758Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 5086,
+        "network.community_id": "1:Us40G9GKff9nidizV7rCFgCQb9E=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.151",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.151",
+        "source.geo.city_name": "Berdychiv",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "ukr",
+        "source.geo.region_name": "Zhytomyr Oblast",
+        "source.ip": "192.0.2.151",
+        "source.port": 62551
+    },
+    {
+        "@timestamp": "2019-11-11T13:10:24.214Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 8080,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1yre751fekaxzs\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":8080,\"protocol\":6,\"src_ip\":\"192.0.2.241\",\"src_port\":44542},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"Vicenza\",\"continent\":\"Europe\",\"country\":\"ita\",\"region\":\"Veneto\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T13:10:30.804549999Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T13:10:24.214995318Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 6141,
+        "network.community_id": "1:CKIvQ4W48ZjqiomnWxipDck9Yb0=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.241",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.241",
+        "source.geo.city_name": "Vicenza",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "ita",
+        "source.geo.region_name": "Veneto",
+        "source.ip": "192.0.2.241",
+        "source.port": 44542
+    },
+    {
+        "@timestamp": "2019-11-11T13:35:23.504Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"5kanfzfiqepkh\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"192.0.2.114\",\"src_port\":41293},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"Tula\",\"continent\":\"Europe\",\"country\":\"rus\",\"region\":\"Tula Oblast\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T13:35:28.934918322Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T13:35:23.504719962Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 7185,
+        "network.community_id": "1:4MspX9JxDXjbalHc/6y9GntbkUc=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.114",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.114",
+        "source.geo.city_name": "Tula",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "rus",
+        "source.geo.region_name": "Tula Oblast",
+        "source.ip": "192.0.2.114",
+        "source.port": 41293
+    },
+    {
+        "@timestamp": "2019-11-11T13:36:52.135Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"59z0t8fiow9vg\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"192.0.2.251\",\"src_port\":59106},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"Stavropol\",\"continent\":\"Europe\",\"country\":\"rus\",\"region\":\"Stavropol Krai\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T13:36:54.238077643Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T13:36:52.135887769Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 8228,
+        "network.community_id": "1:KygoHJBT+06I9CnmAPRmvl5CRO4=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.251",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.251",
+        "source.geo.city_name": "Stavropol",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "rus",
+        "source.geo.region_name": "Stavropol Krai",
+        "source.ip": "192.0.2.251",
+        "source.port": 59106
+    },
+    {
+        "@timestamp": "2019-11-11T14:06:16.593Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1y7e4yzff816cq\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"192.0.2.189\",\"src_port\":61000},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"Viol\u00e8s\",\"continent\":\"Europe\",\"country\":\"fra\",\"region\":\"Provence-Alpes-C\u00f4te d'Azur\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T14:06:26.357446279Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T14:06:16.59353182Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 9279,
+        "network.community_id": "1:20yMRdGVeNrVtL6TKhpfMDy284w=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.189",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.189",
+        "source.geo.city_name": "Viol\u00e8s",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "fra",
+        "source.geo.region_name": "Provence-Alpes-C\u00f4te d'Azur",
+        "source.ip": "192.0.2.189",
+        "source.port": 61000
+    },
+    {
+        "@timestamp": "2019-11-11T14:06:22.930Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"lx5jlsfggpr0q\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"192.0.2.189\",\"src_port\":61000},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"Viol\u00e8s\",\"continent\":\"Europe\",\"country\":\"fra\",\"region\":\"Provence-Alpes-C\u00f4te d'Azur\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T14:06:28.203068653Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T14:06:22.930570324Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 10341,
+        "network.community_id": "1:20yMRdGVeNrVtL6TKhpfMDy284w=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.189",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.189",
+        "source.geo.city_name": "Viol\u00e8s",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "fra",
+        "source.geo.region_name": "Provence-Alpes-C\u00f4te d'Azur",
+        "source.ip": "192.0.2.189",
+        "source.port": 61000
+    },
+    {
+        "@timestamp": "2019-11-11T14:32:07.407Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 8080,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"18ynfbufer19m1\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":8080,\"protocol\":6,\"src_ip\":\"192.0.2.200\",\"src_port\":42716},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"city\":\"\u0130zmir\",\"continent\":\"Asia\",\"country\":\"tur\",\"region\":\"\u0130zmir\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T14:32:14.038485761Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T14:32:07.407039908Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 11403,
+        "network.community_id": "1:6fenc8+hp2KWF1J9vvGwv3iswV0=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.200",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.200",
+        "source.geo.city_name": "\u0130zmir",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_name": "tur",
+        "source.geo.region_name": "\u0130zmir",
+        "source.ip": "192.0.2.200",
+        "source.port": 42716
+    },
+    {
+        "@timestamp": "2019-11-12T12:41:20.972Z",
+        "destination.address": "8.8.8.8",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "8.8.8.8",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"tzddthfsr6fv5\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"8.8.8.8\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"10.28.0.16\",\"src_port\":46418},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"continent\":\"America\",\"country\":\"usa\"},\"rule_details\":{\"action\":\"DENY\",\"destination_range\":[\"8.8.8.0/24\"],\"direction\":\"EGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"ALL\"}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-1\",\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-12T12:41:28.971534988Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-12T12:41:20.972747063Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.destination_range": [
+            "8.8.8.0/24"
+        ],
+        "googlecloud.firewall.rule_details.direction": "EGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "ALL"
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-1",
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-central1",
+        "googlecloud.firewall.source.instance.zone": "us-central1-a",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 12444,
+        "network.community_id": "1:L+yxRTY3bxAv2hbljIrAstKlE+g=",
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.28.0.16",
+            "8.8.8.8"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "10.28.0.16",
+        "source.domain": "adrian-test",
+        "source.ip": "10.28.0.16",
+        "source.port": 46418
+    },
+    {
+        "@timestamp": "2019-11-12T12:42:26.505Z",
+        "destination.address": "8.8.8.8",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "8.8.8.8",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1k2b7kefsnhzq7\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"8.8.8.8\",\"dest_port\":80,\"protocol\":17,\"src_ip\":\"10.28.0.16\",\"src_port\":58725},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_location\":{\"continent\":\"America\",\"country\":\"usa\"},\"rule_details\":{\"action\":\"DENY\",\"destination_range\":[\"8.8.8.0/24\"],\"direction\":\"EGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"ALL\"}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-1\",\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-12T12:42:33.671883883Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-12T12:42:26.50532921Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.destination_range": [
+            "8.8.8.0/24"
+        ],
+        "googlecloud.firewall.rule_details.direction": "EGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "ALL"
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-1",
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-central1",
+        "googlecloud.firewall.source.instance.zone": "us-central1-a",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 13425,
+        "network.community_id": "1:c7bqGkBTPmOmWydHv/uxpk1qOjc=",
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.name": "default",
+        "network.transport": "udp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.28.0.16",
+            "8.8.8.8"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "10.28.0.16",
+        "source.domain": "adrian-test",
+        "source.ip": "10.28.0.16",
+        "source.port": 58725
+    },
+    {
+        "@timestamp": "2019-11-11T12:54:13.531Z",
+        "destination.address": "10.42.0.10",
+        "destination.domain": "test-es",
+        "destination.ip": "10.42.0.10",
+        "destination.port": 9200,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1sdfuwxfk8hq1c\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.42.0.10\",\"dest_port\":9200,\"protocol\":6,\"src_ip\":\"192.0.2.114\",\"src_port\":44666},\"disposition\":\"ALLOWED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-es\",\"zone\":\"us-east1-b\"},\"remote_instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-kibana\",\"zone\":\"us-east1-b\"},\"remote_location\":{\"continent\":\"America\",\"country\":\"usa\"},\"remote_vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"},\"rule_details\":{\"action\":\"ALLOW\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"9200\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:allow9200\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"allow9200\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:54:15.188832255Z\",\"resource\":{\"labels\":{\"location\":\"us-east1-b\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"758019854043528829\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:54:13.531819246Z\"}",
+        "event.outcome": "allow",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-east1",
+        "googlecloud.firewall.destination.instance.zone": "us-east1-b",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "ALLOW",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "9200"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:allow9200",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "allow9200"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-east1",
+        "googlecloud.firewall.source.instance.zone": "us-east1-b",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-east1-b",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "758019854043528829",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 14407,
+        "network.community_id": "1:DAX43chSGct8LhjTchX9JgmQSEE=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.114",
+            "10.42.0.10"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.114",
+        "source.domain": "test-kibana",
+        "source.geo.continent_name": "America",
+        "source.geo.country_name": "usa",
+        "source.ip": "192.0.2.114",
+        "source.port": 44666
+    },
+    {
+        "@timestamp": "2019-11-11T12:54:13.551Z",
+        "destination.address": "10.42.0.10",
+        "destination.domain": "test-es",
+        "destination.ip": "10.42.0.10",
+        "destination.port": 9200,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1sdfuwxfk8hq1b\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.42.0.10\",\"dest_port\":9200,\"protocol\":6,\"src_ip\":\"192.0.2.114\",\"src_port\":44668},\"disposition\":\"ALLOWED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-es\",\"zone\":\"us-east1-b\"},\"remote_instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-kibana\",\"zone\":\"us-east1-b\"},\"remote_location\":{\"continent\":\"America\",\"country\":\"usa\"},\"remote_vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"},\"rule_details\":{\"action\":\"ALLOW\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"9200\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:allow9200\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"allow9200\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:54:15.188832255Z\",\"resource\":{\"labels\":{\"location\":\"us-east1-b\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"758019854043528829\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:54:13.551617516Z\"}",
+        "event.outcome": "allow",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-east1",
+        "googlecloud.firewall.destination.instance.zone": "us-east1-b",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "ALLOW",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "9200"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:allow9200",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "allow9200"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-east1",
+        "googlecloud.firewall.source.instance.zone": "us-east1-b",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-east1-b",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "758019854043528829",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 15594,
+        "network.community_id": "1:TPU3xS0q892TRpPVImmLO31ok9s=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.114",
+            "10.42.0.10"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.114",
+        "source.domain": "test-kibana",
+        "source.geo.continent_name": "America",
+        "source.geo.country_name": "usa",
+        "source.ip": "192.0.2.114",
+        "source.port": 44668
+    },
+    {
+        "@timestamp": "2019-11-11T12:54:15.771Z",
+        "destination.address": "10.42.0.2",
+        "destination.domain": "test-windows",
+        "destination.ip": "10.42.0.2",
+        "destination.port": 3389,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"yot1ojetjdiw\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.42.0.2\",\"dest_port\":3389,\"protocol\":6,\"src_ip\":\"192.0.2.7\",\"src_port\":1683},\"disposition\":\"ALLOWED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-windows\",\"zone\":\"us-east1-b\"},\"remote_location\":{\"city\":\"Almelo\",\"continent\":\"Europe\",\"country\":\"nld\",\"region\":\"Overijssel\"},\"rule_details\":{\"action\":\"ALLOW\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"3389\"]}],\"priority\":1000,\"reference\":\"network:windows-isolated/firewall:windows-isolated-allow-rdp\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"allow-rdp\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"windows-isolated\",\"vpc_name\":\"windows-isolated\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:54:28.477733837Z\",\"resource\":{\"labels\":{\"location\":\"us-east1-b\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"3238409883146034900\",\"subnetwork_name\":\"windows-isolated\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:54:15.771161946Z\"}",
+        "event.outcome": "allow",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-east1",
+        "googlecloud.firewall.destination.instance.zone": "us-east1-b",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "windows-isolated",
+        "googlecloud.firewall.destination.vpc.vpc_name": "windows-isolated",
+        "googlecloud.firewall.rule_details.action": "ALLOW",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "3389"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:windows-isolated/firewall:windows-isolated-allow-rdp",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "allow-rdp"
+        ],
+        "input.type": "log",
+        "labels.location": "us-east1-b",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "3238409883146034900",
+        "labels.subnetwork_name": "windows-isolated",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 16781,
+        "network.community_id": "1:nptqbsyCEhZhJ1ZBfy4iEMDFucI=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "windows-isolated",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.7",
+            "10.42.0.2"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.7",
+        "source.geo.city_name": "Almelo",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_name": "nld",
+        "source.geo.region_name": "Overijssel",
+        "source.ip": "192.0.2.7",
+        "source.port": 1683
+    },
+    {
+        "@timestamp": "2019-11-11T12:54:35.850Z",
+        "destination.address": "10.42.0.10",
+        "destination.domain": "test-es",
+        "destination.ip": "10.42.0.10",
+        "destination.port": 9200,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"5a27u1g22jks9e\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.42.0.10\",\"dest_port\":9200,\"protocol\":6,\"src_ip\":\"192.0.2.114\",\"src_port\":45068},\"disposition\":\"ALLOWED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-es\",\"zone\":\"us-east1-b\"},\"remote_instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-kibana\",\"zone\":\"us-east1-b\"},\"remote_location\":{\"continent\":\"America\",\"country\":\"usa\"},\"remote_vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"},\"rule_details\":{\"action\":\"ALLOW\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"9200\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:allow9200\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"allow9200\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:54:45.189726185Z\",\"resource\":{\"labels\":{\"location\":\"us-east1-b\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"758019854043528829\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:54:35.850729583Z\"}",
+        "event.outcome": "allow",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-east1",
+        "googlecloud.firewall.destination.instance.zone": "us-east1-b",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "ALLOW",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "9200"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:allow9200",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "allow9200"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-east1",
+        "googlecloud.firewall.source.instance.zone": "us-east1-b",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-east1-b",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "758019854043528829",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 17858,
+        "network.community_id": "1:+KvUpcdGASPCZ5QYcOHVgid9Yjg=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.114",
+            "10.42.0.10"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.114",
+        "source.domain": "test-kibana",
+        "source.geo.continent_name": "America",
+        "source.geo.country_name": "usa",
+        "source.ip": "192.0.2.114",
+        "source.port": 45068
+    },
+    {
+        "@timestamp": "2019-11-11T12:54:35.850Z",
+        "destination.address": "10.42.0.10",
+        "destination.domain": "test-es",
+        "destination.ip": "10.42.0.10",
+        "destination.port": 9200,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"5a27u1g22jks8t\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.42.0.10\",\"dest_port\":9200,\"protocol\":6,\"src_ip\":\"192.0.2.114\",\"src_port\":45062},\"disposition\":\"ALLOWED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-es\",\"zone\":\"us-east1-b\"},\"remote_instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-kibana\",\"zone\":\"us-east1-b\"},\"remote_location\":{\"continent\":\"America\",\"country\":\"usa\"},\"remote_vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"},\"rule_details\":{\"action\":\"ALLOW\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"9200\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:allow9200\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"allow9200\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-11T12:54:45.189726185Z\",\"resource\":{\"labels\":{\"location\":\"us-east1-b\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"758019854043528829\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-11T12:54:35.85023465Z\"}",
+        "event.outcome": "allow",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-east1",
+        "googlecloud.firewall.destination.instance.zone": "us-east1-b",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "ALLOW",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "9200"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:allow9200",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "allow9200"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-east1",
+        "googlecloud.firewall.source.instance.zone": "us-east1-b",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-east1-b",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "758019854043528829",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 19045,
+        "network.community_id": "1:v6u3NIKBcvTUebkWUOly9nrN/HE=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.114",
+            "10.42.0.10"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "192.0.2.114",
+        "source.domain": "test-kibana",
+        "source.geo.continent_name": "America",
+        "source.geo.country_name": "usa",
+        "source.ip": "192.0.2.114",
+        "source.port": 45062
+    },
+    {
+        "@timestamp": "2019-11-06T16:41:38.394Z",
+        "destination.address": "10.28.0.16",
+        "destination.domain": "adrian-test",
+        "destination.ip": "10.28.0.16",
+        "destination.port": 80,
+        "event.category": "firewall-rule",
+        "event.dataset": "googlecloud.firewall",
+        "event.module": "googlecloud",
+        "event.original": "{\"insertId\":\"1dobeotg13df9f5\",\"jsonPayload\":{\"connection\":{\"dest_ip\":\"10.28.0.16\",\"dest_port\":80,\"protocol\":6,\"src_ip\":\"10.42.0.10\",\"src_port\":57794},\"disposition\":\"DENIED\",\"instance\":{\"project_id\":\"test-beats\",\"region\":\"us-central1\",\"vm_name\":\"adrian-test\",\"zone\":\"us-central1-a\"},\"remote_instance\":{\"project_id\":\"test-beats\",\"region\":\"us-east1\",\"vm_name\":\"test-es\",\"zone\":\"us-east1-b\"},\"remote_vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"},\"rule_details\":{\"action\":\"DENY\",\"direction\":\"INGRESS\",\"ip_port_info\":[{\"ip_protocol\":\"TCP\",\"port_range\":[\"80\",\"8080\"]}],\"priority\":1000,\"reference\":\"network:default/firewall:adrian-test-3\",\"source_range\":[\"0.0.0.0/0\"],\"target_tag\":[\"adrian-test\"]},\"vpc\":{\"project_id\":\"test-beats\",\"subnetwork_name\":\"default\",\"vpc_name\":\"default\"}},\"logName\":\"projects/test-beats/logs/compute.googleapis.com%2Ffirewall\",\"receiveTimestamp\":\"2019-11-06T16:41:45.009675991Z\",\"resource\":{\"labels\":{\"location\":\"us-central1-a\",\"project_id\":\"test-beats\",\"subnetwork_id\":\"1266623735137648253\",\"subnetwork_name\":\"default\"},\"type\":\"gce_subnetwork\"},\"timestamp\":\"2019-11-06T16:41:38.394575419Z\"}",
+        "event.outcome": "deny",
+        "event.type": "firewall",
+        "fileset.name": "firewall",
+        "googlecloud.firewall.destination.instance.project_id": "test-beats",
+        "googlecloud.firewall.destination.instance.region": "us-central1",
+        "googlecloud.firewall.destination.instance.zone": "us-central1-a",
+        "googlecloud.firewall.destination.vpc.project_id": "test-beats",
+        "googlecloud.firewall.destination.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.destination.vpc.vpc_name": "default",
+        "googlecloud.firewall.rule_details.action": "DENY",
+        "googlecloud.firewall.rule_details.direction": "INGRESS",
+        "googlecloud.firewall.rule_details.ip_port_info": [
+            {
+                "ip_protocol": "TCP",
+                "port_range": [
+                    "80",
+                    "8080"
+                ]
+            }
+        ],
+        "googlecloud.firewall.rule_details.priority": 1000,
+        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
+        "googlecloud.firewall.rule_details.source_range": [
+            "0.0.0.0/0"
+        ],
+        "googlecloud.firewall.rule_details.target_tag": [
+            "adrian-test"
+        ],
+        "googlecloud.firewall.source.instance.project_id": "test-beats",
+        "googlecloud.firewall.source.instance.region": "us-east1",
+        "googlecloud.firewall.source.instance.zone": "us-east1-b",
+        "googlecloud.firewall.source.vpc.project_id": "test-beats",
+        "googlecloud.firewall.source.vpc.subnetwork_name": "default",
+        "googlecloud.firewall.source.vpc.vpc_name": "default",
+        "input.type": "log",
+        "labels.location": "us-central1-a",
+        "labels.project_id": "test-beats",
+        "labels.subnetwork_id": "1266623735137648253",
+        "labels.subnetwork_name": "default",
+        "log.logger": "projects/test-beats/logs/compute.googleapis.com%2Ffirewall",
+        "log.offset": 20231,
+        "network.community_id": "1:6Q1oPyCPH/prdYU6FXBpxAgFrP8=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.name": "default",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.42.0.10",
+            "10.28.0.16"
+        ],
+        "service.type": "googlecloud",
+        "source.address": "10.42.0.10",
+        "source.domain": "test-es",
+        "source.ip": "10.42.0.10",
+        "source.port": 57794
+    }
+]

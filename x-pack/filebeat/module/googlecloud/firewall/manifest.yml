@@ -1,0 +1,28 @@
+module_version: "1.0"
+
+var:
+  - name: input
+    default: google-pubsub
+  - name: project_id
+    default: SET_PROJECT_NAME
+  - name: topic
+    default: stackdriver-firewall
+  - name: subscription_name
+    default: filebeat-googlecloud-firewall
+  - name: credentials_file
+    default: googlecloud-firewall-reader-service-identity.json
+  - name: keep_pubsub_labels
+    default: true
+  - name: keep_resource_labels
+    default: true
+  - name: overwrite_labels
+    default: true
+  - name: debug
+    default: false
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

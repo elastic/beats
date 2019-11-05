@@ -1,0 +1,29 @@
+{{ if eq .input "google-pubsub" }}
+
+type: google-pubsub
+project_id: {{ .project_id }}
+topic: {{ .topic }}
+subscription.name: {{ .subscription_name }}
+credentials_file: {{ .credentials_file }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+processors:
+  - script:
+      lang: javascript
+      id: googlecloud_firewall_script
+      file: ${path.home}/module/googlecloud/firewall/config/pipeline.js
+      params:
+        keep_pubsub_labels: {{ .keep_pubsub_labels }}
+        keep_resource_labels: {{ .keep_resource_labels }}
+        overwrite_labels: {{ .overwrite_labels }}
+        debug: {{ .debug }}
