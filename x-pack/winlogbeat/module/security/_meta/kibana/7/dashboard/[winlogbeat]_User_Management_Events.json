@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Uses Simple Metric Visualizations",
+        "description": "Includes Visual Builder Metric Interval size 90 days",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
@@ -135,8 +135,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-11-04T16:20:39.430Z",
-      "version": "WzUzOSwxXQ=="
+      "updated_at": "2019-11-05T15:40:21.391Z",
+      "version": "WzU2MiwxXQ=="
     },
     {
       "attributes": {

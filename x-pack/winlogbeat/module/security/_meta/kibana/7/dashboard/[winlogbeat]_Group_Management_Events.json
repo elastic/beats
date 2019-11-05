@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Includes Visual Builder Metric\nBucket size 90 days",
+        "description": "Includes Visual Builder Metric\nInterval size 90 days",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
@@ -115,8 +115,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-11-04T14:33:22.241Z",
-      "version": "WzQ4MiwxXQ=="
+      "updated_at": "2019-11-05T15:39:38.478Z",
+      "version": "WzU2MSwxXQ=="
     },
     {
       "attributes": {
