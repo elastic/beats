@@ -244,6 +244,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Convert indexed ms-since-epoch timestamp fields in `elasticsearch/ml_job` metricset to ints from float64s. {issue}14220[14220] {pull}14222[14222]
 - Fix ARN parsing function to work for ELB ARNs. {pull}14316[14316]
 - Update azure configuration example. {issue}14224[14224]
+- Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
 
 *Packetbeat*
 
