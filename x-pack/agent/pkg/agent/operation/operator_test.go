@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
@@ -355,6 +356,9 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
 		},
+		MonitoringConfig: &monitoring.Config{
+			MonitorMetrics: false,
+		},
 	}
 
 	cfg, err := config.NewConfigFrom(operatorConfig)
@@ -372,7 +376,7 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(l, cfg, fetcher, installer, stateResolver, nil)
+	operator, err := NewOperator(l, "p1", cfg, fetcher, installer, stateResolver, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

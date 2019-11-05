@@ -27,6 +27,10 @@ func (o *Operator) initHandlerMap() {
 }
 
 func (o *Operator) handleRun(step configrequest.Step) error {
+	if step.Process == monitoringName {
+		return o.handleStartSidecar(step)
+	}
+
 	p, cfg, err := getProgramFromStep(step)
 	if err != nil {
 		return errors.Wrap(err, "operator.handleStart failed to create program")
@@ -36,6 +40,10 @@ func (o *Operator) handleRun(step configrequest.Step) error {
 }
 
 func (o *Operator) handleRemove(step configrequest.Step) error {
+	if step.Process == monitoringName {
+		return o.handleStopSidecar(step)
+	}
+
 	p, _, err := getProgramFromStep(step)
 	if err != nil {
 		return errors.Wrap(err, "operator.handleStart failed to create program")
@@ -44,27 +52,30 @@ func (o *Operator) handleRemove(step configrequest.Step) error {
 	return o.stop(p)
 }
 
-func (o *Operator) handleStartSidecar(step configrequest.Step) error {
-	// TODO: add support for monitoring
-	return nil
-}
-
-func (o *Operator) handleStopSidecar(step configrequest.Step) error {
-	// TODO: add support for monitoring
-	return nil
-}
-
 func getProgramFromStep(step configrequest.Step) (Descriptor, map[string]interface{}, error) {
+	return getProgramFromStepWithTags(step, nil)
+}
+
+func getProgramFromStepWithTags(step configrequest.Step, tags map[app.Tag]string) (Descriptor, map[string]interface{}, error) {
+	config, err := getConfigFromStep(step)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	p := app.NewDescriptor(step.Process, step.Version, tags)
+	return p, config, nil
+}
+
+func getConfigFromStep(step configrequest.Step) (map[string]interface{}, error) {
 	metConfig, ok := step.Meta[configrequest.MetaConfigKey]
 	if !ok {
-		return nil, nil, fmt.Errorf("step: %s, no config in metadata", step.ID)
+		return nil, fmt.Errorf("step: %s, no config in metadata", step.ID)
 	}
 
 	config, ok := metConfig.(map[string]interface{})
 	if !ok {
-		return nil, nil, fmt.Errorf("step: %s, program config is in invalid format", step.ID)
+		return nil, fmt.Errorf("step: %s, program config is in invalid format", step.ID)
 	}
 
-	p := app.NewDescriptor(step.Process, step.Version, nil)
-	return p, config, nil
+	return config, nil
 }

@@ -47,14 +47,13 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 		}
 	}()
 
+	if err := a.monitor.Prepare(a.uid, a.gid); err != nil {
+		return err
+	}
+
 	spec, err := a.spec.Spec(a.downloadConfig)
 	if err != nil {
 		return errors.New(err, errors.TypeFilesystem)
-	}
-
-	uid, gid, err := getUserGroup(spec)
-	if err != nil {
-		return errors.New(err, errors.TypeConfig)
 	}
 
 	if err := a.configureByFile(&spec, cfg); err != nil {
@@ -75,12 +74,13 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 		a.limiter.Add()
 	}
 
+	spec.Args = a.monitor.EnrichArgs(spec.Args)
 	a.state.ProcessInfo, err = process.Start(
 		a.logger,
 		spec.BinaryPath,
 		a.processConfig,
-		uid,
-		gid,
+		a.uid,
+		a.gid,
 		processCreds,
 		spec.Args...)
 	if err != nil {
@@ -179,6 +179,11 @@ func (a *Application) configureByFile(spec *ProcessSpec, config map[string]inter
 		return errors.New(err, errors.TypeFilesystem)
 	}
 	defer f.Close()
+
+	// change owner
+	if err := os.Chown(filePath, a.uid, a.gid); err != nil {
+		return err
+	}
 
 	encoder := yaml.NewEncoder(f)
 	if err := encoder.Encode(config); err != nil {

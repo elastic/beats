@@ -58,7 +58,7 @@ func newLocal(
 	}
 
 	discover := discoverer(pathConfigFile, c.Path)
-	emit := emitter(log, router)
+	emit := emitter(log, router, injectMonitoring)
 
 	var cfgSource source
 	if !c.Reload.Enabled {

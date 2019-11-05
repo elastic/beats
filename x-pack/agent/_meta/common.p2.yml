@@ -104,3 +104,11 @@ retry:
   # With 30s delay and 3 retries: 30, 60, 120s
   # Default is false
   exponential: false
+
+monitoring:
+  # enabled turns on monitoring of running processes
+  enabled: false
+  # enables log monitoring
+  logs: false
+  # enables metrics monitoring
+  metrics: false

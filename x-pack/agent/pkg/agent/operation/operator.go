@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
 	rconfig "github.com/elastic/beats/x-pack/agent/pkg/core/remoteconfig/grpc"
 )
@@ -29,11 +30,13 @@ import (
 // Enables running sidecars for processes.
 // TODO: implement retry strategies
 type Operator struct {
+	pipelineID     string
 	logger         *logger.Logger
 	config         *operatorCfg.Config
 	handlers       map[string]handleFunc
 	stateResolver  *stateresolver.StateResolver
 	eventProcessor callbackHooks
+	isMonitoring   bool
 
 	apps     map[string]Application
 	appsLock sync.Mutex
@@ -47,6 +50,7 @@ type Operator struct {
 // Based on backed up collection it prepares clients, watchers... on init
 func NewOperator(
 	logger *logger.Logger,
+	pipelineID string,
 	config *config.Config,
 	fetcher download.Downloader,
 	installer install.Installer,
@@ -62,12 +66,20 @@ func NewOperator(
 		return nil, fmt.Errorf("artifacts configuration not provided")
 	}
 
+	if operatorConfig.MonitoringConfig == nil {
+		operatorConfig.MonitoringConfig = &monitoring.Config{
+			MonitorLogs:    false,
+			MonitorMetrics: false,
+		}
+	}
+
 	if eventProcessor == nil {
 		eventProcessor = &noopCallbackHooks{}
 	}
 
 	operator := &Operator{
 		config:         operatorConfig,
+		pipelineID:     pipelineID,
 		logger:         logger,
 		downloader:     fetcher,
 		installer:      installer,
@@ -213,7 +225,27 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return nil, fmt.Errorf("descriptor is not an app.Specifier")
 	}
 
-	a := app.NewApplication(p.ID(), p.BinaryName(), specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing)
+	monitor := monitoring.NewMonitor(isMonitorable(p), p.BinaryName(), o.pipelineID, o.config.DownloadConfig, o.config.MonitoringConfig.MonitorLogs, o.config.MonitoringConfig.MonitorMetrics)
+
+	a, err := app.NewApplication(p.ID(), p.BinaryName(), specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing, monitor)
+	if err != nil {
+		return nil, err
+	}
+
 	o.apps[id] = a
 	return a, nil
+}
+
+func isMonitorable(descriptor Descriptor) bool {
+	type taggable interface {
+		Tags() map[app.Tag]string
+	}
+
+	if taggable, ok := descriptor.(taggable); ok {
+		tags := taggable.Tags()
+		_, isSidecar := tags[app.TagSidecar]
+		return !isSidecar // everything is monitorable except sidecar
+	}
+
+	return false
 }

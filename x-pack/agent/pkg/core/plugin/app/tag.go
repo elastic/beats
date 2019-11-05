@@ -8,11 +8,5 @@ package app
 // to a process.
 type Tag string
 
-// TagSidecarOf tags a sidecar process and identifies
-// a process which is sidecard-ed.
-// Example:
-// - p1: filebeat 	- watches apache logs
-// - p2: metricbeat - waches p1
-// p1.Tags = []
-// p2.Tags = [{ "sidecar-of": "filebeat" }]
-const TagSidecarOf = "sidecar-of"
+// TagSidecar tags a sidecar process
+const TagSidecar = "sidecar"
