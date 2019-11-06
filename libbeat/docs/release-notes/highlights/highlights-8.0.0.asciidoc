@@ -11,7 +11,7 @@ Refer to the {beats} <<breaking-changes-8.0, Breaking Changes>> and
 <<release-notes, Release Notes>> for a list of bug fixes and other changes.
 
 //Also read the
-//https://www.elastic.co/blog/beats-7-4-0-released[Beats release blog] for a full
+//https://www.elastic.co/blog/beats-8-0-0-released[Beats release blog] for a full
 //description of new features.
 
 //NOTE: The notable-highlights tagged regions are re-used in the
