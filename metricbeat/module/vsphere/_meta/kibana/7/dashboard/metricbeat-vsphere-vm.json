@@ -138,7 +138,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "virtualmachine used CPU total ram network [Metricbeat VSphere] ECS",
+        "title": "CPU/RAM/Network per VM [Metricbeat VSphere] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
