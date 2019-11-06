@@ -234,7 +234,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-traefik-health,health>>   
 |<<metricbeat-module-uwsgi,uwsgi>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>>   
-|<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-vsphere-datastore,datastore>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>> beta[]  
