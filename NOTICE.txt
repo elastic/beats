@@ -11,7 +11,7 @@ Third party libraries used by the Elastic Beats project:
 
 --------------------------------------------------------------------
 Dependency: 4d63.com/tz
-Revision: bd6cee76f7319745d44ff235e42124b3891e293d
+Revision: acbe7ac603850b02c7bc4329a2354e389857bf18
 License type (autodetected): MIT
 ./vendor/4d63.com/tz/LICENSE:
 --------------------------------------------------------------------
