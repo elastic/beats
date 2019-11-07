@@ -1,0 +1,74 @@
+// TODO: Create script that generates this file. Condiitional coding needs to
+// be preserved.
+
+//# tag::processors-list[]
+* <<add-cloud-metadata,`add_cloud_metadata`>>
+* <<add-docker-metadata,`add_docker_metadata`>>
+* <<add-fields, `add_fields`>>
+* <<add-host-metadata,`add_host_metadata`>>
+* <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
+* <<add-labels, `add_labels`>>
+* <<add-locale,`add_locale`>>
+* <<add-observer-metadata,`add_observer_metadata`>>
+* <<add-process-metadata,`add_process_metadata`>>
+* <<add-tags, `add_tags`>>
+* <<community-id,`community_id`>>
+* <<convert,`convert`>>
+* <<decode-base64-field,`decode_base64_field`>>
+ifdef::has_decode_cef_processor[]
+* <<processor-decode-cef,`decode_cef`>>
+endif::[]
+ifdef::has_decode_csv_fields_processor[]
+* <<decode-csv-fields,`decode_csv_fields`>>
+endif::[]
+* <<decode-json-fields,`decode_json_fields`>>
+* <<decompress-gzip-field,`decompress_gzip_field`>>
+* <<dissect, `dissect`>>
+* <<processor-dns, `dns`>>
+* <<drop-event,`drop_event`>>
+* <<drop-fields,`drop_fields`>>
+* <<extract-array,`extract_array`>>
+* <<include-fields,`include_fields`>>
+* <<processor-registered-domain,`registered_domain`>>
+* <<rename-fields,`rename`>>
+ifdef::has_script_processor[]
+* <<processor-script,`script`>>
+endif::[]
+ifdef::has_timestamp_processor[]
+* <<processor-timestamp,`timestamp`>>
+endif::[]
+//# end::processors-list[]
+
+//# tag::processors-include[]
+include::{processors-dir}/processor-add-cloud-metadata.asciidoc[]
+include::{processors-dir}/processor-add-docker-metadata.asciidoc[]
+include::{processors-dir}/processor-add-fields.asciidoc[]
+include::{processors-dir}/processor-add-host-metadata.asciidoc[]
+include::{processors-dir}/processor-add-kubernetes-metadata.asciidoc[]
+include::{processors-dir}/processor-add-labels.asciidoc[]
+include::{processors-dir}/processor-add-locale.asciidoc[]
+include::{processors-dir}/processor-add-observer-metadata.asciidoc[]
+include::{processors-dir}/processor-add-process-metadata.asciidoc[]
+include::{processors-dir}/processor-add-tags.asciidoc[]
+include::{processors-dir}/processor-community-id.asciidoc[]
+include::{processors-dir}/processor-convert.asciidoc[]
+include::{processors-dir}/processor-decode-base64-field.asciidoc[]
+include::{processors-dir}/processor-decode-cef.asciidoc[]
+include::{processors-dir}/processor-decode-csv.asciidoc[]
+include::{processors-dir}/processor-decode-json-fields.asciidoc[]
+include::{processors-dir}/processor-decompress-gzip-field.asciidoc[]
+include::{processors-dir}/processor-dissect.asciidoc[]
+include::{processors-dir}/processor-dns.asciidoc[]
+include::{processors-dir}/processor-drop-event.asciidoc[]
+include::{processors-dir}/processor-drop-fields.asciidoc[]
+include::{processors-dir}/processor-extract-array.asciidoc[]
+include::{processors-dir}/processor-fingerprint.asciidoc[]
+include::{processors-dir}/processor-include-fields.asciidoc[]
+include::{processors-dir}/processor-registered-domain.asciidoc[]
+include::{processors-dir}/processor-rename-fields.asciidoc[]
+include::{processors-dir}/processor-script.asciidoc[]
+include::{processors-dir}/processor-timestamp.asciidoc[]
+
+//# end::processors-include[]
+
+
