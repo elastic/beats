@@ -29,8 +29,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/useragent"
-
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
