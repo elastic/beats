@@ -76,4 +76,4 @@
     - name: file_desc
       type: keyword
       description: >
-        Frequently files can be “described” to give a bit more context. If the $f field is provided this field will be automatically filled out.
+        Frequently files can be described to give a bit more context. If the $f field is provided this field will be automatically filled out.
