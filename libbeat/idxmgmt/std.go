@@ -54,12 +54,16 @@ type indexManager struct {
 	assets        Asseter
 }
 
-type indexSelector outil.Selector
+type indexSelector struct {
+	sel      outil.Selector
+	beatInfo beat.Info
+}
 
 type ilmIndexSelector struct {
-	index outil.Selector
-	alias outil.Selector
-	st    *indexState
+	index    outil.Selector
+	alias    outil.Selector
+	st       *indexState
+	beatInfo beat.Info
 }
 
 type componentType uint8
@@ -201,7 +205,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 	}
 
 	if mode != ilm.ModeAuto {
-		return indexSelector(indexSel), nil
+		return indexSelector{indexSel, s.info}, nil
 	}
 
 	selCfg.SetString("index", -1, alias)
@@ -321,7 +325,7 @@ func (m *indexManager) setupWithILM() (bool, error) {
 }
 
 func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
-	if idx := getEventCustomIndex(evt); idx != "" {
+	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
 		return idx, nil
 	}
 
@@ -335,13 +339,13 @@ func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
 }
 
 func (s indexSelector) Select(evt *beat.Event) (string, error) {
-	if idx := getEventCustomIndex(evt); idx != "" {
+	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
 		return idx, nil
 	}
-	return outil.Selector(s).Select(evt)
+	return s.sel.Select(evt)
 }
 
-func getEventCustomIndex(evt *beat.Event) string {
+func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	if len(evt.Meta) == 0 {
 		return ""
 	}
@@ -357,6 +361,16 @@ func getEventCustomIndex(evt *beat.Event) string {
 			ts := evt.Timestamp.UTC()
 			return fmt.Sprintf("%s-%d.%02d.%02d",
 				idx, ts.Year(), ts.Month(), ts.Day())
+		}
+	}
+
+	// This is functionally identical to Meta["alias"], returning the overriding
+	// metadata as the index name if present. It is currently used by Filebeat
+	// to send the index for particular inputs to formatted string templates,
+	// which are then expanded by a processor to the "raw_index" field.
+	if tmp := evt.Meta["raw_index"]; tmp != nil {
+		if idx, ok := tmp.(string); ok {
+			return idx
 		}
 	}
 
