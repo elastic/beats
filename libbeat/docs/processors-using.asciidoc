@@ -839,6 +839,7 @@ The `decode_cef` processor has the following configuration settings.
 .Decode CEF options
 [options="header"]
 |======
+| Name             | Required | Default | Description
 | `field`          | no       | message | Source field containing the CEF message to be parsed.                        |
 | `target_field`   | no       | cef     | Target field where the parsed CEF object will be written.                    |
 | `ecs`            | no       | true    | Generate Elastic Common Schema (ECS) fields from the CEF data.
@@ -1183,6 +1184,27 @@ The following settings are supported:
                   empty value, it is left unset. The empty string (`""`), an
                   empty array (`[]`) or an empty object (`{}`) are considered
                   empty values. Default is `false`.
+
+[[fingerprint]]
+=== Generate a fingerprint of an event
+
+The `fingerprint` processor generates a fingerprint of an event based on a
+specified subset of its fields.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - fingerprint:
+     fields: ["field1", "field2", ...]
+-----------------------------------------------------
+
+The following settings are supported:
+
+`fields`:: List of fields to use as the source for the fingerprint.
+`ignore_missing`:: (Optional) Whether to ignore missing fields. Default is `false`.
+`target_field`:: (Optional) Field in which the generated fingerprint should be stored. Default is `fingerprint`.
+`method`:: (Optional) Algorithm to use for computing the fingerprint. Must be one of: `md5`, `sha1`, `sha256`, `sha384`, `sha512`. Default is `sha256`.
+`encoding`:: (Optional) Encoding to use on the fingerprint value. Must be one of `hex`, `base32`, or `base64`. Default is `hex`.
 
 [[include-fields]]
 === Keep fields from events
@@ -1810,8 +1832,6 @@ field will be present in the output.
 ifdef::has_script_processor[]
 [[processor-script]]
 === Script Processor
-
-experimental[]
 
 The script processor executes Javascript code to process an event. The processor
 uses a pure Go implementation of ECMAScript 5.1 and has no external
