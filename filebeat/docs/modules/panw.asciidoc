@@ -10,8 +10,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Palo Alto Networks module
 
-beta[]
-
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is a module for Palo Alto Networks PAN-OS firewall monitoring logs received
