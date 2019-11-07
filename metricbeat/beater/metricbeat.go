@@ -18,8 +18,9 @@
 package beater
 
 import (
-	"github.com/elastic/beats/libbeat/paths"
 	"sync"
+
+	"github.com/elastic/beats/libbeat/paths"
 
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/management"
