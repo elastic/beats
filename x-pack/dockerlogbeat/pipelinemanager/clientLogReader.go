@@ -62,42 +62,6 @@ func (cl *ClientLogger) Close() error {
 
 }
 
-// ConsumeAndSendLogs reads from the FIFO file and sends to the pipeline client. This will block and should be called in its own goroutine
-// TODO: Publish() can block, which is a problem. This whole thing should be two goroutines.
-// func (cl *ClientLogger) ConsumeAndSendLogs() {
-// 	reader := pb.NewUint32DelimitedReader(cl.logFile, binary.BigEndian, 2e6)
-
-// 	publishWriter := make(chan logdriver.LogEntry, 500)
-
-// 	go cl.publishLoop(publishWriter)
-// 	// Clean up the reader after we're done
-// 	defer func() {
-
-// 		close(publishWriter)
-
-// 		err := reader.Close()
-// 		if err != nil {
-// 			fmt.Fprintf(os.Stderr, "Error closing FIFO reader: %s", err)
-// 		}
-// 	}()
-
-// 	var log logdriver.LogEntry
-// 	for {
-// 		err := reader.ReadMsg(&log)
-// 		if err != nil {
-// 			if err == io.EOF || err == os.ErrClosed || strings.Contains(err.Error(), "file already closed") {
-// 				cl.logFile.Close()
-// 				return
-// 			}
-// 			// I am...not sure why we do this
-// 			reader = pb.NewUint32DelimitedReader(cl.logFile, binary.BigEndian, 2e6)
-// 		}
-// 		publishWriter <- log
-// 		log.Reset()
-
-// 	}
-// }
-
 // ConsumePipelineAndSend consumes events from the FIFO pipe and sends them to the pipeline client
 func (cl *ClientLogger) ConsumePipelineAndSend() {
 	publishWriter := make(chan logdriver.LogEntry, 500)
@@ -105,13 +69,8 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	go cl.publishLoop(publishWriter)
 	// Clean up the reader after we're done
 	defer func() {
-
 		close(publishWriter)
 
-		err := cl.logFile.Close()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error closing FIFO reader: %s\n", err)
-		}
 	}()
 
 	var log logdriver.LogEntry
