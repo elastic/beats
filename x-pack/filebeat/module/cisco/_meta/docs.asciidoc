@@ -5,8 +5,6 @@
 
 == Cisco module
 
-beta[]
-
 This is a module for Cisco network device's logs. It includes the following
 filesets for receiving logs over syslog or read from a file:
 
