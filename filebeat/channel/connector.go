@@ -62,7 +62,7 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return nil, err
 	}
 
-	procs, err := buildProcessorList(c.parent.beatInfo, config, clientCfg)
+	procs, err := processorsForConfig(c.parent.beatInfo, config, clientCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -117,8 +117,8 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	return outlet, nil
 }
 
-// buildProcessorList assembles the Processors for a pipelineConnector.
-func buildProcessorList(
+// processorsForConfig assembles the Processors for a pipelineConnector.
+func processorsForConfig(
 	beatInfo beat.Info, config inputOutletConfig, clientCfg beat.ClientConfig,
 ) (*processors.Processors, error) {
 	procs := processors.NewList(nil)

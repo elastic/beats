@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/actions"
 )
 
-func TestBuildProcessorList(t *testing.T) {
+func TestProcessorsForConfig(t *testing.T) {
 	testCases := map[string]struct {
 		beatInfo       beat.Info
 		configStr      string
@@ -114,7 +114,7 @@ func TestBuildProcessorList(t *testing.T) {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
-		processors, err := buildProcessorList(test.beatInfo, config, test.clientCfg)
+		processors, err := processorsForConfig(test.beatInfo, config, test.clientCfg)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
 			continue
@@ -147,10 +147,10 @@ func TestBuildProcessorList(t *testing.T) {
 	}
 }
 
-func TestBuildProcessorListIsFlat(t *testing.T) {
+func TestProcessorsForConfigIsFlat(t *testing.T) {
 	// This test is regrettable, and exists because of inconsistencies in
 	// processor handling between processors.Processors and processing.group
-	// (which implements beat.ProcessorList) -- see buildProcessorList for
+	// (which implements beat.ProcessorList) -- see processorsForConfig for
 	// details. The upshot is that, for now, if the input configuration specifies
 	// processors, they must be returned as direct children of the resulting
 	// processors.Processors (rather than being collected in additional tree
@@ -164,7 +164,8 @@ func TestBuildProcessorListIsFlat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	processors, err := buildProcessorList(beat.Info{}, config, beat.ClientConfig{})
+	processors, err := processorsForConfig(
+		beat.Info{}, config, beat.ClientConfig{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +174,7 @@ func TestBuildProcessorListIsFlat(t *testing.T) {
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
 // constant string in the event metadata. It is used to test order of operations
-// for buildProcessorList.
+// for processorsForConfig.
 type setRawIndex struct {
 	indexStr string
 }
