@@ -3,6 +3,7 @@
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 :dockerconfig: https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/docker/{beatname_lc}.docker.yml
 :downloads: https://artifacts.elastic.co/downloads/beats
+:processors-dir: {libbeat-dir}/docs/processors
 
 :cm-ui: Central Management
 :libbeat-docs: Beats Platform Reference
