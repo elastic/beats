@@ -152,7 +152,7 @@ func processorsForConfig(
 	// because the contents of what we return are later pulled out into a
 	// processing.group rather than a processors.Processors, and the two have
 	// different error semantics: processors.Processors aborts processing on
-	// any error, whereas `processing.group` only aborts on fatal errors. The
+	// any error, whereas processing.group only aborts on fatal errors. The
 	// latter is the most common behavior, and the one we are preserving here for
 	// backwards compatibility.
 	// We are unhappy about this and have plans to fix this inconsistency at a
