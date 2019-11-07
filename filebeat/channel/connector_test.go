@@ -120,9 +120,11 @@ func TestBuildProcessorList(t *testing.T) {
 			continue
 		}
 		processedEvent, err := processors.Run(&test.event)
-		if err != nil {
-			t.Error(err)
-			continue
+		// We don't check if err != nil, because we are testing the final outcome
+		// of running the processors, including when some of them fail.
+		if processedEvent == nil {
+			t.Errorf("[%s] Unexpected fatal error running processors: %v\n",
+				description, err)
 		}
 		for key, value := range test.expectedFields {
 			field, err := processedEvent.GetValue(key)
@@ -143,6 +145,30 @@ func TestBuildProcessorList(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestBuildProcessorListIsFlat(t *testing.T) {
+	// This test is regrettable, and exists because of inconsistencies in
+	// processor handling between processors.Processors and processing.group
+	// (which implements beat.ProcessorList) -- see buildProcessorList for
+	// details. The upshot is that, for now, if the input configuration specifies
+	// processors, they must be returned as direct children of the resulting
+	// processors.Processors (rather than being collected in additional tree
+	// structure).
+	// This test should be removed once we have a more consistent mechanism for
+	// collecting and running processors.
+	configStr := `processors:
+- add_fields: {fields: {testField: value}}
+- add_fields: {fields: {testField2: stuff}}`
+	config, err := outletConfigFromString(configStr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	processors, err := buildProcessorList(beat.Info{}, config, beat.ClientConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, 2, len(processors.List))
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
