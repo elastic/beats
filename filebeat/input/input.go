@@ -60,7 +60,7 @@ type Runner struct {
 // New instantiates a new Runner
 func New(
 	conf *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
 	dynFields *common.MapStrPointer,
@@ -99,7 +99,7 @@ func New(
 		Meta:          nil,
 	}
 	var ipt Input
-	ipt, err = f(conf, outlet, context)
+	ipt, err = f(conf, connector, context)
 	if err != nil {
 		return input, err
 	}
