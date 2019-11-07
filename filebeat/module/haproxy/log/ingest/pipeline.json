@@ -21,6 +21,7 @@
         },
         {
             "date": {
+                "if": "ctx.event.timezone == null",
                 "field": "haproxy.request_date",
                 "target_field": "@timestamp",
                 "formats": [
