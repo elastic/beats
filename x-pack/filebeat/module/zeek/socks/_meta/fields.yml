@@ -1,5 +1,6 @@
 - name: socks
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek SOCKS log.
   fields:

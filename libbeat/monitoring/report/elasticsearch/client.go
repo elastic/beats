@@ -32,6 +32,8 @@ import (
 	"github.com/elastic/beats/libbeat/testing"
 )
 
+var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
+
 type publishClient struct {
 	es     *esout.Client
 	params map[string]string
@@ -185,13 +187,19 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 		"_routing": nil,
 	}
 
-	if c.es.GetVersion().Major < 7 {
+	esVersion := c.es.GetVersion()
+	if esVersion.Major < 7 {
 		meta["_type"] = "doc"
 	}
 
-	action := common.MapStr{
-		"index": meta,
+	action := common.MapStr{}
+	var opType string
+	if esVersion.LessThan(createDocPrivAvailableESVersion) {
+		opType = "index"
+	} else {
+		opType = "create"
 	}
+	action[opType] = meta
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 

@@ -26116,6 +26116,16 @@ alias to: rabbitmq.node.name
 
 --
 
+*`rabbitmq.connection.state`*::
++
+--
+Connection state.
+
+
+type: keyword
+
+--
+
 *`rabbitmq.connection.channels`*::
 +
 --
