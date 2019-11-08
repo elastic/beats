@@ -22,12 +22,11 @@ const (
 )
 
 func getMonitoringEndpoint(program, operatingSystem, pipelineID string) string {
-	format := mbEndpointFileFormat
 	if operatingSystem == "windows" {
-		format = mbEndpointFileFormatWin
+		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, program)
 	}
 
-	return fmt.Sprintf(format, pipelineID, program, program)
+	return fmt.Sprintf(mbEndpointFileFormat, pipelineID, program, program)
 }
 
 func getLoggingFile(program, operatingSystem, installPath, pipelineID string) string {

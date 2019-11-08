@@ -51,14 +51,23 @@ func NewMonitor(process, pipelineID string, downloadConfig *artifact.Config, mon
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
 func (b *Monitor) EnrichArgs(args []string) []string {
-	appendix := []string{
-		"-E", "http.enabled=true",
-		"-E", "http.host=" + b.monitoringEndpoint,
-		"-E", "logging.files.path=" + b.loggingPath,
-		"-E", "logging.files.name=" + b.process,
-		"-E", "logging.files.keepfiles=7",
-		"-E", "logging.files.permission=0644",
-		"-E", "logging.files.interval=1h",
+	appendix := make([]string, 0, 7)
+
+	if b.monitoringEndpoint != "" {
+		appendix = append(appendix,
+			"-E", "http.enabled=true",
+			"-E", "http.host="+b.monitoringEndpoint,
+		)
+	}
+
+	if b.loggingPath != "" {
+		appendix = append(appendix,
+			"-E", "logging.files.path="+b.loggingPath,
+			"-E", "logging.files.name="+b.process,
+			"-E", "logging.files.keepfiles=7",
+			"-E", "logging.files.permission=0644",
+			"-E", "logging.files.interval=1h",
+		)
 	}
 
 	return append(args, appendix...)
