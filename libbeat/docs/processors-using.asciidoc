@@ -194,7 +194,7 @@ endif::[]
 
 The supported processors are:
 
-include::processors/processors-list.asciidoc[tag=processors-list]
+include::processors-list.asciidoc[tag=processors-list]
 
 [[conditions]]
 ==== Conditions
@@ -462,9 +462,9 @@ For example, to configure the condition `NOT status = OK`:
 
 [source,yaml]
 ------
-not:
+not
   equals:
     status: OK
 ------
 
-include::{processors-dir}/processors-list.asciidoc[tag=processors-include]
+include::processors-list.asciidoc[tag=processors-include]
