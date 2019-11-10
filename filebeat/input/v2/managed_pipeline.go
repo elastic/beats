@@ -20,6 +20,8 @@ package v2
 import (
 	"sync"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/go-concert/chorus"
 )
@@ -32,8 +34,7 @@ import (
 // be published.
 type managedPipeline struct {
 	pipeline beat.PipelineConnector
-
-	closer *chorus.Closer
+	closer   *chorus.Closer
 
 	mu      sync.Mutex
 	clients []*managedClient
@@ -49,16 +50,16 @@ func (p *managedPipeline) Close() error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	// TODO: multierr
-	var err error
+	var errs multierror.Errors
 	for _, client := range p.clients {
-		closeErr := client.Client.Close()
+		err := client.Client.Close()
 		if err != nil {
-			err = closeErr
+			errs = append(errs, err)
 		}
 	}
 	p.clients = nil
-	return err
+
+	return errs.Err()
 }
 
 func (p *managedPipeline) Connect() (beat.Client, error) {

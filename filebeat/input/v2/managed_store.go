@@ -20,9 +20,8 @@ package v2
 import (
 	"sync"
 
-	"go.uber.org/atomic"
-
 	"github.com/elastic/go-concert"
+	"github.com/elastic/go-concert/atomic"
 )
 
 // managedStoreAccessor keeps track of active stores in use.
@@ -36,7 +35,7 @@ import (
 type managedStoreAccessor struct {
 	accessor StoreAccessor
 
-	mu           sync.Mutex
+	mux          sync.Mutex
 	activeStores map[string]*managedStore
 }
 
