@@ -18,7 +18,8 @@
 package v2
 
 import (
-	"github.com/elastic/beats/heartbeat/scheduler"
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -26,9 +27,15 @@ import (
 )
 
 type Plugin struct {
-	Name        string
-	Constraints Constraint
-	Doc         string
+	Name string
+
+	Stability Stability
+
+	Deprecated bool
+
+	Constraints []Constraint
+
+	Doc string
 
 	// TODO: config schema info for config validation
 
@@ -72,7 +79,8 @@ type RunnerFactory interface {
 // NOTE: the type is defined such that it is compatible with libbeat config
 // reloading and autodiscovery.
 type Runner interface {
-	String() string
+	fmt.Stringer
+
 	Start()
 	Stop()
 }
@@ -81,6 +89,10 @@ type Runner interface {
 // inputs. The `Closer` provided is compatible to `context.Context` and can be used
 // with common IO libraries to unblock connections on shutdown.
 type Context struct {
+	// ID of the input, for informational purposes only. Loggers and observer will already report
+	// the ID if needed.
+	ID string
+
 	// StoreAccessor allows inputs to access a resource store. The store can be used
 	// for serializing state, but also for coordination such that only one input
 	// collects data from a resource.
@@ -94,17 +106,9 @@ type Context struct {
 	// Log provides the structured logger for the input to use
 	Log *logp.Logger
 
-	// Scheduler provides cron-job like services to an input.
-	// It can be used to configure the exact moment a task should be executed.
-	// Tasks should only be configured with the scheduler for as long as the input is running.
-	// On 'stop' an input must unregister configured tasks
-	//
-	// XXX: currently in heartbeat, but we will move it to libbeat
-	Scheduler *scheduler.Scheduler
-
 	// Observer is used to signal state changes. The state is used for reporting
 	// the state/healthiness to users using management/monitoring APIs.
-	Status StatusObserver
+	Status RunnerObserver
 
 	// Pipeline allows inputs to connect to the active publisher pipeline. Each
 	// go-routine creating and publishing events should have it's own connection.

@@ -20,9 +20,20 @@ package v2
 // StatusObserver is used to report a standardized set of state change events
 // of an input.
 type StatusObserver interface {
+	RunnerObserver
+
 	// Starting indicates that the input is about to be configured and started.
 	Starting()
 
+	// Stopped reports that the input has finished the shutdown and cleanup.
+	Stopped()
+
+	// Failed indicates that the input has been stopped due to a fatal error.
+	Failed(err error)
+}
+
+// RunnerObserver reports the current state of an active input instance.
+type RunnerObserver interface {
 	// Initialized reports that required resources are initialized, but the
 	// Input is not collecting events yet.
 	Initialized()
@@ -36,10 +47,4 @@ type StatusObserver interface {
 
 	// Stopping reports that the input is about to stop and clean up resources.
 	Stopping()
-
-	// Stopped reports that the input has finished the shutdown and cleanup.
-	Stopped()
-
-	// Failed indicates that the input has been stopped due to a fatal error.
-	Failed(err error)
 }

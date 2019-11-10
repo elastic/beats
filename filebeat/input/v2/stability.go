@@ -17,27 +17,12 @@
 
 package v2
 
-type Constraint interface {
-	Check(ConstraintContext, Plugin) error
-}
+// Stability defines the stability of the feature, this value can be used to filter a bundler.
+type Stability uint32
 
-type ConstraintContext struct {
-	LicenseChecker licenseChecker
-}
-
-type licenseChecker interface {
-	CheckLicense(LicenseType) error
-}
-
-type contraintFunc func(ConstraintContext, Plugin) error
-
-func (fn contraintFunc) Check(ctx ConstraintContext, plugin Plugin) error {
-	return fn(ctx, plugin)
-}
-
-// WithLicense constraint that sets the minimal required license
-func WithLicense(license LicenseType) Constraint {
-	return contraintFunc(func(ctx ConstraintContext, plugin Plugin) error {
-		return ctx.LicenseChecker.CheckLicense(license)
-	})
-}
+// List all the available stability for a feature.
+const (
+	Experimental Stability = iota
+	Beta
+	Stable
+)
