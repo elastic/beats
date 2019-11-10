@@ -37,6 +37,6 @@ heartbeat.autodiscover:
     hints.enabled: true
 ----------------------------------------------------------------------
 
-Then, start {{beatname_uc}}. This should discover the container you built and ping it once with ICMP, another time with TCP.
+Then, start {beatname_uc}. This should discover the container you built and ping it once with ICMP, another time with TCP.
 
 For a full list of variables available see the provider specific docs in <<configuration-autodiscover>>.
