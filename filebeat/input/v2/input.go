@@ -119,8 +119,8 @@ func (r *simpleRunner) run() {
 
 func reportDone(err *error, reporter StatusObserver) {
 	if *err == nil {
-		ctx.Status.Stopped()
+		reporter.Stopped()
 	} else {
-		ctx.Status.Failed(*err)
+		reporter.Failed(*err)
 	}
 }

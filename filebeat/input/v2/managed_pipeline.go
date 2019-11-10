@@ -31,12 +31,12 @@ import (
 // when the input is closed, potentially unblocking inputs waiting on events to
 // be published.
 type managedPipeline struct {
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 
 	closer *chorus.Closer
 
 	mu      sync.Mutex
-	clients []managedClient
+	clients []*managedClient
 }
 
 type managedClient struct {

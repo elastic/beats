@@ -25,8 +25,7 @@ import (
 )
 
 type Loader struct {
-	licenser licenseChecker
-	plugins  map[string]Plugin
+	plugins map[string]Plugin
 
 	DefaultType string
 }
@@ -36,7 +35,6 @@ type inputTypeConfig struct {
 }
 
 func NewLoader(
-	licenseChecker licenseChecker,
 	plugins ...Plugin,
 ) (*Loader, error) {
 	m := make(map[string]Plugin, len(plugins))
@@ -61,15 +59,6 @@ func (l *Loader) Configure(log *logp.Logger, config *common.Config) (Input, erro
 	plugin, exists := l.plugins[typeConfig.Type]
 	if !exists {
 		return nil, fmt.Errorf("unknown input type %v", typeConfig.Type)
-	}
-
-	if l.licenser != nil && plugin.Constraints != nil {
-		err := plugin.Constraints.Check(ConstraintContext{
-			LicenseChecker: l.licenser,
-		})
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return plugin.Configure(log, config)

@@ -131,20 +131,20 @@ func (inst *kafkaInput) Run(context input.Context) error {
 	// If the consumer fails to connect, we use exponential backoff with
 	// jitter up to 8 * the initial backoff interval.
 	backoff := backoff.NewEqualJitterBackoff(
-		inst.context.Done,
+		context.Done,
 		inst.config.ConnectBackoff,
 		8*inst.config.ConnectBackoff)
 
-	inst.context.Status.Initialized()
+	context.Status.Initialized()
 
-	for context.Closer.Err() == nil { // restart input after error (given there is no shutdown signal)
+	for !input.IsDone(context.Closer.Err()) { // restart input after error (given there is no shutdown signal)
 		group, err := sarama.NewConsumerGroup(inst.config.Hosts, inst.config.GroupID, inst.saramaConfig)
 		if err != nil {
-			if err == chorus.ErrClosed {
+			if input.IsDone(err) {
 				break
 			}
 
-			inst.context.Status.Failing(err)
+			context.Status.Failing(err)
 			log.Errorw(
 				"Error initializing kafka consumer group", "error", err)
 			backoff.Wait()
@@ -159,13 +159,13 @@ func (inst *kafkaInput) Run(context input.Context) error {
 		// In an ideal run, this function never returns until shutdown; if it
 		// does, it means the errors have been logged and the consumer group
 		// has been closed, so we try creating a new one in the next iteration.
-		inst.context.Status.Active()
+		context.Status.Active()
 		err := inst.runConsumerGroup(context, out, consumerGroup)
-		if err != nil && err != chorus.ErrClosed {
-			inst.context.Status.Failing(err)
+		if err != nil && !input.IsDone(err) {
+			context.Status.Failing(err)
 		}
 	}
-	inst.context.Status.Stopping()
+	context.Status.Stopping()
 
 	return nil
 }

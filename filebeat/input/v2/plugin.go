@@ -106,7 +106,7 @@ type Context struct {
 
 	// Observer is used to signal state changes. The state is used for reporting
 	// the state/healthiness to users using management/monitoring APIs.
-	Status RunnerObserver
+	Status StatusObserver
 
 	// Pipeline allows inputs to connect to the active publisher pipeline. Each
 	// go-routine creating and publishing events should have it's own connection.
