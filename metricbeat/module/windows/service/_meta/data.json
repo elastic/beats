@@ -13,7 +13,7 @@
     },
     "windows": {
         "service": {
-            "display_name": "Servicio de enrutador de AllJoyn",
+            "display_name": "Routing Service AllJoyn",
             "exit_code": "ERROR_SERVICE_NEVER_STARTED",
             "id": "IOQgaoSLJ7",
             "name": "AJRouter",
