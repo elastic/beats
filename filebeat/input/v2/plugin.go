@@ -33,8 +33,6 @@ type Plugin struct {
 
 	Deprecated bool
 
-	Constraints []Constraint
-
 	Doc string
 
 	// TODO: config schema info for config validation
