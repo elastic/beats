@@ -103,11 +103,11 @@ services:
       - 9200
 
   envoyproxy:
-    image: docker.elastic.co/observability-ci/beats-integration-envoyproxy:${ENVOYPROXY_VERSION:-v1.7.0}-1
+    image: docker.elastic.co/observability-ci/beats-integration-envoyproxy:${ENVOYPROXY_VERSION:-v1.12.0}-1
     build:
       context: ./module/envoyproxy/_meta
       args:
-        ENVOYPROXY_VERSION: ${ENVOYPROXY_VERSION:-v1.7.0}
+        ENVOYPROXY_VERSION: ${ENVOYPROXY_VERSION:-v1.12.0}
     ports:
       - 9901
 

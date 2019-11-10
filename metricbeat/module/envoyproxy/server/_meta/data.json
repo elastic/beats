@@ -1,9 +1,5 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "envoyproxy": {
         "server": {
             "cluster_manager": {
@@ -11,14 +7,19 @@
                 "cluster_added": 1,
                 "cluster_modified": 0,
                 "cluster_removed": 0,
+                "cluster_updated": 0,
+                "cluster_updated_via_merge": 0,
+                "update_merge_cancelled": 0,
+                "update_out_of_merge_window": 0,
                 "warming_clusters": 0
             },
             "filesystem": {
-                "flushed_by_timer": 15,
+                "flushed_by_timer": 1377,
                 "reopen_failed": 0,
-                "write_buffered": 151,
-                "write_completed": 31,
-                "write_total_buffered": 518
+                "write_buffered": 2624,
+                "write_completed": 1378,
+                "write_failed": 0,
+                "write_total_buffered": 387
             },
             "http2": {},
             "listener_manager": {
@@ -27,34 +28,41 @@
                 "listener_create_success": 12,
                 "listener_modified": 0,
                 "listener_removed": 0,
+                "listener_stopped": 0,
                 "total_listeners_active": 1,
                 "total_listeners_draining": 0,
                 "total_listeners_warming": 0
             },
             "runtime": {
                 "admin_overrides_active": 0,
+                "deprecated_feature_use": 0,
                 "load_error": 0,
-                "load_success": 0,
+                "load_success": 1,
                 "num_keys": 0,
+                "num_layers": 2,
                 "override_dir_exists": 0,
-                "override_dir_not_exists": 0
+                "override_dir_not_exists": 1
             },
             "server": {
+                "concurrency": 12,
                 "days_until_first_cert_expiring": 2147483647,
+                "debug_assertion_failures": 0,
+                "dynamic_unknown_fields": 0,
                 "hot_restart_epoch": 0,
                 "live": 1,
-                "memory_allocated": 3302416,
-                "memory_heap_size": 4194304,
+                "memory_allocated": 4103680,
+                "memory_heap_size": 5242880,
                 "parent_connections": 0,
+                "state": 0,
+                "static_unknown_fields": 0,
+                "stats_recent_lookups": 0,
                 "total_connections": 0,
-                "uptime": 150,
-                "version": 4151803,
-                "watchdog_mega_miss": 0,
-                "watchdog_miss": 0
+                "uptime": 17035,
+                "version": 11219146,
+                "watchdog_mega_miss": 1,
+                "watchdog_miss": 1
             },
-            "stats": {
-                "overflow": 0
-            }
+            "stats": {}
         }
     },
     "event": {
@@ -63,10 +71,11 @@
         "module": "envoyproxy"
     },
     "metricset": {
-        "name": "server"
+        "name": "server",
+        "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:9901",
+        "address": "172.18.0.2:9901",
         "type": "envoyproxy"
     }
 }
