@@ -26,7 +26,7 @@ LABEL co.elastic.monitor/1.type=tcp co.elastic.monitor/1.hosts='${data.host}:637
 LABEL co.elastic.monitor/2.type=icmp co.elastic.monitor/2.hosts='${data.host}' co.elastic.monitor/2.schedule='@every 10s'
 ```
 
-Then, add the following to `heartbeat.yml:
+Then, add the following to `heartbeat.yml`:
 
 ```yaml
 heartbeat.autodiscover:
