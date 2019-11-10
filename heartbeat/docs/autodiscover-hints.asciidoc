@@ -9,7 +9,8 @@ you'd like to set that option to.
 
 As an example let's convert the regular syntax heartbeat monitors below into autodiscover hints.
 
-```yaml
+[source,yml]
+----------------------------------------------------------------------
 -- heartbeat.monitors:
 - type: tcp
   hosts: '${data.host}:6379'
@@ -17,23 +18,24 @@ As an example let's convert the regular syntax heartbeat monitors below into aut
 - type: icmp
   hosts: '${data.host}'
   schedule: @every 10s
-```
+----------------------------------------------------------------------
 
 To configure this with autodiscover add the following line to your Dockerfile to add the requisite labels.
 
-```
+----------------------------------------------------------------------
 LABEL co.elastic.monitor/1.type=tcp co.elastic.monitor/1.hosts='${data.host}:6379' co.elastic.monitor/1.schedule='@every 10s'
 LABEL co.elastic.monitor/2.type=icmp co.elastic.monitor/2.hosts='${data.host}' co.elastic.monitor/2.schedule='@every 10s'
-```
+----------------------------------------------------------------------
 
 Then, add the following to `heartbeat.yml:
 
-```yaml
+[source,yml]
+----------------------------------------------------------------------
 heartbeat.autodiscover:
   providers:
   - type: docker
     hints.enabled: true
-```
+----------------------------------------------------------------------
 
 Then, start {{beatname_uc}}. This should discover the container you built and ping it once with ICMP, another time with TCP.
 
