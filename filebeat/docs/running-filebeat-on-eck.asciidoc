@@ -1,8 +1,8 @@
-[[running-on-kubernetes]]
+[[running-filebeat-on-eck]]
 === Running Filebeat on Elastic Cloud on Kubernetes (ECK)
 
 We already know how to run Filebeat on Kubernetes. However, since Elasticsearch and Kibana can also run on Kubernetes
-by leveraging the ECK (Elastic Cloud on Kubernetes), a user would like to deploy Metrcibeat along with ECK managed clucters.
+by leveraging the ECK (Elastic Cloud on Kubernetes), a user would like to deploy Filebeat along with ECK managed clucters.
 ECK is based on the Kubernetes Operator pattern and it is built for managing Elasticsearch and Kibana on Kubernetes.
 
 In this section we cover the process of:
@@ -10,9 +10,6 @@ In this section we cover the process of:
 1. Deploying ECK
 2. Deploying a monitoring ES+Kibana cluster
 3. Deploying Filebeat reporting k8s metrics to the monitoring cluster
-
-
-endif::[]
 
 
 [float]
@@ -87,15 +84,6 @@ You’ll be taken to the homepage of Kibana. Our cluster is totally ready!
 
 
 [float]
-==== Deploy kube-state-metrics
-["source", "sh", subs="attributes"]
-------------------------------------------------
-git clone https://github.com/kubernetes/kube-state-metrics.git kube-state-metrics
-kubectl create -f kube-state-metrics/kubernetes
-------------------------------------------------
-
-
-[float]
 ==== Deploy Filebeat
 Filebeat in order to connect to Elasticsearch will use `elasticsearch-monitoring-es-elastic-user` and `elasticsearch-monitoring-es-http-certs-public`
 secrets that are already created by the Operator.
@@ -103,13 +91,10 @@ secrets that are already created by the Operator.
 
 The following command will deploy Filebeat:
 
-[float]
-==== Deploy kube-state-metrics
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
 kubectl apply -f https://raw.githubusercontent.com/elastic/cloud-on-k8s/master/config/recipes/beats/2_filebeat-kubernetes.yaml
 ------------------------------------------------
-
 
 
 [float]

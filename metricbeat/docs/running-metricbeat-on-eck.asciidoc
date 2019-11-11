@@ -12,9 +12,6 @@ In this section we cover the process of:
 3. Deploying Metricbeat reporting k8s metrics to the monitoring cluster
 
 
-endif::[]
-
-
 [float]
 ==== Preparing Minikube
 If you are going to use Minikube, configure it with the resources needed and start it up:
@@ -88,6 +85,12 @@ You’ll be taken to the homepage of Kibana. Our cluster is totally ready!
 
 [float]
 ==== Deploy kube-state-metrics
+
+Metricbeat gets some metrics from https://github.com/kubernetes/kube-state-metrics#usage[kube-state-metrics].
+If `kube-state-metrics` is not already running, deploy it now (see the
+https://github.com/kubernetes/kube-state-metrics#kubernetes-deployment[Kubernetes
+deployment] docs).
+
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
 git clone https://github.com/kubernetes/kube-state-metrics.git kube-state-metrics
@@ -103,8 +106,6 @@ secrets that are already created by the Operator.
 
 The following command will deploy Metricbeat:
 
-[float]
-==== Deploy kube-state-metrics
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
 kubectl apply -f https://raw.githubusercontent.com/elastic/cloud-on-k8s/master/config/recipes/beats/3_metricbeat-kubernetes.yaml
