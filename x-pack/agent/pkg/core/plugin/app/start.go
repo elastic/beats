@@ -75,6 +75,10 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 	}
 
 	spec.Args = a.monitor.EnrichArgs(spec.Args)
+
+	// specify beat name to avoid data lock conflicts
+	spec.Args = injectBeatName(spec.Args, a.id)
+
 	a.state.ProcessInfo, err = process.Start(
 		a.logger,
 		spec.BinaryPath,
@@ -97,6 +101,10 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 	a.watch(a.state.ProcessInfo.Process, cfg)
 
 	return nil
+}
+
+func injectBeatName(args []string, id string) []string {
+	return append(args, "-E", "name="+id)
 }
 
 func generateCA(configurable string) (*authority.CertificateAuthority, error) {
