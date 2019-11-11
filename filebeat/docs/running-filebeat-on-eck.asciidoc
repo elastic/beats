@@ -73,7 +73,7 @@ Here is the correct secret and path for our case:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-kubectl port-forward -n beats service/monitor-kb-http 5601
+echo `kubectl get secret monitor-es-elastic-user -o=jsonpath='{.data.elastic}' -n beats | base64 --decode`
 ------------------------------------------------
 
 The password for the elastic user is displayed. Copy and save it into a notepad.
