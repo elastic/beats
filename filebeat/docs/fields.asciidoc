@@ -1794,6 +1794,16 @@ type: keyword
 
 --
 
+*`azure.activitylogs.category`*::
++
+--
+Category
+
+
+type: keyword
+
+--
+
 [float]
 === properties
 

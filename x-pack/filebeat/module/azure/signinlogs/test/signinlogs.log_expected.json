@@ -43,9 +43,6 @@
                 "identity":"Test LTest",
                 "properties":{
                     "risk_level_aggregated":"none",
-                    "authentication_requirement_policies":[
-
-                    ],
                     "client_app_used":"Browser",
                     "applied_conditional_access_policies":[
                         {
@@ -93,8 +90,6 @@
                     "token_issuer_type":"AzureAD",
                     "original_request_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
                     "conditional_access_status":"notApplied",
-                    "authentication_details":[
-                    ],
                     "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
                     "app_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
                     "network_location_details":[
@@ -106,9 +101,6 @@
                     "is_interactive":"false",
                     "service_principal_id":"",
                     "app_display_name":"Office 365",
-                    "authentication_processing_details":[
-
-                    ],
                     "ip_address":"81.171.241.231",
                     "device_detail":{
                         "device_id":"",

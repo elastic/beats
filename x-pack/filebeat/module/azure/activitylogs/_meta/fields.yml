@@ -90,6 +90,10 @@
       type: keyword
       description: >
         Result signature
+    - name: category
+      type: keyword
+      description: >
+        Category
     - name: properties
       type: group
       description: >
