@@ -105,8 +105,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		watcher:   watcher,
 	}
 
-	// TODO
-	// add an event handler to deal with the "events" receveid from the API
 	watcher.AddEventHandler(nomad.ResourceEventHandlerFuncs{
 		AddFunc: func(obj nomad.Resource) {
 			logp.Debug("nomad", "Watcher Allocation add: %+v", obj.ID)
@@ -167,6 +165,7 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	tasks, ok := rawMeta["tasks"].([]common.MapStr)
 	if !ok {
 		logp.Err("Error getting the allocation's metadata: %+v", rawMeta)
+		return
 	}
 	rawMeta.Delete("tasks")
 

@@ -67,9 +67,10 @@ func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 	return cfg
 }
 
-// ResourceMetadata generates metadata for the *given Nomad allocation*
+// ResourceMetadata generates metadata for the given Nomad allocation*
 func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	tasksMeta := g.groupMeta(obj.Job)
+
 	for idx, task := range tasksMeta {
 		labelMap := common.MapStr{}
 
@@ -109,7 +110,8 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	return meta
 }
 
-// returns a tuple of maps (group/task name to metadata)
+// Returns an array of per-task metadata aggregating the group metadata into the
+// task metadata
 func (g *metaGenerator) groupMeta(job *Job) []common.MapStr {
 	tasksMeta := []common.MapStr{}
 
@@ -125,10 +127,10 @@ func (g *metaGenerator) groupMeta(job *Job) []common.MapStr {
 	return tasksMeta
 }
 
-// returns a map of task name to metadata
+// Returns per-task metadata
 func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
-	taskMap := common.MapStr{}
 	tasks := []common.MapStr{}
+
 	for _, task := range group.Tasks {
 		svcMeta := common.MapStr{
 			"name":        []string{},
@@ -139,7 +141,8 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 		for _, service := range task.Services {
 			svcMeta["name"] = append(svcMeta["name"].([]string), service.Name)
 			svcMeta["tags"] = append(svcMeta["name"].([]string), service.Tags...)
-			svcMeta["canary_tags"] = append(svcMeta["name"].([]string), service.CanaryTags...)
+			svcMeta["canary_tags"] = append(svcMeta["name"].([]string),
+				service.CanaryTags...)
 		}
 
 		joinMeta := group.Meta
@@ -157,7 +160,6 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 		tasks = append(tasks, meta)
 	}
 
-	taskMap.Put("tasks", tasks)
 	return tasks
 }
 

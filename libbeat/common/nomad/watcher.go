@@ -70,6 +70,7 @@ func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 		options:   options,
 		logger:    logp.NewLogger("nomad"),
 		waitIndex: 0,
+		lastFetch: time.Now(),
 	}
 
 	return w, nil
@@ -137,6 +138,13 @@ func (w *watcher) sync() error {
 	localWaitIndex := queryOpts.WaitIndex
 
 	// Only emit updated metadata if the WaitIndex have changed
+	if (remoteWaitIndex <= localWaitIndex) && localWaitIndex != 0 {
+		w.logger.Debugf("Allocations index is unchanged remoteWaitIndex=%v localWaitIndex=%v",
+			fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
+		return nil
+	}
+
+	// Only emit updated metadata if the WaitIndex have changed
 	// if remoteWaitIndex == localWaitIndex {
 	// 	w.logger.Debugf("Allocations index is unchanged (%d == %d)",
 	// 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
@@ -167,16 +175,20 @@ func (w *watcher) sync() error {
 
 		// allocation was updated after our last fetch
 		// TODO verify if this is needed while relying on the WaitIndex
-		if alloc.ModifyTime > w.lastFetch.Unix() {
+		if alloc.ModifyTime > w.lastFetch.UnixNano() {
 			w.handler.OnUpdate(*alloc)
 		}
 	}
 
-	w.logger.Debug("Allocations index has changed: %s %s",
+	w.logger.Debug("Allocations index has changed: %d %d",
 		fmt.Sprint(remoteWaitIndex), fmt.Sprint(localWaitIndex))
 
 	w.waitIndex = meta.LastIndex
 	w.lastFetch = time.Now()
+
+	if w.waitIndex == 0 {
+		w.waitIndex = 1
+	}
 
 	return nil
 }
