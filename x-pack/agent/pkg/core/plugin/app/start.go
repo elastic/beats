@@ -77,7 +77,9 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 	spec.Args = a.monitor.EnrichArgs(spec.Args)
 
 	// specify beat name to avoid data lock conflicts
-	spec.Args = injectBeatName(spec.Args, a.id)
+	// as for https://github.com/elastic/beats/pull/14030 more than one instance
+	// of the beat with same data path fails to start
+	spec.Args = injectDataPath(spec.Args, a.pipelineID, a.id)
 
 	a.state.ProcessInfo, err = process.Start(
 		a.logger,
@@ -103,8 +105,14 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 	return nil
 }
 
-func injectBeatName(args []string, id string) []string {
-	return append(args, "-E", "beat.name="+id)
+func injectDataPath(args []string, pipelineID, id string) []string {
+	wd := ""
+	if w, err := os.Getwd(); err == nil {
+		wd = w
+	}
+
+	dataPath := filepath.Join(wd, "data", pipelineID, id)
+	return append(args, "-E", "path.data="+dataPath)
 }
 
 func generateCA(configurable string) (*authority.CertificateAuthority, error) {

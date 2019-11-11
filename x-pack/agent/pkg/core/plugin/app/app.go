@@ -39,6 +39,7 @@ type ReportFailureFunc func(string, error)
 type Application struct {
 	id              string
 	name            string
+	pipelineID      string
 	spec            Specifier
 	state           state.State
 	grpcClient      remoteconfig.Client
@@ -65,7 +66,7 @@ type ArgsDecorator func([]string) []string
 
 // NewApplication creates a new instance of an applications. It will not automatically start
 // the application.
-func NewApplication(id, appName string,
+func NewApplication(id, appName, pipelineID string,
 	spec Specifier,
 	factory remoteconfig.ConnectionCreator,
 	cfg *config.Config,
@@ -87,6 +88,7 @@ func NewApplication(id, appName string,
 	return &Application{
 		id:              id,
 		name:            appName,
+		pipelineID:      pipelineID,
 		spec:            spec,
 		clientFactory:   factory,
 		processConfig:   cfg.ProcessConfig,
