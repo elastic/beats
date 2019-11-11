@@ -104,7 +104,7 @@ func (a *Application) Start(cfg map[string]interface{}) (err error) {
 }
 
 func injectBeatName(args []string, id string) []string {
-	return append(args, "-E", "name="+id)
+	return append(args, "-E", "beat.name="+id)
 }
 
 func generateCA(configurable string) (*authority.CertificateAuthority, error) {
