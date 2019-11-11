@@ -724,6 +724,12 @@
 			"revisionTime": "2019-07-23T11:24:16Z"
 		},
 		{
+			"checksumSHA1": "Fo6XV4q33h7fXJuYrvOyDB6kw8I=",
+			"path": "github.com/cespare/xxhash",
+			"revision": "2372543dd2bbab7a55ce14c54eb357abe23a42f5",
+			"revisionTime": "2019-10-31T20:04:18Z"
+		},
+		{
 			"checksumSHA1": "Mu77HNTb0SVN0IEBB+hSDeZzO+g=",
 			"path": "github.com/cloudflare/cfssl/api",
 			"revision": "b1ec8c586c2aa3ec3eaf4a622933f169cfa5648b",
