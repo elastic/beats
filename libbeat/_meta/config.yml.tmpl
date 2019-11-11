@@ -96,7 +96,9 @@ output.elasticsearch:
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
+{{- if .UseDockerMetadataProcessor }}
   - add_docker_metadata: ~
+{{ end }}
 
 {{- if .UseKubernetesMetadataProcessor }}
   - add_kubernetes_metadata: ~
