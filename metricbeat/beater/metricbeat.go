@@ -20,9 +20,9 @@ package beater
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/management"
+	"github.com/elastic/beats/libbeat/paths"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"

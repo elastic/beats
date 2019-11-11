@@ -32,14 +32,6 @@ var Name = "metricbeat"
 var RootCmd *cmd.BeatsRootCmd
 
 var (
-	rootCreator = beater.Creator(
-		beater.WithLightModules(),
-		beater.WithModuleOptions(
-			module.WithMetricSetInfo(),
-			module.WithServiceName(),
-		),
-	)
-
 	// Use a customized instance of Metricbeat where startup delay has
 	// been disabled to workaround the fact that Modules() will return
 	// the static modules (not the dynamic ones) with a start delay.
@@ -55,7 +47,7 @@ var (
 func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	RootCmd = cmd.GenRootCmdWithSettings(rootCreator, instance.Settings{RunFlags: runFlags, Name: Name})
+	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", testModulesCreator))
 	xpackcmd.AddXPack(RootCmd, Name)
