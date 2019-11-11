@@ -12,13 +12,19 @@ rules:
         path: type
         re: ^metric/(?P<type>.+)
         with: $type
+    - rename:
+        from: type
+        to: module
 - copy:
     from: inputs
     to: metricbeat
+- rename:
+    from: metricbeat.inputs
+    to: modules
 - filter:
     selectors:
     - metricbeat
     - output
     - keystore
-when: HasItems(%{[metricbeat.inputs]}) && HasNamespace('output', 'elasticsearch',
+when: HasItems(%{[metricbeat.modules]}) && HasNamespace('output', 'elasticsearch',
   'redis', 'kafka', 'logstash')
