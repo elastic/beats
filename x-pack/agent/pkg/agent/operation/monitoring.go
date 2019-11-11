@@ -14,7 +14,9 @@ import (
 )
 
 const (
-	monitoringName = "FLEET_MONITORING"
+	monitoringName          = "FLEET_MONITORING"
+	monitoringKey           = "monitoring"
+	monitoringEnabledSubkey = "enabled"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) error {
@@ -87,7 +89,7 @@ func monitoringTags() map[app.Tag]string {
 }
 
 func isMonitoringEnabled(logger *logger.Logger, cfg map[string]interface{}) bool {
-	monitoringVal, found := cfg["monitoring"]
+	monitoringVal, found := cfg[monitoringKey]
 	if !found {
 		logger.Error("operator.isMonitoringEnabled: monitoring not found in config")
 		return false
@@ -99,7 +101,7 @@ func isMonitoringEnabled(logger *logger.Logger, cfg map[string]interface{}) bool
 		return false
 	}
 
-	enabledVal, found := monitoringMap["enabled"]
+	enabledVal, found := monitoringMap[monitoringEnabledSubkey]
 	if !found {
 		logger.Infof("operator.isMonitoringEnabled: monitoring.enabled key not found: %v", monitoringMap)
 		return false
@@ -118,7 +120,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		return nil
 	}
 
-	outputIface, found := config["monitoring"]
+	outputIface, found := config[monitoringKey]
 	if !found {
 		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar: %v", config)
 		return nil

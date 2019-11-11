@@ -27,9 +27,9 @@ func injectMonitoring(rootAst *transpiler.AST, programsToRun []program.Program) 
 
 	var config map[string]interface{}
 
-	if _, found := transpiler.Lookup(rootAst, "monitoring"); !found {
+	if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
 		config = make(map[string]interface{})
-		config["monitoring.enabled"] = false
+		config[enabledKey] = false
 	} else {
 		ast := rootAst.Clone()
 		if err := getMonitoringRule().Apply(ast); err != nil {
@@ -60,6 +60,6 @@ func injectMonitoring(rootAst *transpiler.AST, programsToRun []program.Program) 
 
 func getMonitoringRule() *transpiler.RuleList {
 	return transpiler.NewRuleList(
-		transpiler.Filter("monitoring", "programs"),
+		transpiler.Filter(monitoringKey, programsKey),
 	)
 }
