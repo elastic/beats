@@ -78,16 +78,26 @@ processors:
 
         String convertHexToString(String hex) {
             StringBuilder sb = new StringBuilder();
+            boolean needed_encoding = false;
 
             for (int i=0; i < hex.length() - 1; i+=2) {
-                String output = hex.substring(i, (i + 2));
-                int decimal = Integer.parseInt(output, 16);
-                sb.append((char)decimal);
+                int cp = Integer.parseInt(hex.substring(i, (i +2)), 16);
+                if (cp < 33 || cp == 34 || cp == 127) {
+                    needed_encoding = true;
+                }
+                if (cp < 32 || cp == 127) {
+                    sb.append('^');
+                    cp ^= 64;
+                }
+                sb.append((char)cp);
             }
-            return sb.toString();
+            if (needed_encoding) {
+                return sb.toString();
+            }
+            return hex;
         }
 
-        def possibleHexKeys = ["exe", "cmd"];
+        def possibleHexKeys = ["exe", "cmd", "data", "path", "comm", "file", "name", "watch", "cwd", "acct", "dir", "vm", "old-chardev", "new-chardev", "old-disk", "new-disk", "old-fs", "new-fs", "old-net", "new-net", "device", "cgroup", "apparmor", "operation", "denied_mask", "info", "profile", "requested_mask", "old-rng", "new-rng", "ocomm", "grp", "new_group", "invalid_context", "sw", "root_dir", "proctitle"];
         def audit = ctx.auditd.get("log");
         Iterator entries = audit.entrySet().iterator();
 
