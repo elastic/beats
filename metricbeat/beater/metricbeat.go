@@ -107,6 +107,30 @@ func DefaultCreator() beat.Creator {
 	)
 }
 
+// DefaultTestModulesCreator returns a customized instance of Metricbeat
+// where startup delay has been disabled to workaround the fact that
+// Modules() will return the static modules (not the dynamic ones)
+// with a start delay.
+//
+// This is equivalent to calling
+//
+//  beater.Creator(
+//		beater.WithLightModules(),
+//		beater.WithModuleOptions(
+//			module.WithMetricSetInfo(),
+//			module.WithMaxStartDelay(0),
+//		),
+//	)
+func DefaultTestModulesCreator() beat.Creator {
+	return Creator(
+		WithLightModules(),
+		WithModuleOptions(
+			module.WithMetricSetInfo(),
+			module.WithMaxStartDelay(0),
+		),
+	)
+}
+
 // newMetricbeat creates and returns a new Metricbeat instance.
 func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbeat, error) {
 	config := defaultConfig
