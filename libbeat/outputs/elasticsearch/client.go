@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -68,6 +69,7 @@ type ClientSettings struct {
 	ProxyDisable       bool
 	TLS                *transport.TLSConfig
 	Username, Password string
+	APIKey             string
 	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
@@ -86,6 +88,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
+	APIKey   string
 	Headers  map[string]string
 
 	http              *http.Client
@@ -205,6 +208,7 @@ func NewClient(
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
+			APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
 			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
@@ -277,6 +281,7 @@ func (client *Client) Clone() *Client {
 			TLS:              client.tlsConfig,
 			Username:         client.Username,
 			Password:         client.Password,
+			APIKey:           client.APIKey,
 			Parameters:       nil, // XXX: do not pass params?
 			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
@@ -799,8 +804,13 @@ func (conn *Connection) execRequest(
 
 func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
+
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+
+	if conn.APIKey != "" {
+		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
 	}
 
 	for name, value := range conn.Headers {
