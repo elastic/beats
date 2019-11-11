@@ -100,7 +100,7 @@ kubectl apply -f https://raw.githubusercontent.com/elastic/cloud-on-k8s/master/c
 [float]
 ====  Explore your Logs
 Now that everything is set up, navigate to Infrastructure panel of Kibana and see the overview of your Kubernetes cluster.
-In addition, one can explore your logs in real time in Logs panel.
+In addition, one can explore their logs in real time in Logs panel.
 
 
 [float]
