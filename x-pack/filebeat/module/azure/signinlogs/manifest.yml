@@ -4,11 +4,11 @@ var:
   - name: input
     default: kafka
   - name: eventhub
-    default: "insights-logs-auditlogs"
+    default: "insights-logs-signinlogs"
   - name: consumer_group
     default: "$Default"
 
 ingest_pipeline:
-- ingest/pipeline.json
-- ../azure-shared-pipeline.json
-input: config/signinlogs.yml
+  - ingest/pipeline.json
+  - ../azure-shared-pipeline.json
+input: config/{{.input}}.yml

@@ -1660,6 +1660,16 @@ type: keyword
 
 --
 
+*`azure.activitylogs.identity.claims.*`*::
++
+--
+Claims
+
+
+type: object
+
+--
+
 [float]
 === authorization
 

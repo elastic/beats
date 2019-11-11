@@ -1,93 +1,138 @@
 [
     {
-        "@timestamp": "2019-10-18T09:45:48.072Z",
-        "azure.resource.id": "/tenants/8a4de8b5-095c-47d0-a96f-a75130c61d53/providers/Microsoft.aadiam",
-        "azure.resource.provider": "Microsoft.aadiam",
-        "azure.correlation_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-        "azure.signinlogs.identity": "Test LTest",
-        "azure.signinlogs.operation_name": "Sign-in activity",
-        "azure.signinlogs.operation_version": "1.0",
-        "azure.signinlogs.properties.app_display_name": "Office 365",
-        "azure.signinlogs.properties.app_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-        "azure.signinlogs.properties.applied_conditional_access_policies": [
-            {
-                "conditionsNotSatisfied": 2,
-                "conditionsSatisfied": 1,
-                "displayName": "Require MFA for Azure (Can come from Okta)",
-                "enforcedGrantControls": [
-                    "Mfa"
-                ],
-                "enforcedSessionControls": [],
-                "id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-                "result": "notApplied"
+        "geo":{
+            "country_name":"Seine-Et-Marne",
+            "city_name":"Champs-Sur-Marne",
+            "location":{
+                "lon":2.12341234,
+                "lat":48.12341234
             },
-            {
-                "conditionsNotSatisfied": 0,
-                "conditionsSatisfied": 0,
-                "displayName": "Disable Persistent Browser Sessions",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-                "result": "notEnabled"
-            },
-            {
-                "conditionsNotSatisfied": 0,
-                "conditionsSatisfied": 0,
-                "displayName": "12-hour Session timeouts",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-                "result": "notEnabled"
-            }
-        ],
-        "azure.signinlogs.properties.authentication_details": [],
-        "azure.signinlogs.properties.authentication_processing_details": [],
-        "azure.signinlogs.properties.authentication_requirement_policies": [],
-        "azure.signinlogs.properties.client_app_used": "Browser",
-        "azure.signinlogs.properties.conditional_access_status": "notApplied",
-        "azure.signinlogs.properties.correlation_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-        "azure.signinlogs.properties.created_at": "2019-10-18T09:45:48.0729893+00:00",
-        "azure.signinlogs.properties.device_detail.browser": "Chrome 77.0.3865",
-        "azure.signinlogs.properties.device_detail.device_id": "",
-        "azure.signinlogs.properties.device_detail.operating_system": "MacOs",
-        "azure.signinlogs.properties.id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-        "azure.signinlogs.properties.ip_address": "81.171.241.231",
-        "azure.signinlogs.properties.is_interactive": false,
-        "azure.signinlogs.properties.network_location_details": [],
-        "azure.signinlogs.properties.original_request_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-        "azure.signinlogs.properties.processing_time_ms": 239,
-        "azure.signinlogs.properties.riskEventTypes": [],
-        "azure.signinlogs.properties.risk_detail": "none",
-        "azure.signinlogs.properties.risk_level_aggregated": "none",
-        "azure.signinlogs.properties.risk_level_during_signin": "none",
-        "azure.signinlogs.properties.risk_state": "none",
-        "azure.signinlogs.properties.service_principal_id": "",
-        "azure.signinlogs.properties.status.error_code": 50140,
-        "azure.signinlogs.properties.token_issuer_name": "",
-        "azure.signinlogs.properties.token_issuer_type": "AzureAD",
-        "azure.signinlogs.properties.user_display_name": "Test LTest",
-        "azure.signinlogs.properties.user_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-        "azure.signinlogs.properties.user_principal_name": "test@elastic.co",
-        "azure.signinlogs.result_description": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
-        "azure.signinlogs.result_signature": "None",
-        "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
-        "cloud.provider": "azure",
-        "event.category": "SignInLogs",
-        "event.dataset": "azure.signinlogs",
-        "event.duration": 0.0,
-        "event.module": "azure",
-        "event.outcome": "50140",
-        "fileset.name": "signinlogs",
-        "geo.city_name": "Champs-Sur-Marne",
-        "geo.country_iso_code": "FR",
-        "geo.country_name": "Seine-Et-Marne",
-        "geo.location.lat": 48.12341234,
-        "geo.location.lon": 2.12341234,
+            "country_iso_code":"FR"
+        },
+        "fileset" : {
+            "name" : "signinlogs"
+        },
+        "service" : {
+            "type" : "azure"
+        },
+        "cloud":{
+            "provider":"azure"
+        },
+        "@timestamp":"2019-10-18T09:45:48.072Z",
+        "log":{
+            "level":4
+        },
+        "source":{
+            "ip":"81.171.241.231"
+        },
+        "event":{
+            "duration":0.0,
+            "category":"SignInLogs",
+            "outcome":"50140"
+        },
         "input.type": "log",
-        "log.level": 4,
-        "log.offset": 0,
-        "service.type": "azure",
-        "source.ip": "81.171.241.231",
-        "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in."
+        "message":"This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
+        "azure":{
+            "tenant_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+            "correlation_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+            "signinlogs":{
+                "operation_name":"Sign-in activity",
+                "result_description":"This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
+                "operation_version":"1.0",
+                "result_signature":"None",
+                "identity":"Test LTest",
+                "properties":{
+                    "risk_level_aggregated":"none",
+                    "authentication_requirement_policies":[
+
+                    ],
+                    "client_app_used":"Browser",
+                    "applied_conditional_access_policies":[
+                        {
+                            "conditionsNotSatisfied":2,
+                            "result":"notApplied",
+                            "conditionsSatisfied":1,
+                            "enforcedSessionControls":[
+
+                            ],
+                            "enforcedGrantControls":[
+                                "Mfa"
+                            ],
+                            "displayName":"Require MFA for Azure (Can come from Okta)",
+                            "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53"
+                        },
+                        {
+                            "conditionsNotSatisfied":0,
+                            "result":"notEnabled",
+                            "conditionsSatisfied":0,
+                            "enforcedSessionControls":[
+
+                            ],
+                            "enforcedGrantControls":[
+
+                            ],
+                            "displayName":"Disable Persistent Browser Sessions",
+                            "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53"
+                        },
+                        {
+                            "conditionsNotSatisfied":0,
+                            "result":"notEnabled",
+                            "conditionsSatisfied":0,
+                            "enforcedSessionControls":[
+
+                            ],
+                            "enforcedGrantControls":[
+
+                            ],
+                            "displayName":"12-hour Session timeouts",
+                            "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53"
+                        }
+                    ],
+                    "created_at":"2019-10-18T09:45:48.0729893+00:00",
+                    "risk_level_during_signin":"none",
+                    "token_issuer_type":"AzureAD",
+                    "original_request_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                    "conditional_access_status":"notApplied",
+                    "authentication_details":[
+
+                    ],
+                    "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                    "app_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                    "network_location_details":[
+
+                    ],
+                    "riskEventTypes":[
+
+                    ],
+                    "is_interactive":"false",
+                    "service_principal_id":"",
+                    "app_display_name":"Office 365",
+                    "authentication_processing_details":[
+
+                    ],
+                    "ip_address":"81.171.241.231",
+                    "device_detail":{
+                        "device_id":"",
+                        "operating_system":"MacOs",
+                        "browser":"Chrome 77.0.3865"
+                    },
+                    "risk_detail":"none",
+                    "token_issuer_name":"",
+                    "risk_state":"none",
+                    "user_principal_name":"test@elastic.co",
+                    "processing_time_ms":239,
+                    "user_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                    "correlation_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
+                    "user_display_name":"Test LTest",
+                    "status":{
+                        "error_code":50140
+                    }
+                }
+            },
+            "resource":{
+                "provider":"Microsoft.aadiam",
+                "id":"/tenants/8a4de8b5-095c-47d0-a96f-a75130c61d53/providers/Microsoft.aadiam"
+            }
+        }
     }
-] 
+]
