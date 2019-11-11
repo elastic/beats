@@ -1,0 +1,29 @@
+[
+    {
+        "@timestamp": "2008-07-17T07:51:27.437Z",
+        "destination.address": "192.168.0.254",
+        "destination.ip": "192.168.0.254",
+        "destination.port": 3306,
+        "event.dataset": "zeek.mysql",
+        "event.id": "C5Hol527kLMUw36hj3",
+        "event.module": "zeek",
+        "fileset.name": "mysql",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:0HUQbshhYbATQXDHv/ysOs0DlZA=",
+        "network.protocol": "mysql",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.0.254",
+        "source.ip": "192.168.0.254",
+        "source.port": 56162,
+        "tags": [
+            "zeek.mysql"
+        ],
+        "zeek.mysql.arg": "select count(*) from foo",
+        "zeek.mysql.cmd": "query",
+        "zeek.mysql.rows": 1,
+        "zeek.mysql.success": true,
+        "zeek.session_id": "C5Hol527kLMUw36hj3"
+    }
+]

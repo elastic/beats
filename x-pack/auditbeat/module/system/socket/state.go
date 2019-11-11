@@ -611,11 +611,19 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 	if sockNoPID := sock.pid == 0; sockNoPID != (f.pid == 0) {
 		if sockNoPID {
 			sock.pid = f.pid
-			sock.process = f.process
 		} else {
 			f.pid = sock.pid
+		}
+	}
+	if sockNoProcess := sock.process == nil; sockNoProcess != (f.process == nil) {
+		if sockNoProcess {
+			sock.process = f.process
+		} else {
 			f.process = sock.process
 		}
+	} else if sock.process == nil && sock.pid != 0 {
+		sock.process = s.getProcess(sock.pid)
+		f.process = sock.process
 	}
 }
 
@@ -632,6 +640,7 @@ func (s *state) createFlow(ref flow) error {
 
 	ref.createdTime = ref.lastSeenTime
 	s.mutualEnrich(sock, &ref)
+
 	// don't create the flow yet if it doesn't have a populated remote address
 	if ref.remote.addr.IP == nil {
 		return nil
@@ -658,6 +667,8 @@ func (s *state) OnSockDestroyed(ptr uintptr, pid uint32) error {
 	// Enrich with pid
 	if sock.pid == 0 && pid != 0 {
 		sock.pid = pid
+	}
+	if sock.process == nil && sock.pid != 0 {
 		sock.process = s.getProcess(pid)
 	}
 	// Keep the sock around in case it's a connected TCP socket, as still some

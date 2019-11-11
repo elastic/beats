@@ -21,6 +21,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
 - Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
 - By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
+- Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
+- Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 
 *Auditbeat*
 
@@ -37,14 +39,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
-- Add support for gzipped files in S3 input {pull}13980[13980]
-- Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
 
 *Heartbeat*
 
 - Removed the `add_host_metadata` and `add_cloud_metadata` processors from the default config. These don't fit well with ECS for Heartbeat and were rarely used.
 - Fixed/altered redirect behavior. `max_redirects` now defaults to 0 (no redirects). Following redirects now works across hosts, but some timing fields will not be reported. {pull}14125[14125]
 - Removed `host.name` field that should never have been included. Heartbeat uses `observer.*` fields instead. {pull}14140[14140]
+- Changed default user-agent to be `Elastic Heartbeat/VERSION (PLATFORM_INFO)` as the current default `Go-http-client/1.1` is often blacklisted. {pull}14291[14291]
+- JSON/Regex checks against HTTP bodies will only consider the first 100MiB of the HTTP body to prevent excessive memory usage. {pull}14223[pull]
 
 *Journalbeat*
 
@@ -57,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new dashboard for Aerospike database stats {pull}13217[13217]
 - Add new dashboard for Couchbase cluster stats {pull}13212[13212]
 - Add new dashboard for Prometheus server stats {pull}13126[13126]
+- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
@@ -118,6 +121,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Kubernetes watcher at `add_kubernetes_metadata` fails with StatefulSets {pull}13905[13905]
 - Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over
   TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
+- Support usage of custom builders without hints and mappers {pull}13839[13839]
+- Fix kubernetes `metaGenerator.ResourceMetadata` when parent reference controller is nil {issue}14320[14320] {pull}14329[14329]
 
 *Auditbeat*
 
@@ -181,12 +186,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix calculation of `network.bytes` and `network.packets` for bi-directional netflow events. {pull}14111[14111]
 - Accept '-' as http.response.body.bytes in apache module. {pull}14137[14137]
 - Fix timezone parsing of MySQL module ingest pipelines. {pull}14130[14130]
+- Improve error message in s3 input when handleSQSMessage failed. {pull}14113[14113]
+- Fix race condition in S3 input plugin. {pull}14359[14359]
 
 *Heartbeat*
 
 - Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
 - Fix integer comparison on JSON responses. {pull}13348[13348]
+- Fix storage of HTTP bodies to work when JSON/Regex body checks are enabled. {pull}14223[14223]
 
 *Journalbeat*
 
@@ -234,6 +242,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change kubernetes.event.message to text. {pull}13964[13964]
 - Fix performance counter values for windows/perfmon metricset. {issue}14036[14036] {pull}14039[14039]
 - Add FailOnRequired when applying schema and fix metric names in mongodb metrics metricset. {pull}14143[14143]
+- Convert increments of 100 nanoseconds/ticks to milliseconds for WriteTime and ReadTime in diskio metricset (Windows) for consistency. {issue}14233[14233]
+- Limit some of the error messages to the logs only {issue}14317[14317] {pull}14327[14327]
+- Convert indexed ms-since-epoch timestamp fields in `elasticsearch/ml_job` metricset to ints from float64s. {issue}14220[14220] {pull}14222[14222]
+- Fix ARN parsing function to work for ELB ARNs. {pull}14316[14316]
+- Update azure configuration example. {issue}14224[14224]
+- Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
 
 *Packetbeat*
 
@@ -242,6 +256,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
 - Limit memory usage of Redis replication sessions. {issue}12657[12657]
 - Fix parsing the extended RCODE in the DNS parser. {pull}12805[12805]
+- Fix parsing of the HTTP host header when it contains a port or an IPv6 address. {pull}14215[14215]
 
 *Winlogbeat*
 
@@ -301,6 +316,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add condition to the config file template for add_kubernetes_metadata {pull}14056[14056]
 - Marking Central Management deprecated. {pull}14018[14018]
 - Add `keep_null` setting to allow Beats to publish null values in events. {issue}5522[5522] {pull}13928[13928]
+- Add shared_credential_file option in aws related config for specifying credential file directory. {issue}14157[14157] {pull}14178[14178]
+- GA the `script` processor. {pull}14325[14325]
+- Add `fingerprint` processor. {issue}11173[11173] {pull}14205[14205]
+- Add support for API keys in Elasticsearch outputs. {pull}14324[14324]
 
 *Auditbeat*
 
@@ -366,7 +385,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ELB fileset to AWS module. {pull}14020[14020]
 - Add module for MISP (Malware Information Sharing Platform). {pull}13805[13805]
 - Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
+- Add support for gzipped files in S3 input. {pull}13980[13980]
+- Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
 - Add Kibana Dashboard for MISP module. {pull}14147[14147]
+- Add JSON options to autodiscover hints {pull}14208[14208]
+- Add more filesets to Zeek module. {pull}14150[14150]
+- Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
+- Remove beta flag for some filebeat modules. {pull}14374[14374]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -444,6 +469,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ability to filter by tags for cloudwatch metricset. {pull}13758[13758] {issue}13145[13145]
 - Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 - Add Oracle overview dashboard {pull}14021[14021]
+- Release CoreDNS module as GA. {pull}14308[14308]
+- Release CouchDB module as GA. {pull}14300[14300]
+- Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
+- Add `connection.state` field for RabbitMQ module. {pull}13981[13981]
 
 *Packetbeat*
 
@@ -472,6 +501,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add certain winlog.event_data.* fields to the index template. {issue}13700[13700] {pull}13704[13704]
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
+- GA the Winlogbeat `sysmon` module. {pull}14326[14326]
 
 ==== Deprecated
 

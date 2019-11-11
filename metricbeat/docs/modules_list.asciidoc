@@ -39,14 +39,14 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>> beta[]  
 |<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
-|<<metricbeat-module-coredns,coredns>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>> beta[]  
+|<<metricbeat-module-coredns,coredns>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>>   
 |<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
 |<<metricbeat-metricset-couchbase-node,node>>   
-|<<metricbeat-module-couchdb,couchdb>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>> beta[]  
+|<<metricbeat-module-couchdb,couchdb>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>>   
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .9+| .9+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   
@@ -60,8 +60,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-dropwizard,Dropwizard>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>>   
 |<<metricbeat-module-elasticsearch,Elasticsearch>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.10+| .10+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
+.11+| .11+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
 |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>   
+|<<metricbeat-metricset-elasticsearch-enrich,enrich>>   
 |<<metricbeat-metricset-elasticsearch-index,index>>   
 |<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>   
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>>   
@@ -192,7 +193,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-traefik-health,health>>   
 |<<metricbeat-module-uwsgi,uwsgi>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>>   
-|<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-vsphere-datastore,datastore>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>> beta[]  

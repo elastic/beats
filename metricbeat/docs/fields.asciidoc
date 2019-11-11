@@ -11082,6 +11082,54 @@ type: long
 --
 
 [float]
+=== enrich
+
+Enrich stats
+
+
+
+*`elasticsearch.enrich.queue.size`*::
++
+--
+Number of search requests in the queue.
+
+
+type: long
+
+--
+
+
+*`elasticsearch.enrich.remote_requests.current`*::
++
+--
+Current number of outstanding remote requests.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.remote_requests.total`*::
++
+--
+Number of outstanding remote requests executed since node startup.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.executed_searches.total`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
+
+
+type: long
+
+--
+
+[float]
 === index
 
 index
@@ -26065,6 +26113,16 @@ Node name.
 type: alias
 
 alias to: rabbitmq.node.name
+
+--
+
+*`rabbitmq.connection.state`*::
++
+--
+Connection state.
+
+
+type: keyword
 
 --
 

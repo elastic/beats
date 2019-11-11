@@ -482,7 +482,8 @@ Under `check.request`, specify these options:
 
 *`method`*:: The HTTP method to use. Valid values are `"HEAD"`, `"GET"` and
 `"POST"`.
-*`headers`*:: A dictionary of additional HTTP headers to send.
+*`headers`*:: A dictionary of additional HTTP headers to send. By default heartbeat
+will set the 'User-Agent' header to identify itself.
 *`body`*:: Optional request body content.
 
 Example configuration:
@@ -511,7 +512,8 @@ Under `check.response`, specify these options:
 
 *`status`*:: The expected status code. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
 *`headers`*:: The required response headers.
-*`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
+*`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match. HTTP response
+bodies of up to 100MiB are supported.
 
 Example configuration:
 This monitor examines the
@@ -535,7 +537,8 @@ response body for the strings `saved` or `Saved`
       - saved
 -------------------------------------------------------------------------------
 
-*`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON.
+*`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON. Body sizes
+must be less than or equal to 100 MiB.
 
 The following configuration shows how to check the response when the body
 contains JSON:

@@ -67,6 +67,7 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 
 	expectedXPackMetricsets := []string{
 		"ccr",
+		"enrich",
 		"cluster_stats",
 		"index",
 		"index_recovery",
@@ -85,6 +86,9 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
 var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+
+// EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
+var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
