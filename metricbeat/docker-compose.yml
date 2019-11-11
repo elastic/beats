@@ -15,11 +15,7 @@ services:
 
   # Modules
   aerospike:
-    image: docker.elastic.co/observability-ci/beats-integration-aerospike:${AEROSPIKE_VERSION:-3.9.0}-1
-    build:
-      context: ./module/aerospike/_meta
-      args:
-        AEROSPIKE_VERSION: ${AEROSPIKE_VERSION:-3.9.0}
+    image: docker.elastic.co/observability-ci/aerospike:${AEROSPIKE_VERSION:-3.9.0}
     ports:
       - 3000
 
@@ -34,38 +30,22 @@ services:
       - 5066
 
   ceph:
-    image: docker.elastic.co/observability-ci/beats-integration-ceph:${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}-1
-    build:
-      context: ./module/ceph/_meta
-      args:
-        CEPH_VERSION: ${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}
+    image: docker.elastic.co/observability-ci/ceph:${CEPH_VERSION:-master-6373c6a-jewel-centos-7-x86_64}
     ports:
       - 5000
 
   consul:
-    image: docker.elastic.co/observability-ci/beats-integration-consul:${CONSUL_VERSION:-1.4.2}-1
-    build:
-      context: ./module/consul/_meta
-      args:
-        CONSUL_VERSION: ${CONSUL_VERSION:-1.4.2}
+    image: docker.elastic.co/observability-ci/consul:${CONSUL_VERSION:-1.4.2}
     ports:
       - 8500
 
   couchbase:
-    image: docker.elastic.co/observability-ci/beats-integration-couchbase:${COUCHBASE_VERSION:-4.5.1}-1
-    build:
-      context: ./module/couchbase/_meta
-      args:
-        COUCHBASE_VERSION: ${COUCHBASE_VERSION:-4.5.1}
+    image: docker.elastic.co/observability-ci/couchbase:${COUCHBASE_VERSION:-4.5.1}
     ports:
       - 8091
 
   couchdb:
-    image: docker.elastic.co/observability-ci/beats-integration-couchdb:${COUCHDB_VERSION:-1.7}-1
-    build:
-      context: ./module/couchdb/_meta
-      args:
-        COUCHDB_VERSION: ${COUCHDB_VERSION:-1.7}
+    image: docker.elastic.co/observability-ci/couchdb:${COUCHDB_VERSION:-1.7}
     ports:
       - 5984
 
