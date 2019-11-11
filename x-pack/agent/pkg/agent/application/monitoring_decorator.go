@@ -14,6 +14,7 @@ const (
 	programsKey    = "programs"
 	monitoringKey  = "monitoring"
 	enabledKey     = "monitoring.enabled"
+	outputKey      = "output"
 )
 
 func injectMonitoring(rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
@@ -60,6 +61,6 @@ func injectMonitoring(rootAst *transpiler.AST, programsToRun []program.Program) 
 
 func getMonitoringRule() *transpiler.RuleList {
 	return transpiler.NewRuleList(
-		transpiler.Filter(monitoringKey, programsKey),
+		transpiler.Filter(monitoringKey, programsKey, outputKey),
 	)
 }

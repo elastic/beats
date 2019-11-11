@@ -16,6 +16,7 @@ import (
 const (
 	monitoringName          = "FLEET_MONITORING"
 	monitoringKey           = "monitoring"
+	outputKey               = "output"
 	monitoringEnabledSubkey = "enabled"
 )
 
@@ -120,7 +121,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		return nil
 	}
 
-	outputIface, found := config[monitoringKey]
+	outputIface, found := config[outputKey]
 	if !found {
 		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar: %v", config)
 		return nil
