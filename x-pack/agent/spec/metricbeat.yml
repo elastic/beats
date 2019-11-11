@@ -15,12 +15,12 @@ rules:
     - rename:
         from: type
         to: module
-- rename:
-    from: inputs
-    to: modules
 - copy:
-    from: modules
+    from: inputs
     to: metricbeat
+- rename:
+    from: metricbeat.inputs
+    to: modules
 - filter:
     selectors:
     - metricbeat
