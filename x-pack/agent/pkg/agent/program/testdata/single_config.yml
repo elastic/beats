@@ -1,6 +1,8 @@
 inputs:
   - type: metric/docker
+    setting: one
   - type: metric/apache
+    setting: two
   - type: event/file
     paths:
       - /var/log/hello1.log
