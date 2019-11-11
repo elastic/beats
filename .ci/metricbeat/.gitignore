@@ -1,3 +1,4 @@
 # For the BATS testing
 bats-core/
 target
+tests/test_helper
