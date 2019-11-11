@@ -1,5 +1,6 @@
 - name: modbus
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek modbus log.
   fields:
