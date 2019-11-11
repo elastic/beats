@@ -1,5 +1,6 @@
 - name: rfb
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek RFB log.
   fields:
