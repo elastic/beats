@@ -1589,6 +1589,16 @@ type: keyword
 
 --
 
+*`azure.resource.authorization_rule`*::
++
+--
+Authorization rule
+
+
+type: keyword
+
+--
+
 [float]
 === activitylogs
 
@@ -1832,6 +1842,16 @@ type: keyword
 +
 --
 The operation version
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.identity`*::
++
+--
+Identity
 
 
 type: keyword

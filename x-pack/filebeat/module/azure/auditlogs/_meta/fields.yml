@@ -11,6 +11,10 @@
       type: keyword
       description: >
         The operation version
+    - name: identity
+      type: keyword
+      description: >
+        Identity
     - name: tenant_id
       type: keyword
       description: >
