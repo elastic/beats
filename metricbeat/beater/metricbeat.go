@@ -21,7 +21,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/paths"
-
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/management"
 
