@@ -75,11 +75,12 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 
 	var log logdriver.LogEntry
 	for {
-		err := cl.logFile.ReadMessage(log)
+		err := cl.logFile.ReadMessage(&log)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error getting message: %s\n", err)
 			return
 		}
+		fmt.Fprintf(os.Stderr, "Got struct %#v\n", log)
 		publishWriter <- log
 		log.Reset()
 
