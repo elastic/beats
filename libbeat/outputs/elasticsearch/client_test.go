@@ -448,3 +448,11 @@ func TestClientWithAPIKey(t *testing.T) {
 	client.Ping()
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
+
+func TestBulkReadToItems(t *testing.T) {
+	// TODO
+}
+
+func TestBulkReadItemStatus(t *testing.T) {
+	// TODO
+}
