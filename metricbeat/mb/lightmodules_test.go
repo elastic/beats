@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 // +build !integration
 
@@ -15,7 +28,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -27,7 +39,7 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 		name       string
 		module     string
 		isDefault  bool
-		hostParser mb.HostParser
+		hostParser HostParser
 	}
 
 	cases := map[string]struct {
@@ -77,19 +89,19 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 		},
 	}
 
-	fakeMetricSetFactory := func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	fakeMetricSetFactory := func(base BaseMetricSet) (MetricSet, error) {
 		return &base, nil
 	}
 
-	newRegistry := func(metricSets []testMetricSet) *mb.Register {
-		r := mb.NewRegister()
+	newRegistry := func(metricSets []testMetricSet) *Register {
+		r := NewRegister()
 		for _, m := range metricSets {
-			opts := []mb.MetricSetOption{}
+			opts := []MetricSetOption{}
 			if m.isDefault {
-				opts = append(opts, mb.DefaultMetricSet())
+				opts = append(opts, DefaultMetricSet())
 			}
 			if m.hostParser != nil {
-				opts = append(opts, mb.WithHostParser(m.hostParser))
+				opts = append(opts, WithHostParser(m.hostParser))
 			}
 			r.MustAddMetricSet(m.module, m.name, fakeMetricSetFactory, opts...)
 		}
@@ -174,7 +186,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		config         common.MapStr
 		err            bool
 		expectedOption string
-		expectedQuery  mb.QueryParams
+		expectedQuery  QueryParams
 		expectedPeriod time.Duration
 	}{
 		"normal module": {
@@ -196,7 +208,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"light module with query": {
 			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
 			expectedOption: "test",
-			expectedQuery:  mb.QueryParams{"param": "foo"},
+			expectedQuery:  QueryParams{"param": "foo"},
 		},
 		"light module with custom period": {
 			config:         common.MapStr{"module": "service", "period": "42s"},
@@ -217,7 +229,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		},
 	}
 
-	r := mb.NewRegister()
+	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
@@ -226,7 +238,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config, err := common.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
-			module, metricSets, err := mb.NewModule(config, r)
+			module, metricSets, err := NewModule(config, r)
 			if c.err {
 				assert.Error(t, err)
 				return
@@ -248,7 +260,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 					assert.Equal(t, c.expectedQuery, ms.Module().Config().Query)
 					expectedPeriod := c.expectedPeriod
 					if expectedPeriod == 0 {
-						expectedPeriod = mb.DefaultModuleConfig().Period
+						expectedPeriod = DefaultModuleConfig().Period
 					}
 					assert.Equal(t, expectedPeriod, ms.Module().Config().Period)
 				})
@@ -260,31 +272,31 @@ func TestNewModuleFromConfig(t *testing.T) {
 func TestNewModulesCallModuleFactory(t *testing.T) {
 	logp.TestingSetup()
 
-	r := mb.NewRegister()
+	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	called := false
-	r.AddModule("foo", func(base mb.BaseModule) (mb.Module, error) {
+	r.AddModule("foo", func(base BaseModule) (Module, error) {
 		called = true
-		return mb.DefaultModuleFactory(base)
+		return DefaultModuleFactory(base)
 	})
 
 	config, err := common.NewConfigFrom(common.MapStr{"module": "service"})
 	require.NoError(t, err)
 
-	_, _, err = mb.NewModule(config, r)
+	_, _, err = NewModule(config, r)
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")
 }
 
 type metricSetWithOption struct {
-	mb.BaseMetricSet
+	BaseMetricSet
 	Option string
 }
 
-func newMetricSetWithOption(base mb.BaseMetricSet) (mb.MetricSet, error) {
+func newMetricSetWithOption(base BaseMetricSet) (MetricSet, error) {
 	config := struct {
 		Option string `config:"option"`
 	}{
@@ -301,4 +313,4 @@ func newMetricSetWithOption(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (*metricSetWithOption) Fetch(mb.ReporterV2) error { return nil }
+func (*metricSetWithOption) Fetch(ReporterV2) error { return nil }
