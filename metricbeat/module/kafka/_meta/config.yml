@@ -1,7 +1,10 @@
 - module: kafka
   #metricsets:
+  #  - broker
   #  - partition
+  #  - consumer
   #  - consumergroup
+  #  - producer
   period: 10s
   hosts: ["localhost:9092"]
 
