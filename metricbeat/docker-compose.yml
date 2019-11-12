@@ -324,10 +324,6 @@ services:
       - 9192
 
   zookeeper:
-    image: docker.elastic.co/observability-ci/beats-integration-zookeeper:${ZOOKEEPER_VERSION:-3.5.5}-1
-    build:
-      context: ./module/zookeeper/_meta
-      args:
-        ZOOKEEPER_VERSION: ${ZOOKEEPER_VERSION:-3.5.5}
+    image: docker.elastic.co/observability-ci/beats-integration-zookeeper:${ZOOKEEPER_VERSION:-3.5.5}
     ports:
       - 2181
