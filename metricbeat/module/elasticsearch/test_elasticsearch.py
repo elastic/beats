@@ -47,6 +47,45 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS +
                              ["service.name"], extras={"index_recovery.active_only": "false"})
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_xpack_cluster_stats(self):
+        """
+        elasticsearch-xpack module test for type:cluster_stats
+        """
+        self.render_config_template(modules=[{
+            "name": "elasticsearch",
+            "metricsets": [
+                "ccr",
+                "cluster_stats",
+                "index",
+                "index_recovery",
+                "index_summary",
+                "ml_job",
+                "node_stats",
+                "shard"
+            ],
+            "hosts": self.get_hosts(),
+            "period": "1s",
+            "extras": {
+                "xpack.enabled": "true"
+            }
+        }])
+        proc = self.start_beat()
+        self.wait_log_contains('"type": "cluster_stats"')
+
+        # self.wait_until(lambda: self.output_has_message('"type":"cluster_stats"'))
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        docs = self.read_output_json()
+        for doc in docs:
+            t = doc["type"]
+            if t != "cluster_stats":
+                continue
+            license = doc["license"]
+            issue_date = license["issue_date_in_millis"]
+            self.assertIsNot(type(issue_date), float)
+
     def get_hosts(self):
         return [os.getenv('ES_HOST', 'localhost') + ':' +
                 os.getenv('ES_PORT', '9200')]
