@@ -321,6 +321,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - GA the `script` processor. {pull}14325[14325]
 - Add `fingerprint` processor. {issue}11173[11173] {pull}14205[14205]
 - Add support for API keys in Elasticsearch outputs. {pull}14324[14324]
+- Ensure that init containers are no longer tailed after they stop {pull}14394[14394]
 
 *Auditbeat*
 
