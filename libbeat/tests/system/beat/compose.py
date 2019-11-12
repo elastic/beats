@@ -215,3 +215,17 @@ class ComposeMixin(object):
             class_dir, current = os.path.split(class_dir)
             if current == '':  # We have reached root
                 raise Exception("failed to find a docker-compose.yml file")
+
+    @classmethod
+    def get_service_log(cls, service):
+        container = cls.compose_project().containers(service_names=[service])[0]
+        return container.logs()
+
+    @classmethod
+    def service_log_contains(cls, service, msg):
+        log = cls.get_service_log(service)
+        counter = 0
+        for line in log.splitlines():
+            if line.find(msg) >= 0:
+                counter += 1
+        return counter > 0

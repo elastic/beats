@@ -1,0 +1,95 @@
+- name: smb_cmd
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek smb_cmd log.
+  fields:
+    - name: command
+      type: keyword
+      description: |
+        The command sent by the client.
+
+    - name: sub_command
+      type: keyword
+      description: |
+        The subcommand sent by the client, if present.
+
+    - name: argument
+      type: keyword
+      description: |
+        Command argument sent by the client, if any.
+
+    - name: status
+      type: keyword
+      description: |
+        Server reply to the client's command.
+
+    - name: rtt
+      type: double
+      description: |
+        Round trip time from the request to the response.
+
+    - name: version
+      type: keyword
+      description: |
+        Version of SMB for the command.
+
+    - name: username
+      type: keyword
+      description: |
+        Authenticated username, if available.
+
+    - name: tree
+      type: keyword
+      description: |
+        If this is related to a tree, this is the tree that was used for the current command.
+
+    - name: tree_service
+      type: keyword
+      description: |
+        The type of tree (disk share, printer share, named pipe, etc.).
+
+    - name: file
+      type: group
+      description: |
+        If the command referenced a file, store it here.
+      fields:
+        - name: name
+          type: keyword
+          description: |
+            Filename if one was seen.
+
+        - name: action
+          type: keyword
+          description: |
+            Action this log record represents.
+
+        - name: uid
+          type: keyword
+          description: |
+            UID of the referenced file.
+
+        - name: host
+          type: group
+          fields:
+            - name: tx
+              type: ip
+              description: |
+                Address of the transmitting host.
+
+            - name: rx
+              type: ip
+              description: |
+                Address of the receiving host.
+
+    - name: smb1_offered_dialects
+      type: keyword
+      description: |
+        Present if base/protocols/smb/smb1-main.bro is loaded.
+        Dialects offered by the client.
+
+    - name: smb2_offered_dialects
+      type:  integer
+      description: |
+        Present if base/protocols/smb/smb2-main.bro is loaded.
+        Dialects offered by the client.

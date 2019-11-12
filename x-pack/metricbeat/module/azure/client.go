@@ -65,7 +65,7 @@ func (client *Client) InitResources(fn mapMetric, report mb.ReporterV2) error {
 		if len(resourceList.Values()) == 0 {
 			err = errors.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
 				resource.ID, resource.Group, resource.Type, resource.Query)
-			client.LogError(report, err)
+			client.Log.Error(err)
 			continue
 		}
 		for _, res := range resourceList.Values() {
@@ -78,10 +78,10 @@ func (client *Client) InitResources(fn mapMetric, report mb.ReporterV2) error {
 			}
 		}
 	}
-	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable, we log and create an event if this is the case (see above)
-	// but we return an error when absolutely no resources are found
+	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
+	// we also log a debug message when absolutely no resources are found
 	if len(metrics) == 0 {
-		return errors.New("no resources were found based on all the configurations options entered")
+		client.Log.Debug("no resources were found based on all the configurations options entered")
 	}
 	client.Resources.Metrics = metrics
 	return nil
