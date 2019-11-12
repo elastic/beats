@@ -36,6 +36,7 @@ bats-support: ##Install bats-support in the project itself
 prepare-test: bats bats-assert bats-support## Prepare the bats dependencies
 	@echo "Pulling Alpine image"
 	@docker pull node:${LTS_ALPINE}
+	@docker pull mikefarah/yq:2.4.0
 	@mkdir -p target
 	@docker build --build-arg DIND_VERSION=${DIND} -t docker.elastic.co/observability-ci/docker:${DIND} .
 
