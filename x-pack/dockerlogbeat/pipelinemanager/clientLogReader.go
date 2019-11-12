@@ -80,7 +80,6 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 			fmt.Fprintf(os.Stderr, "Error getting message: %s\n", err)
 			return
 		}
-		fmt.Fprintf(os.Stderr, "Got struct %#v\n", log)
 		publishWriter <- log
 		log.Reset()
 

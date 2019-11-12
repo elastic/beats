@@ -7,9 +7,7 @@ package pipereader
 import (
 	"context"
 	"encoding/binary"
-	"fmt"
 	"io"
-	"os"
 	"syscall"
 
 	"github.com/containerd/fifo"
@@ -34,12 +32,12 @@ func NewReaderFromPath(file string) (*PipeReader, error) {
 		return nil, errors.Wrapf(err, "error opening logger fifo: %q", file)
 	}
 
-	return &PipeReader{fifoPipe: inputFile, byteOrder: binary.BigEndian, lenFrameBuf: make([]byte, 4), bodyBuf: make([]byte, 4*1024), maxSize: 2e6}, nil
+	return &PipeReader{fifoPipe: inputFile, byteOrder: binary.BigEndian, lenFrameBuf: make([]byte, 4), bodyBuf: nil, maxSize: 2e6}, nil
 }
 
 // NewReaderFromReadCloser creates a new FIFO pipe reader from an existing ReadCloser
 func NewReaderFromReadCloser(pipe io.ReadCloser) (*PipeReader, error) {
-	return &PipeReader{fifoPipe: pipe, byteOrder: binary.BigEndian, lenFrameBuf: make([]byte, 4), bodyBuf: make([]byte, 4*1024), maxSize: 2e6}, nil
+	return &PipeReader{fifoPipe: pipe, byteOrder: binary.BigEndian, lenFrameBuf: make([]byte, 4), bodyBuf: nil, maxSize: 2e6}, nil
 }
 
 // ReadMessage reads a log message from the pipe
@@ -57,7 +55,6 @@ func (reader *PipeReader) ReadMessage(log *logdriver.LogEntry) error {
 		if err != nil {
 			return errors.Wrap(err, "error getting length frame")
 		}
-		fmt.Fprintf(os.Stderr, "Got header specifying length %d\n", lenFrame)
 		if lenFrame <= reader.maxSize {
 			break
 		}
@@ -70,29 +67,32 @@ func (reader *PipeReader) ReadMessage(log *logdriver.LogEntry) error {
 	}
 
 	//proceed with 3)
-	reader.setBuffer(lenFrame)
-	_, err = io.ReadFull(reader.fifoPipe, reader.bodyBuf[:lenFrame])
+	readBuf := reader.setBuffer(lenFrame)
+	_, err = io.ReadFull(reader.fifoPipe, readBuf[:lenFrame])
 	if err != nil {
 		return errors.Wrap(err, "error reading buffer")
 	}
-	fmt.Fprintf(os.Stderr, "Buffer now contains %#v\n", reader.bodyBuf[:lenFrame])
-	return proto.Unmarshal(reader.bodyBuf[:lenFrame], log)
+	return proto.Unmarshal(readBuf[:lenFrame], log)
 
 }
 
-// setBuffer checks the size and only reallocates if we need to
-func (reader *PipeReader) setBuffer(sz int) {
-	const minSz = 4 * 1024 // min 4KB read buffer
+// setBuffer checks the needed size, and returns a buffer, allocating a new buffer if needed
+func (reader *PipeReader) setBuffer(sz int) []byte {
+	const minSz = 1024
+	const maxSz = minSz * 32
 
+	// return only the portion of the buffer we need
 	if len(reader.bodyBuf) >= sz {
-		return
+		return reader.bodyBuf[:sz]
 	}
 
-	if sz < minSz {
-		sz = minSz
+	// if we have an abnormally large buffer, don't set it to bodyBuf so GC can clean it up
+	if sz > maxSz {
+		return make([]byte, sz)
 	}
 
 	reader.bodyBuf = make([]byte, sz)
+	return reader.bodyBuf
 }
 
 // getValidLengthFrame scrolls through the buffer until we get a valid length
