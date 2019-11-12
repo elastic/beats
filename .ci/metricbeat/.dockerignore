@@ -1,0 +1,6 @@
+bats-code
+target
+tests
+Makefile
+Dockerfile
+*.sh

@@ -4,6 +4,7 @@ BATS_VERSION = c706d1470dd1376687776bbe985ac22d09780327 #v1.1.0
 BATS_ASSERT = 9f88b4207da750093baabc4e3f41bf68f0dd3630 #v0.3.0
 BATS_SUPPORT = 004e707638eedd62e0481e8cdc9223ad471f12ee #v0.3.0
 LTS_ALPINE ?= 12-alpine
+DIND ?= 19-dind
 
 help: ## Display this help text
 	@grep -E '^[a-zA-Z_-]+[%]?:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -36,6 +37,7 @@ prepare-test: bats bats-assert bats-support## Prepare the bats dependencies
 	@echo "Pulling Alpine image"
 	@docker pull node:${LTS_ALPINE}
 	@mkdir -p target
+	@docker build --build-arg DIND_VERSION=${DIND} -t docker.elastic.co/observability-ci/docker:${DIND} .
 
 convert-tests-results: ## convert TAP test results to JUnit
 	@APP=$* docker run --rm -e APP=$${APP} -v "$(CURDIR)":/usr/src/app -w /usr/src/app node:${LTS_ALPINE} \
