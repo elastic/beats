@@ -13,14 +13,16 @@ function cleanup {
 }
 
 function read_version {
-    local file=$1
-    local index=$2
+    local module=$1
+    local file=$2
+    local index=$3
 
-    docker run --rm -v $(pwd):/workdir mikefarah/yq:2.4.0 yq r $file versions[$index]
+    docker run --rm -v "${EXCHANGE_PATH}/metricbeat/module/${module}/_meta:/workdir" mikefarah/yq:2.4.0 yq r $file versions[$index]
 }
 
 function read_versions {
-    local file=$1
+    local module=$1
+    local file=$2
 
-    docker run --rm -v $(pwd):/workdir mikefarah/yq:2.4.0 yq r $file versions
+    docker run --rm -v "${EXCHANGE_PATH}/metricbeat/module/${module}/_meta:/workdir" mikefarah/yq:2.4.0 yq r $file versions
 }

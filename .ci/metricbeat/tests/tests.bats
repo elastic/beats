@@ -16,12 +16,12 @@ MODULE_UPPER=$(echo ${MODULE} | tr a-z A-Z)
 # Location of the Dockerfiles for each module
 CONTEXT_DIR="${BATS_TEST_DIRNAME}/../../../metricbeat/module/${MODULE}/_meta"
 cd ${CONTEXT_DIR}
-COUNT=$(read_versions "docker-versions.yml" |wc -l)
+COUNT=$(read_versions "${MODULE}" "docker-versions.yml" |wc -l)
 
 @test "${MODULE} - build images" {
 	for (( i=0; i < $COUNT; i++ ))
 	do
-		v=$(read_version "docker-versions.yml" $i)
+		v=$(read_version "${MODULE}" "docker-versions.yml" $i)
 
 		run docker build --build-arg ${MODULE_UPPER}_VERSION=${v} --rm -t ${IMAGE}:${v} .
 		assert_success
@@ -35,7 +35,7 @@ COUNT=$(read_versions "docker-versions.yml" |wc -l)
 @test "${MODULE} - create test containers" {
 	for (( i=0; i < $COUNT; i++ ))
 	do
-		v=$(read_version "docker-versions.yml" $i)
+		v=$(read_version "${MODULE}" "docker-versions.yml" $i)
 		container=${CONTAINER}-${v}
 
 		run docker run -d --name $container -P ${IMAGE}:${v} ${CMD}
@@ -48,7 +48,7 @@ COUNT=$(read_versions "docker-versions.yml" |wc -l)
 @test "${MODULE} - test container with 0 as exitcode" {
 	for (( i=0; i < $COUNT; i++ ))
 	do
-		v=$(read_version "docker-versions.yml" $i)
+		v=$(read_version "${MODULE}" "docker-versions.yml" $i)
 		container=${CONTAINER}-${v}
 
 		sleep 1
@@ -60,7 +60,7 @@ COUNT=$(read_versions "docker-versions.yml" |wc -l)
 @test "${MODULE} - clean test containers afterwards" {
 	for (( i=0; i < $COUNT; i++ ))
 	do
-		v=$(read_version "docker-versions.yml" $i)
+		v=$(read_version "${MODULE}" "docker-versions.yml" $i)
 		container=${CONTAINER}-${v}
 
 		cleanup $container
