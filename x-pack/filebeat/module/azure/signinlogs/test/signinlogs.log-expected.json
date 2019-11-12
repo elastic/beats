@@ -44,47 +44,6 @@
                 "properties":{
                     "risk_level_aggregated":"none",
                     "client_app_used":"Browser",
-                    "applied_conditional_access_policies":[
-                        {
-                            "conditionsNotSatisfied":2,
-                            "result":"notApplied",
-                            "conditionsSatisfied":1,
-                            "enforcedSessionControls":[
-
-                            ],
-                            "enforcedGrantControls":[
-                                "Mfa"
-                            ],
-                            "displayName":"Require MFA for Azure (Can come from Okta)",
-                            "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53"
-                        },
-                        {
-                            "conditionsNotSatisfied":0,
-                            "result":"notEnabled",
-                            "conditionsSatisfied":0,
-                            "enforcedSessionControls":[
-
-                            ],
-                            "enforcedGrantControls":[
-
-                            ],
-                            "displayName":"Disable Persistent Browser Sessions",
-                            "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53"
-                        },
-                        {
-                            "conditionsNotSatisfied":0,
-                            "result":"notEnabled",
-                            "conditionsSatisfied":0,
-                            "enforcedSessionControls":[
-
-                            ],
-                            "enforcedGrantControls":[
-
-                            ],
-                            "displayName":"12-hour Session timeouts",
-                            "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53"
-                        }
-                    ],
                     "created_at":"2019-10-18T09:45:48.0729893+00:00",
                     "risk_level_during_signin":"none",
                     "token_issuer_type":"AzureAD",
@@ -92,12 +51,6 @@
                     "conditional_access_status":"notApplied",
                     "id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
                     "app_id":"8a4de8b5-095c-47d0-a96f-a75130c61d53",
-                    "network_location_details":[
-
-                    ],
-                    "riskEventTypes":[
-
-                    ],
                     "is_interactive":"false",
                     "service_principal_id":"",
                     "app_display_name":"Office 365",
