@@ -109,6 +109,46 @@ class Test(metricbeat.BaseTest):
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_xpack_cluster_stats(self):
+        """
+        elasticsearch-xpack module test for type:cluster_stats
+        """
+        self.render_config_template(modules=[{
+            "name": "elasticsearch",
+            "metricsets": [
+                "ccr",
+                "cluster_stats",
+                "enrich",
+                "index",
+                "index_recovery",
+                "index_summary",
+                "ml_job",
+                "node_stats",
+                "shard"
+            ],
+            "hosts": self.get_hosts(),
+            "period": "1s",
+            "extras": {
+                "xpack.enabled": "true"
+            }
+        }])
+        proc = self.start_beat()
+        self.wait_log_contains('"type": "cluster_stats"')
+
+        # self.wait_until(lambda: self.output_has_message('"type":"cluster_stats"'))
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        docs = self.read_output_json()
+        for doc in docs:
+            t = doc["type"]
+            if t != "cluster_stats":
+                continue
+            license = doc["license"]
+            issue_date = license["issue_date_in_millis"]
+            self.assertIsNot(type(issue_date), float)
+
     def create_ml_job(self):
         # Check if an ml job already exists
         response = self.ml_es.get_jobs()
