@@ -31173,6 +31173,66 @@ type: integer
 
 --
 
+*`system.socket.summary.tcp.all.syn_sent`*::
++
+--
+Number of TCP connections in _syn_sent_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.syn_recv`*::
++
+--
+Number of TCP connections in _syn_recv_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait1`*::
++
+--
+Number of TCP connections in _fin_wait1_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait2`*::
++
+--
+Number of TCP connections in _fin_wait2_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.last_ack`*::
++
+--
+Number of TCP connections in _last_ack_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.closing`*::
++
+--
+Number of TCP connections in _closing_ state
+
+
+type: integer
+
+--
+
 [float]
 === udp
 
