@@ -37,6 +37,11 @@ func NewReaderFromPath(file string) (*PipeReader, error) {
 	return &PipeReader{fifoPipe: inputFile, byteOrder: binary.BigEndian, lenFrameBuf: make([]byte, 4), bodyBuf: make([]byte, 4*1024), maxSize: 2e6}, nil
 }
 
+// NewReaderFromReadCloser creates a new FIFO pipe reader from an existing ReadCloser
+func NewReaderFromReadCloser(pipe io.ReadCloser) (*PipeReader, error) {
+	return &PipeReader{fifoPipe: pipe, byteOrder: binary.BigEndian, lenFrameBuf: make([]byte, 4), bodyBuf: make([]byte, 4*1024), maxSize: 2e6}, nil
+}
+
 // ReadMessage reads a log message from the pipe
 // The message stream consists of a 4-byte length frame and a message body
 // There's three logical paths for this code to take:
