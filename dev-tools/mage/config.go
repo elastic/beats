@@ -115,6 +115,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 		"ExcludeLogstash":                false,
 		"ExcludeRedis":                   false,
 		"UseObserverProcessor":           false,
+		"UseDockerMetadataProcessor":     true,
 		"UseKubernetesMetadataProcessor": false,
 		"ExcludeDashboards":              false,
 	}
