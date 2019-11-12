@@ -28,6 +28,7 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("logstash", "node_stats", self.get_hosts(), self.FIELDS)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @unittest.skip("flaky; see https://github.com/elastic/beats/issues/13947")
     def test_xpack(self):
         """
         logstash-xpack module tests
