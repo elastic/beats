@@ -411,9 +411,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	err = b.setupMonitoring(settings)
+	r, err := b.setupMonitoring(settings)
 	if err != nil {
 		return err
+	}
+	if r != nil {
+		defer r.Stop()
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
@@ -875,15 +878,15 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 	return callback, nil
 }
 
-func (b *Beat) setupMonitoring(settings Settings) error {
+func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	monitoringClusterUUID, err := monitoring.GetClusterUUID(monitoringCfg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Expose monitoring.cluster_uuid in state API
@@ -902,12 +905,12 @@ func (b *Beat) setupMonitoring(settings Settings) error {
 		}
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		defer reporter.Stop()
+		return reporter, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 // handleError handles the given error by logging it and then returning the
