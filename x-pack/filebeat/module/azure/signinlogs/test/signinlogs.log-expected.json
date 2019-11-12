@@ -25,11 +25,11 @@
         "source":{
             "ip":"81.171.241.231"
         },
-        "event":{
-            "duration":0.0,
-            "category":"SignInLogs",
-            "outcome":"50140"
-        },
+        "event.duration":  0.0,
+        "event.module": "azure",
+        "event.category": "SignInLogs",
+        "event.dataset": "azure.signinlogs",
+        "event.outcome": "50140",
         "input.type": "log",
         "message":"This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
         "azure":{

@@ -24,13 +24,11 @@
         "service" : {
             "type" : "azure"
         },
-        "event" : {
-            "duration" : 0.0,
-            "module" : "azure",
-            "category" : "Administrative",
-            "dataset" : "azure.activitylogs",
-            "outcome" : "Start"
-        },
+        "event.duration":  0.0,
+        "event.module": "azure",
+        "event.category": "Administrative",
+        "event.dataset": "azure.activitylogs",
+        "event.outcome": "Start",
         "azure" : {
             "subscription_id" : "8a4de8b5-095c-47d0-a96f-a75130c61d53",
             "resource" : {
