@@ -450,9 +450,53 @@ func TestClientWithAPIKey(t *testing.T) {
 }
 
 func TestBulkReadToItems(t *testing.T) {
-	// TODO
+	response := []byte(`{
+		"errors": false,
+		"items": [
+			{"create": {"status": 200}},
+			{"create": {"status": 300}},
+			{"create": {"status": 400}}
+    ]}`)
+
+	reader := NewJSONReader(response)
+
+	err := BulkReadToItems(reader)
+	assert.NoError(t, err)
+
+	for status := 200; status <= 400; status += 100 {
+		err = reader.ExpectDict()
+		assert.NoError(t, err)
+
+		kind, raw, err := reader.nextFieldName()
+		assert.NoError(t, err)
+		assert.Equal(t, mapKeyEntity, kind)
+		assert.Equal(t, []byte("create"), raw)
+
+		err = reader.ExpectDict()
+		assert.NoError(t, err)
+
+		kind, raw, err = reader.nextFieldName()
+		assert.NoError(t, err)
+		assert.Equal(t, mapKeyEntity, kind)
+		assert.Equal(t, []byte("status"), raw)
+
+		code, err := reader.nextInt()
+		assert.NoError(t, err)
+		assert.Equal(t, status, code)
+
+		_, _, err = reader.endDict()
+		assert.NoError(t, err)
+
+		_, _, err = reader.endDict()
+		assert.NoError(t, err)
+	}
 }
 
 func TestBulkReadItemStatus(t *testing.T) {
-	// TODO
+	response := []byte(`{"create": {"status": 200}}`)
+
+	reader := NewJSONReader(response)
+	code, _, err := BulkReadItemStatus(reader)
+	assert.NoError(t, err)
+	assert.Equal(t, 200, code)
 }
