@@ -192,6 +192,9 @@ func TestEmitEvent(t *testing.T) {
 						{
 							Name:        name,
 							ContainerID: containerID,
+							State: v1.ContainerState{
+								Running: &v1.ContainerStateRunning{},
+							},
 						},
 					},
 				},
