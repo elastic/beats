@@ -5416,15 +5416,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-Dependency: github.com/tonistiigi/fifo
-Revision: bda0ff6ed73c67bfb5e62bc9c697f146b7fd7f13
-License type (autodetected): Apache-2.0
-./x-pack/dockerlogbeat/vendor/github.com/tonistiigi/fifo/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
 Revision: 7c5392a5f2b5c5fa393c71e1f9064e22b5408995
 License type (autodetected): BSD-3-Clause
