@@ -1,16 +1,77 @@
 - module: zeek
-  # All logs
+  capture_loss:
+    enabled: true
   connection:
     enabled: true
-  dns: 
+  dce_rpc:
     enabled: true
-  http:
+  dhcp:
+    enabled: true
+  dnp3:
+    enabled: true
+  dns:
+    enabled: true
+  dpd:
     enabled: true
   files:
     enabled: true
-  ssl:
+  ftp:
+    enabled: true
+  http:
+    enabled: true
+  irc:
+    enabled: true
+  kerberos:
+    enabled: true
+  modbus:
+    enabled: true
+  mysql:
     enabled: true
   notice:
+    enabled: true
+  ntlm:
+    enabled: true
+  ocsp:
+    enabled: true
+  pe:
+    enabled: true
+  radius:
+    enabled: true
+  rdp:
+    enabled: true
+  rfb:
+    enabled: true
+  signatures:
+    enabled: true
+  sip:
+    enabled: true
+  smb_cmd:
+    enabled: true
+  smb_files:
+    enabled: true
+  smb_mapping:
+    enabled: true
+  smtp:
+    enabled: true
+  snmp:
+    enabled: true
+  socks:
+    enabled: true
+  ssh:
+    enabled: true
+  ssl:
+    enabled: true
+  stats:
+    enabled: true
+  syslog:
+    enabled: true
+  traceroute:
+    enabled: true
+  tunnel:
+    enabled: true
+  weird:
+    enabled: true
+  x509:
     enabled: true
 
     # Set custom paths for the log files. If left empty,

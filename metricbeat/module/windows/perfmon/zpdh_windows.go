@@ -58,6 +58,7 @@ var (
 
 	procPdhOpenQueryW               = modpdh.NewProc("PdhOpenQueryW")
 	procPdhAddEnglishCounterW       = modpdh.NewProc("PdhAddEnglishCounterW")
+	procPdhRemoveCounter            = modpdh.NewProc("PdhRemoveCounter")
 	procPdhCollectQueryData         = modpdh.NewProc("PdhCollectQueryData")
 	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
 	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
@@ -84,6 +85,14 @@ func _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, 
 
 func __PdhAddCounter(query PdhQueryHandle, counterPath *uint16, userData uintptr, counter *PdhCounterHandle) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhAddEnglishCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) {
+	r0, _, _ := syscall.Syscall(procPdhRemoveCounter.Addr(), 1, uintptr(counter), 0, 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

@@ -8,6 +8,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/x-pack/winlogbeat/module"
+
+	// Register required processors.
+	_ "github.com/elastic/beats/libbeat/cmd/instance"
+	_ "github.com/elastic/beats/libbeat/processors/timestamp"
 )
 
 func TestSecurity(t *testing.T) {

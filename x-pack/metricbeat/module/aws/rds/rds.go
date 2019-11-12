@@ -32,9 +32,7 @@ var (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-	)
+	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -131,7 +129,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Create Cloudwatch Events for RDS
-		events, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap)
+		events, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap, m.AccountName, m.AccountID)
 		if err != nil {
 			m.Logger().Error(err.Error())
 			report.Error(err)
@@ -164,12 +162,16 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDet
 	for _, dbInstance := range output.DBInstances {
 		dbInstanceARNs = append(dbInstanceARNs, *dbInstance.DBInstanceArn)
 		dbDetails := DBDetails{
-			dbArn:              *dbInstance.DBInstanceArn,
-			dbAvailabilityZone: *dbInstance.AvailabilityZone,
-			dbClass:            *dbInstance.DBInstanceClass,
-			dbIdentifier:       *dbInstance.DBInstanceIdentifier,
-			dbStatus:           *dbInstance.DBInstanceStatus,
+			dbArn:        *dbInstance.DBInstanceArn,
+			dbClass:      *dbInstance.DBInstanceClass,
+			dbIdentifier: *dbInstance.DBInstanceIdentifier,
+			dbStatus:     *dbInstance.DBInstanceStatus,
 		}
+
+		if dbInstance.AvailabilityZone != nil {
+			dbDetails.dbAvailabilityZone = *dbInstance.AvailabilityZone
+		}
+
 		dbDetailsMap[*dbInstance.DBInstanceArn] = dbDetails
 	}
 	return dbInstanceARNs, dbDetailsMap, nil
@@ -221,13 +223,13 @@ func constructLabel(metricDimensions []cloudwatch.Dimension, dbInstanceARN strin
 	return label
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap map[string]DBDetails) (map[string]mb.Event, error) {
+func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap map[string]DBDetails, accountName string, accountID string) (map[string]mb.Event, error) {
 	// Initialize events and metricSetFieldResults per dbInstance
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
 
 	for dbInstanceArn := range dbInstanceMap {
-		events[dbInstanceArn] = aws.InitEvent(metricsetName, regionName)
+		events[dbInstanceArn] = aws.InitEvent(regionName, accountName, accountID)
 		metricSetFieldResults[dbInstanceArn] = map[string]interface{}{}
 	}
 

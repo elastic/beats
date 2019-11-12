@@ -75,6 +75,9 @@ type jobConfig struct {
 	// Fields and tags to add to monitor.
 	EventMetadata common.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool `config:"keep_null"`
 }
 
 // ProcessorsError is used to indicate situations when processors could not be loaded.
@@ -108,6 +111,7 @@ func (t *configuredJob) Start() {
 		Processing: beat.ProcessingConfig{
 			EventMetadata: t.config.EventMetadata,
 			Processor:     t.processors,
+			KeepNull:      t.config.KeepNull,
 			Fields:        fields,
 		},
 	})

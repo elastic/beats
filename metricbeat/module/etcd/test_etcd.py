@@ -27,4 +27,4 @@ class Test(metricbeat.BaseTest):
 
 
 class Test_3_2(Test):
-    COMPOSE_SERVICES = ['etcd_3_2']
+    COMPOSE_ENV = {'ETCD_VERSION': '3.2.25'}

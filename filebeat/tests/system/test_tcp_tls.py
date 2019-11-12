@@ -163,7 +163,6 @@ class Test(BaseTest):
                               ca_certs=CERTIFICATE1, do_handshake_on_connect=True)
         tls.connect((config.get('host'), config.get('port')))
 
-    @unittest.skip('flaky test https://github.com/elastic/beats/issues/13009')
     def test_tcp_over_tls_mutual_auth_succeed(self):
         """
         Test filebeat TCP with TLS when enforcing client auth with good client certificates.

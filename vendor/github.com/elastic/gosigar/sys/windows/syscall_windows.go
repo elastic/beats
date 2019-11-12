@@ -580,11 +580,6 @@ func GetTickCount64() (uptime uint64, err error) {
 	return uptime, nil
 }
 
-// Use "GOOS=windows go generate -v -x ." to generate the source.
-
-// Add -trace to enable debug prints around syscalls.
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -systemdll=false -output zsyscall_windows.go syscall_windows.go
-
 // Windows API calls
 //sys   _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) = kernel32.GlobalMemoryStatusEx
 //sys   _GetLogicalDriveStringsW(bufferLength uint32, buffer *uint16) (length uint32, err error) = kernel32.GetLogicalDriveStringsW

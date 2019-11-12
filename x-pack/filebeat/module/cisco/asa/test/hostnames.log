@@ -1,0 +1,1 @@
+Oct 10 2019 10:21:36 localhost: %ASA-6-302021: Teardown ICMP connection for faddr target.destination.hostname.local/10005 gaddr 10.0.55.66/0 laddr Prod-host.name.addr/0

@@ -170,10 +170,12 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 				consumer = nil
 				continue
 			}
+			if queueBatch != nil {
+				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
+			}
 
-			batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
 			paused = c.paused()
-			if paused {
+			if paused || batch == nil {
 				out = nil
 			}
 		}

@@ -1,6 +1,6 @@
 FROM debian:stretch
 
-ARG KAFKA_VERSION=2.1.1
+ARG KAFKA_VERSION
 
 ENV KAFKA_HOME /kafka
 

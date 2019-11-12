@@ -48,6 +48,8 @@ type ClientConfig struct {
 
 	Processing ProcessingConfig
 
+	CloseRef CloseRef
+
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
 	// WaitClose is only effective if one of ACKCount, ACKEvents and ACKLastEvents
@@ -78,6 +80,13 @@ type ClientConfig struct {
 	ACKLastEvent func(interface{})
 }
 
+// CloseRef allows users to close the client asynchronously.
+// A CloseReg implements a subset of function required for context.Context.
+type CloseRef interface {
+	Done() <-chan struct{}
+	Err() error
+}
+
 // ProcessingConfig provides additional event processing settings a client can
 // pass to the publisher pipeline on Connect.
 type ProcessingConfig struct {
@@ -97,6 +106,9 @@ type ProcessingConfig struct {
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
 	Processor ProcessorList
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool
 
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.

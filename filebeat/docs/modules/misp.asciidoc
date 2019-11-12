@@ -1,0 +1,41 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-misp]]
+[role="xpack"]
+
+:modulename: misp
+:has-dashboards: false
+
+== MISP module
+
+beta[]
+
+This is a filebeat module for reading threat intel information from the MISP platform (https://www.circl.lu/doc/misp/). It uses the httpjson input to access the MISP REST API interface.
+
+The configuration in the config.yml file uses the following format:
+
+ * var.api_key: specifies the API key to access MISP.
+ * var.json_objects_array: specifies the array object in MISP response, e.g., "response.Attribute".
+ * var.url: URI of the MISP REST API, e.g., "http://x.x.x.x/attributes/restSearch"
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-misp.png[]
+
+:has-dashboards!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-misp,exported fields>> section.
+

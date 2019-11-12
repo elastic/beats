@@ -74,7 +74,7 @@ func Strict(laxValidator validator.Validator) validator.Validator {
 		}
 		sort.Strings(validatedPaths)
 
-		walk(actual, false, func(woi walkObserverInfo) error {
+		walk(reflect.ValueOf(actual), false, func(woi walkObserverInfo) error {
 			_, validatedExactly := res.Fields[woi.path.String()]
 			if validatedExactly {
 				return nil // This key was tested, passes strict test
@@ -98,33 +98,36 @@ func Strict(laxValidator validator.Validator) validator.Validator {
 
 func compile(in interface{}) (validator.Validator, error) {
 	switch in.(type) {
-	case map[string]interface{}:
-		return compileMap(in.(map[string]interface{}))
-	case []interface{}:
-		return compileSlice(in.([]interface{}))
 	case isdef.IsDef:
 		return compileIsDef(in.(isdef.IsDef))
 	case nil:
 		// nil can't be handled by the default case of IsEqual
 		return compileIsDef(isdef.IsNil)
 	default:
-		// By default we just check reflection equality
-		return compileIsDef(isdef.IsEqual(in))
+		inVal := reflect.ValueOf(in)
+		switch inVal.Kind() {
+		case reflect.Map:
+			return compileMap(inVal)
+		case reflect.Slice, reflect.Array:
+			return compileSlice(inVal)
+		default:
+			return compileIsDef(isdef.IsEqual(in))
+		}
 	}
 }
 
-func compileMap(in map[string]interface{}) (validator validator.Validator, err error) {
+func compileMap(inVal reflect.Value) (validator validator.Validator, err error) {
 	wo, compiled := setupWalkObserver()
-	err = walkMap(in, true, wo)
+	err = walkMap(inVal, true, wo)
 
 	return func(actual interface{}) *llresult.Results {
 		return compiled.Check(actual)
 	}, err
 }
 
-func compileSlice(in []interface{}) (validator validator.Validator, err error) {
+func compileSlice(inVal reflect.Value) (validator validator.Validator, err error) {
 	wo, compiled := setupWalkObserver()
-	err = walkSlice(in, true, wo)
+	err = walkSlice(inVal, true, wo)
 
 	// Slices are always strict in validation because
 	// it would be surprising to only validate the first specified values
@@ -142,18 +145,16 @@ func compileIsDef(def isdef.IsDef) (validator validator.Validator, err error) {
 func setupWalkObserver() (walkObserver, *CompiledSchema) {
 	compiled := make(CompiledSchema, 0)
 	return func(current walkObserverInfo) error {
-		// Determine whether we should test this value
-		// We want to test all values except collections that contain a value
-		// If a collection contains a value, we Check those 'leaf' values instead
-		rv := reflect.ValueOf(current.value)
-		kind := rv.Kind()
+		kind := current.value.Kind()
 		isCollection := kind == reflect.Map || kind == reflect.Slice
-		isNonEmptyCollection := isCollection && rv.Len() > 0
+		isEmptyCollection := isCollection && current.value.Len() == 0
 
-		if !isNonEmptyCollection {
-			isDef, isIsDef := current.value.(isdef.IsDef)
+		// We do comparisons on all leaf nodes. If the leaf is an empty collection
+		// we do a comparison to let us test empty structures.
+		if !isCollection || isEmptyCollection {
+			isDef, isIsDef := current.value.Interface().(isdef.IsDef)
 			if !isIsDef {
-				isDef = isdef.IsEqual(current.value)
+				isDef = isdef.IsEqual(current.value.Interface())
 			}
 
 			compiled = append(compiled, flatValidator{current.path, isDef})

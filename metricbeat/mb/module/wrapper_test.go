@@ -215,8 +215,7 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 	<-output
 	close(done)
 
-	// Validate that the channel is closed after receiving the two
-	// initial events.
+	// Validate that the channel is closed after receiving the event.
 	select {
 	case _, ok := <-output:
 		if !ok {
@@ -225,5 +224,49 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 		} else {
 			assert.Fail(t, "received unexpected event")
 		}
+	}
+}
+
+func TestPeriodIsAddedToEvent(t *testing.T) {
+	cases := map[string]struct {
+		metricset string
+		hasPeriod bool
+	}{
+		"fetch metricset events should have period": {
+			metricset: eventFetcherName,
+			hasPeriod: true,
+		},
+		"push metricset events should not have period": {
+			metricset: pushMetricSetName,
+			hasPeriod: false,
+		},
+	}
+
+	registry := newTestRegistry(t)
+
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			hosts := []string{"alpha"}
+			config := newConfig(t, map[string]interface{}{
+				"module":     moduleName,
+				"metricsets": []string{c.metricset},
+				"hosts":      hosts,
+			})
+
+			m, err := module.NewWrapper(config, registry, module.WithMetricSetInfo())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			done := make(chan struct{})
+			defer close(done)
+
+			output := m.Start(done)
+
+			event := <-output
+
+			hasPeriod, _ := event.Fields.HasKey("metricset.period")
+			assert.Equal(t, c.hasPeriod, hasPeriod, "has metricset.period in event %+v", event)
+		})
 	}
 }

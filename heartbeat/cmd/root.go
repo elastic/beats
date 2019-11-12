@@ -18,11 +18,15 @@
 package cmd
 
 import (
-	// register default heartbeat monitors
+	"fmt"
+
+	_ "github.com/elastic/beats/heartbeat/autodiscover"
 	"github.com/elastic/beats/heartbeat/beater"
+	// register default heartbeat monitors
 	_ "github.com/elastic/beats/heartbeat/monitors/defaults"
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 )
 
 // Name of this beat
@@ -32,7 +36,11 @@ var Name = "heartbeat"
 var RootCmd *cmd.BeatsRootCmd
 
 func init() {
-	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+	settings := instance.Settings{
+		Name:       Name,
+		Processing: processing.MakeDefaultSupport(true, processing.WithECS, processing.WithBeatMeta("agent")),
+	}
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
 
 	// remove dashboard from export commands
 	for _, cmd := range RootCmd.ExportCmd.Commands() {
@@ -49,6 +57,9 @@ func init() {
  * ILM Policy
 `
 	setup.ResetFlags()
+	setup.Flags().Bool(cmd.IndexManagementKey, false, "Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
+	setup.Flags().MarkDeprecated(cmd.TemplateKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
+	setup.Flags().MarkDeprecated(cmd.ILMPolicyKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
 	setup.Flags().Bool(cmd.TemplateKey, false, "Setup index template")
 	setup.Flags().Bool(cmd.ILMPolicyKey, false, "Setup ILM policy")
 }

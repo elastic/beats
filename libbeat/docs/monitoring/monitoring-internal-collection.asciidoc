@@ -1,0 +1,112 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/monitoring/monitoring-internal-collection.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[role="xpack"]
+[[monitoring-internal-collection]]
+== Collect {beatname_uc} monitoring data with internal collectors
+++++
+<titleabbrev>Internal collection</titleabbrev>
+++++
+
+The following method involves sending the metrics to the production cluster, 
+which ultimately routes them to the monitoring cluster.
+ifndef::serverless[]
+For an alternative method, see <<monitoring-metricbeat-collection>>.
+endif::[]
+
+To learn about monitoring in general, see 
+{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
+
+//TODO: Not sure if these docs need to be updated to be parallel with other
+//stack components since this is the old way of configuring monitoring. 
+
+. Create an API key or user that has appropriate authority to send system-level monitoring
+data to {es}. For example, you can use the built-in +{beat_monitoring_user}+ user or
+assign the built-in +{beat_monitoring_user}+ role to another user. For more
+information on the required privileges, see <<privileges-to-publish-monitoring>>.
+For more information on how to use API keys, see <<beats-api-keys>>.
+
+. Add the `monitoring` settings in the {beatname_uc} configuration file. If you
+configured the {es} output and want to send {beatname_uc} monitoring events to
+the same {es} cluster, specify the following minimal configuration:
++
+["source","yml",subs="attributes"]
+--------------------
+monitoring:
+  enabled: true
+  elasticsearch:
+    api_key:  id:api_key <1>
+    username: {beat_monitoring_user}
+    password: somepassword
+--------------------
+<1> Specify one of `api_key` or `username`/`password`.
++
+If you
+ifndef::no-output-logstash[]
+configured a different output, such as {ls} or you
+endif::[]
+want to send {beatname_uc} monitoring events to a separate {es} cluster
+(referred to as the _monitoring cluster_), you must specify additional
+configuration options. For example:
++
+["source","yml",subs="attributes"]
+--------------------
+monitoring:
+  enabled: true
+  cluster_uuid: PRODUCTION_ES_CLUSTER_UUID <1>
+  elasticsearch:
+    hosts: ["https://example.com:9200", "https://example2.com:9200"] <2>
+    api_key:  id:api_key <3>
+    username: {beat_monitoring_user}
+    password: somepassword
+--------------------
+<1> This setting identifies the {es} cluster under which the
+monitoring data for this {beatname_uc} instance will appear in the
+Stack Monitoring UI. To get a cluster's `cluster_uuid`,
+call the `GET /` API against that cluster.
+<2> This setting identifies the hosts and port numbers of {es} nodes
+that are part of the monitoring cluster.
+<3> Specify one of `api_key` or `username`/`password`.
++
+If you want to use PKI authentication to send monitoring events to
+{es}, you must specify a different set of configuration options. For
+example:
++
+[source,yaml]
+--------------------
+monitoring:
+  enabled: true
+  cluster_uuid: PRODUCTION_ES_CLUSTER_UUID
+  elasticsearch:
+    hosts: ["https://example.com:9200", "https://example2.com:9200"]
+    username: ""
+    ssl:
+      ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+      ssl.certificate: "/etc/pki/client/cert.pem"
+      ssl.key: "/etc/pki/client/cert.key"
+--------------------
++
+You must specify the `username` as `""` explicitly so that
+the username from the client certificate (`CN`) is used. See
+<<configuration-ssl>> for more information about SSL settings.
+
+ifndef::serverless[]
+. Start {beatname_uc}.
+endif::[]
+
+ifdef::serverless[]
+. Deploy {beatname_uc}.
+endif::[]
+
+. {kibana-ref}/monitoring-data.html[View the monitoring data in {kib}]. 
+
+
+include::shared-monitor-config.asciidoc[]

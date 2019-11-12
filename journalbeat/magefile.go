@@ -30,9 +30,14 @@ import (
 	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
 
 	devtools.Platforms = devtools.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
@@ -40,6 +45,8 @@ func init() {
 
 const (
 	libsystemdDevPkgName = "libsystemd-dev"
+	libsystemdPkgName    = "libsystemd0"
+	libgcryptPkgName     = "libgcrypt20"
 )
 
 // Build builds the Beat binary.
@@ -74,11 +81,6 @@ func CrossBuildXPack() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon(devtools.ImageSelector(selectImage))
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -149,46 +151,46 @@ var (
 )
 
 func installLinuxAMD64() error {
-	return installDependencies(libsystemdDevPkgName, "")
+	return installDependencies("", libsystemdDevPkgName)
 }
 
 func installLinuxARM64() error {
-	return installDependencies(libsystemdDevPkgName+":arm64", "arm64")
+	return installDependencies("arm64", libsystemdDevPkgName+":arm64")
 }
 
 func installLinuxARMHF() error {
-	return installDependencies(libsystemdDevPkgName+":armhf", "armhf")
+	return installDependencies("armhf", libsystemdDevPkgName+":armhf")
 }
 
 func installLinuxARMLE() error {
-	return installDependencies(libsystemdDevPkgName+":armel", "armel")
+	return installDependencies("armel", libsystemdDevPkgName+":armel")
 }
 
 func installLinux386() error {
-	return installDependencies(libsystemdDevPkgName+":i386", "i386")
+	return installDependencies("i386", libsystemdDevPkgName+":i386", libsystemdPkgName+":i386", libgcryptPkgName+":i386")
 }
 
 func installLinuxMIPS() error {
-	return installDependencies(libsystemdDevPkgName+":mips", "mips")
+	return installDependencies("mips", libsystemdDevPkgName+":mips")
 }
 
 func installLinuxMIPS64LE() error {
-	return installDependencies(libsystemdDevPkgName+":mips64el", "mips64el")
+	return installDependencies("mips64el", libsystemdDevPkgName+":mips64el")
 }
 
 func installLinuxMIPSLE() error {
-	return installDependencies(libsystemdDevPkgName+":mipsel", "mipsel")
+	return installDependencies("mipsel", libsystemdDevPkgName+":mipsel")
 }
 
 func installLinuxPPC64LE() error {
-	return installDependencies(libsystemdDevPkgName+":ppc64el", "ppc64el")
+	return installDependencies("ppc64el", libsystemdDevPkgName+":ppc64el")
 }
 
 func installLinuxS390X() error {
-	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
+	return installDependencies("s390x", libsystemdDevPkgName+":s390x")
 }
 
-func installDependencies(pkg, arch string) error {
+func installDependencies(arch string, pkgs ...string) error {
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
@@ -200,7 +202,8 @@ func installDependencies(pkg, arch string) error {
 		return err
 	}
 
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+	params := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
+	return sh.Run("apt-get", params...)
 }
 
 func selectImage(platform string) (string, error) {

@@ -1,9 +1,11 @@
 [[beats-reference]]
 = Beats Developer Guide
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
 
 :dev-guide: true
 :beatname_lc: beatname

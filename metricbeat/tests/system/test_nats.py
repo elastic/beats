@@ -5,7 +5,7 @@ import unittest
 NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
 
 
-class Test(metricbeat.BaseTest):
+class TestNats(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['nats']
 
@@ -108,3 +108,7 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
+
+
+class TestNats1_3(TestNats):
+    COMPOSE_SERVICES = ['nats_1_3']

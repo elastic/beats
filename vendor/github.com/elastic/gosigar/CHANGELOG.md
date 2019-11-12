@@ -8,11 +8,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Fixed uptime calculation under Windows. #126
-
 ### Changed
 
 ### Deprecated
+
+## [0.10.5]
+
+### Fixed
+
+- Fixed uptime calculation under Windows. #126
+- Fixed compilation issue for darwin/386. #128
+
+### Changed
+
+- Load DLLs only from Windows system directory. #132
 
 ## [0.10.4]
 

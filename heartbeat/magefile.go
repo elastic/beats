@@ -28,13 +28,24 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/generator/common/beatgen"
 	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
 	devtools.BeatServiceName = "heartbeat-elastic"
+}
+
+// VendorUpdate updates elastic/beats in the vendor dir
+func VendorUpdate() error {
+	return beatgen.VendorUpdate()
 }
 
 // Build builds the Beat binary.
@@ -66,11 +77,6 @@ func CrossBuildXPack() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.

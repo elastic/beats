@@ -1,0 +1,18 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/ELB
+        statistic: ["Sum"]
+        name: ["BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX", "HTTPCode_Backend_4XX", "HTTPCode_Backend_5XX", "HTTPCode_ELB_4XX", "HTTPCode_ELB_5XX", "RequestCount", "SpilloverCount"]
+        tags.resource_type_filter: elasticloadbalancing
+      - namespace: AWS/ELB
+        statistic: ["Maximum"]
+        name: ["HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"]
+        tags.resource_type_filter: elasticloadbalancing
+      - namespace: AWS/ELB
+        statistic: ["Average"]
+        name: ["Latency", "EstimatedALBActiveConnectionCount", "EstimatedALBConsumedLCUs", "EstimatedALBNewConnectionCount", "EstimatedProcessedBytes"]
+        tags.resource_type_filter: elasticloadbalancing

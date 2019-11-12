@@ -716,7 +716,7 @@
             }
           }
         },
-        "title": "Controller Memory [Metricset Kubernetes]",
+        "title": "Controller Memory [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {

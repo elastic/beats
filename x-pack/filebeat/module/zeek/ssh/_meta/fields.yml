@@ -1,0 +1,78 @@
+- name: ssh
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek SSH log.
+  fields:
+    - name: client
+      type: keyword
+      description: >
+        The client's version string.
+
+    - name: direction
+      type: keyword
+      description: |
+        Direction of the connection. If the client was a local host logging into
+        an external host, this would be OUTBOUND. INBOUND would be set for the
+        opposite situation.
+
+    - name: host_key
+      type: keyword
+      description: >
+        The server's key thumbprint.
+
+    - name: server
+      type: keyword
+      description: >
+        The server's version string.
+
+    - name: version
+      type: integer
+      description: >
+        SSH major version (1 or 2).
+
+    - name: algorithm
+      type: group
+      description: >
+        Cipher algorithms used in this session.
+      fields:
+        - name: cipher
+          type: keyword
+          description: >
+            The encryption algorithm in use.
+
+        - name: compression
+          type: keyword
+          description: >
+            The compression algorithm in use.
+
+        - name: host_key
+          type: keyword
+          description: >
+            The server host key's algorithm.
+
+        - name: key_exchange
+          type: keyword
+          description: >
+            The key exchange algorithm in use.
+
+        - name: mac
+          type: keyword
+          description: >
+            The signing (MAC) algorithm in use.
+
+    - name: auth
+      type: group
+      fields:
+        - name: attempts
+          type: integer
+          description: |
+            The number of authentication attemps we observed. There's always at
+            least one, since some servers might support no authentication at all.
+            It's important to note that not all of these are failures, since some
+            servers require two-factor auth (e.g. password AND pubkey).
+
+        - name: success
+          type: boolean
+          description: >
+            Authentication result.

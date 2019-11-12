@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD 
 *Affecting all Beats*
 
 - Fixed OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
+- Allow 'ilm.rollover_alias' to expand global fields like `agent.version`. {issue}12233[12233]
 
 *Auditbeat*
 

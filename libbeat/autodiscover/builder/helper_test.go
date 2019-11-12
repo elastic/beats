@@ -38,14 +38,46 @@ func TestGenerateHints(t *testing.T) {
 
 		// Scenarios being tested:
 		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/json.keys_under_root must be a nested common.MapStr under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
 			annotations: map[string]string{
+				"co.elastic.logs/multiline.pattern":    "^test",
+				"co.elastic.logs/json.keys_under_root": "true",
+				"co.elastic.metrics/module":            "prometheus",
+				"co.elastic.metrics/period":            "10s",
+				"co.elastic.metrics.foobar/period":     "15s",
+				"co.elastic.metrics.foobar1/period":    "15s",
+				"not.to.include":                       "true",
+			},
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"multiline": common.MapStr{
+						"pattern": "^test",
+					},
+					"json": common.MapStr{
+						"keys_under_root": "true",
+					},
+				},
+				"metrics": common.MapStr{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+		},
+		// Scenarios being tested:
+		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// metrics/module must be found in hints.metrics
+		// not.to.include must not be part of hints
+		// metrics/metrics_path must be found in hints.metrics
+		{
+			annotations: map[string]string{
 				"co.elastic.logs/multiline.pattern": "^test",
 				"co.elastic.metrics/module":         "prometheus",
 				"co.elastic.metrics/period":         "10s",
+				"co.elastic.metrics/metrics_path":   "/metrics/prometheus",
 				"co.elastic.metrics.foobar/period":  "15s",
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
@@ -57,8 +89,9 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 				"metrics": common.MapStr{
-					"module": "prometheus",
-					"period": "15s",
+					"module":       "prometheus",
+					"period":       "15s",
+					"metrics_path": "/metrics/prometheus",
 				},
 			},
 		},

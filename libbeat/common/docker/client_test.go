@@ -16,6 +16,7 @@
 // under the License.
 
 // +build integration
+// +build linux darwin windows
 
 package docker
 

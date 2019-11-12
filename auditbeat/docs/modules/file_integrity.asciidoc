@@ -122,6 +122,9 @@ of this directories are watched. If `recursive` is set to `true`, the
 `file_integrity` module will watch for changes on this directories and all
 their subdirectories.
 
+*`keep_null`*:: If this option is set to true, fields with `null` values will be
+published in the output document. By default, `keep_null` is set to `false`.
+
 
 [float]
 === Example configuration

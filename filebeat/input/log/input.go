@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
@@ -91,7 +91,11 @@ func NewInput(
 	//  The outlet generated here is the underlying outlet, only closed
 	//  once all workers have been shut down.
 	//  For state updates and events, separate sub-outlets will be used.
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -650,8 +654,8 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 		p.cfg,
 		state,
 		p.states,
-		func(d *util.Data) bool {
-			return p.stateOutlet.OnEvent(d)
+		func(state file.State) bool {
+			return p.stateOutlet.OnEvent(beat.Event{Private: state})
 		},
 		subOutletWrap(p.outlet),
 	)
@@ -711,10 +715,9 @@ func (p *Input) updateState(state file.State) error {
 
 	// Update first internal state
 	p.states.Update(state)
-
-	data := util.NewData()
-	data.SetState(state)
-	ok := p.outlet.OnEvent(data)
+	ok := p.outlet.OnEvent(beat.Event{
+		Private: state,
+	})
 	if !ok {
 		logp.Info("input outlet closed")
 		return errors.New("input outlet closed")

@@ -28,9 +28,14 @@ import (
 
 	auditbeat "github.com/elastic/beats/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
 }
 
@@ -64,11 +69,6 @@ func CrossBuild() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -147,16 +147,6 @@ func Dashboards() error {
 // Docs collects the documentation.
 func Docs() {
 	mg.Deps(auditbeat.ModuleDocs, auditbeat.FieldDocs)
-}
-
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

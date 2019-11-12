@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "AvailabilityZone": "us-east-1c"
+            },
+            "namespace": "AWS/ELB"
+        },
+        "metrics": {
+            "BackendConnectionErrors": {
+                "sum": 10
+            },
+            "HealthyHostCount": {
+                "max": 2
+            },
+            "UnHealthyHostCount": {
+                "max": 1
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "elb",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

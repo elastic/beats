@@ -24,7 +24,7 @@ func (p BalanceStrategyPlan) Add(memberID, topic string, partitions ...int32) {
 // --------------------------------------------------------------------
 
 // BalanceStrategy is used to balance topics and partitions
-// across memebers of a consumer group
+// across members of a consumer group
 type BalanceStrategy interface {
 	// Name uniquely identifies the strategy.
 	Name() string
@@ -78,7 +78,7 @@ type balanceStrategy struct {
 // Name implements BalanceStrategy.
 func (s *balanceStrategy) Name() string { return s.name }
 
-// Balance implements BalanceStrategy.
+// Plan implements BalanceStrategy.
 func (s *balanceStrategy) Plan(members map[string]ConsumerGroupMemberMetadata, topics map[string][]int32) (BalanceStrategyPlan, error) {
 	// Build members by topic map
 	mbt := make(map[string][]string)

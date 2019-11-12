@@ -28,6 +28,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/common"
@@ -180,7 +181,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			defer server.Stop()
 
 			conn, err := net.Dial("tcp", server.Listener.Addr().String())
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			fmt.Fprint(conn, test.messageSent)
 			conn.Close()
 

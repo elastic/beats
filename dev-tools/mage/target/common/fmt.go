@@ -27,3 +27,8 @@ import (
 func Fmt() {
 	mg.Deps(devtools.Format)
 }
+
+// AddLicenseHeaders adds license headers
+func AddLicenseHeaders() {
+	mg.Deps(devtools.AddLicenseHeaders)
+}

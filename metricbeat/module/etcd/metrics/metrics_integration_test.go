@@ -20,7 +20,6 @@
 package metrics
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,9 +32,9 @@ import (
 func TestFetch(t *testing.T) {
 	logp.TestingSetup()
 
-	compose.EnsureUp(t, "etcd")
+	service := compose.EnsureUp(t, "etcd")
 
-	m := mbtest.NewFetcher(t, getConfig())
+	m := mbtest.NewFetcher(t, getConfig(service.Host()))
 	events, errs := m.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -45,34 +44,16 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "etcd")
+	service := compose.EnsureUp(t, "etcd")
 
-	m := mbtest.NewFetcher(t, getConfig())
+	m := mbtest.NewFetcher(t, getConfig(service.Host()))
 	m.WriteEvents(t, "")
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "etcd",
 		"metricsets": []string{"metrics"},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":      []string{host},
 	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("ETCD_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("ETCD_PORT")
-
-	if len(port) == 0 {
-		port = "2379"
-	}
-	return port
 }

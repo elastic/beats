@@ -3,6 +3,6 @@ This is the envoyproxy module.
 The default metricset is `server`.
 
 [float]
-=== Compability
+=== Compatibility
 
 The envoyproxy module is tested with Envoy 1.7.0.

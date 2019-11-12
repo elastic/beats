@@ -1,0 +1,22 @@
+# Cronjob that will execute each minute.
+# It will print a message and sleep (reporting being active) for 5 seconds
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mycronjob
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mycron-container
+            image: alpine
+            imagePullPolicy: IfNotPresent
+            command: ['sh', '-c', 'echo elastic world ; sleep 5']
+    
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 0
+  concurrencyPolicy: Allow

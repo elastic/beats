@@ -22,7 +22,6 @@ package partition
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -37,9 +36,6 @@ import (
 )
 
 const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
-
 	kafkaSASLProducerUsername = "producer"
 	kafkaSASLProducerPassword = "producer-secret"
 	kafkaSASLUsername         = "stats"
@@ -47,11 +43,14 @@ const (
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(120*time.Second),
+		compose.UpWithAdvertisedHostEnvFile,
+	)
 
-	generateKafkaData(t, "metricbeat-generate-data")
+	generateKafkaData(t, service.Host(), "metricbeat-generate-data")
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(""))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), ""))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
@@ -59,8 +58,7 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
-
-	compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka")
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 
@@ -68,9 +66,9 @@ func TestTopic(t *testing.T) {
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic
-	generateKafkaData(t, testTopic)
+	generateKafkaData(t, service.Host(), testTopic)
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(testTopic))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), testTopic))
 	dataBefore, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
@@ -84,7 +82,7 @@ func TestTopic(t *testing.T) {
 	var i int64 = 0
 	// Create n messages
 	for ; i < n; i++ {
-		generateKafkaData(t, testTopic)
+		generateKafkaData(t, service.Host(), testTopic)
 	}
 
 	dataAfter, err := mbtest.ReportingFetchV2Error(f)
@@ -123,7 +121,7 @@ func TestTopic(t *testing.T) {
 	assert.True(t, offsetBefore+n == offsetAfter)
 }
 
-func generateKafkaData(t *testing.T, topic string) {
+func generateKafkaData(t *testing.T, host string, topic string) {
 	t.Logf("Send Kafka Event to topic: %v", topic)
 
 	config := sarama.NewConfig()
@@ -136,7 +134,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLProducerUsername
 	config.Net.SASL.Password = kafkaSASLProducerPassword
-	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
+	client, err := sarama.NewClient([]string{host}, config)
 	if err != nil {
 		t.Errorf("%s", err)
 		t.FailNow()
@@ -164,7 +162,7 @@ func generateKafkaData(t *testing.T, topic string) {
 	}
 }
 
-func getConfig(topic string) map[string]interface{} {
+func getConfig(host string, topic string) map[string]interface{} {
 	var topics []string
 	if topic != "" {
 		topics = []string{topic}
@@ -173,27 +171,9 @@ func getConfig(topic string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
-		"hosts":      []string{getTestKafkaHost()},
+		"hosts":      []string{host},
 		"topics":     topics,
 		"username":   kafkaSASLUsername,
 		"password":   kafkaSASLPassword,
 	}
-}
-
-func getTestKafkaHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("KAFKA_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }

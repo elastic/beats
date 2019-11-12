@@ -3,8 +3,8 @@ package sarama
 type CoordinatorType int8
 
 const (
-	CoordinatorGroup       CoordinatorType = 0
-	CoordinatorTransaction CoordinatorType = 1
+	CoordinatorGroup CoordinatorType = iota
+	CoordinatorTransaction
 )
 
 type FindCoordinatorRequest struct {

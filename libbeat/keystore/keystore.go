@@ -67,6 +67,7 @@ type Keystore interface {
 // Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
 type Packager interface {
 	Package() ([]byte, error)
+	ConfiguredPath() string
 }
 
 // Factory Create the right keystore with the configured options.
