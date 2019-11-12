@@ -333,12 +333,6 @@
 			"revisionTime": "2019-09-11T17:52:35Z"
 		},
 		{
-			"checksumSHA1": "hRpd9yDAKix9wL1+joE44uJrXTQ=",
-			"path": "github.com/tonistiigi/fifo",
-			"revision": "bda0ff6ed73c67bfb5e62bc9c697f146b7fd7f13",
-			"revisionTime": "2019-08-16T18:02:39Z"
-		},
-		{
 			"checksumSHA1": "RNVKKPbxQAFzQ7bawOBsoMrjh2A=",
 			"path": "golang.org/x/sys/unix",
 			"revision": "c990c680b611ac1aeb7d8f2af94a825f98d69720",

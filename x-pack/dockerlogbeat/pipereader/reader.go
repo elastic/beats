@@ -12,10 +12,10 @@ import (
 	"os"
 	"syscall"
 
+	"github.com/containerd/fifo"
 	"github.com/docker/engine/api/types/plugins/logdriver"
 	"github.com/gogo/protobuf/proto"
 	"github.com/pkg/errors"
-	"github.com/tonistiigi/fifo"
 )
 
 // PipeReader reads from the FIFO pipe we get from the docker container
