@@ -4,7 +4,7 @@ the container starts, {beatname_uc} will check if it contains any hints and laun
 it. Hints tell {beatname_uc} how to get logs for the given container.
 
 Hints for {beatname_uc} take the form `co.elastic.monitor/MONITOR_INDEX.CONFIG_OPTION=VALUE`, where `MONITOR_INDEX` represents
-the index of monitor, `CONFIG_OPTION` is any of the <<configuration-heartbeat-options>> options, with `VALUE` being the value
+the index of monitor, and `CONFIG_OPTION` is any of the <<configuration-heartbeat-options>> options, with `VALUE` being the value
 you'd like to set that option to.
 
 As an example let's convert the regular syntax {beatname_uc} monitors below into autodiscover hints.
