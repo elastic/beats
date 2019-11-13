@@ -112,7 +112,7 @@ func configYML() error {
 
 // includeList generates include/list.go with imports for inputs.
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
+	return devtools.GenerateIncludeListGo([]string{"input/*"}, []string{"module"}, nil, "include/list.go", "")
 }
 
 // Fields generates fields.yml and fields.go files for the Beat.
