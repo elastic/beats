@@ -222,7 +222,7 @@
           "script": {
               "lang": "painless",
               "source": "if (ctx.azure.activitylogs.identity.claims != null) { ctx.temp_claims = new HashMap(); for (String key : ctx.azure.activitylogs.identity.claims.keySet()) {  ctx.temp_claims[key.replace('.', '_')] = ctx.azure.activitylogs.identity.claims.get(key) ;}ctx.azure.activitylogs.identity.claims = ctx.temp_claims; ctx.remove('temp_claims');}",
-              "ignore_failure": false
+              "ignore_failure": true
           }
       },
       {
