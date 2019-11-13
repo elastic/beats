@@ -4353,15 +4353,6 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
-Dependency: github.com/OneOfOne/xxhash
-Revision: 74ace4fe5525ef62ce28d5093d6b0faaa6a575f3
-License type (autodetected): Apache-2.0
-./vendor/github.com/OneOfOne/xxhash/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
 Revision: eaa60544f31ccf3b0653b1a118b76d33418ff41b
 License type (autodetected): Apache-2.0
