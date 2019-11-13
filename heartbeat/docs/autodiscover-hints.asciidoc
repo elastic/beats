@@ -3,11 +3,11 @@ hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.el
 the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
 it. Hints tell {beatname_uc} how to get logs for the given container.
 
-Hints for Heartbeat take the form `co.elastic.monitor/MONITOR_INDEX.CONFIG_OPTION=VALUE`. Where `MONITOR_INDEX` represents
+Hints for {beatname_uc} take the form `co.elastic.monitor/MONITOR_INDEX.CONFIG_OPTION=VALUE`, where `MONITOR_INDEX` represents
 the index of monitor, `CONFIG_OPTION` is any of the <<configuration-heartbeat-options>> options, with `VALUE` being the value
 you'd like to set that option to.
 
-As an example let's convert the regular syntax heartbeat monitors below into autodiscover hints.
+As an example let's convert the regular syntax {beatname_uc} monitors below into autodiscover hints.
 
 [source,yml]
 ----------------------------------------------------------------------
@@ -20,7 +20,7 @@ As an example let's convert the regular syntax heartbeat monitors below into aut
   schedule: @every 10s
 ----------------------------------------------------------------------
 
-To configure this with autodiscover add the following line to your Dockerfile to add the requisite labels.
+To configure this with autodiscover, add the following line to your Dockerfile to add the requisite labels.
 
 ----------------------------------------------------------------------
 LABEL co.elastic.monitor/1.type=tcp co.elastic.monitor/1.hosts='${data.host}:6379' co.elastic.monitor/1.schedule='@every 10s'
