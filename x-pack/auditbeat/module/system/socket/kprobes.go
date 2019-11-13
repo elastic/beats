@@ -19,8 +19,10 @@ import (
 	"github.com/elastic/beats/x-pack/auditbeat/tracing"
 )
 
-// Enough for padding + mac_hdr + max ip_hdr + udp_hdr
-const pktHeaderDumpBytes = 8 * 12
+// This is how many data we dump from sk_buff->data to read full packet headers
+// (IP + UDP header). This has been observed to include up to 100 bytes of
+// padding.
+const skBuffDataDumpBytes = 256
 
 // ProbeTransform transforms a probe before its installed.
 type ProbeTransform func(helper.ProbeDef) helper.ProbeDef
@@ -300,7 +302,7 @@ var sharedKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udp_queue_rcv_skb",
 			Address:   "udp_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 head=+{{.SK_BUFF_HEAD}}({{.P2}}) base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, pktHeaderDumpBytes),
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddr=+{{.INET_SOCK_LADDR}}({{.P1}}):u32 lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpQueueRcvSkb) }),
 	},
@@ -463,7 +465,7 @@ var ipv6KProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "udpv6_queue_rcv_skb",
 			Address:   "udpv6_queue_rcv_skb",
-			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, pktHeaderDumpBytes),
+			Fetchargs: "sock={{.P1}} size=+{{.SK_BUFF_LEN}}({{.P2}}):u32 laddra={{.INET_SOCK_V6_LADDR_A}}({{.P1}}){{.INET_SOCK_V6_TERM}} laddrb={{.INET_SOCK_V6_LADDR_B}}({{.P1}}){{.INET_SOCK_V6_TERM}} lport=+{{.INET_SOCK_LPORT}}({{.P1}}):u16 iphdr=+{{.SK_BUFF_NETWORK}}({{.P2}}):u16 udphdr=+{{.SK_BUFF_TRANSPORT}}({{.P2}}):u16 base=+{{.SK_BUFF_HEAD}}({{.P2}}) packet=" + helper.MakeMemoryDump("+{{.SK_BUFF_HEAD}}({{.P2}})", 0, skBuffDataDumpBytes),
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(udpv6QueueRcvSkb) }),
 	},

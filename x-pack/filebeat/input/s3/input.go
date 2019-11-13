@@ -6,6 +6,7 @@ package s3
 
 import (
 	"bufio"
+	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -247,7 +248,7 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 
 	s3Infos, err := handleSQSMessage(message)
 	if err != nil {
-		p.logger.Error(errors.Wrap(err, "handleMessage failed"))
+		p.logger.Error(errors.Wrap(err, "handleSQSMessage failed"))
 		return
 	}
 
@@ -255,8 +256,8 @@ func (p *s3Input) processMessage(svcS3 s3iface.ClientAPI, message sqs.Message, w
 	err = p.handleS3Objects(svcS3, s3Infos, errC)
 	if err != nil {
 		err = errors.Wrap(err, "handleS3Objects failed")
-		errC <- err
 		p.logger.Error(err)
+		errC <- err
 	}
 }
 
@@ -275,7 +276,10 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 				}
 				p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
-				p.logger.Debug("ACK done, deleting message from SQS")
+				// When ACK done, message will be deleted. Or when message is
+				// not s3 ObjectCreated event related(handleSQSMessage function
+				// failed), it will be removed as well.
+				p.logger.Debug("Deleting message from SQS: ", message.MessageId)
 				// only delete sqs message when errC is closed with no error
 				err := p.deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 				if err != nil {
@@ -339,13 +343,15 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 	var s3Infos []s3Info
 	for _, record := range msg.Records {
-		if record.EventSource == "aws:s3" && record.EventName == "ObjectCreated:Put" {
+		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "ObjectCreated:") {
 			s3Infos = append(s3Infos, s3Info{
 				region: record.AwsRegion,
 				name:   record.S3.bucket.Name,
 				key:    record.S3.object.Key,
 				arn:    record.S3.bucket.Arn,
 			})
+		} else {
+			return nil, errors.New("this SQS queue should be dedicated to s3 ObjectCreated event notifications")
 		}
 	}
 	return s3Infos, nil
@@ -433,6 +439,17 @@ func (p *s3Input) newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info) (*bufi
 	if resp.Body == nil {
 		return nil, errors.New("s3 get object response body is empty")
 	}
+
+	if strings.HasSuffix(s3Info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+
+		if err != nil {
+			return nil, errors.Wrapf(err, "Failed to decompress gzipped file %v", s3Info.key)
+		}
+
+		return bufio.NewReader(gzipReader), nil
+	}
+
 	return bufio.NewReader(resp.Body), nil
 }
 
@@ -504,16 +521,21 @@ func s3ObjectHash(s3Info s3Info) string {
 }
 
 func (c *s3Context) Fail(err error) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	// only care about the last error for now
-	// TODO: add "Typed" error to error for context
-	c.err = err
+	c.setError(err)
 	c.done()
 }
 
+func (c *s3Context) setError(err error) {
+	// only care about the last error for now
+	// TODO: add "Typed" error to error for context
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	c.err = err
+}
+
 func (c *s3Context) done() {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	c.refs--
 	if c.refs == 0 {
 		c.errC <- c.err

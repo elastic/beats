@@ -147,6 +147,11 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
+	err := setUmaskWithSettings(settings)
+	if err != nil && err != errNotImplemented {
+		return errw.Wrap(err, "could not set umask")
+	}
+
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
 	version := settings.Version
@@ -366,6 +371,15 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
+	// Try to acquire exclusive lock on data path to prevent another beat instance
+	// sharing same data path.
+	bl := newLocker(b)
+	err = bl.lock()
+	if err != nil {
+		return err
+	}
+	defer bl.unlock()
+
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
@@ -375,6 +389,18 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	svc.BeforeRun()
 	defer svc.Cleanup()
+
+	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
+	// set the appropriate permission on the unix domain file without having to whitelist anything
+	// that would be set at runtime.
+	if b.Config.HTTP.Enabled() {
+		s, err := api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		if err != nil {
+			return errw.Wrap(err, "could not start the HTTP server for the API")
+		}
+		s.Start()
+		defer s.Stop()
+	}
 
 	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
 		return err
@@ -428,10 +454,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-
-	if b.Config.HTTP.Enabled() {
-		api.Start(b.Config.HTTP)
-	}
 
 	// Launch config manager
 	b.ConfigManager.Start()
@@ -1028,4 +1050,11 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
+}
+
+func setUmaskWithSettings(settings Settings) error {
+	if settings.Umask != nil {
+		return setUmask(*settings.Umask)
+	}
+	return setUmask(0027) // 0640 for files | 0750 for dirs
 }

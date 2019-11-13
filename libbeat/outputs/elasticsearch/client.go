@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -68,6 +69,7 @@ type ClientSettings struct {
 	ProxyDisable       bool
 	TLS                *transport.TLSConfig
 	Username, Password string
+	APIKey             string
 	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
@@ -86,6 +88,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
+	APIKey   string
 	Headers  map[string]string
 
 	http              *http.Client
@@ -205,6 +208,7 @@ func NewClient(
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
+			APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
 			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
@@ -277,6 +281,7 @@ func (client *Client) Clone() *Client {
 			TLS:              client.tlsConfig,
 			Username:         client.Username,
 			Password:         client.Password,
+			APIKey:           client.APIKey,
 			Parameters:       nil, // XXX: do not pass params?
 			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
@@ -327,7 +332,7 @@ func (client *Client) publishEvents(
 	}
 
 	origCount := len(data)
-	data = bulkEncodePublishRequest(body, client.index, client.pipeline, eventType, data)
+	data = bulkEncodePublishRequest(client.GetVersion(), body, client.index, client.pipeline, eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -384,6 +389,7 @@ func (client *Client) publishEvents(
 // fillBulkRequest encodes all bulk requests and returns slice of events
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
+	version common.Version,
 	body bulkWriter,
 	index outputs.IndexSelector,
 	pipeline *outil.Selector,
@@ -393,7 +399,7 @@ func bulkEncodePublishRequest(
 	okEvents := data[:0]
 	for i := range data {
 		event := &data[i].Content
-		meta, err := createEventBulkMeta(index, pipeline, eventType, event)
+		meta, err := createEventBulkMeta(version, index, pipeline, eventType, event)
 		if err != nil {
 			logp.Err("Failed to encode event meta data: %s", err)
 			continue
@@ -409,6 +415,7 @@ func bulkEncodePublishRequest(
 }
 
 func createEventBulkMeta(
+	version common.Version,
 	indexSel outputs.IndexSelector,
 	pipelineSel *outil.Selector,
 	eventType string,
@@ -444,7 +451,7 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
-	if id != "" {
+	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
 		return bulkCreateAction{meta}, nil
 	}
 	return bulkIndexAction{meta}, nil
@@ -797,8 +804,13 @@ func (conn *Connection) execRequest(
 
 func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
+
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+
+	if conn.APIKey != "" {
+		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
 	}
 
 	for name, value := range conn.Headers {

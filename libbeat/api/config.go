@@ -17,16 +17,25 @@
 
 package api
 
+import "os"
+
+// Config is the configuration for the API endpoint.
 type Config struct {
-	Enabled bool
-	Host    string
-	Port    int
+	Enabled            bool   `config:"enabled"`
+	Host               string `config:"host"`
+	Port               int    `config:"port"`
+	User               string `config:"named_pipe.user"`
+	SecurityDescriptor string `config:"named_pipe.security_descriptor"`
 }
 
 var (
+	// DefaultConfig is the default configuration used by the API endpoint.
 	DefaultConfig = Config{
 		Enabled: false,
 		Host:    "localhost",
 		Port:    5066,
 	}
 )
+
+// File mode for the socket file, owner of the process can do everything, member of the group can read.
+const socketFileMode = os.FileMode(0740)

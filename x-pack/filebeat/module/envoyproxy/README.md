@@ -2,10 +2,6 @@
 
 This is a filebeat module for Envoy proxy access log. 
 
-## Caveats
-
-* Module is to be considered _beta_.
-
 ## Download and install Filebeat
 
 Grab the filebeat binary from elastic.co, and install it by following the instructions.
@@ -56,7 +52,7 @@ This enables auto-discovery and hints for filebeat. When default.disable is set 
 
 #### Note the following section in the DaemonSet, make changes to the yaml file if necessary
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
@@ -64,6 +60,9 @@ metadata:
   labels:
     k8s-app: filebeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
   template:
     metadata:
       labels:
@@ -99,12 +98,15 @@ The module setup step can also be done separately without Kubernetes if applicab
 #### Sample Deployment for envoy, using ambassador as an example. Note the annotations.
 
 ```
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ambassador
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      service: ambassador
   template:
     metadata:
       annotations:

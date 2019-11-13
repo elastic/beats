@@ -1,0 +1,30 @@
+191015  9:46:45	    13 Query	SHOW /*!50002 GLOBAL */ STATUS
+2019-10-16 17:24:15 0 [Note] InnoDB: Using Linux native AIO
+2019-10-16 17:24:15 0 [Note] InnoDB: Mutexes and rw_locks use GCC atomic builtins
+2019-10-16 17:24:15 0 [Note] InnoDB: Uses event mutexes
+2019-10-16 17:24:15 0 [Note] InnoDB: Compressed tables use zlib 1.2.7
+2019-10-16 17:24:15 0 [Note] InnoDB: Number of pools: 1
+2019-10-16 17:24:15 0 [Note] InnoDB: Using SSE2 crc32 instructions
+2019-10-16 17:24:15 0 [Note] InnoDB: Initializing buffer pool, total size = 128M, instances = 1, chunk size = 128M
+2019-10-16 17:24:15 0 [Note] InnoDB: Completed initialization of buffer pool
+2019-10-16 17:24:15 0 [Note] InnoDB: If the mysqld execution user is authorized, page cleaner thread priority can be changed. See the man page of setpriority().
+2019-10-16 17:24:15 0 [Note] InnoDB: 128 out of 128 rollback segments are active.
+2019-10-16 17:24:15 0 [Note] InnoDB: Creating shared tablespace for temporary tables
+2019-10-16 17:24:15 0 [Note] InnoDB: Setting file './ibtmp1' size to 12 MB. Physically writing the file full; Please wait ...
+2019-10-16 17:24:15 0 [Note] InnoDB: File './ibtmp1' size is now 12 MB.
+2019-10-16 17:24:15 0 [Note] InnoDB: Waiting for purge to start
+2019-10-16 17:24:15 0 [Note] InnoDB: 10.4.8 started; log sequence number 1631101; transaction id 791
+2019-10-16 17:24:15 0 [Note] InnoDB: Loading buffer pool(s) from /data/mysqldata/mysql/ib_buffer_pool
+2019-10-16 17:24:15 0 [Note] Plugin 'FEEDBACK' is disabled.
+2019-10-16 17:24:15 0 [Note] InnoDB: Buffer pool(s) load completed at 191016 17:24:15
+2019-10-16 17:24:15 0 [Note] Server socket created on IP: '::'.
+2019-10-16 17:24:15 0 [Note] Reading of all Master_info entries succeeded
+2019-10-16 17:24:15 0 [Note] Added new Master_info '' to hash table
+2019-10-16 17:24:15 0 [Note] /usr/sbin/mysqld: ready for connections.
+Version: '10.4.8-MariaDB-log'  socket: '/data/mysqldata/mysql.sock'  port: 3306  MariaDB Server
+2019-10-16 17:25:43 11 [Note] Event Scheduler: scheduler thread started with id 11
+2019-10-16 17:25:43 11 [Note] Event Scheduler: Last execution of test.test_error_log. Dropping.
+2019-10-16 17:25:43 12 [Note] Event Scheduler: Dropping test.test_error_log
+2019-10-16 17:25:43 12 [ERROR] Event Scheduler: [root@localhost][test.test_error_log] hi from the error log
+2019-10-16 17:25:43 12 [Note] Event Scheduler: [root@localhost][test.test_error_log] At line 1 in test.test_error_log
+

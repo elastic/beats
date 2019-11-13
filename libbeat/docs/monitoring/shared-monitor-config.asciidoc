@@ -32,6 +32,11 @@ The default value is `false`.
 The {es} instances that you want to ship your {beatname_uc} metrics to. This
 configuration option contains the following fields:
 
+==== `api_key`
+
+The detail of the API key to be used to send monitoring information to {es}.
+See <<beats-api-keys>> for more information.
+
 ==== `bulk_max_size`
 
 The maximum number of metrics to bulk in a single {es} bulk API index request.

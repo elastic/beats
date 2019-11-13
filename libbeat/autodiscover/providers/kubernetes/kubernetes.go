@@ -57,6 +57,7 @@ type Provider struct {
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The kubernetes autodiscover is beta")
+	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up kubernetes autodiscover provider")
@@ -80,6 +81,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
+	logger.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
+
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 		Node:        config.Host,
@@ -92,9 +95,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, errWrap(err)
-	}
-	if len(mapper) == 0 && !config.Hints.Enabled() {
-		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
 	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
@@ -116,26 +116,51 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		appenders: appenders,
 		metagen:   metagen,
 		watcher:   watcher,
-		logger:    logp.NewLogger("kubernetes"),
+		logger:    logger,
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			p.logger.Debugf("Watcher Pod add: %+v", obj)
-			p.emit(obj.(*kubernetes.Pod), "start")
-		},
-		UpdateFunc: func(obj interface{}) {
-			p.logger.Debugf("Watcher Pod update: %+v", obj)
-			p.emit(obj.(*kubernetes.Pod), "stop")
-			p.emit(obj.(*kubernetes.Pod), "start")
-		},
-		DeleteFunc: func(obj interface{}) {
-			p.logger.Debugf("Watcher Pod delete: %+v", obj)
-			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
-		},
+		AddFunc:    p.handleAdd,
+		UpdateFunc: p.handleUpdate,
+		DeleteFunc: p.handleDelete,
 	})
 
 	return p, nil
+}
+
+// handleAdd emits a start event for the given pod
+func (p *Provider) handleAdd(obj interface{}) {
+	p.logger.Debugf("Watcher Pod add: %+v", obj)
+	p.emit(obj.(*kubernetes.Pod), "start")
+}
+
+// handleUpdate emits events for a given pod depending on the state of the pod,
+// if it is terminating, a stop event is scheduled, if not, a stop and a start
+// events are sent sequentially to recreate the resources assotiated to the pod.
+func (p *Provider) handleUpdate(obj interface{}) {
+	pod := obj.(*kubernetes.Pod)
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
+		// Pod is terminating, don't reload its configuration and ignore the event
+		// if some pod is still running, we will receive more events when containers
+		// terminate.
+		for _, container := range pod.Status.ContainerStatuses {
+			if container.State.Running != nil {
+				return
+			}
+		}
+		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
+	} else {
+		p.logger.Debugf("Watcher Pod update: %+v", obj)
+		p.emit(pod, "stop")
+		p.emit(pod, "start")
+	}
+}
+
+// handleDelete emits a stop event for the given pod
+func (p *Provider) handleDelete(obj interface{}) {
+	p.logger.Debugf("Watcher Pod delete: %+v", obj)
+	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 }
 
 // Start for Runner interface.
@@ -170,9 +195,14 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-		containerIDs[c.Name] = cid
-		runtimes[c.Name] = runtime
+		// If the container is not being stopped then add the container only if it is in running state.
+		// This makes sure that we dont keep tailing init container logs after they have stopped.
+		// Emit the event in case that the pod is being stopped.
+		if flag == "stop" || c.State.Running != nil {
+			cid, runtime := kubernetes.ContainerIDWithRuntime(c)
+			containerIDs[c.Name] = cid
+			runtimes[c.Name] = runtime
+		}
 	}
 
 	// Emit container and port information
