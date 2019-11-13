@@ -62,5 +62,23 @@
         "misp.threat_indicator.id": "5d159be2-d4b4-4d97-9e14-406a02de0b81",
         "misp.threat_indicator.type": "filename",
         "service.type": "misp"
+    },
+    {
+        "@timestamp": "2017-03-30T12:54:26.000Z",
+        "event.category": "threat-intel",
+        "event.dataset": "misp.threat",
+        "event.module": "misp",
+        "event.type": "indicator",
+        "fileset.name": "threat",
+        "input.type": "log",
+        "log.offset": 1551,
+        "message": "f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de",
+        "misp.threat_indicator.attack_pattern": "[dns:question:name = 'f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de' OR url:domain = 'f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de' OR source:domain = 'f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de' OR destination:domain = 'f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de']",
+        "misp.threat_indicator.attack_pattern_kql": "dns.question.name: \"f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de\" OR url.domain: \"f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de\" OR source.domain: \"f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de\" OR destination.domain: \"f6bf5b8bb2400aad4ac844f2b94a4e556907f35b44c5ff462fb4e70c0208c9de\"",
+        "misp.threat_indicator.description": "OSINT Expansion on Systematic cyber attacks against Israeli and Palestinian targets going on for a year by Norman",
+        "misp.threat_indicator.feed": "misp",
+        "misp.threat_indicator.id": "563b3ea6-b26c-401f-a68b-4d84950d210b",
+        "misp.threat_indicator.type": "domain",
+        "service.type": "misp"
     }
 ]

@@ -49,19 +49,16 @@ var threat = (function () {
                 } else {
                     asn = v;
                 }
-                attackPattern = '[' + 'as:number = ' + '\'' + asn + '\'' + ']';
-                attackPatternKQL = 'as.number: ' + asn;
-                evt.Put("as.number", asn);
+                attackPattern = '[' + 'source:as:number = ' + '\'' + asn + '\'' + ' OR destination:as:number = ' + '\'' + asn + '\'' + ']';
+                attackPatternKQL = 'source.as.number: ' + asn + ' OR destination.as.number: ' + asn;
                 break;
             case 'btc':
                 attackPattern = '[' + 'bitcoin:address = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'bitcoin.address: ' + '"' + v + '"'; 
                 break;
             case "domain":
-                attackPattern = '[' + 'dns:question:name = ' + '\'' + v + '\'' + ' OR url:domain = ' + '\'' + v + '\'' + ']';
-                attackPatternKQL = 'dns.question.name: ' + '"' + v + '"' + ' OR url.domain: ' + '"' + v + '"'; 
-                evt.Put("dns.question.name", v);
-                evt.Put("url.domain", v);
+                attackPattern = '[' + 'dns:question:name = ' + '\'' + v + '\'' + ' OR url:domain = ' + '\'' + v + '\'' + ' OR source:domain = ' + '\'' + v + '\'' + ' OR destination:domain = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'dns.question.name: ' + '"' + v + '"' + ' OR url.domain: ' + '"' + v + '"' + ' OR source.domain: ' + '"' + v + '"' + ' OR destination.domain: ' + '"' + v + '"'; 
                 break;
             case "domain|ip":
                 arr = v.split("|");
@@ -71,10 +68,6 @@ var threat = (function () {
                     attackPattern = '[' + '(' + 'dns:question:name = ' + '\'' + domain + '\'' + ' OR url:domain = ' + '\'' + domain + '\'' + ')' +
                         ' AND ' + '(' + 'source:ip = ' + '\'' + ip + '\'' + ' OR destination:ip = ' + '\'' + ip + '\'' + ')' + ']';
                     attackPatternKQL = '(' + 'dns.question.name :' + '"' + domain + '"' + ' OR url.domain: ' + '"' + domain + '"' + ')' + ' AND ' + '(' + 'source.ip: ' + '"' + ip + '"' + ' OR destination.ip: ' + '"' + ip + '"' + ')';
-                    evt.Put("dns.question.name", domain);
-                    evt.Put("url.domain", domain);
-                    evt.Put("source.ip", ip);
-                    evt.Put("destination.ip", ip);
                 }
                 break;
             case 'email-src':
@@ -121,14 +114,12 @@ var threat = (function () {
                 }
                 break;
             case 'github-username':
-                attackPattern = '[' + 'github:username = ' + '\'' + v + '\'' + ']';
-                attackPatternKQL = 'github.username: ' + '"' + v + '"';
+                attackPattern = '[' + 'user:name = ' + '\'' + v + '\'' + ']';
+                attackPatternKQL = 'user.name: ' + '"' + v + '"';
                 break;
             case "hostname":
                 attackPattern = '[' + 'source:domain = ' + '\'' + v + '\'' + ' OR destination:domain = ' + '\'' + v + '\'' + ']';
                 attackPatternKQL = 'source.domain: ' + '"' + v + '"' + ' OR destination.domain: ' + '"' + v + '"';
-                evt.Put("source.domain", v);
-                evt.Put("destination.domain", v);
                 break;
             case "ip-dst":
                 ip = v.split("/")[0];
