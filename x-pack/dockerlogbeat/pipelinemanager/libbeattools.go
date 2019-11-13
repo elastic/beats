@@ -9,6 +9,9 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/pkg/errors"
+	yaml "gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt"
@@ -16,8 +19,6 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/libbeat/publisher/processing"
-	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // makeConfigHash is the helper function that turns a user config into a hash

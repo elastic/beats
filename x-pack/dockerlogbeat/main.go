@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/docker/go-plugins-helpers/sdk"
+
 	"github.com/elastic/beats/libbeat/common"
 	logpcfg "github.com/elastic/beats/libbeat/logp/configure"
 	_ "github.com/elastic/beats/libbeat/outputs/console"

@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/docker/engine/daemon/logger"
+
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemanager"
 
@@ -54,7 +55,7 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 			return
 		}
 
-		go cl.ConsumeAndSendLogs()
+		go cl.ConsumePipelineAndSend()
 
 		respondOK(w)
 	} // end func
