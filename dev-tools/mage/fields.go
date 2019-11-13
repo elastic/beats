@@ -142,8 +142,28 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 
 // GenerateModuleIncludeListGo generates an include/list.go file containing
 // a import statement for each module and dataset.
-func GenerateModuleIncludeListGo(moduleDirs []string, modulesToExclude []string, outfile string, buildTags string) error {
-	return GenerateIncludeListGo(nil, moduleDirs, modulesToExclude, outfile,  buildTags)
+func GenerateModuleIncludeListGo() error {
+	return GenerateIncludeListGo(nil, []string{"module"}, nil, "include/list.go",  "")
+}
+
+// GenerateOSSMetricbeatModuleIncludeListGo generates include/list_{suffix}.go files containing
+// a import statement for each module and dataset.
+func GenerateOSSMetricbeatModuleIncludeListGo() error {
+	err := GenerateIncludeListGo(
+		nil, []string{"module"},
+		[]string{"module/docker", "module/kubernetes"},
+		"include/list_common.go",  "")
+	if err != nil {
+		return err
+	}
+	err = GenerateIncludeListGo(
+		nil, []string{"module/docker", "module/kubernetes"},
+		nil,
+		"include/list_docker.go",  "\n// +build linux darwin windows\n")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GenerateIncludeListGo generates an include/list.go file containing imports
