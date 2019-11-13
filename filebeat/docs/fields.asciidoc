@@ -1985,13 +1985,97 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.target_resources.*`*::
-+
---
+[float]
+=== target_resources.*
+
 Target resources
 
 
-type: object
+
+*`azure.auditlogs.properties.target_resources.*.display_name`*::
++
+--
+Display name
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.*.id`*::
++
+--
+ID
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.*.type`*::
++
+--
+Type
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.*.ip_address`*::
++
+--
+ip Address
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.*.user_principal_name`*::
++
+--
+User principal name
+
+
+type: keyword
+
+--
+
+[float]
+=== modified_properties.*
+
+Modified properties
+
+
+
+*`azure.auditlogs.properties.target_resources.*.modified_properties.*.new_value`*::
++
+--
+New value
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.*.modified_properties.*.display_name`*::
++
+--
+Display value
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.properties.target_resources.*.modified_properties.*.old_value`*::
++
+--
+Old value
+
+
+type: keyword
 
 --
 
