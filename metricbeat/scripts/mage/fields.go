@@ -25,16 +25,24 @@ import (
 // a import statement for each module and dataset.
 func GenerateOSSMetricbeatModuleIncludeListGo() error {
 	err := devtools.GenerateIncludeListGo(
-		nil, []string{"module"},
-		[]string{"module/docker", "module/kubernetes"},
-		"include/list_common.go", "", "include")
+		devtools.IncludeListOptions{
+			nil,
+			[]string{"module"},
+			[]string{"module/docker", "module/kubernetes"},
+			"include/list_common.go",
+			"",
+			"include"})
 	if err != nil {
 		return err
 	}
 	err = devtools.GenerateIncludeListGo(
-		nil, []string{"module/docker", "module/kubernetes"},
-		nil,
-		"include/list_docker.go", "\n// +build linux darwin windows\n", "include")
+		devtools.IncludeListOptions{
+			nil,
+			[]string{"module/docker", "module/kubernetes"},
+			nil,
+			"include/list_docker.go",
+			"\n// +build linux darwin windows\n",
+			"include"})
 	if err != nil {
 		return err
 	}

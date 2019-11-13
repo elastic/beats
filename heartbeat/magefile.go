@@ -113,7 +113,11 @@ func Fields() error {
 // Imports generates an include/list.go file containing
 // a import statement for each module and dataset.
 func Imports() error {
-	return devtools.GenerateIncludeListGo(nil, []string{"monitors"}, nil, "monitors/defaults/default.go", "", "defaults")
+	options := devtools.DefaultIncludeListOptions()
+	options.ModuleDirs = []string{"monitors"}
+	options.Outfile = "monitors/defaults/default.go"
+	options.Pkg = "defaults"
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // GoTestUnit executes the Go unit tests.
