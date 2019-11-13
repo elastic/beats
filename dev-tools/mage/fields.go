@@ -37,6 +37,7 @@ const (
 	FieldsAllYML = "build/fields/fields.all.yml"
 )
 
+// IncludeListOptions stores the options for IncludeList generation
 type IncludeListOptions struct {
 	ImportDirs       []string
 	ModuleDirs       []string
@@ -46,6 +47,7 @@ type IncludeListOptions struct {
 	Pkg              string
 }
 
+// DefaultIncludeListOptions initializes IncludeListOptions struct with default values
 func DefaultIncludeListOptions() IncludeListOptions {
 	return IncludeListOptions{
 		ImportDirs:       nil,
