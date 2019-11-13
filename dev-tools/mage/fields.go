@@ -142,14 +142,14 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 
 // GenerateModuleIncludeListGo generates an include/list.go file containing
 // a import statement for each module and dataset.
-func GenerateModuleIncludeListGo() error {
-	return GenerateIncludeListGo(nil, []string{"module"})
+func GenerateModuleIncludeListGo(moduleDirs []string, modulesToExclude []string, outfile string, buildTags string) error {
+	return GenerateIncludeListGo(nil, moduleDirs, modulesToExclude, outfile,  buildTags)
 }
 
 // GenerateIncludeListGo generates an include/list.go file containing imports
 // for the packages that match the paths (or globs) in importDirs (optional)
 // and moduleDirs (optional).
-func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
+func GenerateIncludeListGo(importDirs []string, moduleDirs []string, modulesToExclude []string, outfile string, buildTags string) error {
 	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -160,6 +160,7 @@ func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
 	includeListCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", toLibbeatLicenseName(BeatLicense),
+		"-out", outfile, "-buildTags", buildTags,
 	)
 
 	var args []string
@@ -175,7 +176,12 @@ func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
 		}
 		args = append(args, "-moduleDir", dir)
 	}
-
+	for _, dir := range modulesToExclude {
+		if !filepath.IsAbs(dir) {
+			dir = CWD(dir)
+		}
+		args = append(args, "-moduleExcludeDirs", dir)
+	}
 	return includeListCmd(args...)
 }
 

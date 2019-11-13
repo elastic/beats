@@ -123,9 +123,9 @@ func configYML() error {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
+	devtools.GenerateModuleIncludeListGo([]string{"module"}, nil, "include/list.go", "")
 	mg.SerialDeps(Fields, Dashboards, Config,
-		metricbeat.PrepareModulePackagingXPack,
-		devtools.GenerateModuleIncludeListGo)
+		metricbeat.PrepareModulePackagingXPack)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

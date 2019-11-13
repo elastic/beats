@@ -91,6 +91,30 @@ func Config() {
 	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
 }
 
+// Imports generates an include/list_{suffix}.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	// generates include/list_common.go
+	err := devtools.GenerateModuleIncludeListGo(
+		[]string{"module"},
+		[]string{"module/docker", "module/kubernetes"},
+		"include/list_common.go",
+		"")
+	if err != nil {
+		return err
+	}
+	// generates include/list_docker.go
+	err = devtools.GenerateModuleIncludeListGo(
+		[]string{"module/docker", "module/kubernetes"},
+		nil,
+		"include/list_docker.go",
+		"\n// +build linux darwin windows\n")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func configYML() error {
 	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
 }
