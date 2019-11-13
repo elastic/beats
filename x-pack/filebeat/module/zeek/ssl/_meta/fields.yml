@@ -1,5 +1,6 @@
 - name: ssl
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek SSL log.
   fields:

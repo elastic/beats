@@ -142,23 +142,9 @@ func NoopSupport(_ *logp.Logger, info beat.Info, config *common.Config) (Support
 }
 
 func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {
-	return fmt.Run(&beat.Event{
-		Fields: common.MapStr{
-			// beat object was left in for backward compatibility reason for older configs.
-			"beat": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-			"agent": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-			// For the Beats that have an observer role
-			"observer": common.MapStr{
-				"name":    info.Beat,
-				"version": info.Version,
-			},
-		},
-		Timestamp: time.Now(),
-	})
+	return fmt.Run(
+		&beat.Event{
+			Fields:    fmtstr.FieldsForBeat(info.Beat, info.Version),
+			Timestamp: time.Now(),
+		})
 }

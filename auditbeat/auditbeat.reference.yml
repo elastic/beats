@@ -414,8 +414,11 @@ output.elasticsearch:
   # Configure escaping HTML symbols in strings.
   #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
@@ -1252,8 +1255,11 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 

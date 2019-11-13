@@ -2,8 +2,6 @@
 [role="xpack"]
 == Sysmon Module
 
-beta[]
-
 The sysmon module processes event log records from the
 https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon[Sysinternals
 System Monitor] (Sysmon) which is a Windows service and device driver that logs

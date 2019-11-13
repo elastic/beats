@@ -1,5 +1,6 @@
 - name: irc
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek IRC log
   fields:
