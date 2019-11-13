@@ -72,9 +72,12 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		return nil, err
 	}
 
-	var dialer, tlsDialer transport.Dialer
+	var tlsDialer transport.Dialer
+	dialer, uri, err := makeDialer(config.ConnectTimeout, hostData.URI)
+	if err != nil {
+		return nil, err
+	}
 
-	dialer = transport.NetDialer(config.ConnectTimeout)
 	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
 	if err != nil {
 		return nil, err
@@ -92,7 +95,7 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		},
 		headers: config.Headers,
 		method:  "GET",
-		uri:     hostData.SanitizedURI,
+		uri:     uri,
 		body:    nil,
 	}, nil
 }

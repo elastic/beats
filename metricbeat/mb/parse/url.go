@@ -98,6 +98,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
 			}
 		}
+
 		// Normalize basepath
 		basePath = strings.Trim(basePath, "/")
 
@@ -138,6 +139,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 // Values from the rawHost take precedence over the defaults.
 func ParseURL(rawHost, scheme, user, pass, path, query string) (mb.HostData, error) {
 	u, err := getURL(rawHost, scheme, user, pass, path, query)
+
 	if err != nil {
 		return mb.HostData{}, err
 	}
@@ -190,7 +192,12 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 
 	SetURLUser(u, username, password)
 
-	if !strings.HasSuffix(u.Scheme, "unix") && !strings.HasSuffix(u.Scheme, "npipe") {
+	if strings.HasSuffix(u.Scheme, "unix") || strings.HasSuffix(u.Scheme, "npipe") {
+		if u.Host == "" {
+			u.Host = u.Path
+			u.Path = ""
+		}
+	} else {
 		if u.Host == "" {
 			return nil, fmt.Errorf("error parsing URL: empty host")
 		}
