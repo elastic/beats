@@ -26,6 +26,7 @@ import (
 	nomad "github.com/hashicorp/nomad/api"
 )
 
+// NomadClient defines the interface that nomad clients have to implement
 type NomadClient interface {
 	Allocations(nodeID string, q *nomad.QueryOptions) ([]*nomad.Allocation, *nomad.QueryMeta, error)
 }
@@ -34,14 +35,17 @@ type apiClient struct {
 	client *nomad.Client
 }
 
+// Allocations returns the allocations present on the node with nodeID
 func (c *apiClient) Allocations(nodeID string, q *nomad.QueryOptions) ([]*nomad.Allocation, *nomad.QueryMeta, error) {
 	return c.client.Nodes().Allocations(nodeID, q)
 }
 
+// WrapClient returns an abstract NomadClient based on the nomad.Client provided
 func WrapClient(client *nomad.Client) NomadClient {
 	return &apiClient{client: client}
 }
 
+// NewClient returns a nomad client with the provided configuration
 func NewClient(address, region, secretID string, httpClient *http.Client) (*nomad.Client, error) {
 	cfg := nomad.Config{
 		Address:    address,

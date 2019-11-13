@@ -26,6 +26,8 @@ import (
 	nomad "github.com/hashicorp/nomad/api"
 )
 
+// AllocationHandler can be implemented to set how to act when
+// new allocations are started on the node
 type AllocationHandler func(alloc *nomad.Allocation)
 
 type watcher struct {
@@ -45,6 +47,7 @@ type Watcher interface {
 	Stop()
 }
 
+// NewWatcherWithClient creates a new Watcher from a given Nomad client
 func NewWatcherWithClient(client NomadClient, nodeID string, h AllocationHandler) (Watcher, error) {
 	w := &watcher{
 		client:  client,
@@ -57,6 +60,7 @@ func NewWatcherWithClient(client NomadClient, nodeID string, h AllocationHandler
 	return w, nil
 }
 
+// Start watching nomad API for new allocations
 func (w *watcher) Start() error {
 	opts := &nomad.QueryOptions{WaitTime: 5 * time.Minute}
 
@@ -89,6 +93,7 @@ func (w *watcher) Start() error {
 	}
 }
 
+// Stop watching the nomad API for new allocations
 func (w *watcher) Stop() {
 	close(w.stopCh)
 }

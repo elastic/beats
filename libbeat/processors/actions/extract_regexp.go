@@ -41,6 +41,7 @@ func init() {
 			checks.AllowedFields("field", "regexp", "prefix")))
 }
 
+// NewExtractRegexp returns a new extract regexp processor.
 func NewExtractRegexp(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Regexp string `config:"regexp"`

@@ -28,7 +28,7 @@ type Config struct {
 	Region         string        `config:"region"`
 	Address        string        `config:"address"`
 	SecretID       string        `config:"secret_id"`
-	MetaPrefix     string        `config:"meta_prefix`
+	MetaPrefix     string        `config:"meta_prefix"`
 }
 
 func defaultConfig() Config {

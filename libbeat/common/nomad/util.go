@@ -29,6 +29,7 @@ import (
 
 var indexRegex = regexp.MustCompile(`\[(?P<index>[0-9]+)\]`)
 
+// FetchProperties returns a map with all the properties of the allocation
 func FetchProperties(alloc *nomad.Allocation) map[string]interface{} {
 	properties := map[string]interface{}{
 		"region":     *alloc.Job.Region,
@@ -53,6 +54,7 @@ func filterMeta(alloc map[string]string, meta map[string]interface{}, prefix str
 	}
 }
 
+// FetchMetadata returns a map with the metadata that starts with prefix
 func FetchMetadata(alloc *nomad.Allocation, task, prefix string) map[string]interface{} {
 	meta := make(map[string]interface{})
 	filterMeta(alloc.Job.Meta, meta, prefix)
@@ -69,6 +71,7 @@ func FetchMetadata(alloc *nomad.Allocation, task, prefix string) map[string]inte
 	return meta
 }
 
+// IsTerminal returns if the allocation is terminal
 func IsTerminal(alloc *nomad.Allocation) bool {
 	switch alloc.ClientStatus {
 	case nomad.AllocClientStatusComplete, nomad.AllocClientStatusFailed, nomad.AllocClientStatusLost:
