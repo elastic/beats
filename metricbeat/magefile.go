@@ -94,7 +94,7 @@ func Config() {
 // Imports generates an include/list_{suffix}.go file containing
 // a import statement for each module and dataset.
 func Imports() error {
-	return devtools.GenerateOSSMetricbeatModuleIncludeListGo()
+	return metricbeat.GenerateOSSMetricbeatModuleIncludeListGo()
 }
 
 func configYML() error {

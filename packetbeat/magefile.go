@@ -150,7 +150,7 @@ func Config() error {
 }
 
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"protos/*"}, nil, nil, "include/list.go", "")
+	return devtools.GenerateIncludeListGo([]string{"protos/*"}, nil, nil, "include/list.go", "", "include")
 }
 
 // Fields generates fields.yml and fields.go files for the Beat.
