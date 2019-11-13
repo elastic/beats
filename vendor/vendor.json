@@ -2318,6 +2318,12 @@
 			"revisionTime": "2016-12-05T14:13:22Z"
 		},
 		{
+			"checksumSHA1": "ajAqUByI39Sfm99F/ZNOguPP3Mk=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b",
+			"revisionTime": "2019-08-25T01:20:11Z"
+		},
+		{
 			"checksumSHA1": "dF75743hHL364Dx3HKdZbBBFrpE=",
 			"path": "github.com/grpc-ecosystem/go-grpc-prometheus",
 			"revision": "ae0d8660c5f2108ca70a3776dbe0fb53cf79f1da",
@@ -2342,6 +2348,12 @@
 			"revisionTime": "2019-07-30T05:26:13Z"
 		},
 		{
+			"checksumSHA1": "x3Hz3DwZpIp521DL8nh9FpOQP/4=",
+			"path": "github.com/hashicorp/go-cleanhttp",
+			"revision": "d3fcbee8e1810ecee4bdbf415f42f84cfd0e3361",
+			"revisionTime": "2019-04-06T16:20:18Z"
+		},
+		{
 			"checksumSHA1": "P1Enisj7Nzf3wMl6lgPPar0ljoY=",
 			"path": "github.com/hashicorp/go-immutable-radix",
 			"revision": "0146a9aba1948ded4ed290cfd3fded2c15313f63",
@@ -2352,6 +2364,12 @@
 			"path": "github.com/hashicorp/go-memdb",
 			"revision": "5500ca0de0dab231b02aedabac095d43a59f31d2",
 			"revisionTime": "2019-05-22T20:56:50Z"
+		},
+		{
+			"checksumSHA1": "4RZ1iELCUhuMwFUEzmAMG8YStik=",
+			"path": "github.com/hashicorp/go-rootcerts",
+			"revision": "df8e78a645e18d56ed7bb9ae10ffb8174ab892e2",
+			"revisionTime": "2019-06-10T21:58:08Z"
 		},
 		{
 			"checksumSHA1": "5AxXPtBqAKyFGcttFzxT5hp/3Tk=",
@@ -2370,6 +2388,18 @@
 			"path": "github.com/hashicorp/golang-lru/simplelru",
 			"revision": "59383c442f7d7b190497e9bb8fc17a48d06cd03f",
 			"revisionTime": "2019-05-20T14:04:33Z"
+		},
+		{
+			"checksumSHA1": "SrtyTPL5DU0tPKchzkrlYguydqA=",
+			"path": "github.com/hashicorp/nomad/api",
+			"revision": "75c10ce0c4c360b944b47de80703162fd7ade272",
+			"revisionTime": "2019-11-11T20:18:54Z"
+		},
+		{
+			"checksumSHA1": "fqswK1Rf5F7cRNG+UHgY/gQFC78=",
+			"path": "github.com/hashicorp/nomad/api/contexts",
+			"revision": "75c10ce0c4c360b944b47de80703162fd7ade272",
+			"revisionTime": "2019-11-11T20:18:54Z"
 		},
 		{
 			"checksumSHA1": "3LWNcQT7yTaLpEmjhI/3fi8puv0=",
