@@ -143,7 +143,7 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 // GenerateModuleIncludeListGo generates an include/list.go file containing
 // a import statement for each module and dataset.
 func GenerateModuleIncludeListGo() error {
-	return GenerateIncludeListGo(nil, []string{"module"}, nil, "include/list.go", "")
+	return GenerateIncludeListGo(nil, []string{"module"}, nil, "include/list.go", "", "include")
 }
 
 // GenerateOSSMetricbeatModuleIncludeListGo generates include/list_{suffix}.go files containing
@@ -152,14 +152,14 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 	err := GenerateIncludeListGo(
 		nil, []string{"module"},
 		[]string{"module/docker", "module/kubernetes"},
-		"include/list_common.go", "")
+		"include/list_common.go", "", "include")
 	if err != nil {
 		return err
 	}
 	err = GenerateIncludeListGo(
 		nil, []string{"module/docker", "module/kubernetes"},
 		nil,
-		"include/list_docker.go", "\n// +build linux darwin windows\n")
+		"include/list_docker.go", "\n// +build linux darwin windows\n", "include")
 	if err != nil {
 		return err
 	}
@@ -169,7 +169,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 // GenerateIncludeListGo generates an include/list.go file containing imports
 // for the packages that match the paths (or globs) in importDirs (optional)
 // and moduleDirs (optional).
-func GenerateIncludeListGo(importDirs []string, moduleDirs []string, modulesToExclude []string, outfile string, buildTags string) error {
+func GenerateIncludeListGo(importDirs []string, moduleDirs []string, modulesToExclude []string, outfile string, buildTags string, pkg string) error {
 	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -181,6 +181,7 @@ func GenerateIncludeListGo(importDirs []string, moduleDirs []string, modulesToEx
 		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", toLibbeatLicenseName(BeatLicense),
 		"-out", outfile, "-buildTags", buildTags,
+		"-pkg", pkg,
 	)
 
 	var args []string
