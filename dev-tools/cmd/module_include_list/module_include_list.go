@@ -65,7 +65,7 @@ func init() {
 	flag.StringVar(&outFile, "out", "include/list.go", "Output file.")
 	flag.StringVar(&buildTags, "buildTags", "", "Build Tags.")
 	flag.Var(&moduleDirs, "moduleDir", "Directory to search for modules to include")
-	flag.Var(&moduleExcludeDirs, "moduleExcludeDirs", "Directory to search for modules to include")
+	flag.Var(&moduleExcludeDirs, "moduleExcludeDirs", "Directory to exclude from the list")
 	flag.Var(&importDirs, "import", "Directory to include")
 	flag.Usage = usageFlag
 }
