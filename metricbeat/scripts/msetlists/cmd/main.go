@@ -23,9 +23,8 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/metricbeat/mb"
-
 	_ "github.com/elastic/beats/metricbeat/include"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/scripts/msetlists"
 )
 
