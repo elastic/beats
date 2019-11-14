@@ -115,41 +115,12 @@ func (pm *PipelineManager) checkAndCreatePipeline(logOptsConfig map[string]strin
 	return pipeline, nil
 }
 
-// getPipeline gets a pipeline based on a confighash
-func (pm *PipelineManager) getPipeline(hashstring string) (*Pipeline, bool) {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-	pipeline, exists := pm.pipelines[hashstring]
-	return pipeline, exists
-}
-
 // getClient gets a pipeline client based on a file handle
 func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 	cli, exists := pm.clients[file]
 	return cli, exists
-}
-
-// checkIfHashExists is a short atomic function to see if a pipeline alread exists inside the PM. Thread-safe.
-func (pm *PipelineManager) checkIfHashExists(logOptsConfig map[string]string) bool {
-	hashstring := makeConfigHash(logOptsConfig)
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-	_, test := pm.pipelines[hashstring]
-	if test {
-		return true
-	}
-	return false
-}
-
-// registerPipeline is a small atomic function that registers a new pipeline with the managers
-// TODO: What happens if we try to register a pipeline that already exists? Which pipeline "wins"?
-func (pm *PipelineManager) registerPipeline(pipeline *Pipeline, hashstring string) {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-	pm.pipelines[hashstring] = pipeline
-
 }
 
 // removePipeline removes a pipeline from the manager if it's refcount is zero.
