@@ -91,6 +91,12 @@ func Config() {
 	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
 }
 
+// Imports generates an include/list_{suffix}.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	return metricbeat.GenerateOSSMetricbeatModuleIncludeListGo()
+}
+
 func configYML() error {
 	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
 }
