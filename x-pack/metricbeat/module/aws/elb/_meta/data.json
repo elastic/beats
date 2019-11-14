@@ -1,0 +1,56 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "LoadBalancerName": "DockerReg-EcsElast-1UFCSV3UVE46A"
+            },
+            "namespace": "AWS/ELB"
+        },
+        "metrics": {
+            "EstimatedALBActiveConnectionCount": {
+                "avg": 8.857142857142858
+            },
+            "EstimatedALBConsumedLCUs": {
+                "avg": 0.00007857142857142858
+            },
+            "EstimatedALBNewConnectionCount": {
+                "avg": 5.142857142857143
+            },
+            "EstimatedProcessedBytes": {
+                "avg": 1077.2857142857142
+            },
+            "HealthyHostCount": {
+                "max": 2
+            },
+            "UnHealthyHostCount": {
+                "max": 0
+            }
+        },
+        "tags": {
+            "aws:cloudformation:logical-id": "EcsElasticLoadBalancer",
+            "aws:cloudformation:stack-id": "arn:aws:cloudformation:us-east-1:627959692251:stack/DockerRegistryECSStack/c48d6560-031b-11e6-8ec2-50ba0727c06e",
+            "aws:cloudformation:stack-name": "DockerRegistryECSStack"
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "elb",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

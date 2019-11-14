@@ -27,7 +27,7 @@ func TestData(t *testing.T) {
 		namespace string
 		path      string
 	}{
-		{"AWS/ELB", "./_meta/data_elb.json"},
+		{"AWS/ELB", "./_meta/data.json"},
 		{"AWS/ApplicationELB", "./_meta/data_alb.json"},
 		{"AWS/NetworkELB", "./_meta/data_nlb.json"},
 	}
