@@ -26,23 +26,23 @@ import (
 func GenerateOSSMetricbeatModuleIncludeListGo() error {
 	err := devtools.GenerateIncludeListGo(
 		devtools.IncludeListOptions{
-			nil,
-			[]string{"module"},
-			[]string{"module/docker", "module/kubernetes"},
-			"include/list_common.go",
-			"",
-			"include"})
+			ImportDirs:       nil,
+			ModuleDirs:       []string{"module"},
+			ModulesToExclude: []string{"module/docker", "module/kubernetes"},
+			Outfile:          "include/list_common.go",
+			BuildTags:        "",
+			Pkg:              "include"})
 	if err != nil {
 		return err
 	}
 	err = devtools.GenerateIncludeListGo(
 		devtools.IncludeListOptions{
-			nil,
-			[]string{"module/docker", "module/kubernetes"},
-			nil,
-			"include/list_docker.go",
-			"\n// +build linux darwin windows\n",
-			"include"})
+			ImportDirs:       nil,
+			ModuleDirs:       []string{"module/docker", "module/kubernetes"},
+			ModulesToExclude: nil,
+			Outfile:          "include/list_docker.go",
+			BuildTags:        "\n// +build linux darwin windows\n",
+			Pkg:              "include"})
 	if err != nil {
 		return err
 	}
