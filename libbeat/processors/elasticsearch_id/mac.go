@@ -26,7 +26,7 @@ import (
 
 type id []byte
 
-const MacAddrLen = 6
+const addrLen = 6
 
 func getSecureMungedMACAddress() ([]byte, error) {
 	addr, err := getMacAddress()
@@ -41,13 +41,13 @@ func getSecureMungedMACAddress() ([]byte, error) {
 		}
 	}
 
-	munged := make([]byte, MacAddrLen)
+	munged := make([]byte, addrLen)
 	_, err = rand.Read(munged)
 	if err != nil {
 		return nil, err
 	}
 
-	for i := 0; i < MacAddrLen; i++ {
+	for i := 0; i < addrLen; i++ {
 		munged[i] ^= addr[i]
 	}
 
@@ -87,7 +87,7 @@ func isValidAddress(addr []byte) bool {
 }
 
 func constructDummyMulticastAddress() ([]byte, error) {
-	dummy := make([]byte, MacAddrLen)
+	dummy := make([]byte, addrLen)
 	_, err := rand.Read(dummy)
 	if err != nil {
 		return nil, err
