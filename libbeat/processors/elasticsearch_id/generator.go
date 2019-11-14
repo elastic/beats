@@ -46,7 +46,7 @@ func getBase64UUID() string {
 	mu.Lock()
 	defer mu.Unlock()
 
-	sequenceNumber += 1
+	sequenceNumber++
 
 	// We only use bottom 3 bytes for the sequence number.
 	s := sequenceNumber & 0xffffff
