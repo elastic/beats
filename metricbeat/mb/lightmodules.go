@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package mb
 
@@ -15,7 +28,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
 )
 
 const (
@@ -105,15 +117,15 @@ func (s *LightModulesSource) HasMetricSet(moduleName, metricSetName string) bool
 }
 
 // MetricSetRegistration obtains a registration for a light metric set
-func (s *LightModulesSource) MetricSetRegistration(register *mb.Register, moduleName, metricSetName string) (mb.MetricSetRegistration, error) {
+func (s *LightModulesSource) MetricSetRegistration(register *Register, moduleName, metricSetName string) (MetricSetRegistration, error) {
 	lightModule, err := s.loadModule(moduleName)
 	if err != nil {
-		return mb.MetricSetRegistration{}, errors.Wrapf(err, "failed to load module '%s'", moduleName)
+		return MetricSetRegistration{}, errors.Wrapf(err, "failed to load module '%s'", moduleName)
 	}
 
 	ms, found := lightModule.MetricSets[metricSetName]
 	if !found {
-		return mb.MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", moduleName, metricSetName)
+		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", moduleName, metricSetName)
 	}
 
 	return ms.Registration(register)
@@ -141,7 +153,7 @@ type lightModuleConfig struct {
 // LightModule contains the definition of a light module
 type LightModule struct {
 	Name       string
-	MetricSets map[string]mb.LightMetricSet
+	MetricSets map[string]LightMetricSet
 }
 
 func (s *LightModulesSource) loadModule(moduleName string) (*LightModule, error) {
@@ -186,8 +198,8 @@ func (s *LightModulesSource) loadModuleConfig(modulePath string) (*lightModuleCo
 	return &moduleConfig, nil
 }
 
-func (s *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, metricSetNames []string) (map[string]mb.LightMetricSet, error) {
-	metricSets := make(map[string]mb.LightMetricSet)
+func (s *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, metricSetNames []string) (map[string]LightMetricSet, error) {
+	metricSets := make(map[string]LightMetricSet)
 	for _, metricSet := range metricSetNames {
 		manifestPath := filepath.Join(moduleDirPath, metricSet, manifestYML)
 
@@ -203,7 +215,7 @@ func (s *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, me
 	return metricSets, nil
 }
 
-func (s *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms mb.LightMetricSet, err error) {
+func (s *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
 	config, err := common.LoadFile(manifestPath)
 	if err != nil {
 		return ms, errors.Wrapf(err, "failed to load metricset manifest from '%s'", manifestPath)
