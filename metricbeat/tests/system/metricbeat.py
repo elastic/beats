@@ -134,7 +134,7 @@ def parameterized_with_supported_versions(base_class):
     of it are registered, one for each supported version.
     """
     class_dir = os.path.abspath(os.path.dirname(sys.modules[base_class.__module__].__file__))
-    versions_path = os.path.join(class_dir, 'supported-versions.yml')
+    versions_path = os.path.join(class_dir, '_meta', 'supported-versions.yml')
     variants = supported_versions(versions_path)
     decorator = parameterized_class(['COMPOSE_ENV'], variants)
     decorator(base_class)
