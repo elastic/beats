@@ -3,6 +3,16 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.5]]
+=== Beats version 6.8.5
+https://github.com/elastic/beats/compare/v6.8.4...v6.8.5[View commits]
+
+==== Bugfixes
+
+*Metricbeat*
+
+- Convert indexed ms-since-epoch timestamp fields in `elasticsearch/ml_job` metricset to ints from float64s. {issue}14220[14220] {pull}14222[14222]
+
 [[release-notes-6.8.4]]
 === Beats version 6.8.4
 https://github.com/elastic/beats/compare/v6.8.3...v6.8.4[View commits]
