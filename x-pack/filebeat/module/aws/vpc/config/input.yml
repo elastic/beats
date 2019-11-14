@@ -29,7 +29,7 @@ processors:
         - {from: aws.vpc.dstaddr, to: destination.address}
         - {from: aws.vpc.dstaddr, to: destination.ip, type: ip}
         - {from: aws.vpc.dstport, to: destination.port, type: long}
-        - {from: aws.vpc.protocol, to: network.iana_number, type: long}
+        - {from: aws.vpc.protocol, to: network.iana_number, type: string}
         - {from: aws.vpc.packets, to: source.packets, type: long}
         - {from: aws.vpc.bytes, to: source.bytes, type: long}
         - {from: aws.vpc.packets, to: network.packets, type: long}
@@ -46,3 +46,37 @@ processors:
       when.equals.aws.vpc.action: REJECT
       target: event
       fields: {outcome: deny}
+
+  - add_fields:
+      target: event
+      fields: {type: flow}
+  - add_fields:
+      target: event
+      fields: {category: network_traffic}
+
+  # Add network.type: ipv4 or ipv6
+  - if:
+      contains.source.ip: .
+    then:
+      - add_fields:
+          target: network
+          fields: {type: ipv4}
+    else:
+      - add_fields:
+          target: network
+          fields: {type: ipv6}
+
+  # Add network.transport: based on IANA protocol number of the traffic
+  # http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
+  - if:
+      equals.network.iana_number: "6"
+    then:
+      - add_fields:
+          target: network
+          fields: {transport: tcp}
+  - if:
+      equals.network.iana_number: "17"
+    then:
+      - add_fields:
+          target: network
+          fields: {transport: udp}
