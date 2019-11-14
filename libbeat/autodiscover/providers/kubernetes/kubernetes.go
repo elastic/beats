@@ -195,9 +195,14 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-		containerIDs[c.Name] = cid
-		runtimes[c.Name] = runtime
+		// If the container is not being stopped then add the container only if it is in running state.
+		// This makes sure that we dont keep tailing init container logs after they have stopped.
+		// Emit the event in case that the pod is being stopped.
+		if flag == "stop" || c.State.Running != nil {
+			cid, runtime := kubernetes.ContainerIDWithRuntime(c)
+			containerIDs[c.Name] = cid
+			runtimes[c.Name] = runtime
+		}
 	}
 
 	// Emit container and port information

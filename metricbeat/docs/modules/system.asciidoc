@@ -141,6 +141,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-raid,raid>>
 
+* <<metricbeat-metricset-system-service,service>>
+
 * <<metricbeat-metricset-system-socket,socket>>
 
 * <<metricbeat-metricset-system-socket_summary,socket_summary>>
@@ -170,6 +172,8 @@ include::system/process.asciidoc[]
 include::system/process_summary.asciidoc[]
 
 include::system/raid.asciidoc[]
+
+include::system/service.asciidoc[]
 
 include::system/socket.asciidoc[]
 
