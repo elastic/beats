@@ -85,8 +85,9 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	}
 
 	options := nomad.WatchOptions{
-		SyncTimeout: 120 * time.Second,
-		Node:        config.Host,
+		SyncTimeout:     config.WaitTime,
+		RefreshInterval: config.SyncPeriod,
+		Node:            config.Host,
 	}
 
 	watcher, err := nomad.NewWatcher(client, options)
@@ -160,29 +161,26 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 		nodeName = host
 	}
 
-	// metadata from the entire allocation
+	// common metadata from the entire allocation
 	rawMeta := p.metagen.ResourceMetadata(*obj)
-	tasks, ok := rawMeta["tasks"].([]common.MapStr)
-	if !ok {
-		logp.Err("Error getting the allocation's metadata: %+v", rawMeta)
-		return
-	}
-	rawMeta.Delete("tasks")
+
+	// job metadatata merged with the task metadata
+	tasks := p.metagen.GroupMeta(obj.Job)
 
 	// emit per-task separated events
-	for i := range tasks {
+	for _, task := range tasks {
 		// TODO Fix this
 		// patch rawMeta with the meta for the current task
-		rawMeta.Put("tasks", []common.MapStr{
-			tasks[i],
-		})
+		// rawMeta.Put("tasks", task)
 
 		event := bus.Event{
 			"provider": p.uuid,
 			"id":       obj.ID,
 			flag:       true,
 			"host":     nodeName,
-			"meta":     rawMeta,
+			"meta": common.MapStrUnion(rawMeta, common.MapStr{
+				"task": task,
+			}),
 		}
 
 		p.publish(event)
@@ -202,6 +200,7 @@ func (p *Provider) publish(event bus.Event) {
 
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
+
 	p.bus.Publish(event)
 }
 
@@ -241,11 +240,11 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	}
 
 	// for hints we look at the aggregated task's meta
-	if rawTasks, ok := meta["tasks"]; ok {
-		tasks := rawTasks.([]common.MapStr)
+	if rawTasks, ok := meta["task"]; ok {
+		tasks := rawTasks.(common.MapStr)
 
 		// TODO Fix this issue here
-		meta = tasks[0]
+		meta = tasks
 	}
 
 	cname := builder.GetContainerName(container)

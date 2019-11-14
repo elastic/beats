@@ -30,6 +30,10 @@ type MetaGenerator interface {
 
 	// AllocationNodeName returns the name of the node where the Task is allocated
 	AllocationNodeName(id string) (string, error)
+
+	// GroupMeta returns per-task metadata merged with the group metadata, task
+	// metadata takes will overwrite metadata from the group with the same key
+	GroupMeta(job *Job) []common.MapStr
 }
 
 // MetaGeneratorConfig settings
@@ -69,7 +73,38 @@ func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 
 // ResourceMetadata generates metadata for the given Nomad allocation*
 func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
-	tasksMeta := g.groupMeta(obj.Job)
+	// default labels that we expose / filter with `IncludeLabels`
+	meta := common.MapStr{
+		"name":        obj.Name,
+		"job":         *obj.Job.Name,
+		"namespace":   obj.Namespace,
+		"datacenters": obj.Job.Datacenters,
+		"region":      *obj.Job.Region,
+		"type":        *obj.Job.Type,
+		"alloc_id":    obj.ID,
+	}
+
+	return meta
+}
+
+// Returns an array of per-task metadata aggregating the group metadata into the
+// task metadata
+func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
+	tasksMeta := []common.MapStr{}
+
+	for _, group := range job.TaskGroups {
+		// copy of job.Meta
+		meta := make(map[string]string)
+		for k, v := range job.Meta {
+			meta[k] = v
+		}
+
+		mergo.Merge(&meta, group.Meta, mergo.WithOverride)
+		group.Meta = meta
+
+		tasks := g.tasksMeta(group)
+		tasksMeta = append(tasksMeta, tasks...)
+	}
 
 	for idx, task := range tasksMeta {
 		labelMap := common.MapStr{}
@@ -93,35 +128,6 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 		}
 
 		tasksMeta[idx] = labelMap
-	}
-
-	// default labels that we expose / filter with `IncludeLabels`
-	meta := common.MapStr{
-		"name":        obj.Name,
-		"job":         *obj.Job.Name,
-		"namespace":   obj.Namespace,
-		"datacenters": obj.Job.Datacenters,
-		"region":      *obj.Job.Region,
-		"type":        *obj.Job.Type,
-		"uuid":        obj.ID,
-		"tasks":       tasksMeta, // contains metadata for all tasks in the allocation
-	}
-
-	return meta
-}
-
-// Returns an array of per-task metadata aggregating the group metadata into the
-// task metadata
-func (g *metaGenerator) groupMeta(job *Job) []common.MapStr {
-	tasksMeta := []common.MapStr{}
-
-	for _, group := range job.TaskGroups {
-		meta := job.Meta
-		mergo.Merge(&meta, group.Meta, mergo.WithOverride)
-		group.Meta = meta
-
-		tasks := g.tasksMeta(group)
-		tasksMeta = append(tasksMeta, tasks...)
 	}
 
 	return tasksMeta

@@ -175,6 +175,8 @@ func (w *watcher) sync() error {
 
 		// allocation was updated after our last fetch
 		// TODO verify if this is needed while relying on the WaitIndex
+		// TODO `alloc.ModifyTime` is set in UTC we would probably need to do
+		// the same here
 		if alloc.ModifyTime > w.lastFetch.UnixNano() {
 			w.handler.OnUpdate(*alloc)
 		}
@@ -197,7 +199,7 @@ func (w *watcher) watch() {
 	// Failures counter, do exponential backoff on retries
 	var failures uint
 	logp.Info("Nomad: %s", "Watching API for resource events")
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(w.options.RefreshInterval)
 
 	for {
 		select {

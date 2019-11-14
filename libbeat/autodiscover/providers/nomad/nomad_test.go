@@ -52,26 +52,22 @@ func TestGenerateHints(t *testing.T) {
 		{
 			event: bus.Event{
 				"meta": common.MapStr{
-					"tasks": []common.MapStr{
-						getNestedAnnotations(common.MapStr{
-							"co.elastic.logs/multiline.pattern": "^test",
-							"co.elastic.metrics/module":         "prometheus",
-							"co.elastic.metrics/period":         "10s",
-							"not.to.include":                    "true",
-						}),
-					},
+					"task": getNestedAnnotations(common.MapStr{
+						"co.elastic.logs/multiline.pattern": "^test",
+						"co.elastic.metrics/module":         "prometheus",
+						"co.elastic.metrics/period":         "10s",
+						"not.to.include":                    "true",
+					}),
 				},
 			},
 			result: bus.Event{
 				"meta": common.MapStr{
-					"tasks": []common.MapStr{
-						getNestedAnnotations(common.MapStr{
-							"co.elastic.logs/multiline.pattern": "^test",
-							"co.elastic.metrics/module":         "prometheus",
-							"co.elastic.metrics/period":         "10s",
-							"not.to.include":                    "true",
-						}),
-					},
+					"task": getNestedAnnotations(common.MapStr{
+						"co.elastic.logs/multiline.pattern": "^test",
+						"co.elastic.metrics/module":         "prometheus",
+						"co.elastic.metrics/period":         "10s",
+						"not.to.include":                    "true",
+					}),
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
@@ -173,25 +169,23 @@ func TestEmitEvent(t *testing.T) {
 				"meta": common.MapStr{
 					"datacenters": []string{"europe-west4"},
 					"job":         "my-job",
-					"tasks": []common.MapStr{
-						common.MapStr{
-							"group-key": "group.value",
-							"job-key":   "job.value",
-							"key1":      "task-value",
-							"name":      "task1",
-							"service": common.MapStr{
-								"canary_tags": []string{"web", "nginx"},
-								"name":        []string{"web", "nginx"},
-								"tags":        []string{"web", "nginx", "tag-c", "tag-d"},
-							},
-							"task-key": "task.value",
+					"task": common.MapStr{
+						"group-key": "group.value",
+						"job-key":   "job.value",
+						"key1":      "task-value",
+						"name":      "task1",
+						"service": common.MapStr{
+							"canary_tags": []string{"web", "nginx"},
+							"name":        []string{"web", "nginx"},
+							"tags":        []string{"web", "nginx", "tag-c", "tag-d"},
 						},
+						"task-key": "task.value",
 					},
 					"name":      "job.task",
 					"namespace": "default",
 					"region":    "global",
 					"type":      "service",
-					"uuid":      UUID.String(),
+					"alloc_id":  UUID.String(),
 				},
 			},
 		},
