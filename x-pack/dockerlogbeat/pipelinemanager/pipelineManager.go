@@ -74,20 +74,7 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 func (pm *PipelineManager) CreateClientWithConfig(logOptsConfig map[string]string, file string) (*ClientLogger, error) {
 
 	hashstring := makeConfigHash(logOptsConfig)
-
-	//If we don't have an existing pipeline for this hash, make one
-	exists := pm.checkIfHashExists(logOptsConfig)
-	var pipeline *Pipeline
-	var err error
-	if !exists {
-		pipeline, err = loadNewPipeline(logOptsConfig, file, pm.Logger)
-		if err != nil {
-			return nil, errors.Wrap(err, "error loading pipeline")
-		}
-		pm.registerPipeline(pipeline, hashstring)
-	} else {
-		pipeline, _ = pm.getPipeline(hashstring)
-	}
+	pipeline, err := pm.checkAndCreatePipeline(logOptsConfig, file)
 
 	//actually get to crafting the new client.
 	cl, err := newClientFromPipeline(pipeline.pipeline, file, hashstring)
@@ -102,6 +89,28 @@ func (pm *PipelineManager) CreateClientWithConfig(logOptsConfig map[string]strin
 
 //===================
 // Private methods
+
+// checkAndCreatePipeline performs the pipeline check and creation as one atomic operation
+// It will either return a new pipeline, or an existing one from the pipeline map
+func (pm *PipelineManager) checkAndCreatePipeline(logOptsConfig map[string]string, file string) (*Pipeline, error) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	hashstring := makeConfigHash(logOptsConfig)
+
+	var pipeline *Pipeline
+	var err error
+	pipeline, test := pm.pipelines[hashstring]
+	if !test {
+		pipeline, err = loadNewPipeline(logOptsConfig, file, pm.Logger)
+		if err != nil {
+			return nil, errors.Wrap(err, "error loading pipeline")
+		}
+		pm.pipelines[hashstring] = pipeline
+	}
+
+	return pipeline, nil
+}
 
 // getPipeline gets a pipeline based on a confighash
 func (pm *PipelineManager) getPipeline(hashstring string) (*Pipeline, bool) {
