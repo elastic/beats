@@ -104,6 +104,12 @@ func Update() error {
 	return update.Update()
 }
 
+// Imports generates an include/list.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	return devtools.GenerateModuleIncludeListGo()
+}
+
 // Test runs all available tests
 func Test() {
 	mg.Deps(unittest.GoUnitTest)

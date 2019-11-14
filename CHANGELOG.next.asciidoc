@@ -187,9 +187,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Accept '-' as http.response.body.bytes in apache module. {pull}14137[14137]
 - Fix timezone parsing of MySQL module ingest pipelines. {pull}14130[14130]
 - Improve error message in s3 input when handleSQSMessage failed. {pull}14113[14113]
+- Close chan of Closer first before calling callback {pull}14231[14231]
 - Fix race condition in S3 input plugin. {pull}14359[14359]
 - Decode hex values in auditd module. {pull}14471[14471]
 - Fix parse of remote addresses that are not IPs in nginx logs. {pull}14505[14505]
+- Fix handling multiline log entries in nginx module. {issue}14349[14349] {pull}14499[14499]
 
 *Heartbeat*
 
@@ -251,6 +253,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update azure configuration example. {issue}14224[14224]
 - Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
+- Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 
 *Packetbeat*
 
