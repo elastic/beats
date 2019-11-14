@@ -30,6 +30,7 @@ CPU_FIELDS = [
     "load", "user", "system", "children_user", "children_system"
 ]
 
+
 @metricbeat.parameterized_with_supported_versions
 class ApacheStatusTest(metricbeat.BaseTest):
 
@@ -85,14 +86,12 @@ class ApacheStatusTest(metricbeat.BaseTest):
                 self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
             # There are more fields that could be checked.
 
-
     def old_apache_version(self):
         if not 'APACHE_VERSION' in self.COMPOSE_ENV:
             return False
 
         version = self.COMPOSE_ENV['APACHE_VERSION']
         return semver.compare(version, '2.4.12') <= 0
-
 
     def get_hosts(self):
         return ['http://' + self.compose_host()]

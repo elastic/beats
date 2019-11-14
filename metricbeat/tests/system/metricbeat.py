@@ -128,6 +128,7 @@ def supported_versions(path):
 
     return variants
 
+
 def parameterized_with_supported_versions(base_class):
     """
     Decorates a class so instead of the base class, multiple copies
