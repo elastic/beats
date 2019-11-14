@@ -3,6 +3,7 @@ import unittest
 from nose.plugins.attrib import attr
 import urllib2
 import time
+import semver
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
@@ -29,7 +30,7 @@ CPU_FIELDS = [
     "load", "user", "system", "children_user", "children_system"
 ]
 
-
+@metricbeat.parameterized_with_supported_versions
 class ApacheStatusTest(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['apache']
@@ -74,22 +75,24 @@ class ApacheStatusTest(metricbeat.BaseTest):
     def verify_fields(self, evt):
         self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
         apache_status = evt["apache"]["status"]
-        self.assertItemsEqual(
-            self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
-        self.assertItemsEqual(
-            self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
-        # There are more fields that could be checked.
+        if self.old_apache_version():
+            self.assertItemsEqual(
+                self.de_dot(APACHE_OLD_STATUS_FIELDS), apache_status.keys())
+        else:
+            self.assertItemsEqual(
+                self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
+            self.assertItemsEqual(
+                self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
+            # There are more fields that could be checked.
+
+
+    def old_apache_version(self):
+        if not 'APACHE_VERSION' in self.COMPOSE_ENV:
+            return False
+
+        version = self.COMPOSE_ENV['APACHE_VERSION']
+        return semver.compare(version, '2.4.12') <= 0
+
 
     def get_hosts(self):
         return ['http://' + self.compose_host()]
-
-
-class ApacheOldStatusTest(ApacheStatusTest):
-
-    COMPOSE_ENV = {'APACHE_VERSION': '2.4.12'}
-
-    def verify_fields(self, evt):
-        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
-        apache_status = evt["apache"]["status"]
-        self.assertItemsEqual(
-            self.de_dot(APACHE_OLD_STATUS_FIELDS), apache_status.keys())
