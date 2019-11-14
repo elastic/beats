@@ -75,11 +75,14 @@ func (pm *PipelineManager) CreateClientWithConfig(logOptsConfig map[string]strin
 
 	hashstring := makeConfigHash(logOptsConfig)
 	pipeline, err := pm.checkAndCreatePipeline(logOptsConfig, file)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting pipeline")
+	}
 
 	//actually get to crafting the new client.
 	cl, err := newClientFromPipeline(pipeline.pipeline, file, hashstring)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error creating client")
 	}
 
 	pm.registerClient(cl, hashstring, file)
