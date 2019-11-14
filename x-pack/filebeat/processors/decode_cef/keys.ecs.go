@@ -87,7 +87,7 @@ var ecsExtensionMapping = map[string]mappedField{
 		Translate: func(in *cef.Field) (interface{}, error) {
 			// Does the string look like URL?
 			if strings.HasPrefix(in.String, "http") {
-				return in, nil
+				return in.String, nil
 			}
 			return nil, nil
 		},
