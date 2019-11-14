@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package flake_id
+package elasticsearch_id
 
 import (
 	"encoding/base64"
@@ -68,7 +68,7 @@ func getBase64UUID() string {
 	//// compression (by making sure we share common prefixes between enough ids).
 
 	// We use the sequence number rather than the timestamp because the distribution of
-	// the timestamp depends too much on the ingestion rate, so it is less reliable.
+	// the timestamp depends too much on the indexing rate, so it is less reliable.
 	uuidBytes[0] = byte(s)       // copy lowest-order byte from sequence number
 	uuidBytes[1] = byte(s >> 16) // copy 3rd lowest-order byte from sequence number
 

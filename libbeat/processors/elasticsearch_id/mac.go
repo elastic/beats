@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package flake_id
+package elasticsearch_id
 
 import (
 	"crypto/rand"
