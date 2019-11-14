@@ -22,8 +22,9 @@ package nomad
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	nomad "github.com/hashicorp/nomad/api"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // AllocationHandler can be implemented to set how to act when

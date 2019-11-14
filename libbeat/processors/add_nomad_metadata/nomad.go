@@ -20,14 +20,15 @@ package add_nomad_metadata
 import (
 	"time"
 
+	nomad "github.com/hashicorp/nomad/api"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	nomadbeat "github.com/elastic/beats/libbeat/common/nomad"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
-	nomad "github.com/hashicorp/nomad/api"
-	"github.com/pkg/errors"
 )
 
 const (

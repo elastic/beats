@@ -24,8 +24,8 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/actions"              // Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_nomad_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
+	_ "github.com/elastic/beats/libbeat/processors/add_nomad_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_observer_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/communityid"
