@@ -119,7 +119,7 @@ def supported_versions(path):
         # Return an empty variant so a class is instantiated with defaults
         return [[{}]]
 
-    variants = [[{}]]
+    variants = []
     with open(path) as f:
         versions_info = yaml.safe_load(f)
 
