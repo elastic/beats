@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/docker/engine/daemon/logger"
+	"github.com/docker/docker/daemon/logger"
 
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemanager"

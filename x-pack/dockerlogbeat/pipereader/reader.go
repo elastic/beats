@@ -11,7 +11,7 @@ import (
 	"syscall"
 
 	"github.com/containerd/fifo"
-	"github.com/docker/engine/api/types/plugins/logdriver"
+	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/gogo/protobuf/proto"
 	"github.com/pkg/errors"
 )
