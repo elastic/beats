@@ -23,7 +23,7 @@ COUNT=$(read_versions "${MODULE}" "docker-versions.yml" |wc -l)
 	do
 		v=$(read_version "${MODULE}" "docker-versions.yml" $i)
 
-		run docker build --build-arg ${MODULE_UPPER}_VERSION=${v} --rm -t ${IMAGE}:${v} .
+		run docker build --build-arg ${MODULE_UPPER}_VARIANT=${MODULE} --build-arg ${MODULE_UPPER}_VERSION=${v} --rm -t ${IMAGE}:${v} .
 		assert_success
 	done
 }
