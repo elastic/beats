@@ -3830,6 +3830,33 @@ required: True
 
 --
 
+*`process.exit_code`*::
++
+--
+the exit code of a process
+
+type: long
+
+--
+
+*`systemd.fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
+
+type: keyword
+
+--
+
 [[exported-fields-consul]]
 == consul fields
 
@@ -30892,6 +30919,146 @@ type: long
 --
 
 [float]
+=== service
+
+metrics for system services
+
+
+
+*`system.service.name`*::
++
+--
+The name of the service
+
+type: keyword
+
+--
+
+*`system.service.load_state`*::
++
+--
+The load state of the service
+
+type: keyword
+
+--
+
+*`system.service.state`*::
++
+--
+The activity state of the service
+
+type: keyword
+
+--
+
+*`system.service.sub_state`*::
++
+--
+The sub-state of the service
+
+type: keyword
+
+--
+
+*`system.service.state_since`*::
++
+--
+The timestamp of the last state change. If the service is active and running, this is its uptime.
+
+type: date
+
+--
+
+*`system.service.exec_code`*::
++
+--
+The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+[float]
+=== resources
+
+system metrics associated with the service
+
+
+*`system.service.resources.cpu.usage.ns`*::
++
+--
+CPU usage in nanoseconds
+
+type: long
+
+--
+
+*`system.service.resources.memory.usage.bytes`*::
++
+--
+memory usage in bytes
+
+type: long
+
+--
+
+*`system.service.resources.tasks.count`*::
++
+--
+number of tasks associated with the service
+
+type: long
+
+--
+
+[float]
+=== network
+
+network resource usage
+
+
+*`system.service.resources.network.in.bytes`*::
++
+--
+bytes in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.in.packets`*::
++
+--
+packets in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.out.packets`*::
++
+--
+packets out
+
+type: long
+
+--
+
+*`system.service.resources.network.out.bytes`*::
++
+--
+bytes out
+
+type: long
+
+--
+
+[float]
 === socket
 
 TCP sockets that are active.
@@ -31167,6 +31334,66 @@ type: integer
 +
 --
 Number of TCP connections in _time_wait_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.syn_sent`*::
++
+--
+Number of TCP connections in _syn_sent_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.syn_recv`*::
++
+--
+Number of TCP connections in _syn_recv_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait1`*::
++
+--
+Number of TCP connections in _fin_wait1_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait2`*::
++
+--
+Number of TCP connections in _fin_wait2_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.last_ack`*::
++
+--
+Number of TCP connections in _last_ack_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.closing`*::
++
+--
+Number of TCP connections in _closing_ state
 
 
 type: integer
