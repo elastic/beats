@@ -24,6 +24,7 @@ import (
 // GenerateOSSMetricbeatModuleIncludeListGo generates include/list_{suffix}.go files containing
 // a import statement for each module and dataset.
 func GenerateOSSMetricbeatModuleIncludeListGo() error {
+	// generate include/list_common.go
 	err := devtools.GenerateIncludeListGo(
 		devtools.IncludeListOptions{
 			ImportDirs:       nil,
@@ -35,6 +36,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 	if err != nil {
 		return err
 	}
+	// generate include/list_docker.go
 	err = devtools.GenerateIncludeListGo(
 		devtools.IncludeListOptions{
 			ImportDirs:       nil,

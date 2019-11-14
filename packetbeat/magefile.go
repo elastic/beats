@@ -152,6 +152,7 @@ func Config() error {
 func includeList() error {
 	options := devtools.DefaultIncludeListOptions()
 	options.ImportDirs = []string{"protos/*"}
+	options.ModuleDirs = nil
 	return devtools.GenerateIncludeListGo(options)
 }
 
