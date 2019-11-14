@@ -141,6 +141,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/process"
 	_ "github.com/elastic/beats/metricbeat/module/system/process_summary"
 	_ "github.com/elastic/beats/metricbeat/module/system/raid"
+	_ "github.com/elastic/beats/metricbeat/module/system/service"
 	_ "github.com/elastic/beats/metricbeat/module/system/socket"
 	_ "github.com/elastic/beats/metricbeat/module/system/socket_summary"
 	_ "github.com/elastic/beats/metricbeat/module/system/uptime"
