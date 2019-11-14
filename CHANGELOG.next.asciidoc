@@ -192,6 +192,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Decode hex values in auditd module. {pull}14471[14471]
 - Fix handling multiline log entries in nginx module. {issue}14349[14349] {pull}14499[14499]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 
 *Heartbeat*
 
