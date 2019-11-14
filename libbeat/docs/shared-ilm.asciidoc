@@ -61,6 +61,7 @@ overwrite the template to apply the changes.
 ==== `setup.ilm.pattern`
 
 The rollover index pattern. The default is `%{now/d}-000001`.
+Indices created with this pattern have name `%{[setup.ilm.rollover_alias]}-%{now/d}-000001`
 
 Date math is supported in this setting. For example:
 
