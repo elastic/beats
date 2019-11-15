@@ -1,0 +1,82 @@
+// TODO: Create script that generates this file. Condiitional coding needs to
+// be preserved.
+
+//# tag::processors-list[]
+* <<add-cloud-metadata,`add_cloud_metadata`>>
+* <<add-docker-metadata,`add_docker_metadata`>>
+* <<add-fields, `add_fields`>>
+* <<add-host-metadata,`add_host_metadata`>>
+* <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
+* <<add-labels, `add_labels`>>
+* <<add-locale,`add_locale`>>
+* <<add-observer-metadata,`add_observer_metadata`>>
+* <<add-process-metadata,`add_process_metadata`>>
+* <<add-tags, `add_tags`>>
+* <<community-id,`community_id`>>
+* <<convert,`convert`>>
+* <<decode-base64-field,`decode_base64_field`>>
+ifdef::has_decode_cef_processor[]
+* <<processor-decode-cef,`decode_cef`>>
+endif::[]
+ifdef::has_decode_csv_fields_processor[]
+* <<decode-csv-fields,`decode_csv_fields`>>
+endif::[]
+* <<decode-json-fields,`decode_json_fields`>>
+* <<decompress-gzip-field,`decompress_gzip_field`>>
+* <<dissect, `dissect`>>
+* <<processor-dns, `dns`>>
+* <<drop-event,`drop_event`>>
+* <<drop-fields,`drop_fields`>>
+* <<extract-array,`extract_array`>>
+* <<include-fields,`include_fields`>>
+* <<processor-registered-domain,`registered_domain`>>
+* <<rename-fields,`rename`>>
+ifdef::has_script_processor[]
+* <<processor-script,`script`>>
+endif::[]
+ifdef::has_timestamp_processor[]
+* <<processor-timestamp,`timestamp`>>
+endif::[]
+//# end::processors-list[]
+
+//# tag::processors-include[]
+include::{libbeat-processors-dir}/add_cloud_metadata/docs/add_cloud_metadata.asciidoc[]
+include::{libbeat-processors-dir}/add_docker_metadata/docs/add_docker_metadata.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/add_fields.asciidoc[]
+include::{libbeat-processors-dir}/add_host_metadata/docs/add_host_metadata.asciidoc[]
+include::{libbeat-processors-dir}/add_kubernetes_metadata/docs/add_kubernetes_metadata.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/add_labels.asciidoc[]
+include::{libbeat-processors-dir}/add_locale/docs/add_locale.asciidoc[]
+include::{libbeat-processors-dir}/add_observer_metadata/docs/add_observer_metadata.asciidoc[]
+include::{libbeat-processors-dir}/add_process_metadata/docs/add_process_metadata.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/add_tags.asciidoc[]
+include::{libbeat-processors-dir}/communityid/docs/communityid.asciidoc[]
+include::{libbeat-processors-dir}/convert/docs/convert.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/decode_base64_field.asciidoc[]
+ifdef::has_decode_cef_processor[]
+include::{x-filebeat-processors-dir}/decode_cef/docs/decode_cef.asciidoc[]
+endif::[]
+ifdef::has_decode_csv_fields_processor[]
+include::{libbeat-processors-dir}/decode_csv_fields/docs/decode_csv_fields.asciidoc[]
+endif::[]
+include::{libbeat-processors-dir}/actions/docs/decode_json_fields.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/decompress_gzip_field.asciidoc[]
+include::{libbeat-processors-dir}/dissect/docs/dissect.asciidoc[]
+include::{libbeat-processors-dir}/dns/docs/dns.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/drop_event.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/drop_fields.asciidoc[]
+include::{libbeat-processors-dir}/extract_array/docs/extract_array.asciidoc[]
+include::{libbeat-processors-dir}/fingerprint/docs/fingerprint.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/include_fields.asciidoc[]
+include::{libbeat-processors-dir}/registered_domain/docs/registered_domain.asciidoc[]
+include::{libbeat-processors-dir}/actions/docs/rename.asciidoc[]
+ifdef::has_script_processor[]
+include::{libbeat-processors-dir}/script/docs/script.asciidoc[]
+endif::[]
+ifdef::has_timestamp_processor[]
+include::{libbeat-processors-dir}/timestamp/docs/timestamp.asciidoc[]
+endif::[]
+
+//# end::processors-include[]
+
+
