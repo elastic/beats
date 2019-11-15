@@ -43,6 +43,7 @@ func init() {
 }
 
 func getBase64UUID() string {
+	// TODO: consider moving only critical section into IIFE? Check after benchmarking.
 	mu.Lock()
 	defer mu.Unlock()
 
