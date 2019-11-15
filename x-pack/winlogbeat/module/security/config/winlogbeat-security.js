@@ -1216,7 +1216,7 @@ var security = (function () {
 	    if (!cl) {
 		return;
 	    }
-	    evt.Put("process.args", cl.match(/\S+/g))
+	    evt.Put("process.args", cl.match(/\S+/g));
 	})
         .Build();
 
