@@ -57,7 +57,7 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 - Accept '-' as http.response.body.bytes in apache module. {pull}14137[14137]
 - Fix timezone parsing of MySQL module ingest pipelines. {pull}14130[14130]
 - Improve error message in s3 input when handleSQSMessage failed. {pull}14113[14113]
-- Fix race condition in S3 input plugin. {pull}14359[14359
+- Fix race condition in S3 input plugin. {pull}14359[14359]
 
 *Heartbeat*
 
@@ -75,7 +75,7 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 - Update azure configuration example. {issue}14224[14224]
 - Limit some of the error messages to the logs only {issue}14317[14317] {pull}14327[14327]
 - Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
-- Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378
+- Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
 
 *Packetbeat*
 
@@ -96,7 +96,7 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 - Marking Central Management deprecated. {pull}14018[14018]
 - Add `keep_null` setting to allow Beats to publish null values in events. {issue}5522[5522] {pull}13928[13928]
 - Add shared_credential_file option in aws related config for specifying credential file directory. {issue}14157[14157] {pull}14178[14178]
-- Ensure that init containers are no longer tailed after they stop {pull}14394[14394]
+- Ensure that init containers are no longer tailed after they stop. {pull}14394[14394]
 
 *Auditbeat*
 
@@ -158,8 +158,6 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 *Metricbeat*
 
 - `kubernetes.container.id` field for `state_container` is deprecated in favour of ECS `container.id` and `container.runtime`. {pull}13884[13884]
-
-==== Known Issue
 
 [[release-notes-7.4.1]]
 === Beats version 7.4.1
