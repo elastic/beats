@@ -18,7 +18,7 @@ RUN wget http://archive.apache.org/dist/tomcat/tomcat-7/v${TOMCAT_VERSION}/bin/$
     sed -i -e 's/Connector port="8080"/Connector port="8778"/g' /usr/${TC}/conf/server.xml && \
     curl -J -L -s -f -o - https://github.com/kadwanev/retry/releases/download/1.0.1/retry-1.0.1.tar.gz | tar xfz - -C /usr/local/bin && \
     retry --min 1 --max 180 -- curl -J -L -s -f --show-error -o /usr/${TC}/webapps/jolokia.war \
-        "https://oss.sonatype.org/content/repositories/releases/org/jolokia/jolokia-war/${JOLOKIA_VERSION}/jolokia-war-${JOLOKIA_VERSION}.war"
+        "https://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-war/${JOLOKIA_VERSION}/jolokia-war-${JOLOKIA_VERSION}.war"
 
 # JMX setting to request authentication with remote connection
 RUN echo "monitorRole QED" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password && \
