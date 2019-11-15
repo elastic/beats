@@ -187,6 +187,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Accept '-' as http.response.body.bytes in apache module. {pull}14137[14137]
 - Fix timezone parsing of MySQL module ingest pipelines. {pull}14130[14130]
 - Improve error message in s3 input when handleSQSMessage failed. {pull}14113[14113]
+- Close chan of Closer first before calling callback {pull}14231[14231]
 - Fix race condition in S3 input plugin. {pull}14359[14359]
 - Decode hex values in auditd module. {pull}14471[14471]
 - Fix handling multiline log entries in nginx module. {issue}14349[14349] {pull}14499[14499]
@@ -251,6 +252,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update azure configuration example. {issue}14224[14224]
 - Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
+- Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
+- Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 
 *Packetbeat*
 
@@ -396,6 +399,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more filesets to Zeek module. {pull}14150[14150]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Remove beta flag for some filebeat modules. {pull}14374[14374]
+- Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -479,6 +483,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for Application ELB and Network ELB. {pull}14123[14123] {issue}13538[13538] {issue}13539[13539]
 - Add `connection.state` field for RabbitMQ module. {pull}13981[13981]
 - Add more TCP states to Metricbeat system socket_summary. {pull}14347[14347]
+- Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
 
 *Packetbeat*
 
