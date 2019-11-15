@@ -450,7 +450,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 			m.Logger().Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
 		}
 
-		if len(tagsFilter) != 0 && resourceTagMap == nil {
+		if len(tagsFilter) != 0 && len(resourceTagMap) == 0 {
 			continue
 		}
 
@@ -483,7 +483,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 					identifierValue := labels[identifierValueIdx]
 					tags := resourceTagMap[identifierValue]
-					if len(tagsFilter) != 0 && tags == nil {
+					if len(tagsFilter) != 0 && len(tags) == 0 {
 						continue
 					}
 
