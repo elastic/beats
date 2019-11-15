@@ -55,7 +55,7 @@ func init() {
 }
 
 // Load uses a Config object to create a new complete Pipeline instance with
-// configured queue and outputs.
+// configured queue and outputs. This is a non-blocking operation, and outputs should connect lazily.
 func Load(
 	beatInfo beat.Info,
 	monitors Monitors,
