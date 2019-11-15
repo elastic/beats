@@ -1,0 +1,6 @@
+- module: activemq
+  metricsets: ["broker"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+

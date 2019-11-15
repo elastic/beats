@@ -1,0 +1,10 @@
+- name: topic
+  type: group
+  release: beta
+  description: >
+    topic
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

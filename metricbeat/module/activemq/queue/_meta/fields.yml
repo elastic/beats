@@ -1,0 +1,10 @@
+- name: queue
+  type: group
+  release: beta
+  description: >
+    queue
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
