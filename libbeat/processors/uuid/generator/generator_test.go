@@ -17,4 +17,47 @@
 
 package generator
 
-// TODO: test unknown type
+import (
+	"reflect"
+	"runtime"
+	"testing"
+
+	"github.com/elastic/beats/libbeat/processors/uuid/generator/elasticsearch"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestFactory(t *testing.T) {
+	tests := map[string]struct {
+		expectedGeneratorFn generatorFn
+		expectedErr         error
+	}{
+		"elasticsearch": {
+			elasticsearch.GetBase64UUID,
+			nil,
+		},
+		"foobar": {
+			nil,
+			makeErrUnknownType("foobar"),
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			typ := name
+			fn, err := Factory(typ)
+			if test.expectedGeneratorFn != nil {
+				fnName := getGeneratorFuncName(fn)
+				expectedFnName := getGeneratorFuncName(test.expectedGeneratorFn)
+				assert.Equal(t, fnName, expectedFnName)
+			}
+			if test.expectedErr != nil {
+				assert.EqualError(t, err, test.expectedErr.Error())
+			}
+		})
+	}
+}
+
+func getGeneratorFuncName(fn generatorFn) string {
+	return runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+}
