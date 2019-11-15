@@ -10,21 +10,20 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/api/npipe"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 func makeDialer(t time.Duration, uri string) (transport.Dialer, string, error) {
-	if npipe.IsNPipe(uri) {
-		return nil, "", fmt.Errorf(
-			"cannot use %s as the URI, named pipes are only supported on Windows",
+	if strings.Contains(uri, "unix://") {
+		return nil, fmt.Errorf(
+			"cannot use %s as the URI, unix sockets are not supported on Windows, use npipe instead",
 			uri,
 		)
 	}
 
-	if strings.HasPrefix(uri, "http+unix://") || strings.HasPrefix(uri, "unix://") {
-		s := strings.TrimPrefix(uri, "http+unix://")
-		s = strings.TrimPrefix(s, "unix://")
+	if strings.HasPrefix(uri, "http+npipe://") || strings.HasPrefix(uri, "npipe://") {
+		s := strings.TrimPrefix(uri, "http+npipe://")
+		s = strings.TrimPrefix(s, "npipe://")
 
 		parts := strings.SplitN(s, "/", 2)
 
@@ -34,10 +33,10 @@ func makeDialer(t time.Duration, uri string) (transport.Dialer, string, error) {
 		}
 
 		if len(parts) == 1 {
-			return transport.UnixDialer(t, sockFile), "http://unix/", nil
+			return npipe.DialContext(npipe.TransformString(p)), "http://npipe/", nil
 		}
 
-		return transport.UnixDialer(t, sockFile), "http://unix/" + parts[1], nil
+		return npipe.DialContext(npipe.TransformString(p)), "http://npipe/" + parts[1], nil
 	}
 
 	return transport.NetDialer(t), uri, nil

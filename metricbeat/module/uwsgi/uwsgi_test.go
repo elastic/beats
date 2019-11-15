@@ -34,7 +34,7 @@ func TestHostParser(t *testing.T) {
 		{"localhost", "tcp://localhost"},
 		{"localhost:9191", "tcp://localhost:9191"},
 		{"tcp://localhost:9191", "tcp://localhost:9191"},
-		{"unix:///var/lib/uwsgi.sock", "unix:///var/lib/uwsgi.sock"},
+		{"unix:///var/lib/uwsgi.sock", "unix://%2Fvar%2Flib%2Fuwsgi.sock"},
 	}
 
 	m := mbtest.NewTestModule(t, map[string]interface{}{})

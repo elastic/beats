@@ -180,6 +180,9 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 // getURL constructs a URL from the rawHost value and adds the provided user,
 // password, path, and query params if one was not set in the rawURL value.
 func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, error) {
+	// Normalize npipe definition into a URI format.
+	rawURL = strings.Replace(rawURL, `\\.\pipe\`, "npipe:///", 1)
+
 	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
 		// Add scheme.
 		rawURL = fmt.Sprintf("%s://%s", scheme, rawURL)
@@ -191,6 +194,7 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 	}
 
 	SetURLUser(u, username, password)
+	// url == unix:///tmp/foo.sock
 
 	if strings.HasSuffix(u.Scheme, "unix") || strings.HasSuffix(u.Scheme, "npipe") {
 		if u.Host == "" {
@@ -224,6 +228,10 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 		}
 		u.Path = path
 	}
+
+	// path == andrew
+
+	// unix://%2Ftmp%2Ffoo.sock/andrew
 
 	//Adds the query params in the url
 	u, err = SetQueryParams(u, query)
