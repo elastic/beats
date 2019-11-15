@@ -1,0 +1,18 @@
+[[uuid]]
+=== Generate UUID for an event
+
+The `uuid` processor generates a random but roughly ordered UUID for an event.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - elasticsearch_id: ~
+-----------------------------------------------------
+
+The following settings are supported:
+
+`target_field`:: (Optional) Field in which the generated ID should be stored. Default is `@metadata.id`.
+
+`type`:: (Optional) Type of ID to generate. Currently only `elasticsearch` is supported and is the default.
+The `elasticsearch` type generates IDs using the same algorithm that Elasticsearch uses for auto-generating
+its document IDs.
