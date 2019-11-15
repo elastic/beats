@@ -832,6 +832,14 @@
 			"revisionTime": "2019-08-29T19:00:40Z"
 		},
 		{
+			"checksumSHA1": "WF6GR2/MTAreZskxw9rvh+HCQc4=",
+			"path": "github.com/coreos/go-systemd/dbus",
+			"revision": "fd7a80b32e1fc73e890fde45604ed5009dc817a3",
+			"revisionTime": "2019-07-19T11:48:52Z",
+			"version": "v20",
+			"versionExact": "v20"
+		},
+		{
 			"checksumSHA1": "cEszpxh1szqTb440ze4hm/Vfm40=",
 			"path": "github.com/coreos/go-systemd/sdjournal",
 			"revision": "9002847aa1425fb6ac49077c0a630b3b67e0fbfd",
@@ -2030,6 +2038,12 @@
 			"path": "github.com/gocarina/gocsv",
 			"revision": "ffef3ffc77bec026fefa6f76bd53d158cfa0e669",
 			"revisionTime": "2017-03-24T09:53:51Z"
+		},
+		{
+			"checksumSHA1": "KSgw53WGLfdZpEMm8It5H0yedV0=",
+			"path": "github.com/godbus/dbus",
+			"revision": "37bf87eef99d69c4f1d3528bd66e3a87dc201472",
+			"revisionTime": "2019-09-30T11:59:46Z"
 		},
 		{
 			"checksumSHA1": "BfjvAbPn5t/2KrdC5E7418OuzV8=",
