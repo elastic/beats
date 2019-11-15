@@ -39,15 +39,37 @@ func TestDefaultTargetField(t *testing.T) {
 
 	v, err := newEvent.GetValue("@metadata.id")
 	assert.NoError(t, err)
-	assert.NotEmpty(t, v)
-
 	assertLen(t, v)
 }
 
-// TODO: non default
+func TestNonDefaultTargetField(t *testing.T) {
+	cfg := common.MustNewConfigFrom(common.MapStr{
+		"target_field": "foo",
+	})
+	p, err := New(cfg)
+	assert.NoError(t, err)
+
+	testEvent := &beat.Event{
+		Fields: common.MapStr{},
+	}
+
+	newEvent, err := p.Run(testEvent)
+	assert.NoError(t, err)
+
+	v, err := newEvent.GetValue("foo")
+	assert.NoError(t, err)
+	assertLen(t, v)
+
+	v, err = newEvent.GetValue("@metadata.id")
+	assert.NoError(t, err)
+	assert.Nil(t, v)
+}
 
 func assertLen(t *testing.T, value interface{}) {
 	assert.IsType(t, "", value)
+
+	assert.NotEmpty(t, value)
+
 	decoded, err := base64.RawURLEncoding.DecodeString(value.(string))
 	assert.NoError(t, err)
 	assert.Len(t, decoded, 15)
