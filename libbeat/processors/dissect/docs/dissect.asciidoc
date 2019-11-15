@@ -1,0 +1,30 @@
+[[dissect]]
+=== Dissect strings
+
+The dissect processor tokenizes incoming strings using defined patterns.
+
+[source,yaml]
+-------
+processors:
+- dissect:
+    tokenizer: "%{key1} %{key2}"
+    field: "message"
+    target_prefix: "dissect"
+-------
+
+The `dissect` processor has the following configuration settings:
+
+`field`:: (Optional) The event field to tokenize. Default is `message`.
+
+`target_prefix`:: (Optional) The name of the field where the values will be extracted. When an empty
+string is defined, the processor will create the keys at the root of the event. Default is
+`dissect`. When the target key already exists in the event, the processor won't replace it and log
+an error; you need to either drop or rename the key before using dissect.
+
+For tokenization to be successful, all keys must be found and extracted, if one of them cannot be
+found an error will be logged and no modification is done on the original event.
+
+NOTE: A key can contain any characters except reserved suffix or prefix modifiers:  `/`,`&`, `+`
+and `?`.
+
+See <<conditions>> for a list of supported conditions.
