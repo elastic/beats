@@ -194,8 +194,6 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 	}
 
 	SetURLUser(u, username, password)
-	// url == unix:///tmp/foo.sock
-
 	if strings.HasSuffix(u.Scheme, "unix") || strings.HasSuffix(u.Scheme, "npipe") {
 		// Taking the URI RFC (RFC3986) https://tools.ietf.org/html/rfc3986 as the source of truth.
 		//
