@@ -39,30 +39,13 @@ type stateMetricsMetricSet struct {
 	mapping    *prometheus.MetricsMapping
 }
 
-// Config for StateMetrics metricset
-type Config struct {
-	BlackList  []string `config:"filter.blacklist"`
-	WhiteList  []string `config:"filter.whitelist"`
-	LabelDedot bool     `config:"labels.dedot"`
-}
-
 // getGroupMappingsFn function instances can be found at this package to feed the
 // metric and label mappings that have not been filtered through configuration
 type getGroupMappingsFn func() (mm map[string]prometheus.MetricMap, lm map[string]prometheus.LabelMap)
 
 // new returns a mb.MetricSet object that can fetch and report
-// kube-state-metrics metrics
+// kube-state-metrics metrics.
 func new(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	// Read user config on top of default configuration
-	c := Config{LabelDedot: true}
-	if err := base.Module().UnpackConfig(&c); err != nil {
-		return nil, err
-	}
-
-	if len(c.BlackList) != 0 && len(c.WhiteList) != 0 {
-		return nil, errors.New("kubernetes statemetrics cannot do whitelist and blacklist filtering at the same time, please use only one")
-	}
-
 	// ksmGroups maps configuration item strings that identify each
 	// kubernetes state metrics group with the function that returns
 	// metrics and label mappings for that group
@@ -71,33 +54,9 @@ func new(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		"configmap":                 getConfigMapMapping,
 	}
 
-	tempKsmGroups := map[string]getGroupMappingsFn{}
-	if len(c.WhiteList) != 0 {
-		// do whitelist filtering
-		for _, wl := range c.WhiteList {
-			v, ok := ksmGroups[wl]
-			if !ok {
-				base.Logger().Errorf("whitelist filter element %q is not valid", wl)
-				continue
-			}
-			tempKsmGroups[wl] = v
-		}
-		ksmGroups = tempKsmGroups
-	} else {
-		// do blacklist filtering
-		for _, bl := range c.BlackList {
-			if _, ok := ksmGroups[bl]; !ok {
-				base.Logger().Errorf("blacklist filter element %q is not valid", bl)
-				continue
-			}
-			delete(ksmGroups, bl)
-		}
-	}
-
-	if len(ksmGroups) == 0 {
-		return nil, errors.New("kubernetes statemetrics group filtering returned an empty set. Please your config filtering to allow at least one group")
-	}
-
+	// Iterate all ksmGroups to get metrics and label mappings.
+	// A metrics pre-process filter could be implemented before
+	// running this block
 	metricsMap := map[string]prometheus.MetricMap{}
 	labelsMap := map[string]prometheus.LabelMap{}
 	for g, fn := range ksmGroups {
@@ -125,12 +84,15 @@ func new(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}}, nil
 }
 
+// Fetch events and dispatch them to reporter
 func (s *stateMetricsMetricSet) Fetch(reporter mb.ReporterV2) error {
 	events, err := s.promClient.GetProcessedMetrics(s.mapping)
 	if err != nil {
 		return errors.Wrap(err, "error getting metrics")
 	}
 
+	// Iterate all events and move event paths from the prometheus helper response
+	// to their intended placements.
 	for _, event := range events {
 		var moduleFieldsMapStr common.MapStr
 		moduleFields, ok := event[mb.ModuleDataKey]
