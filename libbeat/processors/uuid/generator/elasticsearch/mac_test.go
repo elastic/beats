@@ -58,6 +58,14 @@ func TestIsValidAddress(t *testing.T) {
 	}
 }
 
-// TODO: test constructDummyMulticastAddress (length, multicast bit)
+func TestConstructDummyMulticastAddress(t *testing.T) {
+	addr, err := constructDummyMulticastAddress()
+	assert.NoError(t, err)
+	assert.Len(t, addr, addrLen)
+
+	firstOctet := addr[0]
+	assert.EqualValues(t, 0x01, firstOctet&0x01)
+}
+
 // TODO: test getSecureMungedMACAddress (length)
 // TODO: getMacAddress (not loopback, length)
