@@ -24,6 +24,6 @@ type Config struct {
 
 func defaultConfig() Config {
 	return Config{
-		TargetField: "metadata.id",
+		TargetField: "@metadata.id",
 	}
 }
