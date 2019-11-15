@@ -123,14 +123,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				continue
 			}
 
-			storeAllLabels := false
-			labelsLocation := ""
-			if m != nil {
-				c := m.GetConfiguration()
-				storeAllLabels = c.StoreNonMappedLabels
-				labelsLocation = c.NonMappedLabelsPlacement
-			}
-
 			// Ignore unknown metrics
 			if !ok {
 				continue
@@ -142,6 +134,14 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			// Ignore retrieval errors (bad conf)
 			if value == nil {
 				continue
+			}
+
+			storeAllLabels := false
+			labelsLocation := ""
+			if m != nil {
+				c := m.GetConfiguration()
+				storeAllLabels = c.StoreNonMappedLabels
+				labelsLocation = c.NonMappedLabelsPlacement
 			}
 
 			// Apply extra options
