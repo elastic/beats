@@ -18,6 +18,7 @@
 package elasticsearch_id
 
 import (
+	"encoding/base64"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -39,4 +40,13 @@ func TestDefaultTargetField(t *testing.T) {
 	v, err := newEvent.GetValue("@metadata.id")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, v)
+
+	assertLen(t, v)
+}
+
+func assertLen(t *testing.T, value interface{}) {
+	assert.IsType(t, "", value)
+	decoded, err := base64.RawURLEncoding.DecodeString(value.(string))
+	assert.NoError(t, err)
+	assert.Len(t, decoded, 15)
 }
