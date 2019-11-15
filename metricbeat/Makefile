@@ -41,9 +41,9 @@ configs: python-env
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
-imports: python-env
+imports:
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
+	mage imports
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect

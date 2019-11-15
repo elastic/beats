@@ -29,3 +29,7 @@ class Test(metricbeat.BaseTest):
         print(evt)
 
         self.assert_fields_are_documented(evt)
+
+
+class TestEnvoyProxy1_12(Test):
+    COMPOSE_ENV = {'ENVOYPROXY_VERSION': 'v1.12.0'}
