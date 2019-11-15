@@ -79,7 +79,7 @@ func getBase64UUID() string {
 	uuidBytes[5] = byte(t >> 40) // 6th lowest-order byte from timestamp; changes every 35 years
 
 	// Copy mac address bytes (6 bytes)
-	uuidBytes = append(uuidBytes, mac...)
+	copy(uuidBytes[6:6+addrLen], mac)
 
 	// Finally we put the remaining bytes, which will likely not be compressed at all.
 	uuidBytes[12] = byte(t >> 8) // 2nd lowest-order byte from timestamp
