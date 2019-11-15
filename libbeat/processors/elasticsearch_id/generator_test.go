@@ -17,5 +17,6 @@
 
 package elasticsearch_id
 
+// TODO: bytes 7-12 are mac address
 // TODO: test consecutive
 // TODO: benchmarking
