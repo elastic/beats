@@ -5,6 +5,10 @@ This file is generated! See scripts/mage/docs_collector.go
 [options="header"]
 |===
 |Modules   |Dashboards   |Metricsets   
+|<<metricbeat-module-activemq,activemq>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-activemq-broker,broker>> beta[]  
+|<<metricbeat-metricset-activemq-queue,queue>> beta[]  
+|<<metricbeat-metricset-activemq-topic,topic>> beta[]  
 |<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -209,6 +213,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 --
 
+include::modules/activemq.asciidoc[]
 include::modules/aerospike.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/appsearch.asciidoc[]

@@ -12,6 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
+* <<exported-fields-activemq>>
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-appsearch>>
@@ -71,6 +72,70 @@ grouped in the following categories:
 * <<exported-fields-zookeeper>>
 
 --
+[[exported-fields-activemq]]
+== activemq fields
+
+activemq module
+
+
+
+[float]
+=== activemq
+
+
+
+
+[float]
+=== broker
+
+broker
+
+
+
+*`activemq.broker.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
+=== queue
+
+queue
+
+
+
+*`activemq.queue.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
+=== topic
+
+topic
+
+
+
+*`activemq.topic.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
 [[exported-fields-aerospike]]
 == Aerospike fields
 

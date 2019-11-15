@@ -1,0 +1,9 @@
+# Module: activemq
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-activemq.html
+
+- module: activemq
+  metricsets: ["broker"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+

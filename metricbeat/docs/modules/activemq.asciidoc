@@ -1,0 +1,47 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-activemq]]
+== activemq module
+
+beta[]
+
+This is the activemq module.
+
+
+
+[float]
+=== Example configuration
+
+The activemq module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: activemq
+  metricsets: ["broker"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-activemq-broker,broker>>
+
+* <<metricbeat-metricset-activemq-queue,queue>>
+
+* <<metricbeat-metricset-activemq-topic,topic>>
+
+include::activemq/broker.asciidoc[]
+
+include::activemq/queue.asciidoc[]
+
+include::activemq/topic.asciidoc[]
+

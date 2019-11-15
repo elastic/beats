@@ -131,6 +131,14 @@ metricbeat.modules:
   # Diskio configurations
   #diskio.include_devices: []
 
+#------------------------------- Activemq Module -------------------------------
+- module: activemq
+  metricsets: ["broker"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]
