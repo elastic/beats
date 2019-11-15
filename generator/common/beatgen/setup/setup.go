@@ -48,17 +48,7 @@ func RunSetup() error {
 	if err != nil {
 		return errors.Wrapf(err, "error copying pkg to %s", vendorPath)
 	}
-	return LinkImportsHelper()
-}
-
-// LinkImportsHelper links generate_imports_helper.py
-func LinkImportsHelper() error {
-	vendorPath := "./vendor/github.com/"
-	pwd, err := os.Getwd()
-	if err != nil {
-		return errors.Wrap(err, "error gettting current directory")
-	}
-	return sh.Run("ln", "-sf", filepath.Join(pwd, vendorPath, "elastic/beats/metricbeat/scripts/generate_imports_helper.py"), filepath.Join(pwd, vendorPath, "elastic/beats/script/generate_imports_helper.py"))
+	return nil
 }
 
 // CopyVendor copies a new version of beats into the vendor directory of PWD
