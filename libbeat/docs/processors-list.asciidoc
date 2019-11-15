@@ -92,6 +92,9 @@ endif::[]
 ifndef::no_truncate_fields_processor[]
 * <<truncate-fields, `truncate_fields`>>
 endif::[]
+ifndef::no_uuid_processor[]
+* <<processor-uuid,`uuid`>>
+endif::[]
 //# end::processors-list[]
 
 //# tag::processors-include[]
@@ -184,6 +187,9 @@ include::{libbeat-processors-dir}/timestamp/docs/timestamp.asciidoc[]
 endif::[]
 ifndef::no_truncate_fields_processor[]
 include::{libbeat-processors-dir}/actions/docs/truncate_fields.asciidoc[]
+endif::[]
+ifndef::no_uuid_processor[]
+include::{libbeat-processors-dir}/uuid/docs/uuid.asciidoc[]
 endif::[]
 
 //# end::processors-include[]
