@@ -7,8 +7,15 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This is the activemq module.
+This module periodically fetches JMX metrics from Apache ActiveMQ.
 
+[float]
+=== Compatibility
+The module has been tested with Tomcat 5.8.0 and 5.15.9. Other versions are expected to work.
+
+[float]
+=== Usage
+The Tomcat module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
 
 
 [float]
@@ -21,11 +28,12 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: activemq
-  metricsets: ["broker"]
-  enabled: false
+  metricsets: ['broker', 'queue', 'topic']
   period: 10s
-  hosts: ["localhost"]
-
+  hosts: ['localhost:8161']
+  path: '/api/jolokia/?ignoreErrors=true&canonicalNaming=false'
+  username: admin # default username
+  password: admin # default password
 ----
 
 [float]

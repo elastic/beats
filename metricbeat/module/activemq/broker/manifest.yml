@@ -1,0 +1,27 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: 'broker'
+    jmx.mappings:
+    - mbean: 'org.apache.activemq:brokerName=*,type=Broker'
+      attributes:
+      - attr: MemoryPercentUsage
+        field: memory.usage.percent
+      - attr: StorePercentUsage
+        field: store.usage.percent
+      - attr: TempPercentUsage
+        field: temp.usage.percent
+      - attr: TotalConnectionsCount
+        field: connections.total.count
+      - attr: TotalConsumerCount
+        field: consumer.total.count
+      - attr: TotalDequeueCount
+        field: dequeue.total.count
+      - attr: TotalEnqueueCount
+        field: enqueue.total.count
+      - attr: TotalMessageCount
+        field: message.total.count
+      - attr: TotalMessageCount
+        field: message.total.count

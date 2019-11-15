@@ -1,0 +1,33 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: 'topic'
+    jmx.mappings:
+    - mbean: 'org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker'
+      attributes:
+      - attr: AverageEnqueueTime
+        field: enqueue.time.avg
+      - attr: AverageMessageSize
+        field: message.size.avg
+      - attr: ConsumerCount
+        field: consumer.count
+      - attr: DequeueCount
+        field: dequeue.count
+      - attr: DispatchCount
+        field: dispatch.count
+      - attr: EnqueueCount
+        field: enqueue.count
+      - attr: ExpiredCount
+        field: expired.count
+      - attr: InFlightCount
+        field: inflight.count
+      - attr: MaxEnqueueTime
+        field: enqueue.time.max
+      - attr: MemoryPercentUsage
+        field: memory.usage.percent
+      - attr: MinEnqueueTime
+        field: enqueue.time.min
+      - attr: ProducerCount
+        field: producer.count
