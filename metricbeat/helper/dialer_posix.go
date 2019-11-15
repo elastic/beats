@@ -62,7 +62,7 @@ func makeDialer(t time.Duration, uri string) (transport.Dialer, string, error) {
 			qStr = "?" + encoded
 		}
 
-		return transport.UnixDialer(t, sockFile), "http://unix/" + path + qStr, nil
+		return transport.UnixDialer(t, strings.TrimSuffix(sockFile, "/")), "http://unix/" + path + qStr, nil
 	}
 
 	return transport.NetDialer(t), uri, nil

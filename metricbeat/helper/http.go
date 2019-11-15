@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+// HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
+// from HTTP endpoint.
 type HTTP struct {
 	hostData mb.HostData
 	client   *http.Client // HTTP client that is reused across requests.

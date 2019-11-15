@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build !windows
+//+build windows
 
 package helper
 
@@ -61,7 +61,9 @@ func makeDialer(t time.Duration, uri string) (transport.Dialer, string, error) {
 			qStr = "?" + encoded
 		}
 
-		return npipe.DialContext(npipe.TransformString(p)), "http://npipe/" + path + qStr, nil
+		return npipe.DialContext(
+			strings.TrimSuffix(npipe.TransformString(p), "/"),
+		), "http://npipe/" + path + qStr, nil
 	}
 
 	return transport.NetDialer(t), uri, nil

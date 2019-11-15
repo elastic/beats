@@ -167,40 +167,79 @@ func TestOverUnixSocket(t *testing.T) {
 		return
 	}
 
-	tmpDir, err := ioutil.TempDir("", "testsocket")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	t.Run("at root", func(t *testing.T) {
+		tmpDir, err := ioutil.TempDir("", "testsocket")
+		require.NoError(t, err)
+		defer os.RemoveAll(tmpDir)
 
-	sockFile := tmpDir + "/test.sock"
-	uri := "unix://" + sockFile
+		sockFile := tmpDir + "/test.sock"
+		uri := "unix://" + sockFile
 
-	l, err := net.Listen("unix", sockFile)
-	require.NoError(t, err)
+		l, err := net.Listen("unix", sockFile)
+		require.NoError(t, err)
 
-	defer l.Close()
+		defer l.Close()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "ehlo!")
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, "ehlo!")
+		})
+
+		go http.Serve(l, mux)
+
+		cfg := defaultConfig()
+		hostData := mb.HostData{
+			URI:          uri,
+			SanitizedURI: uri,
+		}
+
+		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		require.NoError(t, err)
+
+		r, err := h.FetchResponse()
+		require.NoError(t, err)
+		defer r.Body.Close()
+		content, err := ioutil.ReadAll(r.Body)
+		require.NoError(t, err)
+		assert.Equal(t, []byte("ehlo!"), content)
 	})
 
-	go http.Serve(l, mux)
+	t.Run("at specific path", func(t *testing.T) {
+		tmpDir, err := ioutil.TempDir("", "testsocket")
+		require.NoError(t, err)
+		defer os.RemoveAll(tmpDir)
 
-	cfg := defaultConfig()
-	hostData := mb.HostData{
-		URI:          uri,
-		SanitizedURI: uri,
-	}
+		sockFile := tmpDir + "/test.sock"
+		uri := "unix://" + sockFile + "/?__path=ok"
 
-	h, err := newHTTPFromConfig(cfg, "test", hostData)
-	require.NoError(t, err)
+		l, err := net.Listen("unix", sockFile)
+		require.NoError(t, err)
 
-	r, err := h.FetchResponse()
-	require.NoError(t, err)
-	defer r.Body.Close()
-	content, err := ioutil.ReadAll(r.Body)
-	require.NoError(t, err)
-	assert.Equal(t, []byte("ehlo!"), content)
+		defer l.Close()
+
+		mux := http.NewServeMux()
+		mux.HandleFunc("/ok", func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, "ehlo!")
+		})
+
+		go http.Serve(l, mux)
+
+		cfg := defaultConfig()
+		hostData := mb.HostData{
+			URI:          uri,
+			SanitizedURI: uri,
+		}
+
+		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		require.NoError(t, err)
+
+		r, err := h.FetchResponse()
+		require.NoError(t, err)
+		defer r.Body.Close()
+		content, err := ioutil.ReadAll(r.Body)
+		require.NoError(t, err)
+		assert.Equal(t, []byte("ehlo!"), content)
+	})
 }
 
 func checkTimeout(t *testing.T, h *HTTP) {
