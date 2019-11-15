@@ -1192,6 +1192,34 @@ var security = (function () {
         target: "",
     });
 
+    var renameNewProcessFields = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.NewProcessId", to: "process.pid", type: "long"},
+                {from: "winlog.event_data.NewProcessName", to: "process.executable"},
+		{from: "winlog.event_data.ParentProcessName", to: "process.parent.name"},
+            ],
+            mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Add(function(evt) {
+            var name = evt.Get("process.name");
+            if (name) {
+                return;
+            }
+            var exe = evt.Get("process.executable");
+            evt.Put("process.name", path.basename(exe));
+        })
+	.Add(function(evt) {
+	    var cl = evt.Get("winlog.event_data.CommandLine");
+	    if (!cl) {
+		return;
+	    }
+	    evt.Put("process.args", cl.match(/\S+/g))
+	})
+        .Build();
+
     // Handles 4634 and 4647.
     var logoff = new processor.Chain()
         .Add(copyTargetUser)
@@ -1235,6 +1263,16 @@ var security = (function () {
         .Add(addActionDesc)
         .Build();
 
+    var event4688 = new processor.Chain()
+        .Add(copySubjectUser)
+	.Add(renameNewProcessFields)
+        .Build();    
+
+    var event4689 = new processor.Chain()
+        .Add(copySubjectUser)
+	.Add(renameCommonAuthFields)
+        .Build();    
+    
     var userMgmtEvts = new processor.Chain()
         .Add(copyTargetUser)
         .Add(copySubjectUserLogonId)
@@ -1267,6 +1305,12 @@ var security = (function () {
         // 4672 - Special privileges assigned to new logon.
         4672: event4672.Run,
 
+        // 4688 - A new process has been created.
+        4688: event4688.Run,
+
+        // 4689 - A process has exited.
+        4689: event4689.Run,
+	
         // 4720 - A user account was created
         4720: userMgmtEvts.Run,
 
