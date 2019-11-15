@@ -3,34 +3,27 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "LoadBalancerName": "DockerReg-EcsElast-1UFCSV3UVE46A"
+                "LoadBalancerName": "tf-lb-20171218185946539900000004"
             },
             "namespace": "AWS/ELB"
         },
         "metrics": {
             "EstimatedALBActiveConnectionCount": {
-                "avg": 8.857142857142858
+                "avg": 2.6
             },
             "EstimatedALBConsumedLCUs": {
-                "avg": 0.00007857142857142858
+                "avg": 0.000015000000000000002
             },
             "EstimatedALBNewConnectionCount": {
-                "avg": 5.142857142857143
+                "avg": 0
             },
             "EstimatedProcessedBytes": {
-                "avg": 1077.2857142857142
-            },
-            "HealthyHostCount": {
-                "max": 2
-            },
-            "UnHealthyHostCount": {
-                "max": 0
+                "avg": 237.6
             }
         },
         "tags": {
-            "aws:cloudformation:logical-id": "EcsElasticLoadBalancer",
-            "aws:cloudformation:stack-id": "arn:aws:cloudformation:us-east-1:627959692251:stack/DockerRegistryECSStack/c48d6560-031b-11e6-8ec2-50ba0727c06e",
-            "aws:cloudformation:stack-name": "DockerRegistryECSStack"
+            "Name": "logstash",
+            "owner": "logstash"
         }
     },
     "cloud": {

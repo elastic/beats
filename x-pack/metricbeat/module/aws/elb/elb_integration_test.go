@@ -39,21 +39,6 @@ func TestData(t *testing.T) {
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)
-
-		event, errs := metricSet.FetchEvents()
-		if errs != nil {
-			t.Skip("Skipping TestData: ", errs[0].Error())
-		}
-
-		if len(event) == 0 {
-			t.Skip("Skipping TestData: FetchEvents returns no event")
-		}
-
-		eventRootFields := event[0].RootFields
-		if eventRootFields == nil {
-			t.Skip("Skipping TestData: event root field is empty")
-		}
-
 		t.Run(fmt.Sprintf("namespace: %s", df.namespace), func(t *testing.T) {
 			metricSet.WriteEventsCond(t, df.path, namespaceIs(df.namespace))
 		})
