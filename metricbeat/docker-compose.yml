@@ -52,11 +52,11 @@ services:
       - 8500
 
   couchbase:
-    image: docker.elastic.co/observability-ci/beats-integration-couchbase:${COUCHBASE_VERSION:-4.5.1}-1
+    image: docker.elastic.co/observability-ci/beats-integration-couchbase:${COUCHBASE_VERSION:-4.6.5}-1
     build:
       context: ./module/couchbase/_meta
       args:
-        COUCHBASE_VERSION: ${COUCHBASE_VERSION:-4.5.1}
+        COUCHBASE_VERSION: ${COUCHBASE_VERSION:-4.6.5}
     ports:
       - 8091
 
