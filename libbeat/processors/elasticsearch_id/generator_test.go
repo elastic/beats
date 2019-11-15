@@ -17,38 +17,5 @@
 
 package elasticsearch_id
 
-import (
-	"encoding/base64"
-	"testing"
-
-	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/libbeat/beat"
-
-	"github.com/stretchr/testify/assert"
-)
-
-func TestDefaultTargetField(t *testing.T) {
-	p, err := New(common.MustNewConfigFrom(nil))
-	assert.NoError(t, err)
-
-	testEvent := &beat.Event{}
-
-	newEvent, err := p.Run(testEvent)
-	assert.NoError(t, err)
-
-	v, err := newEvent.GetValue("@metadata.id")
-	assert.NoError(t, err)
-	assert.NotEmpty(t, v)
-
-	assertLen(t, v)
-}
-
-// TODO: non default
-
-func assertLen(t *testing.T, value interface{}) {
-	assert.IsType(t, "", value)
-	decoded, err := base64.RawURLEncoding.DecodeString(value.(string))
-	assert.NoError(t, err)
-	assert.Len(t, decoded, 15)
-}
+// TODO: test consecutive
+// TODO: benchmarking
