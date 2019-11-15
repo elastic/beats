@@ -59,9 +59,6 @@ wait_for_port 9092
 wait_for_port 8779
 
 
-KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-producer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8775,host=0.0.0.0" \
-
-
 echo "Kafka load status code $?"
 
 # ACLS used to prepare tests
@@ -81,6 +78,7 @@ cat /dev/urandom | KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas
 
 wait_for_port 8775
 
+# Start a forever consumer
 KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-consumer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8774,host=0.0.0.0" \
  ${KAFKA_HOME}/bin/kafka-console-consumer.sh --topic=test --bootstrap-server=localhost:9091 --consumer.config ${KAFKA_HOME}/bin/sasl-producer.properties > /dev/null &
 
