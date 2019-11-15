@@ -4,4 +4,5 @@
 - module: activemq
   metricsets: ['broker', 'queue', 'topic']
   period: 10s
-  hosts: ['localhost']
+  hosts: ['localhost:8161']
+  path: '/api/jolokia/?ignoreErrors=true&canonicalNaming=false'
