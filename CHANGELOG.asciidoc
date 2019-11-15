@@ -11,23 +11,15 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 
 *Affecting all Beats*
 
-- Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
-- Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
-- Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
 - By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
 
 *Filebeat*
 
-- Add support for gzipped files in S3 input {pull}13980[13980]
-- Add Filebeat Azure Dashboards {pull}14127[14127]
-
 *Heartbeat*
 
-- JSON/Regex checks against HTTP bodies will only consider the first 100MiB of the HTTP body to prevent excessive memory usage. {pull}14223[pull]
+- JSON/Regex checks against HTTP bodies will only consider the first 100MiB of the HTTP body to prevent excessive memory usage. {pull}14223[14223]
 
 *Metricbeat*
-
-- Add new dashboards for Azure vms, vm guest metrics, vm scale sets {pull}14000[14000]
 
 ==== Bugfixes
 
@@ -97,6 +89,9 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 - Add `keep_null` setting to allow Beats to publish null values in events. {issue}5522[5522] {pull}13928[13928]
 - Add shared_credential_file option in aws related config for specifying credential file directory. {issue}14157[14157] {pull}14178[14178]
 - Ensure that init containers are no longer tailed after they stop. {pull}14394[14394]
+- Libbeat HTTP's Server can listen to a unix socket using the `unix:///tmp/hello.sock` syntax. {pull}13655[13655]
+- Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
+- Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
 
 *Auditbeat*
 
@@ -119,6 +114,9 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 - Add support for all the ObjectCreated events in S3 input. {pull}14077[14077]
 - Add `source.bytes` and `source.packets` for uni-directional netflow events. {pull}14111[14111]
 - Add Kibana Dashboard for MISP module. {pull}14147[14147]
+- Add support for gzipped files in S3 input {pull}13980[13980]
+- Add Filebeat Azure Dashboards {pull}14127[14127]
+
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -143,6 +141,7 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 - Add ability to filter by tags for cloudwatch metricset. {pull}13758[13758] {issue}13145[13145]
 - Release cloudwatch, s3_daily_storage, s3_request, sqs and rds metricset as GA. {pull}14114[14114] {issue}14059[14059]
 - Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
+- Add new dashboards for Azure vms, vm guest metrics, vm scale sets {pull}14000[14000]
 
 *Functionbeat*
 
