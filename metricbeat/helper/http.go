@@ -73,7 +73,7 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 	}
 
 	var tlsDialer transport.Dialer
-	dialer, uri, err := makeDialer(config.ConnectTimeout, hostData.URI)
+	dialer, uri, err := makeDialer(config.ConnectTimeout, hostData.SanitizedURI)
 	if err != nil {
 		return nil, err
 	}

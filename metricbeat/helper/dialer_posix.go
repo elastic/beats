@@ -23,21 +23,29 @@ func makeDialer(t time.Duration, uri string) (transport.Dialer, string, error) {
 	}
 
 	if strings.HasPrefix(uri, "http+unix://") || strings.HasPrefix(uri, "unix://") {
-		s := strings.TrimPrefix(uri, "http+unix://")
-		s = strings.TrimPrefix(s, "unix://")
-
-		parts := strings.SplitN(s, "/", 2)
-
-		sockFile, err := url.PathUnescape(parts[0])
+		u, err := url.Parse(uri)
 		if err != nil {
-			return nil, "", errors.Wrap(err, "could no decode path to the socket")
+			return nil, "", errors.Wrap(err, "fail to parse URI")
 		}
 
-		if len(parts) == 1 {
-			return transport.UnixDialer(t, sockFile), "http://unix/", nil
+		sockFile := u.Path
+
+		q := u.Query()
+		path := q.Get("__path")
+		if path != "" {
+			path, err = url.PathUnescape(path)
+			if err != nil {
+				return nil, "", fmt.Errorf("could not unescape resource path %s", path)
+			}
+		}
+		q.Del("__path")
+
+		var qStr string
+		if encoded := q.Encode(); encoded != "" {
+			qStr = "?" + encoded
 		}
 
-		return transport.UnixDialer(t, sockFile), "http://unix/" + parts[1], nil
+		return transport.UnixDialer(t, sockFile), "http://unix/" + path + qStr, nil
 	}
 
 	return transport.NetDialer(t), uri, nil
