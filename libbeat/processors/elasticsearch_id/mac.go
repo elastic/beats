@@ -84,6 +84,8 @@ func isValidAddress(addr []byte) bool {
 			return true // If any of the bytes are non zero assume a good address
 		}
 	}
+
+	return false
 }
 
 func constructDummyMulticastAddress() ([]byte, error) {
