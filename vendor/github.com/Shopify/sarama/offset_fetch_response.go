@@ -115,7 +115,12 @@ func (r *OffsetFetchResponse) decode(pd packetDecoder, version int16) (err error
 			}
 
 			if numBlocks == 0 {
-				r.Blocks[name] = nil
+				//r.Blocks[name] = nil
+				// HACK: Azure is returning an empty block table for consumer groups
+				// that haven't committed an explicit offset yet. Add a placeholder
+				// to unstick things.
+				r.Blocks[name] = make(map[int32]*OffsetFetchResponseBlock)
+				r.Blocks[name][0] = &OffsetFetchResponseBlock{Offset: -1}
 				continue
 			}
 			r.Blocks[name] = make(map[int32]*OffsetFetchResponseBlock, numBlocks)
