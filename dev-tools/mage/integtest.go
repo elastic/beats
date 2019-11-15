@@ -55,9 +55,6 @@ var (
 	// to use (like snapshot (default), latest, 5x). Formerly known as
 	// TESTING_ENVIRONMENT.
 	StackEnvironment = EnvOr("STACK_ENVIRONMENT", "snapshot")
-
-	// Generate env var enables data generation in several tests
-	Generate = EnvOr("GENERATE", "")
 )
 
 // AddIntegTestUsage increments the use count for the integration test
@@ -195,7 +192,6 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// compose.EnsureUp needs to know the environment type.
 		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
-		"-e", "GENERATE=" + Generate,
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
