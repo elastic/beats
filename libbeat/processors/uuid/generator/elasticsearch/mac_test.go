@@ -17,7 +17,47 @@
 
 package elasticsearch
 
-// TODO: test isValidAddress (length, not all zeros)
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestIsValidAddress(t *testing.T) {
+	tests := map[string]struct {
+		addr     []byte
+		expected bool
+	}{
+		"nil": {
+			nil,
+			false,
+		},
+		"too_short": {
+			[]byte{0xde, 0xad, 0xbe, 0xef},
+			false,
+		},
+		"too_long": {
+			[]byte{0xbe, 0xa7, 0x5a, 0x43, 0xda, 0xbe, 0x57},
+			false,
+		},
+		"all_zeros": {
+			[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			false,
+		},
+		"good": {
+			[]byte{0xbe, 0xa7, 0x5a, 0x43, 0x90, 0x0d},
+			true,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			v := isValidAddress(test.addr)
+			assert.Equal(t, test.expected, v)
+		})
+	}
+}
+
 // TODO: test constructDummyMulticastAddress (length, multicast bit)
 // TODO: test getSecureMungedMACAddress (length)
 // TODO: getMacAddress (not loopback, length)
