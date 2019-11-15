@@ -15,8 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch_id
+package generator
 
-// TODO: bytes 7-12 are mac address
-// TODO: test consecutive
-// TODO: benchmarking
+import "github.com/elastic/beats/libbeat/processors/uuid/generator/elasticsearch"
+
+type generatorFn func() string
+
+func Factory(typ string) (generatorFn, error) {
+	switch typ {
+	case "elasticsearch":
+		return elasticsearch.GetBase64UUID, nil
+	default:
+		return nil, makeErrUnknownType(typ)
+	}
+}

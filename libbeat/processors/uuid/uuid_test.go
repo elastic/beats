@@ -15,10 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch_id
+package uuid
 
 import (
-	"encoding/base64"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -39,7 +38,7 @@ func TestDefaultTargetField(t *testing.T) {
 
 	v, err := newEvent.GetValue("@metadata.id")
 	assert.NoError(t, err)
-	assertLen(t, v)
+	assert.NotEmpty(t, v)
 }
 
 func TestNonDefaultTargetField(t *testing.T) {
@@ -58,19 +57,9 @@ func TestNonDefaultTargetField(t *testing.T) {
 
 	v, err := newEvent.GetValue("foo")
 	assert.NoError(t, err)
-	assertLen(t, v)
+	assert.NotEmpty(t, v)
 
 	v, err = newEvent.GetValue("@metadata.id")
 	assert.NoError(t, err)
-	assert.Nil(t, v)
-}
-
-func assertLen(t *testing.T, value interface{}) {
-	assert.IsType(t, "", value)
-
-	assert.NotEmpty(t, value)
-
-	decoded, err := base64.RawURLEncoding.DecodeString(value.(string))
-	assert.NoError(t, err)
-	assert.Len(t, decoded, 15)
+	assert.Empty(t, v)
 }

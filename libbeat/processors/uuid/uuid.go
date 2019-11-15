@@ -15,10 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch_id
+package uuid
 
 import (
 	"fmt"
+
+	"github.com/elastic/beats/libbeat/processors/uuid/generator"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -27,24 +29,24 @@ import (
 )
 
 func init() {
-	processors.RegisterPlugin("elasticsearch_id", New)
-	jsprocessor.RegisterPlugin("ElasticsearchID", New)
+	processors.RegisterPlugin("uuid", New)
+	jsprocessor.RegisterPlugin("UUID", New)
 }
 
-const processorName = "elasticsearch_id"
+const processorName = "uuid"
 
-type elasticsearchID struct {
+type uuid struct {
 	config Config
 }
 
-// New constructs a new Elasticsearch ID processor.
+// New constructs a new UUID processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
 	}
 
-	p := &elasticsearchID{
+	p := &uuid{
 		config,
 	}
 
@@ -52,8 +54,13 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 // Run enriches the given event with an ID
-func (p *elasticsearchID) Run(event *beat.Event) (*beat.Event, error) {
-	id := getBase64UUID()
+func (p *uuid) Run(event *beat.Event) (*beat.Event, error) {
+	idFn, err := generator.Factory(p.config.Type)
+	if err != nil {
+		return nil, makeErrComputeID(err)
+	}
+
+	id := idFn()
 	if _, err := event.PutValue(p.config.TargetField, id); err != nil {
 		return nil, makeErrComputeID(err)
 	}
@@ -61,6 +68,6 @@ func (p *elasticsearchID) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *elasticsearchID) String() string {
+func (p *uuid) String() string {
 	return fmt.Sprintf("%v=[target_field=[%v]]", processorName, p.config.TargetField)
 }

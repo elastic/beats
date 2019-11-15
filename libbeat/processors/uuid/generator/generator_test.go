@@ -15,9 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch_id
+package generator
 
-// TODO: test isValidAddress (length, not all zeros)
-// TODO: test constructDummyMulticastAddress (length, multicast bit)
-// TODO: test getSecureMungedMACAddress (length)
-// TODO: getMacAddress (not loopback, length)
+// TODO: test unknown type

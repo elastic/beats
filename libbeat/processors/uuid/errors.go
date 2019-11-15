@@ -15,15 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch_id
+package uuid
 
-// Config for Elasticsearch ID processor.
-type Config struct {
-	TargetField string `config:"target_field"` // Target field for the ID
+import (
+	"fmt"
+)
+
+type (
+	errConfigUnpack struct{ cause error }
+	errComputeID    struct{ cause error }
+	errUnknownType  struct{ typ string }
+)
+
+func makeErrConfigUnpack(cause error) errConfigUnpack {
+	return errConfigUnpack{cause}
+}
+func (e errConfigUnpack) Error() string {
+	return fmt.Sprintf("failed to unpack %v processor configuration: %v", processorName, e.cause)
 }
 
-func defaultConfig() Config {
-	return Config{
-		TargetField: "@metadata.id",
-	}
+func makeErrComputeID(cause error) errComputeID {
+	return errComputeID{cause}
+}
+func (e errComputeID) Error() string {
+	return fmt.Sprintf("failed to compute ID: %v", e.cause)
+}
+
+func makeErrUnknownType(typ string) errUnknownType {
+	return errUnknownType{typ}
+}
+func (e errUnknownType) Error() string {
+	return fmt.Sprintf("invalid type [%s]", e.typ)
 }

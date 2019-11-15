@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch_id
+package elasticsearch
 
 import (
 	"encoding/base64"
@@ -42,7 +42,7 @@ func init() {
 	sequenceNumber = rand.Uint32()
 }
 
-func getBase64UUID() string {
+func GetBase64UUID() string {
 	// TODO: consider moving only critical section into IIFE? Check after benchmarking.
 	mu.Lock()
 	defer mu.Unlock()

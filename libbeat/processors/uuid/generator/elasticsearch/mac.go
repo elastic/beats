@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch_id
+package elasticsearch
 
 import (
 	"crypto/rand"
