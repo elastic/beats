@@ -1,19 +1,90 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2019-11-15T16:54:40.906Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"activemq",
-        "name":"broker",
-        "rtt":44269
+    "metricset": {
+        "period": 10000,
+        "name": "broker"
     },
-    "activemq":{
-        "broker":{
-            "example": "broker"
+    "service": {
+        "address": "localhost:8161",
+        "type": "activemq"
+    },
+    "activemq": {
+        "broker": {
+            "enqueue": {
+                "total": {
+                    "count": 1
+                }
+            },
+            "mbean": "org.apache.activemq:brokerName=localhost,type=Broker",
+            "temp": {
+                "usage": {
+                    "percent": 0
+                }
+            },
+            "store": {
+                "usage": {
+                    "percent": 0
+                }
+            },
+            "connections": {
+                "total": {
+                    "count": 0
+                }
+            },
+            "message": {
+                "total": {
+                    "count": 0
+                }
+            },
+            "consumer": {
+                "total": {
+                    "count": 0
+                }
+            },
+            "dequeue": {
+                "total": {
+                    "count": 0
+                }
+            },
+            "memory": {
+                "usage": {
+                    "percent": 0
+                }
+            }
         }
     },
-    "type":"metricsets"
+    "host": {
+        "name": "macbook.local",
+        "os": {
+            "family": "darwin",
+            "name": "Mac OS X",
+            "kernel": "17.7.0",
+            "build": "17G8037",
+            "platform": "darwin",
+            "version": "10.13.6"
+        },
+        "id": "EEBF3B21-350A-5F10-B217-5B8EA1DA5477",
+        "hostname": "macbook.local",
+        "architecture": "x86_64"
+    },
+    "agent": {
+        "ephemeral_id": "7787c99e-abec-477e-9cd6-d62abdf91447",
+        "hostname": "macbook.local",
+        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a",
+        "version": "8.0.0",
+        "type": "metricbeat"
+    },
+    "ecs": {
+        "version": "1.2.0"
+    },
+    "event": {
+        "dataset": "activemq.broker",
+        "module": "activemq",
+        "duration": 20211732
+    }
 }
