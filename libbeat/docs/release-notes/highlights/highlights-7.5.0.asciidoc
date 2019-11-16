@@ -1,0 +1,34 @@
+[[release-highlights-7.5.0]]
+=== 7.5 release highlights
+++++
+<titleabbrev>7.5</titleabbrev>
+++++
+
+coming[7.5.0]
+
+Each release of {beats} brings new features and product improvements. 
+Following are the most notable features and enhancements in 7.5.
+
+//For a complete list of highlights, see the 
+//https://www.elastic.co/blog/beats-7-5-0-released[{beats} 7.5 release blog].
+
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-7.5, Breaking Changes>> and <<release-notes, Release Notes>>.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+// ADD NOTABLE HIGHLIGHTS HERE
+
+//[float]
+//==== Add title here
+
+//Add description here.
+
+//[float]
+//==== Add title here
+
+//Add description here.
+
+// end::notable-highlights[]
