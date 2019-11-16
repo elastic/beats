@@ -27,6 +27,7 @@ import (
 
 // Resource is used to lock and modify a resource its registry contents in a
 // store.
+// A resource must not be used anymore once the store has been closed.
 type Resource struct {
 	store    *Store
 	isLocked bool
@@ -46,6 +47,8 @@ func newResource(store *Store, key ResourceKey) *Resource {
 	// been caught) we set a finalizer to eventually free the resource.
 	// The Unlock operation will unsert the finalizer.
 	runtime.SetFinalizer(res, (*Resource).finalize)
+
+	store.session.Retain()
 	return res
 }
 
@@ -60,6 +63,8 @@ func (r *Resource) finalize() {
 	if r.IsLocked() {
 		r.doUnlock()
 	}
+
+	r.store.session.Release()
 }
 
 func (r *Resource) link(create bool) {
@@ -67,15 +72,11 @@ func (r *Resource) link(create bool) {
 		return
 	}
 
-	store := r.store
-	store.resourcesMux.Lock()
-	defer store.resourcesMux.Unlock()
-
-	entry := store.find(r.key)
-	if entry == nil && create {
-		entry = store.create(r.key)
+	if create {
+		r.entry = r.store.findOrCreate(r.key, lockRequired)
+	} else {
+		r.entry = r.store.find(r.key, lockRequired)
 	}
-	r.entry = entry
 }
 
 // unlink removes the pointer to the memory backed resource.
@@ -89,12 +90,7 @@ func (r *Resource) unlink() {
 	entry := r.entry
 	r.entry = nil
 
-	store := r.store
-	store.resourcesMux.Lock()
-	defer store.resourcesMux.Unlock()
-	if entry.Release() {
-		store.remove(r.key)
-	}
+	r.store.releaseEntry(entry)
 }
 
 // Lock locks a resource held by the store. It blocks until the lock becomes
@@ -147,10 +143,17 @@ func (r *Resource) markUnlocked() {
 	r.isLocked = false
 }
 
-// Has check if resource is already in registry.
+// Has checks if resource is already in registry.
 // Has does not require the lock to be taken.
 func (r *Resource) Has() (bool, error) {
+	const op = "resource/has"
+
+	if !r.store.active.Load() {
+		return false, raiseClosed(op)
+	}
+
 	has := false
+
 	err := r.store.persistentStore.View(func(tx *registry.Tx) error {
 		found, err := tx.Has(registry.Key(r.key))
 		if err == nil {
@@ -161,7 +164,7 @@ func (r *Resource) Has() (bool, error) {
 
 	if err != nil {
 		err = &Error{
-			op:      "resource/has",
+			op:      op,
 			message: "failed to lookup resource",
 			cause:   err,
 		}
@@ -183,6 +186,10 @@ func (r *Resource) Has() (bool, error) {
 // an overlapping set of fields.
 func (r *Resource) Update(val interface{}) error {
 	const op = "resource/update"
+
+	if !r.store.active.Load() {
+		return raiseClosed(op)
+	}
 
 	checkLocked(r.IsLocked())
 
@@ -207,13 +214,18 @@ func (r *Resource) Update(val interface{}) error {
 	return nil
 }
 
-// read current state of resource. If there are pending operations, this is
-// the last in-memory state. If there are no operations, or all pending operations have been acked, we read directly from the registry.
+// Read current state of resource. If there are pending operations, this is
+// the last in-memory state. If there are no operations, or all pending
+// operations have been acked, we read directly from the registry.
 // Read does not require the resource to be locked. But if the lock is
 // not taken, you are subject to data races as the go-routine holding a lock on the resource
 // can update its contents.
 func (r *Resource) Read(to interface{}) error {
 	const op = "resource/read"
+
+	if !r.store.active.Load() {
+		return raiseClosed(op)
+	}
 
 	r.link(false)
 	entry := r.entry
@@ -262,6 +274,10 @@ func (r *Resource) Read(to interface{}) error {
 func (r *Resource) UpdateOp(val interface{}) (*ResourceUpdateOp, error) {
 	const op = "resource/create-update-op"
 
+	if !r.store.active.Load() {
+		return nil, raiseClosed(op)
+	}
+
 	checkLocked(r.IsLocked())
 
 	entry := r.entry
@@ -290,8 +306,7 @@ func (r *Resource) UpdateOp(val interface{}) (*ResourceUpdateOp, error) {
 	}
 
 	entry.value.pending++
-	entry.Retain()
-	return newUpdateOp(r.store, r.key, entry, val), nil
+	return newUpdateOp(r.store.session, r.key, entry, val), nil
 }
 
 func checkLocked(b bool) {
@@ -306,8 +321,4 @@ func invariant(b bool, message string) {
 	if !b {
 		panic(errors.New(message))
 	}
-}
-
-func implementMe() error {
-	panic("TODO: implement me")
 }

@@ -27,15 +27,19 @@ import (
 // The operation can be applied to the registry using ApplyWith. Calling Close
 // will mark the operation as done.
 type ResourceUpdateOp struct {
-	store   *Store
+	session *storeSession
 	key     ResourceKey
 	entry   *resourceEntry
 	updates interface{}
+	applied bool
 }
 
-func newUpdateOp(store *Store, key ResourceKey, entry *resourceEntry, updates interface{}) *ResourceUpdateOp {
+func newUpdateOp(session *storeSession, key ResourceKey, entry *resourceEntry, updates interface{}) *ResourceUpdateOp {
+	session.Retain()
+	entry.refCount.Retain()
+
 	op := &ResourceUpdateOp{
-		store:   store,
+		session: session,
 		key:     key,
 		entry:   entry,
 		updates: updates,
@@ -50,22 +54,30 @@ func newUpdateOp(store *Store, key ResourceKey, entry *resourceEntry, updates in
 // the provided store.  If possible the helper should keep the transaction open
 // if an array of operations are applied.
 func (op *ResourceUpdateOp) ApplyWith(withTx func(*registry.Store, func(*registry.Tx) error) error) error {
-	return withTx(op.store.persistentStore, func(tx *registry.Tx) error {
+	store := op.session.store
+	err := withTx(store.persistentStore, func(tx *registry.Tx) error {
 		return tx.Update(registry.Key(op.key), op.updates)
 	})
+	op.applied = true
+	return err
 }
 
 // Close marks the operation as done. ApplyWith can not be run anymore
 // afterwards.  If all pending operations have been closed, the persistent
 // store is assumed to be in sync with the in memory state.
 func (op *ResourceUpdateOp) Close() {
-	op.closePending()
-	op.unlink()
 	runtime.SetFinalizer(op, nil)
+	op.finalize()
 }
 
 func (op *ResourceUpdateOp) finalize() {
+	if !op.applied {
+		panic("unapplied resource update detected")
+	}
+
+	op.closePending()
 	op.unlink()
+	op.session.Release()
 }
 
 func (op *ResourceUpdateOp) closePending() {
@@ -83,11 +95,6 @@ func (op *ResourceUpdateOp) closePending() {
 }
 
 func (op *ResourceUpdateOp) unlink() {
-	store, entry := op.store, op.entry
-
-	store.resourcesMux.Lock()
-	defer store.resourcesMux.Unlock()
-	if entry.Release() {
-		store.remove(op.key)
-	}
+	store, entry := op.session.store, op.entry
+	store.releaseEntry(entry)
 }

@@ -27,6 +27,7 @@ import (
 
 var (
 	ErrCodeOpFailed = errors.New("operation failed")
+	ErrClosed       = errors.New("store is closed")
 )
 
 // predefined errors
@@ -87,4 +88,11 @@ func (e *Error) Error() string {
 	}
 	padOpt(e.cause)
 	return buf.String()
+}
+
+func raiseClosed(op string) *Error {
+	return &Error{
+		op:   op,
+		code: ErrClosed,
+	}
 }

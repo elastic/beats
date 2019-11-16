@@ -21,7 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/go-concert/atomic"
+	"github.com/elastic/go-concert"
 )
 
 // In memory registry state table. Updates are written directly to this table.
@@ -37,7 +37,7 @@ type table struct {
 // resourceEntry keeps track of actual resource locks and pending updates.
 type resourceEntry struct {
 	key      ResourceKey
-	refCount atomic.Uint
+	refCount concert.RefCount
 	lock     chan struct{}
 	value    valueState
 }
@@ -53,40 +53,31 @@ type valueState struct {
 	cached  common.MapStr // current value if state == valueOutOfSync
 }
 
-func (t table) Empty() bool {
+func (t *table) Empty() bool {
 	return len(t.m) == 0
 }
 
-func (t table) Create(k ResourceKey) *resourceEntry {
+func (t *table) Create(k ResourceKey) *resourceEntry {
 	lock := make(chan struct{}, 1)
 	lock <- struct{}{}
 	r := &resourceEntry{
-		key:      k,
-		lock:     lock,
-		refCount: atomic.MakeUint(1),
+		key:  k,
+		lock: lock,
 	}
 	t.m[k] = r
 	return r
 }
 
-func (t table) Find(k ResourceKey) *resourceEntry {
-	r := t.m[k]
-	if r != nil {
-		r.Retain()
+func (t *table) Find(k ResourceKey) *resourceEntry {
+	entry := t.m[k]
+	if entry != nil {
+		entry.refCount.Retain()
 	}
-	return r
+	return entry
 }
 
-func (t table) Remove(k ResourceKey) {
+func (t *table) Remove(k ResourceKey) {
 	delete(t.m, k)
-}
-
-func (r *resourceEntry) Retain() {
-	r.refCount.Inc()
-}
-
-func (r *resourceEntry) Release() bool {
-	return r.refCount.Dec() == 0
 }
 
 func (r *resourceEntry) Lock() {

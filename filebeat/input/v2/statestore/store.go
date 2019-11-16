@@ -20,61 +20,84 @@ package statestore
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/go-concert"
+	"github.com/elastic/go-concert/atomic"
+
 	"github.com/elastic/beats/libbeat/registry"
 )
 
 // Store provides some coordinates access to a registry.Store.
-// All update and read operations require users to acquire an resource first.
+// All update and read operations require users to acquire a resource first.
 // A Resource must be locked before it can be modified. This ensures that at most
 // one go-routine has access to a resource. Lock/TryLock/Unlock can be used to
 // coordinate resource access even between independent components.
 type Store struct {
-	active bool
-	waiter chan struct{}
+	active atomic.Bool
 
-	log *logp.Logger
-
-	persistentStore *registry.Store
-
-	resourcesMux sync.Mutex
-	resources    table
+	session *storeSession
+	*store
 }
 
-// NewStore creates a new state Store that is backed by a persistent store.
-func NewStore(log *logp.Logger, store *registry.Store) *Store {
-	invariant(log != nil, "missing a logger")
+// store is the shared store instance as is tracked by the Connector.
+// Any two go-routines accessing a Store will reference the same underlying store.
+// If one of the go-routines closes the store, we ensure that the shared resources
+// are kept alive until all go-routines have given up access.
+type store struct {
+	refCount concert.RefCount
+
+	parent *Connector
+	name   string
+
+	persistentStore *registry.Store
+	resourcesMux    sync.Mutex
+	resources       table
+}
+
+// storeSession keeps track of the lifetime of a Store instance.
+// In flight resource update operations do extend the lifetime of
+// a Store, even if the store has been closed by a go-routine.
+//
+// A session will shutdown when the Store is closed and all pending
+// update operations have been persisted.
+type storeSession struct {
+	refCount concert.RefCount
+	store    *store
+}
+
+func newSession(store *store) *storeSession {
+	session := &storeSession{store: store}
+	session.refCount.Action = func(_ error) { session.Close() }
+	return session
+}
+
+func (s *storeSession) Close() {
+	connector := s.store.parent
+	connector.releaseStore(s.store)
+	s.store = nil
+}
+
+func (s *storeSession) Retain()       { s.refCount.Retain() }
+func (s *storeSession) Release() bool { return s.refCount.Release() }
+
+// newStore creates a new state Store with an active session.
+func newStore(store *store) *Store {
 	invariant(store != nil, "missing a persistent store")
 
 	return &Store{
-		active:          true,
-		log:             log,
-		persistentStore: store,
-		resources:       table{},
-		waiter:          make(chan struct{}),
+		active:  atomic.MakeBool(true),
+		store:   store,
+		session: newSession(store),
 	}
 }
 
-// Deactivate signals the store to close itself. Resources can not be accessed anymore,
-// but in progress resource updates are still active, until they are eventually ACKed.
-// The underlying persistent store will be finally closed once all pending updates
-// have been written to the persistent store.
-func (s *Store) Deactivate() {
-	s.resourcesMux.Lock()
-	defer s.resourcesMux.Unlock()
-	s.active = false
-}
-
 // Close deactivates the store and waits for all resources to be released.
-// It returns after the persistent store has been closed.
+// Resources can not be accessed anymore, but in progress resource updates are
+// still active, until they are eventually ACKed.  The underlying persistent
+// store will be finally closed once all pending updates have been written to
+// the persistent store.
 func (s *Store) Close() {
-	s.Deactivate()
-	<-s.waiter
-}
-
-func (s *Store) shutdown() {
-	defer close(s.waiter)
-	s.persistentStore.Close()
+	s.active.Store(false)
+	s.session.Release()
 }
 
 // Access an unlocked resource. This creates a handle to a resource that may
@@ -83,50 +106,71 @@ func (s *Store) Access(key ResourceKey) *Resource {
 	return newResource(s, key)
 }
 
-// Lock locks and returns the resource for a given key.
-func (s *Store) Lock(key ResourceKey) *Resource {
-	res := s.Access(key)
-	res.Lock()
-	return res
-}
+func (s *Store) findOrCreate(key ResourceKey, lm lockMode) (res *resourceEntry) {
+	if !s.active.Load() {
+		return nil
+	}
 
-// TryLock locks and returns the resource for a given key.
-// The locked return value is set to false if TryLock failed, but the resource
-// itself is always returned.
-func (s *Store) TryLock(key ResourceKey) (res *Resource, locked bool) {
-	res = s.Access(key)
-	return res, res.TryLock()
+	withLockMode(&s.resourcesMux, lm, func() error {
+		if res = s.resources.Find(key); res == nil {
+			res = s.resources.Create(key)
+		}
+		return nil
+	})
+	return res
 }
 
 // find returns the in memory resource entry, if the key is known to the store.
 // find returns nil if the resource is unknown so far.
-//
-// NOTE: the store.resourcesMux must be locked when calling `create`.
-func (s *Store) find(key ResourceKey) *resourceEntry {
-	if !s.active {
+func (s *Store) find(key ResourceKey, lm lockMode) (res *resourceEntry) {
+	if !s.active.Load() {
 		return nil
 	}
-	return s.resources.Find(key)
+	return s.store.find(key, lm)
 }
 
 // create adds a new entry to the in-memory table and returns the pointer to the entry.
 // It fails if the store has been deactivated and returns 'null'.
-//
-// NOTE: the store.resourcesMux must be locked when calling `create`.
-func (s *Store) create(key ResourceKey) *resourceEntry {
-	if !s.active {
+func (s *Store) create(key ResourceKey, lm lockMode) (res *resourceEntry) {
+	if !s.active.Load() {
 		return nil
 	}
-	return s.resources.Create(key)
+	return s.store.create(key, lm)
 }
 
-// remove deletes and entry from the store. It is called after all pending updates
-// and resource/ops references to the entry are removed or garbage collected.
-//
-// NOTE: the store.resourcesMux must be locked when calling `remove`.
-func (s *Store) remove(key ResourceKey) {
-	s.resources.Remove(key)
-	if !s.active && s.resources.Empty() {
-		s.shutdown()
+func (s *store) close() error {
+	err := s.persistentStore.Close()
+	s.persistentStore = nil
+	return err
+}
+
+func (s *store) releaseEntry(entry *resourceEntry) {
+	s.resourcesMux.Lock()
+	defer s.resourcesMux.Unlock()
+	if entry.refCount.Release() {
+		s.remove(entry.key, lockAlreadyTaken)
 	}
+}
+
+func (s *store) find(key ResourceKey, lm lockMode) (res *resourceEntry) {
+	withLockMode(&s.resourcesMux, lm, func() error {
+		res = s.resources.Find(key)
+		return nil
+	})
+	return res
+}
+
+func (s *store) create(key ResourceKey, lm lockMode) (res *resourceEntry) {
+	withLockMode(&s.resourcesMux, lm, func() error {
+		res = s.resources.Create(key)
+		return nil
+	})
+	return res
+}
+
+func (s *store) remove(key ResourceKey, lm lockMode) {
+	withLockMode(&s.resourcesMux, lm, func() error {
+		s.resources.Remove(key)
+		return nil
+	})
 }
