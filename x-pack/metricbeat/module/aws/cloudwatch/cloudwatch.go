@@ -450,7 +450,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 			m.Logger().Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
 		}
 
-		if tagsFilter != nil && resourceTagMap == nil {
+		if len(tagsFilter) != 0 && len(resourceTagMap) == 0 {
 			continue
 		}
 
@@ -472,7 +472,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 					labels := strings.Split(*output.Label, labelSeperator)
 					if len(labels) != 5 {
 						// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
-						if tagsFilter != nil {
+						if len(tagsFilter) != 0 {
 							continue
 						}
 						eventNew := aws.InitEvent(regionName, m.AccountName, m.AccountID)
@@ -483,7 +483,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 					identifierValue := labels[identifierValueIdx]
 					tags := resourceTagMap[identifierValue]
-					if tagsFilter != nil && tags == nil {
+					if len(tagsFilter) != 0 && len(tags) == 0 {
 						continue
 					}
 
