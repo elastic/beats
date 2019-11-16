@@ -4,15 +4,16 @@
 <titleabbrev>7.5</titleabbrev>
 ++++
 
+coming[7.5.0]
+
 Each release of {beats} brings new features and product improvements. 
-Here are the highlights of the new features and enhancements in 7.5.
+Following are the most notable features and enhancements in 7.5.
 
-Refer to the {beats} <<breaking-changes-7.5, Breaking Changes>> and
-<<release-notes, Release Notes>> for a list of bug fixes and other changes.
+//For a complete list of highlights, see the 
+//https://www.elastic.co/blog/beats-7-5-0-released[{beats} 7.5 release blog].
 
-//Also read the
-//https://www.elastic.co/blog/beats-7-5-0-released[Beats release blog] for a full
-//description of new features.
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-7.5, Breaking Changes>> and <<release-notes, Release Notes>>.
 
 //NOTE: The notable-highlights tagged regions are re-used in the
 //Installation and Upgrade Guide
@@ -29,3 +30,5 @@ Refer to the {beats} <<breaking-changes-7.5, Breaking Changes>> and
 //==== Add title here
 
 //Add description here.
+
+// end::notable-highlights[]
