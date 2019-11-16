@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
-type extract_regexp struct {
+type extractRegexp struct {
 	Field     string
 	Prefix    string
 	RegexpStr string
@@ -41,7 +41,9 @@ func init() {
 			checks.AllowedFields("field", "regexp", "prefix")))
 }
 
-// NewExtractRegexp returns a new extract regexp processor.
+// NewExtractRegexp returns a new extract regexp processor. This gets a regexp, an event field
+// and a prefix and finds all the expression defined names on the field adding them on the event
+// pefixed by the defined prefix.
 func NewExtractRegexp(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Regexp string `config:"regexp"`
@@ -64,7 +66,7 @@ func NewExtractRegexp(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to compile regexp: %s", err)
 	}
 
-	f := &extract_regexp{
+	f := &extractRegexp{
 		Regexp:    r,
 		RegexpStr: config.Regexp,
 		Field:     config.Field,
@@ -73,7 +75,7 @@ func NewExtractRegexp(c *common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f *extract_regexp) Run(event *beat.Event) (*beat.Event, error) {
+func (f *extractRegexp) Run(event *beat.Event) (*beat.Event, error) {
 	fieldValue, err := event.GetValue(f.Field)
 	if err != nil {
 		return event, fmt.Errorf("error getting field '%s' from event", f.Field)
@@ -93,6 +95,6 @@ func (f *extract_regexp) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f extract_regexp) String() string {
+func (f extractRegexp) String() string {
 	return "extract_regexp=" + f.RegexpStr
 }
