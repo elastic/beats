@@ -44,7 +44,7 @@ type Batch interface {
 type Event struct {
 	Content beat.Event
 	Flags   EventFlags
-	Cache   EventCache
+	Cache   *EventCache
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.
