@@ -1,4 +1,4 @@
-package scheduler
+package throttler
 
 import (
 	"math"
@@ -6,6 +6,9 @@ import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
 
+// Throttler is useful for managing access to some resource that can handle a certain amount of concurrency only.
+// You could also do this with a Pool, but this uses a constant amount of memory, and doesn't need to have token
+// objects passed around which is cleaner.
 type Throttler struct {
 	limit          uint
 	availableSlots uint
@@ -15,6 +18,7 @@ type Throttler struct {
 	done           chan bool
 }
 
+// NewThrottler returns a new *Throttler that is not yet started. You must invoke Start for it to do anything.
 func NewThrottler(limit uint) *Throttler {
 	if limit < 1 { // assume unlimited
 		limit = math.MaxUint32
@@ -31,7 +35,7 @@ func NewThrottler(limit uint) *Throttler {
 	return t
 }
 
-func (t *Throttler) start() {
+func (t *Throttler) Start() {
 	go func() {
 		for {
 			// If no slots are available, we just wait for jobs to stop, in which case
@@ -58,13 +62,13 @@ func (t *Throttler) start() {
 	}()
 }
 
-func (t *Throttler) stop() {
+func (t *Throttler) Stop() {
 	close(t.done)
 }
 
-// acquireSlot attempts to acquire a resource. It returns whether acquisition was successful.
+// AcquireSlot attempts to acquire a resource. It returns whether acquisition was successful.
 // If acquisition was successful releaseSlotFn must be invoked, otherwise it may be ignored.
-func (t *Throttler) acquireSlot() (acquired bool, releaseSlotFn func()) {
+func (t *Throttler) AcquireSlot() (acquired bool, releaseSlotFn func()) {
 	startedCh := make(chan bool)
 	t.starts <- startedCh
 

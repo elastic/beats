@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/scheduler/throttler"
+
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -43,7 +45,7 @@ type Scheduler struct {
 	active  atomic.Uint // number of active entries
 	waiting atomic.Uint // number of jobs waiting to run, but constrained by scheduler limit
 
-	throttler *Throttler
+	throttler *throttler.Throttler
 }
 
 type Canceller func() error
@@ -77,16 +79,19 @@ type taskOverSignal struct {
 	cont  []task // continuation tasks to be executed by concurrently for job at hand
 }
 
+// Schedule defines an interface for getting the next scheduled runtime for a job
 type Schedule interface {
 	Next(now time.Time) (next time.Time)
 }
 
 var debugf = logp.MakeDebug("scheduler")
 
+// New creates a new Scheduler
 func New(limit uint) *Scheduler {
 	return NewWithLocation(limit, time.Local)
 }
 
+// NewWithLocation creates a new Scheduler using the given time zone.
 func NewWithLocation(limit uint, location *time.Location) *Scheduler {
 	stateInitial := statePreRunning
 	return &Scheduler{
@@ -96,13 +101,14 @@ func NewWithLocation(limit uint, location *time.Location) *Scheduler {
 		state: atomic.MakeInt(stateInitial),
 		done:  make(chan int),
 
-		throttler: NewThrottler(limit),
+		throttler: throttler.NewThrottler(limit),
 	}
 }
 
+// Start the scheduler.
 func (s *Scheduler) Start() error {
 	s.state.Store(stateRunning)
-	s.throttler.start()
+	s.throttler.Start()
 
 	// Stats reporter
 	go func() {
@@ -122,10 +128,11 @@ func (s *Scheduler) Start() error {
 	return nil
 }
 
+// Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
 func (s *Scheduler) Stop() error {
 	s.state.Store(stateDone)
 	close(s.done)
-	s.throttler.stop()
+	s.throttler.Stop()
 
 	return nil
 }
@@ -170,21 +177,31 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	return removeFn, nil
 }
 
+// runOnce runs a TaskFunc and its continuations once.
 func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
+	// Since we run all continuations asynchronously we use a wait group to block until we're done.
 	wg := sync.WaitGroup{}
 
-	// Declare this to allow us to use it recursively
+	// Since task funcs can emit continuations recursively we need a function to execute
+	// recursively. We declare the function variable before definition to allow for recursion.
 	var runRecursive func(task TaskFunc)
 	runRecursive = func(task TaskFunc) {
-		wg.Add(1) // we start with one task
+		wg.Add(1)
 		defer wg.Done()
 
+		// The accounting for waiting/active is done using atomics. Absolute accuracy is not critical here so the gap
+		// between modifying waiting and active is acceptable.
 		s.waiting.Inc()
-		acquired, releaseSlot := s.throttler.acquireSlot()
+
+		// Acquire an execution slot in keeping with heartbeat.scheduler.limit
+		acquired, releaseSlot := s.throttler.AcquireSlot()
 		defer releaseSlot()
+
 		s.active.Inc()
 		s.waiting.Dec()
 
+		// The only situation in which we can't acquire a slot is during shutdown. In that case we can just return
+		// without worrying about any of the counters since we're going away soon.
 		if !acquired {
 			return
 		}
@@ -192,7 +209,7 @@ func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 		s.active.Dec()
 
 		for _, cont := range continuations {
-			go runRecursive(cont) // Run continuations in parallel
+			go runRecursive(cont) // Run continuations in parallel, note that these each will acquire their own slots
 		}
 	}
 
