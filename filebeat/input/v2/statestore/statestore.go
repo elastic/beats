@@ -41,4 +41,5 @@
 // applied to after already pending updates.
 package statestore
 
+// ResourceKey is used to describe an unique resource to be stored in the registry.
 type ResourceKey string

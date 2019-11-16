@@ -26,14 +26,9 @@ import (
 // error codes
 
 var (
-	ErrCodeOpFailed = errors.New("operation failed")
-	ErrClosed       = errors.New("store is closed")
-)
-
-// predefined errors
-
-var (
-	ErrResourceInUse = errors.New("resource in use")
+	// ErrClosed error code indicates that the operation can not
+	// be executed, because the store has been closed already.
+	ErrClosed = errors.New("store is closed")
 )
 
 // Error provides a common error type used by the statestore package.  It
