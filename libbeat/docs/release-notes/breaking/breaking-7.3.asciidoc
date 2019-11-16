@@ -1,6 +1,9 @@
 [[breaking-changes-7.3]]
 
 === Breaking changes in 7.3
+++++
+<titleabbrev>7.3</titleabbrev>
+++++
 
 {see-relnotes}
 
