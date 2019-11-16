@@ -35,6 +35,7 @@ func NewThrottler(limit uint) *Throttler {
 	return t
 }
 
+// Start starts the internal thread and unblocks callers of AcquireSlot() which were invoked before this was called.
 func (t *Throttler) Start() {
 	go func() {
 		for {
@@ -62,6 +63,7 @@ func (t *Throttler) Start() {
 	}()
 }
 
+// Stop halts the internal goroutine. Once invoked this throttler will no longer be able to perform work.
 func (t *Throttler) Stop() {
 	close(t.done)
 }
