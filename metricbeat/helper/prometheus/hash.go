@@ -19,7 +19,6 @@ package prometheus
 
 import (
 	"bytes"
-	"fmt"
 	"sort"
 	"strconv"
 	"sync"
@@ -50,7 +49,15 @@ func (ls labels) Less(i, j int) bool { return ls[i].key < ls[j].key }
 
 // LabelHash hashes the labels map and returns a string
 func LabelHash(labelMap common.MapStr) string {
-	ls := flatten("", labelMap, make(labels, 0))
+	ls := make(labels, len(labelMap))
+
+	for k, v := range labelMap {
+		if val, ok := v.(string); ok {
+			ls = append(ls, label{k, val})
+		}
+	}
+
+	sort.Sort(ls)
 	b := byteBuffer.Get().(*bytes.Buffer)
 	b.Reset()
 
@@ -63,38 +70,4 @@ func LabelHash(labelMap common.MapStr) string {
 	hash := xxhash.Sum64(b.Bytes())
 	byteBuffer.Put(b)
 	return strconv.FormatUint(hash, 10)
-}
-
-func flatten(prefix string, in common.MapStr, out labels) labels {
-	for k, v := range in {
-		var fullKey string
-		if prefix == "" {
-			fullKey = k
-		} else {
-			fullKey = fmt.Sprintf("%s.%s", prefix, k)
-		}
-
-		if m, ok := tryToMapStr(v); ok {
-			flatten(fullKey, m, out)
-		} else {
-			if val, ok := v.(string); ok {
-				out = append(out, label{fullKey, val})
-			}
-
-		}
-	}
-
-	sort.Sort(out)
-	return out
-}
-
-func tryToMapStr(v interface{}) (common.MapStr, bool) {
-	switch m := v.(type) {
-	case common.MapStr:
-		return m, true
-	case map[string]interface{}:
-		return common.MapStr(m), true
-	default:
-		return nil, false
-	}
 }
