@@ -1,6 +1,9 @@
 [[breaking-changes-8.0]]
 
 === Breaking changes in 8.0
+++++
+<titleabbrev>8.0</titleabbrev>
+++++
 
 This section discusses the main changes that you should be aware of if you
 upgrade the Beats to version 8.0.
