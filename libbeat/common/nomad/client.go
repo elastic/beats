@@ -47,13 +47,23 @@ func WrapClient(client *nomad.Client) NomadClient {
 
 // NewClient returns a nomad client with the provided configuration
 func NewClient(address, region, secretID string, httpClient *http.Client) (*nomad.Client, error) {
-	cfg := nomad.Config{
-		Address:    address,
-		Region:     region,
-		SecretID:   secretID,
-		HttpClient: httpClient,
+	cfg := nomad.DefaultConfig()
+	if address != "" {
+		cfg.Address = address
 	}
-	return nomad.NewClient(&cfg)
+
+	if region != "" {
+		cfg.Region = region
+	}
+
+	if secretID != "" {
+		cfg.SecretID = secretID
+	}
+
+	if httpClient != nil {
+		cfg.HttpClient = httpClient
+	}
+	return nomad.NewClient(cfg)
 }
 
 // GetLocalNodeID returns the node ID of the local Nomad Client and an error if

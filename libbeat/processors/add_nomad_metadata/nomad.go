@@ -25,10 +25,11 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	nomadbeat "github.com/elastic/beats/libbeat/common/nomad"
+	nomadlib "github.com/elastic/beats/libbeat/common/nomad"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -48,6 +49,7 @@ type nomadAnnotator struct {
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
+	jsprocessor.RegisterPlugin("AddNomadMetadata", New)
 }
 
 // New constructs a new add_kubernetes_metadata processor.
@@ -57,7 +59,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	client, err := nomadbeat.NewClient(config.Address, config.Region, config.SecretID, nil)
+	client, err := nomadlib.NewClient(config.Address, config.Region, config.SecretID, nil)
 	if err != nil {
 		logp.Err("nomad: Couldn't create nomad client: %v", err)
 		return nil, err
@@ -65,7 +67,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	nodeID := config.Node
 	if nodeID == "" {
-		if nodeID, err = nomadbeat.GetLocalNodeID(client); err != nil {
+		if nodeID, err = nomadlib.GetLocalNodeID(client); err != nil {
 			logp.Err("nomad: Couldn't get nomad node ID: %v", err)
 			return nil, err
 		}
@@ -94,7 +96,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		metaPrefix:      config.MetaPrefix,
 	}
 
-	watcher, err := nomadbeat.NewWatcherWithClient(nomadbeat.WrapClient(client), nodeID, annotator.modifiedAllocation)
+	watcher, err := nomadlib.NewWatcherWithClient(nomadlib.WrapClient(client), nodeID, annotator.modifiedAllocation)
 	if err != nil {
 		logp.Err("nomad: Couldn't create allocation watcher")
 		return nil, err
@@ -146,16 +148,16 @@ func (n *nomadAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (n *nomadAnnotator) modifiedAllocation(alloc *nomad.Allocation) {
-	if nomadbeat.IsTerminal(alloc) {
+	if nomadlib.IsTerminal(alloc) {
 		n.cache.delete(alloc.ID)
 		for k := range alloc.TaskStates {
 			n.cache.delete(alloc.ID + k)
 		}
 		return
 	}
-	n.cache.set(alloc.ID, nomadbeat.FetchProperties(alloc))
+	n.cache.set(alloc.ID, nomadlib.FetchProperties(alloc))
 	for k := range alloc.TaskStates {
-		n.cache.set(alloc.ID+k, nomadbeat.FetchMetadata(alloc, k, n.metaPrefix))
+		n.cache.set(alloc.ID+k, nomadlib.FetchMetadata(alloc, k, n.metaPrefix))
 	}
 }
 
