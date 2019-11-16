@@ -39,8 +39,9 @@ type Scheduler struct {
 
 	location *time.Location
 
-	jobs   []*job
-	active uint // number of active entries
+	jobs    []*job
+	active  atomic.Uint // number of active entries
+	waiting atomic.Uint // number of jobs waiting to run, but constrained by scheduler limit
 
 	throttler *Throttler
 }
@@ -102,6 +103,22 @@ func NewWithLocation(limit uint, location *time.Location) *Scheduler {
 func (s *Scheduler) Start() error {
 	s.state.Store(stateRunning)
 	s.throttler.start()
+
+	// Stats reporter
+	go func() {
+		t := time.NewTicker(time.Second * 10)
+
+		for {
+			select {
+			case <-s.done:
+				t.Stop()
+				return
+			case <-t.C:
+				logp.Info("Scheduler Active/Waiting (limit): %d/%d (%d)", s.active.Load(), s.waiting.Load(), s.limit)
+			}
+		}
+	}()
+
 	return nil
 }
 
@@ -120,26 +137,31 @@ var ErrAlreadyStopped = errors.New("attempted to add job to already stopped sche
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
 func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn func() error, err error) {
+	if s.state.Load() == stateDone {
+		return nil, ErrAlreadyStopped
+	}
+
 	removeCh := make(chan bool)
 	removeFn = func() error {
 		removeCh <- true
 		return nil
 	}
 
+	var timer *time.Timer
 	go func() {
 		for {
 			now := time.Now()
 			next := sched.Next(now)
-			timer := time.NewTimer(next.Sub(now))
-
-			logp.Info("TIMER LOOP %s", next.Sub(now))
+			if timer == nil {
+				timer = time.NewTimer(next.Sub(now))
+			} else {
+				timer.Reset(next.Sub(now))
+			}
 
 			select {
 			case <-timer.C:
-				logp.Info("TIMER RUN")
 				s.runOnce(id, entrypoint)
 			case <-removeCh:
-				logp.Info("TIMER REMOVE")
 				return
 			}
 		}
@@ -154,25 +176,24 @@ func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 	// Declare this to allow us to use it recursively
 	var runRecursive func(task TaskFunc)
 	runRecursive = func(task TaskFunc) {
-		logp.Info("INCR")
 		wg.Add(1) // we start with one task
 		defer wg.Done()
 
+		s.waiting.Inc()
 		acquired, releaseSlot := s.throttler.acquireSlot()
 		defer releaseSlot()
-		logp.Info("ACQ %v", acquired)
+		s.active.Inc()
+		s.waiting.Dec()
+
 		if !acquired {
-			debugf("Could not acquire slot for task, likely due to stop")
 			return
 		}
 		continuations := task()
-		logp.Info("RAN TASK, CONTS %v", continuations)
+		s.active.Dec()
 
 		for _, cont := range continuations {
 			go runRecursive(cont) // Run continuations in parallel
 		}
-
-		logp.Info("DECR")
 	}
 
 	runRecursive(entrypoint)
