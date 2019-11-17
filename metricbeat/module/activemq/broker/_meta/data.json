@@ -1,13 +1,13 @@
 {
-    "@timestamp": "2019-11-15T16:54:40.906Z",
+    "@timestamp": "2019-11-17T14:04:01.157Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
     "metricset": {
-        "period": 10000,
-        "name": "broker"
+        "name": "broker",
+        "period": 10000
     },
     "service": {
         "address": "localhost:8161",
@@ -15,76 +15,66 @@
     },
     "activemq": {
         "broker": {
-            "enqueue": {
-                "total": {
-                    "count": 1
-                }
+            "consumers": {
+                "count": 0
             },
+            "name": "localhost",
             "mbean": "org.apache.activemq:brokerName=localhost,type=Broker",
-            "temp": {
-                "usage": {
-                    "percent": 0
-                }
+            "producers": {
+                "count": 0
             },
-            "store": {
-                "usage": {
-                    "percent": 0
+            "memory": {
+                "store": {
+                    "pct": 0
+                },
+                "temp": {
+                    "pct": 0
+                },
+                "broker": {
+                    "pct": 0
                 }
             },
             "connections": {
-                "total": {
-                    "count": 0
-                }
+                "count": 0
             },
-            "message": {
-                "total": {
+            "messages": {
+                "dequeue": {
                     "count": 0
-                }
-            },
-            "consumer": {
-                "total": {
-                    "count": 0
-                }
-            },
-            "dequeue": {
-                "total": {
-                    "count": 0
-                }
-            },
-            "memory": {
-                "usage": {
-                    "percent": 0
-                }
+                },
+                "enqueue": {
+                    "count": 3
+                },
+                "count": 0
             }
         }
-    },
-    "host": {
-        "name": "macbook.local",
-        "os": {
-            "family": "darwin",
-            "name": "Mac OS X",
-            "kernel": "17.7.0",
-            "build": "17G8037",
-            "platform": "darwin",
-            "version": "10.13.6"
-        },
-        "id": "EEBF3B21-350A-5F10-B217-5B8EA1DA5477",
-        "hostname": "macbook.local",
-        "architecture": "x86_64"
-    },
-    "agent": {
-        "ephemeral_id": "7787c99e-abec-477e-9cd6-d62abdf91447",
-        "hostname": "macbook.local",
-        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a",
-        "version": "8.0.0",
-        "type": "metricbeat"
-    },
-    "ecs": {
-        "version": "1.2.0"
     },
     "event": {
         "dataset": "activemq.broker",
         "module": "activemq",
-        "duration": 20211732
+        "duration": 47746702
+    },
+    "agent": {
+        "type": "metricbeat",
+        "ephemeral_id": "e96c58a1-9a27-4aa2-8bcc-7468ce6f83f0",
+        "hostname": "macbook.local",
+        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a",
+        "version": "8.0.0"
+    },
+    "ecs": {
+        "version": "1.2.0"
+    },
+    "host": {
+        "name": "macbook.local",
+        "os": {
+            "version": "10.13.6",
+            "family": "darwin",
+            "name": "Mac OS X",
+            "kernel": "17.7.0",
+            "build": "17G8037",
+            "platform": "darwin"
+        },
+        "id": "EEBF3B21-350A-5F10-B217-5B8EA1DA5477",
+        "hostname": "macbook.local",
+        "architecture": "x86_64"
     }
 }

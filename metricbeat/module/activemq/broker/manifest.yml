@@ -7,21 +7,23 @@ input:
     jmx.mappings:
     - mbean: 'org.apache.activemq:brokerName=*,type=Broker'
       attributes:
+      - attr: BrokerName
+        field: name
       - attr: MemoryPercentUsage
-        field: memory.usage.percent
+        field: memory.broker.pct
       - attr: StorePercentUsage
-        field: store.usage.percent
+        field: memory.store.pct
       - attr: TempPercentUsage
-        field: temp.usage.percent
+        field: memory.temp.pct
       - attr: TotalConnectionsCount
-        field: connections.total.count
+        field: connections.count
       - attr: TotalConsumerCount
-        field: consumer.total.count
+        field: consumers.count
       - attr: TotalDequeueCount
-        field: dequeue.total.count
+        field: messages.dequeue.count
       - attr: TotalEnqueueCount
-        field: enqueue.total.count
+        field: messages.enqueue.count
       - attr: TotalMessageCount
-        field: message.total.count
-      - attr: TotalMessageCount
-        field: message.total.count
+        field: messages.count
+      - attr: TotalProducerCount
+        field: producers.count

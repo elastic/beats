@@ -1,86 +1,87 @@
 {
-    "@timestamp": "2019-11-15T16:54:40.904Z",
+    "@timestamp": "2019-11-17T14:04:11.197Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
-    "agent": {
-        "hostname": "macbook.local",
-        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a",
-        "version": "8.0.0",
-        "type": "metricbeat",
-        "ephemeral_id": "7787c99e-abec-477e-9cd6-d62abdf91447"
+    "activemq": {
+        "topic": {
+            "consumers": {
+                "count": 0
+            },
+            "mbean": "org.apache.activemq:brokerName=localhost,destinationName=sample_topic,destinationType=Topic,type=Broker",
+            "memory": {
+                "broker": {
+                    "pct": 0
+                }
+            },
+            "messages": {
+                "expired": {
+                    "count": 0
+                },
+                "dispatch": {
+                    "count": 0
+                },
+                "dequeue": {
+                    "count": 0
+                },
+                "enqueue": {
+                    "time": {
+                        "avg": 0,
+                        "min": 0,
+                        "max": 0
+                    },
+                    "count": 2
+                },
+                "size": {
+                    "avg": 1024
+                },
+                "inflight": {
+                    "count": 0
+                }
+            },
+            "producers": {
+                "count": 0
+            },
+            "name": "sample_topic"
+        }
     },
     "ecs": {
         "version": "1.2.0"
     },
+    "host": {
+        "name": "macbook.local",
+        "hostname": "macbook.local",
+        "architecture": "x86_64",
+        "os": {
+            "kernel": "17.7.0",
+            "build": "17G8037",
+            "platform": "darwin",
+            "version": "10.13.6",
+            "family": "darwin",
+            "name": "Mac OS X"
+        },
+        "id": "EEBF3B21-350A-5F10-B217-5B8EA1DA5477"
+    },
+    "agent": {
+        "version": "8.0.0",
+        "type": "metricbeat",
+        "ephemeral_id": "e96c58a1-9a27-4aa2-8bcc-7468ce6f83f0",
+        "hostname": "macbook.local",
+        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a"
+    },
     "event": {
+        "dataset": "activemq.topic",
         "module": "activemq",
-        "duration": 13322342,
-        "dataset": "activemq.topic"
+        "duration": 11779628
     },
     "metricset": {
-        "period": 10000,
-        "name": "topic"
+        "name": "topic",
+        "period": 10000
     },
     "service": {
         "address": "localhost:8161",
         "type": "activemq"
-    },
-    "activemq": {
-        "topic": {
-            "inflight": {
-                "count": 0
-            },
-            "producer": {
-                "count": 0
-            },
-            "dispatch": {
-                "count": 0
-            },
-            "dequeue": {
-                "count": 0
-            },
-            "message": {
-                "size": {
-                    "avg": 1024
-                }
-            },
-            "mbean": "org.apache.activemq:brokerName=localhost,destinationName=ActiveMQ.Advisory.MasterBroker,destinationType=Topic,type=Broker",
-            "memory": {
-                "usage": {
-                    "percent": 0
-                }
-            },
-            "consumer": {
-                "count": 0
-            },
-            "enqueue": {
-                "time": {
-                    "avg": 0,
-                    "min": 0,
-                    "max": 0
-                },
-                "count": 1
-            },
-            "expired": {
-                "count": 0
-            }
-        }
-    },
-    "host": {
-        "hostname": "macbook.local",
-        "architecture": "x86_64",
-        "os": {
-            "family": "darwin",
-            "name": "Mac OS X",
-            "kernel": "17.7.0",
-            "build": "17G8037",
-            "platform": "darwin",
-            "version": "10.13.6"
-        },
-        "id": "EEBF3B21-350A-5F10-B217-5B8EA1DA5477",
-        "name": "macbook.local"
     }
 }

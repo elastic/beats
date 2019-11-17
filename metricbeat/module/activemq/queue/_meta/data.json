@@ -1,18 +1,25 @@
 {
-    "@timestamp": "2019-11-16T23:23:31.336Z",
+    "@timestamp": "2019-11-17T14:04:11.197Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
+    "agent": {
+        "version": "8.0.0",
+        "type": "metricbeat",
+        "ephemeral_id": "e96c58a1-9a27-4aa2-8bcc-7468ce6f83f0",
+        "hostname": "macbook.local",
+        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a"
+    },
     "event": {
         "dataset": "activemq.queue",
         "module": "activemq",
-        "duration": 10415988
+        "duration": 8450732
     },
     "metricset": {
-        "name": "queue",
-        "period": 10000
+        "period": 10000,
+        "name": "queue"
     },
     "service": {
         "address": "localhost:8161",
@@ -20,69 +27,60 @@
     },
     "activemq": {
         "queue": {
-            "consumer": {
-                "count": 0
-            },
-            "inflight": {
-                "count": 0
-            },
-            "producer": {
-                "count": 0
-            },
-            "message": {
-                "size": {
-                    "avg": 1065
-                }
-            },
-            "queue": {
-                "size": 0
-            },
-            "dispatch": {
-                "count": 60
-            },
             "memory": {
-                "usage": {
-                    "percent": 0
+                "broker": {
+                    "pct": 0
                 }
             },
-            "dequeue": {
-                "count": 60
+            "mbean": "org.apache.activemq:brokerName=localhost,destinationName=sample_queue,destinationType=Queue,type=Broker",
+            "messages": {
+                "dequeue": {
+                    "count": 0
+                },
+                "inflight": {
+                    "count": 0
+                },
+                "size": {
+                    "avg": 0
+                },
+                "expired": {
+                    "count": 0
+                },
+                "enqueue": {
+                    "time": {
+                        "min": 0,
+                        "max": 0,
+                        "avg": 0
+                    },
+                    "count": 0
+                },
+                "dispatch": {
+                    "count": 0
+                }
             },
-            "mbean": "org.apache.activemq:brokerName=localhost,destinationName=sampleQueue,destinationType=Queue,type=Broker",
-            "expired": {
+            "consumers": {
                 "count": 0
             },
-            "enqueue": {
-                "count": 60,
-                "time": {
-                    "max": 65,
-                    "avg": 27.366666666666667,
-                    "min": 1
-                }
+            "name": "sample_queue",
+            "producers": {
+                "count": 0
             }
         }
-    },
-    "agent": {
-        "ephemeral_id": "ce75a288-e155-448c-a3c7-eb09758ab54a",
-        "hostname": "macbook.local",
-        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a",
-        "version": "8.0.0",
-        "type": "metricbeat"
     },
     "ecs": {
         "version": "1.2.0"
     },
     "host": {
-        "name": "macbook.local",
         "os": {
-            "kernel": "17.7.0",
-            "build": "17G8037",
             "platform": "darwin",
             "version": "10.13.6",
             "family": "darwin",
-            "name": "Mac OS X"
+            "name": "Mac OS X",
+            "kernel": "17.7.0",
+            "build": "17G8037"
         },
         "id": "EEBF3B21-350A-5F10-B217-5B8EA1DA5477",
+        "name": "macbook.local",
         "hostname": "macbook.local",
         "architecture": "x86_64"
     }

@@ -7,27 +7,29 @@ input:
     jmx.mappings:
     - mbean: 'org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker'
       attributes:
+      - attr: Name
+        field: name
       - attr: AverageEnqueueTime
-        field: enqueue.time.avg
+        field: messages.enqueue.time.avg
       - attr: AverageMessageSize
-        field: message.size.avg
+        field: messages.size.avg
       - attr: ConsumerCount
-        field: consumer.count
+        field: consumers.count
       - attr: DequeueCount
-        field: dequeue.count
+        field: messages.dequeue.count
       - attr: DispatchCount
-        field: dispatch.count
+        field: messages.dispatch.count
       - attr: EnqueueCount
-        field: enqueue.count
+        field: messages.enqueue.count
       - attr: ExpiredCount
-        field: expired.count
+        field: messages.expired.count
       - attr: InFlightCount
-        field: inflight.count
+        field: messages.inflight.count
       - attr: MaxEnqueueTime
-        field: enqueue.time.max
+        field: messages.enqueue.time.max
       - attr: MemoryPercentUsage
-        field: memory.usage.percent
+        field: memory.broker.pct
       - attr: MinEnqueueTime
-        field: enqueue.time.min
+        field: messages.enqueue.time.min
       - attr: ProducerCount
-        field: producer.count
+        field: producers.count
