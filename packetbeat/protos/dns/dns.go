@@ -501,6 +501,16 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 			// etld_plus_one should be removed for 8.0.0.
 			qMapStr["etld_plus_one"] = eTLDPlusOne
 			qMapStr["registered_domain"] = eTLDPlusOne
+
+			if eTLDPlusOne != "" && strings.Contains(eTLDPlusOne, ".") {
+				topLevelDomain := strings.Join(strings.Split(eTLDPlusOne, ".")[1:], ".")
+				qMapStr["top_level_domain"] = topLevelDomain
+
+				subdomain := strings.Trim(strings.TrimRight(q.Name, eTLDPlusOne), ".")
+				if subdomain != "" {
+					qMapStr["subdomain"] = subdomain
+				}
+			}
 		}
 	}
 
