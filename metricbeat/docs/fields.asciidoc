@@ -342,7 +342,7 @@ type: long
 [float]
 === topic
 
-Queue metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
+Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
 
 
 *`activemq.topic.mbean`*::

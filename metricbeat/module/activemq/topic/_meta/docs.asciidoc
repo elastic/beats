@@ -1,1 +1,15 @@
-This is the topic metricset of the module activemq.
+Topic Metricset retrieves the JMX key `org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker` using Jolokia. It exposes the following metrics:
+
+* `name`: Topic name.
+* `messages.enqueue.time.avg`: Average time a message was held on this destination.
+* `messages.size.avg`: Average message size on this destination.
+* `consumers.count`: Number of consumers subscribed to this destination.
+* `messages.dequeue.count`: Number of messages that has been acknowledged (and removed) from the destination.
+* `messages.dispatch.count`: Number of messages that has been delivered to consumers, including those not acknowledged.
+* `messages.enqueue.count`: Number of messages that have been sent to the destination.
+* `messages.expired.count`: Number of messages that have been expired.
+* `messages.inflight.count`: Number of messages that have been dispatched to, but not acknowledged by, consumers.
+* `messages.enqueue.time.max`: The longest time a message was held on this destination.
+* `memory.broker.pct`: Percent of memory limit used.
+* `messages.enqueue.time.min`: The shortest time a message was held on this destination.
+* `producers.count`: Number of producers attached to this destination.

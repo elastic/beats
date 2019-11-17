@@ -1,1 +1,12 @@
-This is the broker metricset of the module activemq.
+Broker Metricset retrieves the JMX key `org.apache.activemq:brokerName=*,type=Broker` using Jolokia. It exposes the following metrics:
+
+* `name`: Broker name.
+* `memory.broker.pct`: The percentage of the memory limit used.
+* `memory.store.pct`: Percent of store limit used.
+* `memory.temp.pct`: The percentage of the temp usage limit used.
+* `connections.count`: Total number of connections.
+* `consumers.count`: Number of message consumers.
+* `messages.dequeue.count`: Number of messages that have been acknowledged on the broker.
+* `messages.enqueue.count`: Number of messages that have been sent to the destination.
+* `messages.count`: Number of unacknowledged messages on the broker.
+* `producers.count`: Number of message producers active on destinations on the broker.
