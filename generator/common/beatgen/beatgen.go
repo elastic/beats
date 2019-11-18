@@ -129,8 +129,7 @@ func VendorUpdate() error {
 	}
 
 	devtools.SetElasticBeatsDir(getAbsoluteBeatsPath())
-	mg.SerialDeps(setup.CopyVendor, setup.LinkImportsHelper)
-	return nil
+	return setup.CopyVendor()
 }
 
 // returns a "compleated" config object with everything we need

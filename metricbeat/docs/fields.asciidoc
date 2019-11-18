@@ -3830,6 +3830,33 @@ required: True
 
 --
 
+*`process.exit_code`*::
++
+--
+the exit code of a process
+
+type: long
+
+--
+
+*`systemd.fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
+
+type: keyword
+
+--
+
 [[exported-fields-consul]]
 == consul fields
 
@@ -12052,6 +12079,46 @@ type: integer
 
 --
 
+*`envoyproxy.server.cluster_manager.cluster_updated`*::
++
+--
+Total cluster updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_updated_via_merge`*::
++
+--
+Total cluster updates applied as merged updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_merge_cancelled`*::
++
+--
+Total merged updates that got cancelled and delivered early
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_out_of_merge_window`*::
++
+--
+Total updates which arrived out of a merge window
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.filesystem.flushed_by_timer`*::
 +
@@ -12103,11 +12170,21 @@ type: integer
 
 --
 
+*`envoyproxy.server.filesystem.write_failed`*::
++
+--
+Total number of times an error occurred during a file write operation
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.runtime.load_error`*::
 +
 --
-Total number of load attempts that resulted in an error
+Total number of load attempts that resulted in an error in any layer
 
 
 type: integer
@@ -12117,7 +12194,7 @@ type: integer
 *`envoyproxy.server.runtime.load_success`*::
 +
 --
-Total number of load attempts that were successful
+Total number of load attempts that were successful at all layers
 
 
 type: integer
@@ -12157,6 +12234,29 @@ type: integer
 *`envoyproxy.server.runtime.admin_overrides_active`*::
 +
 --
+1 if any admin overrides are active otherwise 0
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.deprecated_feature_use`*::
++
+--
+Total number of times deprecated features were used.
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.num_layers`*::
++
+--
+Number of layers currently active (without loading errors)
+
+
 type: integer
 
 --
@@ -12236,6 +12336,16 @@ type: integer
 +
 --
 Number of currently warming listeners
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.listener_manager.listener_stopped`*::
++
+--
+Total listeners stopped
 
 
 type: integer
@@ -12354,6 +12464,60 @@ type: integer
 Current hot restart epoch
 
 
+type: integer
+
+--
+
+*`envoyproxy.server.server.concurrency`*::
++
+--
+Number of worker threads
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.debug_assertion_failures`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.server.dynamic_unknown_fields`*::
++
+--
+Number of messages in dynamic configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.state`*::
++
+--
+Current state of the Server
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.static_unknown_fields`*::
++
+--
+Number of messages in static configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.stats_recent_lookups`*::
++
+--
 type: integer
 
 --
@@ -30886,6 +31050,146 @@ type: long
 --
 Number of blocks on the device that are in sync, in 1024-byte blocks.
 
+
+type: long
+
+--
+
+[float]
+=== service
+
+metrics for system services
+
+
+
+*`system.service.name`*::
++
+--
+The name of the service
+
+type: keyword
+
+--
+
+*`system.service.load_state`*::
++
+--
+The load state of the service
+
+type: keyword
+
+--
+
+*`system.service.state`*::
++
+--
+The activity state of the service
+
+type: keyword
+
+--
+
+*`system.service.sub_state`*::
++
+--
+The sub-state of the service
+
+type: keyword
+
+--
+
+*`system.service.state_since`*::
++
+--
+The timestamp of the last state change. If the service is active and running, this is its uptime.
+
+type: date
+
+--
+
+*`system.service.exec_code`*::
++
+--
+The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+[float]
+=== resources
+
+system metrics associated with the service
+
+
+*`system.service.resources.cpu.usage.ns`*::
++
+--
+CPU usage in nanoseconds
+
+type: long
+
+--
+
+*`system.service.resources.memory.usage.bytes`*::
++
+--
+memory usage in bytes
+
+type: long
+
+--
+
+*`system.service.resources.tasks.count`*::
++
+--
+number of tasks associated with the service
+
+type: long
+
+--
+
+[float]
+=== network
+
+network resource usage
+
+
+*`system.service.resources.network.in.bytes`*::
++
+--
+bytes in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.in.packets`*::
++
+--
+packets in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.out.packets`*::
++
+--
+packets out
+
+type: long
+
+--
+
+*`system.service.resources.network.out.bytes`*::
++
+--
+bytes out
 
 type: long
 
