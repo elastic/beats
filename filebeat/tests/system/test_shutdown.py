@@ -54,7 +54,7 @@ class Test(BaseTest):
 
         self.wait_log_contains(
             "Continue shutdown: All enqueued events being published.",
-            max_timeout=60)
+            max_timeout=15)
 
         # validate registry entry offset matches last published event
         registry = self.get_registry()
@@ -100,7 +100,7 @@ class Test(BaseTest):
 
         self.wait_log_contains(
             "Continue shutdown: Time out waiting for events being published.",
-            max_timeout=60)
+            max_timeout=15)
 
         # check registry being really empty
         reg = self.get_registry()
@@ -139,7 +139,7 @@ class Test(BaseTest):
         # Waits for filebeat to stop
         self.wait_until(
             lambda: self.log_contains("filebeat stopped."),
-            max_timeout=60)
+            max_timeout=15)
 
         # Checks that registry was written
         data = self.get_registry()
