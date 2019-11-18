@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/heartbeat/hbregistry"
-
 	"github.com/elastic/beats/heartbeat/scheduler/throttler"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
