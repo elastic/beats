@@ -183,5 +183,5 @@ func PythonIntegTest(ctx context.Context) error {
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
 		return devtools.PythonNoseTest(args)
-	})
+	}, "GENERATE")
 }
