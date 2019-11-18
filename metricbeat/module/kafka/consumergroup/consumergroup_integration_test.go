@@ -51,7 +51,7 @@ func TestData(t *testing.T) {
 	}
 	defer c.Close()
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092)))
 	for retries := 0; retries < 3; retries++ {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
@@ -71,7 +71,7 @@ func TestFetch(t *testing.T) {
 	}
 	defer c.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092)))
 
 	var data []mb.Event
 	var errors []error
