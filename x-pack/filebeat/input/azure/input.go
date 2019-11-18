@@ -2,24 +2,17 @@ package azure
 
 import (
 	"context"
-	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/elastic/beats/libbeat/beat"
-	"os"
-	"os/signal"
-	"time"
 	"fmt"
+	"github.com/Azure/azure-amqp-common-go/aad"
+	"github.com/Azure/go-autorest/autorest/azure"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"time"
 
-
-	"github.com/Azure/azure-amqp-common-go/conn"
-	"github.com/Azure/azure-amqp-common-go/sas"
 	"github.com/Azure/azure-event-hubs-go"
-	"github.com/Azure/azure-event-hubs-go/eph"
-	"github.com/Azure/azure-event-hubs-go/storage"
-	"github.com/Azure/azure-storage-blob-go/azblob"
-
 )
 
 var
@@ -49,86 +42,121 @@ func NewInput(
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
-	parsed, err := conn.ParsedConnectionFromStr(eventHubConnStr)
-	if err != nil {
-		// handle error
-		return nil, err
+	hub, partitions := initHub()
+	exit := make(chan struct{})
+
+	handler := func(ctx context.Context, event *eventhub.Event) error {
+		text := string(event.Data)
+		if text == "exit\n" {
+			fmt.Println("Oh snap!! Someone told me to exit!")
+			exit <- *new(struct{})
+		} else {
+			fmt.Println(string(event.Data))
+		}
+		return nil
 	}
 
-	// create a new Azure Storage Leaser / Checkpointer
-	cred, err := azblob.NewSharedKeyCredential(storageAccountName, storageAccountKey)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	for _, partitionID := range partitions {
+		_, err := hub.Receive(ctx, partitionID, handler, eventhub.ReceiveWithLatestOffset())
+		if err != nil {
+			fmt.Println("Error: ", err)
+			return
+		}
 	}
+	cancel()
 
-	leaserCheckpointer, err := storage.NewStorageLeaserCheckpointer(cred, storageAccountName, storageContainerName, azure.PublicCloud)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
+	fmt.Println("I am listening...")
+
+	select {
+	case <-exit:
+		fmt.Println("closing after 2 seconds")
+		select {
+		case <-time.After(2 * time.Second):
+			return
+		}
 	}
-
-	// SAS token provider for Azure Event Hubs
-	provider, err := sas.NewTokenProvider(sas.TokenProviderWithKey(parsed.KeyName, parsed.Key))
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	// create a new EPH processor
-	processor, err := eph.New(ctx, parsed.Namespace, parsed.HubName, provider, leaserCheckpointer, leaserCheckpointer)
-	if err != nil {
-		fmt.Println(err)
-		return nil , err
-	}
-
-	// register a message handler -- many can be registered
-	handlerID, err := processor.RegisterHandler(ctx,
-		func(c context.Context, e *eventhub.Event) error {
-			fmt.Println(string(e.Data))
-			return nil
-		})
-	if err != nil {
-		fmt.Println(err)
-		return nil , err
-	}
-
-	fmt.Printf("handler id: %q is running\n", handlerID)
-
-	// unregister a handler to stop that handler from receiving events
-	// processor.UnregisterHandler(ctx, handleID)
-
-	// start handling messages from all of the partitions balancing across multiple consumers
-	err = processor.StartNonBlocking(ctx)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	// Wait for a signal to quit:
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, os.Kill)
-	<-signalChan
-
-	err = processor.Close(context.Background())
-	if err != nil {
-		fmt.Println(err)
-		return nil , err
-	}
-	return nil , err
 }
 
-
-
-
-
-
-// Run start a TCP input
+// Run runs the input
 func (p *azureInput) Run() {
+	p.workerOnce.Do(func() {
+		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
+		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
+		if err != nil {
+			p.logger.Errorf("failed to get region name from queueURL: %v", p.config.QueueURL)
+		}
 
+		awsConfig := p.awsConfig.Copy()
+		awsConfig.Region = regionName
+		svcSQS := sqs.New(awsConfig)
+		svcS3 := s3.New(awsConfig)
+
+		p.workerWg.Add(1)
+		go p.run(svcSQS, svcS3, visibilityTimeout)
+		p.workerWg.Done()
+	})
 }
+
+func initHub() (*eventhub.Hub, []string) {
+	namespace := mustGetenv("EVENTHUB_NAMESPACE")
+	hubMgmt, err := ensureEventHub(context.Background(), HubName)
+	if err != nil {
+
+	}
+
+	provider, err := aad.NewJWTProvider(aad.JWTProviderWithEnvironmentVars())
+	if err != nil {
+
+	}
+	hub, err := eventhub.NewHub(namespace, HubName, provider)
+	if err != nil {
+		panic(err)
+	}
+	return hub, *hubMgmt.PartitionIds
+}
+
+func mustGetenv(key string) string {
+	v := os.Getenv(key)
+	if v == "" {
+		panic("Environment variable '" + key + "' required for integration tests.")
+	}
+	return v
+}
+
+func ensureEventHub(ctx context.Context, name string) (*mgmt.Model, error) {
+	namespace := mustGetenv("EVENTHUB_NAMESPACE")
+	client := getEventHubMgmtClient()
+	hub, err := client.Get(ctx, ResourceGroupName, namespace, name)
+
+	partitionCount := int64(4)
+	if err != nil {
+		newHub := &mgmt.Model{
+			Name: &name,
+			Properties: &mgmt.Properties{
+				PartitionCount: &partitionCount,
+			},
+		}
+
+		hub, err = client.CreateOrUpdate(ctx, ResourceGroupName, namespace, name, *newHub)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &hub, nil
+}
+
+func getEventHubMgmtClient() *mgmt.EventHubsClient {
+	subID := mustGetenv("AZURE_SUBSCRIPTION_ID")
+	client := mgmt.NewEventHubsClientWithBaseURI(azure.PublicCloud.ResourceManagerEndpoint, subID)
+	a, err := azauth.NewAuthorizerFromEnvironment()
+	if err != nil {
+		log.Fatal(err)
+	}
+	client.Authorizer = a
+	return &client
+}
+
 
 // Stop stops TCP server
 func (p *azureInput) Stop() {
