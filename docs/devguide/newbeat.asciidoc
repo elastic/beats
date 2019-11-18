@@ -31,13 +31,10 @@ The following topics describe how to build a new Beat:
 
 All Beats are written in http://golang.org/[Go], so having Go installed and knowing
 the basics are prerequisites for understanding this guide.
-But don't worry if you aren't a Go expert. Go is a relatively new
-language, and very few people are experts in it. In fact, several
-people learned Go by contributing to Packetbeat and libbeat, including the
-original Packetbeat authors.
 
 *Before you begin:* Set up your Go environment as described under
-<<setting-up-dev-environment>> in <<beats-contributing>>.
+<<setting-up-dev-environment>> in <<beats-contributing>>. The minimum required
+Go version is {go-version}.
 
 To build your Beat on a specific version of libbeat, check out the specific
 branch ({branch} in the example below):
