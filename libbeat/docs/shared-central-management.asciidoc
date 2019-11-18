@@ -5,7 +5,7 @@
 [partintro]
 --
 
-beta[]
+include::{asciidoc-dir}/../../shared/discontinued.asciidoc[tag=cm-discontinued]
 
 [WARNING]
 =======================================
@@ -38,7 +38,7 @@ include::shared-license-statement.asciidoc[]
 [role="xpack"]
 == How central management works
 
-beta[]
+include::{asciidoc-dir}/../../shared/discontinued.asciidoc[tag=cm-discontinued]
 
 {beats} central management uses a mechanism called configuration tags to group
 related configurations. You define configuration tags in the {cm-ui} UI in {kib}
@@ -105,7 +105,7 @@ the Beat to troubleshoot the problem.
 [role="xpack"]
 == Enroll {beats} in central management
 
-beta[]
+include::{asciidoc-dir}/../../shared/discontinued.asciidoc[tag=cm-discontinued]
 
 You need to enroll {beats} to register them in
 <<configuration-central-management,central management>> and establish
