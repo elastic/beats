@@ -40,28 +40,28 @@ type sender interface {
 	) (*http.Response, error)
 }
 
-type operatorPipeline struct {
+type operatorStream struct {
 	configHandler ConfigHandler
 	log           *logger.Logger
 }
 
-func (b *operatorPipeline) Close() error {
+func (b *operatorStream) Close() error {
 	return nil
 }
 
-func (b *operatorPipeline) Execute(cfg *configRequest) error {
+func (b *operatorStream) Execute(cfg *configRequest) error {
 	return b.configHandler.HandleConfig(cfg)
 }
 
-func pipelineFactory(cfg *config.Config, client sender, r reporter) func(*logger.Logger, routingKey) (pipeline, error) {
-	return func(log *logger.Logger, id routingKey) (pipeline, error) {
+func streamFactory(cfg *config.Config, client sender, r reporter) func(*logger.Logger, routingKey) (stream, error) {
+	return func(log *logger.Logger, id routingKey) (stream, error) {
 		// new operator per pipeline to isolate processes without using tags
 		operator, err := newOperator(log, cfg, r)
 		if err != nil {
 			return nil, err
 		}
 
-		return &operatorPipeline{
+		return &operatorStream{
 			log:           log,
 			configHandler: operator,
 		}, nil
