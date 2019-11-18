@@ -8850,7 +8850,7 @@ type: keyword
 [float]
 === firewall
 
-Fields for Google Cloud Firewall Rules logs.
+Fields for Google Cloud Firewall logs.
 
 
 
