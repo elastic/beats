@@ -108,7 +108,7 @@ func TestScheduler_Start(t *testing.T) {
 		case got := <-executed:
 			received = append(received, got)
 		case <-time.After(10 * time.Second):
-			require.Fail(t, "Timed out waiting for schedule job to execute")
+			require.Fail(t, "Timed out waitingTasks for schedule job to execute")
 		}
 	}
 

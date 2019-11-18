@@ -22,10 +22,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/scheduler/throttler"
+	"github.com/elastic/beats/heartbeat/hbregistry"
 
+	"github.com/elastic/beats/heartbeat/scheduler/throttler"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 const (
@@ -34,6 +36,12 @@ const (
 	stateDone
 )
 
+// countersRegistry is for tracking scheduler counters, confusingly known as 'stats' elsewhere in the stack.
+var countersRegistry = hbregistry.StatsRegistry.NewRegistry("scheduler")
+
+// gaugesRegistry is for tracking scheduler gauges, confusingly known as 'state' elsewhere in the stack.
+var gaugesRegistry = hbregistry.StateRegistry.NewRegistry("scheduler")
+
 type Scheduler struct {
 	limit uint
 	state atomic.Int
@@ -41,9 +49,12 @@ type Scheduler struct {
 
 	location *time.Location
 
-	jobs    []*job
-	active  atomic.Uint // number of active entries
-	waiting atomic.Uint // number of jobs waiting to run, but constrained by scheduler limit
+	jobs               []*job
+	activeJobs         *monitoring.Uint // gauge showing number of active jobs
+	activeTasks        *monitoring.Uint // gauge showing number of active tasks
+	waitingTasks       *monitoring.Uint // number of tasks waiting to run, but constrained by scheduler limit
+	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
+	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 
 	throttler *throttler.Throttler
 }
@@ -51,7 +62,7 @@ type Scheduler struct {
 type Canceller func() error
 
 // A job is a re-schedulable entry point in a set of tasks. Each task can return
-// a new set of tasks being executed (subject to active task limits). Only after
+// a new set of tasks being executed (subject to activeJobs task limits). Only after
 // all tasks of a job have been finished, the job is marked as done and subject
 // to be re-scheduled.
 type job struct {
@@ -61,16 +72,16 @@ type job struct {
 	fn       TaskFunc
 
 	registered bool
-	running    uint32 // count number of active task for job
+	running    uint32 // count number of activeJobs task for job
 }
 
-// A single task in an active job.
+// A single task in an activeJobs job.
 type task struct {
 	job *job
 	fn  TaskFunc
 }
 
-// Single task in an active job. Optionally returns continuation of tasks to
+// Single task in an activeJobs job. Optionally returns continuation of tasks to
 // be executed within current job.
 type TaskFunc func() []TaskFunc
 
@@ -105,6 +116,11 @@ func NewWithLocation(limit uint, location *time.Location) *Scheduler {
 		state: atomic.MakeInt(stateInitial),
 		done:  make(chan int),
 
+		activeJobs:         monitoring.NewUint(gaugesRegistry, "jobs.active"),
+		activeTasks:        monitoring.NewUint(gaugesRegistry, "tasks.active"),
+		waitingTasks:       monitoring.NewUint(gaugesRegistry, "tasks.waiting"),
+		jobsMissedDeadline: monitoring.NewUint(countersRegistry, "jobs.missed_deadline"),
+
 		throttler: throttler.NewThrottler(limit),
 	}
 }
@@ -114,17 +130,30 @@ func (s *Scheduler) Start() error {
 	s.state.Store(stateRunning)
 	s.throttler.Start()
 
-	// Stats reporter
-	go func() {
-		t := time.NewTicker(time.Second * 10)
+	interval := time.Second * 10
 
+	// Missed deadline reporter
+	go func() {
+		t := time.NewTicker(interval)
+
+		// Counter used to check if we're missing more checks now than before
+		missedAtLastCheck := uint64(0)
 		for {
 			select {
 			case <-s.done:
 				t.Stop()
 				return
 			case <-t.C:
-				logp.Info("Scheduler Active/Waiting (limit): %d/%d (%d)", s.active.Load(), s.waiting.Load(), s.limit)
+				// Take a snapshot of items that have missed the deadline.
+				// We only need to mutex long enough to do this. Since maps are reference types we can
+				// do this through assignment
+
+				missingNow := s.jobsMissedDeadline.Get()
+				missedDelta := missingNow - missedAtLastCheck
+				if missedDelta > 0 {
+					logp.Warn("%d tasks have missed their schedule deadlines in the last %s.", missedDelta, interval)
+				}
+				missedAtLastCheck = missingNow
 			}
 		}
 	}()
@@ -168,10 +197,26 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		if sched.RunOnInit() {
 			lastRanAt = time.Unix(0, 0)
 		}
-		for {
+
+		// true for the  first iteration
+		for i := uint64(0); true; i++ {
 			now := time.Now()
 			// We use the time the last task was invoked to figure out when to next run it.
 			next := sched.Next(lastRanAt)
+
+			// If we are running behind schedule there's no need to invoke the timer, we can run right away.
+			// This can happen if the task is slow, and also on first run when we intentionally set the lastRan
+			// to the epoch.
+			if next.Before(now) {
+				lastRanAt = now
+				s.runOnce(id, entrypoint)
+
+				// Record the missed deadline except in the case of the first run, where this would otherwise
+				// always trigger
+				if i > 0 {
+					s.jobsMissedDeadline.Inc()
+				}
+			}
 
 			if timer == nil {
 				timer = time.NewTimer(next.Sub(now))
@@ -213,16 +258,16 @@ func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 		wg.Add(1)
 		defer wg.Done()
 
-		// The accounting for waiting/active is done using atomics. Absolute accuracy is not critical here so the gap
-		// between modifying waiting and active is acceptable.
-		s.waiting.Inc()
+		// The accounting for waitingTasks/activeJobs is done using atomics. Absolute accuracy is not critical here so the gap
+		// between modifying waitingTasks and activeJobs is acceptable.
+		s.waitingTasks.Inc()
 
 		// Acquire an execution slot in keeping with heartbeat.scheduler.limit
 		acquired, releaseSlot := s.throttler.AcquireSlot()
 		defer releaseSlot()
 
-		s.active.Inc()
-		s.waiting.Dec()
+		s.activeTasks.Inc()
+		s.waitingTasks.Dec()
 
 		// The only situation in which we can't acquire a slot is during shutdown. In that case we can just return
 		// without worrying about any of the counters since we're going away soon.
@@ -230,14 +275,16 @@ func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 			return
 		}
 		continuations := task()
-		s.active.Dec()
+		s.activeTasks.Dec()
 
 		for _, cont := range continuations {
 			go runRecursive(cont) // Run continuations in parallel, note that these each will acquire their own slots
 		}
 	}
 
+	s.activeJobs.Inc()
 	runRecursive(entrypoint)
 
 	wg.Wait()
+	s.activeJobs.Dec()
 }
