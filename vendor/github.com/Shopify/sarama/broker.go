@@ -386,6 +386,20 @@ func (b *Broker) FetchOffset(request *OffsetFetchRequest) (*OffsetFetchResponse,
 	if err != nil {
 		return nil, err
 	}
+	// Workaround: if a requested partition receives no response, we initialize
+	// it with a starting offset of -1. Theoretically this should be done for us
+	// by the server, but Azure recently stopped filling in this data for
+	// newly-created consumer groups.
+	for topic, partitions := range request.partitions {
+		if response.Blocks[topic] == nil {
+			response.Blocks[topic] = make(map[int32]*OffsetFetchResponseBlock)
+		}
+		for _, p := range partitions {
+			if response.Blocks[topic][p] == nil {
+				response.Blocks[topic][p] = &OffsetFetchResponseBlock{Offset: -1}
+			}
+		}
+	}
 
 	return response, nil
 }
