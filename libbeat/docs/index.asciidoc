@@ -28,9 +28,9 @@ include::./config-file-format.asciidoc[]
 
 include::./upgrading.asciidoc[]
 
-include::./highlights.asciidoc[]
+include::./release-notes/highlights/highlights.asciidoc[]
 
-include::./breaking.asciidoc[]
+include::./release-notes/breaking/breaking.asciidoc[]
 
 include::./release.asciidoc[]
 

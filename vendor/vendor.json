@@ -3,10 +3,10 @@
 	"ignore": "test tools",
 	"package": [
 		{
-			"checksumSHA1": "vBY5JVo2RftJoZExAKoCCTOr5fU=",
+			"checksumSHA1": "HQMYtd0TnYGOJZxKxODjBy+OyVw=",
 			"path": "4d63.com/tz",
-			"revision": "bd6cee76f7319745d44ff235e42124b3891e293d",
-			"revisionTime": "2019-03-11T03:41:57Z"
+			"revision": "acbe7ac603850b02c7bc4329a2354e389857bf18",
+			"revisionTime": "2019-08-31T23:37:02Z"
 		},
 		{
 			"checksumSHA1": "NkpNQgmrdzGr9HUDL8Bp5YAxt0k=",
@@ -830,6 +830,14 @@
 			"path": "github.com/coreos/etcd/raft/raftpb",
 			"revision": "4d210173ae0d59d4d746735fdd26839513aadaf1",
 			"revisionTime": "2019-08-29T19:00:40Z"
+		},
+		{
+			"checksumSHA1": "WF6GR2/MTAreZskxw9rvh+HCQc4=",
+			"path": "github.com/coreos/go-systemd/dbus",
+			"revision": "fd7a80b32e1fc73e890fde45604ed5009dc817a3",
+			"revisionTime": "2019-07-19T11:48:52Z",
+			"version": "v20",
+			"versionExact": "v20"
 		},
 		{
 			"checksumSHA1": "cEszpxh1szqTb440ze4hm/Vfm40=",
@@ -2030,6 +2038,12 @@
 			"path": "github.com/gocarina/gocsv",
 			"revision": "ffef3ffc77bec026fefa6f76bd53d158cfa0e669",
 			"revisionTime": "2017-03-24T09:53:51Z"
+		},
+		{
+			"checksumSHA1": "KSgw53WGLfdZpEMm8It5H0yedV0=",
+			"path": "github.com/godbus/dbus",
+			"revision": "37bf87eef99d69c4f1d3528bd66e3a87dc201472",
+			"revisionTime": "2019-09-30T11:59:46Z"
 		},
 		{
 			"checksumSHA1": "BfjvAbPn5t/2KrdC5E7418OuzV8=",

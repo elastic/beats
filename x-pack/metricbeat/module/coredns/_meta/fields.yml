@@ -2,7 +2,7 @@
   title: "coredns"
   description: >
     coredns Module
-  release: beta
+  release: ga
   fields:
     - name: coredns
       type: group
