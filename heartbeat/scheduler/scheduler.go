@@ -87,7 +87,7 @@ type task struct {
 	fn  TaskFunc
 }
 
-// Single task in an activeJobs job. Optionally returns continuation of tasks to
+// TaskFunc represents a single task in a job. Optionally returns continuation of tasks to
 // be executed within current job.
 type TaskFunc func() []TaskFunc
 
@@ -269,8 +269,8 @@ func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 		wg.Add(1)
 		defer wg.Done()
 
-		// The accounting for waitingTasks/activeJobs is done using atomics. Absolute accuracy is not critical here so the gap
-		// between modifying waitingTasks and activeJobs is acceptable.
+		// The accounting for waiting/active tasks is done using atomics.
+		// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
 		s.waitingTasks.Inc()
 
 		// Acquire an execution slot in keeping with heartbeat.scheduler.limit
