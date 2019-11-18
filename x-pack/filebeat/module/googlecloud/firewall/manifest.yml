@@ -11,7 +11,10 @@ var:
     default: filebeat-googlecloud-firewall
   - name: credentials_file
     default: googlecloud-firewall-reader-service-identity.json
-
+  - name: debug
+    default: false
+  - name: keep_original_message
+    default: false
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
 

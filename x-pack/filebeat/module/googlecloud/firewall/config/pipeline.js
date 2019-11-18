@@ -5,7 +5,15 @@
 var processor = require("processor");
 var console   = require("console");
 
-var DEBUG = false;
+var params = {
+    keep_original: false,
+    debug: false
+};
+
+// Register params from configuration.
+function register(scriptParams) {
+    params = scriptParams;
+}
 
 // makeMapper({from:field, to:field, default:value mappings:{orig: new, [...]}})
 //
@@ -67,8 +75,8 @@ function PipelineBuilder(pipelineName, debug) {
     }
 }
 
-var firewall = (function() {
-    var builder = new PipelineBuilder("firewall", DEBUG);
+function FirewallProcessor(keep_original, debug) {
+    var builder = new PipelineBuilder("firewall", debug);
 
     // The pub/sub input writes the Stackdriver LogEntry object into the message
     // field. The message needs decoded as JSON.
@@ -86,12 +94,14 @@ var firewall = (function() {
         ignore_missing: true
     }));
 
-    builder.Add("saveOriginalMessage", new processor.Convert({
-       fields: [
-           {from: "message", to: "event.original"}
-       ],
-        mode: "rename"
-    }));
+    if (keep_original) {
+        builder.Add("saveOriginalMessage", new processor.Convert({
+            fields: [
+                {from: "message", to: "event.original"}
+            ],
+            mode: "rename"
+        }));
+    }
 
     builder.Add("dropPubSubFields", function(evt) {
         evt.Delete("message");
@@ -317,8 +327,15 @@ var firewall = (function() {
     return {
         process: chain.Run
     };
-})();
+}
+
+var firewall;
 
 function process(evt) {
+    if (firewall == null) {
+        // Initialize firewall in first call to process to ensure that register
+        // has been called and config options are set.
+        firewall = new FirewallProcessor(params.keep_original, params.debug);
+    }
     return firewall.process(evt);
 }
