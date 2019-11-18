@@ -137,7 +137,7 @@ func (p *Provider) Stop() {
 	p.watcher.Stop()
 }
 
-// String returns a description of kubernetes autodiscover provider.
+// String returns a description of nomad autodiscover provider.
 func (p *Provider) String() string {
 	return "nomad"
 }
@@ -169,10 +169,6 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 
 	// emit per-task separated events
 	for _, task := range tasks {
-		// TODO Fix this
-		// patch rawMeta with the meta for the current task
-		// rawMeta.Put("tasks", task)
-
 		event := bus.Event{
 			"provider": p.uuid,
 			"id":       obj.ID,
@@ -215,7 +211,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	rawMeta, ok := event["meta"]
 	if ok {
 		meta = rawMeta.(common.MapStr)
-		// The builder base config can configure any of the field values of kubernetes if need be.
+		// The builder base config can configure any of the field values of nomad if need be.
 		e["meta"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
 			tags = rawAnn.(common.MapStr)
@@ -241,9 +237,12 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	// for hints we look at the aggregated task's meta
 	if rawTasks, ok := meta["task"]; ok {
-		tasks := rawTasks.(common.MapStr)
+		tasks, ok := rawTasks.(common.MapStr)
+		if !ok {
+			logp.Info("Could not get meta for the given task: ", rawTasks)
+			return e
+		}
 
-		// TODO Fix this issue here
 		meta = tasks
 	}
 

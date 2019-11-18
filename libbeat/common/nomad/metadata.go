@@ -52,7 +52,7 @@ type MetaGeneratorConfig struct {
 
 type metaGenerator = MetaGeneratorConfig
 
-// NewMetaGenerator initializes and returns a new kubernetes metadata generator
+// NewMetaGenerator initializes and returns a new nomad metadata generator
 func NewMetaGenerator(cfg *common.Config, c *Client) (MetaGenerator, error) {
 	// default settings:
 	generator := metaGenerator{
@@ -66,7 +66,7 @@ func NewMetaGenerator(cfg *common.Config, c *Client) (MetaGenerator, error) {
 	return &generator, err
 }
 
-// NewMetaGeneratorFromConfig initializes and returns a new kubernetes metadata generator
+// NewMetaGeneratorFromConfig initializes and returns a new nomad metadata generator
 func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 	return cfg
 }
@@ -93,7 +93,7 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 	tasksMeta := []common.MapStr{}
 
 	for _, group := range job.TaskGroups {
-		// copy of job.Meta
+		// TODO: copy of job.Meta
 		meta := make(map[string]string)
 		for k, v := range job.Meta {
 			meta[k] = v
