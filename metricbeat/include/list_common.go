@@ -21,7 +21,6 @@ package include
 
 import (
 	// Import packages that need to register themselves.
-	_ "github.com/elastic/beats/metricbeat/module/activemq"
 	_ "github.com/elastic/beats/metricbeat/module/aerospike"
 	_ "github.com/elastic/beats/metricbeat/module/aerospike/namespace"
 	_ "github.com/elastic/beats/metricbeat/module/apache"
