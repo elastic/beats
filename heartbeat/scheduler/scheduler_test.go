@@ -52,6 +52,10 @@ func TestNewWithLocation(t *testing.T) {
 // Runs tasks as fast as possible. Good for keeping tests snappy.
 type instantSchedule struct{}
 
+func (schedule instantSchedule) RunOnInit() bool {
+	return true
+}
+
 func (instantSchedule) Next(now time.Time) time.Time {
 	return now
 }

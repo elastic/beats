@@ -39,8 +39,14 @@ const (
 // countersRegistry is for tracking scheduler counters, confusingly known as 'stats' elsewhere in the stack.
 var countersRegistry = hbregistry.StatsRegistry.NewRegistry("scheduler")
 
+var jobsMissedDeadlineCounter = monitoring.NewUint(countersRegistry, "jobs.missed_deadline")
+
 // gaugesRegistry is for tracking scheduler gauges, confusingly known as 'state' elsewhere in the stack.
 var gaugesRegistry = hbregistry.StateRegistry.NewRegistry("scheduler")
+
+var activeJobsGauge = monitoring.NewUint(gaugesRegistry, "jobs.active")
+var activeTasksGauge = monitoring.NewUint(gaugesRegistry, "tasks.active")
+var waitingTasksGauge = monitoring.NewUint(gaugesRegistry, "tasks.waiting")
 
 type Scheduler struct {
 	limit uint
@@ -116,10 +122,10 @@ func NewWithLocation(limit uint, location *time.Location) *Scheduler {
 		state: atomic.MakeInt(stateInitial),
 		done:  make(chan int),
 
-		activeJobs:         monitoring.NewUint(gaugesRegistry, "jobs.active"),
-		activeTasks:        monitoring.NewUint(gaugesRegistry, "tasks.active"),
-		waitingTasks:       monitoring.NewUint(gaugesRegistry, "tasks.waiting"),
-		jobsMissedDeadline: monitoring.NewUint(countersRegistry, "jobs.missed_deadline"),
+		activeJobs:         activeJobsGauge,
+		activeTasks:        activeTasksGauge,
+		waitingTasks:       waitingTasksGauge,
+		jobsMissedDeadline: jobsMissedDeadlineCounter,
 
 		throttler: throttler.NewThrottler(limit),
 	}
@@ -181,9 +187,14 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		return nil, ErrAlreadyStopped
 	}
 
+	removed := atomic.MakeBool(false)
 	removeCh := make(chan bool)
 	removeFn = func() error {
-		removeCh <- true
+		// Safely close the channel exactly once
+		// Clients may invoke this function multiple times
+		if removed.CAS(false, true) {
+			close(removeCh)
+		}
 		return nil
 	}
 
