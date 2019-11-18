@@ -19,6 +19,7 @@ package throttler
 
 import (
 	"math"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
@@ -27,13 +28,10 @@ import (
 // You could also do this with a Pool, but this uses a constant amount of memory, and doesn't need to have token
 // objects passed around which is cleaner.
 type Throttler struct {
-	limit          uint
-	availableSlots uint
-	active         atomic.Int
-	starts         chan struct{}
-	stops          chan struct{}
-	done           chan struct{}
-	isDone         atomic.Bool
+	limit     uint
+	buf       chan struct{}
+	done      chan struct{}
+	isStarted sync.WaitGroup
 }
 
 // NewThrottler returns a new *Throttler that is not yet started. You must invoke Start for it to do anything.
@@ -43,43 +41,20 @@ func NewThrottler(limit uint) *Throttler {
 	}
 
 	t := &Throttler{
-		limit:          limit,
-		availableSlots: limit,
-		active:         atomic.Int{},
-		starts:         make(chan struct{}),
-		stops:          make(chan struct{}),
-		done:           make(chan struct{}),
-		isDone:         atomic.MakeBool(false),
+		limit:     limit,
+		buf:       make(chan struct{}, limit),
+		done:      make(chan struct{}),
+		isStarted: sync.WaitGroup{},
 	}
+
+	t.isStarted.Add(1)
 
 	return t
 }
 
 // Start starts the internal thread and unblocks callers of AcquireSlot() which were invoked before this was called.
 func (t *Throttler) Start() {
-	go func() {
-		for {
-			// If no slots are available, we just wait for jobs to stop, in which case
-			// we can increase the number of slots for next time through the loop
-			if t.availableSlots < 1 {
-				select {
-				case <-t.stops:
-					t.availableSlots++
-				case <-t.done:
-					return
-				}
-			} else {
-				select {
-				case <-t.stops:
-					t.availableSlots++
-				case <-t.starts:
-					t.availableSlots--
-				case <-t.done:
-					return
-				}
-			}
-		}
-	}()
+	t.isStarted.Done()
 }
 
 // Stop halts the internal goroutine. Once invoked this throttler will no longer be able to perform work.
@@ -90,13 +65,22 @@ func (t *Throttler) Stop() {
 // AcquireSlot attempts to acquire a resource. It returns whether acquisition was successful.
 // If acquisition was successful releaseSlotFn must be invoked, otherwise it may be ignored.
 func (t *Throttler) AcquireSlot() (acquired bool, releaseSlotFn func()) {
-	t.active.Inc()
+	t.isStarted.Wait()
+
 	select {
 	// Block until a resource is available
-	case t.starts <- struct{}{}:
+	case t.buf <- struct{}{}:
+		released := atomic.NewBool(false)
 		return true, func() {
-			t.active.Dec()
-			t.stops <- struct{}{}
+			// Only release once even if this is invoked multiple times
+			if released.CAS(false, true) {
+				select {
+				case <-t.buf:
+					// release the acquired resource
+				case <-t.done:
+					// Release if we're shutdown
+				}
+			}
 		}
 	// If we're shutting down exit early
 	case <-t.done:
