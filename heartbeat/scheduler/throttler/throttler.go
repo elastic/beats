@@ -30,9 +30,10 @@ type Throttler struct {
 	limit          uint
 	availableSlots uint
 	active         atomic.Int
-	starts         chan chan bool
-	stops          chan bool
-	done           chan bool
+	starts         chan struct{}
+	stops          chan struct{}
+	done           chan struct{}
+	isDone         atomic.Bool
 }
 
 // NewThrottler returns a new *Throttler that is not yet started. You must invoke Start for it to do anything.
@@ -45,10 +46,12 @@ func NewThrottler(limit uint) *Throttler {
 		limit:          limit,
 		availableSlots: limit,
 		active:         atomic.Int{},
-		starts:         make(chan chan bool),
-		stops:          make(chan bool),
-		done:           make(chan bool),
+		starts:         make(chan struct{}),
+		stops:          make(chan struct{}),
+		done:           make(chan struct{}),
+		isDone:         atomic.MakeBool(false),
 	}
+
 	return t
 }
 
@@ -69,9 +72,8 @@ func (t *Throttler) Start() {
 				select {
 				case <-t.stops:
 					t.availableSlots++
-				case ch := <-t.starts:
+				case <-t.starts:
 					t.availableSlots--
-					ch <- true
 				case <-t.done:
 					return
 				}
@@ -88,17 +90,16 @@ func (t *Throttler) Stop() {
 // AcquireSlot attempts to acquire a resource. It returns whether acquisition was successful.
 // If acquisition was successful releaseSlotFn must be invoked, otherwise it may be ignored.
 func (t *Throttler) AcquireSlot() (acquired bool, releaseSlotFn func()) {
-	startedCh := make(chan bool)
-	t.starts <- startedCh
-
+	t.active.Inc()
 	select {
+	// Block until a resource is available
+	case t.starts <- struct{}{}:
+		return true, func() {
+			t.active.Dec()
+			t.stops <- struct{}{}
+		}
+	// If we're shutting down exit early
 	case <-t.done:
 		return false, func() {}
-	case <-startedCh:
-		t.active.Inc()
-		return true, func() {
-			t.stops <- true
-			t.active.Dec()
-		}
 	}
 }
