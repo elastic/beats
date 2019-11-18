@@ -19,5 +19,8 @@ package hbregistry
 
 import "github.com/elastic/beats/libbeat/monitoring"
 
+// StatsRegistry contains a singleton instance of the heartbeat stats registry
 var StatsRegistry = monitoring.Default.NewRegistry("heartbeat")
+
+// StateRegistry contains a singleton instance of the heartbeat state registry
 var StateRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")

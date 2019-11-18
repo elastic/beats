@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/heartbeat/hbregistry"
-
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/plugin"
