@@ -1,14 +1,17 @@
 [[release-highlights-7.3.0]]
-=== 7.3.0 release highlights
+=== 7.3 release highlights
 ++++
-<titleabbrev>7.3.0</titleabbrev>
+<titleabbrev>7.3</titleabbrev>
 ++++
 
 Each release of {beats} brings new features and product improvements. 
-Here are the highlights of the new features and enhancements in 7.3.0.
+Following are the most notable features and enhancements in 7.3.
 
-Refer to the {beats} <<breaking-changes-7.3, Breaking Changes>> and
-<<release-notes, Release Notes>> for a list of bug fixes and other changes.
+For a complete list of highlights, see the 
+https://www.elastic.co/blog/beats-7-3-0-released[{beats} 7.3 release blog].
+
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-7.3, Breaking Changes>> and <<release-notes, Release Notes>>.
 
 //NOTE: The notable-highlights tagged regions are re-used in the
 //Installation and Upgrade Guide
