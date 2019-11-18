@@ -81,7 +81,11 @@ type taskOverSignal struct {
 
 // Schedule defines an interface for getting the next scheduled runtime for a job
 type Schedule interface {
+	// Next returns the next time a scheduled event occurs after the given time
 	Next(now time.Time) (next time.Time)
+	// Returns true if this schedule type should run once immediately before checking Next.
+	// Cron tasks run at exact times so should set this to false.
+	RunOnInit() bool
 }
 
 var debugf = logp.MakeDebug("scheduler")
@@ -156,9 +160,19 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 
 	var timer *time.Timer
 	go func() {
+		// lastRanAt stores the last time the task was invoked
+		// The initial value is time.Now() because we use it to get the next time a job is scheduled to run
+		lastRanAt := time.Now()
+		// If this job should be run immediately set the timestamp to the epoch.
+		// That will cause any (plausible) schedule to run immediately
+		if sched.RunOnInit() {
+			lastRanAt = time.Unix(0, 0)
+		}
 		for {
 			now := time.Now()
-			next := sched.Next(now)
+			// We use the time the last task was invoked to figure out when to next run it.
+			next := sched.Next(lastRanAt)
+
 			if timer == nil {
 				timer = time.NewTimer(next.Sub(now))
 			} else {
@@ -167,6 +181,16 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 
 			select {
 			case <-timer.C:
+				// time may have elapsed between when we scheduled the task and when it was actually invoked
+				// it may seem to make more sense to just use `now` rather than `time.Now`, however, there's an
+				// advantage to being more precise here. In the case where more jobs are scheduled than can
+				// be executed simultaneously, and schedules like `@every 5s` are in use this will cause any delayed
+				// job to be permanently offset. This will naturally lead to a more even distribution of jobs over
+				// the timeline in short order, rather than repeatedly bursting schedules. This should lead to more
+				// reliability in those high concurrency scenarios.
+				//
+				// For cron scheduling this does nothing since cron schedules run at exact times.
+				lastRanAt = time.Now()
 				s.runOnce(id, entrypoint)
 			case <-removeCh:
 				return
