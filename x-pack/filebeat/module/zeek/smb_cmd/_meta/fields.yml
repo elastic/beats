@@ -1,5 +1,6 @@
 - name: smb_cmd
   type: group
+  default_field: false
   description: >
     Fields exported by the Zeek smb_cmd log.
   fields:

@@ -3830,6 +3830,33 @@ required: True
 
 --
 
+*`process.exit_code`*::
++
+--
+the exit code of a process
+
+type: long
+
+--
+
+*`systemd.fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
+
+type: keyword
+
+--
+
 [[exported-fields-consul]]
 == consul fields
 
@@ -11082,6 +11109,54 @@ type: long
 --
 
 [float]
+=== enrich
+
+Enrich stats
+
+
+
+*`elasticsearch.enrich.queue.size`*::
++
+--
+Number of search requests in the queue.
+
+
+type: long
+
+--
+
+
+*`elasticsearch.enrich.remote_requests.current`*::
++
+--
+Current number of outstanding remote requests.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.remote_requests.total`*::
++
+--
+Number of outstanding remote requests executed since node startup.
+
+
+type: long
+
+--
+
+*`elasticsearch.enrich.executed_searches.total`*::
++
+--
+Number of search requests that enrich processors have executed since node startup.
+
+
+type: long
+
+--
+
+[float]
 === index
 
 index
@@ -12004,6 +12079,46 @@ type: integer
 
 --
 
+*`envoyproxy.server.cluster_manager.cluster_updated`*::
++
+--
+Total cluster updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_updated_via_merge`*::
++
+--
+Total cluster updates applied as merged updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_merge_cancelled`*::
++
+--
+Total merged updates that got cancelled and delivered early
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_out_of_merge_window`*::
++
+--
+Total updates which arrived out of a merge window
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.filesystem.flushed_by_timer`*::
 +
@@ -12055,11 +12170,21 @@ type: integer
 
 --
 
+*`envoyproxy.server.filesystem.write_failed`*::
++
+--
+Total number of times an error occurred during a file write operation
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.runtime.load_error`*::
 +
 --
-Total number of load attempts that resulted in an error
+Total number of load attempts that resulted in an error in any layer
 
 
 type: integer
@@ -12069,7 +12194,7 @@ type: integer
 *`envoyproxy.server.runtime.load_success`*::
 +
 --
-Total number of load attempts that were successful
+Total number of load attempts that were successful at all layers
 
 
 type: integer
@@ -12109,6 +12234,29 @@ type: integer
 *`envoyproxy.server.runtime.admin_overrides_active`*::
 +
 --
+1 if any admin overrides are active otherwise 0
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.deprecated_feature_use`*::
++
+--
+Total number of times deprecated features were used.
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.num_layers`*::
++
+--
+Number of layers currently active (without loading errors)
+
+
 type: integer
 
 --
@@ -12188,6 +12336,16 @@ type: integer
 +
 --
 Number of currently warming listeners
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.listener_manager.listener_stopped`*::
++
+--
+Total listeners stopped
 
 
 type: integer
@@ -12306,6 +12464,60 @@ type: integer
 Current hot restart epoch
 
 
+type: integer
+
+--
+
+*`envoyproxy.server.server.concurrency`*::
++
+--
+Number of worker threads
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.debug_assertion_failures`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.server.dynamic_unknown_fields`*::
++
+--
+Number of messages in dynamic configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.state`*::
++
+--
+Current state of the Server
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.static_unknown_fields`*::
++
+--
+Number of messages in static configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.stats_recent_lookups`*::
++
+--
 type: integer
 
 --
@@ -26068,6 +26280,16 @@ alias to: rabbitmq.node.name
 
 --
 
+*`rabbitmq.connection.state`*::
++
+--
+Connection state.
+
+
+type: keyword
+
+--
+
 *`rabbitmq.connection.channels`*::
 +
 --
@@ -30834,6 +31056,146 @@ type: long
 --
 
 [float]
+=== service
+
+metrics for system services
+
+
+
+*`system.service.name`*::
++
+--
+The name of the service
+
+type: keyword
+
+--
+
+*`system.service.load_state`*::
++
+--
+The load state of the service
+
+type: keyword
+
+--
+
+*`system.service.state`*::
++
+--
+The activity state of the service
+
+type: keyword
+
+--
+
+*`system.service.sub_state`*::
++
+--
+The sub-state of the service
+
+type: keyword
+
+--
+
+*`system.service.state_since`*::
++
+--
+The timestamp of the last state change. If the service is active and running, this is its uptime.
+
+type: date
+
+--
+
+*`system.service.exec_code`*::
++
+--
+The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+[float]
+=== resources
+
+system metrics associated with the service
+
+
+*`system.service.resources.cpu.usage.ns`*::
++
+--
+CPU usage in nanoseconds
+
+type: long
+
+--
+
+*`system.service.resources.memory.usage.bytes`*::
++
+--
+memory usage in bytes
+
+type: long
+
+--
+
+*`system.service.resources.tasks.count`*::
++
+--
+number of tasks associated with the service
+
+type: long
+
+--
+
+[float]
+=== network
+
+network resource usage
+
+
+*`system.service.resources.network.in.bytes`*::
++
+--
+bytes in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.in.packets`*::
++
+--
+packets in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.out.packets`*::
++
+--
+packets out
+
+type: long
+
+--
+
+*`system.service.resources.network.out.bytes`*::
++
+--
+bytes out
+
+type: long
+
+--
+
+[float]
 === socket
 
 TCP sockets that are active.
@@ -31109,6 +31471,66 @@ type: integer
 +
 --
 Number of TCP connections in _time_wait_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.syn_sent`*::
++
+--
+Number of TCP connections in _syn_sent_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.syn_recv`*::
++
+--
+Number of TCP connections in _syn_recv_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait1`*::
++
+--
+Number of TCP connections in _fin_wait1_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.fin_wait2`*::
++
+--
+Number of TCP connections in _fin_wait2_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.last_ack`*::
++
+--
+Number of TCP connections in _last_ack_ state
+
+
+type: integer
+
+--
+
+*`system.socket.summary.tcp.all.closing`*::
++
+--
+Number of TCP connections in _closing_ state
 
 
 type: integer
