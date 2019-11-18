@@ -178,13 +178,13 @@
 		},
 		{
 			"checksumSHA1": "+cWsLeFazZSfjKE6wbddbXKr0Rs=",
-			"path": "github.com/docker/engine/api/types/plugins/logdriver",
+			"path": "github.com/docker/docker/api/types/plugins/logdriver",
 			"revision": "5b57f41241cb0d8df5886a1db3d7920494a9e432",
 			"revisionTime": "2019-09-27T16:46:57Z"
 		},
 		{
 			"checksumSHA1": "X58QYfDGPjij6Jj1KCZAyD95T3M=",
-			"path": "github.com/docker/engine/daemon/logger",
+			"path": "github.com/docker/docker/daemon/logger",
 			"revision": "5b57f41241cb0d8df5886a1db3d7920494a9e432",
 			"revisionTime": "2019-09-27T16:46:57Z"
 		},

@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/docker/engine/api/types/plugins/logdriver"
+	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
