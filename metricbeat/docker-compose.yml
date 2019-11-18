@@ -21,7 +21,7 @@ services:
       args:
         ACTIVEMQ_VERSION: ${ACTIVEMQ_VERSION:-5.15.9}
     ports:
-      - 8161:8161
+      - 8161
       - 61613
 
   aerospike:
