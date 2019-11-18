@@ -74,7 +74,7 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 func (pm *PipelineManager) CreateClientWithConfig(logOptsConfig map[string]string, file string) (*ClientLogger, error) {
 
 	hashstring := makeConfigHash(logOptsConfig)
-	pipeline, err := pm.checkAndCreatePipeline(logOptsConfig, file)
+	pipeline, err := pm.getOrCreatePipeline(logOptsConfig, file, hashstring)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline")
 	}
@@ -95,11 +95,9 @@ func (pm *PipelineManager) CreateClientWithConfig(logOptsConfig map[string]strin
 
 // checkAndCreatePipeline performs the pipeline check and creation as one atomic operation
 // It will either return a new pipeline, or an existing one from the pipeline map
-func (pm *PipelineManager) checkAndCreatePipeline(logOptsConfig map[string]string, file string) (*Pipeline, error) {
+func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig map[string]string, file string, hashstring string) (*Pipeline, error) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
-
-	hashstring := makeConfigHash(logOptsConfig)
 
 	var pipeline *Pipeline
 	var err error
