@@ -48,7 +48,7 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFile,
 	)
 
-	generateKafkaData(t, service.Host(), "metricbeat-generate-data")
+	generateKafkaData(t, service.HostForPort(9092), "metricbeat-generate-data")
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), ""))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
@@ -66,7 +66,7 @@ func TestTopic(t *testing.T) {
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic
-	generateKafkaData(t, service.Host(), testTopic)
+	generateKafkaData(t, service.HostForPort(9092), testTopic)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), testTopic))
 	dataBefore, err := mbtest.ReportingFetchV2Error(f)
@@ -82,7 +82,7 @@ func TestTopic(t *testing.T) {
 	var i int64 = 0
 	// Create n messages
 	for ; i < n; i++ {
-		generateKafkaData(t, service.Host(), testTopic)
+		generateKafkaData(t, service.HostForPort(9092), testTopic)
 	}
 
 	dataAfter, err := mbtest.ReportingFetchV2Error(f)

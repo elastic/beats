@@ -45,7 +45,7 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFile,
 	)
 
-	c, err := startConsumer(t, service.Host(), "metricbeat-test")
+	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
@@ -65,7 +65,7 @@ func TestData(t *testing.T) {
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka")
 
-	c, err := startConsumer(t, service.Host(), "metricbeat-test")
+	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
