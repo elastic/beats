@@ -376,10 +376,9 @@ metricbeat.modules:
 #-------------------------------- Kafka Module --------------------------------
 # Kafka metrics collected using the Kafka protocol
 - module: kafka
-  enabled: true
-  metricsets:
-    - consumergroup
-    - partition
+  #metricsets:
+  #  - partition
+  #  - consumergroup
   period: 10s
   hosts: ["localhost:9092"]
 
@@ -406,24 +405,24 @@ metricbeat.modules:
 
 # Metrics collected from a Kafka broker using Jolokia
 #- module: kafka
-#  enabled: true
-#  metricsets: ['broker']
+#  metricsets:
+#    - broker
 #  period: 10s
-#  hosts: ['localhost:8779']
+#  hosts: ["localhost:8779"]
 
 # Metrics collected from a Java Kafka consumer using Jolokia
 #- module: kafka
-#  enabled: true
-#  metricsets: ['consumer']
+#  metricsets:
+#    - consumer
 #  period: 10s
-#  hosts: ['localhost:8775']
+#  hosts: ["localhost:8775"]
 
 # Metrics collected from a Java Kafka producer using Jolokia
 #- module: kafka
-#  enabled: true
-#  metricsets: ['producer']
+#  metricsets:
+#    - producer
 #  period: 10s
-#  hosts: ['localhost:8774']
+#  hosts: ["localhost:8774"]
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana

@@ -1,6 +1,7 @@
 # Module: kafka
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kafka.html
 
+# Kafka metrics collected using the Kafka protocol
 - module: kafka
   #metricsets:
   #  - partition

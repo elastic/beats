@@ -1,3 +1,4 @@
+# Kafka metrics collected using the Kafka protocol
 - module: kafka
   #metricsets:
   #  - partition
