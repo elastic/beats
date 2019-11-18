@@ -24,14 +24,21 @@ import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
 
+const (
+	stateUnstarted = iota
+	stateStarted
+	stateStopped
+)
+
 // Throttler is useful for managing access to some resource that can handle a certain amount of concurrency only.
 // You could also do this with a Pool, but this uses a constant amount of memory, and doesn't need to have token
 // objects passed around which is cleaner.
 type Throttler struct {
-	limit     uint
-	buf       chan struct{}
-	done      chan struct{}
-	isStarted sync.WaitGroup
+	limit   uint
+	buf     chan struct{}
+	done    chan struct{}
+	state   atomic.Int
+	startWg sync.WaitGroup
 }
 
 // NewThrottler returns a new *Throttler that is not yet started. You must invoke Start for it to do anything.
@@ -41,31 +48,53 @@ func NewThrottler(limit uint) *Throttler {
 	}
 
 	t := &Throttler{
-		limit:     limit,
-		buf:       make(chan struct{}, limit),
-		done:      make(chan struct{}),
-		isStarted: sync.WaitGroup{},
+		limit:   limit,
+		buf:     make(chan struct{}, limit),
+		done:    make(chan struct{}),
+		state:   atomic.MakeInt(stateUnstarted),
+		startWg: sync.WaitGroup{},
 	}
 
-	t.isStarted.Add(1)
+	t.startWg.Add(1)
 
 	return t
 }
 
 // Start starts the internal thread and unblocks callers of AcquireSlot() which were invoked before this was called.
-func (t *Throttler) Start() {
-	t.isStarted.Done()
+// Returns true if moving from unstarted to started. A stopped throttler cannot restart.
+func (t *Throttler) Start() bool {
+	if t.state.CAS(stateUnstarted, stateStarted) {
+		t.startWg.Done()
+		return true
+	}
+
+	return false
 }
 
 // Stop halts the internal goroutine. Once invoked this throttler will no longer be able to perform work.
-func (t *Throttler) Stop() {
-	close(t.done)
+// Returns true if moving from started to stopped. False in all other conditions.
+func (t *Throttler) Stop() bool {
+	if t.state.CAS(stateStarted, stateStopped) {
+		close(t.done)
+		return true
+	}
+
+	return false
 }
 
 // AcquireSlot attempts to acquire a resource. It returns whether acquisition was successful.
 // If acquisition was successful releaseSlotFn must be invoked, otherwise it may be ignored.
 func (t *Throttler) AcquireSlot() (acquired bool, releaseSlotFn func()) {
-	t.isStarted.Wait()
+	// If we haven't started yet wait for it
+	state := t.state.Load()
+	if state == stateUnstarted {
+		t.startWg.Wait()
+	} else if state == stateStopped {
+		// The select blocks below checking for a closed done aren't quite enough,
+		// we need the stateStopped check here because select will pick a block at random, and we *always* want
+		// AcquireSlot to return false once Stop is invoked.
+		return false, func() {}
+	}
 
 	select {
 	// Block until a resource is available
