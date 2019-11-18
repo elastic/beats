@@ -23,8 +23,8 @@
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
 
-    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
-    # configured to use this topic as a sink for VPC flow logs.
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
     var.topic: googlecloud-vpc-firewall
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
