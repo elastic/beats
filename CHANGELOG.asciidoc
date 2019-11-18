@@ -73,6 +73,12 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
 
 - Fix parsing of the HTTP host header when it contains a port or an IPv6 address. {pull}14215[14215]
 
+==== Known issues
+
+*Filebeat*
+
+- The Azure module (beta) has stopped working due to recent changes in Azure.
+We are working with Microsoft to find and fix the root cause.
 
 ==== Added
 
