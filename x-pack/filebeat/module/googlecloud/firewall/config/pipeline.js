@@ -5,20 +5,7 @@
 var processor = require("processor");
 var console   = require("console");
 
-var params = {
-    keep_pubsub_labels: false,
-    keep_resource_labels: false,
-    overwrite_labels: true,
-    debug: false
-};
-
-// Receive params from processor declaration.
-function register(scriptParams) {
-    params = scriptParams;
-    if (params.debug) {
-        makeLogEvent("using script params")(params);
-    }
-}
+var DEBUG = false;
 
 // makeMapper({from:field, to:field, default:value mappings:{orig: new, [...]}})
 //
@@ -59,11 +46,9 @@ function makeLogEvent(msg) {
 
 // PipelineBuilder to aid debugging of pipelines during development.
 function PipelineBuilder(pipelineName, debug) {
-    this.count = 0;
     this.pipeline = new processor.Chain();
     this.add = function (processor) {
         this.pipeline = this.pipeline.Add(processor);
-        this.count ++;
     };
     this.Add = function (name, processor) {
         this.add(processor);
@@ -75,7 +60,6 @@ function PipelineBuilder(pipelineName, debug) {
         if (debug) {
             this.add(makeLogEvent(pipelineName + "processing done"));
         }
-        console.info("built " + pipelineName + " with " + this.count + " processors");
         return this.pipeline.Build();
     };
     if (debug) {
@@ -83,8 +67,8 @@ function PipelineBuilder(pipelineName, debug) {
     }
 }
 
-function Firewall() {
-    var builder = new PipelineBuilder("firewall", params.debug);
+var firewall = (function() {
+    var builder = new PipelineBuilder("firewall", DEBUG);
 
     // The pub/sub input writes the Stackdriver LogEntry object into the message
     // field. The message needs decoded as JSON.
@@ -111,7 +95,7 @@ function Firewall() {
 
     builder.Add("dropPubSubFields", function(evt) {
         evt.Delete("message");
-        if (!params.keep_pubsub_labels) evt.Delete("labels");
+        evt.Delete("labels");
     });
 
     builder.Add("categorizeEvent", new processor.AddFields({
@@ -129,18 +113,6 @@ function Firewall() {
         ],
         ignore_missing: true
     }));
-
-    builder.Add("storeLabels", function (evt) {
-        if (!params.keep_resource_labels) return;
-        var src = evt.Get("json.resource.labels");
-        if (src == null) return;
-        Object.keys(src).forEach( function (key) {
-            var dst = "labels." + key;
-            if (params.overwrite_labels || evt.Get(dst) == null) {
-                evt.Put(dst, src[key]);
-            }
-        });
-    });
 
     // Firewall logs are structured so the LogEntry includes a jsonPayload field.
     // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
@@ -341,16 +313,12 @@ function Firewall() {
         event.AppendTo("related.ip", event.Get("destination.ip"));
     });
 
+    var chain = builder.Build();
     return {
-        process: builder.Build().Run
+        process: chain.Run
     };
-}
-
-var firewall;
+})();
 
 function process(evt) {
-    if (firewall == null) {
-        firewall = new Firewall();
-    }
     return firewall.process(evt);
 }

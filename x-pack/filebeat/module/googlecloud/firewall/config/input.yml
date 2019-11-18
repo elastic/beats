@@ -22,8 +22,3 @@ processors:
       lang: javascript
       id: googlecloud_firewall_script
       file: ${path.home}/module/googlecloud/firewall/config/pipeline.js
-      params:
-        keep_pubsub_labels: {{ .keep_pubsub_labels }}
-        keep_resource_labels: {{ .keep_resource_labels }}
-        overwrite_labels: {{ .overwrite_labels }}
-        debug: {{ .debug }}

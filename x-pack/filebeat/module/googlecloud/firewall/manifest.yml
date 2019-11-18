@@ -11,14 +11,6 @@ var:
     default: filebeat-googlecloud-firewall
   - name: credentials_file
     default: googlecloud-firewall-reader-service-identity.json
-  - name: keep_pubsub_labels
-    default: true
-  - name: keep_resource_labels
-    default: true
-  - name: overwrite_labels
-    default: true
-  - name: debug
-    default: false
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
