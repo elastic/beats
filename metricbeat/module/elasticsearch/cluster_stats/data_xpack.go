@@ -201,6 +201,12 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	}
 
 	l := license.ToMapStr()
+	if license.ExpiryDateInMillis == 0 {
+		// We don't want to record a 0 expiry date as this means the license has expired
+		// in the Stack Monitoring UI
+		l.Delete("expiry_date_in_millis")
+	}
+
 	l["cluster_needs_tls"] = clusterNeedsTLS
 
 	isAPMFound, err := apmIndicesExist(clusterState)
