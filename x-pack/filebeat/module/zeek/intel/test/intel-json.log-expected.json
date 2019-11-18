@@ -1,0 +1,38 @@
+[
+    {
+        "@timestamp": 1573030980000,
+        "destination.address": "198.41.0.4",
+        "destination.as.number": 20431,
+        "destination.as.organization.name": "VeriSign Global Registry Services",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "198.41.0.4",
+        "destination.port": 53,
+        "event.dataset": "zeek.intel",
+        "event.id": "Ctefoj1tgOPt4D0EK2",
+        "event.module": "zeek",
+        "fileset.name": "intel",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "source.port": 37598,
+        "tags": [
+            "zeek.intel"
+        ],
+        "zeek.intel.matched": [
+            "Intel::ADDR"
+        ],
+        "zeek.intel.seen.indicator": "198.41.0.4",
+        "zeek.intel.seen.indicator_type": "Intel::ADDR",
+        "zeek.intel.seen.node": "worker-1-2",
+        "zeek.intel.seen.where": "Conn::IN_RESP",
+        "zeek.intel.sources": [
+            "ETPRO Rep: AbusedTLD Score: 127"
+        ],
+        "zeek.session_id": "Ctefoj1tgOPt4D0EK2"
+    }
+]
