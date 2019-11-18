@@ -249,6 +249,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update azure configuration example. {issue}14224[14224]
 - Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
+- Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 
 *Packetbeat*
 
@@ -473,6 +474,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release CouchDB module as GA. {pull}14300[14300]
 - Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
 - Add support for Application ELB and Network ELB. {pull}14123[14123] {issue}13538[13538] {issue}13539[13539]
+- Release aws ebs metricset as GA. {pull}14312[14312] {issue}14060[14060]
 - Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
 
 *Packetbeat*
