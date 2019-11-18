@@ -44,16 +44,16 @@ type Compose mg.Namespace
 // BuildSupportedVersions builds images for versions defined in supported-versions.yml files
 func (c Compose) BuildSupportedVersions() error {
 	fmt.Println(">> compose: Building docker images for supported versions")
-	return c.target("build", "Building images")
+	return c.composeForEachVariant("build", "Building images")
 }
 
 // PushSupportedVersions pushes images for versions defined in supported-versions.yml files
 func (c Compose) PushSupportedVersions() error {
 	fmt.Println(">> compose: Pushing docker images for supported versions")
-	return c.target("push", "Pushing images")
+	return c.composeForEachVariant("push", "Pushing images")
 }
 
-func (c Compose) target(action, message string) error {
+func (c Compose) composeForEachVariant(action, message string) error {
 	files, err := findSupportedVersionsFiles()
 	if err != nil {
 		return errors.Wrap(err, "finding supported versions files")
