@@ -84,6 +84,11 @@ func findSupportedVersionsFiles() ([]string, error) {
 		return []string{f}, nil
 	}
 
+	if module := os.Getenv("MODULE"); len(module) > 0 {
+		path := filepath.Join("module", module, "_meta/supported-versions.yml")
+		return []string{path}, nil
+	}
+
 	return devtools.FindFilesRecursive(func(path string, _ os.FileInfo) bool {
 		return filepath.Base(path) == "supported-versions.yml"
 	})
