@@ -20905,13 +20905,13 @@ type: keyword
 
 --
 
-*`zeek.intel.seen.fa_file`*::
+*`zeek.intel.seen.f`*::
 +
 --
 If the data was discovered within a file, the file record should go here to provide context to the data.
 
 
-type: keyword
+type: object
 
 --
 
