@@ -2,9 +2,12 @@ import re
 import six
 import sys
 import unittest
-import metricbeat
 import getpass
 import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
+
 
 SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]

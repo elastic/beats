@@ -1,7 +1,10 @@
 import os
-import metricbeat
+import sys
 import unittest
 from nose.plugins.attrib import attr
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
 
 
 class Test(metricbeat.BaseTest):

@@ -1,19 +1,22 @@
 import os
-import metricbeat
+import sys
 import unittest
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
 
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['couchdb']
+    COMPOSE_SERVICES = ['envoyproxy']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
-        Couchdb module outputs an event.
+        EnvoyProxy module outputs an event.
         """
         self.render_config_template(modules=[{
-            "name": "couchdb",
+            "name": "envoyproxy",
             "metricsets": ["server"],
             "hosts": self.get_hosts(),
             "period": "5s",
@@ -25,9 +28,11 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output_json()
         self.assertTrue(len(output) >= 1)
-        event = output[0]
-        print(event)
+        evt = output[0]
+        print(evt)
 
-        self.assertNotIn("error", event)
+        self.assert_fields_are_documented(evt)
 
-        self.assert_fields_are_documented(event)
+
+class TestEnvoyProxy1_12(Test):
+    COMPOSE_ENV = {'ENVOYPROXY_VERSION': 'v1.12.0'}

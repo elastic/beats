@@ -1,22 +1,27 @@
 import os
-import metricbeat
+import sys
 import unittest
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
 
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['memcached']
+    COMPOSE_SERVICES = ['munin']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_stats(self):
-        """
-        memached stats metricset test
-        """
+    def test_munin_node(self):
+        namespace = "node_test"
+
         self.render_config_template(modules=[{
-            "name": "memcached",
-            "metricsets": ["stats"],
+            "name": "munin",
+            "metricsets": ["node"],
             "hosts": self.get_hosts(),
             "period": "1s",
+            "extras": {
+                "munin.plugins": ["cpu"],
+            },
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
@@ -27,5 +32,9 @@ class Test(metricbeat.BaseTest):
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print(evt)
+
+        assert evt["service"]["type"] == "cpu"
+        assert evt["munin"]["plugin"]["name"] == "cpu"
+        assert evt["munin"]["metrics"]["user"] > 0
 
         self.assert_fields_are_documented(evt)

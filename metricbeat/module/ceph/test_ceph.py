@@ -1,9 +1,11 @@
 import os
-import metricbeat
+import sys
+import time
 import unittest
 from parameterized import parameterized
-import time
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
 
 class Test(metricbeat.BaseTest):
 

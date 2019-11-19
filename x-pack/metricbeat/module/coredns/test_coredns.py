@@ -1,7 +1,10 @@
 import os
-from xpack_metricbeat import XPackTest
-import metricbeat
+import sys
 import unittest
+from xpack_metricbeat import XPackTest
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+from xpack_metricbeat import XPackTest, metricbeat
 
 
 COREDNS_FIELDS = metricbeat.COMMON_FIELDS + ["coredns"]

@@ -1,10 +1,13 @@
-import os
-import metricbeat
-import unittest
-from nose.plugins.skip import SkipTest
-import urllib2
 import json
+import os
 import semver
+import sys
+import unittest
+import urllib2
+from nose.plugins.skip import SkipTest
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
 
 
 class Test(metricbeat.BaseTest):

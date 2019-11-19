@@ -1,22 +1,26 @@
 import os
-import metricbeat
+import sys
 import unittest
 
-PHPFPM_FIELDS = metricbeat.COMMON_FIELDS + ["php_fpm"]
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
+
+
+PROMETHEUS_FIELDS = metricbeat.COMMON_FIELDS + ["prometheus"]
 
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['phpfpm']
+    COMPOSE_SERVICES = ['prometheus']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_info(self):
+    def test_stats(self):
         """
-        php_fpm pool metricset test
+        prometheus stats test
         """
         self.render_config_template(modules=[{
-            "name": "php_fpm",
-            "metricsets": ["pool"],
+            "name": "prometheus",
+            "metricsets": ["collector"],
             "hosts": self.get_hosts(),
             "period": "5s"
         }])
@@ -26,9 +30,8 @@ class Test(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(PHPFPM_FIELDS), evt.keys(), evt)
+        self.assertItemsEqual(self.de_dot(PROMETHEUS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)

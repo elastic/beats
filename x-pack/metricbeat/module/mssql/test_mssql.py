@@ -1,9 +1,10 @@
 import os
-
-from xpack_metricbeat import XPackTest
-import metricbeat
+import sys
 import unittest
 from nose.plugins.attrib import attr
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+from xpack_metricbeat import XPackTest, metricbeat
 
 
 MSSQL_FIELDS = metricbeat.COMMON_FIELDS + ["mssql"]
