@@ -1,28 +1,26 @@
 {
-    "@timestamp": "2019-11-17T14:04:01.157Z",
+    "@timestamp": "2019-11-19T13:14:17.425Z",
     "@metadata": {
         "beat": "metricbeat",
         "type": "_doc",
         "version": "8.0.0"
     },
+    "event": {
+        "duration": 100756657,
+        "dataset": "activemq.broker",
+        "module": "activemq"
+    },
     "metricset": {
         "name": "broker",
-        "period": 10000
+        "period": 5000
     },
     "service": {
-        "address": "localhost:8161",
+        "address": "localhost:33051",
         "type": "activemq"
     },
     "activemq": {
         "broker": {
-            "consumers": {
-                "count": 0
-            },
-            "name": "localhost",
             "mbean": "org.apache.activemq:brokerName=localhost,type=Broker",
-            "producers": {
-                "count": 0
-            },
             "memory": {
                 "store": {
                     "pct": 0
@@ -34,47 +32,38 @@
                     "pct": 0
                 }
             },
-            "connections": {
-                "count": 0
-            },
             "messages": {
                 "dequeue": {
                     "count": 0
                 },
                 "enqueue": {
-                    "count": 3
+                    "count": 1
                 },
                 "count": 0
-            }
+            },
+            "producers": {
+                "count": 0
+            },
+            "connections": {
+                "count": 0
+            },
+            "consumers": {
+                "count": 0
+            },
+            "name": "localhost"
         }
-    },
-    "event": {
-        "dataset": "activemq.broker",
-        "module": "activemq",
-        "duration": 47746702
-    },
-    "agent": {
-        "type": "metricbeat",
-        "ephemeral_id": "e96c58a1-9a27-4aa2-8bcc-7468ce6f83f0",
-        "hostname": "macbook.local",
-        "id": "a369b7a2-c3c3-457f-9354-6d8191ecbf3a",
-        "version": "8.0.0"
     },
     "ecs": {
         "version": "1.2.0"
     },
     "host": {
-        "name": "macbook.local",
-        "os": {
-            "version": "10.13.6",
-            "family": "darwin",
-            "name": "Mac OS X",
-            "kernel": "17.7.0",
-            "build": "17G8037",
-            "platform": "darwin"
-        },
-        "id": "EEBF3B21-350A-5F10-B217-5B8EA1DA5477",
+        "name": "macbook.local"
+    },
+    "agent": {
         "hostname": "macbook.local",
-        "architecture": "x86_64"
+        "id": "8d20f9a9-b24d-419b-97e6-bcccfb64679c",
+        "version": "8.0.0",
+        "type": "metricbeat",
+        "ephemeral_id": "aa9fb858-9b48-4028-a5e6-d46d83982572"
     }
 }
