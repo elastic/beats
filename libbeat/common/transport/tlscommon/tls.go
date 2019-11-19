@@ -149,7 +149,7 @@ func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
 
 		if ok := roots.AppendCertsFromPEM(pemData); !ok {
 			logp.Critical("Failed to add CA to the cert pool, CA is not a valid PEM file")
-			errors = append(errors, fmt.Errorf("%v adding %v to the list of known CA", ErrNotACertificate, path))
+			errors = append(errors, fmt.Errorf("%v adding %v to the list of known CAs", ErrNotACertificate, path))
 			continue
 		}
 		logp.Debug("tls", "successfully loaded CA certificate: %v", path)
