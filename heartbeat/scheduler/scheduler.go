@@ -60,7 +60,6 @@ type Scheduler struct {
 
 	location *time.Location
 
-	jobs               []*job
 	activeJobs         *monitoring.Uint // gauge showing number of active jobs
 	activeTasks        *monitoring.Uint // gauge showing number of active tasks
 	waitingTasks       *monitoring.Uint // number of tasks waiting to run, but constrained by scheduler limit
@@ -72,36 +71,9 @@ type Scheduler struct {
 	sem       *semaphore.Weighted
 }
 
-type Canceller func() error
-
-// A job is a re-schedulable entry point in a set of tasks. Each task can return
-// a new set of tasks being executed (subject to activeJobs task limits). Only after
-// all tasks of a job have been finished, the job is marked as done and subject
-// to be re-scheduled.
-type job struct {
-	id       string
-	next     time.Time
-	schedule Schedule
-	fn       TaskFunc
-
-	registered bool
-	running    uint32 // count number of activeJobs task for job
-}
-
-// A single task in an activeJobs job.
-type task struct {
-	job *job
-	fn  TaskFunc
-}
-
 // TaskFunc represents a single task in a job. Optionally returns continuation of tasks to
 // be executed within current job.
 type TaskFunc func() []TaskFunc
-
-type taskOverSignal struct {
-	entry *job
-	cont  []task // continuation tasks to be executed by concurrently for job at hand
-}
 
 // Schedule defines an interface for getting the next scheduled runtime for a job
 type Schedule interface {
