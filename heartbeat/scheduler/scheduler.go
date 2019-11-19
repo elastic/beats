@@ -18,12 +18,15 @@
 package scheduler
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
+	"golang.org/x/sync/semaphore"
+
 	"github.com/elastic/beats/heartbeat/hbregistry"
-	"github.com/elastic/beats/heartbeat/scheduler/throttler"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -32,7 +35,7 @@ import (
 const (
 	statePreRunning int = iota + 1
 	stateRunning
-	stateDone
+	stateStopped
 )
 
 // countersRegistry is for tracking scheduler counters, confusingly known as 'stats' elsewhere in the stack.
@@ -48,7 +51,7 @@ var activeTasksGauge = monitoring.NewUint(gaugesRegistry, "tasks.active")
 var waitingTasksGauge = monitoring.NewUint(gaugesRegistry, "tasks.waiting")
 
 type Scheduler struct {
-	limit uint
+	limit int64
 	state atomic.Int
 	done  chan int
 
@@ -61,7 +64,8 @@ type Scheduler struct {
 	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
 	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 
-	throttler *throttler.Throttler
+	ctx context.Context
+	sem *semaphore.Weighted
 }
 
 type Canceller func() error
@@ -107,14 +111,15 @@ type Schedule interface {
 var debugf = logp.MakeDebug("scheduler")
 
 // New creates a new Scheduler
-func New(limit uint) *Scheduler {
+func New(limit int64) *Scheduler {
 	return NewWithLocation(limit, time.Local)
 }
 
 // NewWithLocation creates a new Scheduler using the given time zone.
-func NewWithLocation(limit uint, location *time.Location) *Scheduler {
+func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 	stateInitial := statePreRunning
-	return &Scheduler{
+
+	sched := &Scheduler{
 		limit:    limit,
 		location: location,
 
@@ -126,14 +131,25 @@ func NewWithLocation(limit uint, location *time.Location) *Scheduler {
 		waitingTasks:       waitingTasksGauge,
 		jobsMissedDeadline: jobsMissedDeadlineCounter,
 
-		throttler: throttler.NewThrottler(limit),
+		ctx: context.Background(),
+		sem: semaphore.NewWeighted(int64(limit)),
 	}
+
+	// Block the semaphore initially
+
+	return sched
 }
 
-// Start the scheduler.
+// Start the scheduler. Starting a stopped scheduler returns an error.
 func (s *Scheduler) Start() error {
-	s.state.Store(stateRunning)
-	s.throttler.Start()
+	s.state.CAS(statePreRunning, stateRunning)
+	if s.state.Load() == stateStopped {
+		return fmt.Errorf("Cannot start a stopped scheduler!")
+	} else if s.state.Load() == stateRunning {
+		return nil
+	}
+
+	s.sem.Release(s.limit)
 
 	interval := time.Second * 10
 
@@ -168,9 +184,12 @@ func (s *Scheduler) Start() error {
 
 // Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
 func (s *Scheduler) Stop() error {
-	s.state.Store(stateDone)
-	close(s.done)
-	s.throttler.Stop()
+	if s.state.Load() == stateStopped {
+		return nil
+	} else if s.state.CAS(stateRunning, stateStopped) {
+		close(s.done)
+		s.ctx.Done()
+	}
 
 	return nil
 }
@@ -182,7 +201,7 @@ var ErrAlreadyStopped = errors.New("attempted to add job to already stopped sche
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
 func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn func() error, err error) {
-	if s.state.Load() == stateDone {
+	if s.state.Load() == stateStopped {
 		return nil, ErrAlreadyStopped
 	}
 
@@ -273,17 +292,12 @@ func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 		s.waitingTasks.Inc()
 
 		// Acquire an execution slot in keeping with heartbeat.scheduler.limit
-		acquired, releaseSlot := s.throttler.AcquireSlot()
-		defer releaseSlot()
+		s.sem.Acquire(s.ctx, 1)
+		defer s.sem.Release(1)
 
 		s.activeTasks.Inc()
 		s.waitingTasks.Dec()
 
-		// The only situation in which we can't acquire a slot is during shutdown. In that case we can just return
-		// without worrying about any of the counters since we're going away soon.
-		if !acquired {
-			return
-		}
 		continuations := task()
 		s.activeTasks.Dec()
 

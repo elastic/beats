@@ -39,13 +39,13 @@ func tarawaTime() *time.Location {
 
 func TestNew(t *testing.T) {
 	scheduler := New(123)
-	assert.Equal(t, uint(123), scheduler.limit)
+	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, time.Local, scheduler.location)
 }
 
 func TestNewWithLocation(t *testing.T) {
 	scheduler := NewWithLocation(123, tarawaTime())
-	assert.Equal(t, uint(123), scheduler.limit)
+	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, tarawaTime(), scheduler.location)
 }
 
