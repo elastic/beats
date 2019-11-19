@@ -3,20 +3,27 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "AvailabilityZone": "us-east-1c"
+                "LoadBalancerName": "tf-lb-20171218185946539900000004"
             },
             "namespace": "AWS/ELB"
         },
         "metrics": {
-            "BackendConnectionErrors": {
-                "sum": 10
+            "EstimatedALBActiveConnectionCount": {
+                "avg": 2.6
             },
-            "HealthyHostCount": {
-                "max": 2
+            "EstimatedALBConsumedLCUs": {
+                "avg": 0.000015000000000000002
             },
-            "UnHealthyHostCount": {
-                "max": 1
+            "EstimatedALBNewConnectionCount": {
+                "avg": 0
+            },
+            "EstimatedProcessedBytes": {
+                "avg": 237.6
             }
+        },
+        "tags": {
+            "Name": "logstash",
+            "owner": "logstash"
         }
     },
     "cloud": {

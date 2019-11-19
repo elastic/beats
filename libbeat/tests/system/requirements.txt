@@ -27,6 +27,6 @@ termcolor==1.1.0
 texttable==0.9.1
 urllib3==1.24.2
 websocket-client==0.47.0
-parameterized==0.6.1
+parameterized==0.7.0
 jsondiff==1.1.2
 semver==2.8.1

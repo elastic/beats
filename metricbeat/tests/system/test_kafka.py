@@ -8,6 +8,7 @@ from nose.plugins.skip import SkipTest
 class KafkaTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['kafka']
     COMPOSE_ADVERTISED_HOST = True
+    COMPOSE_ADVERTISED_PORT = "9092/tcp"
 
     VERSION = "2.0.0"
 
@@ -56,6 +57,10 @@ class KafkaTest(metricbeat.BaseTest):
             sasl_plain_password=self.PRODUCER_PASSWORD,
             retries=20, retry_backoff_ms=500)
         producer.send('foobar', b'some_message_bytes')
+
+    @classmethod
+    def get_hosts(cls):
+        return [cls.compose_host(port=cls.COMPOSE_ADVERTISED_PORT)]
 
 
 class Kafka_1_1_0_Test(KafkaTest):
