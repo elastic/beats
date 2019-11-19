@@ -63,6 +63,7 @@ class ActiveMqTest(XPackTest):
                 assert 0 < evt['activemq'][destination_type]['messages']['size']['avg']
                 if 'queue' == destination_type:
                     assert 0 < evt['activemq'][destination_type]['size']
+                self.assert_fields_are_documented(evt)
                 passed = True
 
         conn.disconnect()
@@ -83,6 +84,7 @@ class ActiveMqTest(XPackTest):
             assert 'pct' in evt['activemq']['broker']['memory']['broker']
             assert 'count' in evt['activemq']['broker']['producers']
             assert 'count' in evt['activemq']['broker']['consumers']
+            self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_queue_metrics_collected(self):
