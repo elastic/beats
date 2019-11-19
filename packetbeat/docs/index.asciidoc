@@ -22,6 +22,10 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :linux_os:
 :docker_platform:
 :win_os:
+:no_decode_cef_processor:
+:no_decode_csv_fields_processor:
+:no_script_processor:
+:no_timestamp_processor:
 
 include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
