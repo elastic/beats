@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -32,8 +33,6 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-type taskCanceller func() error
-
 // configuredJob represents a job combined with its config and any
 // subsequent processors.
 type configuredJob struct {
@@ -41,7 +40,7 @@ type configuredJob struct {
 	config     jobConfig
 	monitor    *Monitor
 	processors *processors.Processors
-	cancelFn   taskCanceller
+	cancelFn   context.CancelFunc
 	client     beat.Client
 }
 

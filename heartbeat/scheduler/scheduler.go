@@ -24,11 +24,12 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/semaphore"
+
 	"github.com/elastic/beats/heartbeat/hbregistry"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -55,7 +56,6 @@ var waitingTasksGauge = monitoring.NewUint(gaugesRegistry, "tasks.waiting")
 type Scheduler struct {
 	limit int64
 	state atomic.Int
-	done  chan int
 
 	location *time.Location
 
@@ -66,8 +66,9 @@ type Scheduler struct {
 	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
 	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 
-	ctx context.Context
-	sem *semaphore.Weighted
+	ctx       context.Context
+	cancelCtx context.CancelFunc
+	sem       *semaphore.Weighted
 }
 
 type Canceller func() error
@@ -121,20 +122,19 @@ func New(limit int64) *Scheduler {
 func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 	stateInitial := statePreRunning
 
+	ctx, cancelCtx := context.WithCancel(context.Background())
 	sched := &Scheduler{
-		limit:    limit,
-		location: location,
-
-		state: atomic.MakeInt(stateInitial),
-		done:  make(chan int),
+		limit:     limit,
+		location:  location,
+		state:     atomic.MakeInt(stateInitial),
+		ctx:       ctx,
+		cancelCtx: cancelCtx,
+		sem:       semaphore.NewWeighted(int64(limit)),
 
 		activeJobs:         activeJobsGauge,
 		activeTasks:        activeTasksGauge,
 		waitingTasks:       waitingTasksGauge,
 		jobsMissedDeadline: jobsMissedDeadlineCounter,
-
-		ctx: context.Background(),
-		sem: semaphore.NewWeighted(int64(limit)),
 	}
 
 	// Block the semaphore initially
@@ -163,7 +163,7 @@ func (s *Scheduler) Start() error {
 		missedAtLastCheck := uint64(0)
 		for {
 			select {
-			case <-s.done:
+			case <-s.ctx.Done():
 				t.Stop()
 				return
 			case <-t.C:
@@ -183,8 +183,7 @@ func (s *Scheduler) Start() error {
 // Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
 func (s *Scheduler) Stop() error {
 	if s.state.CAS(stateRunning, stateStopped) {
-		close(s.done)
-		s.ctx.Done()
+		s.cancelCtx()
 		return nil
 	} else if s.state.Load() == stateStopped {
 		return nil
@@ -199,21 +198,12 @@ var ErrAlreadyStopped = errors.New("attempted to add job to already stopped sche
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn func() error, err error) {
+func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn context.CancelFunc, err error) {
 	if s.state.Load() == stateStopped {
 		return nil, ErrAlreadyStopped
 	}
 
-	removeOnce := sync.Once{}
-	removeCh := make(chan bool)
-	removeFn = func() error {
-		// Safely close the channel exactly once
-		// Clients may invoke this function multiple times
-		removeOnce.Do(func() {
-			close(removeCh)
-		})
-		return nil
-	}
+	jobCtx, jobCtxCancel := context.WithCancel(s.ctx)
 
 	var timer *time.Timer
 	go func() {
@@ -265,13 +255,13 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 				// For cron scheduling this does nothing since cron schedules run at exact times.
 				lastRanAt = time.Now()
 				s.runOnce(id, entrypoint)
-			case <-removeCh:
+			case <-jobCtx.Done():
 				return
 			}
 		}
 	}()
 
-	return removeFn, nil
+	return jobCtxCancel, nil
 }
 
 // runOnce runs a TaskFunc and its continuations once.
@@ -301,6 +291,14 @@ func (s *Scheduler) runRecursive(wg sync.WaitGroup, task TaskFunc) {
 	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
 	s.sem.Acquire(s.ctx, 1)
 	defer s.sem.Release(1)
+
+	// Check if the scheduler has been shut down. If so, exit early
+	select {
+	case <-s.ctx.Done():
+		return
+	default:
+		// proceed normally
+	}
 
 	s.activeTasks.Inc()
 	s.waitingTasks.Dec()

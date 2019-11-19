@@ -18,6 +18,8 @@
 package scheduler
 
 import (
+	"context"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -89,13 +91,20 @@ func TestScheduler_Start(t *testing.T) {
 
 	removedEvents := uint32(1)
 	// This function will be removed after being invoked once
-	var remove func() error
-	// Attempt to execute this twice to see if remove() had any effect
-	remove, err := s.Add(instantSchedule{}, "removed", testTaskTimes(removedEvents+1, func() {
+	removeMtx := sync.Mutex{}
+	var remove context.CancelFunc
+	testFn := func() {
 		executed <- "removed"
+		removeMtx.Lock()
 		remove()
-	}))
+		removeMtx.Unlock()
+	}
+	// Attempt to execute this twice to see if remove() had any effect
+	removeMtx.Lock()
+	remove, err := s.Add(instantSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn))
 	require.NoError(t, err)
+	require.NotNil(t, remove)
+	removeMtx.Unlock()
 
 	s.Start()
 
