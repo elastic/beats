@@ -24,12 +24,11 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/sync/semaphore"
-
 	"github.com/elastic/beats/heartbeat/hbregistry"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -37,6 +36,9 @@ const (
 	stateRunning
 	stateStopped
 )
+
+// InvalidTransitionError is returned from start/stop when making an invalid state transition, say from preRunning to stopped
+var InvalidTransitionError = fmt.Errorf("invalid state transition")
 
 // countersRegistry is for tracking scheduler counters, confusingly known as 'stats' elsewhere in the stack.
 var countersRegistry = hbregistry.StatsRegistry.NewRegistry("scheduler")
@@ -144,7 +146,7 @@ func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 func (s *Scheduler) Start() error {
 	s.state.CAS(statePreRunning, stateRunning)
 	if s.state.Load() == stateStopped {
-		return fmt.Errorf("Cannot start a stopped scheduler!")
+		return InvalidTransitionError
 	} else if s.state.Load() == stateRunning {
 		return nil
 	}
@@ -165,10 +167,6 @@ func (s *Scheduler) Start() error {
 				t.Stop()
 				return
 			case <-t.C:
-				// Take a snapshot of items that have missed the deadline.
-				// We only need to mutex long enough to do this. Since maps are reference types we can
-				// do this through assignment
-
 				missingNow := s.jobsMissedDeadline.Get()
 				missedDelta := missingNow - missedAtLastCheck
 				if missedDelta > 0 {
@@ -184,14 +182,15 @@ func (s *Scheduler) Start() error {
 
 // Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
 func (s *Scheduler) Stop() error {
-	if s.state.Load() == stateStopped {
-		return nil
-	} else if s.state.CAS(stateRunning, stateStopped) {
+	if s.state.CAS(stateRunning, stateStopped) {
 		close(s.done)
 		s.ctx.Done()
+		return nil
+	} else if s.state.Load() == stateStopped {
+		return nil
 	}
 
-	return nil
+	return InvalidTransitionError
 }
 
 // ErrAlreadyStopped is returned when an Add operation is attempted after the scheduler
@@ -205,14 +204,14 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		return nil, ErrAlreadyStopped
 	}
 
-	removed := atomic.MakeBool(false)
+	removeOnce := sync.Once{}
 	removeCh := make(chan bool)
 	removeFn = func() error {
 		// Safely close the channel exactly once
 		// Clients may invoke this function multiple times
-		if removed.CAS(false, true) {
+		removeOnce.Do(func() {
 			close(removeCh)
-		}
+		})
 		return nil
 	}
 
@@ -278,37 +277,38 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 // runOnce runs a TaskFunc and its continuations once.
 func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 	// Since we run all continuations asynchronously we use a wait group to block until we're done.
-	wg := sync.WaitGroup{}
-
-	// Since task funcs can emit continuations recursively we need a function to execute
-	// recursively. We declare the function variable before definition to allow for recursion.
-	var runRecursive func(task TaskFunc)
-	runRecursive = func(task TaskFunc) {
-		wg.Add(1)
-		defer wg.Done()
-
-		// The accounting for waiting/active tasks is done using atomics.
-		// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
-		s.waitingTasks.Inc()
-
-		// Acquire an execution slot in keeping with heartbeat.scheduler.limit
-		s.sem.Acquire(s.ctx, 1)
-		defer s.sem.Release(1)
-
-		s.activeTasks.Inc()
-		s.waitingTasks.Dec()
-
-		continuations := task()
-		s.activeTasks.Dec()
-
-		for _, cont := range continuations {
-			go runRecursive(cont) // Run continuations in parallel, note that these each will acquire their own slots
-		}
-	}
+	var wg sync.WaitGroup
 
 	s.activeJobs.Inc()
-	runRecursive(entrypoint)
+	s.runRecursive(wg, entrypoint)
 
 	wg.Wait()
 	s.activeJobs.Dec()
+}
+
+// runRecursive runs a task and its continuations until none are left with as much parallelism as possible.
+// Since task funcs can emit continuations recursively we need a function to execute
+// recursively. We declare the function variable before definition to allow for recursion.
+// The given wait group is
+func (s *Scheduler) runRecursive(wg sync.WaitGroup, task TaskFunc) {
+	wg.Add(1)
+	defer wg.Done()
+
+	// The accounting for waiting/active tasks is done using atomics.
+	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
+	s.waitingTasks.Inc()
+
+	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
+	s.sem.Acquire(s.ctx, 1)
+	defer s.sem.Release(1)
+
+	s.activeTasks.Inc()
+	s.waitingTasks.Dec()
+
+	continuations := task()
+	s.activeTasks.Dec()
+
+	for _, cont := range continuations {
+		go s.runRecursive(wg, cont) // Run continuations in parallel, note that these each will acquire their own slots
+	}
 }
