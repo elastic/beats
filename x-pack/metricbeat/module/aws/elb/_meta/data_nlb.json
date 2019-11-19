@@ -3,27 +3,32 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "LoadBalancerName": "tf-lb-20171218185946539900000004"
+                "LoadBalancer": "net/filebeat-aws-elb-test-tcp-lb/d194184ba08f017f"
             },
-            "namespace": "AWS/ELB"
+            "namespace": "AWS/NetworkELB"
         },
         "metrics": {
-            "EstimatedALBActiveConnectionCount": {
-                "avg": 2.6
-            },
-            "EstimatedALBConsumedLCUs": {
-                "avg": 0.000015000000000000002
-            },
-            "EstimatedALBNewConnectionCount": {
+            "ActiveFlowCount": {
                 "avg": 0
             },
-            "EstimatedProcessedBytes": {
-                "avg": 237.6
+            "ConsumedLCUs": {
+                "avg": 0
+            },
+            "NewFlowCount": {
+                "sum": 0
+            },
+            "ProcessedBytes": {
+                "sum": 336
+            },
+            "TCP_Client_Reset_Count": {
+                "sum": 0
+            },
+            "TCP_ELB_Reset_Count": {
+                "sum": 0
+            },
+            "TCP_Target_Reset_Count": {
+                "sum": 0
             }
-        },
-        "tags": {
-            "Name": "logstash",
-            "owner": "logstash"
         }
     },
     "cloud": {
@@ -32,7 +37,7 @@
             "name": "elastic-test"
         },
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "ap-southeast-1"
     },
     "event": {
         "dataset": "aws.elb",
