@@ -2,6 +2,7 @@ from xpack_metricbeat import XPackTest
 import metricbeat
 import unittest
 
+
 class ActiveMqTest(XPackTest):
     COMPOSE_SERVICES = ['activemq']
 
