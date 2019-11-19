@@ -51,7 +51,6 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(update.Update)
-
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
