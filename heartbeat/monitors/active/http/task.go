@@ -29,6 +29,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/useragent"
+
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
@@ -39,6 +41,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
+
+var userAgent = useragent.UserAgent("Heartbeat")
 
 func newHTTPMonitorHostJob(
 	addr string,
@@ -197,6 +201,9 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 		}
 
 		request.Header.Add(k, v)
+	}
+	if ua := request.Header.Get("User-Agent"); ua == "" {
+		request.Header.Set("User-Agent", userAgent)
 	}
 
 	if enc != nil {

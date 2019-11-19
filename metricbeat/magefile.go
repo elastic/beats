@@ -51,7 +51,6 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(update.Update)
-
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
@@ -89,6 +88,12 @@ func Dashboards() error {
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
+}
+
+// Imports generates an include/list_{suffix}.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	return metricbeat.GenerateOSSMetricbeatModuleIncludeListGo()
 }
 
 func configYML() error {

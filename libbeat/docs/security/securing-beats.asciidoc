@@ -13,7 +13,11 @@ If you want {beatname_uc} to connect to a cluster that has
 . <<feature-roles>>.
 +
 You can use role-based access control to grant {beatname_uc} users access to
-secured resources. 
+secured resources.
+
+. <<beats-api-keys>>.
++
+You can use API keys to grant access to {es} more securely.
 
 . <<beats-basic-auth>>.
 +
@@ -29,6 +33,8 @@ For more information about {security-features}, see
 {ref}/secure-cluster.html[Secure a cluster].
 
 include::users.asciidoc[]
+
+include::api-keys.asciidoc[]
 
 include::basic-auth.asciidoc[]
 
