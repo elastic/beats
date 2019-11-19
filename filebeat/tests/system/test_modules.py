@@ -255,6 +255,7 @@ def clean_keys(obj):
         if "aws.vpcflow.end" not in obj:
             delete_key(obj, "@timestamp")
 
+
 def delete_key(obj, key):
     if key in obj:
         del obj[key]
