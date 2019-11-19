@@ -1,4 +1,4 @@
-Filebeat module for AWS VPC
+Filebeat module for AWS VPC Logs
 ===
 
 Module for the AWS virtual private cloud(VPC) logs which captures information 
@@ -30,7 +30,7 @@ previous step.
 ```
 filebeat.modules:
 - module: aws
-  vpc:
+  vpcflow:
     enabled: true
     var.queue_url: <queue url>
     var.credential_profile_name: <profile name>

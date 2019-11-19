@@ -96,7 +96,7 @@ filebeat.modules:
     # Profile name for aws credential
     #var.credential_profile_name: fb-aws
 
-  vpc:
+  vpcflow:
     enabled: false
 
     # AWS SQS queue url

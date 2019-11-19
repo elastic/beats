@@ -25,13 +25,13 @@ processors:
             event.Put("@metadata.message_token_count", tokens);
         }
 
-  # Default vpc log format
+  # Default vpc flow log format
   - dissect:
       when:
         equals:
           '@metadata.message_token_count': 14
       field: message
-      target_prefix: aws.vpc
+      target_prefix: aws.vpcflow
       tokenizer: '%{version} %{account_id} %{interface_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{packets} %{bytes} %{start} %{end} %{action} %{log_status}'
 
   # Custom flow log for traffic through a NAT gateway
@@ -40,7 +40,7 @@ processors:
         equals:
           '@metadata.message_token_count': 6
       field: message
-      target_prefix: aws.vpc
+      target_prefix: aws.vpcflow
       tokenizer: '%{instance_id} %{interface_id} %{srcaddr} %{dstaddr} %{pkt_srcaddr} %{pkt_dstaddr}'
 
   # Custom flow log for traffic through a transit gateway
@@ -49,33 +49,33 @@ processors:
         equals:
           '@metadata.message_token_count': 17
       field: message
-      target_prefix: aws.vpc
+      target_prefix: aws.vpcflow
       tokenizer: '%{version} %{interface_id} %{account_id} %{vpc_id} %{subnet_id} %{instance_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{tcp_flags} %{type} %{pkt_srcaddr} %{pkt_dstaddr} %{action} %{log_status}'
 
   - convert:
       ignore_missing: true
       fields:
-        - {from: aws.vpc.srcaddr, to: source.address}
-        - {from: aws.vpc.srcaddr, to: source.ip, type: ip}
-        - {from: aws.vpc.srcport, to: source.port, type: long}
-        - {from: aws.vpc.dstaddr, to: destination.address}
-        - {from: aws.vpc.dstaddr, to: destination.ip, type: ip}
-        - {from: aws.vpc.dstport, to: destination.port, type: long}
-        - {from: aws.vpc.protocol, to: network.iana_number, type: string}
-        - {from: aws.vpc.packets, to: source.packets, type: long}
-        - {from: aws.vpc.bytes, to: source.bytes, type: long}
-        - {from: aws.vpc.packets, to: network.packets, type: long}
-        - {from: aws.vpc.bytes, to: network.bytes, type: long}
+        - {from: aws.vpcflow.srcaddr, to: source.address}
+        - {from: aws.vpcflow.srcaddr, to: source.ip, type: ip}
+        - {from: aws.vpcflow.srcport, to: source.port, type: long}
+        - {from: aws.vpcflow.dstaddr, to: destination.address}
+        - {from: aws.vpcflow.dstaddr, to: destination.ip, type: ip}
+        - {from: aws.vpcflow.dstport, to: destination.port, type: long}
+        - {from: aws.vpcflow.protocol, to: network.iana_number, type: string}
+        - {from: aws.vpcflow.packets, to: source.packets, type: long}
+        - {from: aws.vpcflow.bytes, to: source.bytes, type: long}
+        - {from: aws.vpcflow.packets, to: network.packets, type: long}
+        - {from: aws.vpcflow.bytes, to: network.bytes, type: long}
 
   - community_id: ~
 
-  # Use the aws.vpc.action value to set the event.outcome value to either "allow" or "deny".
+  # Use the aws.vpcflow.action value to set the event.outcome value to either "allow" or "deny".
   - add_fields:
-      when.equals.aws.vpc.action: ACCEPT
+      when.equals.aws.vpcflow.action: ACCEPT
       target: event
       fields: {outcome: allow}
   - add_fields:
-      when.equals.aws.vpc.action: REJECT
+      when.equals.aws.vpcflow.action: REJECT
       target: event
       fields: {outcome: deny}
 

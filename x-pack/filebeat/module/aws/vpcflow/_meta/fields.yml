@@ -1,4 +1,4 @@
-- name: vpc
+- name: vpcflow
   type: group
   description: >
     Fields for AWS VPC flow logs.

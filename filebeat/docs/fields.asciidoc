@@ -1490,13 +1490,13 @@ type: keyword
 --
 
 [float]
-=== vpc
+=== vpcflow
 
 Fields for AWS VPC flow logs.
 
 
 
-*`aws.vpc.version`*::
+*`aws.vpcflow.version`*::
 +
 --
 The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.
@@ -1506,7 +1506,7 @@ type: keyword
 
 --
 
-*`aws.vpc.account_id`*::
+*`aws.vpcflow.account_id`*::
 +
 --
 The AWS account ID for the flow log.
@@ -1516,7 +1516,7 @@ type: keyword
 
 --
 
-*`aws.vpc.interface_id`*::
+*`aws.vpcflow.interface_id`*::
 +
 --
 The ID of the network interface for which the traffic is recorded.
@@ -1526,7 +1526,7 @@ type: keyword
 
 --
 
-*`aws.vpc.srcaddr`*::
+*`aws.vpcflow.srcaddr`*::
 +
 --
 The source address for incoming traffic, or the IPv4 or IPv6 address of the network interface for outgoing traffic on the network interface.
@@ -1536,7 +1536,7 @@ type: ip
 
 --
 
-*`aws.vpc.dstaddr`*::
+*`aws.vpcflow.dstaddr`*::
 +
 --
 The destination address for outgoing traffic, or the IPv4 or IPv6 address of the network interface for incoming traffic on the network interface.
@@ -1546,7 +1546,7 @@ type: ip
 
 --
 
-*`aws.vpc.srcport`*::
+*`aws.vpcflow.srcport`*::
 +
 --
 The source port of the traffic.
@@ -1556,7 +1556,7 @@ type: long
 
 --
 
-*`aws.vpc.dstport`*::
+*`aws.vpcflow.dstport`*::
 +
 --
 The destination port of the traffic.
@@ -1566,7 +1566,7 @@ type: long
 
 --
 
-*`aws.vpc.protocol`*::
+*`aws.vpcflow.protocol`*::
 +
 --
 The IANA protocol number of the traffic.
@@ -1576,7 +1576,7 @@ type: long
 
 --
 
-*`aws.vpc.packets`*::
+*`aws.vpcflow.packets`*::
 +
 --
 The number of packets transferred during the flow.
@@ -1586,7 +1586,7 @@ type: long
 
 --
 
-*`aws.vpc.bytes`*::
+*`aws.vpcflow.bytes`*::
 +
 --
 The number of bytes transferred during the flow.
@@ -1596,7 +1596,7 @@ type: long
 
 --
 
-*`aws.vpc.start`*::
+*`aws.vpcflow.start`*::
 +
 --
 The time, in Unix seconds, of the start of the flow.
@@ -1606,7 +1606,7 @@ type: long
 
 --
 
-*`aws.vpc.end`*::
+*`aws.vpcflow.end`*::
 +
 --
 The time, in Unix seconds, of the end of the flow.
@@ -1616,7 +1616,7 @@ type: long
 
 --
 
-*`aws.vpc.action`*::
+*`aws.vpcflow.action`*::
 +
 --
 The action that is associated with the traffic, ACCEPT or REJECT.
@@ -1626,7 +1626,7 @@ type: keyword
 
 --
 
-*`aws.vpc.log_status`*::
+*`aws.vpcflow.log_status`*::
 +
 --
 The logging status of the flow log, OK, NODATA or SKIPDATA.
@@ -1636,7 +1636,7 @@ type: keyword
 
 --
 
-*`aws.vpc.instance_id`*::
+*`aws.vpcflow.instance_id`*::
 +
 --
 The ID of the instance that's associated with network interface for which the traffic is recorded, if the instance is owned by you.
@@ -1646,7 +1646,7 @@ type: keyword
 
 --
 
-*`aws.vpc.pkt_srcaddr`*::
+*`aws.vpcflow.pkt_srcaddr`*::
 +
 --
 The packet-level (original) source IP address of the traffic.
@@ -1656,7 +1656,7 @@ type: ip
 
 --
 
-*`aws.vpc.pkt_dstaddr`*::
+*`aws.vpcflow.pkt_dstaddr`*::
 +
 --
 The packet-level (original) destination IP address for the traffic.
@@ -1666,7 +1666,7 @@ type: ip
 
 --
 
-*`aws.vpc.vpc_id`*::
+*`aws.vpcflow.vpc_id`*::
 +
 --
 The ID of the VPC that contains the network interface for which the traffic is recorded.
@@ -1676,7 +1676,7 @@ type: keyword
 
 --
 
-*`aws.vpc.subnet_id`*::
+*`aws.vpcflow.subnet_id`*::
 +
 --
 The ID of the subnet that contains the network interface for which the traffic is recorded.
@@ -1686,7 +1686,7 @@ type: keyword
 
 --
 
-*`aws.vpc.tcp_flags`*::
+*`aws.vpcflow.tcp_flags`*::
 +
 --
 The bitmask value for the following TCP flags: 2=SYN,18=SYN-ACK,1=FIN,4=RST
@@ -1696,7 +1696,7 @@ type: keyword
 
 --
 
-*`aws.vpc.type`*::
+*`aws.vpcflow.type`*::
 +
 --
 The type of traffic: IPv4, IPv6, or EFA.
