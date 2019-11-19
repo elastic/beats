@@ -1636,6 +1636,76 @@ type: keyword
 
 --
 
+*`aws.vpc.instance_id`*::
++
+--
+The ID of the instance that's associated with network interface for which the traffic is recorded, if the instance is owned by you.
+
+
+type: keyword
+
+--
+
+*`aws.vpc.pkt_srcaddr`*::
++
+--
+The packet-level (original) source IP address of the traffic.
+
+
+type: ip
+
+--
+
+*`aws.vpc.pkt_dstaddr`*::
++
+--
+The packet-level (original) destination IP address for the traffic.
+
+
+type: ip
+
+--
+
+*`aws.vpc.vpc_id`*::
++
+--
+The ID of the VPC that contains the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpc.subnet_id`*::
++
+--
+The ID of the subnet that contains the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpc.tcp_flags`*::
++
+--
+The bitmask value for the following TCP flags: 2=SYN,18=SYN-ACK,1=FIN,4=RST
+
+
+type: keyword
+
+--
+
+*`aws.vpc.type`*::
++
+--
+The type of traffic: IPv4, IPv6, or EFA.
+
+
+type: keyword
+
+--
+
 [[exported-fields-azure]]
 == Azure fields
 
