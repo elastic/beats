@@ -1,0 +1,56 @@
+[
+    {
+        "@timestamp": "2019-11-19T19:22:42.733Z",
+        "aws.vpc.dstaddr": "10.0.0.220",
+        "aws.vpc.instance_id": "-",
+        "aws.vpc.interface_id": "eni-1235b8ca123456789",
+        "aws.vpc.pkt_dstaddr": "203.0.113.5",
+        "aws.vpc.pkt_srcaddr": "10.0.1.5",
+        "aws.vpc.srcaddr": "10.0.1.5",
+        "destination.address": "10.0.0.220",
+        "destination.ip": "10.0.0.220",
+        "event.category": "network_traffic",
+        "event.dataset": "aws.vpc",
+        "event.module": "aws",
+        "event.original": "- eni-1235b8ca123456789 10.0.1.5 10.0.0.220 10.0.1.5 203.0.113.5",
+        "event.type": "flow",
+        "fileset.name": "vpc",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.0.1.5",
+            "10.0.0.220"
+        ],
+        "service.type": "aws",
+        "source.address": "10.0.1.5",
+        "source.ip": "10.0.1.5"
+    },
+    {
+        "@timestamp": "2019-11-19T19:22:42.745Z",
+        "aws.vpc.dstaddr": "203.0.113.5",
+        "aws.vpc.instance_id": "i-01234567890123456",
+        "aws.vpc.interface_id": "eni-1111aaaa2222bbbb3",
+        "aws.vpc.pkt_dstaddr": "203.0.113.5",
+        "aws.vpc.pkt_srcaddr": "10.0.1.5",
+        "aws.vpc.srcaddr": "10.0.1.5",
+        "destination.address": "203.0.113.5",
+        "destination.ip": "203.0.113.5",
+        "event.category": "network_traffic",
+        "event.dataset": "aws.vpc",
+        "event.module": "aws",
+        "event.original": "i-01234567890123456 eni-1111aaaa2222bbbb3 10.0.1.5 203.0.113.5 10.0.1.5 203.0.113.5",
+        "event.type": "flow",
+        "fileset.name": "vpc",
+        "input.type": "log",
+        "log.offset": 65,
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.0.1.5",
+            "203.0.113.5"
+        ],
+        "service.type": "aws",
+        "source.address": "10.0.1.5",
+        "source.ip": "10.0.1.5"
+    }
+]

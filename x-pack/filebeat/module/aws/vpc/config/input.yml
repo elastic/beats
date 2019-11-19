@@ -16,10 +16,24 @@ exclude_files: [".gz$"]
 {{ end }}
 
 processors:
+  # Custom flow log for traffic through a transit gateway
+  - dissect:
+      field: message
+      target_prefix: aws.vpc
+      tokenizer: '%{version} %{interface_id} %{account_id} %{vpc_id} %{subnet_id} %{instance_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{tcp_flags} %{type} %{pkt_srcaddr} %{pkt_dstaddr} %{action} %{log_status}'
+
+  # Default vpc log format
   - dissect:
       field: message
       target_prefix: aws.vpc
       tokenizer: '%{version} %{account_id} %{interface_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{packets} %{bytes} %{start} %{end} %{action} %{log_status}'
+
+  # Custom flow log for traffic through a NAT gateway
+  - dissect:
+      field: message
+      target_prefix: aws.vpc
+      tokenizer: '%{instance_id} %{interface_id} %{srcaddr} %{dstaddr} %{pkt_srcaddr} %{pkt_dstaddr}'
+
   - convert:
       ignore_missing: true
       fields:
