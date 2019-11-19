@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -120,16 +121,19 @@ func New(limit int64) *Scheduler {
 
 // NewWithLocation creates a new Scheduler using the given time zone.
 func NewWithLocation(limit int64, location *time.Location) *Scheduler {
-	stateInitial := statePreRunning
-
 	ctx, cancelCtx := context.WithCancel(context.Background())
+
+	if limit < 1 {
+		limit = math.MaxInt64
+	}
+
 	sched := &Scheduler{
 		limit:     limit,
 		location:  location,
-		state:     atomic.MakeInt(stateInitial),
+		state:     atomic.MakeInt(statePreRunning),
 		ctx:       ctx,
 		cancelCtx: cancelCtx,
-		sem:       semaphore.NewWeighted(int64(limit)),
+		sem:       semaphore.NewWeighted(limit),
 
 		activeJobs:         activeJobsGauge,
 		activeTasks:        activeTasksGauge,
@@ -138,46 +142,49 @@ func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 	}
 
 	// Block the semaphore initially
+	sched.sem.Acquire(sched.ctx, limit)
 
 	return sched
 }
 
 // Start the scheduler. Starting a stopped scheduler returns an error.
 func (s *Scheduler) Start() error {
-	s.state.CAS(statePreRunning, stateRunning)
 	if s.state.Load() == stateStopped {
 		return InvalidTransitionError
-	} else if s.state.Load() == stateRunning {
+	} else if !s.state.CAS(statePreRunning, stateRunning) {
+		// We already were running, so just return nil and do nothing.
 		return nil
 	}
 
 	s.sem.Release(s.limit)
 
-	interval := time.Second * 10
-
 	// Missed deadline reporter
-	go func() {
-		t := time.NewTicker(interval)
-
-		// Counter used to check if we're missing more checks now than before
-		missedAtLastCheck := uint64(0)
-		for {
-			select {
-			case <-s.ctx.Done():
-				t.Stop()
-				return
-			case <-t.C:
-				missingNow := s.jobsMissedDeadline.Get()
-				missedDelta := missingNow - missedAtLastCheck
-				if missedDelta > 0 {
-					logp.Warn("%d tasks have missed their schedule deadlines in the last %s.", missedDelta, interval)
-				}
-				missedAtLastCheck = missingNow
-			}
-		}
-	}()
+	go s.missedDeadlineReporter()
 
 	return nil
+}
+
+func (s *Scheduler) missedDeadlineReporter() {
+	interval := time.Second * 10
+
+	t := time.NewTicker(interval)
+
+	// Counter used to check if we're missing more checks now than before
+	missedAtLastCheck := uint64(0)
+	for {
+		select {
+		case <-s.ctx.Done():
+			t.Stop()
+			return
+		case <-t.C:
+			missingNow := s.jobsMissedDeadline.Get()
+			missedDelta := missingNow - missedAtLastCheck
+			if missedDelta > 0 {
+				logp.Warn("%d tasks have missed their schedule deadlines in the last %s.", missedDelta, interval)
+			}
+			missedAtLastCheck = missingNow
+		}
+	}
 }
 
 // Stop all executing tasks in the scheduler. Cannot be restarted after Stop.
