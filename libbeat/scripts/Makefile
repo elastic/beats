@@ -178,7 +178,6 @@ unit-tests: prepare-tests
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
-	go test ${GOPACKAGES}
 	go test $(RACE) ${GOPACKAGES}
 
 .PHONY: integration-tests
