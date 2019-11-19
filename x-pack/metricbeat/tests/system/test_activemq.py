@@ -24,16 +24,7 @@ class ActiveMqTest(XPackTest):
         }
 
     def get_stomp_host_port(self):
-        container = self.compose_project().containers(service_names=['activemq'])[0]
-        info = container.inspect()
-        portsConfig = info['HostConfig']['PortBindings']
-        port = portsConfig.keys()[1]
-
-        if sys.platform.startswith('linux'):
-            host_port = self._private_host(info, port)
-        else:
-            host_port = self._exposed_host(info, port)
-
+        host_port = self.compose_host(port='61613/tcp')
         s = host_port.split(':')
         return s[0], int(s[1])
 
