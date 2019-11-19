@@ -47,14 +47,17 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        self.get_log()
         self.wait_log_contains(
             "Shutdown output timer started.",
             max_timeout=15)
 
-        self.wait_log_contains(
-            "Continue shutdown: All enqueued events being published.",
-            max_timeout=15)
+        try:
+            self.wait_log_contains(
+                "Continue shutdown: All enqueued events being published.",
+                max_timeout=15)
+        except:
+            print self.get_log()
+            raise
 
         # validate registry entry offset matches last published event
         registry = self.get_registry()
