@@ -1,4 +1,4 @@
-// TODO: Create script that generates this file. Condiitional coding needs to
+// TODO: Create script that generates this file. Conditional coding needs to
 // be preserved.
 
 //# tag::processors-list[]
@@ -15,10 +15,10 @@
 * <<community-id,`community_id`>>
 * <<convert,`convert`>>
 * <<decode-base64-field,`decode_base64_field`>>
-ifdef::has_decode_cef_processor[]
+ifndef::no_decode_cef_processor[]
 * <<processor-decode-cef,`decode_cef`>>
 endif::[]
-ifdef::has_decode_csv_fields_processor[]
+ifndef::no_decode_csv_fields_processor[]
 * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
 * <<decode-json-fields,`decode_json_fields`>>
@@ -31,10 +31,10 @@ endif::[]
 * <<include-fields,`include_fields`>>
 * <<processor-registered-domain,`registered_domain`>>
 * <<rename-fields,`rename`>>
-ifdef::has_script_processor[]
+ifndef::no_script_processor[]
 * <<processor-script,`script`>>
 endif::[]
-ifdef::has_timestamp_processor[]
+ifndef::no_timestamp_processor[]
 * <<processor-timestamp,`timestamp`>>
 endif::[]
 //# end::processors-list[]
@@ -53,10 +53,10 @@ include::{libbeat-processors-dir}/actions/docs/add_tags.asciidoc[]
 include::{libbeat-processors-dir}/communityid/docs/communityid.asciidoc[]
 include::{libbeat-processors-dir}/convert/docs/convert.asciidoc[]
 include::{libbeat-processors-dir}/actions/docs/decode_base64_field.asciidoc[]
-ifdef::has_decode_cef_processor[]
+ifndef::no_decode_cef_processor[]
 include::{x-filebeat-processors-dir}/decode_cef/docs/decode_cef.asciidoc[]
 endif::[]
-ifdef::has_decode_csv_fields_processor[]
+ifndef::no_decode_csv_fields_processor[]
 include::{libbeat-processors-dir}/decode_csv_fields/docs/decode_csv_fields.asciidoc[]
 endif::[]
 include::{libbeat-processors-dir}/actions/docs/decode_json_fields.asciidoc[]
@@ -70,10 +70,10 @@ include::{libbeat-processors-dir}/fingerprint/docs/fingerprint.asciidoc[]
 include::{libbeat-processors-dir}/actions/docs/include_fields.asciidoc[]
 include::{libbeat-processors-dir}/registered_domain/docs/registered_domain.asciidoc[]
 include::{libbeat-processors-dir}/actions/docs/rename.asciidoc[]
-ifdef::has_script_processor[]
+ifndef::no_script_processor[]
 include::{libbeat-processors-dir}/script/docs/script.asciidoc[]
 endif::[]
-ifdef::has_timestamp_processor[]
+ifndef::no_timestamp_processor[]
 include::{libbeat-processors-dir}/timestamp/docs/timestamp.asciidoc[]
 endif::[]
 
