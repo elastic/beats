@@ -14,6 +14,8 @@ The module has transformations for the following event IDs:
 * 4647 - User initiated logoff (interactive logon types).
 * 4648 - A logon was attempted using explicit credentials.
 * 4672 - Special privileges assigned to new logon.
+* 4688 - A new process has been created.
+* 4689 - A process has exited.
 * 4720 - A user account was created.
 * 4722 - A user account was enabled.
 * 4723 - An attempt was made to change an account's password.

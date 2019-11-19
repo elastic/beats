@@ -24,6 +24,8 @@ var security = (function () {
         "4625": "logon-failed",
         "4634": "logged-out",
         "4672": "logged-in-special",
+        "4688": "created-process",
+        "4689": "exited-process",
         "4720": "added-user-account",
         "4722": "enabled-user-account",
         "4723": "changed-password",
@@ -1197,7 +1199,7 @@ var security = (function () {
             fields: [
                 {from: "winlog.event_data.NewProcessId", to: "process.pid", type: "long"},
                 {from: "winlog.event_data.NewProcessName", to: "process.executable"},
-		{from: "winlog.event_data.ParentProcessName", to: "process.parent.name"},
+                {from: "winlog.event_data.ParentProcessName", to: "process.parent.executable"}
             ],
             mode: "rename",
             ignore_missing: true,
@@ -1209,15 +1211,30 @@ var security = (function () {
                 return;
             }
             var exe = evt.Get("process.executable");
+            if (!exe) {
+                return;
+            }
             evt.Put("process.name", path.basename(exe));
         })
-	.Add(function(evt) {
-	    var cl = evt.Get("winlog.event_data.CommandLine");
-	    if (!cl) {
-		return;
-	    }
-	    evt.Put("process.args", cl.match(/\S+/g));
-	})
+        .Add(function(evt) {
+            var name = evt.Get("process.parent.name");
+            if (name) {
+                return;
+            }
+            var exe = evt.Get("process.parent.executable");
+            if (!exe) {
+                return;
+            }
+            evt.Put("process.parent.name", path.basename(exe));
+        })
+        .Add(function(evt) {
+            var cl = evt.Get("winlog.event_data.CommandLine");
+            if (!cl) {
+                return;
+            }
+            evt.Put("process.args", winlogbeat.splitCommandLine(cl));
+            evt.Put("process.command_line", cl);
+        })
         .Build();
 
     // Handles 4634 and 4647.
@@ -1265,14 +1282,24 @@ var security = (function () {
 
     var event4688 = new processor.Chain()
         .Add(copySubjectUser)
-	.Add(renameNewProcessFields)
-        .Build();    
+        .Add(renameNewProcessFields)
+        .Add(addActionDesc)
+        .Add(function(evt) {
+            evt.Put("event.category", "process");
+            evt.Put("event.type", "process_start");
+        })
+        .Build();
 
     var event4689 = new processor.Chain()
         .Add(copySubjectUser)
-	.Add(renameCommonAuthFields)
-        .Build();    
-    
+        .Add(renameCommonAuthFields)
+        .Add(addActionDesc)
+        .Add(function(evt) {
+            evt.Put("event.category", "process");
+            evt.Put("event.type", "process_end");
+        })
+        .Build();
+
     var userMgmtEvts = new processor.Chain()
         .Add(copyTargetUser)
         .Add(copySubjectUserLogonId)
@@ -1310,7 +1337,7 @@ var security = (function () {
 
         // 4689 - A process has exited.
         4689: event4689.Run,
-	
+
         // 4720 - A user account was created
         4720: userMgmtEvts.Run,
 

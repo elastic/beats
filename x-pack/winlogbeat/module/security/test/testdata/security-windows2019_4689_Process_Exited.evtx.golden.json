@@ -2,11 +2,13 @@
   {
     "@timestamp": "2019-11-14T21:26:49.4961966Z",
     "event": {
-      "action": "Process Termination",
+      "action": "exited-process",
+      "category": "process",
       "code": 4689,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": "process_end"
     },
     "log": {
       "level": "information"
@@ -53,11 +55,13 @@
   {
     "@timestamp": "2019-11-14T21:27:46.9609089Z",
     "event": {
-      "action": "Process Termination",
+      "action": "exited-process",
+      "category": "process",
       "code": 4689,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": "process_end"
     },
     "log": {
       "level": "information"
@@ -104,11 +108,13 @@
   {
     "@timestamp": "2019-11-14T21:28:18.4605129Z",
     "event": {
-      "action": "Process Termination",
+      "action": "exited-process",
+      "category": "process",
       "code": 4689,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": "process_end"
     },
     "log": {
       "level": "information"
