@@ -11,13 +11,12 @@
 
 beta[]
 
-Use the `httpjson` input to read messages from an HTTP API that provides JSON data.
+Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-This input can, for example, be used to receive MISP threat indicators, as in the 
+For example, this input can be used to retrieve MISP threat indicators in the 
 filebeat x-pack misp module.
 
-This input supports repeated retrieval at a configurable interval, and it also 
-supports pagination.
+This input supports timed retrieval at a configurable interval and pagination.
 
 Example configurations:
 
@@ -58,12 +57,12 @@ The `httpjson` input supports the following configuration options plus the
 [float]
 ==== `api_key`
 
-API key to access the HTTP API. Optional. Default: "", which means API key is not used.
+API key to access the HTTP API. Optional. Default: "", which means no API key is used.
 
 [float]
 ==== `http_client_timeout`
 
-Time duration before declaring that HTTP client connection has timed out. Default: 60s.
+Time duration before declaring that the HTTP client connection has timed out. Default: 60s.
 
 [float]
 ==== `http_headers`
@@ -73,7 +72,7 @@ Extra HTTP header options can be set by specifying this JSON object. Default: no
 [float]
 ==== `http_method`
 
-What HTTP method to use, GET or POST. Default: GET. 
+This option specifies which HTTP method to use, GET or POST. Default: GET. 
 
 [float]
 ==== `http_request_body`
@@ -95,7 +94,7 @@ from the array. Default: not used.
 [float]
 ==== `pagination.enabled`
 
-Whether pagination is enabled. Default: false.
+This option specifies whether pagination is enabled. Default: false.
 
 [float]
 ==== `pagination.extra_body_content`
