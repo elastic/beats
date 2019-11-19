@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/docker/docker/daemon/logger"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -71,16 +72,16 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 
 // CreateClientWithConfig gets the pipeline linked to the given config, and creates a client
 // If no pipeline for that config exists, it creates one.
-func (pm *PipelineManager) CreateClientWithConfig(logOptsConfig map[string]string, file string) (*ClientLogger, error) {
+func (pm *PipelineManager) CreateClientWithConfig(containerConfig logger.Info, file string) (*ClientLogger, error) {
 
-	hashstring := makeConfigHash(logOptsConfig)
-	pipeline, err := pm.getOrCreatePipeline(logOptsConfig, file, hashstring)
+	hashstring := makeConfigHash(containerConfig.Config)
+	pipeline, err := pm.getOrCreatePipeline(containerConfig.Config, file, hashstring)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline")
 	}
 
 	//actually get to crafting the new client.
-	cl, err := newClientFromPipeline(pipeline.pipeline, file, hashstring)
+	cl, err := newClientFromPipeline(pipeline.pipeline, file, hashstring, containerConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating client")
 	}

@@ -7,9 +7,11 @@ package pipelinemanager
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types/plugins/logdriver"
+	"github.com/docker/docker/daemon/logger"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -23,14 +25,15 @@ import (
 // There's a many-to-one relationship between clients and pipelines.
 // Each container with the same config will get its own client to the same pipeline.
 type ClientLogger struct {
-	logFile      *pipereader.PipeReader
-	client       beat.Client
-	pipelineHash string
-	closer       chan struct{}
+	logFile       *pipereader.PipeReader
+	client        beat.Client
+	pipelineHash  string
+	closer        chan struct{}
+	containerMeta logger.Info
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string, info logger.Info) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
@@ -51,7 +54,7 @@ func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string)
 	}
 	logp.Info("Created new logger for %s", file)
 
-	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{})}, nil
+	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{}), containerMeta: info}, nil
 }
 
 // Close closes the pipeline client and reader
@@ -97,10 +100,20 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			return
 		}
 
+		line := strings.TrimSpace(string(entry.Line))
+
 		cl.client.Publish(beat.Event{
 			Timestamp: time.Unix(0, entry.TimeNano),
 			Fields: common.MapStr{
-				"line": string(entry.Line),
+				"message": line,
+				"container": common.MapStr{
+					"labels": cl.containerMeta.ContainerLabels,
+					"id":     cl.containerMeta.ContainerID,
+					"name":   cl.containerMeta.ContainerName,
+					"image": common.MapStr{
+						"name": cl.containerMeta.ContainerImageName,
+					},
+				},
 			},
 		})
 
