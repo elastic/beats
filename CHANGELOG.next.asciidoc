@@ -406,6 +406,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove beta flag for some filebeat modules. {pull}14374[14374]
 - Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
 - Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
+- New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
