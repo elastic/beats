@@ -523,6 +523,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
 - GA the Winlogbeat `sysmon` module. {pull}14326[14326]
+- Add support for event ID 4688 & 4689 (Process create & exit) to the Security module. {issue}14038[14038]
 
 ==== Deprecated
 
