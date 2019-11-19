@@ -51,3 +51,25 @@ func NewClient(host string, httpClient *http.Client, httpHeaders map[string]stri
 
 	return client.NewClientWithOpts(opts...)
 }
+
+// NewClientFromEnv builds and returns a new Docker client from environment
+// variables. In the case that DOCKER_API_VERSION is not set in the
+// environment, upon first request it perform API version negotiation.
+func NewClientFromEnv() (*client.Client, error) {
+	log := logp.NewLogger("docker")
+
+	opts := []client.Opt{
+		client.FromEnv,
+	}
+
+	version := os.Getenv("DOCKER_API_VERSION")
+	if version != "" {
+		log.Debugf("Docker client will use API version %v as set by the DOCKER_API_VERSION environment variable.", version)
+		opts = append(opts, client.WithVersion(version))
+	} else {
+		log.Debug("Docker client will negotiate the API version on the first request.")
+		opts = append(opts, client.WithAPIVersionNegotiation())
+	}
+
+	return client.NewClientWithOpts(opts...)
+}

@@ -35,6 +35,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
+	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/pkg/errors"
 )
 
@@ -53,14 +54,7 @@ type wrapperDriver struct {
 }
 
 func newWrapperDriver() (*wrapperDriver, error) {
-	opts := []client.Opt{
-		client.FromEnv,
-	}
-	version := os.Getenv("DOCKER_API_VERSION")
-	if version == "" {
-		opts = append(opts, client.WithAPIVersionNegotiation())
-	}
-	c, err := client.NewClientWithOpts(opts...)
+	c, err := docker.NewClientFromEnv()
 	if err != nil {
 		return nil, err
 	}

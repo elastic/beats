@@ -19,11 +19,11 @@ package docker
 
 import (
 	"context"
-	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/elastic/beats/libbeat/common/docker"
 )
 
 // Client for Docker
@@ -33,14 +33,7 @@ type Client struct {
 
 // NewClient builds and returns a docker Client
 func NewClient() (Client, error) {
-	opts := []client.Opt{
-		client.FromEnv,
-	}
-	version := os.Getenv("DOCKER_API_VERSION")
-	if version == "" {
-		opts = append(opts, client.WithAPIVersionNegotiation())
-	}
-	c, err := client.NewClientWithOpts(opts...)
+	c, err := docker.NewClientFromEnv()
 	return Client{cli: c}, err
 }
 

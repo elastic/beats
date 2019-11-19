@@ -28,9 +28,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/auditbeat/core"
+	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -69,14 +69,7 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	opts := []client.Opt{
-		client.FromEnv,
-	}
-	version := os.Getenv("DOCKER_API_VERSION")
-	if version == "" {
-		opts = append(opts, client.WithAPIVersionNegotiation())
-	}
-	client, err := client.NewClientWithOpts(opts...)
+	client, err := docker.NewClientFromEnv()
 	if err != nil {
 		t.Fatal(err)
 	}
