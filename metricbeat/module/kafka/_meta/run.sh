@@ -73,7 +73,7 @@ touch /tmp/.acls_loaded
 
 
 # Start a forever producer
-cat /dev/urandom | KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-producer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8775,host=0.0.0.0" \
+{ while sleep 1; do echo message; done } | KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-producer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8775,host=0.0.0.0" \
  ${KAFKA_HOME}/bin/kafka-console-producer.sh --topic test --broker-list localhost:9091 --producer.config ${KAFKA_HOME}/bin/sasl-producer.properties > /dev/null &
 
 wait_for_port 8775
