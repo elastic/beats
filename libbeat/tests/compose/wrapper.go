@@ -54,7 +54,7 @@ type wrapperDriver struct {
 }
 
 func newWrapperDriver() (*wrapperDriver, error) {
-	c, err := docker.NewClientFromEnv()
+	c, err := docker.NewClient("", nil, nil)
 	if err != nil {
 		return nil, err
 	}

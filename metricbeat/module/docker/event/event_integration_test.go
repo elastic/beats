@@ -69,7 +69,7 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	client, err := docker.NewClientFromEnv()
+	client, err := docker.NewClient("", nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
