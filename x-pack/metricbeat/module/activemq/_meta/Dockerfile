@@ -8,8 +8,9 @@ ENV ACTIVEMQ_STOMP=61613 ACTIVEMQ_REST=8161
 
 RUN set -x && \
     mkdir -p /opt && \
-    apk --update add --virtual build-dependencies curl netcat-openbsd && \
-    curl https://archive.apache.org/dist/activemq/$ACTIVEMQ_VERSION/$ACTIVEMQ-bin.tar.gz -o $ACTIVEMQ-bin.tar.gz
+    apk --update add --virtual build-dependencies curl netcat-openbsd
+
+RUN curl --fail https://archive.apache.org/dist/activemq/$ACTIVEMQ_VERSION/$ACTIVEMQ-bin.tar.gz -o $ACTIVEMQ-bin.tar.gz
 
 RUN tar xvzf $ACTIVEMQ-bin.tar.gz -C  /opt && \
     ln -s /opt/$ACTIVEMQ $ACTIVEMQ_HOME && \
