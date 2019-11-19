@@ -46,6 +46,11 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
+- Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
+- Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
 
 *Packetbeat*
 
