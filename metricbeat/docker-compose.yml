@@ -162,9 +162,6 @@ services:
         KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
     ports:
       - 9092
-      - 8779
-      - 8775
-      - 8774
 
   kibana:
     image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1

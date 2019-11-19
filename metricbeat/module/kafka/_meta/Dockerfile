@@ -29,9 +29,9 @@ ADD healthcheck.sh /healthcheck.sh
 
 EXPOSE 9092
 EXPOSE 2181
-EXPOSE 8779
-EXPOSE 8775
-EXPOSE 8774
+#EXPOSE 8779
+#EXPOSE 8775
+#EXPOSE 8774
 
 # Healthcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available
 HEALTHCHECK --interval=1s --retries=90 CMD /healthcheck.sh
