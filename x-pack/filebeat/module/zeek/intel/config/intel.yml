@@ -33,14 +33,24 @@ processors:
           to: zeek.session_id
 
         # Expand field names containing dots.
-        - from: zeek.intel.seen.indicator_type
-          to: seen.indicator_type
-        - from: zeek.intel.seen.node
-          to: seen.node
         - from: zeek.intel.seen.indicator
           to: seen.indicator
+        - from: zeek.intel.seen.indicator_type
+          to: seen.indicator_type
+        - from: zeek.intel.seen.host
+          to: seen.host
         - from: zeek.intel.seen.where
           to: seen.where
+        - from: zeek.intel.seen.node
+          to: seen.node
+        - from: zeek.intel.seen.conn
+          to: seen.conn
+        - from: zeek.intel.seen.uid
+          to: seen.uid
+        - from: zeek.intel.seen.f
+          to: seen.f
+        - from: zeek.intel.seen.fuid
+          to: seen.fuid
         - from: seen
           to: zeek.intel.seen
   - drop_fields:

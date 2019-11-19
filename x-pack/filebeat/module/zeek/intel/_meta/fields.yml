@@ -3,8 +3,8 @@
   default_field: false
   description: >
     Fields exported by the Zeek Intel log.
-  fields:     
-      
+  fields:
+
     - name: seen
       type: group
       fields:
@@ -17,12 +17,12 @@
           type: keyword
           description: >
             The type of data the indicator represents.
-      
+
         - name: host
           type: keyword
           description: >
             If the indicator type was Intel::ADDR, then this field will be present.
-        
+
         - name: conn
           type: keyword
           description: >
@@ -42,23 +42,23 @@
           type: keyword
           description: >
             If the data was discovered within a connection, the connection uid should go here to give context to the data. If the conn field is provided, this will be automatically filled out.
-            
-        - name: fa_file
-          type: keyword
+
+        - name: f
+          type: object
           description: >
             If the data was discovered within a file, the file record should go here to provide context to the data.
-            
+
         - name: fuid
           type: keyword
           description: >
             If the data was discovered within a file, the file uid should go here to provide context to the data. If the file record f is provided, this will be automatically filled out.
-            
-      
+
+
     - name: matched
       type: keyword
       description: >
         Event to represent a match in the intelligence data from data that was seen.
-      
+
     - name: sources
       type: keyword
       description: >
