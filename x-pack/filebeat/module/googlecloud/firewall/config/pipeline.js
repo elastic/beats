@@ -5,16 +5,6 @@
 var processor = require("processor");
 var console   = require("console");
 
-var params = {
-    keep_original: false,
-    debug: false
-};
-
-// Register params from configuration.
-function register(scriptParams) {
-    params = scriptParams;
-}
-
 // makeMapper({from:field, to:field, default:value mappings:{orig: new, [...]}})
 //
 // Processor that sets _to_ field from a mapping of _from_ field's value.
@@ -39,7 +29,7 @@ function makeMapper(options) {
 function makeConditional(options) {
     return function (evt) {
         var branch = options[options.condition(evt)] || function(evt){};
-        return (typeof branch === "function"? branch : branch.Run)(evt);
+        return (typeof branch === "function" ? branch : branch.Run)(evt);
     };
 }
 
@@ -75,7 +65,7 @@ function PipelineBuilder(pipelineName, debug) {
     }
 }
 
-function FirewallProcessor(keep_original, debug) {
+function FirewallProcessor(keep_original_message, debug) {
     var builder = new PipelineBuilder("firewall", debug);
 
     // The pub/sub input writes the Stackdriver LogEntry object into the message
@@ -94,7 +84,7 @@ function FirewallProcessor(keep_original, debug) {
         ignore_missing: true
     }));
 
-    if (keep_original) {
+    if (keep_original_message) {
         builder.Add("saveOriginalMessage", new processor.Convert({
             fields: [
                 {from: "message", to: "event.original"}
@@ -118,8 +108,8 @@ function FirewallProcessor(keep_original, debug) {
 
     builder.Add("saveMetadata", new processor.Convert({
         fields: [
-            {from: "json.logName", to:"log.logger"},
-            {from: "json.resource.labels.subnetwork_name", to:"network.name"}
+            {from: "json.logName", to: "log.logger"},
+            {from: "json.resource.labels.subnetwork_name", to: "network.name"}
         ],
         ignore_missing: true
     }));
@@ -331,11 +321,11 @@ function FirewallProcessor(keep_original, debug) {
 
 var firewall;
 
+// Register params from configuration.
+function register(params) {
+    firewall = new FirewallProcessor(params.keep_original_message, params.debug);
+}
+
 function process(evt) {
-    if (firewall == null) {
-        // Initialize firewall in first call to process to ensure that register
-        // has been called and config options are set.
-        firewall = new FirewallProcessor(params.keep_original, params.debug);
-    }
     return firewall.process(evt);
 }
