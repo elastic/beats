@@ -237,7 +237,7 @@ func flatten(prefix string, in, out MapStr) MapStr {
 		if prefix == "" {
 			fullKey = k
 		} else {
-			fullKey = fmt.Sprintf("%s.%s", prefix, k)
+			fullKey = prefix + "." + k
 		}
 
 		if m, ok := tryToMapStr(v); ok {

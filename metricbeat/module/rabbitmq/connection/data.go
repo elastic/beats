@@ -37,6 +37,7 @@ var (
 		"vhost":       c.Str("vhost", s.Required),
 		"user":        c.Str("user", s.Required),
 		"node":        c.Str("node", s.Required),
+		"state":       c.Str("state"),
 		"channels":    c.Int("channels"),
 		"channel_max": c.Int("channel_max"),
 		"frame_max":   c.Int("frame_max"),
