@@ -12,6 +12,7 @@ MYSQL_STATUS_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
                        "persistence", "replication", "server", "stats"]
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['mysql']
@@ -47,45 +48,3 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         return ['root:test@tcp({})/'.format(self.compose_host())]
-
-
-class TestMysql80(Test):
-    COMPOSE_ENV = {
-        'MYSQL_VARIANT': 'mysql',
-        'MYSQL_VERSION': '8.0.13',
-    }
-
-
-class TestPercona57(Test):
-    COMPOSE_ENV = {
-        'MYSQL_VARIANT': 'percona',
-        'MYSQL_VERSION': '5.7.24',
-    }
-
-
-class TestPercona80(Test):
-    COMPOSE_ENV = {
-        'MYSQL_VARIANT': 'percona',
-        'MYSQL_VERSION': '8.0.13-4',
-    }
-
-
-class TestMariadb102(Test):
-    COMPOSE_ENV = {
-        'MYSQL_VARIANT': 'mariadb',
-        'MYSQL_VERSION': '10.2.23',
-    }
-
-
-class TestMariadb103(Test):
-    COMPOSE_ENV = {
-        'MYSQL_VARIANT': 'mariadb',
-        'MYSQL_VERSION': '10.3.14',
-    }
-
-
-class TestMariadb104(Test):
-    COMPOSE_ENV = {
-        'MYSQL_VARIANT': 'mariadb',
-        'MYSQL_VERSION': '10.4.4',
-    }
