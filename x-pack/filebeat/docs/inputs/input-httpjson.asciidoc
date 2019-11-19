@@ -13,8 +13,8 @@ beta[]
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-For example, this input can be used to retrieve MISP threat indicators in the 
-filebeat x-pack misp module.
+For example, this input is used to retrieve MISP threat indicators in the filebeat 
+x-pack misp module.
 
 This input supports timed retrieval at a configurable interval and pagination.
 
