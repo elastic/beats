@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
 - By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
 - Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
+- Change wording when we fail to load a CA file to the cert pool. {issue}14309[14309]
 
 *Auditbeat*
 
@@ -200,6 +201,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
 - Fix integer comparison on JSON responses. {pull}13348[13348]
 - Fix storage of HTTP bodies to work when JSON/Regex body checks are enabled. {pull}14223[14223]
+- Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
 
 *Journalbeat*
 
@@ -405,6 +407,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove beta flag for some filebeat modules. {pull}14374[14374]
 - Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
 - Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
+- New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
+- Add document for Filebeat input httpjson. {pull}14602[14602]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -519,6 +523,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
 - GA the Winlogbeat `sysmon` module. {pull}14326[14326]
+- Add support for event ID 4688 & 4689 (Process create & exit) to the Security module. {issue}14038[14038]
 
 ==== Deprecated
 
