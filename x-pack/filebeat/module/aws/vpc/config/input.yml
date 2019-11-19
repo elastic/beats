@@ -16,23 +16,41 @@ exclude_files: [".gz$"]
 {{ end }}
 
 processors:
-  # Custom flow log for traffic through a transit gateway
-  - dissect:
-      field: message
-      target_prefix: aws.vpc
-      tokenizer: '%{version} %{interface_id} %{account_id} %{vpc_id} %{subnet_id} %{instance_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{tcp_flags} %{type} %{pkt_srcaddr} %{pkt_dstaddr} %{action} %{log_status}'
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+            var message = event.Get("message");
+            var tokens = message.split(" ").length;
+            event.Put("@metadata.message_token_count", tokens);
+        }
 
   # Default vpc log format
   - dissect:
+      when:
+        equals:
+          '@metadata.message_token_count': 14
       field: message
       target_prefix: aws.vpc
       tokenizer: '%{version} %{account_id} %{interface_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{packets} %{bytes} %{start} %{end} %{action} %{log_status}'
 
   # Custom flow log for traffic through a NAT gateway
   - dissect:
+      when:
+        equals:
+          '@metadata.message_token_count': 6
       field: message
       target_prefix: aws.vpc
       tokenizer: '%{instance_id} %{interface_id} %{srcaddr} %{dstaddr} %{pkt_srcaddr} %{pkt_dstaddr}'
+
+  # Custom flow log for traffic through a transit gateway
+  - dissect:
+      when:
+        equals:
+          '@metadata.message_token_count': 17
+      field: message
+      target_prefix: aws.vpc
+      tokenizer: '%{version} %{interface_id} %{account_id} %{vpc_id} %{subnet_id} %{instance_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{tcp_flags} %{type} %{pkt_srcaddr} %{pkt_dstaddr} %{action} %{log_status}'
 
   - convert:
       ignore_missing: true

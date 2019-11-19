@@ -76,12 +76,6 @@ processors:
       field: related.ip
       value: ["{{source.ip}}", "{{destination.ip}}"]
 
-  # Remove log.flags fields
-  - remove:
-      field:
-        - log.flags
-      ignore_missing: true
-
 on_failure:
   - set:
       field: "error.message"

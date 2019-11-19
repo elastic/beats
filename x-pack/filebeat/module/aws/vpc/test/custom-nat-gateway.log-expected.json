@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-11-19T19:22:42.733Z",
         "aws.vpc.dstaddr": "10.0.0.220",
         "aws.vpc.instance_id": "-",
         "aws.vpc.interface_id": "eni-1235b8ca123456789",
@@ -27,7 +26,6 @@
         "source.ip": "10.0.1.5"
     },
     {
-        "@timestamp": "2019-11-19T19:22:42.745Z",
         "aws.vpc.dstaddr": "203.0.113.5",
         "aws.vpc.instance_id": "i-01234567890123456",
         "aws.vpc.interface_id": "eni-1111aaaa2222bbbb3",

@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-11-19T19:22:44.039Z",
         "aws.vpc.account_id": "123456789010",
         "aws.vpc.action": "ACCEPT",
         "aws.vpc.dstaddr": "10.40.2.236",
