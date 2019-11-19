@@ -66,6 +66,7 @@ type Scheduler struct {
 	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
 	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 
+	jobsRun   *atomic.Uint64
 	ctx       context.Context
 	cancelCtx context.CancelFunc
 	sem       *semaphore.Weighted
@@ -107,6 +108,7 @@ func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 		cancelCtx: cancelCtx,
 		sem:       semaphore.NewWeighted(limit),
 
+		jobsRun:            atomic.NewUint64(0),
 		activeJobs:         activeJobsGauge,
 		activeTasks:        activeTasksGauge,
 		waitingTasks:       waitingTasksGauge,
@@ -137,7 +139,7 @@ func (s *Scheduler) Start() error {
 }
 
 func (s *Scheduler) missedDeadlineReporter() {
-	interval := time.Second * 10
+	interval := time.Second
 
 	t := time.NewTicker(interval)
 
@@ -149,6 +151,7 @@ func (s *Scheduler) missedDeadlineReporter() {
 			t.Stop()
 			return
 		case <-t.C:
+			logp.Info("JOBS RUN %d", s.jobsRun.Load())
 			missingNow := s.jobsMissedDeadline.Get()
 			missedDelta := missingNow - missedAtLastCheck
 			if missedDelta > 0 {
@@ -245,6 +248,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 
 // runOnce runs a TaskFunc and its continuations once.
 func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
+	s.jobsRun.Inc()
 	// Since we run all continuations asynchronously we use a wait group to block until we're done.
 	var wg sync.WaitGroup
 
