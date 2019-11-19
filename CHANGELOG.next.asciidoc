@@ -191,6 +191,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix race condition in S3 input plugin. {pull}14359[14359]
 - Decode hex values in auditd module. {pull}14471[14471]
 - Fix handling multiline log entries in nginx module. {issue}14349[14349] {pull}14499[14499]
+- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 
 *Heartbeat*
 
@@ -198,6 +200,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
 - Fix integer comparison on JSON responses. {pull}13348[13348]
 - Fix storage of HTTP bodies to work when JSON/Regex body checks are enabled. {pull}14223[14223]
+- Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
 
 *Journalbeat*
 
@@ -254,6 +257,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
+- Vshpere module splits `virtualmachine.host` into `virtualmachine.host.id` and `virtualmachine.host.hostname`. {issue}7187[7187] {pull}7213[7213]
 
 *Packetbeat*
 
@@ -400,6 +405,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Remove beta flag for some filebeat modules. {pull}14374[14374]
 - Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
+- Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -480,6 +486,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release CoreDNS module as GA. {pull}14308[14308]
 - Release CouchDB module as GA. {pull}14300[14300]
 - Add `elasticsearch/enrich` metricset. {pull}14243[14243] {issue}14221[14221]
+- Add support for Application ELB and Network ELB. {pull}14123[14123] {issue}13538[13538] {issue}13539[13539]
 - Release aws ebs metricset as GA. {pull}14312[14312] {issue}14060[14060]
 - Add `connection.state` field for RabbitMQ module. {pull}13981[13981]
 - Add more TCP states to Metricbeat system socket_summary. {pull}14347[14347]

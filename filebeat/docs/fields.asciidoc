@@ -20828,6 +20828,154 @@ type: integer
 --
 
 [float]
+=== intel
+
+Fields exported by the Zeek Intel log.
+
+
+
+
+*`zeek.intel.seen.indicator`*::
++
+--
+The intelligence indicator.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.indicator_type`*::
++
+--
+The type of data the indicator represents.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.host`*::
++
+--
+If the indicator type was Intel::ADDR, then this field will be present.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.conn`*::
++
+--
+If the data was discovered within a connection, the connection record should go here to give context to the data.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.where`*::
++
+--
+Where the data was discovered.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.node`*::
++
+--
+The name of the node where the match was discovered.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.uid`*::
++
+--
+If the data was discovered within a connection, the connection uid should go here to give context to the data. If the conn field is provided, this will be automatically filled out.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.f`*::
++
+--
+If the data was discovered within a file, the file record should go here to provide context to the data.
+
+
+type: object
+
+--
+
+*`zeek.intel.seen.fuid`*::
++
+--
+If the data was discovered within a file, the file uid should go here to provide context to the data. If the file record f is provided, this will be automatically filled out.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.matched`*::
++
+--
+Event to represent a match in the intelligence data from data that was seen.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.sources`*::
++
+--
+Sources which supplied data for this match.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.fuid`*::
++
+--
+If a file was associated with this intelligence hit, this is the uid for the file.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.file_mime_type`*::
++
+--
+A mime type if the intelligence hit is related to a file. If the $f field is provided this will be automatically filled out.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.file_desc`*::
++
+--
+Frequently files can be described to give a bit more context. If the $f field is provided this field will be automatically filled out.
+
+
+type: keyword
+
+--
+
+[float]
 === irc
 
 Fields exported by the Zeek IRC log
