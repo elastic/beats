@@ -9,7 +9,7 @@ input:
       attributes:
       - attr: Name
         field: name
-      - attr: Size
+      - attr: QueueSize
         field: size
       - attr: AverageEnqueueTime
         field: messages.enqueue.time.avg
