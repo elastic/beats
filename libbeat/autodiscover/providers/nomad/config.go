@@ -33,6 +33,7 @@ type Config struct {
 	Host           string        `config:"host"`
 	WaitTime       time.Duration `config:"wait_time"`
 	SyncPeriod     time.Duration `config:"sync_period"`
+	AllowStale     bool          `config:"allow_stale"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout"`
 
 	Prefix    string                  `config:"prefix"`
@@ -48,6 +49,7 @@ func defaultConfig() *Config {
 		Region:     "",
 		Namespace:  "",
 		SecretID:   "",
+		AllowStale: false,
 		WaitTime:   15 * time.Second,
 		SyncPeriod: 30 * time.Second,
 		Prefix:     "co.elastic",

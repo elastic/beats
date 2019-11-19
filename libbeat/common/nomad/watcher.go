@@ -60,6 +60,9 @@ type WatchOptions struct {
 	Namespace string
 	// RefreshInterval is the time interval that the Nomad API will be queried
 	RefreshInterval time.Duration
+	// AllowStale allows any Nomad server (non-leader) to service
+	// a read. This allows for lower latency and higher throughput
+	AllowStale bool
 }
 
 // NewWatcher initializes the watcher client to provide a events handler for
@@ -102,7 +105,7 @@ func (w *watcher) sync() error {
 
 	queryOpts := &api.QueryOptions{
 		WaitTime:   w.options.SyncTimeout,
-		AllowStale: true,
+		AllowStale: w.options.AllowStale,
 		WaitIndex:  w.waitIndex,
 	}
 

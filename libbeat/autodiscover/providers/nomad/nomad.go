@@ -239,7 +239,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	if rawTasks, ok := meta["task"]; ok {
 		tasks, ok := rawTasks.(common.MapStr)
 		if !ok {
-			logp.Info("Could not get meta for the given task: ", rawTasks)
+			logp.Info("Could not get meta for the given task: %s", rawTasks)
 			return e
 		}
 
