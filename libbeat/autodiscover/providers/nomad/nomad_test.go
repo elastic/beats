@@ -53,6 +53,7 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"meta": common.MapStr{
 					"task": getNestedAnnotations(common.MapStr{
+						"alloc_id":                          "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
 						"co.elastic.logs/multiline.pattern": "^test",
 						"co.elastic.metrics/module":         "prometheus",
 						"co.elastic.metrics/period":         "10s",
@@ -63,10 +64,8 @@ func TestGenerateHints(t *testing.T) {
 			result: bus.Event{
 				"meta": common.MapStr{
 					"task": getNestedAnnotations(common.MapStr{
-						"co.elastic.logs/multiline.pattern": "^test",
-						"co.elastic.metrics/module":         "prometheus",
-						"co.elastic.metrics/period":         "10s",
-						"not.to.include":                    "true",
+						"alloc_id":       "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
+						"not.to.include": "true",
 					}),
 				},
 				"hints": common.MapStr{

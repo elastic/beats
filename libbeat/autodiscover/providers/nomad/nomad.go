@@ -18,6 +18,7 @@
 package nomad
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -205,8 +206,8 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Builders are Beat specific.
 	e := bus.Event{}
 
-	var tags common.MapStr
-	var meta, container common.MapStr
+	var tags, container common.MapStr
+	var meta, tasks common.MapStr
 
 	rawMeta, ok := event["meta"]
 	if ok {
@@ -237,23 +238,24 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	// for hints we look at the aggregated task's meta
 	if rawTasks, ok := meta["task"]; ok {
-		tasks, ok := rawTasks.(common.MapStr)
+		tasks, ok = rawTasks.(common.MapStr)
 		if !ok {
 			logp.Info("Could not get meta for the given task: %s", rawTasks)
 			return e
 		}
-
-		meta = tasks
 	}
 
 	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(meta, cname, p.config.Prefix)
+	hints := builder.GenerateHints(tasks, cname, p.config.Prefix)
 
 	logp.Debug("nomad", "Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
 	logp.Debug("nomad", "Generated builder event %+v", e)
+
+	prefix := strings.Split(p.config.Prefix, ".")[0]
+	tasks.Delete(prefix)
 
 	return e
 }
