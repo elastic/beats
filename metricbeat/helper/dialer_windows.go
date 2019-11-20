@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/api/npipe"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -35,10 +36,10 @@ func makeDialer(t time.Duration, hostData mb.HostData) (transport.Dialer, string
 			"cannot use %s as the URI, unix sockets are not supported on Windows, use npipe instead",
 			hostData.SanitizedURI,
 		)
-	case mb.TransportUnix:
+	case mb.TransportNpipe:
 		return npipe.DialContext(
 			strings.TrimSuffix(npipe.TransformString(p), "/"),
-		), mb.SanitizedURI, nil
+		), hostData.SanitizedURI, nil
 	default:
 		return transport.NetDialer(t), hostData.SanitizedURI, nil
 	}
