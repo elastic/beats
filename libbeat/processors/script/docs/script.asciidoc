@@ -1,4 +1,3 @@
-ifdef::has_script_processor[]
 [[processor-script]]
 === Script Processor
 
@@ -165,4 +164,3 @@ thrown.
 
 *Example*: `event.AppendTo("error.message", "invalid file hash");`
 |===
-endif::[]
