@@ -66,6 +66,8 @@ type Scheduler struct {
 	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
 	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 
+	timerQueue *TimerQueue
+
 	jobsRun   *atomic.Uint64
 	ctx       context.Context
 	cancelCtx context.CancelFunc
@@ -78,7 +80,7 @@ type TaskFunc func() []TaskFunc
 
 // Schedule defines an interface for getting the next scheduled runtime for a job
 type Schedule interface {
-	// Next returns the next time a scheduled event occurs after the given time
+	// Next returns the next runAt a scheduled event occurs after the given runAt
 	Next(now time.Time) (next time.Time)
 	// Returns true if this schedule type should run once immediately before checking Next.
 	// Cron tasks run at exact times so should set this to false.
@@ -92,7 +94,7 @@ func New(limit int64) *Scheduler {
 	return NewWithLocation(limit, time.Local)
 }
 
-// NewWithLocation creates a new Scheduler using the given time zone.
+// NewWithLocation creates a new Scheduler using the given runAt zone.
 func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
@@ -113,10 +115,9 @@ func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 		activeTasks:        activeTasksGauge,
 		waitingTasks:       waitingTasksGauge,
 		jobsMissedDeadline: jobsMissedDeadlineCounter,
-	}
 
-	// Block the semaphore initially
-	sched.sem.Acquire(sched.ctx, limit)
+		timerQueue: NewTimerQueue(),
+	}
 
 	return sched
 }
@@ -130,7 +131,7 @@ func (s *Scheduler) Start() error {
 		return nil
 	}
 
-	s.sem.Release(s.limit)
+	s.timerQueue.Start(s.ctx)
 
 	// Missed deadline reporter
 	go s.missedDeadlineReporter()
@@ -187,73 +188,62 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 
 	jobCtx, jobCtxCancel := context.WithCancel(s.ctx)
 
-	var timer *time.Timer
-	go func() {
-		// lastRanAt stores the last time the task was invoked
-		// The initial value is time.Now() because we use it to get the next time a job is scheduled to run
-		lastRanAt := time.Now()
-		// If this job should be run immediately set the timestamp to the epoch.
-		// That will cause any (plausible) schedule to run immediately
-		if sched.RunOnInit() {
-			lastRanAt = time.Unix(0, 0)
+	// lastRanAt stores the last runAt the task was invoked
+	// The initial value is runAt.Now() because we use it to get the next runAt a job is scheduled to run
+	lastRanAt := time.Now()
+
+	var taskFn TimerTaskFn
+
+	schedNextRun := func() {
+		next := sched.Next(lastRanAt)
+
+		now := time.Now()
+		if next.Before(now) {
+			// Our last invocation went long!
+			s.jobsMissedDeadline.Inc()
+			go taskFn(now)
+		} else {
+			// Schedule task to run sometime in the future
+			s.timerQueue.Push(&TimerTask{
+				fn:    taskFn,
+				runAt: next,
+			})
 		}
+	}
 
-		// true for the  first iteration
-		for i := uint64(0); true; i++ {
-			now := time.Now()
-			// We use the time the last task was invoked to figure out when to next run it.
-			next := sched.Next(lastRanAt)
+	taskFn = func(now time.Time) {
+		// Attempt to acquire a resource to see if we're blocked
+		// We can't really tell if we're blocked because we need to acquire resources later
+		// for the entrypoint + continuations, but this is good enough for our lastRanAt
+		// accounting since we want that value set at the first plausible time where the
+		// job could run
+		s.sem.Acquire(s.ctx, 1)
+		s.sem.Release(1)
+		lastRanAt = now
 
-			// If we are running behind schedule there's no need to invoke the timer, we can run right away.
-			// This can happen if the task is slow, and also on first run when we intentionally set the lastRan
-			// to the epoch.
-			if next.Before(now) {
-				lastRanAt = now
-				s.runOnce(id, entrypoint)
+		s.runOnce(jobCtx, id, entrypoint)
 
-				// Record the missed deadline except in the case of the first run, where this would otherwise
-				// always trigger
-				if i > 0 {
-					s.jobsMissedDeadline.Inc()
-				}
-			}
+		schedNextRun()
+	}
 
-			if timer == nil {
-				timer = time.NewTimer(next.Sub(now))
-			} else {
-				timer.Reset(next.Sub(now))
-			}
-
-			select {
-			case <-timer.C:
-				// time may have elapsed between when we scheduled the task and when it was actually invoked
-				// it may seem to make more sense to just use `now` rather than `time.Now`, however, there's an
-				// advantage to being more precise here. In the case where more jobs are scheduled than can
-				// be executed simultaneously, and schedules like `@every 5s` are in use this will cause any delayed
-				// job to be permanently offset. This will naturally lead to a more even distribution of jobs over
-				// the timeline in short order, rather than repeatedly bursting schedules. This should lead to more
-				// reliability in those high concurrency scenarios.
-				//
-				// For cron scheduling this does nothing since cron schedules run at exact times.
-				lastRanAt = time.Now()
-				s.runOnce(id, entrypoint)
-			case <-jobCtx.Done():
-				return
-			}
-		}
-	}()
+	if sched.RunOnInit() {
+		go taskFn(time.Now())
+	} else {
+		schedNextRun()
+	}
+	schedNextRun()
 
 	return jobCtxCancel, nil
 }
 
 // runOnce runs a TaskFunc and its continuations once.
-func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
+func (s *Scheduler) runOnce(jobCtx context.Context, id string, entrypoint TaskFunc) {
 	s.jobsRun.Inc()
 	// Since we run all continuations asynchronously we use a wait group to block until we're done.
 	var wg sync.WaitGroup
 
 	s.activeJobs.Inc()
-	s.runRecursive(wg, entrypoint)
+	s.runRecursive(jobCtx, wg, entrypoint)
 
 	wg.Wait()
 	s.activeJobs.Dec()
@@ -263,33 +253,35 @@ func (s *Scheduler) runOnce(id string, entrypoint TaskFunc) {
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively. We declare the function variable before definition to allow for recursion.
 // The given wait group is
-func (s *Scheduler) runRecursive(wg sync.WaitGroup, task TaskFunc) {
+func (s *Scheduler) runRecursive(jobCtx context.Context, wg sync.WaitGroup, task TaskFunc) {
 	wg.Add(1)
-	defer wg.Done()
-
 	// The accounting for waiting/active tasks is done using atomics.
 	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
 	s.waitingTasks.Inc()
 
-	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
-	s.sem.Acquire(s.ctx, 1)
-	defer s.sem.Release(1)
+	go func() {
+		// Acquire an execution slot in keeping with heartbeat.scheduler.limit
+		s.sem.Acquire(s.ctx, 1)
+		defer s.sem.Release(1)
 
-	// Check if the scheduler has been shut down. If so, exit early
-	select {
-	case <-s.ctx.Done():
-		return
-	default:
-		// proceed normally
-	}
+		// Check if the scheduler has been shut down. If so, exit early
+		select {
+		case <-jobCtx.Done():
+			return
+		default:
+			// proceed normally
+		}
 
-	s.activeTasks.Inc()
-	s.waitingTasks.Dec()
+		s.activeTasks.Inc()
+		s.waitingTasks.Dec()
 
-	continuations := task()
-	s.activeTasks.Dec()
+		continuations := task()
+		s.activeTasks.Dec()
 
-	for _, cont := range continuations {
-		go s.runRecursive(wg, cont) // Run continuations in parallel, note that these each will acquire their own slots
-	}
+		for _, cont := range continuations {
+			go s.runRecursive(jobCtx, wg, cont) // Run continuations in parallel, note that these each will acquire their own slots
+		}
+
+		wg.Done()
+	}()
 }

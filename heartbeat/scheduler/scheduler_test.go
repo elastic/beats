@@ -28,12 +28,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// The time in the island of tarawa 🏝. Good test TZ because it's pretty rare for a local box
+// The runAt in the island of tarawa 🏝. Good test TZ because it's pretty rare for a local box
 // to be state in this TZ, and it has a weird offset +0125+17300.
 func tarawaTime() *time.Location {
 	loc, err := time.LoadLocation("Pacific/Tarawa")
 	if err != nil {
-		panic("this computer doesn't know about tarawa time " + err.Error())
+		panic("this computer doesn't know about tarawa runAt " + err.Error())
 	}
 
 	return loc
@@ -77,7 +77,7 @@ func testTaskTimes(limit uint32, fn func()) func() []TaskFunc {
 }
 
 func TestScheduler_Start(t *testing.T) {
-	// We use tarawa time because it could expose some weird time math if by accident some code
+	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
 	s := NewWithLocation(10, tarawaTime())
 	defer s.Stop()
@@ -130,9 +130,10 @@ func TestScheduler_Start(t *testing.T) {
 	for _, s := range received {
 		counts[s]++
 	}
-	assert.Equal(t, preAddEvents, counts["preAdd"])
-	assert.Equal(t, postAddEvents, counts["postAdd"])
-	assert.Equal(t, removedEvents, counts["removed"])
+	// convert with int() because the printed output is nicer than hex
+	assert.Equal(t, int(preAddEvents), int(counts["preAdd"]))
+	assert.Equal(t, int(postAddEvents), int(counts["postAdd"]))
+	assert.Equal(t, int(removedEvents), int(counts["removed"]))
 }
 
 func TestScheduler_Stop(t *testing.T) {
