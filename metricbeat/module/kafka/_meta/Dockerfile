@@ -34,6 +34,6 @@ EXPOSE 8775
 EXPOSE 8774
 
 # Healthcheck creates an empty topic foo. As soon as a topic is created, it assumes broker is available
-HEALTHCHECK --interval=1s --retries=300 CMD /healthcheck.sh
+HEALTHCHECK --interval=1s --retries=700 CMD /healthcheck.sh
 
 ENTRYPOINT ["/run.sh"]
