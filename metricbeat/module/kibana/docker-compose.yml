@@ -1,0 +1,18 @@
+version: '2.3'
+
+services:
+  kibana:
+    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
+    build:
+      context: ./_meta
+      args:
+        KIBANA_VERSION: ${KIBANA_VERSION:-7.4.0}
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601
+
+  elasticsearch:
+    extends:
+      file: ../elasticsearch/docker-compose.yml
+      service: elasticsearch

@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  envoyproxy:
+    image: docker.elastic.co/observability-ci/beats-integration-envoyproxy:${ENVOYPROXY_VERSION:-v1.7.0}-1
+    build:
+      context: ./_meta
+      args:
+        ENVOYPROXY_VERSION: ${ENVOYPROXY_VERSION:-v1.7.0}
+    ports:
+      - 9901
