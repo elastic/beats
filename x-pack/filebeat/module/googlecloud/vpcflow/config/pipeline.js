@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-var vpcflow = (function () {
+function VPCFlow(keep_original_message) {
     var processor = require("processor");
 
     // The pub/sub input writes the Stackdriver LogEntry object into the message
@@ -21,6 +21,16 @@ var vpcflow = (function () {
         ignore_missing: true,
     });
 
+    var saveOriginalMessage = function(evt) {};
+    if (keep_original_message) {
+        saveOriginalMessage = new processor.Convert({
+            fields: [
+                {from: "message", to: "event.original"}
+            ],
+            mode: "rename"
+        });
+    }
+
     var dropPubSubFields = function(evt) {
         evt.Delete("message");
         evt.Delete("labels");
@@ -32,6 +42,14 @@ var vpcflow = (function () {
             category: "network_traffic",
             type: "flow",
         },
+    });
+
+
+    var saveMetadata = new processor.Convert({
+        fields: [
+            {from: "json.logName", to: "log.logger"},
+        ],
+        ignore_missing: true
     });
 
     // Use the LogEntry object's timestamp. VPC flow logs are structured so the
@@ -205,8 +223,10 @@ var vpcflow = (function () {
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
+        .Add(saveOriginalMessage)
         .Add(dropPubSubFields)
         .Add(categorizeEvent)
+        .Add(saveMetadata)
         .Add(convertLogEntry)
         .Add(convertJsonPayload)
         .Add(dropEmptyObjects)
@@ -223,7 +243,14 @@ var vpcflow = (function () {
     return {
         process: pipeline.Run,
     };
-})();
+}
+
+var vpcflow;
+
+// Register params from configuration.
+function register(params) {
+    vpcflow = new VPCFlow(params.keep_original_message);
+}
 
 function process(evt) {
     return vpcflow.process(evt);
