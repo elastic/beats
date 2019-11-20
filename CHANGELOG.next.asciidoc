@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat HTTP's Server can listen to a Windows named pipe using the `npipe:///hello` syntax. {pull}13655[13655]
 - By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
 - Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
+- Change wording when we fail to load a CA file to the cert pool. {issue}14309[14309]
 
 *Auditbeat*
 
@@ -123,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support usage of custom builders without hints and mappers {pull}13839[13839]
 - Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 - Fix kubernetes `metaGenerator.ResourceMetadata` when parent reference controller is nil {issue}14320[14320] {pull}14329[14329]
+- Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 
 *Auditbeat*
 
@@ -191,6 +193,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix race condition in S3 input plugin. {pull}14359[14359]
 - Decode hex values in auditd module. {pull}14471[14471]
 - Fix handling multiline log entries in nginx module. {issue}14349[14349] {pull}14499[14499]
+- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 
 *Heartbeat*
 
@@ -198,6 +202,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
 - Fix integer comparison on JSON responses. {pull}13348[13348]
 - Fix storage of HTTP bodies to work when JSON/Regex body checks are enabled. {pull}14223[14223]
+- Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
 
 *Journalbeat*
 
@@ -254,6 +259,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
+- Vshpere module splits `virtualmachine.host` into `virtualmachine.host.id` and `virtualmachine.host.hostname`. {issue}7187[7187] {pull}7213[7213]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 
 *Packetbeat*
 
@@ -400,6 +408,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Remove beta flag for some filebeat modules. {pull}14374[14374]
 - Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
+- Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
+- New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
+- Add document for Filebeat input httpjson. {pull}14602[14602]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -515,6 +526,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fill `event.provider`. {pull}13937[13937]
 - Add support for user management events to the Security module. {pull}13530[13530]
 - GA the Winlogbeat `sysmon` module. {pull}14326[14326]
+- Add support for event ID 4688 & 4689 (Process create & exit) to the Security module. {issue}14038[14038]
 
 ==== Deprecated
 
