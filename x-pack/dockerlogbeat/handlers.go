@@ -12,7 +12,6 @@ import (
 
 	"github.com/docker/docker/daemon/logger"
 
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemanager"
 
 	"github.com/pkg/errors"
@@ -27,11 +26,6 @@ type StartLoggingRequest struct {
 // StopLoggingRequest represents the request object we get on a call to //LogDriver.StopLogging
 type StopLoggingRequest struct {
 	File string
-}
-
-// ProcessorPipeline handles a single output pipeline
-type ProcessorPipeline struct {
-	Pipeline *pipeline.Pipeline
 }
 
 // This gets called when a container starts that requests the log driver
@@ -49,7 +43,7 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 		pm.Logger.Debugf("Got a container with the following labels: %#v\n", startReq.Info.ContainerLabels)
 		pm.Logger.Debugf("Got a container with the following log opts: %#v\n", startReq.Info.Config)
 
-		cl, err := pm.CreateClientWithConfig(startReq.Info.Config, startReq.File)
+		cl, err := pm.CreateClientWithConfig(startReq.Info, startReq.File)
 		if err != nil {
 			http.Error(w, errors.Wrap(err, "error creating client").Error(), http.StatusBadRequest)
 			return
