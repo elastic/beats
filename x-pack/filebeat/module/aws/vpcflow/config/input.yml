@@ -67,6 +67,9 @@ processors:
         - {from: aws.vpcflow.packets, to: network.packets, type: long}
         - {from: aws.vpcflow.bytes, to: network.bytes, type: long}
 
+  - drop_fields:
+      fields: ["aws.vpcflow.srcaddr", "aws.vpcflow.srcport", "aws.vpcflow.dstaddr", "aws.vpcflow.dstport", "aws.vpcflow.bytes", "aws.vpcflow.packets"]
+
   - community_id: ~
 
   # Use the aws.vpcflow.action value to set the event.outcome value to either "allow" or "deny".

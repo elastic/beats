@@ -1,11 +1,9 @@
 [
     {
-        "aws.vpcflow.dstaddr": "10.0.0.220",
         "aws.vpcflow.instance_id": "-",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.pkt_dstaddr": "203.0.113.5",
         "aws.vpcflow.pkt_srcaddr": "10.0.1.5",
-        "aws.vpcflow.srcaddr": "10.0.1.5",
         "destination.address": "10.0.0.220",
         "destination.ip": "10.0.0.220",
         "event.category": "network_traffic",
@@ -26,12 +24,10 @@
         "source.ip": "10.0.1.5"
     },
     {
-        "aws.vpcflow.dstaddr": "203.0.113.5",
         "aws.vpcflow.instance_id": "i-01234567890123456",
         "aws.vpcflow.interface_id": "eni-1111aaaa2222bbbb3",
         "aws.vpcflow.pkt_dstaddr": "203.0.113.5",
         "aws.vpcflow.pkt_srcaddr": "10.0.1.5",
-        "aws.vpcflow.srcaddr": "10.0.1.5",
         "destination.address": "203.0.113.5",
         "destination.ip": "203.0.113.5",
         "event.category": "network_traffic",
