@@ -234,10 +234,26 @@ type PushMetricSetV2WithContext interface {
 	Run(ctx context.Context, r ReporterV2)
 }
 
+// Transport defines what kind of transport need to be used for a specific HostData struct.
+type Transport int
+
+// Defines the type of supported transport, by default the URL and scheme will be used to creates
+// the appropriate dialer.
+const (
+	TransportDefault Transport = iota
+	TransportUnix
+	TransportNpipe
+)
+
 // HostData contains values parsed from the 'host' configuration. Other
 // configuration data like protocols, usernames, and passwords may also be
-// used to construct this HostData data.
+// used to construct this HostData data. HostData also contains information when combined scheme are
+// used, like doing HTTP request over a UNIX socket.
+//
 type HostData struct {
+	Transport     Transport // The Transport type to use when creating HTTP client.
+	TransportPath string    // The Transport path to use when creating the dialer.
+
 	URI          string // The full URI that should be used in connections.
 	SanitizedURI string // A sanitized version of the URI without credentials.
 

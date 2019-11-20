@@ -60,6 +60,48 @@ func TestParseURL(t *testing.T) {
 		}
 	})
 
+	t.Run("http+unix at root", func(t *testing.T) {
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, mb.TransportUnix, hostData.Transport)
+			assert.Equal(t, "/var/lib/docker.sock", hostData.TransportPath)
+			assert.Equal(t, "http://unix", hostData.URI)
+			assert.Equal(t, "http://unix", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+unix with path", func(t *testing.T) {
+		rawURL := "http+unix:///var/lib/docker.sock"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, mb.TransportUnix, hostData.Transport)
+			assert.Equal(t, "/var/lib/docker.sock", hostData.TransportPath)
+			assert.Equal(t, "http://unix/apath", hostData.URI)
+			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
+			assert.Equal(t, "unix", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+npipe at root", func(t *testing.T) {
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, mb.TransportNpipe, hostData.Transport)
+			assert.Equal(t, `\\.pipe\custom`, hostData.TransportPath)
+			assert.Equal(t, "http://npipe", hostData.URI)
+			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
 	t.Run("npipe", func(t *testing.T) {
 		rawURL := "npipe://./pipe/docker_engine"
 		hostData, err := ParseURL(rawURL, "tcp", "", "", "", "")

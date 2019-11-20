@@ -57,8 +57,10 @@ func TestOverNamedpipe(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			URI:          p,
-			SanitizedURI: p,
+			Transport:     mb.TransportNpipe,
+			TransportPath: "hellofromnpipe",
+			URI:           p,
+			SanitizedURI:  p,
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)
@@ -73,8 +75,6 @@ func TestOverNamedpipe(t *testing.T) {
 	})
 
 	t.Run("at specific path", func(t *testing.T) {
-		p := "npipe:///apath?__path=ok"
-
 		sd, err := npipe.DefaultSD("")
 		require.NoError(t, err)
 		l, err := npipe.NewListener(`\\.\pipe\apath`, sd)
@@ -90,8 +90,10 @@ func TestOverNamedpipe(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			URI:          p,
-			SanitizedURI: p,
+			Transport:     mb.TransportNpipe,
+			TransportPath: "apath",
+			URI:           p,
+			SanitizedURI:  p,
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)

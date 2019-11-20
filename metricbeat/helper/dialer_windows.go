@@ -21,50 +21,25 @@ package helper
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func makeDialer(t time.Duration, uri string) (transport.Dialer, string, error) {
-	if strings.Contains(uri, "unix://") {
-		return nil, fmt.Errorf(
+func makeDialer(t time.Duration, hostData mb.HostData) (transport.Dialer, string, error) {
+	switch hostData.Transport {
+	case mb.TransportUnix:
+		return nil, "", fmt.Errorf(
 			"cannot use %s as the URI, unix sockets are not supported on Windows, use npipe instead",
-			uri,
+			hostData.SanitizedURI,
 		)
-	}
-
-	if strings.HasPrefix(uri, "http+npipe://") || strings.HasPrefix(uri, "npipe://") {
-		u, err := url.Parse(uri)
-		if err != nil {
-			return nil, "", errors.Wrap(err, "fail to parse URI")
-		}
-
-		sockFile := u.Path
-
-		q := u.Query()
-		path := q.Get("__path")
-		if path != "" {
-			path, err = url.PathUnescape(path)
-			if err != nil {
-				return nil, "", fmt.Errorf("could not unescape resource path %s", path)
-			}
-		}
-		q.Del("__path")
-
-		var qStr string
-		if encoded := q.Encode(); encoded != "" {
-			qStr = "?" + encoded
-		}
-
+	case mb.TransportUnix:
 		return npipe.DialContext(
 			strings.TrimSuffix(npipe.TransformString(p), "/"),
-		), "http://npipe/" + path + qStr, nil
+		), mb.SanitizedURI, nil
+	default:
+		return transport.NetDialer(t), hostData.SanitizedURI, nil
 	}
-
-	return transport.NetDialer(t), uri, nil
 }

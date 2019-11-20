@@ -173,7 +173,6 @@ func TestOverUnixSocket(t *testing.T) {
 		defer os.RemoveAll(tmpDir)
 
 		sockFile := tmpDir + "/test.sock"
-		uri := "unix://" + sockFile
 
 		l, err := net.Listen("unix", sockFile)
 		require.NoError(t, err)
@@ -189,8 +188,10 @@ func TestOverUnixSocket(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			URI:          uri,
-			SanitizedURI: uri,
+			Transport:     mb.TransportUnix,
+			TransportPath: sockFile,
+			URI:           "http://unix/",
+			SanitizedURI:  "http://unix",
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)
@@ -210,7 +211,7 @@ func TestOverUnixSocket(t *testing.T) {
 		defer os.RemoveAll(tmpDir)
 
 		sockFile := tmpDir + "/test.sock"
-		uri := "unix://" + sockFile + "/?__path=ok"
+		uri := "http://unix/ok"
 
 		l, err := net.Listen("unix", sockFile)
 		require.NoError(t, err)
@@ -226,8 +227,10 @@ func TestOverUnixSocket(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			URI:          uri,
-			SanitizedURI: uri,
+			Transport:     mb.TransportUnix,
+			TransportPath: sockFile,
+			URI:           uri,
+			SanitizedURI:  uri,
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)

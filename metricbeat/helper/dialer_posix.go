@@ -21,49 +21,23 @@ package helper
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/api/npipe"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func makeDialer(t time.Duration, uri string) (transport.Dialer, string, error) {
-	if npipe.IsNPipe(uri) {
+func makeDialer(t time.Duration, hostData mb.HostData) (transport.Dialer, string, error) {
+	switch hostData.Transport {
+	case mb.TransportNpipe:
 		return nil, "", fmt.Errorf(
 			"cannot use %s as the URI, named pipes are only supported on Windows",
-			uri,
+			hostData.SanitizedURI,
 		)
+	case mb.TransportUnix:
+		return transport.UnixDialer(t, strings.TrimSuffix(hostData.TransportPath, "/")), hostData.SanitizedURI, nil
+	default:
+		return transport.NetDialer(t), hostData.SanitizedURI, nil
 	}
-
-	if strings.HasPrefix(uri, "http+unix://") || strings.HasPrefix(uri, "unix://") {
-		u, err := url.Parse(uri)
-		if err != nil {
-			return nil, "", errors.Wrap(err, "fail to parse URI")
-		}
-
-		sockFile := u.Path
-
-		q := u.Query()
-		path := q.Get("__path")
-		if path != "" {
-			path, err = url.PathUnescape(path)
-			if err != nil {
-				return nil, "", fmt.Errorf("could not unescape resource path %s", path)
-			}
-		}
-		q.Del("__path")
-
-		var qStr string
-		if encoded := q.Encode(); encoded != "" {
-			qStr = "?" + encoded
-		}
-
-		return transport.UnixDialer(t, strings.TrimSuffix(sockFile, "/")), "http://unix/" + path + qStr, nil
-	}
-
-	return transport.NetDialer(t), uri, nil
 }

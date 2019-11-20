@@ -114,6 +114,10 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 // the HostData.Host field is set to the URLs path instead of the URLs host,
 // the same happens for "npipe".
 func NewHostDataFromURL(u *url.URL) mb.HostData {
+	return NewHostDataFromURLWithTransport(mb.TransportDefault, "", u)
+}
+
+func NewHostDataFromURLWithTransport(transport mb.Transport, path string, u *url.URL) mb.HostData {
 	var user, pass string
 	if u.User != nil {
 		user = u.User.Username()
@@ -126,11 +130,13 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	}
 
 	return mb.HostData{
-		URI:          u.String(),
-		SanitizedURI: redactURLCredentials(u).String(),
-		Host:         host,
-		User:         user,
-		Password:     pass,
+		Transport:     transport,
+		TransportPath: path,
+		URI:           u.String(),
+		SanitizedURI:  redactURLCredentials(u).String(),
+		Host:          host,
+		User:          user,
+		Password:      pass,
 	}
 }
 
@@ -138,13 +144,13 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 // defaults that are added to the URL if not present in the rawHost value.
 // Values from the rawHost take precedence over the defaults.
 func ParseURL(rawHost, scheme, user, pass, path, query string) (mb.HostData, error) {
-	u, err := getURL(rawHost, scheme, user, pass, path, query)
+	u, transport, path, err := getURL(rawHost, scheme, user, pass, path, query)
 
 	if err != nil {
 		return mb.HostData{}, err
 	}
 
-	return NewHostDataFromURL(u), nil
+	return NewHostDataFromURLWithTransport(transport, path, u), nil
 }
 
 // SetURLUser set the user credentials in the given URL. If the username or
@@ -179,9 +185,9 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 
 // getURL constructs a URL from the rawHost value and adds the provided user,
 // password, path, and query params if one was not set in the rawURL value.
-func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, error) {
-	// Normalize npipe definition into a URI format.
-	rawURL = strings.Replace(rawURL, `\\.\pipe\`, "npipe:///", 1)
+func getURL(
+	rawURL, scheme, username, password, path, query string,
+) (*url.URL, mb.Transport, string, error) {
 
 	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
 		// Add scheme.
@@ -190,66 +196,39 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing URL: %v", err)
+		return nil, mb.TransportDefault, "", fmt.Errorf("error parsing URL: %v", err)
+	}
+
+	// discover the transport to use to communicate with the host if we have a combined scheme.
+	// possible values are mb.TransportTCP, mb.transportUnix or mb.TransportNpipe.
+	var t mb.Transport
+	var transportPath string
+	switch u.Scheme {
+	case "http+unix":
+		t = mb.TransportUnix
+		transportPath = u.Path
+		u.Path = ""
+		u.Scheme = "http"
+		u.Host = "unix"
+	case "http+npipe":
+		t = mb.TransportNpipe
+		p := strings.Replace(u.Path, "/pipe", `\\.pipe`, 1)
+		p = strings.Replace(p, "/", "\\", -1)
+		transportPath = p
+
+		u.Path = ""
+		u.Scheme = "http"
+		u.Host = "npipe"
+
+	default:
+		t = mb.TransportDefault
 	}
 
 	SetURLUser(u, username, password)
-	if strings.HasSuffix(u.Scheme, "unix") || strings.HasSuffix(u.Scheme, "npipe") {
-		// Taking the URI RFC (RFC3986) https://tools.ietf.org/html/rfc3986 as the source of truth.
-		//
-		// The specs does not contains an official way of defining an absolute HTTP resource
-		// while using a unix domain socket or a npipe as the transport layer.
-		// Lets say that you want to connect to the socket and get a path. (GET /stats)
-		// in the a normal URI you would define it like this http://host/stats so the path and the host
-		// would be parsed in two different field like this:
-		//
-		// {
-		// Scheme: "http",
-		// Host: "host",
-		// Path: "stats",
-		// }
-		//
-		// Now if you take the Golang URL parser and use an URI to define a unix domain socket:
-		// unix:///tmp/fb.sock, the parser will do the following.
-		//
-		// {
-		// Scheme: "unix",
-		// Host: "",
-		// Path: "/tmp/fb.sock"
-		// }
-		//
-		// Now lets say that you want to access a specific path after making the connection? You cannot
-		// set that information in the path. The other choice would be to take the path and use it as the
-		// host and set the path to the actual resource. The problem is if you do that, the path will be
-		// URL encoded. Now the information is correctly set in the url.URL struct. But if you take the
-		// object and convert it back to a string and later try to parse it again. The URI will now
-		// be invalid because of the encoding. This will also breaks multiples modules tests. So I think
-		// The easiest way to go around that is to define an internal DSN when a unix domain socket is
-		// used and set the path as a query string. Taking the socket file defined earlier and the "stats"
-		// path the struct will look like this.
-		//
-		// {
-		// Scheme: "unix",
-		// Host: "",
-		// Path: "/tmp/fb.sock?__path=stats
-		// }
-		//
-		// The change will not impact any existing behavior that use a parsed sockfile directly, but if
-		// you use the socket file to connect via HTTP it will be transparent.
-		if u.Host == "" && path != "" {
-			q := u.Query()
-			s := q.Get("__path")
-			if s == "" {
-				q.Set("__path", path)
-			} else {
-				return nil, fmt.Errorf("fail to set the path in the query string")
-			}
 
-			u.RawQuery = q.Encode()
-		}
-	} else {
+	if !strings.HasSuffix(u.Scheme, "unix") && !strings.HasSuffix(u.Scheme, "npipe") {
 		if u.Host == "" {
-			return nil, fmt.Errorf("error parsing URL: empty host")
+			return nil, t, "", fmt.Errorf("error parsing URL: empty host")
 		}
 
 		// Validate the host. The port is optional.
@@ -258,11 +237,11 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 			if strings.Contains(err.Error(), "missing port") {
 				host = u.Host
 			} else {
-				return nil, fmt.Errorf("error parsing URL: %v", err)
+				return nil, t, "", fmt.Errorf("error parsing URL: %v", err)
 			}
 		}
 		if host == "" {
-			return nil, fmt.Errorf("error parsing URL: empty host")
+			return nil, t, "", fmt.Errorf("error parsing URL: empty host")
 		}
 	}
 
@@ -277,7 +256,7 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 
 	//Adds the query params in the url
 	u, err = SetQueryParams(u, query)
-	return u, err
+	return u, t, transportPath, err
 }
 
 // SetQueryParams adds the query params to existing query parameters overwriting any
