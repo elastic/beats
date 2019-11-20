@@ -1,12 +1,12 @@
 import random
+import os
+import stomp
 import string
 import sys
-
-import stomp
 import unittest
 
-from xpack_metricbeat import XPackTest
-import metricbeat
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+from xpack_metricbeat import XPackTest, metricbeat
 
 
 class ActiveMqTest(XPackTest):
