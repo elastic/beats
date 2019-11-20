@@ -92,7 +92,7 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
 		return nil, nil, errMonitoringBothConfigEnabled
 	case beatCfg.XPackMonitoring.Enabled():
-		cfgwarn.Deprecate("8.0", warnMonitoringDeprecatedConfig)
+		cfgwarn.Deprecate("8.0.0", warnMonitoringDeprecatedConfig)
 		monitoringCfg := beatCfg.XPackMonitoring
 		return monitoringCfg, &report.Settings{Format: report.FormatXPackMonitoringBulk}, nil
 	case beatCfg.Monitoring.Enabled():
