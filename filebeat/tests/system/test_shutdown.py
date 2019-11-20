@@ -36,7 +36,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
-            shutdown_timeout="10s",
+            shutdown_timeout="30s",
         )
         filebeat = self.start_beat()
 
@@ -54,7 +54,7 @@ class Test(BaseTest):
         try:
             self.wait_log_contains(
                 "Continue shutdown: All enqueued events being published.",
-                max_timeout=15)
+                max_timeout=35)
         except:
             print self.get_log()
             raise
