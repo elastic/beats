@@ -88,12 +88,15 @@ processors:
 
   # Add network.type: ipv4 or ipv6
   - if:
-      contains.source.ip: .
+      contains.source.ip: "."
     then:
       - add_fields:
           target: network
           fields: {type: ipv4}
-    else:
+
+  - if:
+      contains.source.ip: ":"
+    then:
       - add_fields:
           target: network
           fields: {type: ipv6}

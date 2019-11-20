@@ -25,7 +25,6 @@
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 0,
-        "network.type": "ipv6",
         "service.type": "aws"
     },
     {
@@ -54,7 +53,6 @@
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 82,
-        "network.type": "ipv6",
         "service.type": "aws"
     }
 ]
