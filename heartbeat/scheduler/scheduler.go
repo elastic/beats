@@ -152,7 +152,7 @@ func (s *Scheduler) missedDeadlineReporter() {
 			t.Stop()
 			return
 		case <-t.C:
-			logp.Info("JOBS RUN %d", s.jobsRun.Load())
+			logp.Info("JOBS RUN %d / %d", s.jobsRun.Load(), s.timerQueue.th.Len())
 			missingNow := s.jobsMissedDeadline.Get()
 			missedDelta := missingNow - missedAtLastCheck
 			if missedDelta > 0 {

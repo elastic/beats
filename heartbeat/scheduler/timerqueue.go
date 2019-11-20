@@ -34,15 +34,17 @@ type TimerTaskFn func(now time.Time)
 
 type TimerQueue struct {
 	th              *TimerHeap
-	mtx             sync.Mutex
+	mtx             *sync.Mutex
 	nextRunAt       *time.Time
-	nextRunAtChange chan struct{}
+	nextRunAtChange chan time.Time
 }
 
 func NewTimerQueue() *TimerQueue {
+	mtx := &sync.Mutex{}
 	tq := &TimerQueue{
 		th:              &TimerHeap{},
-		nextRunAtChange: make(chan struct{}),
+		mtx:             mtx,
+		nextRunAtChange: make(chan time.Time),
 	}
 	heap.Init(tq.th)
 
@@ -51,17 +53,19 @@ func NewTimerQueue() *TimerQueue {
 
 func (tq *TimerQueue) Push(tt *TimerTask) {
 	tq.mtx.Lock()
-	defer tq.mtx.Unlock()
 
 	heap.Push(tq.th, tt)
 
 	if tq.nextRunAt == nil || tt.runAt.Before(*tq.nextRunAt) {
 		tq.nextRunAt = &tt.runAt
-		tq.nextRunAtChange <- struct{}{}
+		tq.mtx.Unlock()
+		tq.nextRunAtChange <- tt.runAt
+	} else {
+		tq.mtx.Unlock()
 	}
 }
 
-func (tq *TimerQueue) PopRunnable() (res []*TimerTask) {
+func (tq *TimerQueue) PopRunnable() (res []*TimerTask, newNext *time.Time) {
 	tq.mtx.Lock()
 	defer tq.mtx.Unlock()
 
@@ -78,12 +82,12 @@ func (tq *TimerQueue) PopRunnable() (res []*TimerTask) {
 		}
 	}
 
-	// We no longer have a next time to run
 	if tq.th.Len() == 0 {
 		tq.nextRunAt = nil
 	}
 
-	return res
+	// make a copy of the nextRunAt pointer for threadsafety
+	return res, &(*tq.nextRunAt)
 }
 
 func (tq *TimerQueue) Start(ctx context.Context) {
@@ -91,30 +95,36 @@ func (tq *TimerQueue) Start(ctx context.Context) {
 	timer := time.NewTimer(1)
 	go func() {
 		for {
+			var newNext *time.Time
 			select {
 			case <-ctx.Done():
 				// Stop the timerqueue
 				return
 			case <-timer.C:
-				tq.RunRunnableTasks()
-			case <-tq.nextRunAtChange:
+				newNext = tq.RunRunnableTasks()
+			case changed := <-tq.nextRunAtChange:
+				newNext = &changed
 				timer.Stop()
 			}
 
-			tq.mtx.Lock()
-			if tq.nextRunAt != nil {
-				next := tq.nextRunAt.Sub(time.Now())
-				timer.Reset(next)
+			if newNext != nil {
+				nextIn := newNext.Sub(time.Now())
+				if nextIn < 1 {
+					timer.Reset(1)
+				} else {
+					timer.Reset(nextIn)
+				}
 			}
-			tq.mtx.Unlock()
 		}
 	}()
 }
 
 // RunRunnableTasks runs all tasks that are currently runnable
-func (tq *TimerQueue) RunRunnableTasks() {
-	runnable := tq.PopRunnable()
+func (tq *TimerQueue) RunRunnableTasks() *time.Time {
+	runnable, newNext := tq.PopRunnable()
+	now := time.Now()
 	for _, tt := range runnable {
-		go tt.fn(time.Now())
+		go tt.fn(now)
 	}
+	return newNext
 }
