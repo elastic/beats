@@ -38,6 +38,9 @@ endif::[]
 ifndef::no_convert_processor[]
 * <<convert,`convert`>>
 endif::[]
+ifndef::no_copy_fields_processor[]
+* <<copy-fields, `copy_fields`>>
+endif::[]
 ifndef::no_decode_base64_field_processor[]
 * <<decode-base64-field,`decode_base64_field`>>
 endif::[]
@@ -85,6 +88,9 @@ ifndef::no_script_processor[]
 endif::[]
 ifndef::no_timestamp_processor[]
 * <<processor-timestamp,`timestamp`>>
+endif::[]
+ifndef::no_truncate_fields_processor[]
+* <<truncate-fields, `truncate_fields`>>
 endif::[]
 //# end::processors-list[]
 
