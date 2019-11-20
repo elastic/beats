@@ -402,30 +402,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	r, err := b.setupMonitoring(settings)
 	if err != nil {
 		return err
 	}
-
-	if monitoringCfg.Enabled() {
-		settings := report.Settings{
-			DefaultUsername: settings.Monitoring.DefaultUsername,
-			Format:          reporterSettings.Format,
-			ClusterUUID:     reporterSettings.ClusterUUID,
-		}
-		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
-		if err != nil {
-			return err
-		}
-		defer reporter.Stop()
-
-		// Expose monitoring.cluster_uuid in state API
-		if reporterSettings.ClusterUUID != "" {
-			stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-			monitoringRegistry := stateRegistry.NewRegistry("monitoring")
-			clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
-			clusterUUIDRegVar.Set(reporterSettings.ClusterUUID)
-		}
+	if r != nil {
+		defer r.Stop()
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
@@ -885,6 +867,41 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 	}
 
 	return callback, nil
+}
+
+func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
+	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	monitoringClusterUUID, err := monitoring.GetClusterUUID(monitoringCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Expose monitoring.cluster_uuid in state API
+	if monitoringClusterUUID != "" {
+		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+		monitoringRegistry := stateRegistry.NewRegistry("monitoring")
+		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
+		clusterUUIDRegVar.Set(monitoringClusterUUID)
+	}
+
+	if monitoring.IsEnabled(monitoringCfg) {
+		settings := report.Settings{
+			DefaultUsername: settings.Monitoring.DefaultUsername,
+			Format:          reporterSettings.Format,
+			ClusterUUID:     monitoringClusterUUID,
+		}
+		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
+		if err != nil {
+			return nil, err
+		}
+		return reporter, nil
+	}
+
+	return nil, nil
 }
 
 // handleError handles the given error by logging it and then returning the
