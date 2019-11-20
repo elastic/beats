@@ -93,7 +93,7 @@ ifndef::no_truncate_fields_processor[]
 * <<truncate-fields, `truncate_fields`>>
 endif::[]
 ifndef::no_uuid_processor[]
-* <<processor-uuid,`uuid`>>
+* <<uuid,`uuid`>>
 endif::[]
 //# end::processors-list[]
 

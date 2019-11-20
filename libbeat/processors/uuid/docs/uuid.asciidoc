@@ -11,8 +11,8 @@ processors:
 
 The following settings are supported:
 
-`target_field`:: (Optional) Field in which the generated ID should be stored. Default is `@metadata.id`.
+`target_field`:: (Optional) Field where the generated ID will be stored. Default is `@metadata.id`.
 
 `type`:: (Optional) Type of ID to generate. Currently only `elasticsearch` is supported and is the default.
 The `elasticsearch` type generates IDs using the same algorithm that Elasticsearch uses for auto-generating
-its document IDs.
+document IDs.
