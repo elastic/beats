@@ -276,6 +276,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Fix data race affecting config validation at startup. {issue}13005[13005]
+- Set host.name to computername in Windows event logs & sysmon.  Requires {pull}14407[14407] in libbeat to work  {issue}13706[13706]
 
 *Functionbeat*
 
