@@ -8,7 +8,7 @@
       type: keyword
     - name: available_buffer_bytes
       description: The total amount of buffer memory
-      type: long
+      type: float
     - name: batch_size_avg
       description: The average number of bytes sent
       type: float
@@ -26,7 +26,7 @@
       type: float
     - name: records_per_request
       description: The average number of records sent per second
-      type: long
+      type: float
     - name: record_size_avg
       description: The average record size
       type: float
@@ -44,4 +44,4 @@
       type: float
     - name: bytes_out
       description: The rate of bytes going out for the producer
-      type: long
+      type: float

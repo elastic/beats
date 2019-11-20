@@ -17,4 +17,4 @@
       type: float
     - name: bytes_in
       description: The rate of bytes coming in to the consumer
-      type: long
+      type: float
