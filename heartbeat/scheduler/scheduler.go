@@ -255,6 +255,8 @@ func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc) {
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
 func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	// The accounting for waiting/active tasks is done using atomics.
 	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
 	s.waitingTasks.Inc()
@@ -274,18 +276,9 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 		continuations := task()
 		s.activeTasks.Dec()
 
-		// Re-use this go-routine to run the first continuation present.
-		// If there are > 1 continuations we can still re-use this go-routine for the first one
-		// and spin off extra go routines to run the rest
-		if len(continuations) > 0 {
-			firstCont, restCont := continuations[0], continuations[1:]
-			wg.Add(len(restCont))
-			for _, cont := range restCont {
-				go s.runRecursiveTask(jobCtx, cont, wg) // Run continuations in parallel, note that these each will acquire their own slots
-			}
-			firstCont() // we can reuse this goroutine to run this task
+		for _, cont := range continuations {
+			go s.runRecursiveTask(jobCtx, cont, wg) // Run continuations in parallel, note that these each will acquire their own slots
 		}
 	}
 
-	wg.Done()
 }
