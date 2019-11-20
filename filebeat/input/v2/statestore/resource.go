@@ -90,7 +90,7 @@ func (r *Resource) unlink() {
 	entry := r.entry
 	r.entry = nil
 
-	r.store.releaseEntry(entry)
+	r.store.shared.releaseEntry(entry)
 }
 
 // Lock locks a resource held by the store. It blocks until the lock becomes
@@ -154,7 +154,7 @@ func (r *Resource) Has() (bool, error) {
 
 	has := false
 
-	err := r.store.persistentStore.View(func(tx *registry.Tx) error {
+	err := r.store.shared.persistentStore.View(func(tx *registry.Tx) error {
 		found, err := tx.Has(registry.Key(r.key))
 		if err == nil {
 			has = found
@@ -205,7 +205,7 @@ func (r *Resource) Update(val interface{}) error {
 		}
 	}
 
-	err := r.store.persistentStore.Update(func(tx *registry.Tx) error {
+	err := r.store.shared.persistentStore.Update(func(tx *registry.Tx) error {
 		return tx.Update(registry.Key(r.key), val)
 	})
 	if err != nil {
@@ -246,7 +246,7 @@ func (r *Resource) Read(to interface{}) error {
 		entry.value.mux.Unlock()
 	}
 
-	err := r.store.persistentStore.View(func(tx *registry.Tx) error {
+	err := r.store.shared.persistentStore.View(func(tx *registry.Tx) error {
 		vd, err := tx.Get(registry.Key(r.key))
 		if err != nil || vd == nil {
 			return err
@@ -289,7 +289,7 @@ func (r *Resource) UpdateOp(val interface{}) (*ResourceUpdateOp, error) {
 	// load current state from persistent store if there is no cached entry in
 	// the resource.
 	if entry.value.pending == 0 {
-		err := r.store.persistentStore.View(func(tx *registry.Tx) error {
+		err := r.store.shared.persistentStore.View(func(tx *registry.Tx) error {
 			vd, err := tx.Get(registry.Key(r.key))
 			if err != nil || vd == nil {
 				return err

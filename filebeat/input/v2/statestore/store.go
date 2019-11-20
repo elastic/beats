@@ -35,18 +35,17 @@ type Store struct {
 	active atomic.Bool
 
 	session *storeSession
-	*store
+	shared  *sharedStore
 }
 
-// store is the shared store instance as is tracked by the Connector.
+// sharedStore is the shared store instance as is tracked by the Connector.
 // Any two go-routines accessing a Store will reference the same underlying store.
 // If one of the go-routines closes the store, we ensure that the shared resources
 // are kept alive until all go-routines have given up access.
-type store struct {
+type sharedStore struct {
 	refCount concert.RefCount
 
-	parent *Connector
-	name   string
+	name string
 
 	persistentStore *registry.Store
 	resourcesMux    sync.Mutex
@@ -61,32 +60,36 @@ type store struct {
 // update operations have been persisted.
 type storeSession struct {
 	refCount concert.RefCount
-	store    *store
+	store    *sharedStore
+
+	// keep track of owner, so we can remove close the shared store once the last
+	// session goes away.
+	connector *Connector
 }
 
-func newSession(store *store) *storeSession {
-	session := &storeSession{store: store}
+func newSession(connector *Connector, store *sharedStore) *storeSession {
+	session := &storeSession{connector: connector, store: store}
 	session.refCount.Action = func(_ error) { session.Close() }
 	return session
 }
 
 func (s *storeSession) Close() {
-	connector := s.store.parent
-	connector.releaseStore(s.store)
+	s.connector.releaseStore(s.store)
 	s.store = nil
+	s.connector = nil
 }
 
 func (s *storeSession) Retain()       { s.refCount.Retain() }
 func (s *storeSession) Release() bool { return s.refCount.Release() }
 
 // newStore creates a new state Store with an active session.
-func newStore(store *store) *Store {
-	invariant(store != nil, "missing a persistent store")
+func newStore(session *storeSession) *Store {
+	invariant(session != nil, "missing a persistent store")
 
 	return &Store{
 		active:  atomic.MakeBool(true),
-		store:   store,
-		session: newSession(store),
+		shared:  session.store,
+		session: session,
 	}
 }
 
@@ -111,9 +114,9 @@ func (s *Store) findOrCreate(key ResourceKey, lm lockMode) (res *resourceEntry) 
 		return nil
 	}
 
-	withLockMode(&s.resourcesMux, lm, func() error {
-		if res = s.resources.Find(key); res == nil {
-			res = s.resources.Create(key)
+	withLockMode(&s.shared.resourcesMux, lm, func() error {
+		if res = s.shared.resources.Find(key); res == nil {
+			res = s.shared.resources.Create(key)
 		}
 		return nil
 	})
@@ -126,7 +129,7 @@ func (s *Store) find(key ResourceKey, lm lockMode) (res *resourceEntry) {
 	if !s.active.Load() {
 		return nil
 	}
-	return s.store.find(key, lm)
+	return s.shared.find(key, lm)
 }
 
 // create adds a new entry to the in-memory table and returns the pointer to the entry.
@@ -135,16 +138,16 @@ func (s *Store) create(key ResourceKey, lm lockMode) (res *resourceEntry) {
 	if !s.active.Load() {
 		return nil
 	}
-	return s.store.create(key, lm)
+	return s.shared.create(key, lm)
 }
 
-func (s *store) close() error {
+func (s *sharedStore) close() error {
 	err := s.persistentStore.Close()
 	s.persistentStore = nil
 	return err
 }
 
-func (s *store) releaseEntry(entry *resourceEntry) {
+func (s *sharedStore) releaseEntry(entry *resourceEntry) {
 	s.resourcesMux.Lock()
 	defer s.resourcesMux.Unlock()
 	if entry.refCount.Release() {
@@ -152,7 +155,7 @@ func (s *store) releaseEntry(entry *resourceEntry) {
 	}
 }
 
-func (s *store) find(key ResourceKey, lm lockMode) (res *resourceEntry) {
+func (s *sharedStore) find(key ResourceKey, lm lockMode) (res *resourceEntry) {
 	withLockMode(&s.resourcesMux, lm, func() error {
 		res = s.resources.Find(key)
 		return nil
@@ -160,7 +163,7 @@ func (s *store) find(key ResourceKey, lm lockMode) (res *resourceEntry) {
 	return res
 }
 
-func (s *store) create(key ResourceKey, lm lockMode) (res *resourceEntry) {
+func (s *sharedStore) create(key ResourceKey, lm lockMode) (res *resourceEntry) {
 	withLockMode(&s.resourcesMux, lm, func() error {
 		res = s.resources.Create(key)
 		return nil
@@ -168,7 +171,7 @@ func (s *store) create(key ResourceKey, lm lockMode) (res *resourceEntry) {
 	return res
 }
 
-func (s *store) remove(key ResourceKey, lm lockMode) {
+func (s *sharedStore) remove(key ResourceKey, lm lockMode) {
 	withLockMode(&s.resourcesMux, lm, func() error {
 		s.resources.Remove(key)
 		return nil

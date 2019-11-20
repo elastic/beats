@@ -32,7 +32,7 @@ type Connector struct {
 	mux sync.Mutex
 
 	// set of stores currently with at least one active session.
-	stores map[string]*store
+	stores map[string]*sharedStore
 }
 
 // NewConnector creates a new store connector for accessing a resource Store.
@@ -43,7 +43,7 @@ func NewConnector(log *logp.Logger, reg *registry.Registry) *Connector {
 	return &Connector{
 		log:      log,
 		registry: reg,
-		stores:   map[string]*store{},
+		stores:   map[string]*sharedStore{},
 	}
 }
 
@@ -62,24 +62,23 @@ func (c *Connector) Open(name string) (*Store, error) {
 		persistentStore.Close()
 	})
 
-	sharedStore := c.stores[name]
-	if sharedStore == nil {
-		sharedStore = &store{
-			parent:          c,
+	shared := c.stores[name]
+	if shared == nil {
+		shared = &sharedStore{
 			name:            name,
 			persistentStore: persistentStore,
 			resources:       table{},
 		}
-		c.stores[name] = sharedStore
+		c.stores[name] = shared
 	} else {
-		sharedStore.refCount.Retain()
+		shared.refCount.Retain()
 	}
 
 	ok = true
-	return newStore(sharedStore), nil
+	return newStore(newSession(c, shared)), nil
 }
 
-func (c *Connector) releaseStore(store *store) {
+func (c *Connector) releaseStore(store *sharedStore) {
 	c.mux.Lock()
 	released := store.refCount.Release()
 	if released {
