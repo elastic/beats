@@ -339,6 +339,35 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/cespare/xxhash
+Revision: 2372543dd2bbab7a55ce14c54eb357abe23a42f5
+License type (autodetected): MIT
+./vendor/github.com/cespare/xxhash/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2016 Caleb Spare
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/cloudflare/cfssl
 Revision: b1ec8c586c2aa3ec3eaf4a622933f169cfa5648b
 License type (autodetected): BSD-2-Clause
@@ -4217,15 +4246,6 @@ Dependency: github.com/modern-go/reflect2
 Revision: 94122c33edd36123c84d5368cfb2b69df93a0ec8
 License type (autodetected): Apache-2.0
 ./vendor/github.com/modern-go/reflect2/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: github.com/OneOfOne/xxhash
-Revision: 74ace4fe5525ef62ce28d5093d6b0faaa6a575f3
-License type (autodetected): Apache-2.0
-./vendor/github.com/OneOfOne/xxhash/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
