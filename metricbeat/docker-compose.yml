@@ -16,7 +16,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/observability-ci/beats-integration-elasticsearch:${ELASTICSEARCH_VERSION:-7.4.0}-1
     build:
-      context: ./_meta
+      context: ./module/elasticsearch/_meta
       args:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.4.0}
     environment:
@@ -38,7 +38,7 @@ services:
   kibana:
     image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
     build:
-      context: ./_meta
+      context: ./module/kibana/_meta
       args:
         KIBANA_VERSION: ${KIBANA_VERSION:-7.4.0}
     depends_on:
