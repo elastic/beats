@@ -18,6 +18,7 @@
 package perfmon
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -86,4 +87,33 @@ func TestSuccessfulQuery(t *testing.T) {
 	list, err := q.GetFormattedCounterValues()
 	assert.Nil(t, err)
 	assert.NotNil(t, list)
+}
+
+// TestInstanceNameRegexp tests regular expression for instance.
+func TestInstanceNameRegexp(t *testing.T) {
+	queryPaths := []string{`\SQLServer:Databases(*)\Log File(s) Used Size (KB)`, `\Search Indexer(*)\L0 Indexes (Wordlists)`,
+		`\Search Indexer(*)\L0 Merges (flushes) Now.`, `\NUMA Node Memory(*)\Free & Zero Page List MBytes`}
+	for _, path := range queryPaths {
+		matches := instanceNameRegexp.FindStringSubmatch(path)
+		if len(matches) == 2 {
+			assert.Equal(t, matches[1], "*")
+		} else {
+			t.Fatal(errors.New("regular expression did not return any matches"))
+		}
+	}
+}
+
+// TestObjectNameRegexp tests regular expression for object.
+func TestObjectNameRegexp(t *testing.T) {
+	queryPaths := []string{`\Web Service Cache\Output Cache Current Flushed Items`,
+		`\Web Service Cache\Output Cache Total Flushed Items`, `\Web Service Cache\Total Flushed Metadata`,
+		`\Web Service Cache\Kernel: Current URIs Cached`}
+	for _, path := range queryPaths {
+		matches := objectNameRegexp.FindStringSubmatch(path)
+		if len(matches) == 2 {
+			assert.Equal(t, matches[1], "Web Service Cache")
+		} else {
+			t.Fatal(errors.New("regular expression did not return any matches"))
+		}
+	}
 }
