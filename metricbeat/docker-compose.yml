@@ -12,6 +12,7 @@ services:
     network_mode: host
     command: make
 
+  # Used by base tests
   elasticsearch:
     image: docker.elastic.co/observability-ci/beats-integration-elasticsearch:${ELASTICSEARCH_VERSION:-7.4.0}-1
     build:
@@ -27,6 +28,13 @@ services:
     ports:
       - 9200
 
+  # Used by autodiscover tests
+  jolokia:
+    extends:
+      file: ./module/jolokia/docker-compose.yml
+      service: jolokia
+
+  # Used by base tests
   kibana:
     image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
     build:

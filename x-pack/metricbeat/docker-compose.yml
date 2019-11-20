@@ -12,11 +12,13 @@ services:
     network_mode: host
     command: make
 
+  # Used by base tests
   elasticsearch:
     extends:
-      file: ../../metricbeat/module/elasticsearch/docker-compose.yml
+      file: ../../metricbeat/docker-compose.yml
       service: elasticsearch
 
+  # Used by base tests
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
