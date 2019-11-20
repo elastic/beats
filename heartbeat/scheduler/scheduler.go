@@ -126,7 +126,7 @@ func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 func (s *Scheduler) Start() error {
 	if s.state.Load() == stateStopped {
 		return InvalidTransitionError
-	} else if !s.state.CAS(statePreRunning, stateRunning) {
+		//} else if !s.state.CAS(statePreRunning, stateRunning) {
 		// We already were running, so just return nil and do nothing.
 		return nil
 	}
@@ -190,14 +190,14 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 
 	// lastRanAt stores the last runAt the task was invoked
 	// The initial value is runAt.Now() because we use it to get the next runAt a job is scheduled to run
-	lastRanAt := time.Now()
+	lastRanAt := time.Now().In(s.location)
 
 	var taskFn TimerTaskFn
 
 	schedNextRun := func() {
 		next := sched.Next(lastRanAt)
 
-		now := time.Now()
+		now := time.Now().In(s.location)
 		if next.Before(now) {
 			// Our last invocation went long!
 			s.jobsMissedDeadline.Inc()
