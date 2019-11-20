@@ -497,6 +497,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release aws ebs metricset as GA. {pull}14312[14312] {issue}14060[14060]
 - Add `connection.state` field for RabbitMQ module. {pull}13981[13981]
 - Add more TCP states to Metricbeat system socket_summary. {pull}14347[14347]
+- Add Kafka JMX metricsets. {pull}14330[14330]
 - Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
 - Add module for ActiveMQ. {pull}14580[14580]
 
