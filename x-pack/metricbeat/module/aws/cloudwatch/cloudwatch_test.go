@@ -652,44 +652,57 @@ func TestReadCloudwatchConfig(t *testing.T) {
 func TestGenerateFieldName(t *testing.T) {
 	cases := []struct {
 		title             string
+		metricsetName     string
 		label             []string
 		expectedFieldName string
 	}{
 		{
 			"test Average",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.avg",
+			"aws.cloudwatch.metrics.CPUUtilization.avg",
 		},
 		{
 			"test Maximum",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.max",
+			"aws.cloudwatch.metrics.CPUUtilization.max",
 		},
 		{
 			"test Minimum",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.min",
+			"aws.cloudwatch.metrics.CPUUtilization.min",
 		},
 		{
 			"test Sum",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.sum",
+			"aws.cloudwatch.metrics.CPUUtilization.sum",
 		},
 		{
 			"test SampleCount",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.count",
+			"aws.cloudwatch.metrics.CPUUtilization.count",
 		},
 		{
 			"test extended statistic",
+			"cloudwatch",
 			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
-			"aws.metrics.CPUUtilization.p10",
+			"aws.cloudwatch.metrics.CPUUtilization.p10",
+		},
+		{
+			"test other metricset",
+			"ec2",
+			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
+			"aws.ec2.metrics.CPUUtilization.p10",
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			fieldName := generateFieldName(c.label)
+			fieldName := generateFieldName(c.metricsetName, c.label)
 			assert.Equal(t, c.expectedFieldName, fieldName)
 		})
 	}
