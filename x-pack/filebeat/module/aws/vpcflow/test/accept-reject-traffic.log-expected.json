@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2014-12-14T04:07:50.000Z",
+        "@timestamp": "2019-11-19T21:49:28.999Z",
         "aws.vpcflow.account_id": "123456789010",
         "aws.vpcflow.action": "ACCEPT",
         "aws.vpcflow.bytes": "4249",
@@ -33,7 +33,6 @@
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 78.24.182.42 158.109.0.1 20641 22 6 20 4249 1418530010 1418530070 ACCEPT OK",
         "event.outcome": "allow",
-        "event.start": "2014-12-14T04:06:50.000Z",
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",
@@ -65,7 +64,7 @@
         "source.port": 20641
     },
     {
-        "@timestamp": "2014-12-14T04:07:50.000Z",
+        "@timestamp": "2019-11-19T21:49:29.007Z",
         "aws.vpcflow.account_id": "123456789010",
         "aws.vpcflow.action": "REJECT",
         "aws.vpcflow.bytes": "4249",
@@ -98,7 +97,6 @@
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 78.24.182.42 158.109.0.1 49761 3389 6 20 4249 1418530010 1418530070 REJECT OK",
         "event.outcome": "deny",
-        "event.start": "2014-12-14T04:06:50.000Z",
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",
@@ -130,7 +128,7 @@
         "source.port": 49761
     },
     {
-        "@timestamp": "2015-05-29T16:32:22.000Z",
+        "@timestamp": "2019-11-19T21:49:29.013Z",
         "aws.vpcflow.account_id": "123456789010",
         "aws.vpcflow.action": "ACCEPT",
         "aws.vpcflow.bytes": "336",
@@ -154,7 +152,6 @@
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 203.0.113.12 172.31.16.139 0 0 1 4 336 1432917027 1432917142 ACCEPT OK",
         "event.outcome": "allow",
-        "event.start": "2015-05-29T16:30:27.000Z",
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",
@@ -176,7 +173,7 @@
         "source.port": 0
     },
     {
-        "@timestamp": "2015-05-29T16:32:22.000Z",
+        "@timestamp": "2019-11-19T21:49:29.013Z",
         "aws.vpcflow.account_id": "123456789010",
         "aws.vpcflow.action": "REJECT",
         "aws.vpcflow.bytes": "336",
@@ -200,7 +197,6 @@
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 172.31.16.139 203.0.113.12 0 0 1 4 336 1432917094 1432917142 REJECT OK",
         "event.outcome": "deny",
-        "event.start": "2015-05-29T16:31:34.000Z",
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",

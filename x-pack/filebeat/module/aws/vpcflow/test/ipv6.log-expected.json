@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2016-10-31T11:37:00.000Z",
+        "@timestamp": "2019-11-19T21:49:36.295Z",
         "aws.vpcflow.account_id": "123456789010",
         "aws.vpcflow.action": "ACCEPT",
         "aws.vpcflow.bytes": "8855",
@@ -24,7 +24,6 @@
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 2001:db8:1234:a100:8d6e:3477:df66:f105 2001:db8:1234:a102:3304:8879:34cf:4071 34892 22 6 54 8855 1477913708 1477913820 ACCEPT OK",
         "event.outcome": "allow",
-        "event.start": "2016-10-31T11:35:08.000Z",
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",

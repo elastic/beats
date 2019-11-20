@@ -3,13 +3,13 @@ description: Pipeline for AWS VPC Flow Logs
 processors:
   # Convert Unix epoch to timestamp
   - date:
-      field: "aws.vpcflow.end"
+      field: "aws.vpcflowflow.end"
       target_field: "@timestamp"
       ignore_failure: true
       formats:
         - UNIX
   - date:
-      field: "aws.vpcflow.start"
+      field: "aws.vpcflowflow.start"
       target_field: "event.start"
       ignore_failure: true
       formats:
