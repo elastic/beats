@@ -96,8 +96,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-jolokia,Jolokia>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-jolokia-jmx,jmx>>   
 |<<metricbeat-module-kafka,Kafka>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>>   
+.5+| .5+|  |<<metricbeat-metricset-kafka-broker,broker>> beta[]  
+|<<metricbeat-metricset-kafka-consumer,consumer>> beta[]  
+|<<metricbeat-metricset-kafka-consumergroup,consumergroup>>   
 |<<metricbeat-metricset-kafka-partition,partition>>   
+|<<metricbeat-metricset-kafka-producer,producer>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   

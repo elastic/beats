@@ -129,7 +129,7 @@ services:
 
   haproxy:
     image: docker.elastic.co/observability-ci/beats-integration-haproxy:${HAPROXY_VERSION:-1.8}-1
-    build: 
+    build:
       context: ./module/haproxy/_meta
       args:
         HAPROXY_VERSION: ${HAPROXY_VERSION:-1.8}
@@ -155,13 +155,16 @@ services:
       - 8778
 
   kafka:
-    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-1
+    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-2
     build:
       context: ./module/kafka/_meta
       args:
         KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
     ports:
       - 9092
+      - 8779
+      - 8775
+      - 8774
 
   kibana:
     image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
@@ -253,7 +256,7 @@ services:
 
   nginx:
     image: docker.elastic.co/observability-ci/beats-integration-nginx:${NGINX_VERSION:-1.9}-1
-    build: 
+    build:
       context: ./module/nginx/_meta
       args:
         NGINX_VERSION: ${NGINX_VERSION:-1.9}
@@ -262,7 +265,7 @@ services:
 
   phpfpm:
     image: docker.elastic.co/observability-ci/beats-integration-phpfpm:${PHPFPM_VERSION:-7.1}-1
-    build: 
+    build:
       context: ./module/php_fpm/_meta
       args:
         PHPFPM_VERSION: ${PHPFPM_VERSION:-7.1}
