@@ -117,6 +117,8 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	return NewHostDataFromURLWithTransport(mb.TransportDefault, "", u)
 }
 
+// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjonction of the
+// url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
 func NewHostDataFromURLWithTransport(transport mb.Transport, path string, u *url.URL) mb.HostData {
 	var user, pass string
 	if u.User != nil {
