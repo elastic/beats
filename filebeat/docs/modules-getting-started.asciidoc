@@ -40,9 +40,9 @@ To set up and run {beatname_uc} modules:
 installation. By default, {beatname_uc} assumes {es} is running locally on port
 9200.
 +
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
 . Enable the modules you want to run. For example, the following command enables
 the system, nginx, and mysql modules:
