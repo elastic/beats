@@ -26,19 +26,23 @@ import (
 
 type TimerTask struct {
 	fn    TimerTaskFn
+	id    string
 	runAt time.Time
 }
 
 type TimerTaskFn func(now time.Time)
 
 type TimerQueue struct {
-	th  *TimerHeap
-	mtx sync.Mutex
+	th              *TimerHeap
+	mtx             sync.Mutex
+	nextRunAt       *time.Time
+	nextRunAtChange chan struct{}
 }
 
 func NewTimerQueue() *TimerQueue {
 	tq := &TimerQueue{
-		th: &TimerHeap{},
+		th:              &TimerHeap{},
+		nextRunAtChange: make(chan struct{}),
 	}
 	heap.Init(tq.th)
 
@@ -48,7 +52,13 @@ func NewTimerQueue() *TimerQueue {
 func (tq *TimerQueue) Push(tt *TimerTask) {
 	tq.mtx.Lock()
 	defer tq.mtx.Unlock()
+
 	heap.Push(tq.th, tt)
+
+	if tq.nextRunAt == nil || tt.runAt.Before(*tq.nextRunAt) {
+		tq.nextRunAt = &tt.runAt
+		tq.nextRunAtChange <- struct{}{}
+	}
 }
 
 func (tq *TimerQueue) PopRunnable() (res []*TimerTask) {
@@ -57,13 +67,20 @@ func (tq *TimerQueue) PopRunnable() (res []*TimerTask) {
 
 	now := time.Now()
 	for i := 0; i < tq.th.Len(); i++ {
+		// the zeroth element of the heap is the same as a peek
 		peeked := (*tq.th)[0]
 		if peeked.runAt.Before(now) {
 			popped := heap.Pop(tq.th).(*TimerTask)
 			res = append(res, popped)
 		} else {
+			tq.nextRunAt = &peeked.runAt
 			break
 		}
+	}
+
+	// We no longer have a next time to run
+	if tq.th.Len() == 0 {
+		tq.nextRunAt = nil
 	}
 
 	return res
@@ -71,18 +88,25 @@ func (tq *TimerQueue) PopRunnable() (res []*TimerTask) {
 
 func (tq *TimerQueue) Start(ctx context.Context) {
 	// Timer runs every 10ms
-	resolution := time.Millisecond * 50
+	timer := time.NewTimer(1)
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				// Stop the timerqueue
 				return
-			default:
+			case <-timer.C:
 				tq.RunRunnableTasks()
+			case <-tq.nextRunAtChange:
+				timer.Stop()
 			}
 
-			time.Sleep(resolution)
+			tq.mtx.Lock()
+			if tq.nextRunAt != nil {
+				next := tq.nextRunAt.Sub(time.Now())
+				timer.Reset(next)
+			}
+			tq.mtx.Unlock()
 		}
 	}()
 }

@@ -20,7 +20,8 @@ package scheduler
 type TimerHeap []*TimerTask
 
 func (th TimerHeap) Less(i, j int) bool {
-	return th[i].runAt.After(th[j].runAt)
+	// We want pop to give us the earliest (lowest) time s owe use .Before
+	return th[i].runAt.Before(th[j].runAt)
 }
 
 func (th TimerHeap) Swap(i, j int) {

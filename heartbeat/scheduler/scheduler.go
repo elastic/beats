@@ -201,17 +201,18 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		if next.Before(now) {
 			// Our last invocation went long!
 			s.jobsMissedDeadline.Inc()
-			go taskFn(now)
+			taskFn(now)
 		} else {
 			// Schedule task to run sometime in the future
 			s.timerQueue.Push(&TimerTask{
 				fn:    taskFn,
+				id:    id,
 				runAt: next,
 			})
 		}
 	}
 
-	taskFn = func(now time.Time) {
+	taskFn = func(_ time.Time) {
 		// Attempt to acquire a resource to see if we're blocked
 		// We can't really tell if we're blocked because we need to acquire resources later
 		// for the entrypoint + continuations, but this is good enough for our lastRanAt
@@ -219,9 +220,14 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		// job could run
 		s.sem.Acquire(s.ctx, 1)
 		s.sem.Release(1)
-		lastRanAt = now
+		lastRanAt = time.Now()
 
-		s.runOnce(jobCtx, id, entrypoint)
+		s.activeJobs.Inc()
+
+		s.runRecursiveJob(jobCtx, entrypoint)
+
+		s.jobsRun.Inc()
+		s.activeJobs.Dec()
 
 		schedNextRun()
 	}
@@ -231,57 +237,55 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	} else {
 		schedNextRun()
 	}
-	schedNextRun()
 
 	return jobCtxCancel, nil
 }
 
-// runOnce runs a TaskFunc and its continuations once.
-func (s *Scheduler) runOnce(jobCtx context.Context, id string, entrypoint TaskFunc) {
-	s.jobsRun.Inc()
-	// Since we run all continuations asynchronously we use a wait group to block until we're done.
-	var wg sync.WaitGroup
-
-	s.activeJobs.Inc()
-	s.runRecursive(jobCtx, wg, entrypoint)
-
+// runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
+// Subtasks are run in separate goroutines.
+func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc) {
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	s.runRecursiveTask(jobCtx, task, wg)
 	wg.Wait()
-	s.activeJobs.Dec()
 }
 
-// runRecursive runs a task and its continuations until none are left with as much parallelism as possible.
+// runRecursiveTask runs an individual task and its continuations until none are left with as much parallelism as possible.
 // Since task funcs can emit continuations recursively we need a function to execute
-// recursively. We declare the function variable before definition to allow for recursion.
-// The given wait group is
-func (s *Scheduler) runRecursive(jobCtx context.Context, wg sync.WaitGroup, task TaskFunc) {
-	wg.Add(1)
+// recursively.
+// The wait group passed into this function expects to already have its count incremented by one.
+func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup) {
 	// The accounting for waiting/active tasks is done using atomics.
 	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
 	s.waitingTasks.Inc()
 
-	go func() {
-		// Acquire an execution slot in keeping with heartbeat.scheduler.limit
-		s.sem.Acquire(s.ctx, 1)
-		defer s.sem.Release(1)
+	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
+	s.sem.Acquire(s.ctx, 1)
+	defer s.sem.Release(1)
 
-		// Check if the scheduler has been shut down. If so, exit early
-		select {
-		case <-jobCtx.Done():
-			return
-		default:
-			// proceed normally
-		}
-
+	// Check if the scheduler has been shut down. If so, exit early
+	select {
+	case <-jobCtx.Done():
+		return
+	default:
 		s.activeTasks.Inc()
 		s.waitingTasks.Dec()
 
 		continuations := task()
 		s.activeTasks.Dec()
 
-		for _, cont := range continuations {
-			go s.runRecursive(jobCtx, wg, cont) // Run continuations in parallel, note that these each will acquire their own slots
+		// Re-use this go-routine to run the first continuation present.
+		// If there are > 1 continuations we can still re-use this go-routine for the first one
+		// and spin off extra go routines to run the rest
+		if len(continuations) > 0 {
+			firstCont, restCont := continuations[0], continuations[1:]
+			wg.Add(len(restCont))
+			for _, cont := range restCont {
+				go s.runRecursiveTask(jobCtx, cont, wg) // Run continuations in parallel, note that these each will acquire their own slots
+			}
+			firstCont() // we can reuse this goroutine to run this task
 		}
+	}
 
-		wg.Done()
-	}()
+	wg.Done()
 }
