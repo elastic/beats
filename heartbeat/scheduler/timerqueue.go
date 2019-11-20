@@ -39,6 +39,7 @@ type TimerQueue struct {
 	nextRunAtChange chan time.Time
 }
 
+// NewTimerQueue creates a new instance.
 func NewTimerQueue() *TimerQueue {
 	mtx := &sync.Mutex{}
 	tq := &TimerQueue{
@@ -51,6 +52,7 @@ func NewTimerQueue() *TimerQueue {
 	return tq
 }
 
+// Push adds a task to the queue
 func (tq *TimerQueue) Push(tt *TimerTask) {
 	tq.mtx.Lock()
 
@@ -65,6 +67,7 @@ func (tq *TimerQueue) Push(tt *TimerTask) {
 	}
 }
 
+// PopRunnable pops as many runnable tasks from the queue as possible
 func (tq *TimerQueue) PopRunnable() (res []*TimerTask, newNext *time.Time) {
 	tq.mtx.Lock()
 	defer tq.mtx.Unlock()
@@ -90,6 +93,8 @@ func (tq *TimerQueue) PopRunnable() (res []*TimerTask, newNext *time.Time) {
 	return res, &(*tq.nextRunAt)
 }
 
+// Start runs a goroutine within the given context that processes items in the queue, spawning a new goroutine
+// for each.
 func (tq *TimerQueue) Start(ctx context.Context) {
 	// Timer runs every 10ms
 	timer := time.NewTimer(1)

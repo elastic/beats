@@ -19,19 +19,23 @@ package scheduler
 
 type TimerHeap []*TimerTask
 
+// Less computes the order of the heap. We want the earliest time to Pop().
 func (th TimerHeap) Less(i, j int) bool {
-	// We want pop to give us the earliest (lowest) time s owe use .Before
+	// We want pop to give us the earliest (lowest) time so use before
 	return th[i].runAt.Before(th[j].runAt)
 }
 
+// Swap switches two elements.
 func (th TimerHeap) Swap(i, j int) {
 	th[i], th[j] = th[j], th[i]
 }
 
+// Push adds a new TimerTask to the heap
 func (th *TimerHeap) Push(tt interface{}) {
 	*th = append(*th, tt.(*TimerTask))
 }
 
+// Pop returns the TimerTask scheduled soonest.
 func (th *TimerHeap) Pop() interface{} {
 	old := *th
 	n := len(old)
@@ -40,6 +44,7 @@ func (th *TimerHeap) Pop() interface{} {
 	return tt
 }
 
+// Len returns the length.
 func (th TimerHeap) Len() int {
 	return len(th)
 }
