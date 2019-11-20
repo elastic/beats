@@ -1,0 +1,10 @@
+# Module: activemq
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-activemq.html
+
+- module: activemq
+  metricsets: ['broker', 'queue', 'topic']
+  period: 10s
+  hosts: ['localhost:8161']
+  path: '/api/jolokia/?ignoreErrors=true&canonicalNaming=false'
+  username: admin # default username
+  password: admin # default password
