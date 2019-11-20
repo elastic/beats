@@ -4,6 +4,7 @@ import unittest
 from parameterized import parameterized
 
 
+@unittest.skip("See https://github.com/elastic/beats/issues/14660")
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['couchbase']
