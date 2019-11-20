@@ -19,5 +19,5 @@ deployment fails.
 
 include::faq-resource-limit.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/shared-faq.asciidoc[]
 
