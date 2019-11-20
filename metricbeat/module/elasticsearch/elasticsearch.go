@@ -485,10 +485,9 @@ func (l *License) IsOneOf(candidateLicenses ...string) bool {
 // particular it ensures that ms-since-epoch values are marshaled as longs
 // and not floats in scientific notation as Elasticsearch does not like that.
 func (l *License) ToMapStr() common.MapStr {
-
 	m := common.MapStr{
 		"status":               l.Status,
-		"id":                   l.ID,
+		"uid":                  l.ID,
 		"type":                 l.Type,
 		"issue_date":           l.IssueDate,
 		"issue_date_in_millis": l.IssueDateInMillis,
