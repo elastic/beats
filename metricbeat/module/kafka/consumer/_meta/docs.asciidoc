@@ -1,0 +1,20 @@
+This metricset periodically fetches JMX metrics from Kafka Consumers implemented in java and expose JMX metrics through jolokia agent.
+
+[float]
+=== Compatibility
+The module has been tested with Kafka 2.1.1. Other versions are expected to work.
+
+[float]
+=== Usage
+The Consumer metricset requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for more information about Jolokia.
+
+Note that the Jolokia agent is required to be deployed along with the JVM application. This can be achieved by
+using the `KAFKA_OPTS` environment variable when starting the Kafka consumer application:
+
+[source,shell]
+----
+export KAFKA_OPTS=-javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8774,host=localhost
+./bin/kafka-console-consumer.sh --topic=test --bootstrap-server=localhost:9091
+----
+
+Then it will be possible to collect the JMX metrics from `localhost:8774`.

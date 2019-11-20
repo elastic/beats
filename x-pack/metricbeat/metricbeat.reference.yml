@@ -476,11 +476,13 @@ metricbeat.modules:
   jmx.instance:
 
 #-------------------------------- Kafka Module --------------------------------
+# Kafka metrics collected using the Kafka protocol
 - module: kafka
-  metricsets: ["consumergroup", "partition"]
+  #metricsets:
+  #  - partition
+  #  - consumergroup
   period: 10s
   hosts: ["localhost:9092"]
-  enabled: true
 
   #client_id: metricbeat
   #retries: 3
@@ -502,6 +504,27 @@ metricbeat.modules:
   # SASL authentication
   #username: ""
   #password: ""
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana

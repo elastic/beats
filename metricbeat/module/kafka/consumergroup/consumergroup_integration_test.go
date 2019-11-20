@@ -41,8 +41,8 @@ const (
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka",
-		compose.UpWithTimeout(120*time.Second),
-		compose.UpWithAdvertisedHostEnvFile,
+		compose.UpWithTimeout(600*time.Second),
+		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
 	c, err := startConsumer(t, service.Host(), "metricbeat-test")
@@ -63,7 +63,11 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "kafka")
+
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(600*time.Second),
+		compose.UpWithAdvertisedHostEnvFileForPort(9092),
+	)
 
 	c, err := startConsumer(t, service.Host(), "metricbeat-test")
 	if err != nil {
