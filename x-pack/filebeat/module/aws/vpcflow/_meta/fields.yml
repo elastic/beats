@@ -15,34 +15,10 @@
       type: keyword
       description: >
         The ID of the network interface for which the traffic is recorded.
-    - name: srcaddr
-      type: ip
-      description: >
-        The source address for incoming traffic, or the IPv4 or IPv6 address of the network interface for outgoing traffic on the network interface.
-    - name: dstaddr
-      type: ip
-      description: >
-        The destination address for outgoing traffic, or the IPv4 or IPv6 address of the network interface for incoming traffic on the network interface.
-    - name: srcport
-      type: long
-      description: >
-        The source port of the traffic.
-    - name: dstport
-      type: long
-      description: >
-        The destination port of the traffic.
     - name: protocol
-      type: long
+      type: keyword
       description: >
         The IANA protocol number of the traffic.
-    - name: packets
-      type: long
-      description: >
-        The number of packets transferred during the flow.
-    - name: bytes
-      type: long
-      description: >
-        The number of bytes transferred during the flow.
     - name: start
       type: long
       description: >
