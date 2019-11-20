@@ -54,7 +54,7 @@ func (tq *TimerQueue) PopRunnable() (res []*TimerTask) {
 
 func (tq *TimerQueue) Start(ctx context.Context) {
 	// Timer runs every 10ms
-	resolution := time.Millisecond * 10
+	resolution := time.Millisecond * 50
 	go func() {
 		for {
 			select {
