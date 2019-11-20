@@ -893,6 +893,42 @@ func TestPrometheusKeyLabels(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			testName:           "Test gauge InfoMetrics using ExtendedInfoMetric and extra fields",
+			prometheusResponse: promGaugeLabeled,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_that_inform_labels": ExtendedInfoMetric(Configuration{
+						StoreNonMappedLabels:     true,
+						NonMappedLabelsPlacement: "metrics.other_labels",
+						ExtraFields: common.MapStr{
+							"metrics.extra.field1": "extra1",
+							"metrics.extra.field2": "extra2",
+						}}),
+					"metrics_that_use_labels": Metric("metrics.value"),
+				},
+				Labels: map[string]LabelMap{
+					"label1": KeyLabel("metrics.label1"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"value":  20.0,
+						"label1": "I am 1",
+						"other_labels": common.MapStr{
+							"label2": "I am 2",
+							"label3": "I am 3",
+						},
+						"extra": common.MapStr{
+							"field1": "extra1",
+							"field2": "extra2",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

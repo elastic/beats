@@ -54,6 +54,9 @@ type Configuration struct {
 	// MetricProcessing options are a set of functions that will be
 	// applied to metrics after they are retrieved
 	MetricProcessingOptions []MetricOption
+	// ExtraFields is used to add fields to the
+	// event where this metric is included
+	ExtraFields common.MapStr
 }
 
 // MetricOption adds settings to Metric objects behavior

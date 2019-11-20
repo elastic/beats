@@ -138,10 +138,12 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 
 			storeAllLabels := false
 			labelsLocation := ""
+			var extraFields common.MapStr
 			if m != nil {
 				c := m.GetConfiguration()
 				storeAllLabels = c.StoreNonMappedLabels
 				labelsLocation = c.NonMappedLabelsPlacement
+				extraFields = c.ExtraFields
 			}
 
 			// Apply extra options
@@ -167,6 +169,15 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 					// TODO dedot
 					labels.Put(labelsLocation+"."+k, v)
 				}
+			}
+
+			// if extra fields have been added through metric configuration
+			// add them to labels.
+			//
+			// not considering these extra fields to be keylabels as that case
+			// have not appeared yet
+			for k, v := range extraFields {
+				labels.Put(k, v)
 			}
 
 			// Keep a info document if it's an infoMetric
