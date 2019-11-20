@@ -24,6 +24,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/monitoring"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -40,13 +42,13 @@ func tarawaTime() *time.Location {
 }
 
 func TestNew(t *testing.T) {
-	scheduler := New(123)
+	scheduler := New(123, monitoring.NewRegistry())
 	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, time.Local, scheduler.location)
 }
 
 func TestNewWithLocation(t *testing.T) {
-	scheduler := NewWithLocation(123, tarawaTime())
+	scheduler := NewWithLocation(123, monitoring.NewRegistry(), tarawaTime())
 	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, tarawaTime(), scheduler.location)
 }
@@ -79,7 +81,7 @@ func testTaskTimes(limit uint32, fn func()) func() []TaskFunc {
 func TestScheduler_Start(t *testing.T) {
 	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
-	s := NewWithLocation(10, tarawaTime())
+	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime())
 	defer s.Stop()
 
 	executed := make(chan string)
@@ -137,12 +139,12 @@ func TestScheduler_Start(t *testing.T) {
 }
 
 func TestScheduler_Stop(t *testing.T) {
-	s := NewWithLocation(10, tarawaTime())
+	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime())
 
 	executed := make(chan struct{})
 
-	s.Start()
-	s.Stop()
+	require.NoError(t, s.Start())
+	require.NoError(t, s.Stop())
 
 	_, err := s.Add(instantSchedule{}, "testPostStop", testTaskTimes(1, func() {
 		executed <- struct{}{}

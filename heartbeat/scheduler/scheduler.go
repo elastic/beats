@@ -25,9 +25,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/scheduler/timerqueue"
+
 	"golang.org/x/sync/semaphore"
 
-	"github.com/elastic/beats/heartbeat/hbregistry"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -42,18 +43,6 @@ const (
 // InvalidTransitionError is returned from start/stop when making an invalid state transition, say from preRunning to stopped
 var InvalidTransitionError = fmt.Errorf("invalid state transition")
 
-// countersRegistry is for tracking scheduler counters, confusingly known as 'stats' elsewhere in the stack.
-var countersRegistry = hbregistry.StatsRegistry.NewRegistry("scheduler")
-
-var jobsMissedDeadlineCounter = monitoring.NewUint(countersRegistry, "jobs.missed_deadline")
-
-// gaugesRegistry is for tracking scheduler gauges, confusingly known as 'state' elsewhere in the stack.
-var gaugesRegistry = hbregistry.StateRegistry.NewRegistry("scheduler")
-
-var activeJobsGauge = monitoring.NewUint(gaugesRegistry, "jobs.active")
-var activeTasksGauge = monitoring.NewUint(gaugesRegistry, "tasks.active")
-var waitingTasksGauge = monitoring.NewUint(gaugesRegistry, "tasks.waiting")
-
 type Scheduler struct {
 	limit int64
 	state atomic.Int
@@ -66,7 +55,7 @@ type Scheduler struct {
 	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
 	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 
-	timerQueue *TimerQueue
+	timerQueue *timerqueue.TimerQueue
 
 	jobsRun   *atomic.Uint64
 	ctx       context.Context
@@ -90,17 +79,22 @@ type Schedule interface {
 var debugf = logp.MakeDebug("scheduler")
 
 // New creates a new Scheduler
-func New(limit int64) *Scheduler {
-	return NewWithLocation(limit, time.Local)
+func New(limit int64, registry *monitoring.Registry) *Scheduler {
+	return NewWithLocation(limit, registry, time.Local)
 }
 
 // NewWithLocation creates a new Scheduler using the given runAt zone.
-func NewWithLocation(limit int64, location *time.Location) *Scheduler {
+func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.Location) *Scheduler {
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	if limit < 1 {
 		limit = math.MaxInt64
 	}
+
+	jobsMissedDeadlineCounter := monitoring.NewUint(registry, "jobs.missed_deadline")
+	activeJobsGauge := monitoring.NewUint(registry, "jobs.active")
+	activeTasksGauge := monitoring.NewUint(registry, "tasks.active")
+	waitingTasksGauge := monitoring.NewUint(registry, "tasks.waiting")
 
 	sched := &Scheduler{
 		limit:     limit,
@@ -116,7 +110,7 @@ func NewWithLocation(limit int64, location *time.Location) *Scheduler {
 		waitingTasks:       waitingTasksGauge,
 		jobsMissedDeadline: jobsMissedDeadlineCounter,
 
-		timerQueue: NewTimerQueue(),
+		timerQueue: timerqueue.NewTimerQueue(ctx),
 	}
 
 	return sched
@@ -130,8 +124,11 @@ func (s *Scheduler) Start() error {
 		// We already were running, so just return nil and do nothing.
 		return nil
 	}
+	if !s.state.CAS(statePreRunning, stateRunning) {
+		return nil // we already running, just exit
+	}
 
-	s.timerQueue.Start(s.ctx)
+	s.timerQueue.Start()
 
 	// Missed deadline reporter
 	go s.missedDeadlineReporter()
@@ -152,7 +149,7 @@ func (s *Scheduler) missedDeadlineReporter() {
 			t.Stop()
 			return
 		case <-t.C:
-			logp.Info("JOBS RUN %d / %d", s.jobsRun.Load(), s.timerQueue.th.Len())
+			logp.Info("JOBS RUN %d", s.jobsRun.Load())
 			missingNow := s.jobsMissedDeadline.Get()
 			missedDelta := missingNow - missedAtLastCheck
 			if missedDelta > 0 {
@@ -192,7 +189,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	// The initial value is runAt.Now() because we use it to get the next runAt a job is scheduled to run
 	lastRanAt := time.Now().In(s.location)
 
-	var taskFn TimerTaskFn
+	var taskFn timerqueue.TimerTaskFn
 
 	schedNextRun := func() {
 		next := sched.Next(lastRanAt)
@@ -203,12 +200,10 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 			s.jobsMissedDeadline.Inc()
 			taskFn(now)
 		} else {
-			// Schedule task to run sometime in the future
-			s.timerQueue.Push(&TimerTask{
-				fn:    taskFn,
-				id:    id,
-				runAt: next,
-			})
+			// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
+			// block the timer thread.
+			asyncTask := func(now time.Time) { go taskFn(now) }
+			s.timerQueue.Push(timerqueue.NewTimerTask(next, asyncTask))
 		}
 	}
 

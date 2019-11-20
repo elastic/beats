@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package scheduler
+package timerqueue
 
 // timerHeap is the internal type that implements container/heap
 type timerHeap []*TimerTask
