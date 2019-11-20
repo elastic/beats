@@ -24,16 +24,19 @@ import (
 	"time"
 )
 
+// TimerTask represents a task run by the TimerQueue.
 type TimerTask struct {
 	fn    TimerTaskFn
 	id    string
 	runAt time.Time
 }
 
+// TimerTaskFn is the function invoked by a TimerTask.
 type TimerTaskFn func(now time.Time)
 
+// TimerQueue represents a priority queue of timers.
 type TimerQueue struct {
-	th              *TimerHeap
+	th              *timerHeap
 	mtx             *sync.Mutex
 	nextRunAt       *time.Time
 	nextRunAtChange chan time.Time
@@ -43,7 +46,7 @@ type TimerQueue struct {
 func NewTimerQueue() *TimerQueue {
 	mtx := &sync.Mutex{}
 	tq := &TimerQueue{
-		th:              &TimerHeap{},
+		th:              &timerHeap{},
 		mtx:             mtx,
 		nextRunAtChange: make(chan time.Time),
 	}

@@ -17,26 +17,27 @@
 
 package scheduler
 
-type TimerHeap []*TimerTask
+// timerHeap is the internal type that implements container/heap
+type timerHeap []*TimerTask
 
 // Less computes the order of the heap. We want the earliest time to Pop().
-func (th TimerHeap) Less(i, j int) bool {
+func (th timerHeap) Less(i, j int) bool {
 	// We want pop to give us the earliest (lowest) time so use before
 	return th[i].runAt.Before(th[j].runAt)
 }
 
 // Swap switches two elements.
-func (th TimerHeap) Swap(i, j int) {
+func (th timerHeap) Swap(i, j int) {
 	th[i], th[j] = th[j], th[i]
 }
 
 // Push adds a new TimerTask to the heap
-func (th *TimerHeap) Push(tt interface{}) {
+func (th *timerHeap) Push(tt interface{}) {
 	*th = append(*th, tt.(*TimerTask))
 }
 
 // Pop returns the TimerTask scheduled soonest.
-func (th *TimerHeap) Pop() interface{} {
+func (th *timerHeap) Pop() interface{} {
 	old := *th
 	n := len(old)
 	tt := old[n-1]
@@ -45,6 +46,6 @@ func (th *TimerHeap) Pop() interface{} {
 }
 
 // Len returns the length.
-func (th TimerHeap) Len() int {
+func (th timerHeap) Len() int {
 	return len(th)
 }
