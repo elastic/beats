@@ -28,6 +28,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/libbeat/common/docker"
@@ -69,20 +70,20 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	client, err := docker.NewClient("", nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer client.Close()
+	defer c.Close()
 
-	reader, err := client.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
+	reader, err := c.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
 	io.Copy(os.Stdout, reader)
 	reader.Close()
 
-	resp, err := client.ContainerCreate(context.Background(), &container.Config{
+	resp, err := c.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
 		Cmd:   []string{"echo", "foo"},
 	}, nil, nil, "")
@@ -90,7 +91,7 @@ func createEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	client.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{})
+	c.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{})
 }
 
 func getConfig() map[string]interface{} {

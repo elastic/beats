@@ -34,13 +34,6 @@ import (
 func NewClient(host string, httpClient *http.Client, httpHeaders map[string]string) (*client.Client, error) {
 	log := logp.NewLogger("docker")
 
-	if host == "" {
-		host = os.Getenv("DOCKER_HOST")
-		if host == "" {
-			host = "unix:///var/run/docker.sock"
-		}
-	}
-
 	opts := []client.Opt{
 		client.WithHost(host),
 		client.WithHTTPClient(httpClient),
