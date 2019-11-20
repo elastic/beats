@@ -1526,73 +1526,13 @@ type: keyword
 
 --
 
-*`aws.vpcflow.srcaddr`*::
-+
---
-The source address for incoming traffic, or the IPv4 or IPv6 address of the network interface for outgoing traffic on the network interface.
-
-
-type: ip
-
---
-
-*`aws.vpcflow.dstaddr`*::
-+
---
-The destination address for outgoing traffic, or the IPv4 or IPv6 address of the network interface for incoming traffic on the network interface.
-
-
-type: ip
-
---
-
-*`aws.vpcflow.srcport`*::
-+
---
-The source port of the traffic.
-
-
-type: long
-
---
-
-*`aws.vpcflow.dstport`*::
-+
---
-The destination port of the traffic.
-
-
-type: long
-
---
-
 *`aws.vpcflow.protocol`*::
 +
 --
 The IANA protocol number of the traffic.
 
 
-type: long
-
---
-
-*`aws.vpcflow.packets`*::
-+
---
-The number of packets transferred during the flow.
-
-
-type: long
-
---
-
-*`aws.vpcflow.bytes`*::
-+
---
-The number of bytes transferred during the flow.
-
-
-type: long
+type: keyword
 
 --
 
