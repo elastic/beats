@@ -197,7 +197,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		return err
 	}
 	if opts.SetupAdvertisedHostEnvFile {
-		return d.setupAdvertisedHost(ctx, service)
+		return d.setupAdvertisedHost(ctx, service, opts.SetupAdvertisedHostEnvFilePort)
 	}
 	return nil
 }
@@ -236,7 +236,7 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 // setupAdvertisedHost adds a file to a container with its address, this can
 // be used in services that need to configure an address to be advertised to
 // clients.
-func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string) error {
+func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string, port int) error {
 	containers, err := d.containers(ctx, Filter{State: AnyState}, service)
 	if err != nil {
 		return errors.Wrap(err, "setupAdvertisedHost")
@@ -247,7 +247,7 @@ func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string)
 
 	for _, c := range containers {
 		w := &wrapperContainer{info: c}
-		content := fmt.Sprintf("SERVICE_HOST=%s", w.Host())
+		content := fmt.Sprintf("SERVICE_HOST=%s", w.HostForPort(port))
 
 		err := writeToContainer(ctx, d.client, c.ID, "/run/compose_env", content)
 		if err != nil {

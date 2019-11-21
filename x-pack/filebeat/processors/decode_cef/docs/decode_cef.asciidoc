@@ -1,4 +1,3 @@
-ifdef::has_decode_cef_processor[]
 [[processor-decode-cef]]
 [role="xpack"]
 === Decode CEF
@@ -36,4 +35,3 @@ The `decode_cef` processor has the following configuration settings.
 | `ignore_failure` | no       | false   | Ignore failures when the source field does not contain a CEF message.        |
 | `id`             | no       |         | An identifier for this processor instance. Useful for debugging.             |
 |======
-endif::[]
