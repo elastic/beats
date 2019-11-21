@@ -165,7 +165,9 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	value, err := data.Cache.GetValue("partition")
 	if err == nil {
-		logp.Debug("kafka", "Got event.Meta[\"partition\"] = %v", value)
+		if logp.IsDebug(debugSelector) {
+			debugf("got event.Meta[\"partition\"] = %v", value)
+		}
 		if partition, ok := value.(int32); ok {
 			msg.partition = partition
 		}
@@ -173,7 +175,9 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	value, err = data.Cache.GetValue("topic")
 	if err == nil {
-		logp.Debug("kafka", "Got event.Meta[\"topic\"] = %v", value)
+		if logp.IsDebug(debugSelector) {
+			debugf("got event.Meta[\"topic\"] = %v", value)
+		}
 		if topic, ok := value.(string); ok {
 			msg.topic = topic
 		}
@@ -188,7 +192,9 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 			return nil, errNoTopicsSelected
 		}
 		msg.topic = topic
-		logp.Debug("kafka", "Setting event.Meta[\"topic\"] = %v", topic)
+		if logp.IsDebug(debugSelector) {
+			debugf("setting event.Meta[\"topic\"] = %v", topic)
+		}
 		if _, err := data.Cache.Put("topic", topic); err != nil {
 			return nil, fmt.Errorf("setting kafka topic in publisher event failed: %v", err)
 		}
@@ -196,7 +202,9 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
-		logp.Debug("kafka", "Failed event: %v", event)
+		if logp.IsDebug(debugSelector) {
+			debugf("failed event: %v", event)
+		}
 		return nil, err
 	}
 
