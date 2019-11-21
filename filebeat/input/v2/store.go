@@ -18,25 +18,3 @@
 package v2
 
 const DefaultStore = ""
-
-type StoreAccessor interface {
-	OpenStore(name string) (Store, error)
-}
-
-type Store interface {
-	Deactivate()
-	Access(key string) Resource
-	Lock(key string) Resource
-	TryLock(key string) (Resource, bool)
-}
-
-type Resource interface {
-	Lock()
-	TryLock() bool
-	Unlock()
-
-	Has() (bool, error)
-	Update(interface{}) error
-	Read(interface{}) error
-	UpdateOp(interface{}) (interface{}, error)
-}

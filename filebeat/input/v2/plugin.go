@@ -20,6 +20,7 @@ package v2
 import (
 	"fmt"
 
+	"github.com/elastic/beats/filebeat/input/v2/statestore"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -91,18 +92,18 @@ type Context struct {
 	// the ID if needed.
 	ID string
 
+	// Log provides the structured logger for the input to use
+	Log *logp.Logger
+
 	// StoreAccessor allows inputs to access a resource store. The store can be used
 	// for serializing state, but also for coordination such that only one input
 	// collects data from a resource.
-	StoreAccessor
+	StoreAccessor *statestore.Connector
 
 	// Closer provides support for shutdown signaling.
 	// It is compatible to context.Context, and can be used to cancel IO
 	// operations during shutdown.
 	Closer *chorus.Closer
-
-	// Log provides the structured logger for the input to use
-	Log *logp.Logger
 
 	// Observer is used to signal state changes. The state is used for reporting
 	// the state/healthiness to users using management/monitoring APIs.
