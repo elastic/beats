@@ -2854,6 +2854,12 @@
 			"versionExact": "v1.2.2"
 		},
 		{
+			"checksumSHA1": "lIp4dQzfVYRQARgsmRm3h3wRFgs=",
+			"path": "github.com/stretchr/testify/suite",
+			"revision": "f1bd0923b8320ddfb0a8a9d919b5aeb8b7a4cc40",
+			"revisionTime": "2019-08-29T23:36:06Z"
+		},
+		{
 			"checksumSHA1": "CpcG17Q/0k1g2uy8AL26Uu7TouU=",
 			"path": "github.com/theckman/go-flock",
 			"revision": "b139a2487364247d91814e4a7c7b8fdc69e342b2",
