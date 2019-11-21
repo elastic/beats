@@ -159,19 +159,21 @@ func (r *Registrar) Run() {
 	var (
 		// we keep a long running write transaction.
 		// The 'filebeat' store must not be used outside of the Registrar.
-		tx     *registry.Tx
 		timer  *time.Timer
 		flushC <-chan time.Time
+
+		pending    []file.State
+		pendingMap = map[string]int{}
+
+		directIn  chan []file.State
+		collectIn chan []file.State
 	)
 
-	defer func() {
-		if tx != nil {
-			err := r.commit(tx)
-			if err != nil {
-				logp.Err("Registrar write error on shutdown: %+v", err)
-			}
-		}
-	}()
+	if r.flushTimeout <= 0 {
+		directIn = r.Channel
+	} else {
+		collectIn = r.Channel
+	}
 
 	for {
 		select {
@@ -179,36 +181,53 @@ func (r *Registrar) Run() {
 			logp.Info("Ending Registrar")
 			return
 
-		case <-flushC:
-			timer.Stop()
-			if err := r.commit(tx); err != nil {
+		case states := <-directIn:
+			// no flush timeout configured. Directly update registry
+			r.onEvents(states)
+			err := r.store.Update(func(tx *registry.Tx) error {
+				writeStateUpdates(tx, states)
+				return nil
+			})
+			if err != nil {
 				r.failing(err)
 				return
 			}
-			tx = nil
-			flushC = nil
 
-		case states := <-r.Channel:
-			if tx == nil {
-				var err error
-				tx, err = r.store.Begin(false)
-				if err != nil {
-					r.failing(err)
-					return
+		case states := <-collectIn:
+			// flush timeout configured. Only update internal state and track pending
+			// updates to be written to registry.
+			r.onEvents(states)
+			for i := range states {
+				id := states[i].ID()
+				if idx, exists := pendingMap[id]; exists {
+					pending[idx] = states[i]
+				} else {
+					idx := len(pending)
+					pending = append(pending, states[i])
+					pendingMap[id] = idx
 				}
 			}
 
-			r.onEvents(tx, states)
-			if r.flushTimeout <= 0 {
-				if err := r.commit(tx); err != nil {
-					r.failing(err)
-					return
-				}
-				tx = nil
-			} else if flushC == nil {
+			if flushC == nil && len(pending) > 0 {
 				timer = time.NewTimer(r.flushTimeout)
 				flushC = timer.C
 			}
+
+		case <-flushC:
+			timer.Stop()
+			err := r.store.Update(func(tx *registry.Tx) error {
+				writeStateUpdates(tx, pending)
+				return nil
+			})
+			if err != nil {
+				r.failing(err)
+				return
+			}
+
+			pending = nil
+			pendingMap = map[string]int{}
+			flushC = nil
+			timer = nil
 		}
 	}
 }
@@ -242,8 +261,8 @@ func (r *Registrar) failing(err error) {
 }
 
 // onEvents processes events received from the publisher pipeline
-func (r *Registrar) onEvents(tx *registry.Tx, states []file.State) {
-	r.processEventStates(tx, states)
+func (r *Registrar) onEvents(states []file.State) {
+	r.processEventStates(states)
 
 	// check if we need to enable state cleanup
 	if !r.gcEnabled {
@@ -287,16 +306,19 @@ func (r *Registrar) gcStates(tx *registry.Tx) {
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(tx *registry.Tx, states []file.State) {
+func (r *Registrar) processEventStates(states []file.State) {
 	logp.Debug("registrar", "Processing %d events", len(states))
 
 	ts := time.Now()
 	for i := range states {
 		r.states.UpdateWithTs(states[i], ts)
+		statesUpdate.Add(1)
+	}
+}
 
+func writeStateUpdates(tx *registry.Tx, states []file.State) {
+	for i := range states {
 		// TODO: report error
 		tx.Set(registry.Key(states[i].ID()), states[i])
-
-		statesUpdate.Add(1)
 	}
 }
