@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -82,7 +82,7 @@ var validHashes = map[HashType](func() hash.Hash){
 	SHA3_384:   sha3.New384,
 	SHA3_512:   sha3.New512,
 	XXH64: func() hash.Hash {
-		return xxhash.New64()
+		return xxhash.New()
 	},
 }
 

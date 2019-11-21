@@ -35,6 +35,7 @@ Example config:
     var.topic: googlecloud-vpc-flowlogs
     var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+    var.keep_original_message: false
 ----
 
 include::../include/var-paths.asciidoc[]
@@ -55,6 +56,11 @@ exist it will be created.
 *`var.credentials_file`*::
 
 Path to a JSON file containing the credentials and key used to subscribe.
+
+*`var.keep_original_message`*::
+
+Flag to control whether the original message is stored in the `log.original`
+field. Defaults to `false`, meaning the original message is not saved.
 
 :fileset_ex!:
 

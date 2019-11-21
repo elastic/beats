@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support usage of custom builders without hints and mappers {pull}13839[13839]
 - Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 - Fix kubernetes `metaGenerator.ResourceMetadata` when parent reference controller is nil {issue}14320[14320] {pull}14329[14329]
+- Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
 
 *Auditbeat*
 
@@ -191,9 +192,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Close chan of Closer first before calling callback {pull}14231[14231]
 - Fix race condition in S3 input plugin. {pull}14359[14359]
 - Decode hex values in auditd module. {pull}14471[14471]
+- Fix parse of remote addresses that are not IPs in nginx logs. {pull}14505[14505]
 - Fix handling multiline log entries in nginx module. {issue}14349[14349] {pull}14499[14499]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
+- Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 
 *Heartbeat*
 
@@ -260,6 +263,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
 - Vshpere module splits `virtualmachine.host` into `virtualmachine.host.id` and `virtualmachine.host.hostname`. {issue}7187[7187] {pull}7213[7213]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 
 *Packetbeat*
 
@@ -273,6 +277,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Fix data race affecting config validation at startup. {issue}13005[13005]
+- Set host.name to computername in Windows event logs & sysmon.  Requires {pull}14407[14407] in libbeat to work  {issue}13706[13706]
 
 *Functionbeat*
 
@@ -405,10 +410,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more filesets to Zeek module. {pull}14150[14150]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Remove beta flag for some filebeat modules. {pull}14374[14374]
+- Add support for http hostname in nginx filebeat module. {pull}14505[14505]
 - Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
 - Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
 - New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
 - Add document for Filebeat input httpjson. {pull}14602[14602]
+- Add more configuration options to the Netflow module. {pull}14628{14628}
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -493,7 +500,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release aws ebs metricset as GA. {pull}14312[14312] {issue}14060[14060]
 - Add `connection.state` field for RabbitMQ module. {pull}13981[13981]
 - Add more TCP states to Metricbeat system socket_summary. {pull}14347[14347]
+- Add Kafka JMX metricsets. {pull}14330[14330]
 - Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
+- Release kubernetes modules `controllermanager`, `scheduler`, `proxy`, `state_cronjob` and `state_resourcequota` as GA. {pull}14584[14584]
+- Add module for ActiveMQ. {pull}14580[14580]
 
 *Packetbeat*
 
