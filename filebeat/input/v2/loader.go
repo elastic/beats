@@ -24,7 +24,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type Loader struct {
+type Loader interface {
+	Configure(log *logp.Logger, config *common.Config) (Input, error)
+}
+
+type InputLoader struct {
 	plugins map[string]Plugin
 
 	DefaultType string
@@ -34,9 +38,9 @@ type inputTypeConfig struct {
 	Type string `config:"type"`
 }
 
-func NewLoader(
+func NewInputLoader(
 	plugins ...Plugin,
-) (*Loader, error) {
+) (*InputLoader, error) {
 	m := make(map[string]Plugin, len(plugins))
 	for _, p := range plugins {
 		name := p.Name
@@ -47,10 +51,10 @@ func NewLoader(
 		m[name] = p
 	}
 
-	return &Loader{plugins: m}, nil
+	return &InputLoader{plugins: m}, nil
 }
 
-func (l *Loader) Configure(log *logp.Logger, config *common.Config) (Input, error) {
+func (l *InputLoader) Configure(log *logp.Logger, config *common.Config) (Input, error) {
 	typeConfig, err := unpackTypeConfig(l.DefaultType, config)
 	if err != nil {
 		return nil, err
