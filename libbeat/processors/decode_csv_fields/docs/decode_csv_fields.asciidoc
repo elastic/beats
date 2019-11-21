@@ -1,4 +1,3 @@
-ifdef::has_decode_csv_fields_processor[]
 [[decode-csv-fields]]
 === Decode CSV fields
 
@@ -40,5 +39,3 @@ The `decode_csv_fields` has the following settings:
 `fail_on_error`:: (Optional) If set to true, in case of an error the changes to
 the event are reverted, and the original event is returned. If set to `false`,
 processing continues also if an error happens. Default is `true`.
-
-endif::[]
