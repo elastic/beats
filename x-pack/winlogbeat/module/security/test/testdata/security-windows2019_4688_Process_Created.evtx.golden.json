@@ -10,6 +10,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "process_start"
     },
+    "host": {
+      "name": "vagrant"
+    },
     "log": {
       "level": "information"
     },

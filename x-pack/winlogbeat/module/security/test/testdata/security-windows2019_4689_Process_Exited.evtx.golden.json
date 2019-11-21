@@ -10,6 +10,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "process_end"
     },
+    "host": {
+      "name": "vagrant"
+    },
     "log": {
       "level": "information"
     },
@@ -63,6 +66,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "process_end"
     },
+    "host": {
+      "name": "vagrant"
+    },
     "log": {
       "level": "information"
     },
@@ -115,6 +121,9 @@
       "module": "security",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant"
     },
     "log": {
       "level": "information"

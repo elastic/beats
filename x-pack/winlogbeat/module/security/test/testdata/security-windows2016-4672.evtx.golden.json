@@ -8,6 +8,9 @@
       "module": "security",
       "provider": "Microsoft-Windows-Security-Auditing"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
