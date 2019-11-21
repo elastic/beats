@@ -22,4 +22,4 @@ For example, you can capture events such as:
 * security events
 * system events
 
-include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+include::{libbeat-dir}/shared-libbeat-description.asciidoc[]
