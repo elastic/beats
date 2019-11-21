@@ -36,7 +36,7 @@ class KafkaTest(metricbeat.BaseTest):
             "password": self.PASSWORD,
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=60)
         proc.check_kill_and_wait()
 
         output = self.read_output_json()
@@ -45,6 +45,83 @@ class KafkaTest(metricbeat.BaseTest):
         print(evt)
 
         self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_consumer(self):
+      """
+      kafka consumer metricset test
+      """
+
+      host = self.compose_host(port="8774/tcp")
+      modules = [{
+          "name": "kafka",
+          "metricsets": ["consumer"],
+          "hosts": [host],
+          "period": "1s"
+      }]
+      self.render_config_template(modules=modules)
+      proc = self.start_beat(home=self.beat_path)
+      self.wait_until(lambda: self.output_lines() > 0, max_timeout=60)
+      proc.check_kill_and_wait()
+
+      output = self.read_output_json()
+      self.assertTrue(len(output) >= 1)
+      evt = output[0]
+      print(evt)
+
+      self.assert_fields_are_documented(evt)
+
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_producer(self):
+      """
+      kafka producer metricset test
+      """
+
+      host = self.compose_host(port="8775/tcp")
+      modules = [{
+          "name": "kafka",
+          "metricsets": ["producer"],
+          "hosts": [host],
+          "period": "1s"
+      }]
+      self.render_config_template(modules=modules)
+      proc = self.start_beat(home=self.beat_path)
+      self.wait_until(lambda: self.output_lines() > 0, max_timeout=60)
+      proc.check_kill_and_wait()
+
+      output = self.read_output_json()
+      self.assertTrue(len(output) >= 1)
+      evt = output[0]
+      print(evt)
+
+      self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_broker(self):
+      """
+      kafka broker metricset test
+      """
+
+      host = self.compose_host(port="8779/tcp")
+      modules = [{
+          "name": "kafka",
+          "metricsets": ["broker"],
+          "hosts": [host],
+          "period": "1s"
+      }]
+
+      self.render_config_template(modules=modules)
+      proc = self.start_beat(home=self.beat_path)
+      self.wait_until(lambda: self.output_lines() > 0, max_timeout=60)
+      proc.check_kill_and_wait()
+
+      output = self.read_output_json()
+      self.assertTrue(len(output) >= 1)
+      evt = output[0]
+      print(evt)
+
+      self.assert_fields_are_documented(evt)
 
     def create_topic(self):
         from kafka import KafkaProducer
