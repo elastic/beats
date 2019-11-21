@@ -1,0 +1,21 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/mqtt_publish.log
+    os.linux:
+      - /var/log/bro/current/mqtt_publish.log
+    os.darwin:
+      - /usr/local/var/logs/mqtt_publish/mqtt_publish.log
+  - name: tags
+    default: [zeek.mqtt_publish]
+  - name: community_id
+    default: true
+
+ingest_pipeline: ingest/pipeline.json
+input: config/mqtt_publish.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

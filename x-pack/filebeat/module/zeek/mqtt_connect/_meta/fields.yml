@@ -1,0 +1,26 @@
+- name: mqtt_connect
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek mqtt_connect log.
+  fields:     
+                   
+    - name: proto_name
+      type: keyword
+      description: >
+        Indicates the protocol name.
+      
+    - name: proto_version
+      type: keyword
+      description: >
+        The version of the protocol in use.
+
+    - name: client_id
+      type: keyword
+      description: >
+        Unique identifier for the client.
+
+    - name: connect_status
+      type: keyword
+      description: >
+        Status message from the server in response to the connect request.

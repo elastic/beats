@@ -1,0 +1,41 @@
+- name: mqtt_publish
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek mqtt_publish log.
+  fields:     
+                   
+    - name: from_client
+      type: boolean
+      description: >
+        Indicates if the message was published by the client of this connection or published to the client.
+      
+    - name: retain
+      type: boolean
+      description: >
+        Indicates if the message was to be retained by the server.
+
+    - name: qos
+      type: keyword
+      description: >
+        QoS level set for the message.
+
+    - name: status
+      type: keyword
+      description: >
+        Status of the published message.
+
+    - name: topic
+      type: keyword
+      description: >
+        Topic the message was published to.
+
+    - name: payload
+      type: keyword
+      description: >
+        Payload of the message.
+
+    - name: payload_len
+      type: long
+      description: >
+        The actual length of the payload in the case the payload.

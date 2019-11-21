@@ -1,0 +1,31 @@
+- name: mqtt_subscribe
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek mqtt_subscribe log.
+  fields:     
+                   
+    - name: action
+      type: keyword
+      description: >
+        Indicates if a subscribe or unsubscribe action is taking place.
+      
+    - name: topics
+      type: keyword
+      description: >
+        The topics or topic patterns being subscribed to.
+
+    - name: qos_levels
+      type: double
+      description: >
+        QoS levels requested for messages from subscribed topics.
+
+    - name: granted_qos_level
+      type: long
+      description: >
+        QoS level the server granted.
+
+    - name: ack
+      type: boolean
+      description: >
+        Indicates if the request was acked by the server.

@@ -1,0 +1,1 @@
+{"ts":1573118160.77399,"uid":"CBzcJs3dFAFJp4X7hd","id.orig_h":"192.168.165.100","id.orig_p":18674,"id.resp_h":"5.196.95.208","id.resp_p":1883,"action":"MQTT::SUBSCRIBE","topics":["/xPablo/weather"],"qos_levels":[0],"granted_qos_level":0,"ack":true}

@@ -1481,6 +1481,12 @@ filebeat.modules:
     enabled: true
   modbus:
     enabled: true
+  mqtt_connect:
+    enabled: true
+  mqtt_publish:
+    enabled: true
+  mqtt_subscribe:
+    enabled: true        
   mysql:
     enabled: true
   notice:

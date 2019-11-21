@@ -1,0 +1,1 @@
+{"ts":1573117735.833181,"uid":"CPYuka2oWl7bHCnRYi","id.orig_h":"192.168.165.100","id.orig_p":6572,"id.resp_h":"5.196.95.208","id.resp_p":1883,"from_client":false,"retain":true,"qos":"at most once","status":"ok","topic":"revspace/sensors/temperature/5/1","payload":"-14.75 °C","payload_len":10}
