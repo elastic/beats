@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "The dashboard presents metric data describing ActiveMQ topics. Metrics show statistics of exchanged messages, consumers, producers and memory usage.",
+        "description": "The dashboard presents metric data describing ActiveMQ queues. Metrics show statistics of exchanged messages, consumers, producers and memory usage.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -22,12 +22,12 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 15,
-              "i": "adb64a5b-bfe9-4225-a712-f51ad30cab9d",
+              "i": "446c6be8-61e2-4c9c-9bfa-8da8879db215",
               "w": 24,
               "x": 0,
-              "y": 15
+              "y": 0
             },
-            "panelIndex": "adb64a5b-bfe9-4225-a712-f51ad30cab9d",
+            "panelIndex": "446c6be8-61e2-4c9c-9bfa-8da8879db215",
             "panelRefName": "panel_0",
             "version": "7.4.0"
           },
@@ -35,12 +35,12 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 15,
-              "i": "c22e6794-6c79-4f2d-b942-f4a4bb73948e",
+              "i": "85158251-14d2-4100-9ce2-1eea4885adf6",
               "w": 24,
               "x": 24,
               "y": 0
             },
-            "panelIndex": "c22e6794-6c79-4f2d-b942-f4a4bb73948e",
+            "panelIndex": "85158251-14d2-4100-9ce2-1eea4885adf6",
             "panelRefName": "panel_1",
             "version": "7.4.0"
           },
@@ -48,12 +48,12 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 15,
-              "i": "099a7d74-8287-4717-b1d1-77f7ed2b67d0",
+              "i": "e0104818-b373-4a20-990a-aa7558522e9e",
               "w": 24,
               "x": 0,
-              "y": 0
+              "y": 15
             },
-            "panelIndex": "099a7d74-8287-4717-b1d1-77f7ed2b67d0",
+            "panelIndex": "e0104818-b373-4a20-990a-aa7558522e9e",
             "panelRefName": "panel_2",
             "version": "7.4.0"
           },
@@ -74,12 +74,12 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 15,
-              "i": "43902672-df24-4be2-beb5-34961f190b5c",
+              "i": "b2cfe5e4-f220-480e-91fa-4088484eda17",
               "w": 24,
               "x": 0,
               "y": 30
             },
-            "panelIndex": "43902672-df24-4be2-beb5-34961f190b5c",
+            "panelIndex": "b2cfe5e4-f220-480e-91fa-4088484eda17",
             "panelRefName": "panel_4",
             "version": "7.4.0"
           },
@@ -87,37 +87,63 @@
             "embeddableConfig": {},
             "gridData": {
               "h": 15,
-              "i": "09ea3c98-d808-4c5f-9d04-7a94fd3cc2c8",
+              "i": "5f4b107c-94d0-4bdb-be30-b3cd26257658",
               "w": 24,
               "x": 24,
               "y": 30
             },
-            "panelIndex": "09ea3c98-d808-4c5f-9d04-7a94fd3cc2c8",
+            "panelIndex": "5f4b107c-94d0-4bdb-be30-b3cd26257658",
             "panelRefName": "panel_5",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "b5a5ea30-c313-4c80-8e28-2894f292d779",
+              "w": 24,
+              "x": 0,
+              "y": 45
+            },
+            "panelIndex": "b5a5ea30-c313-4c80-8e28-2894f292d779",
+            "panelRefName": "panel_6",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "4a004976-426b-445e-9ecf-1f9964074523",
+              "w": 24,
+              "x": 24,
+              "y": 45
+            },
+            "panelIndex": "4a004976-426b-445e-9ecf-1f9964074523",
+            "panelRefName": "panel_7",
             "version": "7.4.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat ActiveMQ] Topic Overview",
+        "title": "[Metricbeat ActiveMQ] Queues Overview",
         "version": 1
       },
-      "id": "d97b7520-0bbe-11ea-81bb-cf244189d349",
+      "id": "a8160560-0bd0-11ea-81bb-cf244189d349",
       "migrationVersion": {
         "dashboard": "7.3.0"
       },
       "references": [
         {
-          "id": "d22e5e00-0bbd-11ea-81bb-cf244189d349",
+          "id": "ad2d4960-0bd4-11ea-81bb-cf244189d349",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "e91f2b80-0bbd-11ea-81bb-cf244189d349",
+          "id": "00e33010-0bd5-11ea-81bb-cf244189d349",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "a85c09b0-0bbd-11ea-81bb-cf244189d349",
+          "id": "4a93ef10-0bd5-11ea-81bb-cf244189d349",
           "name": "panel_2",
           "type": "visualization"
         },
@@ -127,19 +153,29 @@
           "type": "visualization"
         },
         {
-          "id": "21fb23a0-0bbe-11ea-81bb-cf244189d349",
+          "id": "99f41030-0bd5-11ea-81bb-cf244189d349",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "8ae8aa90-0bc8-11ea-81bb-cf244189d349",
+          "id": "55cc9840-0bd6-11ea-81bb-cf244189d349",
           "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "8599cea0-0c2e-11ea-81bb-cf244189d349",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "a8ac8950-0c2e-11ea-81bb-cf244189d349",
+          "name": "panel_7",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-11-20T19:19:39.989Z",
-      "version": "WzQwMCwxXQ=="
+      "updated_at": "2019-11-21T07:17:54.890Z",
+      "version": "WzQ4NSwxXQ=="
     },
     {
       "attributes": {
@@ -153,163 +189,7 @@
             }
           }
         },
-        "title": "Topic Messages Dispatch [Metricbeat ActiveMQ]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_min": "0",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(104,204,202,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "Dispatch",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "activemq.topic.messages.dispatch.count",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "max"
-                  },
-                  {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "4f39bd50-0bbd-11ea-b87b-6d4c24968040",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "terms",
-                "stacked": "none",
-                "terms_field": "activemq.topic.name",
-                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
-                "type": "timeseries"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "",
-            "type": "timeseries"
-          },
-          "title": "Topic Messages Dispatch [Metricbeat ActiveMQ]",
-          "type": "metrics"
-        }
-      },
-      "id": "d22e5e00-0bbd-11ea-81bb-cf244189d349",
-      "migrationVersion": {
-        "visualization": "7.3.1"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-11-20T17:53:20.081Z",
-      "version": "WzM3MCwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Topic Messages Enqueue [Metricbeat ActiveMQ]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_min": "0",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(115,216,255,1)",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "Enqueue",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "field": "activemq.topic.messages.enqueue.count",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "max"
-                  },
-                  {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "4f39bd50-0bbd-11ea-b87b-6d4c24968040",
-                    "type": "derivative",
-                    "unit": ""
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "terms",
-                "stacked": "none",
-                "terms_field": "activemq.topic.name",
-                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
-                "type": "timeseries"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "",
-            "type": "timeseries"
-          },
-          "title": "Topic Messages Enqueue [Metricbeat ActiveMQ]",
-          "type": "metrics"
-        }
-      },
-      "id": "e91f2b80-0bbd-11ea-81bb-cf244189d349",
-      "migrationVersion": {
-        "visualization": "7.3.1"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2019-11-20T17:52:47.665Z",
-      "version": "WzM2OCwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Topic Messages Dequeue [Metricbeat ActiveMQ]",
+        "title": "Queues Messages Dequeue [Metricbeat ActiveMQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -337,7 +217,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "activemq.topic.messages.dequeue.count",
+                    "field": "activemq.queue.messages.dequeue.count",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   },
@@ -352,7 +232,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "activemq.topic.name",
+                "terms_field": "activemq.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -362,18 +242,18 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Topic Messages Dequeue [Metricbeat ActiveMQ]",
+          "title": "Queues Messages Dequeue [Metricbeat ActiveMQ]",
           "type": "metrics"
         }
       },
-      "id": "a85c09b0-0bbd-11ea-81bb-cf244189d349",
+      "id": "ad2d4960-0bd4-11ea-81bb-cf244189d349",
       "migrationVersion": {
         "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T17:52:19.070Z",
-      "version": "WzM2NiwxXQ=="
+      "updated_at": "2019-11-20T20:31:05.461Z",
+      "version": "WzQzNSwxXQ=="
     },
     {
       "attributes": {
@@ -387,7 +267,163 @@
             }
           }
         },
-        "title": "Topic Messages Expired [Metricbeat ActiveMQ]",
+        "title": "Queues Messages Enqueue [Metricbeat ActiveMQ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(115,216,255,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Enqueue",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "activemq.queue.messages.enqueue.count",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "4f39bd50-0bbd-11ea-b87b-6d4c24968040",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "activemq.queue.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Queues Messages Enqueue [Metricbeat ActiveMQ]",
+          "type": "metrics"
+        }
+      },
+      "id": "00e33010-0bd5-11ea-81bb-cf244189d349",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-20T20:33:36.545Z",
+      "version": "WzQzOSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Queues Messages Dispatch [Metricbeat ActiveMQ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,204,202,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Dispatch",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "activemq.queue.messages.dispatch.count",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "4f39bd50-0bbd-11ea-b87b-6d4c24968040",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "activemq.queue.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Queues Messages Dispatch [Metricbeat ActiveMQ]",
+          "type": "metrics"
+        }
+      },
+      "id": "4a93ef10-0bd5-11ea-81bb-cf244189d349",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-20T20:35:29.537Z",
+      "version": "WzQ0MywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Queues Messages Expired [Metricbeat ActiveMQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -415,7 +451,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "activemq.topic.messages.expired.count",
+                    "field": "activemq.queue.messages.expired.count",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   },
@@ -430,7 +466,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "activemq.topic.name",
+                "terms_field": "activemq.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -440,7 +476,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Topic Messages Expired [Metricbeat ActiveMQ]",
+          "title": "Queues Messages Expired [Metricbeat ActiveMQ]",
           "type": "metrics"
         }
       },
@@ -450,8 +486,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T17:53:48.713Z",
-      "version": "WzM3MywxXQ=="
+      "updated_at": "2019-11-20T20:36:57.531Z",
+      "version": "WzQ0NiwxXQ=="
     },
     {
       "attributes": {
@@ -465,7 +501,7 @@
             }
           }
         },
-        "title": "Topic Messages In-flight [Metricbeat ActiveMQ]",
+        "title": "Queues Messages In-flight [Metricbeat ActiveMQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -493,7 +529,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "activemq.topic.messages.inflight.count",
+                    "field": "activemq.queue.messages.inflight.count",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   },
@@ -508,7 +544,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "activemq.topic.name",
+                "terms_field": "activemq.queue.name",
                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
@@ -518,18 +554,18 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Topic Messages In-flight [Metricbeat ActiveMQ]",
+          "title": "Queues Messages In-flight [Metricbeat ActiveMQ]",
           "type": "metrics"
         }
       },
-      "id": "21fb23a0-0bbe-11ea-81bb-cf244189d349",
+      "id": "99f41030-0bd5-11ea-81bb-cf244189d349",
       "migrationVersion": {
         "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T18:53:49.967Z",
-      "version": "WzM5MSwxXQ=="
+      "updated_at": "2019-11-20T20:37:42.707Z",
+      "version": "WzQ0OCwxXQ=="
     },
     {
       "attributes": {
@@ -543,7 +579,7 @@
             }
           }
         },
-        "title": "Topic Messages Enqueue Time [Metricbeat ActiveMQ]",
+        "title": "Queues Messages Enqueue Time [Metricbeat ActiveMQ]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -567,11 +603,11 @@
                 "fill": 0.5,
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "",
+                "label": "Equeue",
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "activemq.topic.messages.enqueue.time.avg",
+                    "field": "activemq.queue.messages.enqueue.time.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -580,7 +616,8 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "activemq.topic.name",
+                "terms_field": "activemq.queue.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                 "type": "timeseries"
               }
             ],
@@ -589,18 +626,162 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Topic Messages Enqueue Time [Metricbeat ActiveMQ]",
+          "title": "Queues Messages Enqueue Time [Metricbeat ActiveMQ]",
           "type": "metrics"
         }
       },
-      "id": "8ae8aa90-0bc8-11ea-81bb-cf244189d349",
+      "id": "55cc9840-0bd6-11ea-81bb-cf244189d349",
       "migrationVersion": {
         "visualization": "7.3.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T19:04:31.161Z",
-      "version": "WzM5NSwxXQ=="
+      "updated_at": "2019-11-21T07:12:25.470Z",
+      "version": "WzQ2NSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Queues Consumers [Metricbeat ActiveMQ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Consumers",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "activemq.queue.consumers.count",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "activemq.queue.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Queues Consumers [Metricbeat ActiveMQ]",
+          "type": "metrics"
+        }
+      },
+      "id": "8599cea0-0c2e-11ea-81bb-cf244189d349",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-21T07:14:13.769Z",
+      "version": "WzQ3MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Queues Producers [Metricbeat ActiveMQ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(0,156,224,1)",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Producers",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "activemq.queue.producers.count",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "activemq.queue.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Queues Producers [Metricbeat ActiveMQ]",
+          "type": "metrics"
+        }
+      },
+      "id": "a8ac8950-0c2e-11ea-81bb-cf244189d349",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-11-21T07:15:12.613Z",
+      "version": "WzQ3NCwxXQ=="
     }
   ],
   "version": "7.4.0"
