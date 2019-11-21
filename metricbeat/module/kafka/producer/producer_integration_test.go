@@ -44,7 +44,7 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(8779)))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(8775)))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
@@ -58,7 +58,7 @@ func TestFetch(t *testing.T) {
 	)
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(8779)))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(8775)))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
@@ -68,7 +68,7 @@ func TestFetch(t *testing.T) {
 func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kafka",
-		"metricsets": []string{"broker"},
+		"metricsets": []string{"producer"},
 		"hosts":      []string{host},
 	}
 }
