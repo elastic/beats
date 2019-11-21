@@ -261,6 +261,9 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1247,
+        "nginx.access.remote_ip_list": [
+            "localhost"
+        ],
         "service.type": "nginx",
         "source.address": "localhost",
         "url.original": "/test2",
@@ -286,8 +289,12 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1398,
+        "nginx.access.remote_ip_list": [
+            "localhost",
+            "localhost"
+        ],
         "service.type": "nginx",
-        "source.address": "localhost, localhost",
+        "source.address": "localhost",
         "url.original": "/test2",
         "user.name": "-",
         "user_agent.device.name": "Other",

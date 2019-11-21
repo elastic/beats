@@ -41,7 +41,7 @@ const (
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka",
-		compose.UpWithTimeout(120*time.Second),
+		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
@@ -64,7 +64,7 @@ func TestData(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka",
-		compose.UpWithTimeout(120*time.Second),
+		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 

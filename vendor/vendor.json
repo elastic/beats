@@ -177,12 +177,6 @@
 			"revisionTime": "2019-09-04T14:17:38Z"
 		},
 		{
-			"checksumSHA1": "rDoYEddGYvQT73l9V8Uqjk7SHAY=",
-			"path": "github.com/OneOfOne/xxhash",
-			"revision": "74ace4fe5525ef62ce28d5093d6b0faaa6a575f3",
-			"revisionTime": "2018-07-23T16:30:02Z"
-		},
-		{
 			"checksumSHA1": "w5NkRQ2Cebz7a6UfrbwFdhyRWnM=",
 			"path": "github.com/Shopify/sarama",
 			"revision": "46c83074a05474240f9620fb7c70fb0d80ca401a",
@@ -722,6 +716,12 @@
 			"path": "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1",
 			"revision": "26aa36c099c2041b432cf3cc8a26c5fb858d218b",
 			"revisionTime": "2019-07-23T11:24:16Z"
+		},
+		{
+			"checksumSHA1": "Fo6XV4q33h7fXJuYrvOyDB6kw8I=",
+			"path": "github.com/cespare/xxhash",
+			"revision": "2372543dd2bbab7a55ce14c54eb357abe23a42f5",
+			"revisionTime": "2019-10-31T20:04:18Z"
 		},
 		{
 			"checksumSHA1": "Mu77HNTb0SVN0IEBB+hSDeZzO+g=",
