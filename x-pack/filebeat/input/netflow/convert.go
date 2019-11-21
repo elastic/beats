@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -442,7 +442,7 @@ func (p IPProtocol) String() string {
 }
 
 func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {
-	h := xxhash.New64()
+	h := xxhash.New()
 	// Both flows will have the same ID.
 	if srcPort >= dstPort {
 		h.Write(srcIP)

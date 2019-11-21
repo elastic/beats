@@ -11827,7 +11827,20 @@ The attack_pattern for this indicator is a STIX Pattern as specified in STIX Ver
 
 type: keyword
 
-example: [source.ip = '198.51.100.1/32']
+example: [destination:ip = '91.219.29.188/32']
+
+
+--
+
+*`misp.threat_indicator.attack_pattern_kql`*::
++
+--
+The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format. 
+
+
+type: keyword
+
+example: destination.ip: "91.219.29.188/32"
 
 
 --

@@ -16,10 +16,10 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beat_default_index_prefix: {beatname_lc}
 :has_registry:
 :ignores_max_retries:
-:has_script_processor:
-:has_timestamp_processor:
 :win_os:
 :win_only:
+:no_decode_cef_processor:
+:no_decode_csv_fields_processor:
 
 include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
