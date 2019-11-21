@@ -24,7 +24,7 @@ func RunPubSub(ctx context.Context, m gpubsub.Message) error {
 	settings := instance.Settings{
 		Name:            "functionbeat",
 		IndexPrefix:     "functionbeat",
-		ConfigOverrides: config.ConfigOverrides,
+		ConfigOverrides: config.FunctionOverrides,
 	}
 
 	cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
