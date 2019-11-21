@@ -414,6 +414,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
 - New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
 - Add document for Filebeat input httpjson. {pull}14602[14602]
+- Add more configuration options to the Netflow module. {pull}14628{14628}
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
