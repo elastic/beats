@@ -41,7 +41,7 @@ type PipelineManager struct {
 // NewPipelineManager creates a new Pipeline map
 func NewPipelineManager(logCfg *common.Config) *PipelineManager {
 	return &PipelineManager{
-		Logger: logp.NewLogger("dockerlogbeat"),
+		Logger: logp.NewLogger("PipelineManager"),
 		//mu:        new(sync.Mutex),
 		pipelines: make(map[string]*Pipeline),
 		clients:   make(map[string]*ClientLogger),
