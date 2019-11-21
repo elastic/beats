@@ -22,6 +22,8 @@ import "github.com/elastic/beats/libbeat/processors/uuid/generator/elasticsearch
 // Fn represents a random, unique ID generator function.
 type Fn func() string
 
+// Factory takes as input the type of ID to generate and returns the generator
+// function for that ID type.
 func Factory(typ string) (Fn, error) {
 	switch typ {
 	case "elasticsearch":
