@@ -13,7 +13,7 @@
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",
-        "log.offset": 0,
+        "log.offset": 65,
         "network.type": "ipv4",
         "related.ip": [
             "10.0.1.5",
@@ -37,7 +37,7 @@
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",
-        "log.offset": 65,
+        "log.offset": 130,
         "network.type": "ipv4",
         "related.ip": [
             "10.0.1.5",

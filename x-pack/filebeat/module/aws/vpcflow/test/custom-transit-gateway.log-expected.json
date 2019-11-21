@@ -24,7 +24,7 @@
         "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",
-        "log.offset": 0,
+        "log.offset": 159,
         "network.community_id": "1:ws7yjpq1Xp9e30feJWxuPgfVePc=",
         "network.iana_number": "6",
         "network.transport": "tcp",

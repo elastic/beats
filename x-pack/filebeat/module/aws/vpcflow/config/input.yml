@@ -15,6 +15,8 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
+exclude_lines: ["^version", "^instance-id"]
+
 processors:
   - script:
       lang: javascript
@@ -51,6 +53,15 @@ processors:
       field: message
       target_prefix: aws.vpcflow
       tokenizer: '%{version} %{interface_id} %{account_id} %{vpc_id} %{subnet_id} %{instance_id} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{protocol} %{tcp_flags} %{type} %{pkt_srcaddr} %{pkt_dstaddr} %{action} %{log_status}'
+
+  # TCP Flag Sequence
+  - dissect:
+      when:
+        equals:
+          '@metadata.message_token_count': 21
+      field: message
+      target_prefix: aws.vpcflow
+      tokenizer: '%{version} %{vpc_id} %{subnet_id} %{instance_id} %{interface_id} %{account_id} %{type} %{srcaddr} %{dstaddr} %{srcport} %{dstport} %{pkt_srcaddr} %{pkt_dstaddr} %{protocol} %{bytes} %{packets} %{start} %{end} %{action} %{tcp_flags} %{log_status}'
 
   - convert:
       ignore_missing: true
