@@ -49,7 +49,7 @@ func defaultConfig() *Config {
 		Region:     "",
 		Namespace:  "",
 		SecretID:   "",
-		AllowStale: false,
+		AllowStale: true,
 		WaitTime:   15 * time.Second,
 		SyncPeriod: 30 * time.Second,
 		Prefix:     "co.elastic",
