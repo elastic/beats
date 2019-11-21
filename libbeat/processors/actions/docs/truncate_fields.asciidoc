@@ -1,7 +1,7 @@
 [[truncate-fields]]
 === Truncate fields
 
-The `truncate_fields` truncates a field to a given size if bigger. If the size of the field is smaller than
+The `truncate_fields` processor truncates a field to a given size. If the size of the field is smaller than
 the limit, the field is left as is.
 
 `fields`:: List of `from` and `to` pairs to copy from and to.
@@ -26,4 +26,3 @@ processors:
   fail_on_error: false
   ignore_missing: true
 ------------------------------------------------------------------------------
-
