@@ -24,8 +24,6 @@ import (
 	"time"
 )
 
-// Golang port of https://github.com/elastic/elasticsearch/blob/a666fb22664284d8e2114841ebb58ea4e1924691/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
-
 var (
 	sequenceNumber uint32
 	lastTimestamp  *time.Time
@@ -42,6 +40,9 @@ func init() {
 	sequenceNumber = rand.Uint32()
 }
 
+// GetBase64UUID returns a base64-encoded, randomly-generated, but roughly ordered (over time), unique
+// ID. The algorithm used to generate the ID is the same as used by Elasticsearch.
+// See https://github.com/elastic/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
 func GetBase64UUID() string {
 	mu.Lock()
 	defer mu.Unlock()
