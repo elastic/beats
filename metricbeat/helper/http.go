@@ -86,6 +86,7 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 			Transport: &http.Transport{
 				Dial:    dialer.Dial,
 				DialTLS: tlsDialer.Dial,
+				Proxy:   http.ProxyFromEnvironment,
 			},
 			Timeout: config.Timeout,
 		},
