@@ -19,6 +19,7 @@ package generator
 
 import "github.com/elastic/beats/libbeat/processors/uuid/generator/elasticsearch"
 
+// Fn represents a random, unique ID generator function.
 type Fn func() string
 
 func Factory(typ string) (Fn, error) {
