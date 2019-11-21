@@ -55,7 +55,7 @@ type EventCache struct {
 }
 
 // Put lets outputs put key-value pairs into the event cache
-func (ec EventCache) Put(key string, value interface{}) (interface{}, error) {
+func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 	if ec.m == nil {
 		// uninitialized map
 		ec.m = common.MapStr{}
@@ -65,7 +65,7 @@ func (ec EventCache) Put(key string, value interface{}) (interface{}, error) {
 }
 
 // GetValue lets outputs retrieve values from the event cache by key
-func (ec EventCache) GetValue(key string) (interface{}, error) {
+func (ec *EventCache) GetValue(key string) (interface{}, error) {
 	if ec.m == nil {
 		// uninitialized map
 		return nil, common.ErrKeyNotFound
