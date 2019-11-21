@@ -29,7 +29,7 @@ import (
 
 func TestFactory(t *testing.T) {
 	tests := map[string]struct {
-		expectedGeneratorFn generatorFn
+		expectedGeneratorFn Fn
 		expectedErr         error
 	}{
 		"elasticsearch": {
@@ -58,6 +58,6 @@ func TestFactory(t *testing.T) {
 	}
 }
 
-func getGeneratorFuncName(fn generatorFn) string {
+func getGeneratorFuncName(fn Fn) string {
 	return runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 }

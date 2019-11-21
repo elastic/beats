@@ -19,9 +19,9 @@ package generator
 
 import "github.com/elastic/beats/libbeat/processors/uuid/generator/elasticsearch"
 
-type generatorFn func() string
+type Fn func() string
 
-func Factory(typ string) (generatorFn, error) {
+func Factory(typ string) (Fn, error) {
 	switch typ {
 	case "elasticsearch":
 		return elasticsearch.GetBase64UUID, nil
