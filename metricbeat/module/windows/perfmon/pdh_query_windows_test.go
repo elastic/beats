@@ -18,7 +18,6 @@
 package perfmon
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -95,10 +94,8 @@ func TestInstanceNameRegexp(t *testing.T) {
 		`\Search Indexer(*)\L0 Merges (flushes) Now.`, `\NUMA Node Memory(*)\Free & Zero Page List MBytes`}
 	for _, path := range queryPaths {
 		matches := instanceNameRegexp.FindStringSubmatch(path)
-		if len(matches) == 2 {
+		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
 			assert.Equal(t, matches[1], "*")
-		} else {
-			t.Fatal(errors.New("regular expression did not return any matches"))
 		}
 	}
 }
@@ -110,10 +107,8 @@ func TestObjectNameRegexp(t *testing.T) {
 		`\Web Service Cache\Kernel: Current URIs Cached`}
 	for _, path := range queryPaths {
 		matches := objectNameRegexp.FindStringSubmatch(path)
-		if len(matches) == 2 {
+		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
 			assert.Equal(t, matches[1], "Web Service Cache")
-		} else {
-			t.Fatal(errors.New("regular expression did not return any matches"))
 		}
 	}
 }
