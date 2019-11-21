@@ -1,3 +1,4 @@
 kafka-python==1.4.3
 elasticsearch==6.3.1
 semver==2.8.1
+stomp.py==4.1.22
