@@ -20,5 +20,7 @@ package v2
 import "errors"
 
 var (
+	// ErrNoTypeConfigured indicates that a user configuration
+	// has no input type selected.
 	ErrNoTypeConfigured = errors.New("No type configured")
 )
