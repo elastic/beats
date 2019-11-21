@@ -45,3 +45,14 @@ services:
       - elasticsearch
     ports:
       - 5601
+
+  # Used by base tests
+  metricbeat:
+    image: docker.elastic.co/observability-ci/beats-integration-metricbeat:${BEAT_VERSION:-7.3.0}-1
+    build:
+      context: ./module/beat/_meta
+      args:
+        BEAT_VERSION: ${BEAT_VERSION:-7.3.0}
+    command: '-e'
+    ports:
+      - 5066
