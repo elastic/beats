@@ -5,7 +5,6 @@
 package pipelinemanager
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -30,6 +29,7 @@ type ClientLogger struct {
 	pipelineHash  string
 	closer        chan struct{}
 	containerMeta logger.Info
+	logger        *logp.Logger
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
@@ -38,8 +38,9 @@ func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string,
 	settings := beat.ClientConfig{
 		WaitClose: 0,
 	}
+	clientLogger := logp.NewLogger("clientLogReader")
 	settings.ACKCount = func(n int) {
-		logp.Debug("Pipeline client (%s) ACKS; %v", file, n)
+		clientLogger.Debugf("Pipeline client (%s) ACKS; %v", file, n)
 	}
 	settings.PublishMode = beat.DefaultGuarantees
 	client, err := pipeline.ConnectWith(settings)
@@ -52,14 +53,14 @@ func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string,
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening logger fifo: %q", file)
 	}
-	logp.Info("Created new logger for %s", file)
+	clientLogger.Debugf("Created new logger for %s", file)
 
-	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{}), containerMeta: info}, nil
+	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
 }
 
 // Close closes the pipeline client and reader
 func (cl *ClientLogger) Close() error {
-	logp.Info("Closing ClientLogger")
+	cl.logger.Debug("Closing ClientLogger")
 	cl.logFile.Close()
 	return cl.client.Close()
 
@@ -80,7 +81,7 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	for {
 		err := cl.logFile.ReadMessage(&log)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error getting message: %s\n", err)
+			cl.logger.Error(os.Stderr, "Error getting message: %s\n", err)
 			return
 		}
 		publishWriter <- log
@@ -96,7 +97,7 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 	for {
 		entry, ok := <-reader
 		if !ok {
-			logp.Info("Closing publishLoop")
+			cl.logger.Debug("Closing publishLoop")
 			return
 		}
 
