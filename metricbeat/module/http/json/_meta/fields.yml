@@ -1,6 +1,0 @@
-- name: json
-  type: group
-  description: >
-    json metricset
-  release: ga
-  fields:

@@ -1,8 +1,0 @@
-# Module: uwsgi
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-uwsgi.html
-
-- module: uwsgi
-  #metricsets:
-  #  - status
-  period: 10s
-  hosts: ["tcp://127.0.0.1:9191"]

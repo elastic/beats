@@ -1,5 +1,0 @@
-- module: kvm
-  #metricsets:
-  #  - dommemstat
-  period: 10s
-  hosts: ["unix:///var/run/libvirt/libvirt-sock"]

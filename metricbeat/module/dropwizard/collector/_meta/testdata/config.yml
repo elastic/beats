@@ -1,6 +1,0 @@
-type: http
-url: "/metrics/metrics"
-omit_documented_fields_check:
-  - "dropwizard.testnamespace.*"
-module:
-  namespace: testnamespace

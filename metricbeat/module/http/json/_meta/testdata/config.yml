@@ -1,6 +1,0 @@
-type: http
-url: "/"
-module:
-  namespace: test
-omit_documented_fields_check:
-  - "http.test.*"

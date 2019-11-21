@@ -1,4 +1,0 @@
-- module: traefik
-  metricsets: ["health"]
-  period: 10s
-  hosts: ["localhost:8080"]

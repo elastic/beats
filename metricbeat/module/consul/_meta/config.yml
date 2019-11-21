@@ -1,7 +1,0 @@
-- module: consul
-  metricsets:
-  - agent
-  enabled: true
-  period: 10s
-  hosts: ["localhost:8500"]
-

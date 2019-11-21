@@ -27,27 +27,21 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
-
 	// Add autodiscover builders / appenders
-	_ "github.com/elastic/beats/metricbeat/autodiscover"
-
 	// Add metricbeat default processors
-	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}  // Channel used to initiate shutdown.
-	modules      []staticModule // Active list of modules.
-	config       Config
-	autodiscover *autodiscover.Autodiscover
+	done    chan struct{}  // Channel used to initiate shutdown.
+	modules []staticModule // Active list of modules.
+	config  Config
 
 	// Options
 	moduleOptions []module.Option
@@ -138,11 +132,6 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.ConfigManager.Enabled()
-	if !dynamicCfgEnabled && len(config.Modules) == 0 {
-		return nil, mb.ErrEmptyConfig
-	}
-
 	metricbeat := &Metricbeat{
 		done:   make(chan struct{}),
 		config: config,
@@ -195,18 +184,9 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	if err := errs.Err(); err != nil {
 		return nil, err
 	}
-	if len(metricbeat.modules) == 0 && !dynamicCfgEnabled {
-		return nil, mb.ErrAllModulesDisabled
-	}
 
-	if config.Autodiscover != nil {
-		var err error
-		factory := module.NewFactory(metricbeat.moduleOptions...)
-		adapter := autodiscover.NewFactoryAdapter(factory)
-		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
-		if err != nil {
-			return nil, err
-		}
+	if len(metricbeat.modules) == 0 {
+		return nil, mb.ErrAllModulesDisabled
 	}
 
 	return metricbeat, nil
@@ -265,18 +245,6 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
-	// Autodiscover (metricbeat.autodiscover)
-	if bt.autodiscover != nil {
-		bt.autodiscover.Start()
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			<-bt.done
-			bt.autodiscover.Stop()
-		}()
-	}
-
-	wg.Wait()
 	return nil
 }
 

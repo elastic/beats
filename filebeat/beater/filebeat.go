@@ -46,7 +46,6 @@ import (
 	"github.com/elastic/beats/filebeat/registrar"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 )
 

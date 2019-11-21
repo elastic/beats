@@ -1,6 +1,0 @@
-# HELP net_conntrack_listener_conn_accepted_total Total number of connections opened to the listener of a given name.
-# TYPE net_conntrack_listener_conn_accepted_total counter
-net_conntrack_listener_conn_accepted_total{listener_name="http"} 3
-# HELP net_conntrack_listener_conn_closed_total Total number of connections closed that were made to the listener of a given name.
-# TYPE net_conntrack_listener_conn_closed_total counter
-net_conntrack_listener_conn_closed_total{listener_name="http"} 0

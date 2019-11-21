@@ -1,1 +1,0 @@
-This is the `state_cronjob` metricset of the Kubernetes module.

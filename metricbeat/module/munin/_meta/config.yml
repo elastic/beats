@@ -1,5 +1,0 @@
-- module: munin
-  #metricsets:
-  #  - node
-  period: 10s
-  hosts: ["localhost:4949"]

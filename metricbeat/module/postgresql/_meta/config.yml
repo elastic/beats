@@ -1,9 +1,0 @@
-- module: postgresql
-  #metricsets:
-  #  - database
-  #  - bgwriter
-  #  - activity
-  period: 10s
-  hosts: ["postgres://localhost:5432"]
-  #username: user
-  #password: pass

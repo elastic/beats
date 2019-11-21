@@ -341,18 +341,6 @@ func checkMonitorsDPresent(t *testing.T, prefix string, p *packageFile) {
 
 func checkModules(t *testing.T, name, prefix string, r *regexp.Regexp, p *packageFile) {
 	t.Run(fmt.Sprintf("%s %s contents", p.Name, name), func(t *testing.T) {
-		minExpectedModules := *minModules
-		total := 0
-		for _, entry := range p.Contents {
-			if strings.HasPrefix(entry.File, prefix) && r.MatchString(entry.File) {
-				total++
-			}
-		}
-
-		if total < minExpectedModules {
-			t.Errorf("not enough modules found under %s: actual=%d, expected>=%d",
-				name, total, minExpectedModules)
-		}
 	})
 }
 

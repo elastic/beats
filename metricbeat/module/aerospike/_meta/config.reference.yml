@@ -1,5 +1,0 @@
-- module: aerospike
-  metricsets: ["namespace"]
-  enabled: true
-  period: 10s
-  hosts: ["localhost:3000"]
