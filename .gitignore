@@ -38,3 +38,8 @@ x-pack/functionbeat/provider/*/functionbeat-*
 *.test
 *.prof
 *.pyc
+
+# Terraform state files
+*.terraform
+*.tfstate*
+*.tfvars
