@@ -1,10 +1,10 @@
 = Metricbeat Reference
 
-:libbeat-dir: {docdir}/../../libbeat
+:libbeat-dir: {docdir}/../../libbeat/docs
 
 :libbeat-xpack-dir: ../../../x-pack/libbeat
 
-include::{libbeat-dir}/docs/version.asciidoc[]
+include::{libbeat-dir}/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
 
@@ -31,13 +31,13 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_script_processor:
 :no_timestamp_processor:
 
-include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
-include::{libbeat-dir}/docs/repositories.asciidoc[]
+include::{libbeat-dir}/repositories.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
@@ -47,18 +47,18 @@ include::./how-metricbeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-central-management.asciidoc[]
+include::{libbeat-dir}/shared-central-management.asciidoc[]
 
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
+include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
+include::{libbeat-dir}/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-include::{libbeat-dir}/docs/contributing-to-beats.asciidoc[]
+include::{libbeat-dir}/contributing-to-beats.asciidoc[]
