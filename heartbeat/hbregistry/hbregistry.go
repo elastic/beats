@@ -25,5 +25,5 @@ var StatsRegistry = monitoring.Default.NewRegistry("heartbeat")
 // SchedulerRegistry holds scheduler stats
 var SchedulerRegistry = StatsRegistry.NewRegistry("scheduler")
 
-// StateRegistry contains a singleton instance of the heartbeat state registry
-var StateRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
+// TelemetryRegistry contains a singleton instance of the heartbeat telemetry registry
+var TelemetryRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")

@@ -39,13 +39,13 @@ type pluginBuilder struct {
 var pluginKey = "heartbeat.monitor"
 
 // stateGlobalRecorder records statistics across all plugin types
-var stateGlobalRecorder = newRootGaugeRecorder(hbregistry.StateRegistry)
+var stateGlobalRecorder = newRootGaugeRecorder(hbregistry.TelemetryRegistry)
 
 func statsForPlugin(pluginName string) registryRecorder {
 	return multiRegistryRecorder{
 		recorders: []registryRecorder{
 			// state (telemetry)
-			newPluginGaugeRecorder(pluginName, hbregistry.StateRegistry),
+			newPluginGaugeRecorder(pluginName, hbregistry.TelemetryRegistry),
 			// Record global monitors / endpoints count
 			newPluginCountersRecorder(pluginName, hbregistry.StatsRegistry),
 			// When stats for this plugin are updated, update the global stats as well
