@@ -17,9 +17,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-var hubID = "ossifrage"
+var hubID = "elastic"
 var pluginVersion = "0.0.1"
-var name = "dockerlogbeat"
+var name = "docker-logging-plugin"
 var containerName = name + "_container"
 var dockerPluginName = hubID + "/" + name
 var dockerPlugin = dockerPluginName + ":" + pluginVersion
@@ -97,6 +97,6 @@ func Install() error {
 }
 
 // Create builds and creates a docker plugin
-func Create() {
+func Package() {
 	mg.SerialDeps(Build, Install)
 }

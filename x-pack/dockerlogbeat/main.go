@@ -49,7 +49,7 @@ func main() {
 		fatal("error starting config: %s", err)
 	}
 
-	err = logpcfg.Logging("dockerbeat", logcfg)
+	err = logpcfg.Logging("elastic-logging-driver", logcfg)
 	if err != nil {
 		fatal("error starting log handler: %s", err)
 	}
