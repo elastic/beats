@@ -4,7 +4,6 @@ services:
   beat:
     build: ${PWD}/.
     environment:
-      - BEAT_STRICT_PERMS=false
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:

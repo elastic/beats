@@ -65,7 +65,7 @@ class KafkaTest(metricbeat.BaseTest):
             "period": "1s"
         }]
         self.render_config_template(modules=modules)
-        proc = self.start_beat(home=self.beat_path)
+        proc = self.start_beat(home=self.beat_path, env={'BEAT_STRICT_PERMS': 'false'})
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=60)
         proc.check_kill_and_wait()
 
