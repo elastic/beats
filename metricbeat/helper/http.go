@@ -81,12 +81,12 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		builder = dialer.NewDefaultDialerBuilder()
 	}
 
-	var tlsDialer transport.Dialer
 	dialer, err := builder.Make(config.ConnectTimeout)
 	if err != nil {
 		return nil, err
 	}
 
+	var tlsDialer transport.Dialer
 	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
 	if err != nil {
 		return nil, err
