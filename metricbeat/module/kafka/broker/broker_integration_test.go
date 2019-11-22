@@ -17,26 +17,18 @@
 
 // +build integration
 
-package partition
+package broker
 
 import (
-	"os"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
-	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	// Register input module and metricset
 	_ "github.com/elastic/beats/metricbeat/module/jolokia"
 	_ "github.com/elastic/beats/metricbeat/module/jolokia/jmx"
 )
-
-func init() {
-	// To be moved to some kind of helper
-	os.Setenv("BEAT_STRICT_PERMS", "false")
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
-}
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka",
