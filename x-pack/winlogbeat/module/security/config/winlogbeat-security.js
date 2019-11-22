@@ -1101,7 +1101,7 @@ var security = (function () {
         }
         var eventActionDescription = eventActionTypes[code];
         if (eventActionDescription) {
-          evt.Put("event.action", eventActionDescription);
+            evt.Put("event.action", eventActionDescription);
         }
     };
 
@@ -1203,7 +1203,6 @@ var security = (function () {
         })
         .Build();
 
-
     var copySubjectUser  = new processor.Chain()
         .Convert({
             fields: [
@@ -1214,7 +1213,7 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-    
+
     var copyOldTargetUser  = new processor.Chain()
         .Convert({
             fields: [
@@ -1232,7 +1231,6 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-
 
     var renameCommonAuthFields = new processor.Chain()
         .Convert({
@@ -1342,107 +1340,107 @@ var security = (function () {
 
     return {
     
-    // 4624 - An account was successfully logged on.
-    4624: logonSuccess.Run,
+        // 4624 - An account was successfully logged on.
+        4624: logonSuccess.Run,
 
-    // 4625 - An account failed to log on.
-    4625: event4625.Run,
-      
-    // 4634 - An account was logged off.
-    4634: logoff.Run,
+        // 4625 - An account failed to log on.
+        4625: event4625.Run,
 
-    // 4647 - User initiated logoff.
-    4647: logoff.Run,
+        // 4634 - An account was logged off.
+        4634: logoff.Run,
 
-    // 4648 - A logon was attempted using explicit credentials.
-    4648: logonSuccess.Run,
+        // 4647 - User initiated logoff.
+        4647: logoff.Run,
 
-    // 4672 - Special privileges assigned to new logon.
-    4672: event4672.Run,
+        // 4648 - A logon was attempted using explicit credentials.
+        4648: logonSuccess.Run,
 
-    // 4720 - A user account was created
-    4720: userMgmtEvts.Run,
+        // 4672 - Special privileges assigned to new logon.
+        4672: event4672.Run,
 
-    // 4722 - A user account was enabled
-    4722: userMgmtEvts.Run,
+        // 4720 - A user account was created
+        4720: userMgmtEvts.Run,
 
-    // 4723 - An attempt was made to change an account's password
-    4723: userMgmtEvts.Run,
+        // 4722 - A user account was enabled
+        4722: userMgmtEvts.Run,
 
-    // 4724 - An attempt was made to reset an account's password
-    4724: userMgmtEvts.Run,
+        // 4723 - An attempt was made to change an account's password
+        4723: userMgmtEvts.Run,
 
-    // 4725 - A user account was disabled.
-    4725: userMgmtEvts.Run,
+        // 4724 - An attempt was made to reset an account's password
+        4724: userMgmtEvts.Run,
 
-    // 4726 - An user account was deleted.
-    4726: userMgmtEvts.Run,
+        // 4725 - A user account was disabled.
+        4725: userMgmtEvts.Run,
 
-    // 4727 - A security-enabled global group was created. 
-    4727: groupMgmtEvts.Run,
+        // 4726 - An user account was deleted.
+        4726: userMgmtEvts.Run,
 
-    // 4728 - A member was added to a security-enabled global group. 
-    4728: groupMgmtEvts.Run,
+        // 4727 - A security-enabled global group was created. 
+        4727: groupMgmtEvts.Run,
 
-    // 4729 - A member was removed from a security-enabled global group. 
-    4729: groupMgmtEvts.Run,
-        
-    // 4730 - A security-enabled global group was deleted. 
-    4730: groupMgmtEvts.Run,
+        // 4728 - A member was added to a security-enabled global group. 
+        4728: groupMgmtEvts.Run,
 
-    // 4731 - A security-enabled local group was created.
-    4731: groupMgmtEvts.Run,
+        // 4729 - A member was removed from a security-enabled global group. 
+        4729: groupMgmtEvts.Run,
 
-    // 4732 - A member was added to a security-enabled local group.
-    4732: groupMgmtEvts.Run,
+        // 4730 - A security-enabled global group was deleted. 
+        4730: groupMgmtEvts.Run,
 
-    // 4733 - A member was removed from a security-enabled local group.
-    4733: groupMgmtEvts.Run,
+        // 4731 - A security-enabled local group was created.
+        4731: groupMgmtEvts.Run,
 
-    // 4734 - A security-enabled local group was deleted.
-    4734: groupMgmtEvts.Run,
+        // 4732 - A member was added to a security-enabled local group.
+        4732: groupMgmtEvts.Run,
 
-    // 4735 - A security-enabled local group was changed.
-    4735: groupMgmtEvts.Run,
+        // 4733 - A member was removed from a security-enabled local group.
+        4733: groupMgmtEvts.Run,
 
-    // 4737 - A security-enabled global group was changed.
-    4737: groupMgmtEvts.Run,
+        // 4734 - A security-enabled local group was deleted.
+        4734: groupMgmtEvts.Run,
 
-    // 4738 - An user account was changed.
-    4738: userMgmtEvts.Run,
+        // 4735 - A security-enabled local group was changed.
+        4735: groupMgmtEvts.Run,
 
-    // 4740 - An account was locked out
-    4740: userMgmtEvts.Run,
+        // 4737 - A security-enabled global group was changed.
+        4737: groupMgmtEvts.Run,
 
-    // 4754 -  A security-enabled universal group was created. 
-    4754: groupMgmtEvts.Run,
+        // 4738 - An user account was changed.
+        4738: userMgmtEvts.Run,
 
-    // 4755 - A security-enabled universal group was changed. 
-    4755: groupMgmtEvts.Run,
+        // 4740 - An account was locked out
+        4740: userMgmtEvts.Run,
 
-    // 4756 - A member was added to a security-enabled universal group. 
-    4756: groupMgmtEvts.Run,
+        // 4754 -  A security-enabled universal group was created. 
+        4754: groupMgmtEvts.Run,
 
-    // 4757 - A member was removed from a security-enabled universal group. 
-    4757: groupMgmtEvts.Run,
+        // 4755 - A security-enabled universal group was changed. 
+        4755: groupMgmtEvts.Run,
 
-    // 4758 - A security-enabled universal group was deleted. 
-    4758: groupMgmtEvts.Run,
+        // 4756 - A member was added to a security-enabled universal group. 
+        4756: groupMgmtEvts.Run,
 
-    // 4764 - A group\'s type was changed.
-    4764: groupMgmtEvts.Run,
+        // 4757 - A member was removed from a security-enabled universal group. 
+        4757: groupMgmtEvts.Run,
 
-    // 4767 - A user account was unlocked.
-    4767: userMgmtEvts.Run,
+        // 4758 - A security-enabled universal group was deleted. 
+        4758: groupMgmtEvts.Run,
 
-    // 4781 - The name of an account was changed.
-    4781: userRenamed.Run,
+        // 4764 - A group\'s type was changed.
+        4764: groupMgmtEvts.Run,
 
-    // 4798 - A user's local group membership was enumerated.
-    4798: userMgmtEvts.Run,
+        // 4767 - A user account was unlocked.
+        4767: userMgmtEvts.Run,
 
-    // 4799 - A security-enabled local group membership was enumerated.
-    4799: groupMgmtEvts.Run,
+        // 4781 - The name of an account was changed.
+        4781: userRenamed.Run,
+
+        // 4798 - A user's local group membership was enumerated.
+        4798: userMgmtEvts.Run,
+
+        // 4799 - A security-enabled local group membership was enumerated.
+        4799: groupMgmtEvts.Run,
         
 
     process: function(evt) {
