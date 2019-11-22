@@ -68,6 +68,11 @@ must be configured as well. Only SASL/PLAIN is supported.
 
 The password for connecting to Kafka.
 
+===== `sasl.mechanism`
+
+The sasl.mechanism for connecting to Kafka. 
+It can be one of "PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512". Default is PLAIN.
+
 [[topic-option-kafka]]
 ===== `topic`
 
