@@ -1227,9 +1227,9 @@ type: long
 --
 
 [[exported-fields-appsearch]]
-== appsearch fields
+== App Search fields
 
-appsearch module
+App Search module
 
 
 
