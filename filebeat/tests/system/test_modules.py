@@ -250,9 +250,9 @@ def clean_keys(obj):
             # loaded.
             obj["log.file.path"] = filename
 
-    # Remove @timestamp from aws vpc flow log with custom format (with no aws.vpcflow.end time).
+    # Remove @timestamp from aws vpc flow log with custom format (with no event.end time).
     if obj["event.dataset"] == "aws.vpcflow":
-        if "aws.vpcflow.end" not in obj:
+        if "event.end" not in obj:
             delete_key(obj, "@timestamp")
 
 

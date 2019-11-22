@@ -1,7 +1,7 @@
 Filebeat module for AWS VPC Logs
 ===
 
-Module for the AWS virtual private cloud(VPC) logs which captures information 
+Module for the AWS virtual private cloud (VPC) logs which captures information
 about the IP traffic going to and from network interfaces in VPC. These logs can
 help with:
 

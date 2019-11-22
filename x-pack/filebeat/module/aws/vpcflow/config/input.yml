@@ -79,7 +79,7 @@ processors:
         - {from: aws.vpcflow.bytes, to: network.bytes, type: long}
 
   - drop_fields:
-      fields: ["aws.vpcflow.srcaddr", "aws.vpcflow.srcport", "aws.vpcflow.dstaddr", "aws.vpcflow.dstport", "aws.vpcflow.bytes", "aws.vpcflow.packets"]
+      fields: ["aws.vpcflow.srcaddr", "aws.vpcflow.srcport", "aws.vpcflow.dstaddr", "aws.vpcflow.dstport", "aws.vpcflow.bytes", "aws.vpcflow.packets", "aws.vpcflow.protocol"]
 
   - community_id: ~
 

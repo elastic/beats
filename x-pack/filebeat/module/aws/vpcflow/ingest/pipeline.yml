@@ -20,6 +20,9 @@ processors:
       ignore_failure: true
       formats:
         - UNIX
+  - remove:
+      field: ["aws.vpcflow.start", "aws.vpcflow.end"]
+      ignore_missing: true
 
   # IP Geolocation Lookup
   - geoip:
