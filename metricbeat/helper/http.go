@@ -25,6 +25,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -32,6 +33,11 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/metricbeat/mb"
 )
+
+type DialerBuilder interface {
+	Stringer
+	MakeDialer(time.Duration)
+}
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.

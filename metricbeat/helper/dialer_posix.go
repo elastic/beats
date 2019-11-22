@@ -20,24 +20,34 @@
 package helper
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func makeDialer(t time.Duration, hostData mb.HostData) (transport.Dialer, string, error) {
-	switch hostData.Transport {
-	case mb.TransportNpipe:
-		return nil, "", fmt.Errorf(
-			"cannot use %s as the URI, named pipes are only supported on Windows",
-			hostData.SanitizedURI,
-		)
-	case mb.TransportUnix:
-		return transport.UnixDialer(t, strings.TrimSuffix(hostData.TransportPath, "/")), hostData.SanitizedURI, nil
-	default:
-		return transport.NetDialer(t), hostData.SanitizedURI, nil
-	}
+type TransportUnix struct {
+	Path string
+}
+
+func (t *TransportUnix) MakeDialer(timeout time.Duration) (transport.Dialer, error) {
+	return transport.UnixDialer(t, strings.TrimSuffix(t.Path, "/")), nil
+}
+
+func (t *transportUnix) String() string {
+	return "Unix: " + t.path
+}
+
+type TransportNpipe struct {
+	Path string
+}
+
+func (t *TransportNpipe) MakeDialer(timeout time.Duration) (transport.Dialer, string, error) {
+	return nil, errors.New("cannot the URI, named pipes are only supported on Windows")
+}
+
+func (t *TransportNpipe) String() string {
+	return "Npipe: " + t.path
 }

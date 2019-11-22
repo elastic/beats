@@ -20,6 +20,7 @@ package parse
 import (
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -64,8 +65,9 @@ func TestParseURL(t *testing.T) {
 		rawURL := "http+unix:///var/lib/docker.sock"
 		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
-			assert.Equal(t, mb.TransportUnix, hostData.Transport)
-			assert.Equal(t, "/var/lib/docker.sock", hostData.TransportPath)
+			t, ok := hostData.Transport.(*helper.TransportUnix)
+			assert.True(t, ok)
+			assert.Equal(t, "/var/lib/docker.sock", t.Path)
 			assert.Equal(t, "http://unix", hostData.URI)
 			assert.Equal(t, "http://unix", hostData.SanitizedURI)
 			assert.Equal(t, "unix", hostData.Host)
@@ -78,8 +80,9 @@ func TestParseURL(t *testing.T) {
 		rawURL := "http+unix:///var/lib/docker.sock"
 		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
-			assert.Equal(t, mb.TransportUnix, hostData.Transport)
-			assert.Equal(t, "/var/lib/docker.sock", hostData.TransportPath)
+			t, ok := hostData.Transport.(*helper.TransportUnix)
+			assert.True(t, ok)
+			assert.Equal(t, "/var/lib/docker.sock", t.Path)
 			assert.Equal(t, "http://unix/apath", hostData.URI)
 			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
 			assert.Equal(t, "unix", hostData.Host)
@@ -92,10 +95,26 @@ func TestParseURL(t *testing.T) {
 		rawURL := "http+npipe://./pipe/custom"
 		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
-			assert.Equal(t, mb.TransportNpipe, hostData.Transport)
-			assert.Equal(t, `\\.pipe\custom`, hostData.TransportPath)
+			t, ok := hostData.Transport.(*helper.TransportNpipe)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.pipe\custom`, t.Path)
 			assert.Equal(t, "http://npipe", hostData.URI)
 			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+npipe with path", func(t *testing.T) {
+		rawURL := "http+npipe://./pipe/custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			t, ok := hostData.Transport.(*helper.TransportNpipe)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.pipe\custom`, t.Path)
+			assert.Equal(t, "http://npipe/apath", hostData.URI)
+			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)
 			assert.Equal(t, "", hostData.User)
 			assert.Equal(t, "", hostData.Password)
