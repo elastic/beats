@@ -39,57 +39,35 @@ type TimerTaskFn func(now time.Time)
 
 // TimerQueue represents a priority queue of timers.
 type TimerQueue struct {
-	th            *timerHeap
-	ctx           context.Context
-	nextRunAt     *time.Time
-	popRunnableCh chan chan []*TimerTask
-	pushCh        chan *TimerTask
-	timer         *time.Timer
+	th        *timerHeap
+	ctx       context.Context
+	nextRunAt *time.Time
+	pushCh    chan *TimerTask
+	timer     *time.Timer
 }
 
 // NewTimerQueue creates a new instance.
 func NewTimerQueue(ctx context.Context) *TimerQueue {
 	tq := &TimerQueue{
-		th:            &timerHeap{},
-		ctx:           ctx,
-		popRunnableCh: make(chan chan []*TimerTask),
-		pushCh:        make(chan *TimerTask),
-		timer:         time.NewTimer(0),
+		th:     &timerHeap{},
+		ctx:    ctx,
+		pushCh: make(chan *TimerTask, 4096),
+		timer:  time.NewTimer(0),
 	}
 	heap.Init(tq.th)
 
 	return tq
 }
 
-// Push adds a task to the queue
-func (tq *TimerQueue) Push(tt *TimerTask) {
+// Push adds a task to the queue. Returns true if successful
+// false if failed (due to cancelled context)
+func (tq *TimerQueue) Push(tt *TimerTask) bool {
 	// Block until push succeeds or shutdown
 	select {
 	case tq.pushCh <- tt:
+		return true
 	case <-tq.ctx.Done():
-	}
-}
-
-// PopRunnable pops as many runnable tasks from the queue as possible
-func (tq *TimerQueue) PopRunnable() (res []*TimerTask) {
-	popDone := make(chan []*TimerTask)
-	tq.popRunnableCh <- popDone
-
-	select {
-	case res = <-popDone:
-		return res
-	case <-tq.ctx.Done():
-		return
-	}
-}
-
-// RunRunnableTasks runs all tasks that are currently runnable. Tasks are run in serial blocking manner in the
-// current go-routine
-func (tq *TimerQueue) RunRunnableTasks() {
-	runnable := tq.PopRunnable()
-	now := time.Now()
-	for _, tt := range runnable {
-		tt.fn(now)
+		return false
 	}
 }
 
@@ -98,66 +76,52 @@ func (tq *TimerQueue) RunRunnableTasks() {
 func (tq *TimerQueue) Start() {
 	go func() {
 		for {
-			// flag controlling whether we should update tq.nextRunAt after the select block
-			updateNextRunAt := false
-
 			select {
 			case <-tq.ctx.Done():
 				// Stop the timerqueue
 				return
-			case <-tq.timer.C:
-				tq.RunRunnableTasks()
-				updateNextRunAt = true
-			case retCh := <-tq.popRunnableCh:
-				res := tq.popRunnableUnsafe()
-				updateNextRunAt = true
-				retCh <- res
-			case tt := <-tq.pushCh:
-				tq.pushUnsafe(tt)
-			}
+			case now := <-tq.timer.C:
+				tasks := tq.popRunnable(now)
 
-			if updateNextRunAt {
-				tq.updateTimer()
+				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
+				go func() {
+					for _, tt := range tasks {
+						tt.fn(now)
+					}
+				}()
+
+				if tq.th.Len() > 0 {
+					nr := (*tq.th)[0].runAt
+					tq.nextRunAt = &nr
+					tq.timer.Reset(nr.Sub(time.Now()))
+				} else {
+					tq.timer.Reset(10 * time.Millisecond)
+					tq.nextRunAt = nil
+				}
+			case tt := <-tq.pushCh:
+				heap.Push(tq.th, tt)
+
+				if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
+					tq.timer.Stop()
+					tq.nextRunAt = &tt.runAt
+					tq.timer.Reset(tt.runAt.Sub(time.Now()) + 1000)
+				}
 			}
 		}
 	}()
 }
 
-func (tq *TimerQueue) updateTimer() {
-	if tq.th.Len() == 0 {
-		tq.nextRunAt = nil
-		tq.timer.Stop()
-	} else {
-		now := time.Now()
-
-		peeked := (*tq.th)[0]
-		nextIn := peeked.runAt.Sub(now)
-		tq.nextRunAt = &peeked.runAt
-		tq.timer.Reset(nextIn)
-	}
-}
-
-func (tq *TimerQueue) popRunnableUnsafe() (res []*TimerTask) {
-	now := time.Now()
-	for i := 0; i < tq.th.Len(); i++ {
+func (tq *TimerQueue) popRunnable(now time.Time) (res []*TimerTask) {
+	for i := 0; tq.th.Len() > 0; i++ {
 		// the zeroth element of the heap is the same as a peek
 		peeked := (*tq.th)[0]
 		if peeked.runAt.Before(now) {
 			popped := heap.Pop(tq.th).(*TimerTask)
 			res = append(res, popped)
 		} else {
-			tq.nextRunAt = &peeked.runAt
 			break
 		}
 	}
 
 	return res
-}
-
-func (tq *TimerQueue) pushUnsafe(tt *TimerTask) {
-	heap.Push(tq.th, tt)
-
-	if tq.nextRunAt == nil || tt.runAt.Before(*tq.nextRunAt) {
-		tq.nextRunAt = &tt.runAt
-	}
 }

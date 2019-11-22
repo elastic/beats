@@ -191,20 +191,19 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 
 	var taskFn timerqueue.TimerTaskFn
 
-	schedNextRun := func() {
+	pushNextRun := func() {
 		next := sched.Next(lastRanAt)
 
 		now := time.Now().In(s.location)
 		if next.Before(now) {
 			// Our last invocation went long!
 			s.jobsMissedDeadline.Inc()
-			taskFn(now)
-		} else {
-			// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
-			// block the timer thread.
-			asyncTask := func(now time.Time) { go taskFn(now) }
-			s.timerQueue.Push(timerqueue.NewTimerTask(next, asyncTask))
 		}
+
+		// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
+		// block the timer thread.
+		asyncTask := func(now time.Time) { go taskFn(now) }
+		s.timerQueue.Push(timerqueue.NewTimerTask(next, asyncTask))
 	}
 
 	taskFn = func(_ time.Time) {
@@ -224,13 +223,13 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		s.jobsRun.Inc()
 		s.activeJobs.Dec()
 
-		schedNextRun()
+		pushNextRun()
 	}
 
 	if sched.RunOnInit() {
 		go taskFn(time.Now())
 	} else {
-		schedNextRun()
+		pushNextRun()
 	}
 
 	return jobCtxCancel, nil

@@ -19,6 +19,7 @@ package scheduler
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -54,14 +55,16 @@ func TestNewWithLocation(t *testing.T) {
 }
 
 // Runs tasks as fast as possible. Good for keeping tests snappy.
-type instantSchedule struct{}
+type testSchedule struct {
+	delay time.Duration
+}
 
-func (schedule instantSchedule) RunOnInit() bool {
+func (testSchedule) RunOnInit() bool {
 	return true
 }
 
-func (instantSchedule) Next(now time.Time) time.Time {
-	return now
+func (t testSchedule) Next(now time.Time) time.Time {
+	return now.Add(t.delay)
 }
 
 // Test task that will only actually invoke the fn the given number of times
@@ -87,7 +90,7 @@ func TestScheduler_Start(t *testing.T) {
 	executed := make(chan string)
 
 	preAddEvents := uint32(10)
-	s.Add(instantSchedule{}, "preAdd", testTaskTimes(preAddEvents, func() {
+	s.Add(testSchedule{0}, "preAdd", testTaskTimes(preAddEvents, func() {
 		executed <- "preAdd"
 	}))
 
@@ -103,7 +106,7 @@ func TestScheduler_Start(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err := s.Add(instantSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn))
+	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn))
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
@@ -111,19 +114,21 @@ func TestScheduler_Start(t *testing.T) {
 	s.Start()
 
 	postAddEvents := uint32(10)
-	s.Add(instantSchedule{}, "postAdd", testTaskTimes(postAddEvents, func() {
+	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func() {
 		executed <- "postAdd"
 	}))
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
 	// Otherwise, we might only do 1 preAdd and 1 postAdd event
-	for uint32(len(received)) < preAddEvents+removedEvents+postAddEvents {
+	totalExpected := preAddEvents + removedEvents + postAddEvents
+	for uint32(len(received)) < totalExpected {
 		select {
 		case got := <-executed:
 			received = append(received, got)
-		case <-time.After(10 * time.Second):
-			require.Fail(t, "Timed out waitingTasks for schedule job to execute")
+		case <-time.After(5 * time.Second):
+			require.Fail(t, fmt.Sprintf("Timed out waitingTasks for schedule job to execute, got %d of %d: %v",
+				len(received), totalExpected, received))
 		}
 	}
 
@@ -146,9 +151,36 @@ func TestScheduler_Stop(t *testing.T) {
 	require.NoError(t, s.Start())
 	require.NoError(t, s.Stop())
 
-	_, err := s.Add(instantSchedule{}, "testPostStop", testTaskTimes(1, func() {
+	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func() {
 		executed <- struct{}{}
 	}))
 
 	assert.Equal(t, ErrAlreadyStopped, err)
+}
+
+func BenchmarkScheduler(b *testing.B) {
+	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime())
+
+	sched := testSchedule{0}
+
+	executed := make(chan struct{})
+	for i := 0; i < 1024; i++ {
+		_, err := s.Add(sched, "testPostStop", func() []TaskFunc {
+			executed <- struct{}{}
+			return nil
+		})
+		assert.NoError(b, err)
+	}
+
+	err := s.Start()
+	defer s.Stop()
+	assert.NoError(b, err)
+
+	count := 0
+	for count < b.N {
+		select {
+		case <-executed:
+			count++
+		}
+	}
 }
