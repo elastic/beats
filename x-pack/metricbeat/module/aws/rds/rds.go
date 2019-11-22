@@ -248,7 +248,12 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 				}
 
 				if len(output.Values) > timestampIdx && len(labels) > 0 {
-					metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
+					if labels[metricNameIdx] == "CPUUtilization" {
+						metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx] / 100)
+					} else {
+						metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
+					}
+
 					for i := 1; i < len(labels); i += 2 {
 						if labels[i] == "DBInstanceIdentifier" {
 							dbIdentifier := labels[i+1]
