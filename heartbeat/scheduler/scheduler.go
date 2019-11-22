@@ -207,10 +207,6 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 	return jobCtxCancel, nil
 }
 
-func (s *Scheduler) makeTaskFn() {
-
-}
-
 func (s *Scheduler) pushNextRun(next time.Time, taskFn timerqueue.TimerTaskFn) {
 	now := time.Now().In(s.location)
 	if next.Before(now) {
