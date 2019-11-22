@@ -174,8 +174,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-11-21T07:20:06.046Z",
-      "version": "WzQ5NiwxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1MSwxXQ=="
     },
     {
       "attributes": {
@@ -252,8 +252,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T19:54:19.763Z",
-      "version": "WzQxNSwxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1MiwxXQ=="
     },
     {
       "attributes": {
@@ -330,8 +330,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T19:54:35.779Z",
-      "version": "WzQxNywxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1MywxXQ=="
     },
     {
       "attributes": {
@@ -408,8 +408,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T19:54:48.506Z",
-      "version": "WzQxOSwxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1NCwxXQ=="
     },
     {
       "attributes": {
@@ -445,7 +445,7 @@
                 "chart_type": "line",
                 "color": "rgba(226,115,0,1)",
                 "fill": 0.5,
-                "formatter": "number",
+                "formatter": "ms,ms,",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "",
                 "line_width": 1,
@@ -480,8 +480,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-21T07:12:59.069Z",
-      "version": "WzQ2OCwxXQ=="
+      "updated_at": "2019-11-22T12:42:45.591Z",
+      "version": "WzUyNiwyXQ=="
     },
     {
       "attributes": {
@@ -558,8 +558,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T19:55:16.873Z",
-      "version": "WzQyMywxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1NiwxXQ=="
     },
     {
       "attributes": {
@@ -630,8 +630,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-21T07:19:55.125Z",
-      "version": "WzQ5NSwxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1NywxXQ=="
     },
     {
       "attributes": {
@@ -702,8 +702,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-21T07:19:38.050Z",
-      "version": "WzQ5MywxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1OCwxXQ=="
     },
     {
       "attributes": {
@@ -780,8 +780,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-11-20T20:49:26.920Z",
-      "version": "WzQ1NiwxXQ=="
+      "updated_at": "2019-11-21T13:34:10.940Z",
+      "version": "WzQ1OSwxXQ=="
     }
   ],
   "version": "7.4.0"
