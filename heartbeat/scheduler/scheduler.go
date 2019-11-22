@@ -26,12 +26,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/heartbeat/scheduler/timerqueue"
-
-	"golang.org/x/sync/semaphore"
-
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"golang.org/x/sync/semaphore"
 )
 
 const (
