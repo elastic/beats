@@ -56,7 +56,7 @@ func (s *LightModulesSource) Modules() ([]string, error) {
 func (s *LightModulesSource) HasModule(moduleName string) bool {
 	names, err := s.moduleNames()
 	if err != nil {
-		logp.Error(errors.Wrap(err, "failed to get list of light module names"))
+		logp.Err("failed to get list of light module names: %v", err)
 		return false
 	}
 	for _, name := range names {
@@ -104,7 +104,7 @@ func (s *LightModulesSource) HasMetricSet(moduleName, metricSetName string) bool
 
 	moduleConfig, err := s.loadModuleConfig(modulePath)
 	if err != nil {
-		logp.Error(errors.Wrapf(err, "failed to load module config for module '%s'", moduleName))
+		logp.Err("failed to load module config for module '%s': %v", moduleName, err)
 		return false
 	}
 
@@ -134,9 +134,15 @@ func (s *LightModulesSource) MetricSetRegistration(register *Register, moduleNam
 // String returns a string representation of this source, with a list of known metricsets
 func (s *LightModulesSource) String() string {
 	var metricSets []string
-	modules, _ := s.Modules()
+	modules, err := s.Modules()
+	if err != nil {
+		logp.Err("failed to list modules: %s", err)
+	}
 	for _, module := range modules {
-		moduleMetricSets, _ := s.MetricSets(module)
+		moduleMetricSets, err := s.MetricSets(module)
+		if err != nil {
+			logp.Err("failed to list light metricsets for module %s: %v", module, err)
+		}
 		for _, name := range moduleMetricSets {
 			metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 		}
