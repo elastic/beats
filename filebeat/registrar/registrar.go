@@ -316,9 +316,11 @@ func (r *Registrar) processEventStates(states []file.State) {
 	}
 }
 
-func writeStateUpdates(tx *registry.Tx, states []file.State) {
+func writeStateUpdates(tx *registry.Tx, states []file.State) error {
 	for i := range states {
-		// TODO: report error
-		tx.Set(registry.Key(states[i].ID()), states[i])
+		if err := tx.Set(registry.Key(states[i].ID()), states[i]); err != nil {
+			return err
+		}
 	}
+	return nil
 }

@@ -26,8 +26,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	helper "github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	helper "github.com/elastic/v7/beats/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/registry"
+	"github.com/elastic/beats/v7/libbeat/registry/backend/memlog"
 )
 
 type registryVersion string
@@ -60,6 +63,7 @@ func ensureCurrent(home, migrateFile string, perm os.FileMode) error {
 	for {
 		switch version {
 		case legacyVersion:
+			// first migrate to verion0 style registry and go from there
 			if err := migrateLegacy(home, fbRegHome, migrateFile, perm); err != nil {
 				return err
 			}
@@ -152,21 +156,59 @@ func migrateVersion1(home, regHome string, perm os.FileMode) error {
 	logp.Info("Migrate registry version 0 to version 1")
 
 	origDataFile := filepath.Join(regHome, "data.json")
-	newDataFile := filepath.Join(regHome, "1.json")
-
-	if !isFile(newDataFile) && isFile(origDataFile) {
-		if err := helper.SafeFileRotate(newDataFile, origDataFile); err != nil {
-			return err
-		}
+	if !isFile(origDataFile) {
+		return fmt.Errorf("missing original data file at: %v", origDataFile)
 	}
 
-	metaFile := filepath.Join(regHome, "meta.json")
-	tmpFile := metaFile + ".tmp"
-	if err := writeMeta(tmpFile, version1, perm); err != nil {
+	// read states from file and ensure file is closed immediately.
+	states, err := func() ([]file.State, error) {
+		origIn, err := os.Open(origDataFile)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to open original data file")
+		}
+		defer origIn.Close()
+
+		var states []file.State
+		decoder := json.NewDecoder(origIn)
+		if err := decoder.Decode(&states); err != nil {
+			return nil, errors.Wrapf(err, "Error decoding original data file '%v'", origDataFile)
+		}
+		return states, nil
+	}()
+	if err != nil {
 		return err
 	}
 
-	return helper.SafeFileRotate(metaFile, tmpFile)
+	registryBackend, err := memlog.New(memlog.Settings{
+		Root:       home,
+		FileMode:   perm,
+		Checkpoint: func(_ uint, _ uint) bool { return true },
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to create new registry backend")
+	}
+
+	reg := registry.New(registryBackend)
+	defer reg.Close()
+
+	store, err := reg.Get("filebeat")
+	if err != nil {
+		return errors.Wrap(err, "failed to open filebeat registry store")
+	}
+	defer store.Close()
+
+	err = store.Update(func(tx *registry.Tx) error {
+		return writeStateUpdates(tx, states)
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to migrate registry states")
+	}
+
+	if err := os.Remove(origDataFile); err != nil {
+		return errors.Wrapf(err, "migration complete but failed to remove original data file: %v", origDataFile)
+	}
+
+	return nil
 }
 
 func writeMeta(path string, version string, perm os.FileMode) error {
