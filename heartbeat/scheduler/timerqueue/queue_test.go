@@ -11,12 +11,19 @@ import (
 )
 
 func TestQueueRunsInOrder(t *testing.T) {
+	// Bugs can show up only occasionally
+	for i := 0; i < 100; i++ {
+		testQueueRunsInOrderOnce(t)
+	}
+}
+
+func testQueueRunsInOrderOnce(t *testing.T) {
 	ctx, ctxCancel := context.WithCancel(context.Background())
 	defer ctxCancel()
 	tq := NewTimerQueue(ctx)
 
 	// Number of items to test with
-	numItems := 100
+	numItems := 10
 
 	// Make a buffered queue for taskResCh so we can easily write to it within this thread.
 	taskResCh := make(chan int, numItems)
@@ -39,8 +46,11 @@ func TestQueueRunsInOrder(t *testing.T) {
 	rand.Shuffle(len(tasks), func(i, j int) { tasks[i], tasks[j] = tasks[j], tasks[i] })
 
 	// insert the randomly ordered events into the queue
+	// we use the internal push because pushing and running are in the same threads, so
+	// using Push() may result in tasks being executed before all are inserted.
+	// This private method is not threadsafe, so is kept private.
 	for _, tt := range tasks {
-		tq.Push(tt)
+		tq.pushInternal(tt)
 	}
 
 	tq.Start()
@@ -58,7 +68,7 @@ Reader:
 	}
 
 	require.Len(t, taskResults, numItems)
-	require.True(t, sort.IntsAreSorted(taskResults))
+	require.True(t, sort.IntsAreSorted(taskResults), "Results not in order! %v", taskResults)
 }
 
 func TestQueueRunsTasksAddedAfterStart(t *testing.T) {

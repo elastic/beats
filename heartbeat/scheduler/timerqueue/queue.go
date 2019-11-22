@@ -20,6 +20,7 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -65,6 +66,7 @@ func (tq *TimerQueue) Push(tt *TimerTask) bool {
 	// Block until push succeeds or shutdown
 	select {
 	case tq.pushCh <- tt:
+		fmt.Printf("PUSH %s\n", tt.runAt)
 		return true
 	case <-tq.ctx.Done():
 		return false
@@ -99,16 +101,20 @@ func (tq *TimerQueue) Start() {
 					tq.nextRunAt = nil
 				}
 			case tt := <-tq.pushCh:
-				heap.Push(tq.th, tt)
-
-				if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-					tq.timer.Stop()
-					tq.nextRunAt = &tt.runAt
-					tq.timer.Reset(tt.runAt.Sub(time.Now()) + 1000)
-				}
+				tq.pushInternal(tt)
 			}
 		}
 	}()
+}
+
+func (tq *TimerQueue) pushInternal(tt *TimerTask) {
+	heap.Push(tq.th, tt)
+
+	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
+		tq.timer.Stop()
+		tq.nextRunAt = &tt.runAt
+		tq.timer.Reset(tt.runAt.Sub(time.Now()))
+	}
 }
 
 func (tq *TimerQueue) popRunnable(now time.Time) (res []*TimerTask) {

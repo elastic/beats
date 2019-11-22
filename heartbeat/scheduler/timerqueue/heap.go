@@ -18,6 +18,7 @@
 package timerqueue
 
 // timerHeap is the internal type that implements container/heap
+// pointers are faster to swap than bare structs here.
 type timerHeap []*TimerTask
 
 // Less computes the order of the heap. We want the earliest time to Pop().
