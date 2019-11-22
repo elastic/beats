@@ -157,12 +157,6 @@
 			"revisionTime": "2019-08-01T15:21:39Z"
 		},
 		{
-			"checksumSHA1": "eruIVA8JnsB23rVKjETHvqJ0sj8=",
-			"path": "github.com/DataDog/zstd",
-			"revision": "2bf71ec4836011b92dc78df3b9ace6b40e65f7df",
-			"revisionTime": "2016-07-06T22:07:25Z"
-		},
-		{
 			"checksumSHA1": "9vIkKNaaSRELM/2nCkWOAdHD21M=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "6c72808b55902eae4c5943626030429ff20f3b63",
