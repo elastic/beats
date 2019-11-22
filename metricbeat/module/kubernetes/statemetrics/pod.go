@@ -62,7 +62,7 @@ func getPodMapping() (mm map[string]prometheus.MetricMap, lm map[string]promethe
 			"kube_pod_init_container_status_restarts_total":         prometheus.Metric("pod.container.status.restarts.count"),
 			"kube_pod_init_container_resource_limits":               prometheus.Metric("pod.container.resource.limits.value"),
 			"kube_pod_spec_volumes_persistentvolumeclaims_info":     prometheus.InfoMetric(),
-			"kube_pod_spec_volumes_persistentvolumeclaims_readonly": prometheus.InfoMetric(),
+			"kube_pod_spec_volumes_persistentvolumeclaims_readonly": prometheus.BooleanMetric("pod.volume.readonly"),
 			"kube_pod_status_scheduled_time":                        prometheus.Metric("pod.scheduled", prometheus.OpUnixTimestampValue()),
 			"kube_pod_status_unschedulable":                         prometheus.KeywordMetric("pod.container.status.state", "unschedulable"),
 		},
@@ -85,8 +85,9 @@ func getPodMapping() (mm map[string]prometheus.MetricMap, lm map[string]promethe
 			"image_id":              prometheus.Label("pod.container.image.id"),
 			"image":                 prometheus.Label("pod.container.image.name"),
 			"container_id":          prometheus.Label("pod.container.id"),
-			"resource":              prometheus.KeyLabel("resource"), // prefix pod.container? used by requets and limits
-			"unit":                  prometheus.KeyLabel("unit"),     // prefix pod.container.  used by requets and limits
-			"persistentvolumeclaim": prometheus.KeyLabel("pod.volume.pvc"),
+			"resource":              prometheus.KeyLabel("resource"),       // prefix pod.container? used by requets and limits
+			"unit":                  prometheus.KeyLabel("unit"),           // prefix pod.container.  used by requets and limits
+			"persistentvolumeclaim": prometheus.KeyLabel("pod.volume.pvc"), // will this collide with other volume labels?
+
 		}
 }
