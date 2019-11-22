@@ -157,12 +157,6 @@
 			"revisionTime": "2019-08-01T15:21:39Z"
 		},
 		{
-			"checksumSHA1": "eruIVA8JnsB23rVKjETHvqJ0sj8=",
-			"path": "github.com/DataDog/zstd",
-			"revision": "2bf71ec4836011b92dc78df3b9ace6b40e65f7df",
-			"revisionTime": "2016-07-06T22:07:25Z"
-		},
-		{
 			"checksumSHA1": "9vIkKNaaSRELM/2nCkWOAdHD21M=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "6c72808b55902eae4c5943626030429ff20f3b63",
@@ -177,13 +171,14 @@
 			"revisionTime": "2019-09-04T14:17:38Z"
 		},
 		{
-			"checksumSHA1": "w5NkRQ2Cebz7a6UfrbwFdhyRWnM=",
+			"checksumSHA1": "k3QogVVkVCGcCw4iMIxTWrnfiUc=",
+			"origin": "github.com/elastic/sarama",
 			"path": "github.com/Shopify/sarama",
-			"revision": "46c83074a05474240f9620fb7c70fb0d80ca401a",
-			"revisionTime": "2019-07-22T18:01:16Z",
+			"revision": "355d120d09706d85bc6d2a84287be7fbd13ef453",
+			"revisionTime": "2019-11-22T16:04:21Z",
 			"tree": true,
-			"version": "v1.23.1",
-			"versionExact": "v1.23.1"
+			"version": "v1.24.1-elastic",
+			"versionExact": "v1.24.1-elastic"
 		},
 		{
 			"checksumSHA1": "Te1xRugxHQMAg7EvbIUuPWm8fvU=",
@@ -2472,10 +2467,40 @@
 			"revisionTime": "2017-02-18T08:16:04Z"
 		},
 		{
+			"checksumSHA1": "LiFdeSQOf+z92EN3FiRwLCzfQJA=",
+			"path": "github.com/klauspost/compress/fse",
+			"revision": "c099ac9f21ddbdc8fda7992ce71fae347bf1df88",
+			"revisionTime": "2019-11-22T13:07:57Z"
+		},
+		{
+			"checksumSHA1": "Ofzf0iD0Ye6BZHeK/dlr0SzQRr0=",
+			"path": "github.com/klauspost/compress/huff0",
+			"revision": "c099ac9f21ddbdc8fda7992ce71fae347bf1df88",
+			"revisionTime": "2019-11-22T13:07:57Z"
+		},
+		{
+			"checksumSHA1": "tNh2IRye15m0ddyaEKsU2JrJWgI=",
+			"path": "github.com/klauspost/compress/snappy",
+			"revision": "c099ac9f21ddbdc8fda7992ce71fae347bf1df88",
+			"revisionTime": "2019-11-22T13:07:57Z"
+		},
+		{
 			"checksumSHA1": "+azPXaZpPF14YHRghNAer13ThQU=",
 			"path": "github.com/klauspost/compress/zlib",
 			"revision": "14c9a76e3c95e47f8ccce949bba2c1101a8b85e6",
 			"revisionTime": "2017-02-18T08:16:04Z"
+		},
+		{
+			"checksumSHA1": "eemVA4MBAi5+YRV5AieW9Dkf7Fs=",
+			"path": "github.com/klauspost/compress/zstd",
+			"revision": "c099ac9f21ddbdc8fda7992ce71fae347bf1df88",
+			"revisionTime": "2019-11-22T13:07:57Z"
+		},
+		{
+			"checksumSHA1": "jjUmnvMxkPdb7hCrY8PG512EOmY=",
+			"path": "github.com/klauspost/compress/zstd/internal/xxhash",
+			"revision": "c099ac9f21ddbdc8fda7992ce71fae347bf1df88",
+			"revisionTime": "2019-11-22T13:07:57Z"
 		},
 		{
 			"checksumSHA1": "iKPMvbAueGfdyHcWCgzwKzm8WVo=",
