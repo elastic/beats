@@ -23,18 +23,13 @@ import (
 	"time"
 )
 
-// TimerTask represents a task run by the TimerQueue.
-type TimerTask struct {
+// timerTask represents a task run by the TimerQueue.
+type timerTask struct {
 	fn    TimerTaskFn
 	runAt time.Time
 }
 
-// NewTimerTask creates a new TimerTask struct.
-func NewTimerTask(runAt time.Time, fn TimerTaskFn) *TimerTask {
-	return &TimerTask{runAt: runAt, fn: fn}
-}
-
-// TimerTaskFn is the function invoked by a TimerTask.
+// TimerTaskFn is the function invoked by a timerTask.
 type TimerTaskFn func(now time.Time)
 
 // TimerQueue represents a priority queue of timers.
@@ -42,7 +37,7 @@ type TimerQueue struct {
 	th        *timerHeap
 	ctx       context.Context
 	nextRunAt *time.Time
-	pushCh    chan *TimerTask
+	pushCh    chan *timerTask
 	timer     *time.Timer
 }
 
@@ -51,7 +46,7 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 	tq := &TimerQueue{
 		th:     &timerHeap{},
 		ctx:    ctx,
-		pushCh: make(chan *TimerTask, 4096),
+		pushCh: make(chan *timerTask, 4096),
 		timer:  time.NewTimer(0),
 	}
 	heap.Init(tq.th)
@@ -61,10 +56,10 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 
 // Push adds a task to the queue. Returns true if successful
 // false if failed (due to cancelled context)
-func (tq *TimerQueue) Push(tt *TimerTask) bool {
+func (tq *TimerQueue) Push(runAt time.Time, fn TimerTaskFn) bool {
 	// Block until push succeeds or shutdown
 	select {
-	case tq.pushCh <- tt:
+	case tq.pushCh <- &timerTask{runAt: runAt, fn: fn}:
 		return true
 	case <-tq.ctx.Done():
 		return false
@@ -105,7 +100,7 @@ func (tq *TimerQueue) Start() {
 	}()
 }
 
-func (tq *TimerQueue) pushInternal(tt *TimerTask) {
+func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
@@ -115,12 +110,12 @@ func (tq *TimerQueue) pushInternal(tt *TimerTask) {
 	}
 }
 
-func (tq *TimerQueue) popRunnable(now time.Time) (res []*TimerTask) {
+func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
 	for i := 0; tq.th.Len() > 0; i++ {
 		// the zeroth element of the heap is the same as a peek
 		peeked := (*tq.th)[0]
 		if peeked.runAt.Before(now) {
-			popped := heap.Pop(tq.th).(*TimerTask)
+			popped := heap.Pop(tq.th).(*timerTask)
 			res = append(res, popped)
 		} else {
 			break

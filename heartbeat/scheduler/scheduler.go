@@ -203,7 +203,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
 		// block the timer thread.
 		asyncTask := func(now time.Time) { go taskFn(now) }
-		s.timerQueue.Push(timerqueue.NewTimerTask(next, asyncTask))
+		s.timerQueue.Push(next, asyncTask)
 	}
 
 	taskFn = func(_ time.Time) {

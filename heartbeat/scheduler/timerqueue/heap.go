@@ -19,7 +19,7 @@ package timerqueue
 
 // timerHeap is the internal type that implements container/heap
 // pointers are faster to swap than bare structs here.
-type timerHeap []*TimerTask
+type timerHeap []*timerTask
 
 // Less computes the order of the heap. We want the earliest time to Pop().
 func (th timerHeap) Less(i, j int) bool {
@@ -32,12 +32,12 @@ func (th timerHeap) Swap(i, j int) {
 	th[i], th[j] = th[j], th[i]
 }
 
-// Push adds a new TimerTask to the heap
+// Push adds a new timerTask to the heap
 func (th *timerHeap) Push(tt interface{}) {
-	*th = append(*th, tt.(*TimerTask))
+	*th = append(*th, tt.(*timerTask))
 }
 
-// Pop returns the TimerTask scheduled soonest.
+// Pop returns the timerTask scheduled soonest.
 func (th *timerHeap) Pop() interface{} {
 	old := *th
 	n := len(old)

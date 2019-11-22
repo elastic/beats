@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package timerqueue
 
 import (
@@ -29,17 +46,17 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 	taskResCh := make(chan int, numItems)
 
 	// Make a bunch of tasks past their deadline
-	var tasks []*TimerTask
+	var tasks []*timerTask
 	// Start from 1 so we can use the zero value when closing the channel
 	for i := 1; i <= numItems; i++ {
 		func(i int) {
 			schedFor := time.Unix(0, 0).Add(time.Duration(i))
-			tasks = append(tasks, NewTimerTask(schedFor, func(now time.Time) {
+			tasks = append(tasks, &timerTask{runAt: schedFor, fn: func(now time.Time) {
 				taskResCh <- i
 				if i == numItems {
 					close(taskResCh)
 				}
-			}))
+			}})
 		}(i)
 	}
 	// shuffle them so they're out of order
@@ -79,9 +96,9 @@ func TestQueueRunsTasksAddedAfterStart(t *testing.T) {
 	tq.Start()
 
 	resCh := make(chan int)
-	tq.Push(NewTimerTask(time.Now(), func(now time.Time) {
+	tq.Push(time.Now(), func(now time.Time) {
 		resCh <- 1
-	}))
+	})
 
 	select {
 	case r := <-resCh:
