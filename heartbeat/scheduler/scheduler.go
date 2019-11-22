@@ -191,38 +191,37 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 
 	var taskFn timerqueue.TimerTaskFn
 
-	pushNextRun := func() {
-		next := sched.Next(lastRanAt)
-
-		now := time.Now().In(s.location)
-		if next.Before(now) {
-			// Our last invocation went long!
-			s.stats.jobsMissedDeadline.Inc()
-		}
-
-		// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
-		// block the timer thread.
-		asyncTask := func(now time.Time) { go taskFn(now) }
-		s.timerQueue.Push(next, asyncTask)
-	}
-
 	taskFn = func(_ time.Time) {
 		s.stats.activeJobs.Inc()
-
 		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
-
 		s.stats.activeJobs.Dec()
-
-		pushNextRun()
+		s.pushNextRun(sched.Next(lastRanAt), taskFn)
 	}
 
 	if sched.RunOnInit() {
 		go taskFn(time.Now())
 	} else {
-		pushNextRun()
+		s.pushNextRun(sched.Next(lastRanAt), taskFn)
 	}
 
 	return jobCtxCancel, nil
+}
+
+func (s *Scheduler) makeTaskFn() {
+
+}
+
+func (s *Scheduler) pushNextRun(next time.Time, taskFn timerqueue.TimerTaskFn) {
+	now := time.Now().In(s.location)
+	if next.Before(now) {
+		// Our last invocation went long!
+		s.stats.jobsMissedDeadline.Inc()
+	}
+
+	// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
+	// block the timer thread.
+	asyncTask := func(now time.Time) { go taskFn(now) }
+	s.timerQueue.Push(next, asyncTask)
 }
 
 // runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
