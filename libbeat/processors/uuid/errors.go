@@ -33,12 +33,18 @@ func makeErrConfigUnpack(cause error) errConfigUnpack {
 func (e errConfigUnpack) Error() string {
 	return fmt.Sprintf("failed to unpack %v processor configuration: %v", processorName, e.cause)
 }
+func (e errConfigUnpack) Unwrap() error {
+	return e.cause
+}
 
 func makeErrComputeID(cause error) errComputeID {
 	return errComputeID{cause}
 }
 func (e errComputeID) Error() string {
 	return fmt.Sprintf("failed to compute ID: %v", e.cause)
+}
+func (e errComputeID) Unwrap() error {
+	return e.cause
 }
 
 func makeErrUnknownType(typ string) errUnknownType {
