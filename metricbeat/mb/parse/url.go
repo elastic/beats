@@ -24,7 +24,7 @@ import (
 	p "path"
 	"strings"
 
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/pkg/errors"
@@ -115,12 +115,12 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 // the HostData.Host field is set to the URLs path instead of the URLs host,
 // the same happens for "npipe".
 func NewHostDataFromURL(u *url.URL) mb.HostData {
-	return NewHostDataFromURLWithTransport(helper.NewTransportDefault(), u)
+	return NewHostDataFromURLWithTransport(dialer.NewDefaultDialerBuilder(), u)
 }
 
 // NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjonction of the
 // url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
-func NewHostDataFromURLWithTransport(transport helper.DialerBuilder, u *url.URL) mb.HostData {
+func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.HostData {
 	var user, pass string
 	if u.User != nil {
 		user = u.User.Username()
@@ -189,39 +189,37 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 // password, path, and query params if one was not set in the rawURL value.
 func getURL(
 	rawURL, scheme, username, password, path, query string,
-) (*url.URL, mb.Transport, error) {
+) (*url.URL, dialer.Builder, error) {
 
 	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
 		// Add scheme.
 		rawURL = fmt.Sprintf("%s://%s", scheme, rawURL)
 	}
 
+	var t dialer.Builder
+
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, mb.TransportDefault, "", fmt.Errorf("error parsing URL: %v", err)
+		return nil, t, fmt.Errorf("error parsing URL: %v", err)
 	}
 
 	// discover the transport to use to communicate with the host if we have a combined scheme.
 	// possible values are mb.TransportTCP, mb.transportUnix or mb.TransportNpipe.
-	var t helper.DialerBuilder
-	var transportPath string
 	switch u.Scheme {
 	case "http+unix":
-		t = helper.NewTranportUnix(u.Path)
+		t = dialer.NewUnixDialerBuilder(u.Path)
 		u.Path = ""
 		u.Scheme = "http"
 		u.Host = "unix"
 	case "http+npipe":
 		p := strings.Replace(u.Path, "/pipe", `\\.pipe`, 1)
 		p = strings.Replace(p, "/", "\\", -1)
-		t = helper.NewTransportNpipe(p)
-
+		t = dialer.NewNpipeDialerBuilder(p)
 		u.Path = ""
 		u.Scheme = "http"
 		u.Host = "npipe"
-
 	default:
-		t = helper.NewTransportDefault()
+		t = dialer.NewDefaultDialerBuilder()
 	}
 
 	SetURLUser(u, username, password)

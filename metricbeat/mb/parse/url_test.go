@@ -20,7 +20,7 @@ package parse
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -65,9 +65,9 @@ func TestParseURL(t *testing.T) {
 		rawURL := "http+unix:///var/lib/docker.sock"
 		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
-			t, ok := hostData.Transport.(*helper.TransportUnix)
+			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, "/var/lib/docker.sock", t.Path)
+			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
 			assert.Equal(t, "http://unix", hostData.URI)
 			assert.Equal(t, "http://unix", hostData.SanitizedURI)
 			assert.Equal(t, "unix", hostData.Host)
@@ -80,9 +80,9 @@ func TestParseURL(t *testing.T) {
 		rawURL := "http+unix:///var/lib/docker.sock"
 		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
-			t, ok := hostData.Transport.(*helper.TransportUnix)
+			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, "/var/lib/docker.sock", t.Path)
+			assert.Equal(t, "/var/lib/docker.sock", transport.Path)
 			assert.Equal(t, "http://unix/apath", hostData.URI)
 			assert.Equal(t, "http://unix/apath", hostData.SanitizedURI)
 			assert.Equal(t, "unix", hostData.Host)
@@ -95,9 +95,9 @@ func TestParseURL(t *testing.T) {
 		rawURL := "http+npipe://./pipe/custom"
 		hostData, err := ParseURL(rawURL, "http", "", "", "", "")
 		if assert.NoError(t, err) {
-			t, ok := hostData.Transport.(*helper.TransportNpipe)
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, `\\.pipe\custom`, t.Path)
+			assert.Equal(t, `\\.pipe\custom`, transport.Path)
 			assert.Equal(t, "http://npipe", hostData.URI)
 			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)
@@ -110,9 +110,9 @@ func TestParseURL(t *testing.T) {
 		rawURL := "http+npipe://./pipe/custom"
 		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
 		if assert.NoError(t, err) {
-			t, ok := hostData.Transport.(*helper.TransportNpipe)
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, `\\.pipe\custom`, t.Path)
+			assert.Equal(t, `\\.pipe\custom`, transport.Path)
 			assert.Equal(t, "http://npipe/apath", hostData.URI)
 			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)

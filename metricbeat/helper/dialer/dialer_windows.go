@@ -17,40 +17,55 @@
 
 //+build windows
 
-package helper
+package dialer
 
 import (
+	"net"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 
+	winio "github.com/Microsoft/go-winio"
+
 	"github.com/elastic/beats/libbeat/api/npipe"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
-type TransportUnix struct {
+// UnixDialerBuilder creates a builder to dial over a unix domain socket.
+type UnixDialerBuilder struct {
 	Path string
 }
 
-func (t *TransportUnix) MakeDialer(timeout time.Duration) (transport.Dialer, error) {
-	return nil, errors.New("cannot use the URI, unix sockets are not supported on Windows, use npipe instead")
+// Make creates a dialer.
+func (t *UnixDialerBuilder) Make(_ time.Duration) (transport.Dialer, error) {
+	return nil, errors.New(
+		"cannot use the URI, unix sockets are not supported on Windows, use npipe instead",
+	)
 }
 
-func (t *TransportUnix) String() string {
-	return "Unix: " + t.path
+func (t *UnixDialerBuilder) String() string {
+	return "Unix: " + t.Path
 }
 
-type TransportNpipe struct {
+// NpipeDialerBuilder creates a builder to dial over a named pipe.
+type NpipeDialerBuilder struct {
 	Path string
 }
 
-func (t *TransportNpipe) String() string {
-	return "Npipe: " + t.path
+func (t *NpipeDialerBuilder) String() string {
+	return "Npipe: " + t.Path
 }
 
-func (t *TransportNpipe) MakeDialer(timeout time.Duration) (transport.Dialer, string, error) {
-	return npipe.DialContext(
-		strings.TrimSuffix(npipe.TransformString(t.path), "/"),
+// Make creates a dialer.
+func (t *NpipeDialerBuilder) Make(timeout time.Duration) (transport.Dialer, error) {
+	to := timeout
+	return transport.DialerFunc(
+		func(_, _ string) (net.Conn, error) {
+			return winio.DialPipe(
+				strings.TrimSuffix(npipe.TransformString(t.Path), "/"),
+				&to,
+			)
+		},
 	), nil
 }

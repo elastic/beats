@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/api/npipe"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -40,11 +41,10 @@ func TestOverNamedpipe(t *testing.T) {
 	}
 
 	t.Run("at root", func(t *testing.T) {
-		p := "npipe:///hellofromnpipe"
-
+		p := `\\.\pipe\hellofromnpipe`
 		sd, err := npipe.DefaultSD("")
 		require.NoError(t, err)
-		l, err := npipe.NewListener(`\\.\pipe\hellofromnpipe`, sd)
+		l, err := npipe.NewListener(p, sd)
 		require.NoError(t, err)
 		defer l.Close()
 
@@ -57,10 +57,9 @@ func TestOverNamedpipe(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			Transport:     mb.TransportNpipe,
-			TransportPath: "hellofromnpipe",
-			URI:           p,
-			SanitizedURI:  p,
+			Transport:    dialer.NewNpipeDialerBuilder(p),
+			URI:          "http://npipe/",
+			SanitizedURI: "http://npipe/",
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)
@@ -75,9 +74,10 @@ func TestOverNamedpipe(t *testing.T) {
 	})
 
 	t.Run("at specific path", func(t *testing.T) {
+		p := `\\.\pipe\apath`
 		sd, err := npipe.DefaultSD("")
 		require.NoError(t, err)
-		l, err := npipe.NewListener(`\\.\pipe\apath`, sd)
+		l, err := npipe.NewListener(p, sd)
 		require.NoError(t, err)
 		defer l.Close()
 
@@ -90,10 +90,9 @@ func TestOverNamedpipe(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			Transport:     mb.TransportNpipe,
-			TransportPath: "apath",
-			URI:           p,
-			SanitizedURI:  p,
+			Transport:    dialer.NewNpipeDialerBuilder(p),
+			URI:          "http://npipe/ok",
+			SanitizedURI: "http://npipe/ok",
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)

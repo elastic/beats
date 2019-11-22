@@ -17,7 +17,7 @@
 
 //+build !windows
 
-package helper
+package dialer
 
 import (
 	"strings"
@@ -28,26 +28,30 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
-type TransportUnix struct {
+// UnixDialerBuilder creates a builder to dial over unix domain socket.
+type UnixDialerBuilder struct {
 	Path string
 }
 
-func (t *TransportUnix) MakeDialer(timeout time.Duration) (transport.Dialer, error) {
-	return transport.UnixDialer(t, strings.TrimSuffix(t.Path, "/")), nil
+// Make creates a dialer.
+func (t *UnixDialerBuilder) Make(timeout time.Duration) (transport.Dialer, error) {
+	return transport.UnixDialer(timeout, strings.TrimSuffix(t.Path, "/")), nil
 }
 
-func (t *transportUnix) String() string {
-	return "Unix: " + t.path
+func (t *UnixDialerBuilder) String() string {
+	return "Unix: " + t.Path
 }
 
-type TransportNpipe struct {
+// NpipeDialerBuilder creates a builder to dial over a named pipe.
+type NpipeDialerBuilder struct {
 	Path string
 }
 
-func (t *TransportNpipe) MakeDialer(timeout time.Duration) (transport.Dialer, string, error) {
+// Make creates a dialer.
+func (t *NpipeDialerBuilder) Make(_ time.Duration) (transport.Dialer, error) {
 	return nil, errors.New("cannot the URI, named pipes are only supported on Windows")
 }
 
-func (t *TransportNpipe) String() string {
-	return "Npipe: " + t.path
+func (t *NpipeDialerBuilder) String() string {
+	return "Npipe: " + t.Path
 }

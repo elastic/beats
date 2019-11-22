@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 )
 
 const (
@@ -241,7 +241,7 @@ type PushMetricSetV2WithContext interface {
 // used, like doing HTTP request over a UNIX socket.
 //
 type HostData struct {
-	Transport helper.DialerBuilder // The transport build to use when creating the connection.
+	Transport dialer.Builder // The transport builder to use when creating the connection.
 
 	URI          string // The full URI that should be used in connections.
 	SanitizedURI string // A sanitized version of the URI without credentials.

@@ -25,19 +25,14 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 )
-
-type DialerBuilder interface {
-	Stringer
-	MakeDialer(time.Duration)
-}
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.
@@ -80,8 +75,14 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		return nil, err
 	}
 
+	// Ensure backward compatibility
+	builder := hostData.Transport
+	if builder == nil {
+		builder = dialer.NewDefaultDialerBuilder()
+	}
+
 	var tlsDialer transport.Dialer
-	dialer, uri, err := makeDialer(config.ConnectTimeout, hostData)
+	dialer, err := builder.Make(config.ConnectTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 		},
 		headers: config.Headers,
 		method:  "GET",
-		uri:     uri,
+		uri:     hostData.SanitizedURI,
 		body:    nil,
 	}, nil
 }

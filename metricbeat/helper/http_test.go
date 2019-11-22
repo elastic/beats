@@ -31,6 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -188,10 +189,9 @@ func TestOverUnixSocket(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			Transport:     mb.TransportUnix,
-			TransportPath: sockFile,
-			URI:           "http://unix/",
-			SanitizedURI:  "http://unix",
+			Transport:    dialer.NewUnixDialerBuilder(sockFile),
+			URI:          "http://unix/",
+			SanitizedURI: "http://unix",
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)
@@ -227,10 +227,9 @@ func TestOverUnixSocket(t *testing.T) {
 
 		cfg := defaultConfig()
 		hostData := mb.HostData{
-			Transport:     mb.TransportUnix,
-			TransportPath: sockFile,
-			URI:           uri,
-			SanitizedURI:  uri,
+			Transport:    dialer.NewUnixDialerBuilder(sockFile),
+			URI:          uri,
+			SanitizedURI: uri,
 		}
 
 		h, err := newHTTPFromConfig(cfg, "test", hostData)
