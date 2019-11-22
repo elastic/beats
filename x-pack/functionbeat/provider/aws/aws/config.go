@@ -110,7 +110,7 @@ type MemSizeFactor64 int
 func (m *MemSizeFactor64) Unpack(v string) error {
 	sz, err := humanize.ParseBytes(v)
 	if isRawBytes(v) {
-		cfgwarn.Deprecate("7.0", "size now requires a unit (KiB, MiB, etc...), current value: %s.", v)
+		cfgwarn.Deprecate("7.0.0", "size now requires a unit (KiB, MiB, etc...), current value: %s.", v)
 	}
 	if err != nil {
 		return err
