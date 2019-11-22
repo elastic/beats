@@ -2,7 +2,6 @@ import random
 import string
 import sys
 
-import stomp
 import unittest
 
 from xpack_metricbeat import XPackTest
@@ -39,12 +38,14 @@ class ActiveMqTest(XPackTest):
         return False
 
     def verify_destination_metrics_collection(self, destination_type):
+        from stomp import Connection
+
         self.render_config_template(modules=[self.get_activemq_module_config(destination_type)])
         proc = self.start_beat(home=self.beat_path)
 
         destination_name = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
 
-        conn = stomp.Connection([self.get_stomp_host_port()])
+        conn = Connection([self.get_stomp_host_port()])
         conn.start()
         conn.connect(wait=True)
         conn.send('/{}/{}'.format(destination_type, destination_name), 'first message')
