@@ -15,18 +15,6 @@
       type: keyword
       description: >
         The ID of the network interface for which the traffic is recorded.
-    - name: protocol
-      type: keyword
-      description: >
-        The IANA protocol number of the traffic.
-    - name: start
-      type: long
-      description: >
-        The time, in Unix seconds, of the start of the flow.
-    - name: end
-      type: long
-      description: >
-        The time, in Unix seconds, of the end of the flow.
     - name: action
       type: keyword
       description: >

@@ -1526,36 +1526,6 @@ type: keyword
 
 --
 
-*`aws.vpcflow.protocol`*::
-+
---
-The IANA protocol number of the traffic.
-
-
-type: keyword
-
---
-
-*`aws.vpcflow.start`*::
-+
---
-The time, in Unix seconds, of the start of the flow.
-
-
-type: long
-
---
-
-*`aws.vpcflow.end`*::
-+
---
-The time, in Unix seconds, of the end of the flow.
-
-
-type: long
-
---
-
 *`aws.vpcflow.action`*::
 +
 --
