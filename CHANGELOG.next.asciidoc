@@ -23,6 +23,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - By default, all Beats-created files and folders will have a umask of 0027 (on POSIX systems). {pull}14119[14119]
 - Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
 - Change wording when we fail to load a CA file to the cert pool. {issue}14309[14309]
+- Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
 
 *Auditbeat*
 

@@ -36,6 +36,8 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common/docker"
 )
 
 const (
@@ -53,7 +55,7 @@ type wrapperDriver struct {
 }
 
 func newWrapperDriver() (*wrapperDriver, error) {
-	c, err := client.NewEnvClient()
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	if err != nil {
 		return nil, err
 	}
