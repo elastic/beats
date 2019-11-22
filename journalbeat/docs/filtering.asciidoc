@@ -19,7 +19,7 @@ global processing across all data exported by {beatname_uc}.
 [[using-processors]]
 === Processors
 
-include::{libbeat-dir}/docs/processors.asciidoc[]
+include::{libbeat-dir}/processors.asciidoc[]
 
 // You must set the processor-scope attribute to resolve the attribute reference
 // defined in processors-using.asciidoc. The attribute is used to indicate where
@@ -28,5 +28,5 @@ include::{libbeat-dir}/docs/processors.asciidoc[]
 // to processors-using.asciidoc.
 
 :processor-scope: input
-include::{libbeat-dir}/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/processors-using.asciidoc[]
 :processor-scope!:

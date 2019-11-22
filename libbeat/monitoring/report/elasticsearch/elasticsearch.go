@@ -84,6 +84,7 @@ func defaultConfig(settings report.Settings) config {
 		Headers:          nil,
 		Username:         "beats_system",
 		Password:         "",
+		APIKey:           "",
 		ProxyURL:         "",
 		CompressionLevel: 0,
 		TLS:              nil,
@@ -98,7 +99,8 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format: report.FormatXPackMonitoringBulk,
+		Format:      report.FormatXPackMonitoringBulk,
+		ClusterUUID: settings.ClusterUUID,
 	}
 
 	if settings.DefaultUsername != "" {
@@ -117,6 +119,12 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
+	}
+
+	// Unset username which is set by default, even if no password is set
+	if config.APIKey != "" {
+		config.Username = ""
+		config.Password = ""
 	}
 
 	// check endpoint availability on startup only every 30 seconds
@@ -245,10 +253,10 @@ func (r *reporter) initLoop(c config) {
 			break
 		} else {
 			if !logged {
-				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying.")
+				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying. Error: ", err)
 				logged = true
 			}
-			debugf("Monitoring could not connect to elasticsearch, failed with %v", err)
+			debugf("Monitoring could not connect to Elasticsearch, failed with %v", err)
 		}
 
 		select {
@@ -261,12 +269,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod)
+	go r.snapshotLoop("state", "state", c.StatePeriod, c.ClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, clusterUUID string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -305,7 +313,9 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
 		}
 
-		clusterUUID := getClusterUUID()
+		if clusterUUID == "" {
+			clusterUUID = getClusterUUID()
+		}
 		if clusterUUID != "" {
 			meta.Put("cluster_uuid", clusterUUID)
 		}
@@ -336,6 +346,7 @@ func makeClient(
 		TLS:              tlsConfig,
 		Username:         config.Username,
 		Password:         config.Password,
+		APIKey:           config.APIKey,
 		Parameters:       params,
 		Headers:          config.Headers,
 		Index:            outil.MakeSelector(outil.ConstSelectorExpr("_xpack")),

@@ -1,0 +1,49 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "LoadBalancerName": "tf-lb-20171218185946539900000004"
+            },
+            "namespace": "AWS/ELB"
+        },
+        "metrics": {
+            "EstimatedALBActiveConnectionCount": {
+                "avg": 2.6
+            },
+            "EstimatedALBConsumedLCUs": {
+                "avg": 0.000015000000000000002
+            },
+            "EstimatedALBNewConnectionCount": {
+                "avg": 0
+            },
+            "EstimatedProcessedBytes": {
+                "avg": 237.6
+            }
+        },
+        "tags": {
+            "Name": "logstash",
+            "owner": "logstash"
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "elb",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

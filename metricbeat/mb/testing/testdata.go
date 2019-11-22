@@ -31,7 +31,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/mitchellh/hashstructure"
-	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/libbeat/asset"
@@ -263,17 +262,29 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		}
 	}
 
-	output, err := json.Marshal(&data)
-	if err != nil {
-		t.Fatal(err)
+	for _, event := range data {
+		// ensure the event is in expected list
+		found := -1
+		for i, expectedEvent := range expectedMap {
+			if event.String() == expectedEvent.String() {
+				found = i
+				break
+			}
+		}
+		if found > -1 {
+			expectedMap = append(expectedMap[:found], expectedMap[found+1:]...)
+		} else {
+			t.Errorf("Event was not expected: %+v", event)
+		}
 	}
 
-	expectedJSON, err := json.Marshal(&expectedMap)
-	if err != nil {
-		t.Fatal(err)
+	if len(expectedMap) > 0 {
+		t.Error("Some events were missing:")
+		for _, e := range expectedMap {
+			t.Error(e)
+		}
+		t.Fatal()
 	}
-
-	assert.Equal(t, string(expectedJSON), string(output))
 
 	if strings.HasSuffix(file, "docs."+config.Suffix) {
 		writeDataJSON(t, data[0], filepath.Join(config.WritePath, "data.json"))

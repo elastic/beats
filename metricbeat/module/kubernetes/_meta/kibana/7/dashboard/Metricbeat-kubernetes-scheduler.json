@@ -935,7 +935,7 @@
             }
           }
         },
-        "title": "Scheduler Memory [Metricset Kubernetes]",
+        "title": "Scheduler Memory [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {

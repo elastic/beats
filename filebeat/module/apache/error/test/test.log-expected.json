@@ -1,8 +1,9 @@
 [
     {
-        "@timestamp": "2016-12-26T16:22:08.000Z",
+        "@timestamp": "2016-12-26T16:22:08.000-02:00",
         "event.dataset": "apache.error",
         "event.module": "apache",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -13,10 +14,11 @@
         "source.ip": "192.168.33.1"
     },
     {
-        "@timestamp": "2016-12-26T16:15:55.103Z",
+        "@timestamp": "2016-12-26T16:15:55.103-02:00",
         "apache.error.module": "core",
         "event.dataset": "apache.error",
         "event.module": "apache",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "notice",
@@ -26,10 +28,11 @@
         "service.type": "apache"
     },
     {
-        "@timestamp": "2011-09-09T10:42:29.902Z",
+        "@timestamp": "2011-09-09T10:42:29.902-02:00",
         "apache.error.module": "core",
         "event.dataset": "apache.error",
         "event.module": "apache",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -39,6 +42,8 @@
         "process.thread.id": 4328636416,
         "service.type": "apache",
         "source.address": "72.15.99.187",
+        "source.as.number": 11693,
+        "source.as.organization.name": "HC Cable OPCO, LLC",
         "source.geo.city_name": "Newnan",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -49,10 +54,11 @@
         "source.ip": "72.15.99.187"
     },
     {
-        "@timestamp": "2019-06-27T06:58:09.169Z",
+        "@timestamp": "2019-06-27T06:58:09.169-02:00",
         "apache.error.module": "include",
         "event.dataset": "apache.error",
         "event.module": "apache",
+        "event.timezone": "-02:00",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "warn",
@@ -61,6 +67,8 @@
         "process.pid": 15934,
         "service.type": "apache",
         "source.address": "123.123.123.123",
+        "source.as.number": 4808,
+        "source.as.organization.name": "China Unicom Beijing Province Network",
         "source.geo.city_name": "Beijing",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",

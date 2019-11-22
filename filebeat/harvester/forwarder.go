@@ -20,13 +20,13 @@ package harvester
 import (
 	"errors"
 
-	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Outlet interface is used for forwarding events
 type Outlet interface {
-	OnEvent(data *util.Data) bool
+	OnEvent(data beat.Event) bool
 }
 
 // Forwarder contains shared options between all harvesters needed to forward events
@@ -46,8 +46,8 @@ func NewForwarder(outlet Outlet) *Forwarder {
 
 // Send updates the input state and sends the event to the spooler
 // All state updates done by the input itself are synchronous to make sure no states are overwritten
-func (f *Forwarder) Send(data *util.Data) error {
-	ok := f.Outlet.OnEvent(data)
+func (f *Forwarder) Send(event beat.Event) error {
+	ok := f.Outlet.OnEvent(event)
 	if !ok {
 		logp.Info("Input outlet closed")
 		return errors.New("input outlet closed")

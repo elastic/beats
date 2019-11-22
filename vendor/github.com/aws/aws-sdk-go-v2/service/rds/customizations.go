@@ -15,7 +15,7 @@ func init() {
 		opCopyDBClusterSnapshot,
 		opCreateDBCluster,
 	}
-	initRequest = func(c *RDS, r *request.Request) {
+	initRequest = func(c *Client, r *request.Request) {
 		for _, operation := range ops {
 			if r.Operation.Name == operation {
 				r.Handlers.Build.PushFront(fillPresignedURL)
@@ -95,7 +95,7 @@ func presignURL(r *request.Request, sourceRegion *string, newParams interface{})
 	cfgCp.Region = aws.StringValue(sourceRegion)
 
 	metadata := r.Metadata
-	resolved, err := r.Config.EndpointResolver.ResolveEndpoint(metadata.ServiceName, cfgCp.Region)
+	resolved, err := r.Config.EndpointResolver.ResolveEndpoint(metadata.EndpointsID, cfgCp.Region)
 	if err != nil {
 		r.Error = err
 		return nil

@@ -155,7 +155,7 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 	// Start processing at the root
 	properties := common.MapStr{}
 	processor := Processor{EsVersion: t.esVersion, Migration: t.migration}
-	if err := processor.Process(fields, "", properties); err != nil {
+	if err := processor.Process(fields, nil, properties); err != nil {
 		return nil, err
 	}
 	output := t.Generate(properties, dynamicTemplates)

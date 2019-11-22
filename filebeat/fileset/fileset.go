@@ -41,7 +41,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
-	"github.com/elastic/beats/libbeat/paths"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -174,10 +173,9 @@ func (fs *Fileset) evaluateVars(beatVersion string) (map[string]interface{}, err
 			return nil, fmt.Errorf("Variable doesn't have a string 'name' key")
 		}
 
-		value, exists := vals["default"]
-		if !exists {
-			return nil, fmt.Errorf("Variable %s doesn't have a 'default' key", name)
-		}
+		// Variables are not required to have a default. Templates should
+		// handle null default values as necessary.
+		value := vals["default"]
 
 		// evaluate OS specific vars
 		osVals, exists := vals["os"].(map[string]interface{})
@@ -269,7 +267,7 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 // the delimiters are set to `{<` and `>}` instead of `{{` and `}}`. These are easier to use
 // in pipeline definitions.
 func applyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
-	tpl := template.New("text")
+	tpl := template.New("text").Option("missingkey=error")
 	if specialDelims {
 		tpl = tpl.Delims("{<", ">}")
 	}
@@ -353,17 +351,8 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error reading input config: %v", err)
 	}
 
-	// Additional default settings, that must be available for variable expansion.
-	defaults := common.MustNewConfigFrom(map[string]interface{}{
-		"path": map[string]interface{}{
-			"home":   paths.Paths.Home,
-			"config": "${path.home}",
-			"data":   fmt.Sprint("${path.home}", string(os.PathSeparator), "data"),
-			"logs":   fmt.Sprint("${path.home}", string(os.PathSeparator), "logs"),
-		},
-	})
-
-	if err := cfg.Merge(defaults); err != nil {
+	cfg, err = mergePathDefaults(cfg)
+	if err != nil {
 		return nil, err
 	}
 

@@ -18,7 +18,6 @@
 package channel
 
 import (
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
@@ -53,14 +52,9 @@ func (o *outlet) Done() <-chan struct{} {
 	return o.done
 }
 
-func (o *outlet) OnEvent(d *util.Data) bool {
+func (o *outlet) OnEvent(event beat.Event) bool {
 	if !o.isOpen.Load() {
 		return false
-	}
-
-	event := d.GetEvent()
-	if d.HasState() {
-		event.Private = d.GetState()
 	}
 
 	if o.wg != nil {

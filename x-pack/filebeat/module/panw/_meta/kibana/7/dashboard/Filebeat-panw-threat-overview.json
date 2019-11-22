@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Palo Alto Networks PAN-OS Threats Overview",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

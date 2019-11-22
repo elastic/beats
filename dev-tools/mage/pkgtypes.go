@@ -280,6 +280,10 @@ func (s PackageSpec) Clone() PackageSpec {
 	for k, v := range s.Files {
 		clone.Files[k] = v
 	}
+	clone.ExtraVars = make(map[string]string, len(s.ExtraVars))
+	for k, v := range s.ExtraVars {
+		clone.ExtraVars[k] = v
+	}
 	return clone
 }
 
@@ -343,6 +347,10 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 		return MustExpand(in, args...)
 	}
 
+	if s.evalContext == nil {
+		s.evalContext = map[string]interface{}{}
+	}
+
 	for k, v := range s.ExtraVars {
 		s.evalContext[k] = mustExpand(v)
 	}
@@ -374,9 +382,6 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 		}
 	} else {
 		s.packageDir = filepath.Clean(mustExpand(s.packageDir))
-	}
-	if s.evalContext == nil {
-		s.evalContext = map[string]interface{}{}
 	}
 	s.evalContext["PackageDir"] = s.packageDir
 
@@ -651,6 +656,9 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		"--name", spec.ServiceName,
 		"--architecture", spec.Arch,
 	)
+	if packageType == RPM {
+		args = append(args, "--rpm-rpmbuild-define", "_build_id_links none")
+	}
 	if spec.Version != "" {
 		args = append(args, "--version", spec.Version)
 	}

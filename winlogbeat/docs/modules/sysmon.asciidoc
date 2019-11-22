@@ -2,8 +2,6 @@
 [role="xpack"]
 == Sysmon Module
 
-beta[]
-
 The sysmon module processes event log records from the
 https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon[Sysinternals
 System Monitor] (Sysmon) which is a Windows service and device driver that logs
@@ -17,7 +15,7 @@ from the other configured channels. If you do install Sysmon at a later time
 then a restart of Winlogbeat is required to make it begin reading from the
 channel.
 
-This module was built based on Sysmon v9 event manifests. It contains
+This module was built based on Sysmon v10 event manifests. It contains
 transformations for each of the defined event IDs.
 
 [float]

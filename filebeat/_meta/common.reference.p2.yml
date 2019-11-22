@@ -11,7 +11,7 @@
 #        - condition:
 #            equals.docker.container.image: busybox
 #          config:
-#            - type: log
+#            - type: container
 #              paths:
 #                - /var/lib/docker/containers/${data.docker.container.id}/*.log
 

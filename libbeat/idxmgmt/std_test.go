@@ -121,6 +121,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 	}
 	dateIdx := func(base string) nameFunc {
 		return func(ts time.Time) string {
+			ts = ts.UTC()
 			ext := fmt.Sprintf("%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
 			return fmt.Sprintf("%v-%v", base, ext)
 		}

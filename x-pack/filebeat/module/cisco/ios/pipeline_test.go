@@ -11,13 +11,18 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 
 	// Register JS "require" modules.
 	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module"
+	// Register required processors.
+	_ "github.com/elastic/beats/libbeat/cmd/instance"
+	_ "github.com/elastic/beats/libbeat/processors/timestamp"
 )
 
 var logInputHeaders = []string{
@@ -27,13 +32,13 @@ var logInputHeaders = []string{
 
 type testCase struct {
 	message   string
-	validator mapval.Validator
+	validator validator.Validator
 }
 
 var testCases = []testCase{
 	{
 		"%SEC-6-IPACCESSLOGP: list 100 denied udp 198.51.100.1(55934) -> 198.51.100.255(15600), 1 packet",
-		mapval.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]interface{}{
 			"cisco.ios.access_list": "100",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.255",
@@ -44,9 +49,9 @@ var testCases = []testCase{
 			"event.severity":        int64(6),
 			"event.type":            "firewall",
 			"log.level":             "informational",
-			"log.original":          mapval.IsNonEmptyString,
+			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list 100 denied udp 198.51.100.1(55934) -> 198.51.100.255(15600), 1 packet",
-			"network.community_id":  mapval.IsNonEmptyString,
+			"network.community_id":  isdef.IsNonEmptyString,
 			"network.packets":       int64(1),
 			"network.transport":     "udp",
 			"source.ip":             "198.51.100.1",
@@ -57,7 +62,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGDP: list 100 denied icmp 198.51.100.1 -> 198.51.100.2 (3/5), 1 packet",
-		mapval.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]interface{}{
 			"cisco.ios.access_list": "100",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.2",
@@ -69,9 +74,9 @@ var testCases = []testCase{
 			"icmp.code":             int64(5),
 			"icmp.type":             int64(3),
 			"log.level":             "informational",
-			"log.original":          mapval.IsNonEmptyString,
+			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list 100 denied icmp 198.51.100.1 -> 198.51.100.2 (3/5), 1 packet",
-			"network.community_id":  mapval.IsNonEmptyString,
+			"network.community_id":  isdef.IsNonEmptyString,
 			"network.packets":       int64(1),
 			"network.transport":     "icmp",
 			"source.ip":             "198.51.100.1",
@@ -81,7 +86,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGRP: list 170 denied igmp 198.51.100.1 -> 224.168.168.168, 1 packet",
-		mapval.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]interface{}{
 			"cisco.ios.access_list": "170",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.168.168.168",
@@ -91,9 +96,9 @@ var testCases = []testCase{
 			"event.severity":        int64(6),
 			"event.type":            "firewall",
 			"log.level":             "informational",
-			"log.original":          mapval.IsNonEmptyString,
+			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list 170 denied igmp 198.51.100.1 -> 224.168.168.168, 1 packet",
-			"network.community_id":  mapval.IsNonEmptyString,
+			"network.community_id":  isdef.IsNonEmptyString,
 			"network.packets":       int64(1),
 			"network.transport":     "igmp",
 			"source.ip":             "198.51.100.1",
@@ -103,7 +108,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGSP: list INBOUND-ON-AP denied igmp 198.51.100.1 -> 224.0.0.2 (20), 1 packet",
-		mapval.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]interface{}{
 			"cisco.ios.access_list": "INBOUND-ON-AP",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.0.0.2",
@@ -114,9 +119,9 @@ var testCases = []testCase{
 			"event.type":            "firewall",
 			"igmp.type":             int64(20),
 			"log.level":             "informational",
-			"log.original":          mapval.IsNonEmptyString,
+			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list INBOUND-ON-AP denied igmp 198.51.100.1 -> 224.0.0.2 (20), 1 packet",
-			"network.community_id":  mapval.IsNonEmptyString,
+			"network.community_id":  isdef.IsNonEmptyString,
 			"network.packets":       int64(1),
 			"network.transport":     "igmp",
 			"source.ip":             "198.51.100.1",
@@ -126,7 +131,7 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGNP: list 1 permitted 0 198.51.100.1 -> 239.10.10.10, 1 packet",
-		mapval.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]interface{}{
 			"cisco.ios.access_list": "1",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "239.10.10.10",
@@ -136,9 +141,9 @@ var testCases = []testCase{
 			"event.severity":        int64(6),
 			"event.type":            "firewall",
 			"log.level":             "informational",
-			"log.original":          mapval.IsNonEmptyString,
+			"log.original":          isdef.IsNonEmptyString,
 			"message":               "list 1 permitted 0 198.51.100.1 -> 239.10.10.10, 1 packet",
-			"network.community_id":  mapval.IsNonEmptyString,
+			"network.community_id":  isdef.IsNonEmptyString,
 			"network.packets":       int64(1),
 			"network.iana_number":   "0",
 			"source.ip":             "198.51.100.1",
@@ -148,24 +153,24 @@ var testCases = []testCase{
 
 	{
 		"%SEC-6-IPACCESSLOGRL: access-list logging rate-limited or missed 18 packets",
-		mapval.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]interface{}{
 			"cisco.ios.facility": "SEC",
 			"event.code":         "IPACCESSLOGRL",
 			"event.severity":     int64(6),
 			"log.level":          "informational",
-			"log.original":       mapval.IsNonEmptyString,
+			"log.original":       isdef.IsNonEmptyString,
 			"message":            "access-list logging rate-limited or missed 18 packets",
 		}),
 	},
 
 	{
 		"%IPV6-6-ACCESSLOGP: list ACL-IPv6-E0/0-IN/10 permitted tcp 2001:DB8::3(1027) -> 2001:DB8:1000::1(22), 9 packets",
-		mapval.MustCompile(map[string]interface{}{
+		lookslike.MustCompile(map[string]interface{}{
 			"cisco.ios.facility": "IPV6",
 			"event.code":         "ACCESSLOGP",
 			"event.severity":     int64(6),
 			"log.level":          "informational",
-			"log.original":       mapval.IsNonEmptyString,
+			"log.original":       isdef.IsNonEmptyString,
 			"message":            "list ACL-IPv6-E0/0-IN/10 permitted tcp 2001:DB8::3(1027) -> 2001:DB8:1000::1(22), 9 packets",
 		}),
 	},

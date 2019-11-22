@@ -9,16 +9,17 @@
         "controllermanager": {
             "client": {
                 "request": {
-                    "count": 145
+                    "count": 1113352
                 }
             },
-            "code": "201",
+            "code": "200",
             "host": "192.168.205.10:6443",
-            "method": "POST"
+            "method": "GET"
         }
     },
     "metricset": {
-        "name": "controllermanager"
+        "name": "controllermanager",
+        "period": 10000
     },
     "service": {
         "address": "127.0.0.1:55555",

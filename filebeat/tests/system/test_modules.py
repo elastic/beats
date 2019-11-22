@@ -139,8 +139,12 @@ class Test(BaseTest):
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
 
+        # Use a fixed timezone so results don't vary depending on the environment
+        # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
+        # this can happen because UTC uses to be the default timezone in date parsers when no other
+        # timezone is specified.
         local_env = os.environ.copy()
-        local_env["TZ"] = 'Etc/UTC'
+        local_env["TZ"] = 'Etc/GMT+2'
 
         subprocess.Popen(cmd,
                          env=local_env,
@@ -220,7 +224,7 @@ def clean_keys(obj):
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
     # datasets for which @timestamp is removed due to date missing
-    remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"}
+    remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog", "cef.log"}
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
         ('system.syslog', 'tz-offset.log'),

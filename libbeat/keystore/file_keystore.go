@@ -415,6 +415,11 @@ func (k *FileKeystore) Package() ([]byte, error) {
 	return k.loadRaw()
 }
 
+// ConfiguredPath returns the path to the keystore.
+func (k *FileKeystore) ConfiguredPath() string {
+	return k.Path
+}
+
 func (k *FileKeystore) hashPassword(password, salt []byte) []byte {
 	return pbkdf2.Key(password, salt, iterationsCount, keyLength, sha512.New)
 }

@@ -1,0 +1,107 @@
+[[release-highlights-7.0.0]]
+=== 7.0 release highlights
+++++
+<titleabbrev>7.0</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Following are the most notable features and enhancements in 7.0.
+
+For a complete list of highlights, see the 
+https://www.elastic.co/blog/beats-7-0-0-released[{beats} 7.0 release blog].
+
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-7.0, Breaking Changes>> and <<release-notes, Release Notes>>.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+
+[float]
+==== Elastic Common Schema (ECS)
+
+The {ecs-ref}/index.html[Elastic Common Schema], or ECS, is an open source
+specification that defines a common set of document fields for event data
+ingested into {es}. ECS makes it dramatically easier for users to correlate data
+across sources and develop common content, such as dashboards and machine
+learning jobs.
+
+In 7.0, all {beats} and {beats} modules generate ECS format events by default.
+This means that adopting ECS is as easy as upgrading to {beats} 7.0. All {beats}
+module dashboards in 7.0 make use of ECS.
+
+Migrating to a common schema means that many fields have been renamed. We have
+developed an upgrade procedure that uses {es} field aliases to make the
+transition easier. After the upgrade is complete, we strongly advise that you
+adjust your custom {kib} dashboards, machine learning jobs, and other content to
+use the new ECS field names. 
+
+See the {beats-ref}/upgrading.html[{beats} upgrade documentation] for more
+information.
+
+[float]
+==== Index lifecycle management (ILM)
+
+In 6.6, {es} added advanced capabilities for index management. Rather than
+simply performing management actions on your indices on a set schedule, you can
+base actions on other factors such as shard size and performance requirements.
+You control how indices are handled as they age by attaching a lifecycle policy
+to the index template used to create them. You can update the policy to modify
+the lifecycle of both new and existing indices. This set of capabilities are
+grouped in the {ref}/index-lifecycle-management.html[index lifecycle management
+(ILM)] APIs.
+
+In 7.0, {beats} defaults to rotating indices by using ILM policies, if the {es}
+version to which they connect supports ILM. The default policy rotates indices
+when they reach 50 GB or 30 days. You can edit the ILM policy by using the {kib}
+management UI, or directly via the {es} API.
+
+[float]
+==== Stack monitoring
+
+The full suite of modules to {ref}/monitoring-production.html[monitor your
+{stack}] are now GA. These include the {metricbeat} modules for {es}, {ls}, and
+{kib}.
+
+In the future, we will switch to {metricbeat} as the recommended agent
+for monitoring the {stack}. To prepare for the switch, see
+{ref}/configuring-metricbeat.html[Collecting {es} monitoring data with {metricbeat}].
+
+[float]
+==== Logs and infrastructure metrics
+
+{beats} adds several new modules, focusing on datastores and the cloud.
+
+On the cloud side, {metricbeat} adds the
+{metricbeat-ref}/metricbeat-module-aws.html[AWS] module, which collects and
+centralizes basic resource utilization metrics from all your EC2 instances,
+directly from Cloudwatch. A widely used messaging platform,
+{metricbeat-ref}/metricbeat-module-nats.html[NATS], earns its own module for
+capturing stats, connections, routes, and subscriptions metrics.
+
+For datastores, {metricbeat} offers modules for Microsoft SQL Server and
+CouchDB. The {metricbeat-ref}/metricbeat-module-mssql.html[MSSQL] module
+captures transaction log and performance counters, while the
+{metricbeat-ref}/metricbeat-module-couchdb.html[CouchDB] module provides a
+server metricset.
+
+[float]
+==== Security analytics data sources
+
+For data relevant to security analytics, {filebeat} adds a
+{filebeat-ref}/filebeat-module-zeek.html[Zeek] module that integrates with the
+popular open-source Zeek project, formerly known as Bro, and a
+{filebeat-ref}/filebeat-module-santa.html[Santa] module, which tracks process
+executions on macOS. These modules add to the list of data sources already
+supported in the 6.x series, including
+{filebeat-ref}/filebeat-module-suricata.html[Suricata],
+{filebeat-ref}/filebeat-module-iptables.html[IPtables], and
+{filebeat-ref}/filebeat-input-netflow.html[NetFlow].
+
+In addition, the {auditbeat}
+{auditbeat-ref}/auditbeat-module-system.html[system] module keeps improving, and
+the transition to ECS makes all {beats} modules more useful for security
+use cases.
+
+// end::notable-highlights[]

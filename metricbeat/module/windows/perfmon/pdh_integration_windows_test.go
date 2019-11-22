@@ -58,11 +58,11 @@ func TestData(t *testing.T) {
 		},
 	}
 
-	ms := mbtest.NewReportingMetricSetV2(t, config)
-	mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	mbtest.ReportingFetchV2Error(ms)
 	time.Sleep(60 * time.Millisecond)
 
-	events, errs := mbtest.ReportingFetchV2(ms)
+	events, errs := mbtest.ReportingFetchV2Error(ms)
 	if len(errs) > 0 {
 		t.Fatal(errs)
 	}
@@ -87,11 +87,11 @@ func TestCounterWithNoInstanceName(t *testing.T) {
 		},
 	}
 
-	ms := mbtest.NewReportingMetricSetV2(t, config)
-	mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	mbtest.ReportingFetchV2Error(ms)
 	time.Sleep(60 * time.Millisecond)
 
-	events, errs := mbtest.ReportingFetchV2(ms)
+	events, errs := mbtest.ReportingFetchV2Error(ms)
 	if len(errs) > 0 {
 		t.Fatal(errs)
 	}

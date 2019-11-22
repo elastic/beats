@@ -40,10 +40,18 @@ type Processor interface {
 	String() string
 }
 
-func New(config PluginConfig) (*Processors, error) {
-	procs := &Processors{
-		log: logp.NewLogger(logName),
+// NewList creates a new empty processor list.
+// Additional processors can be added to the List field.
+func NewList(log *logp.Logger) *Processors {
+	if log == nil {
+		log = logp.NewLogger(logName)
 	}
+	return &Processors{log: log}
+}
+
+// New creates a list of processors from a list of free user configurations.
+func New(config PluginConfig) (*Processors, error) {
+	procs := NewList(nil)
 
 	for _, procConfig := range config {
 		// Handle if/then/else processor which has multiple top-level keys.

@@ -1,4 +1,5 @@
-FROM cockroachdb/cockroach:v19.1.1
+ARG COCKROACHDB_VERSION
+FROM cockroachdb/cockroach:v${COCKROACHDB_VERSION}
 
 RUN apt-get update && apt-get install -y curl
 

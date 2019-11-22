@@ -13,6 +13,21 @@
           migration: true
           description: >
             Service url used by monitor.
+        - name: response
+          type: group
+          fields:
+            - name: body
+              type: group
+              fields:
+                - name: hash
+                  type: keyword
+                  description: >
+                    Hash of the full response body. Can be used to group responses with identical hashes.
+            - name: redirects
+              type: keyword
+              description: >
+                List of redirects followed to arrive at final content. Last item on the list is the URL for which
+                body content is shown.
         - name: rtt
           type: group
           description: >
@@ -70,8 +85,7 @@
 
             - name: content.us
               type: long
-              description:
-                Time required to retrieved the content in micro seconds.
+              description: Time required to retrieved the content in micro seconds.
 
             - name: total
               type: group

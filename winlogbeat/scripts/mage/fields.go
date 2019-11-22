@@ -40,7 +40,7 @@ func (b fieldsBuilder) FieldsGo() error {
 	case devtools.OSSProject:
 		return b.commonFieldsGo()
 	case devtools.XPackProject:
-		return nil
+		return devtools.GenerateModuleFieldsGo("module")
 	default:
 		panic(devtools.ErrUnknownProjectType)
 	}
@@ -49,8 +49,10 @@ func (b fieldsBuilder) FieldsGo() error {
 func (fieldsBuilder) FieldsYML() error {
 	var modules []string
 	switch SelectLogic {
-	case devtools.OSSProject, devtools.XPackProject:
-		// No modules.
+	case devtools.OSSProject:
+		// No OSS modules.
+	case devtools.XPackProject:
+		modules = append(modules, devtools.XPackBeatDir("module"))
 	default:
 		panic(devtools.ErrUnknownProjectType)
 	}
@@ -62,7 +64,7 @@ func (fieldsBuilder) FieldsYML() error {
 }
 
 func (fieldsBuilder) FieldsAllYML() error {
-	return devtools.GenerateFieldsYAMLTo(devtools.FieldsAllYML)
+	return devtools.GenerateFieldsYAMLTo(devtools.FieldsAllYML, devtools.XPackBeatDir("module"))
 }
 
 func (b fieldsBuilder) commonFieldsGo() error {

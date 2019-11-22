@@ -7,6 +7,8 @@ import (
 // Metadata wraps immutable data from the Client structure.
 type Metadata struct {
 	ServiceName string
+	ServiceID   string
+	EndpointsID string
 	APIVersion  string
 
 	Endpoint      string

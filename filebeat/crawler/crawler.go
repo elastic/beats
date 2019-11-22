@@ -117,7 +117,7 @@ func (c *Crawler) startInput(
 		return nil
 	}
 
-	connector := channel.ConnectTo(pipeline, c.out)
+	connector := c.out(pipeline)
 	p, err := input.New(config, connector, c.beatDone, states, nil)
 	if err != nil {
 		return fmt.Errorf("Error while initializing input: %s", err)

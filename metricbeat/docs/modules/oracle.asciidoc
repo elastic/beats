@@ -1,8 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-oracle]]
+[role="xpack"]
 == Oracle module
 
 beta[]
@@ -15,6 +16,12 @@ Oracle Metricbeat module is being tested version 12c R2 by using the store/oracl
 which is based on 5.0.13-arch1-1-ARCH Arch Linux. This is important, the module has only been tested with the mentioned image in Linux environments.
 
 OCI Instant Client is also required and the module has been tested by using version 18.5. See below for more information.
+
+[float]
+== Dashboard
+An overview dashboard for Kibana is already included:
+
+image::./images/metricbeat-oracle-overview.png[]
 
 [float]
 
@@ -33,6 +40,7 @@ Then, Metricbeat can be launched normally if the environment variable is set.
 
 The following Metricset is included in the module:
 
+[float]
 === `tablespaces`
 
 Includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc.
@@ -48,8 +56,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: oracle
-  metricsets: ["tablespace"]
-  enabled: false
+  metricsets: ["tablespace", "performance"]
+  enabled: true
   period: 10s
   hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
 
@@ -63,7 +71,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-oracle-performance,performance>>
+
 * <<metricbeat-metricset-oracle-tablespace,tablespace>>
+
+include::oracle/performance.asciidoc[]
 
 include::oracle/tablespace.asciidoc[]
 

@@ -4,6 +4,7 @@ metricbeat.config.modules:
 
 processors:
 - add_cloud_metadata: ~
+- add_docker_metadata: ~
 
 output.elasticsearch:
   hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'

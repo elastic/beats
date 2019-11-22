@@ -50,7 +50,8 @@
             }
         },
         "metricset": {
-            "name": "proxy"
+            "name": "proxy",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -76,7 +77,35 @@
             }
         },
         "metricset": {
-            "name": "proxy"
+            "name": "proxy",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.proxy",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "proxy": {
+                "client": {
+                    "request": {
+                        "count": 1
+                    }
+                },
+                "code": "201",
+                "host": "192.168.205.10:6443",
+                "method": "POST"
+            }
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -102,7 +131,8 @@
             }
         },
         "metricset": {
-            "name": "proxy"
+            "name": "proxy",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -200,33 +230,8 @@
             }
         },
         "metricset": {
-            "name": "proxy"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.proxy",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "proxy": {
-                "client": {
-                    "request": {
-                        "count": 1
-                    }
-                },
-                "code": "201",
-                "host": "192.168.205.10:6443",
-                "method": "POST"
-            }
-        },
-        "metricset": {
-            "name": "proxy"
+            "name": "proxy",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",

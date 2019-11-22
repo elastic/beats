@@ -65,6 +65,9 @@ func ExportAllFromYml(client *kibana.Client, ymlPath string) ([]common.MapStr, L
 	if err != nil {
 		return nil, ListYML{}, errors.Wrap(err, "error reading the list of dashboards")
 	}
+	if len(list.Dashboards) == 0 {
+		return nil, ListYML{}, errors.Errorf("dashboards list is empty in file %v", ymlPath)
+	}
 
 	results, err := ExportAll(client, list)
 

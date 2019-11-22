@@ -53,7 +53,7 @@ def document_field(output, field, field_path):
     output.write("*`{}`*::\n+\n--\n".format(field["field_path"]))
 
     if "deprecated" in field:
-        output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
+        output.write("\ndeprecated:[{}]\n\n".format(field["deprecated"]))
 
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))
@@ -90,7 +90,7 @@ def fields_to_asciidoc(input, output, beat):
 
     output.write("""
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]

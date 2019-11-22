@@ -23,6 +23,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/autodiscover/template"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
@@ -45,6 +47,9 @@ func TestDockerStart(t *testing.T) {
 	bus := bus.New("test")
 	config := defaultConfig()
 	config.CleanupTimeout = 0
+
+	s := &template.MapperSettings{nil, nil}
+	config.Templates = *s
 	provider, err := AutodiscoverBuilder(bus, UUID, common.MustNewConfigFrom(config))
 	if err != nil {
 		t.Fatal(err)

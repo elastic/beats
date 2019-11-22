@@ -41,6 +41,7 @@
         },
         {
             "date": {
+                "if": "ctx.event.timezone == null",
                 "field": "system.auth.timestamp",
                 "target_field": "@timestamp",
                 "formats": [
@@ -48,14 +49,19 @@
                     "MMM dd HH:mm:ss",
                     "ISO8601"
                 ],
-                "ignore_failure": true
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
         },
         {
             "date": {
                 "if": "ctx.event.timezone != null",
-                "field": "@timestamp",
-                "formats": ["ISO8601"],
+                "field": "system.auth.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "MMM  d HH:mm:ss",
+                    "MMM dd HH:mm:ss",
+                    "ISO8601"
+                ],
                 "timezone": "{{ event.timezone }}",
                 "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
@@ -70,6 +76,32 @@
                 "field": "source.ip",
                 "target_field": "source.geo",
                 "ignore_failure": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
+                "ignore_missing": true
             }
         },
         {

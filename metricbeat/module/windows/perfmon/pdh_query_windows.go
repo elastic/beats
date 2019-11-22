@@ -22,6 +22,7 @@ package perfmon
 import (
 	"regexp"
 	"runtime"
+	"strings"
 	"syscall"
 	"unsafe"
 
@@ -67,7 +68,7 @@ func (q *Query) Open() error {
 // AddCounter adds the specified counter to the query.
 func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
-		return errors.Errorf("counter %s has been already added", counterPath)
+		return nil
 	}
 	var err error
 	var instanceName string
@@ -91,6 +92,42 @@ func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard b
 		format:       getPDHFormat(counter.Format),
 	}
 	return nil
+}
+
+// RemoveUnusedCounters will remove all counter handles for the paths that are not found anymore
+func (q *Query) RemoveUnusedCounters(counters []string) error {
+	// check if the expandwildcard func did expand th wildcard queries, if not, no counters will be removed
+	for _, counter := range counters {
+		if strings.Contains(counter, "*") {
+			return nil
+		}
+	}
+	unused := make(map[string]*Counter)
+	for counterPath, counter := range q.counters {
+		if !matchCounter(counterPath, counters) {
+			unused[counterPath] = counter
+		}
+	}
+	if len(unused) == 0 {
+		return nil
+	}
+	for counterPath, cnt := range unused {
+		err := PdhRemoveCounter(cnt.handle)
+		if err != nil {
+			return err
+		}
+		delete(q.counters, counterPath)
+	}
+	return nil
+}
+
+func matchCounter(counterPath string, counterList []string) bool {
+	for _, cn := range counterList {
+		if cn == counterPath {
+			return true
+		}
+	}
+	return false
 }
 
 // CollectData collects the value for all counters in the query.
@@ -129,6 +166,9 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	}
 	if err != nil {
 		return nil, err
+	}
+	if expdPaths == nil {
+		return nil, errors.New("no counter paths found")
 	}
 	return UTF16ToStringArray(expdPaths), nil
 }

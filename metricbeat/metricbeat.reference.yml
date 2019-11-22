@@ -14,7 +14,7 @@
 metricbeat.config.modules:
 
   # Glob pattern for configuration reloading
-  path: ${path.config}/conf.d/*.yml
+  path: ${path.config}/modules.d/*.yml
 
   # Period on which files under path should be checked for changes
   reload.period: 10s
@@ -374,11 +374,13 @@ metricbeat.modules:
   jmx.instance:
 
 #-------------------------------- Kafka Module --------------------------------
+# Kafka metrics collected using the Kafka protocol
 - module: kafka
-  metricsets: ["consumergroup", "partition"]
+  #metricsets:
+  #  - partition
+  #  - consumergroup
   period: 10s
   hosts: ["localhost:9092"]
-  enabled: true
 
   #client_id: metricbeat
   #retries: 3
@@ -400,6 +402,27 @@ metricbeat.modules:
   # SASL authentication
   #username: ""
   #password: ""
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
@@ -433,9 +456,10 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
@@ -448,14 +472,17 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_cronjob
+    - state_resourcequota
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # Kubernetes events
@@ -584,6 +611,8 @@ metricbeat.modules:
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
   # The username and password can either be set in the DSN or using the username
   # and password config options. Those specified in the DSN take precedence.
   hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
@@ -810,7 +839,7 @@ metricbeat.modules:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -1065,8 +1094,11 @@ output.elasticsearch:
   # Configure escaping HTML symbols in strings.
   #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
@@ -1717,22 +1749,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'metricbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "metricbeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'metricbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 
@@ -1856,13 +1904,18 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Metricbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
@@ -1882,8 +1935,11 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 
@@ -1970,11 +2026,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

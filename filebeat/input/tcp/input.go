@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/tcp"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -53,11 +52,15 @@ type Input struct {
 // NewInput creates a new TCP input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +83,9 @@ func NewInput(
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	server, err := tcp.New(&config.Config, splitFunc, cb)
+	factory := tcp.SplitHandlerFactory(cb, splitFunc)
+
+	server, err := tcp.New(&config.Config, factory)
 	if err != nil {
 		return nil, err
 	}
@@ -125,9 +130,8 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
-func createEvent(raw []byte, metadata inputsource.NetworkMetadata) *util.Data {
-	data := util.NewData()
-	data.Event = beat.Event{
+func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
+	return beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
 			"message": string(raw),
@@ -138,5 +142,4 @@ func createEvent(raw []byte, metadata inputsource.NetworkMetadata) *util.Data {
 			},
 		},
 	}
-	return data
 }

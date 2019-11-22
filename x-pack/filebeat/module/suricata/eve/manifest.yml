@@ -15,7 +15,7 @@ var:
 
   # - name: nested_ecs
   #   default: false
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/eve.yml
 
 requires.processors:
