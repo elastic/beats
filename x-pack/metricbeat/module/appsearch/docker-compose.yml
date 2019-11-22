@@ -15,5 +15,5 @@ services:
 
   elasticsearch:
     extends:
-      file: ../../../metricbeat/module/elasticsearch/docker-compose.yml
+      file: ../../../metricbeat/docker-compose.yml
       service: elasticsearch
