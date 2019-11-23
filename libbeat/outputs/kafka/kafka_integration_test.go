@@ -368,27 +368,27 @@ func testReadFromKafkaTopic(
 	done := make(chan struct{})
 	msgs := make(chan *sarama.ConsumerMessage)
 	for _, partition := range partitions {
-		go func(p int32) {
-			offset := testTopicOffsets.GetOffset(topic, p)
+		partitionConsumer, err := consumer.ConsumePartition(topic, p, offset)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() {
+			partitionConsumer.Close()
+		}()
 
-			partitionConsumer, err := consumer.ConsumePartition(topic, p, offset)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer func() {
-				partitionConsumer.Close()
-			}()
+		go func(p int32, pc sarama.PartitionConsumer) {
+			offset := testTopicOffsets.GetOffset(topic, p)
 
 			for {
 				select {
-				case msg := <-partitionConsumer.Messages():
+				case msg := <-pc.Messages():
 					testTopicOffsets.SetOffset(topic, p, msg.Offset+1)
 					msgs <- msg
 				case <-done:
 					break
 				}
 			}
-		}(partition)
+		}(partition, partitionConsumer)
 	}
 
 	var messages []*sarama.ConsumerMessage
