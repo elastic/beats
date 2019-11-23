@@ -8,6 +8,9 @@
       "module": "security",
       "provider": "Microsoft-Windows-Security-Auditing"
     },
+    "host": {
+      "name": "WIN-41OB2LO92CR"
+    },
     "log": {
       "level": "information"
     },

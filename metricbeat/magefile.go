@@ -47,11 +47,12 @@ import (
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
 	// mage:import
 	update "github.com/elastic/beats/dev-tools/mage/target/update"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
 )
 
 func init() {
 	common.RegisterCheckDeps(update.Update)
-
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 

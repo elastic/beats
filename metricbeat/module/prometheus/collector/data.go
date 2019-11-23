@@ -22,6 +22,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/helper/prometheus"
 
 	dto "github.com/prometheus/client_model/go"
 )
@@ -34,7 +35,7 @@ type PromEvent struct {
 
 // LabelsHash returns a repeatable string that is unique for the set of labels in this event
 func (p *PromEvent) LabelsHash() string {
-	return p.labels.String()
+	return prometheus.LabelHash(p.labels)
 }
 
 func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {

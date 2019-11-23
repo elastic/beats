@@ -1,0 +1,50 @@
+- name: broker
+  type: group
+  description: Broker metrics from Kafka Broker JMX
+  release: beta
+  fields:
+    - name: mbean
+      description: Mbean that this event is related to
+      type: keyword
+    - name: request.channel.queue.size
+      description: The size of the request queue
+      type: long
+    - name: request.produce.failed_per_second
+      description: The rate of failed produce requests per second
+      type: float
+    - name: request.fetch.failed_per_second
+      description: The rate of client fetch request failures per second
+      type: float
+    - name: replication.leader_elections
+      description: The leader election rate
+      type: float
+    - name: replication.unclean_leader_elections
+      description: The unclean leader election rate
+      type: float
+    - name: session.zookeeper.disconnect
+      description: The ZooKeeper closed sessions per second
+      type: float
+    - name: session.zookeeper.expire
+      description: The ZooKeeper expired sessions per second
+      type: float
+    - name: session.zookeeper.readonly
+      description: The ZooKeeper readonly sessions per second
+      type: float
+    - name: session.zookeeper.sync
+      description: The ZooKeeper client connections per second
+      type: float
+    - name: log.flush_rate
+      description: The log flush rate
+      type: float
+    - name: topic.net.bytes_in
+      description: The incoming byte rate
+      type: float
+    - name: topic.net.bytes_out
+      description: The outgoing byte rate
+      type: float
+    - name: topic.net.bytes_rejected
+      description: The rejected byte rate
+      type: float
+    - name: topic.messages_in
+      description: The incoming message rate
+      type: float

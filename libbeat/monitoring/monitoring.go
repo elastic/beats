@@ -92,19 +92,45 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
 		return nil, nil, errMonitoringBothConfigEnabled
 	case beatCfg.XPackMonitoring.Enabled():
-		cfgwarn.Deprecate("8.0", warnMonitoringDeprecatedConfig)
+		cfgwarn.Deprecate("8.0.0", warnMonitoringDeprecatedConfig)
 		monitoringCfg := beatCfg.XPackMonitoring
 		return monitoringCfg, &report.Settings{Format: report.FormatXPackMonitoringBulk}, nil
 	case beatCfg.Monitoring.Enabled():
 		monitoringCfg := beatCfg.Monitoring
-		var info struct {
-			ClusterUUID string `config:"cluster_uuid"`
-		}
-		if err := monitoringCfg.Unpack(&info); err != nil {
-			return nil, nil, err
-		}
-		return monitoringCfg, &report.Settings{Format: report.FormatBulk, ClusterUUID: info.ClusterUUID}, nil
+		return monitoringCfg, &report.Settings{Format: report.FormatBulk}, nil
 	default:
 		return nil, nil, nil
 	}
+}
+
+// GetClusterUUID returns the value of the monitoring.cluster_uuid setting, if it is set.
+func GetClusterUUID(monitoringCfg *common.Config) (string, error) {
+	if monitoringCfg == nil {
+		return "", nil
+	}
+
+	var config struct {
+		ClusterUUID string `config:"cluster_uuid"`
+	}
+	if err := monitoringCfg.Unpack(&config); err != nil {
+		return "", err
+	}
+
+	return config.ClusterUUID, nil
+}
+
+// IsEnabled returns whether the monitoring reporter is enabled or not.
+func IsEnabled(monitoringCfg *common.Config) bool {
+	if monitoringCfg == nil {
+		return false
+	}
+
+	// If the only setting in the monitoring config is cluster_uuid, it is
+	// not enabled
+	fields := monitoringCfg.GetFields()
+	if len(fields) == 1 && fields[0] == "cluster_uuid" {
+		return false
+	}
+
+	return monitoringCfg.Enabled()
 }
