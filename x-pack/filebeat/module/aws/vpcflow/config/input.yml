@@ -15,9 +15,12 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-exclude_lines: ["^version", "^instance-id"]
-
 processors:
+  - drop_event:
+      when.regexp.message: "^version"
+  - drop_event:
+      when.regexp.message: "^instance-id"
+
   - script:
       lang: javascript
       source: >
