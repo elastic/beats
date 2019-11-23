@@ -307,7 +307,49 @@ func newTestConsumer(t *testing.T) sarama.Consumer {
 	return consumer
 }
 
-var testTopicOffsets = map[string]int64{}
+// topicOffsetMap is threadsafe map from topic => partition => offset
+type topicOffsetMap struct {
+	m  map[string]map[int32]int64
+	mu sync.RWMutex
+}
+
+func (m *topicOffsetMap) GetOffset(topic string, partition int32) int64 {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if m.m == nil {
+		return sarama.OffsetOldest
+	}
+
+	topicMap, ok := m.m[topic]
+	if !ok {
+		return sarama.OffsetOldest
+	}
+
+	offset, ok := topicMap[partition]
+	if !ok {
+		return sarama.OffsetOldest
+	}
+
+	return offset
+}
+
+func (m *topicOffsetMap) SetOffset(topic string, partition int32, offset int64) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.m == nil {
+		m.m = map[string]map[int32]int64{}
+	}
+
+	if _, ok := m.m[topic]; !ok {
+		m.m[topic] = map[int32]int64{}
+	}
+
+	m.m[topic][partition] = offset
+}
+
+var testTopicOffsets topicOffsetMap
 
 func testReadFromKafkaTopic(
 	t *testing.T, topic string, nMessages int,
@@ -318,31 +360,50 @@ func testReadFromKafkaTopic(
 		consumer.Close()
 	}()
 
-	offset, found := testTopicOffsets[topic]
-	if !found {
-		offset = sarama.OffsetOldest
-	}
-
-	partitionConsumer, err := consumer.ConsumePartition(topic, 0, offset)
+	partitions, err := consumer.Partitions(topic)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
-		partitionConsumer.Close()
-	}()
 
-	timer := time.After(timeout)
+	done := make(chan struct{})
+	msgs := make(chan *sarama.ConsumerMessage)
+	for _, partition := range partitions {
+		go func(p int32) {
+			offset := testTopicOffsets.GetOffset(topic, p)
+
+			partitionConsumer, err := consumer.ConsumePartition(topic, p, offset)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() {
+				partitionConsumer.Close()
+			}()
+
+			for {
+				select {
+				case msg := <-partitionConsumer.Messages():
+					testTopicOffsets.SetOffset(topic, p, msg.Offset+1)
+					msgs <- msg
+				case <-done:
+					break
+				}
+			}
+		}(partition)
+	}
+
 	var messages []*sarama.ConsumerMessage
-	for i := 0; i < nMessages; i++ {
+	timer := time.After(timeout)
+
+	for len(messages) < nMessages {
 		select {
-		case msg := <-partitionConsumer.Messages():
+		case msg := <-msgs:
 			messages = append(messages, msg)
-			testTopicOffsets[topic] = msg.Offset + 1
 		case <-timer:
 			break
 		}
 	}
 
+	close(done)
 	return messages
 }
 
