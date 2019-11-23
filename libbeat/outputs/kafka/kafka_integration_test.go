@@ -380,7 +380,10 @@ func testReadFromKafkaTopic(
 		go func(p int32, pc sarama.PartitionConsumer) {
 			for {
 				select {
-				case msg := <-pc.Messages():
+				case msg, ok := <-pc.Messages():
+					if !ok {
+						break
+					}
 					testTopicOffsets.SetOffset(topic, p, msg.Offset+1)
 					msgs <- msg
 				case <-done:
