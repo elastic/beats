@@ -183,15 +183,6 @@
 			"revisionTime": "2018-07-23T16:30:02Z"
 		},
 		{
-			"checksumSHA1": "w5NkRQ2Cebz7a6UfrbwFdhyRWnM=",
-			"path": "github.com/Shopify/sarama",
-			"revision": "46c83074a05474240f9620fb7c70fb0d80ca401a",
-			"revisionTime": "2019-07-22T18:01:16Z",
-			"tree": true,
-			"version": "v1.23.1",
-			"versionExact": "v1.23.1"
-		},
-		{
 			"checksumSHA1": "Te1xRugxHQMAg7EvbIUuPWm8fvU=",
 			"path": "github.com/StackExchange/wmi",
 			"revision": "9f32b5905fd6ce7384093f9d048437e79f7b4d85",
@@ -5474,5 +5465,5 @@
 			"revisionTime": "2019-07-04T18:38:35Z"
 		}
 	],
-	"rootPath": "github.com/elastic/beats"
+	"rootPath": "github.com/faec/beats"
 }
