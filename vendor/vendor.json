@@ -183,6 +183,16 @@
 			"revisionTime": "2018-07-23T16:30:02Z"
 		},
 		{
+			"checksumSHA1": "qrdmO04N/Fb0BvrohZecpjMbcU0=",
+			"origin": "github.com/elastic/sarama",
+			"path": "github.com/Shopify/sarama",
+			"revision": "71dcfe72351b8daf910276a46540ca0b7bbe0a2b",
+			"revisionTime": "2019-11-24T15:23:03Z",
+			"tree": true,
+			"version": "v1.23.1-elastic",
+			"versionExact": "v1.23.1-elastic"
+		},
+		{
 			"checksumSHA1": "Te1xRugxHQMAg7EvbIUuPWm8fvU=",
 			"path": "github.com/StackExchange/wmi",
 			"revision": "9f32b5905fd6ce7384093f9d048437e79f7b4d85",
