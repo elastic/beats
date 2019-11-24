@@ -11,6 +11,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -83,6 +86,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -154,6 +160,9 @@
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -230,6 +239,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -301,6 +313,9 @@
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -374,6 +389,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -445,6 +463,9 @@
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -518,6 +539,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -589,6 +613,9 @@
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -665,6 +692,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -736,6 +766,9 @@
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -812,6 +845,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -883,6 +919,9 @@
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -956,6 +995,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -1027,6 +1069,9 @@
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1100,6 +1145,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -1172,6 +1220,9 @@
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_success"
     },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
     "log": {
       "level": "information"
     },
@@ -1243,6 +1294,9 @@
       "outcome": "failure",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": "authentication_failure"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"

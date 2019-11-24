@@ -1,0 +1,21 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: "consumer"
+    hosts: ["localhost:8774"]
+    path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+    jmx.mappings:
+      - mbean: 'kafka.consumer:client-id=*,type=consumer-fetch-manager-metrics'
+        attributes:
+          - attr: fetch-rate
+            field: fetch_rate
+          - attr: bytes-consumed-total
+            field: bytes_consumed
+          - attr: records-consumed-total
+            field: records_consumed
+      - mbean: 'kafka.consumer:client-id=*,type=consumer-metrics'
+        attributes:
+          - attr: incoming-byte-total
+            field: bytes_in

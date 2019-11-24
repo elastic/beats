@@ -11,7 +11,7 @@ Third party libraries used by the Elastic Beats project:
 
 --------------------------------------------------------------------
 Dependency: 4d63.com/tz
-Revision: bd6cee76f7319745d44ff235e42124b3891e293d
+Revision: acbe7ac603850b02c7bc4329a2354e389857bf18
 License type (autodetected): MIT
 ./vendor/4d63.com/tz/LICENSE:
 --------------------------------------------------------------------
@@ -339,6 +339,35 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/cespare/xxhash
+Revision: 2372543dd2bbab7a55ce14c54eb357abe23a42f5
+License type (autodetected): MIT
+./vendor/github.com/cespare/xxhash/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2016 Caleb Spare
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/cloudflare/cfssl
 Revision: b1ec8c586c2aa3ec3eaf4a622933f169cfa5648b
 License type (autodetected): BSD-2-Clause
@@ -422,8 +451,8 @@ This product includes software developed at CoreOS, Inc.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Version: v18
-Revision: 9002847aa1425fb6ac49077c0a630b3b67e0fbfd
+Version: v20
+Revision: fd7a80b32e1fc73e890fde45604ed5009dc817a3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------
@@ -450,40 +479,6 @@ Copyright 2014 CoreOS, Inc
 
 This product includes software developed at CoreOS, Inc.
 (http://www.coreos.com/).
-
---------------------------------------------------------------------
-Dependency: github.com/DataDog/zstd
-Revision: 2bf71ec4836011b92dc78df3b9ace6b40e65f7df
-License type (autodetected): BSD-3-Clause
-./vendor/github.com/DataDog/zstd/LICENSE:
---------------------------------------------------------------------
-Simplified BSD License
-
-Copyright (c) 2016, Datadog <info@datadoghq.com>
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice,
-      this list of conditions and the following disclaimer in the documentation
-      and/or other materials provided with the distribution.
-    * Neither the name of the copyright holder nor the names of its contributors
-      may be used to endorse or promote products derived from this software
-      without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/davecgh/go-spew
@@ -1728,6 +1723,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
+Dependency: github.com/godbus/dbus
+Revision: 37bf87eef99d69c4f1d3528bd66e3a87dc201472
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/godbus/dbus/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013, Georg Reinke (<guelfey at gmail dot com>), Google
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/gofrs/uuid
 Version: 3.1.1
 Revision: 47cd1dca1a6e7f807d5a492bd7e7f41d0855b5a1
@@ -1798,49 +1825,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------
-Dependency: github.com/gogo/protobuf
-Revision: 636bf0302bc95575d69441b25a2603156ffdddf1
-License type (autodetected): BSD-3-Clause
-./metricbeat/vendor/github.com/gogo/protobuf/LICENSE:
---------------------------------------------------------------------
-Protocol Buffers for Go with Gadgets
-
-Copyright (c) 2013, The GoGo Authors. All rights reserved.
-http://github.com/gogo/protobuf
-
-Go support for Protocol Buffers - Google's data interchange format
-
-Copyright 2010 The Go Authors.  All rights reserved.
-https://github.com/golang/protobuf
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-    * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
---------------------------------------------------------------------
 Dependency: github.com/golang/glog
 Revision: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 License type (autodetected): Apache-2.0
@@ -1856,44 +1840,6 @@ License type (autodetected): BSD-3-Clause
 ./vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
 Copyright 2010 The Go Authors.  All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-    * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
---------------------------------------------------------------------
-Dependency: github.com/golang/protobuf
-Revision: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
-License type (autodetected): BSD-3-Clause
-./metricbeat/vendor/github.com/golang/protobuf/LICENSE:
---------------------------------------------------------------------
-Go support for Protocol Buffers - Google's data interchange format
-
-Copyright 2010 The Go Authors.  All rights reserved.
-https://github.com/golang/protobuf
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -3884,6 +3830,7 @@ License type (autodetected): BSD-3-Clause
 ./vendor/github.com/klauspost/compress/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
+Copyright (c) 2019 Klaus Post. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -3910,6 +3857,69 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/klauspost/compress/snappy
+Revision: c099ac9f21ddbdc8fda7992ce71fae347bf1df88
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/klauspost/compress/snappy/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/klauspost/compress/zstd/internal/xxhash
+Revision: c099ac9f21ddbdc8fda7992ce71fae347bf1df88
+License type (autodetected): MIT
+./vendor/github.com/klauspost/compress/zstd/internal/xxhash/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2016 Caleb Spare
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/klauspost/cpuid
@@ -3992,16 +4002,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/kubernetes/apimachinery
-Version: kubernetes-1.11.1
-Revision: 103fd098999dc9c0c88536f5c9ad2e5da39373ae
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/kubernetes/apimachinery/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/lib/pq
 Revision: 2ff3cb3adc01768e0a552b3a02575a6df38a9bea
 License type (autodetected): MIT
@@ -4075,17 +4075,6 @@ Dependency: github.com/matttproud/golang_protobuf_extensions
 Revision: c182affec369e30f25d3eb8cd8a478dee585ae7d
 License type (autodetected): Apache-2.0
 ./vendor/github.com/matttproud/golang_protobuf_extensions/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
-
---------------------------------------------------------------------
-Dependency: github.com/matttproud/golang_protobuf_extensions
-Revision: c12348ce28de40eed0136aa2b644d0ee0650e56c
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/matttproud/golang_protobuf_extensions/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -4287,15 +4276,6 @@ Dependency: github.com/modern-go/reflect2
 Revision: 94122c33edd36123c84d5368cfb2b69df93a0ec8
 License type (autodetected): Apache-2.0
 ./vendor/github.com/modern-go/reflect2/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: github.com/OneOfOne/xxhash
-Revision: 74ace4fe5525ef62ce28d5093d6b0faaa6a575f3
-License type (autodetected): Apache-2.0
-./vendor/github.com/OneOfOne/xxhash/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -4541,40 +4521,10 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
-Dependency: github.com/prometheus/client_model
-Revision: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/prometheus/client_model/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-Data model artifacts for Prometheus.
-Copyright 2012-2015 The Prometheus Authors
-
-This product includes software developed at
-SoundCloud Ltd. (http://soundcloud.com/).
-
---------------------------------------------------------------------
 Dependency: github.com/prometheus/common
 Revision: 637d7c34db122e2d1a25d061423098663758d2d3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/common/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-Common libraries shared by Prometheus Go components.
-Copyright 2015 The Prometheus Authors
-
-This product includes software developed at
-SoundCloud Ltd. (http://soundcloud.com/).
-
---------------------------------------------------------------------
-Dependency: github.com/prometheus/common
-Revision: 89604d197083d4781071d3c65855d24ecfb0a563
-License type (autodetected): Apache-2.0
-./metricbeat/vendor/github.com/prometheus/common/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -4878,8 +4828,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.23.1
-Revision: 46c83074a05474240f9620fb7c70fb0d80ca401a
+Version: v1.24.1-elastic
+Revision: 355d120d09706d85bc6d2a84287be7fbd13ef453
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
@@ -5958,41 +5908,6 @@ Dependency: gopkg.in/inf.v0
 Revision: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 License type (autodetected): BSD-3-Clause
 ./vendor/gopkg.in/inf.v0/LICENSE:
---------------------------------------------------------------------
-Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
-Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-   * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
-Dependency: gopkg.in/inf.v0
-Revision: d2d2541c53f18d2a059457998ce2876cc8e67cbf
-License type (autodetected): BSD-3-Clause
-./metricbeat/vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
 Authors. All rights reserved.

@@ -23,6 +23,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+
+	"github.com/elastic/beats/libbeat/common/docker"
 )
 
 // Client for Docker
@@ -32,7 +34,7 @@ type Client struct {
 
 // NewClient builds and returns a docker Client
 func NewClient() (Client, error) {
-	c, err := client.NewEnvClient()
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
 	return Client{cli: c}, err
 }
 
