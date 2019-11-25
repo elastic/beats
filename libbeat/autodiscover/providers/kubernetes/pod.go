@@ -25,6 +25,7 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
@@ -87,6 +88,14 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	return p, nil
 }
 
+func (p *pod) Start() error {
+	return p.watcher.Start()
+}
+
+func (p *pod) Stop() {
+	p.watcher.Stop()
+}
+
 func (p *pod) OnAdd(obj interface{}) {
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "start")
@@ -119,6 +128,48 @@ func (p *pod) OnUpdate(obj interface{}) {
 func (p *pod) OnDelete(obj interface{}) {
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
 	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
+}
+
+func (p *pod) GenerateHints(event bus.Event) bus.Event {
+	// Try to build a config with enabled builders. Send a provider agnostic payload.
+	// Builders are Beat specific.
+	e := bus.Event{}
+	var annotations common.MapStr
+	var kubeMeta, container common.MapStr
+	rawMeta, ok := event["kubernetes"]
+	if ok {
+		kubeMeta = rawMeta.(common.MapStr)
+		// The builder base config can configure any of the field values of kubernetes if need be.
+		e["kubernetes"] = kubeMeta
+		if rawAnn, ok := kubeMeta["annotations"]; ok {
+			annotations = rawAnn.(common.MapStr)
+		}
+	}
+	if host, ok := event["host"]; ok {
+		e["host"] = host
+	}
+	if port, ok := event["port"]; ok {
+		e["port"] = port
+	}
+
+	if rawCont, ok := kubeMeta["container"]; ok {
+		container = rawCont.(common.MapStr)
+		// This would end up adding a runtime entry into the event. This would make sure
+		// that there is not an attempt to spin up a docker input for a rkt container and when a
+		// rkt input exists it would be natively supported.
+		e["container"] = container
+	}
+
+	cname := builder.GetContainerName(container)
+	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+	p.logger.Debugf("Generated hints %+v", hints)
+	if len(hints) != 0 {
+		e["hints"] = hints
+	}
+
+	p.logger.Debugf("Generated builder event %+v", e)
+
+	return e
 }
 
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
@@ -219,54 +270,4 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			p.publish(event)
 		}
 	}
-}
-
-func (p *pod) GenerateHints(event bus.Event) bus.Event {
-	// Try to build a config with enabled builders. Send a provider agnostic payload.
-	// Builders are Beat specific.
-	e := bus.Event{}
-	var annotations common.MapStr
-	var kubeMeta, container common.MapStr
-	rawMeta, ok := event["kubernetes"]
-	if ok {
-		kubeMeta = rawMeta.(common.MapStr)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(common.MapStr)
-		}
-	}
-	if host, ok := event["host"]; ok {
-		e["host"] = host
-	}
-	if port, ok := event["port"]; ok {
-		e["port"] = port
-	}
-
-	if rawCont, ok := kubeMeta["container"]; ok {
-		container = rawCont.(common.MapStr)
-		// This would end up adding a runtime entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
-		e["container"] = container
-	}
-
-	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
-	p.logger.Debugf("Generated hints %+v", hints)
-	if len(hints) != 0 {
-		e["hints"] = hints
-	}
-
-	p.logger.Debugf("Generated builder event %+v", e)
-
-	return e
-}
-
-func (p *pod) Start() error {
-	return p.watcher.Start()
-}
-
-func (p *pod) Stop() {
-	p.watcher.Stop()
 }
