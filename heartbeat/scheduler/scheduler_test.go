@@ -70,14 +70,14 @@ func (t testSchedule) Next(now time.Time) time.Time {
 // Test task that will only actually invoke the fn the given number of times
 // this lets us test around timing / scheduling weirdness more accurately, since
 // we can in tests expect an exact number of invocations
-func testTaskTimes(limit uint32, fn func()) func() []TaskFunc {
+func testTaskTimes(limit uint32, fn TaskFunc) TaskFunc {
 	invoked := new(uint32)
-	return func() []TaskFunc {
+	return func(ctx context.Context) (conts []TaskFunc) {
 		if atomic.LoadUint32(invoked) < limit {
-			fn()
+			conts = fn(ctx)
 		}
 		atomic.AddUint32(invoked, 1)
-		return nil
+		return conts
 	}
 }
 
@@ -90,19 +90,25 @@ func TestScheduler_Start(t *testing.T) {
 	executed := make(chan string)
 
 	preAddEvents := uint32(10)
-	s.Add(testSchedule{0}, "preAdd", testTaskTimes(preAddEvents, func() {
+	s.Add(testSchedule{0}, "preAdd", testTaskTimes(preAddEvents, func(_ context.Context) []TaskFunc {
 		executed <- "preAdd"
+		cont := func(_ context.Context) []TaskFunc {
+			executed <- "preAddCont"
+			return nil
+		}
+		return []TaskFunc{cont}
 	}))
 
 	removedEvents := uint32(1)
 	// This function will be removed after being invoked once
 	removeMtx := sync.Mutex{}
 	var remove context.CancelFunc
-	testFn := func() {
+	var testFn TaskFunc = func(_ context.Context) []TaskFunc {
 		executed <- "removed"
 		removeMtx.Lock()
 		remove()
 		removeMtx.Unlock()
+		return nil
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
@@ -114,14 +120,20 @@ func TestScheduler_Start(t *testing.T) {
 	s.Start()
 
 	postAddEvents := uint32(10)
-	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func() {
+	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func(_ context.Context) []TaskFunc {
 		executed <- "postAdd"
+		cont := func(_ context.Context) []TaskFunc {
+			executed <- "postAddCont"
+			return nil
+		}
+		return []TaskFunc{cont}
 	}))
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
 	// Otherwise, we might only do 1 preAdd and 1 postAdd event
-	totalExpected := preAddEvents + removedEvents + postAddEvents
+	// We double the number of pre/post add events to account for their continuations
+	totalExpected := preAddEvents*2 + removedEvents + postAddEvents*2
 	for uint32(len(received)) < totalExpected {
 		select {
 		case got := <-executed:
@@ -133,13 +145,16 @@ func TestScheduler_Start(t *testing.T) {
 	}
 
 	// The removed callback should only have been executed once
-	counts := map[string]uint32{"preAdd": 0, "postAdd": 0, "removed": 0}
+	counts := map[string]uint32{"preAdd": 0, "postAdd": 0, "preAddCont": 0, "postAddcont": 0, "removed": 0}
 	for _, s := range received {
 		counts[s]++
 	}
+
 	// convert with int() because the printed output is nicer than hex
 	assert.Equal(t, int(preAddEvents), int(counts["preAdd"]))
+	assert.Equal(t, int(preAddEvents), int(counts["preAddCont"]))
 	assert.Equal(t, int(postAddEvents), int(counts["postAdd"]))
+	assert.Equal(t, int(postAddEvents), int(counts["postAddCont"]))
 	assert.Equal(t, int(removedEvents), int(counts["removed"]))
 }
 
@@ -151,8 +166,9 @@ func TestScheduler_Stop(t *testing.T) {
 	require.NoError(t, s.Start())
 	require.NoError(t, s.Stop())
 
-	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func() {
+	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
+		return nil
 	}))
 
 	assert.Equal(t, ErrAlreadyStopped, err)
@@ -165,7 +181,7 @@ func BenchmarkScheduler(b *testing.B) {
 
 	executed := make(chan struct{})
 	for i := 0; i < 1024; i++ {
-		_, err := s.Add(sched, "testPostStop", func() []TaskFunc {
+		_, err := s.Add(sched, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
 		})

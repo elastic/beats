@@ -25,11 +25,12 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/semaphore"
+
 	"github.com/elastic/beats/heartbeat/scheduler/timerqueue"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -63,7 +64,7 @@ type schedulerStats struct {
 
 // TaskFunc represents a single task in a job. Optionally returns continuation of tasks to
 // be executed within current job.
-type TaskFunc func() []TaskFunc
+type TaskFunc func(ctx context.Context) []TaskFunc
 
 // Schedule defines an interface for getting the next scheduled runtime for a job
 type Schedule interface {
@@ -73,8 +74,6 @@ type Schedule interface {
 	// Cron tasks run at exact times so should set this to false.
 	RunOnInit() bool
 }
-
-var debugf = logp.MakeDebug("scheduler")
 
 // New creates a new Scheduler
 func New(limit int64, registry *monitoring.Registry) *Scheduler {
@@ -136,7 +135,7 @@ func (s *Scheduler) Start() error {
 }
 
 func (s *Scheduler) missedDeadlineReporter() {
-	interval := time.Second
+	interval := time.Second * 15
 
 	t := time.NewTicker(interval)
 
@@ -193,21 +192,21 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		s.stats.activeJobs.Inc()
 		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
 		s.stats.activeJobs.Dec()
-		s.pushNextRun(sched.Next(lastRanAt), taskFn)
+		s.runOnce(sched.Next(lastRanAt), taskFn)
 	}
 
 	if sched.RunOnInit() {
 		go taskFn(time.Now())
 	} else {
-		s.pushNextRun(sched.Next(lastRanAt), taskFn)
+		s.runOnce(sched.Next(lastRanAt), taskFn)
 	}
 
 	return jobCtxCancel, nil
 }
 
-func (s *Scheduler) pushNextRun(next time.Time, taskFn timerqueue.TimerTaskFn) {
+func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 	now := time.Now().In(s.location)
-	if next.Before(now) {
+	if runAt.Before(now) {
 		// Our last invocation went long!
 		s.stats.jobsMissedDeadline.Inc()
 	}
@@ -215,7 +214,7 @@ func (s *Scheduler) pushNextRun(next time.Time, taskFn timerqueue.TimerTaskFn) {
 	// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
 	// block the timer thread.
 	asyncTask := func(now time.Time) { go taskFn(now) }
-	s.timerQueue.Push(next, asyncTask)
+	s.timerQueue.Push(runAt, asyncTask)
 }
 
 // runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
@@ -255,7 +254,7 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 		s.stats.activeTasks.Inc()
 		s.stats.waitingTasks.Dec()
 
-		continuations := task()
+		continuations := task(jobCtx)
 		s.stats.activeTasks.Dec()
 
 		wg.Add(len(continuations))

@@ -88,7 +88,7 @@ func (e ProcessorsError) Error() string {
 }
 
 func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
-	return func() []scheduler.TaskFunc {
+	return func(_ context.Context) []scheduler.TaskFunc {
 		return runPublishJob(job, t.client)
 	}
 }
@@ -176,7 +176,7 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 		// Without this only the last continuation will be executed len(conts) times
 		localCont := cont
 
-		contTasks[i] = func() []scheduler.TaskFunc {
+		contTasks[i] = func(_ context.Context) []scheduler.TaskFunc {
 			return runPublishJob(localCont, client)
 		}
 	}
