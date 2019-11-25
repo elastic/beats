@@ -160,7 +160,7 @@ shared:
   - &docker_spec
     <<: *binary_spec
     extra_vars:
-      from: 'registry.access.redhat.com/ubi7/ubi-minimal:7.7'
+      from: 'registry.access.redhat.com/ubi7/ubi:7.7'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
     files:
