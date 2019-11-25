@@ -61,20 +61,20 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	client, err := nomadlib.NewClient(config.Address, config.Region, config.SecretID, nil)
 	if err != nil {
-		logp.Err("nomad: Couldn't create nomad client: %v", err)
+		logp.Err("nomad: couldn't create nomad client: %v", err)
 		return nil, err
 	}
 
 	nodeID := config.Node
 	if nodeID == "" {
 		if nodeID, err = nomadlib.GetLocalNodeID(client); err != nil {
-			logp.Err("nomad: Couldn't get nomad node ID: %v", err)
+			logp.Err("nomad: couldn't get nomad node ID: %v", err)
 			return nil, err
 		}
 	}
 	node, _, err := client.Nodes().Info(nodeID, nil)
 	if err != nil {
-		logp.Err("nomad: Couldn't get node information: %v", err)
+		logp.Err("nomad: couldn't get node information: %v", err)
 		return nil, err
 	}
 
@@ -98,7 +98,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	watcher, err := nomadlib.NewWatcherWithClient(nomadlib.WrapClient(client), nodeID, annotator.modifiedAllocation)
 	if err != nil {
-		logp.Err("nomad: Couldn't create allocation watcher")
+		logp.Err("nomad: couldn't create allocation watcher")
 		return nil, err
 	}
 
@@ -111,14 +111,14 @@ func (n *nomadAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	var err error
 	if lfp, _ := event.Fields.GetValue("log.file.path"); lfp != nil { // TODO: what if lfp is nil
 		if event, err = n.sourceProcessor.Run(event); err != nil {
-			n.log.Debugf("Error while extracting container ID from source path: %v", err)
+			n.log.Debugf("error while extracting container ID from source path: %v", err)
 			return event, nil
 		}
 	}
 
 	allocID, err := event.GetValue(nomadRegexDataPrefix + "allocation")
 	if err != nil {
-		n.log.Debugf("Error while extracting allocation ID from event: %v", err)
+		n.log.Debugf("error while extracting allocation ID from event: %v", err)
 		return event, nil
 	}
 
@@ -129,7 +129,7 @@ func (n *nomadAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 
 	task, err := event.GetValue(nomadRegexDataPrefix + "task")
 	if err != nil {
-		n.log.Debugf("Error while extracting task from event: %v", err)
+		n.log.Debugf("error while extracting task from event: %v", err)
 		return event, nil
 	}
 
