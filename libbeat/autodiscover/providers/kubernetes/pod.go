@@ -42,6 +42,7 @@ type pod struct {
 	watcher kubernetes.Watcher
 }
 
+// NewPodEventer creates an eventer that can discover and process pod objects
 func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
 	metagen, err := kubernetes.NewMetaGenerator(cfg)
 	if err != nil {
@@ -88,20 +89,13 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	return p, nil
 }
 
-func (p *pod) Start() error {
-	return p.watcher.Start()
-}
-
-func (p *pod) Stop() {
-	p.watcher.Stop()
-}
-
+// OnAdd ensures processing of service objects that are newly added
 func (p *pod) OnAdd(obj interface{}) {
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
-// handleUpdate emits events for a given pod depending on the state of the pod,
+// OnUpdate emits events for a given pod depending on the state of the pod,
 // if it is terminating, a stop event is scheduled, if not, a stop and a start
 // events are sent sequentially to recreate the resources assotiated to the pod.
 func (p *pod) OnUpdate(obj interface{}) {
@@ -124,7 +118,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 	}
 }
 
-// handleDelete emits a stop event for the given pod
+// GenerateHints creates hints needed for hints builder
 func (p *pod) OnDelete(obj interface{}) {
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
 	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
@@ -170,6 +164,16 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	p.logger.Debugf("Generated builder event %+v", e)
 
 	return e
+}
+
+// Start starts the eventer
+func (p *pod) Start() error {
+	return p.watcher.Start()
+}
+
+// Stop stops the eventer
+func (p *pod) Stop() {
+	p.watcher.Stop()
 }
 
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {

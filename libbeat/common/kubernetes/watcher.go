@@ -181,6 +181,18 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		}
 
 		objType = "statefulset"
+	case *Service:
+		svc := client.CoreV1().Services(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return svc.List(options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return svc.Watch(options)
+			},
+		}
+
+		objType = "service"
 	default:
 		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
 	}

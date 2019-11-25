@@ -105,6 +105,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		p.eventer, err = NewPodEventer(uuid, c, client, p.publish)
 	case "node":
 		p.eventer, err = NewNodeEventer(uuid, c, client, p.publish)
+	case "service":
+		p.eventer, err = NewServiceEventer(uuid, c, client, p.publish)
 	default:
 		return nil, fmt.Errorf("unsupported autodiscover resource %s", config.Resource)
 	}
