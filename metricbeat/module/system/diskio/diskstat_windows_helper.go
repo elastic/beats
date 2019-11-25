@@ -138,7 +138,7 @@ func ioCounter(path string, diskPerformance *diskPerformance) error {
 // enablePerformanceCounters will enable performance counters by adding the EnableCounterForIoctl registry key
 func enablePerformanceCounters() error {
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\partmgr", registry.READ|registry.WRITE)
-	// closing handler for the registry key. If the key is not one of the predefined registry keys (which is the case here), a call the RegCloseKey function shoulc be executed after using the handle.
+	// closing handler for the registry key. If the key is not one of the predefined registry keys (which is the case here), a call the RegCloseKey function should be executed after using the handle.
 	defer func() {
 		if key != 0 {
 			clErr := key.Close()
