@@ -119,6 +119,9 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
 			m, ok := mapping.Metrics[family.GetName()]
+			if m == nil {
+				continue
+			}
 
 			// Ignore unknown metrics
 			if !ok {
@@ -133,6 +136,16 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				continue
 			}
 
+			storeAllLabels := false
+			labelsLocation := ""
+			var extraFields common.MapStr
+			if m != nil {
+				c := m.GetConfiguration()
+				storeAllLabels = c.StoreNonMappedLabels
+				labelsLocation = c.NonMappedLabelsPlacement
+				extraFields = c.ExtraFields
+			}
+
 			// Apply extra options
 			allLabels := getLabels(metric)
 			for _, option := range m.GetOptions() {
@@ -142,6 +155,7 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			// Convert labels
 			labels := common.MapStr{}
 			keyLabels := common.MapStr{}
+
 			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
@@ -149,7 +163,21 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 					} else {
 						labels.Put(l.GetField(), v)
 					}
+				} else if storeAllLabels {
+					// if label for this metric is not found at the label mappings but
+					// it is configured to store any labels found, make it so
+					// TODO dedot
+					labels.Put(labelsLocation+"."+k, v)
 				}
+			}
+
+			// if extra fields have been added through metric configuration
+			// add them to labels.
+			//
+			// not considering these extra fields to be keylabels as that case
+			// have not appeared yet
+			for k, v := range extraFields {
+				labels.Put(k, v)
 			}
 
 			// Keep a info document if it's an infoMetric
@@ -230,7 +258,7 @@ func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.Report
 }
 
 func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {
-	hash := LabelHash(labels.Flatten())
+	hash := labels.String()
 	res, ok := m[hash]
 	if !ok {
 		res = labels

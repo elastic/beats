@@ -19319,6 +19319,49 @@ type: keyword
 --
 
 [float]
+=== service
+
+kubernetes service metrics
+
+
+
+*`kubernetes.service.name`*::
++
+--
+Service name.
+
+type: keyword
+
+--
+
+*`kubernetes.service.cluster_ip`*::
++
+--
+Internal IP for the service.
+
+type: ip
+
+--
+
+*`kubernetes.service.external_name`*::
++
+--
+Service external DNS name
+
+type: keyword
+
+--
+
+*`kubernetes.service.load_balancer_ip`*::
++
+--
+Load Balancer service IP name
+
+type: keyword
+
+--
+
+[float]
 === statefulset
 
 kubernetes stateful set metrics
