@@ -43,7 +43,8 @@ type UpOptions struct {
 
 	// Set to true if it should inform the container of the host it should
 	// use to advertise itself to clients
-	SetupAdvertisedHostEnvFile bool
+	SetupAdvertisedHostEnvFile     bool
+	SetupAdvertisedHostEnvFilePort int
 }
 
 // UpOption is a modifier for UpOptions
@@ -58,6 +59,16 @@ func UpWithTimeout(timeout time.Duration) UpOption {
 // host to use to advertise to client as the `SERVICE_HOST` variable
 func UpWithAdvertisedHostEnvFile(options *UpOptions) {
 	options.SetupAdvertisedHostEnvFile = true
+}
+
+// UpWithAdvertisedHostEnvFileForPort adds the /run/compose_env file with the
+// host to use to advertise for an specific port to client as the
+// `SERVICE_HOST` variable
+func UpWithAdvertisedHostEnvFileForPort(port int) UpOption {
+	return func(options *UpOptions) {
+		options.SetupAdvertisedHostEnvFile = true
+		options.SetupAdvertisedHostEnvFilePort = port
+	}
 }
 
 // Filter options for services
