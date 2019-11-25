@@ -58,15 +58,15 @@ input:
       - mbean: 'kafka.server:name=BytesRejectedPerSec,topic=*,type=BrokerTopicMetrics'
         attributes:
           - attr: MeanRate
-            field: topic.net.bytes_rejected
+            field: topic.net.rejected.bytes_per_sec
       - mbean: 'kafka.server:name=BytesInPerSec,topic=*,type=BrokerTopicMetrics,topic=*'
         attributes:
           - attr: MeanRate
-            field: topic.net.bytes_in
+            field: topic.net.in.bytes_per_sec
       - mbean: 'kafka.server:name=BytesOutPerSec,topic=*,type=BrokerTopicMetrics,topic=*'
         attributes:
           - attr: MeanRate
-            field: topic.net.bytes_out
+            field: topic.net.out.bytes_per_sec
       - mbean: 'kafka.server:type=BrokerTopicMetrics,topic=*,name=MessagesInPerSec,topic=*'
         attributes:
           - attr: MeanRate
@@ -74,15 +74,15 @@ input:
       - mbean: 'kafka.server:name=BytesRejectedPerSec,type=BrokerTopicMetrics'
         attributes:
           - attr: MeanRate
-            field: net.bytes_rejected
+            field: net.rejected.bytes_per_sec
       - mbean: 'kafka.server:name=BytesInPerSec,type=BrokerTopicMetrics'
         attributes:
           - attr: MeanRate
-            field: net.bytes_in
+            field: net.in.bytes_per_sec
       - mbean: 'kafka.server:name=BytesOutPerSec,type=BrokerTopicMetrics'
         attributes:
           - attr: MeanRate
-            field: net.bytes_out
+            field: net.out.bytes_per_sec
       - mbean: 'kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec'
         attributes:
           - attr: MeanRate

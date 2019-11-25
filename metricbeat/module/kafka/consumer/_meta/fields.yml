@@ -15,7 +15,7 @@
     - name: records_consumed
       description: The average number of records consumed per second for a specific topic
       type: float
-    - name: bytes_in
+    - name: in.bytes_per_sec
       description: The rate of bytes coming in to the consumer
       type: float
     - name: max_lag

@@ -15517,7 +15517,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_in`*::
+*`kafka.broker.topic.net.in.bytes_per_sec`*::
 +
 --
 The incoming byte rate per topic
@@ -15526,7 +15526,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_out`*::
+*`kafka.broker.topic.net.out.bytes_per_sec`*::
 +
 --
 The outgoing byte rate per topic
@@ -15535,7 +15535,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_rejected`*::
+*`kafka.broker.topic.net.rejected.bytes_per_sec`*::
 +
 --
 The rejected byte rate per topic
@@ -15553,7 +15553,7 @@ type: float
 
 --
 
-*`kafka.broker.net.bytes_in`*::
+*`kafka.broker.net.in.bytes_per_sec`*::
 +
 --
 The incoming byte rate
@@ -15562,7 +15562,7 @@ type: float
 
 --
 
-*`kafka.broker.net.bytes_out`*::
+*`kafka.broker.net.out.bytes_per_sec`*::
 +
 --
 The outgoing byte rate
@@ -15571,7 +15571,7 @@ type: float
 
 --
 
-*`kafka.broker.net.bytes_rejected`*::
+*`kafka.broker.net.rejected.bytes_per_sec`*::
 +
 --
 The rejected byte rate
@@ -15631,7 +15631,7 @@ type: float
 
 --
 
-*`kafka.consumer.bytes_in`*::
+*`kafka.consumer.in.bytes_per_sec`*::
 +
 --
 The rate of bytes coming in to the consumer
@@ -16094,7 +16094,7 @@ type: float
 
 --
 
-*`kafka.producer.bytes_out`*::
+*`kafka.producer.out.bytes_per_sec`*::
 +
 --
 The rate of bytes going out for the producer

@@ -42,25 +42,25 @@
     - name: log.flush_rate
       description: The log flush rate
       type: float
-    - name: topic.net.bytes_in
+    - name: topic.net.in.bytes_per_sec
       description: The incoming byte rate per topic
       type: float
-    - name: topic.net.bytes_out
+    - name: topic.net.out.bytes_per_sec
       description: The outgoing byte rate per topic
       type: float
-    - name: topic.net.bytes_rejected
+    - name: topic.net.rejected.bytes_per_sec
       description: The rejected byte rate per topic
       type: float
     - name: topic.messages_in
       description: The incoming message rate per topic
       type: float
-    - name: net.bytes_in
+    - name: net.in.bytes_per_sec
       description: The incoming byte rate
       type: float
-    - name: net.bytes_out
+    - name: net.out.bytes_per_sec
       description: The outgoing byte rate
       type: float
-    - name: net.bytes_rejected
+    - name: net.rejected.bytes_per_sec
       description: The rejected byte rate
       type: float
     - name: messages_in

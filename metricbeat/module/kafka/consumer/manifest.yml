@@ -18,7 +18,7 @@ input:
       - mbean: 'kafka.consumer:client-id=*,type=consumer-metrics'
         attributes:
           - attr: incoming-byte-total
-            field: bytes_in
+            field: in.bytes_per_sec
       - mbean: 'kafka.consumer:client-id=*,type=consumer-fetch-manager-metrics'
         attributes:
           - attr: records-lag-max
