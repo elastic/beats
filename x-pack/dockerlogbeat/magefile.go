@@ -7,7 +7,11 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -18,15 +22,28 @@ import (
 )
 
 var hubID = "elastic"
-var pluginVersion = "0.0.1"
 var name = "docker-logging-plugin"
 var containerName = name + "_container"
-var dockerPluginName = hubID + "/" + name
-var dockerPlugin = dockerPluginName + ":" + pluginVersion
+var dockerPluginName = filepath.Join(hubID, name)
+var packageStagingDir = "build/package/"
+var packageEndDir = "build/distributions/"
+var dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
+
+// getPluginName returns the fully qualified name:version string
+func getPluginName() (string, error) {
+	version, err := mage.BeatQualifiedVersion()
+	if err != nil {
+		return "", errors.Wrap(err, "error getting beats version")
+	}
+
+	return dockerPluginName + ":" + version, nil
+}
 
 // Build builds docker rootfs container root
 func Build() error {
 	mg.Deps(Clean)
+	mage.CreateDir(packageStagingDir)
+	mage.CreateDir(packageEndDir)
 
 	dockerLogBeatDir, err := os.Getwd()
 	if err != nil {
@@ -53,42 +70,55 @@ func Build() error {
 		return errors.Wrap(err, "error returning to dockerlogbeat dir")
 	}
 
-	os.Mkdir("rootfs", 0755)
+	os.Mkdir(filepath.Join(packageStagingDir, "rootfs"), 0755)
 
 	err = sh.RunV("docker", "create", "--name", containerName, "rootfsimage", "true")
 	if err != nil {
 		return errors.Wrap(err, "error creating container")
 	}
 
-	err = sh.RunV("docker", "export", containerName, "-o", "temproot.tar")
+	err = sh.RunV("docker", "export", containerName, "-o", dockerExportPath)
 	if err != nil {
 		return errors.Wrap(err, "error exporting container")
 	}
 
-	return sh.RunV("tar", "-xf", "temproot.tar", "-C", "rootfs")
+	err = mage.Copy("config.json", filepath.Join(packageStagingDir, "config.json"))
+	if err != nil {
+		return errors.Wrap(err, "error copying config.json")
+	}
+
+	return sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(packageStagingDir, "rootfs"))
 }
 
 // Clean removes working objects and containers
 func Clean() error {
+	name, err := getPluginName()
+	if err != nil {
+		return err
+	}
 
 	sh.RunV("docker", "rm", "-vf", containerName)
 	sh.RunV("docker", "rmi", "rootfsimage")
-	sh.Rm("temproot.tar")
-	sh.Rm("rootfs")
-	sh.RunV("docker", "plugin", "disable", "-f", dockerPlugin)
-	sh.RunV("docker", "plugin", "rm", "-f", dockerPlugin)
+	sh.Rm(packageStagingDir)
+	sh.RunV("docker", "plugin", "disable", "-f", name)
+	sh.RunV("docker", "plugin", "rm", "-f", name)
 
 	return nil
 }
 
 // Install installs the beat
 func Install() error {
-	err := sh.RunV("docker", "plugin", "create", dockerPlugin, ".")
+	name, err := getPluginName()
+	if err != nil {
+		return err
+	}
+
+	err = sh.RunV("docker", "plugin", "create", name, packageStagingDir)
 	if err != nil {
 		return errors.Wrap(err, "error creating plugin")
 	}
 
-	err = sh.RunV("docker", "plugin", "enable", dockerPlugin)
+	err = sh.RunV("docker", "plugin", "enable", name)
 	if err != nil {
 		return errors.Wrap(err, "error enabling plugin")
 	}
@@ -99,4 +129,32 @@ func Install() error {
 // Package builds and creates a docker plugin
 func Package() {
 	mg.SerialDeps(Build, Install)
+}
+
+// BuildTar builds a "release" tarball that can be used later with `docker pugin create`
+func BuildTar() error {
+	mg.Deps(Build)
+	name, err := getPluginName()
+	if err != nil {
+		return err
+	}
+
+	bashScript := `#!/bin/bash
+docker plugin create %s
+docker plugin enable %s
+	`
+	formatted := []byte(fmt.Sprintf(bashScript, name, name))
+	err = ioutil.WriteFile(filepath.Join(packageStagingDir, "install.sh"), formatted, 0774)
+	if err != nil {
+		return errors.Wrap(err, "error writing script")
+	}
+
+	outpath := filepath.Join(packageEndDir, fmt.Sprintf("%s.gz", strings.Replace(name, "/", "-", -1)))
+
+	sh.RunV("tar", "zcf", outpath,
+		filepath.Join(packageStagingDir, "rootfs"),
+		filepath.Join(packageStagingDir, "config.json"),
+		filepath.Join(packageStagingDir, "install.sh"))
+
+	return nil
 }

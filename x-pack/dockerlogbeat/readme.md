@@ -4,7 +4,7 @@
 This code is a working MVP for a [docker logging plugin](https://docs.docker.com/engine/extend/plugins_logging/). With the proper config, it can send logs to elasticsearch.
 ## Build and install
 
-To build and install, just run `mage Package`. The build process happens entire within docker. The only external dependency is [mage](https://github.com/magefile/mage#installation)
+To build and install, just run `mage Package`. The build process happens entire within docker. The only external dependencies are [mage](https://github.com/magefile/mage#installation) and golang.
 
 
 ## Running
