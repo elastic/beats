@@ -50,8 +50,18 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	logger := logp.NewLogger("autodiscover.pod")
 
 	config := defaultConfig()
-	cfg.Unpack(&config)
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+	err = cfg.Unpack(&config)
+	if err != nil {
+		return nil, err
+	}
+
+	// Ensure that host is set correctly whenever the scope is set to "host". Make sure that host is empty
+	// when cluster scope is enforced.
+	if config.Scope == "host" {
+		config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+	} else {
+		config.Host = ""
+	}
 
 	logger.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
 
