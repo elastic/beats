@@ -45,3 +45,6 @@
     - name: bytes_out
       description: The rate of bytes going out for the producer
       type: float
+    - name: message_rate
+      description: The producer message rate
+      type: float

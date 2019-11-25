@@ -37,3 +37,10 @@ input:
         attributes:
           - attr: outgoing-byte-total
             field: bytes_out
+      - mbean: 'kafka\.producer:type=ProducerTopicMetrics,name=MessagesPerSec,clientId=.*'
+        attributes:
+          - attr: Count
+            field: message_rate
+
+
+
