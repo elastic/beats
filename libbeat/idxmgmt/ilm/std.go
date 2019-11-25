@@ -67,9 +67,10 @@ func NewStdSupport(
 	}
 }
 
-func (s *stdSupport) Mode() Mode     { return s.mode }
-func (s *stdSupport) Alias() Alias   { return s.alias }
-func (s *stdSupport) Policy() Policy { return s.policy }
+func (s *stdSupport) Mode() Mode      { return s.mode }
+func (s *stdSupport) Alias() Alias    { return s.alias }
+func (s *stdSupport) Policy() Policy  { return s.policy }
+func (s *stdSupport) Overwrite() bool { return s.overwrite }
 
 func (s *stdSupport) Manager(h ClientHandler) Manager {
 	return &stdManager{
@@ -78,7 +79,7 @@ func (s *stdSupport) Manager(h ClientHandler) Manager {
 	}
 }
 
-func (m *stdManager) Enabled() (bool, error) {
+func (m *stdManager) CheckEnabled() (bool, error) {
 	if m.mode == ModeDisabled {
 		return false, nil
 	}
@@ -99,10 +100,6 @@ func (m *stdManager) Enabled() (bool, error) {
 	m.cache.Enabled = enabled
 	m.cache.LastUpdate = time.Now()
 	return enabled, nil
-}
-
-func (m *stdManager) Overwrite() bool {
-	return m.overwrite
 }
 
 func (m *stdManager) EnsureAlias() error {

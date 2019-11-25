@@ -40,12 +40,12 @@ type Supporter interface {
 	Alias() Alias
 	Policy() Policy
 	Manager(h ClientHandler) Manager
+	Overwrite() bool
 }
 
 // Manager uses a ClientHandler to install a policy.
 type Manager interface {
-	Enabled() (bool, error)
-	Overwrite() bool
+	CheckEnabled() (bool, error)
 
 	EnsureAlias() error
 
