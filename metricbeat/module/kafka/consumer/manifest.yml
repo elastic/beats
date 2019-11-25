@@ -19,3 +19,7 @@ input:
         attributes:
           - attr: incoming-byte-total
             field: bytes_in
+      - mbean: 'kafka.consumer:client-id=*,type=consumer-fetch-manager-metrics'
+        attributes:
+          - attr: records-lag-max
+            field: max_lag

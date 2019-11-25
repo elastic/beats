@@ -17,7 +17,7 @@
 
 // +build integration
 
-package partition
+package producer
 
 import (
 	"testing"

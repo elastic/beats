@@ -15586,6 +15586,15 @@ type: float
 
 --
 
+*`kafka.consumer.max_lag`*::
++
+--
+The maximum consumer lag
+
+type: float
+
+--
+
 [float]
 === consumergroup
 

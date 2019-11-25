@@ -18,3 +18,6 @@
     - name: bytes_in
       description: The rate of bytes coming in to the consumer
       type: float
+    - name: max_lag
+      description: The maximum consumer lag
+      type: float
