@@ -359,11 +359,12 @@ func (h *Harvester) Run() error {
 
 func (h *Harvester) monitorFileSize() {
 	for {
+		timer := time.NewTimer(30 * time.Second)
 		select {
 		case <-h.done:
 			return
 		case <-h.checkSize:
-		case <-time.After(30 * time.Second):
+		case <-timer.C:
 			err := h.updateCurrentSize()
 			if err != nil {
 				logp.Err("Error updating file size: %v; File: %v", err, h.state.Source)
