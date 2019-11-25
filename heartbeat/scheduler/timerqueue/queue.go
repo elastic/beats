@@ -34,7 +34,7 @@ type TimerTaskFn func(now time.Time)
 
 // TimerQueue represents a priority queue of timers.
 type TimerQueue struct {
-	th        *timerHeap
+	th        timerHeap
 	ctx       context.Context
 	nextRunAt *time.Time
 	pushCh    chan *timerTask
@@ -44,12 +44,12 @@ type TimerQueue struct {
 // NewTimerQueue creates a new instance.
 func NewTimerQueue(ctx context.Context) *TimerQueue {
 	tq := &TimerQueue{
-		th:     &timerHeap{},
+		th:     timerHeap{},
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
 		timer:  time.NewTimer(0),
 	}
-	heap.Init(tq.th)
+	heap.Init(&tq.th)
 
 	return tq
 }
@@ -86,7 +86,7 @@ func (tq *TimerQueue) Start() {
 				}()
 
 				if tq.th.Len() > 0 {
-					nr := (*tq.th)[0].runAt
+					nr := tq.th[0].runAt
 					tq.nextRunAt = &nr
 					tq.timer.Reset(nr.Sub(time.Now()))
 				} else {
@@ -101,7 +101,7 @@ func (tq *TimerQueue) Start() {
 }
 
 func (tq *TimerQueue) pushInternal(tt *timerTask) {
-	heap.Push(tq.th, tt)
+	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
 		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
@@ -117,9 +117,9 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
 	for i := 0; tq.th.Len() > 0; i++ {
 		// the zeroth element of the heap is the same as a peek
-		peeked := (*tq.th)[0]
+		peeked := tq.th[0]
 		if peeked.runAt.Before(now) {
-			popped := heap.Pop(tq.th).(*timerTask)
+			popped := heap.Pop(&tq.th).(*timerTask)
 			res = append(res, popped)
 		} else {
 			break
