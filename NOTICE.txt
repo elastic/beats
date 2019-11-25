@@ -4863,8 +4863,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: v1.23.1
-Revision: 46c83074a05474240f9620fb7c70fb0d80ca401a
+Version: v1.23.1-elastic
+Revision: 71dcfe72351b8daf910276a46540ca0b7bbe0a2b
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
