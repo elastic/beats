@@ -6,3 +6,7 @@ connected consumers, producers and its current length.
 
 To collect data, the module communicates with a Jolokia HTTP/REST endpoint
 that exposes the JMX metrics over HTTP/REST/JSON (JMX key: `org.apache.activemq:brokerName=localhost,destinationName=sample_queue,destinationType=Queue,type=Broker`).
+
+The queue metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-activemq-queues-overview.png[]

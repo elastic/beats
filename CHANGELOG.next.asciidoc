@@ -198,6 +198,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
+- Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
 
 *Heartbeat*
 
@@ -264,6 +265,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
+- Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
 - Vshpere module splits `virtualmachine.host` into `virtualmachine.host.id` and `virtualmachine.host.hostname`. {issue}7187[7187] {pull}7213[7213]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 
@@ -507,6 +509,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
 - Release kubernetes modules `controllermanager`, `scheduler`, `proxy`, `state_cronjob` and `state_resourcequota` as GA. {pull}14584[14584]
 - Add module for ActiveMQ. {pull}14580[14580]
+- Enable script processor. {pull}14711[14711]
 
 *Packetbeat*
 
