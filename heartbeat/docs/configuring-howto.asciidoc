@@ -76,12 +76,10 @@ include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :standalone!:
 
 :autodiscoverHints:
-include::{libbeat-dir}/shared-autodiscover.asciidoc[]
-:autodiscoverHints!:
-
 :autodiscoverAWSELB:
 include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 :autodiscoverAWSELB!:
+:autodiscoverHints!:
 
 :standalone:
 include::{libbeat-dir}/yaml.asciidoc[]
