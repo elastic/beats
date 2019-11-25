@@ -27,6 +27,22 @@
           type: integer
           description: >
             Number of currently warming (not active) clusters
+        - name: cluster_updated
+          type: integer
+          description: >
+            Total cluster updates
+        - name: cluster_updated_via_merge
+          type: integer
+          description: >
+            Total cluster updates applied as merged updates
+        - name: update_merge_cancelled
+          type: integer
+          description: >
+            Total merged updates that got cancelled and delivered early
+        - name: update_out_of_merge_window
+          type: integer
+          description: >
+            Total updates which arrived out of a merge window
 
     - name: filesystem
       type: group
@@ -51,6 +67,10 @@
           type: integer
           description: >
             Current total size of internal flush buffer in bytes
+        - name: write_failed
+          type: integer
+          description: >
+            Total number of times an error occurred during a file write operation
 
     - name: runtime
       type: group
@@ -58,11 +78,11 @@
         - name: load_error
           type: integer
           description: >
-            Total number of load attempts that resulted in an error
+            Total number of load attempts that resulted in an error in any layer
         - name: load_success
           type: integer
           description: >
-            Total number of load attempts that were successful
+            Total number of load attempts that were successful at all layers
         - name: num_keys 
           type: integer
           description: >
@@ -77,6 +97,16 @@
             Total number of loads that did not use an override directory
         - name: admin_overrides_active
           type: integer
+          description: >
+            1 if any admin overrides are active otherwise 0
+        - name: deprecated_feature_use
+          type: integer
+          description: >
+            Total number of times deprecated features were used.
+        - name: num_layers
+          type: integer
+          description: >
+            Number of layers currently active (without loading errors)
 
     - name: listener_manager
       type: group
@@ -113,6 +143,10 @@
           type: integer
           description: >
             Number of currently warming listeners
+        - name: listener_stopped
+          type: integer
+          description: >
+            Total listeners stopped
 
     - name: stats
       type: group
@@ -165,6 +199,26 @@
           type: integer
           description: >
             Current hot restart epoch
+        - name: concurrency
+          type: integer
+          description: >
+            Number of worker threads
+        - name: debug_assertion_failures
+          type: integer
+        - name: dynamic_unknown_fields
+          type: integer
+          description: >
+            Number of messages in dynamic configuration with unknown fields
+        - name: state
+          type: integer
+          description: >
+            Current state of the Server
+        - name: static_unknown_fields
+          type: integer
+          description: >
+            Number of messages in static configuration with unknown fields
+        - name: stats_recent_lookups
+          type: integer
 
     - name: http2
       type: group

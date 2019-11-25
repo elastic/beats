@@ -21,8 +21,7 @@ For a metricset to go GA, the following criterias should be met:
 * [ ] Fields follow [ECS](https://github.com/elastic/ecs) and [naming conventions](https://www.elastic.co/guide/en/beats/devguide/master/event-conventions.html)
 * [ ] Dashboards exists (if applicable)
 * [ ] Kibana Home Tutorial (if applicable)
-  * [ ] Open issue in [EUI repo](https://github.com/elastic/eui) to add [icon for module](https://elastic.github.io/eui/#/display/icons) if not already exists.
-  * [ ] Open PR against Kibana repo with tutorial. Examples can be found [here](https://github.com/elastic/kibana/tree/master/src/legacy/core_plugins/kibana/server/tutorials).
+  * Open PR against Kibana repo with tutorial. Examples can be found [here](https://github.com/elastic/kibana/tree/master/src/legacy/core_plugins/kibana/server/tutorials).
 
 ## Filebeat module
 

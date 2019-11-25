@@ -134,7 +134,9 @@ func Update() {
 }
 
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"input/*", "processors/*"}, []string{"module"})
+	options := devtools.DefaultIncludeListOptions()
+	options.ImportDirs = []string{"input/*", "processors/*"}
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
@@ -181,5 +183,5 @@ func PythonIntegTest(ctx context.Context) error {
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
 		return devtools.PythonNoseTest(args)
-	})
+	}, "GENERATE")
 }

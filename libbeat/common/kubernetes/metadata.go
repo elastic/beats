@@ -110,7 +110,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	// Add controller metadata if present
 	if g.IncludeCreatorMetadata {
 		for _, ref := range accessor.GetOwnerReferences() {
-			if *ref.Controller {
+			if ref.Controller != nil && *ref.Controller {
 				switch ref.Kind {
 				// TODO grow this list as we keep adding more `state_*` metricsets
 				case "Deployment",

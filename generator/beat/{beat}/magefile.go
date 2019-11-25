@@ -22,6 +22,7 @@ func init() {
 
 	devtools.BeatDescription = "One sentence description of the Beat."
 	devtools.BeatVendor = "{full_name}"
+	devtools.BeatProjectType = devtools.CommunityProject
 }
 
 // VendorUpdate updates elastic/beats in the vendor dir

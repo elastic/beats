@@ -194,9 +194,6 @@ func (conn *Connection) Send(method, extraPath string,
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
-	if method != "GET" {
-		req.Header.Set("kbn-version", conn.Version.String())
-	}
 
 	for header, values := range headers {
 		for _, value := range values {

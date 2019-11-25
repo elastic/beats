@@ -354,6 +354,14 @@ func TestFindIdentifierFromARN(t *testing.T) {
 			"arn:aws:sns:us-east-1:627959692251:notification-topic-1",
 			"notification-topic-1",
 		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/app/ece-ui/b195d6cf21493989",
+			"app/ece-ui/b195d6cf21493989",
+		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+			"net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+		},
 	}
 
 	for _, c := range cases {

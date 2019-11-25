@@ -1,0 +1,128 @@
+- name: ftp
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek FTP log
+  fields:
+    - name: user
+      type: keyword
+      description: |
+        User name for the current FTP session.
+
+    - name: password
+      type: keyword
+      description: |
+        Password for the current FTP session if captured.
+
+    - name: command
+      type: keyword
+      description: |
+        Command given by the client.
+
+    - name: arg
+      type: keyword
+      description: |
+        Argument for the command if one is given.
+
+    - name: file
+      type: group
+      fields:
+        - name: size
+          type: long
+          description: |
+            Size of the file if the command indicates a file transfer.
+
+        - name: mime_type
+          type: keyword
+          description: |
+            Sniffed mime type of file.
+
+        - name: fuid
+          type: keyword
+          description: |
+            (present if base/protocols/ftp/files.bro is loaded)
+            File unique ID.
+
+    - name: reply
+      type: group
+      fields:
+        - name: code
+          type: integer
+          description: |
+            Reply code from the server in response to the command.
+
+        - name: msg
+          type: keyword
+          description: |
+            Reply message from the server in response to the command.
+
+    - name: data_channel
+      type: group
+      description: |
+        Expected FTP data channel.
+      fields:
+        - name: passive
+          type: boolean
+          description: |
+            Whether PASV mode is toggled for control channel.
+
+        - name: originating_host
+          type: ip
+          description: |
+            The host that will be initiating the data connection.
+
+        - name: response_host
+          type: ip
+          description: |
+            The host that will be accepting the data connection.
+
+        - name: response_port
+          type: integer
+          description: |
+            The port at which the acceptor is listening for the data connection.
+
+    - name: cwd
+      type: keyword
+      description: |
+        Current working directory that this session is in. By making the default value '.', we can indicate that unless something more concrete is discovered that the existing but unknown directory is ok to use.
+
+    - name: cmdarg
+      type: group
+      description: |
+        Command that is currently waiting for a response.
+      fields:
+        - name: cmd
+          type: keyword
+          description: |
+            Command.
+
+        - name: arg
+          type: keyword
+          description: |
+            Argument for the command if one was given.
+
+        - name: seq
+          type: integer
+          description: |
+            Counter to track how many commands have been executed.
+
+    - name: pending_commands
+      type: integer
+      description: |
+        Queue for commands that have been sent but not yet responded to are tracked here.
+
+    - name: passive
+      type: boolean
+      description: |
+        Indicates if the session is in active or passive mode.
+
+    - name: capture_password
+      type: boolean
+      description: |
+        Determines if the password will be captured for this request.
+
+    - name: last_auth_requested
+      type: keyword
+      description: |
+        present if base/protocols/ftp/gridftp.bro is loaded.
+        Last authentication/security mechanism that was used.
