@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build linux darwin windows
-
 package nomad
 
 import (
@@ -39,8 +37,8 @@ func FetchProperties(alloc *nomad.Allocation) map[string]interface{} {
 		"allocation": alloc.ID,
 	}
 
-	if matchs := indexRegex.FindStringSubmatch(alloc.Name); len(matchs) == 2 {
-		index, _ := strconv.Atoi(matchs[1])
+	if matches := indexRegex.FindStringSubmatch(alloc.Name); len(matches) == 2 {
+		index, _ := strconv.Atoi(matches[1])
 		properties["alloc_index"] = index
 	}
 	return properties

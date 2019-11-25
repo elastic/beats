@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build linux darwin windows
-
 package nomad
 
 import (
@@ -71,16 +69,16 @@ func NewClient(address, region, secretID string, httpClient *http.Client) (*noma
 func GetLocalNodeID(client *nomad.Client) (string, error) {
 	info, err := client.Agent().Self()
 	if err != nil {
-		return "", fmt.Errorf("Error querying agent info: %s", err)
+		return "", fmt.Errorf("error querying agent info: %s", err)
 	}
 	clientStats, ok := info.Stats["client"]
 	if !ok {
-		return "", fmt.Errorf("Nomad not running in client mode")
+		return "", fmt.Errorf("error getting client info: omad not running in client mode")
 	}
 
 	nodeID, ok := clientStats["node_id"]
 	if !ok {
-		return "", fmt.Errorf("Failed to determine node ID")
+		return "", fmt.Errorf("failed to determine node ID")
 	}
 
 	return nodeID, nil
