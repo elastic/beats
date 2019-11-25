@@ -251,7 +251,7 @@ func (o *Operator) getMetricbeatEndpoints() []string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		metricEndpoint := a.Monitor().MetricsPath()
+		metricEndpoint := a.Monitor().MetricsPathPrefixed()
 		if metricEndpoint != "" {
 			endpoints = append(endpoints, metricEndpoint)
 		}

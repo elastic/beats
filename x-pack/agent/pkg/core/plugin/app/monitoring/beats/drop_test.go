@@ -17,8 +17,10 @@ func TestMonitoringDrops(t *testing.T) {
 	cases := []testCase{
 		testCase{`/var/lib/drop/abc.sock`, "/var/lib/drop"},
 		testCase{`npipe://drop`, ""},
+		testCase{`http+npipe://drop`, ""},
 		testCase{`\\.\pipe\drop`, ""},
 		testCase{`unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
+		testCase{`http+unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
 		testCase{`file:///var/lib/drop/abc.sock`, "/var/lib/drop"},
 		testCase{`http://localhost/stats`, ""},
 		testCase{`localhost/stats`, ""},

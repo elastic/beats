@@ -14,6 +14,8 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
 )
 
+const httpPlusPrefix = "http+"
+
 // Monitor is a monitoring interface providing information about the way
 // how beat is monitored
 type Monitor struct {
@@ -136,6 +138,11 @@ func (b *Monitor) MetricsPath() string {
 	return b.monitoringEndpoint
 }
 
+// MetricsPathPrefixed return metrics path prefixed with http+ prefix.
+func (b *Monitor) MetricsPathPrefixed() string {
+	return httpPlusPrefix + b.MetricsPath()
+}
+
 func (b *Monitor) monitoringDrop() string {
 	return monitoringDrop(b.monitoringEndpoint)
 }
@@ -149,6 +156,10 @@ func monitoringDrop(path string) (drop string) {
 
 	if strings.Contains(path, "localhost") {
 		return ""
+	}
+
+	if strings.HasPrefix(path, httpPlusPrefix) {
+		path = strings.TrimPrefix(path, httpPlusPrefix)
 	}
 
 	// npipe is virtual without a drop

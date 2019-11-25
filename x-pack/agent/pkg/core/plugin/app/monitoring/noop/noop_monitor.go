@@ -41,3 +41,8 @@ func (b *Monitor) LogPath() string {
 func (b *Monitor) MetricsPath() string {
 	return ""
 }
+
+// MetricsPathPrefixed return metrics path prefixed with http+ prefix.
+func (b *Monitor) MetricsPathPrefixed() string {
+	return ""
+}

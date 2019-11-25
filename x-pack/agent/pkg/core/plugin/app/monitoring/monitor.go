@@ -18,6 +18,7 @@ type Monitor interface {
 	Cleanup() error
 	LogPath() string
 	MetricsPath() string
+	MetricsPathPrefixed() string
 }
 
 // NewMonitor creates a monitor based on a process configuration.
