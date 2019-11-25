@@ -13,14 +13,15 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-// Sarma configuration options
+// Sarama configuration options
 var (
-	brokers = ""
-	version = ""
-	group   = ""
-	topics  = ""
-	oldest  = true
-	verbose = false
+	brokers  = ""
+	version  = ""
+	group    = ""
+	topics   = ""
+	assignor = ""
+	oldest   = true
+	verbose  = false
 )
 
 func init() {
@@ -28,7 +29,8 @@ func init() {
 	flag.StringVar(&group, "group", "", "Kafka consumer group definition")
 	flag.StringVar(&version, "version", "2.1.1", "Kafka cluster version")
 	flag.StringVar(&topics, "topics", "", "Kafka topics to be consumed, as a comma seperated list")
-	flag.BoolVar(&oldest, "oldest", true, "Kafka consumer consume initial ofset from oldest")
+	flag.StringVar(&assignor, "assignor", "range", "Consumer group partition assignment strategy (range, roundrobin, sticky)")
+	flag.BoolVar(&oldest, "oldest", true, "Kafka consumer consume initial offset from oldest")
 	flag.BoolVar(&verbose, "verbose", false, "Sarama logging")
 	flag.Parse()
 
@@ -64,6 +66,17 @@ func main() {
 	config := sarama.NewConfig()
 	config.Version = version
 
+	switch assignor {
+	case "sticky":
+		config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategySticky
+	case "roundrobin":
+		config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRoundRobin
+	case "range":
+		config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRange
+	default:
+		log.Panicf("Unrecognized consumer group partition assignor: %s", assignor)
+	}
+
 	if oldest {
 		config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	}
@@ -72,7 +85,7 @@ func main() {
 	 * Setup a new Sarama consumer group
 	 */
 	consumer := Consumer{
-		ready: make(chan bool, 0),
+		ready: make(chan bool),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -82,8 +95,8 @@ func main() {
 	}
 
 	wg := &sync.WaitGroup{}
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
 		for {
 			if err := client.Consume(ctx, strings.Split(topics, ","), &consumer); err != nil {
@@ -93,7 +106,7 @@ func main() {
 			if ctx.Err() != nil {
 				return
 			}
-			consumer.ready = make(chan bool, 0)
+			consumer.ready = make(chan bool)
 		}
 	}()
 

@@ -76,7 +76,7 @@ class Test(BaseTest):
 
         body = {
             "transient": {
-                "script.max_compilations_rate": "1000/1m"
+                "script.max_compilations_rate": "2000/1m"
             }
         }
 
@@ -249,6 +249,11 @@ def clean_keys(obj):
             # so that the exception mechanism can be triggered when the json is
             # loaded.
             obj["log.file.path"] = filename
+
+    # Remove @timestamp from aws vpc flow log with custom format (with no event.end time).
+    if obj["event.dataset"] == "aws.vpcflow":
+        if "event.end" not in obj:
+            delete_key(obj, "@timestamp")
 
 
 def delete_key(obj, key):
