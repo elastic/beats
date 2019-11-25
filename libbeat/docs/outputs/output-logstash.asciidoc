@@ -49,7 +49,7 @@ endif::[]
 
 ifndef::win-only[]
  
-include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/step-test-config.asciidoc[]
 
 endif::win-only[]
 
