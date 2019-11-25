@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // DataType specifies one of CEF data types.
