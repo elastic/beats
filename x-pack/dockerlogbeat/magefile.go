@@ -96,7 +96,7 @@ func Install() error {
 	return nil
 }
 
-// Create builds and creates a docker plugin
+// Package builds and creates a docker plugin
 func Package() {
 	mg.SerialDeps(Build, Install)
 }
