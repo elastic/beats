@@ -27,7 +27,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const packageSpecFile = "dev-tools/packaging/packages.yml"
+const packageSpecFileOSS = "dev-tools/packaging/packages-oss.yml"
+const packageSpecFileXPack = "dev-tools/packaging/packages-xpack.yml"
 
 // Packages defines the set of packages to be built when the package target is
 // executed.
@@ -36,7 +37,7 @@ var Packages []OSPackageArgs
 // UseCommunityBeatPackaging configures the package target to build packages for
 // a community Beat.
 func UseCommunityBeatPackaging() {
-	MustUsePackaging("community_beat", packageSpecFile)
+	MustUsePackaging("community_beat", packageSpecFileOSS)
 }
 
 // UseElasticBeatPackaging configures the package target to build packages for
@@ -45,19 +46,19 @@ func UseCommunityBeatPackaging() {
 // Elastic License and may contain additional X-Pack features.
 func UseElasticBeatPackaging() {
 	UseElasticBeatOSSPackaging()
-	MustUsePackaging("elastic_beat_xpack_separate_binaries", packageSpecFile)
+	MustUsePackaging("elastic_beat_xpack_separate_binaries", packageSpecFileXPack)
 }
 
 // UseElasticBeatOSSPackaging configures the package target to build OSS
 // packages.
 func UseElasticBeatOSSPackaging() {
-	MustUsePackaging("elastic_beat_oss", packageSpecFile)
+	MustUsePackaging("elastic_beat_oss", packageSpecFileOSS)
 }
 
 // UseElasticBeatXPackPackaging configures the package target to build Elastic
 // licensed (X-Pack) packages.
 func UseElasticBeatXPackPackaging() {
-	MustUsePackaging("elastic_beat_xpack", packageSpecFile)
+	MustUsePackaging("elastic_beat_xpack", packageSpecFileXPack)
 }
 
 // UseElasticBeatWithoutXPackPackaging configures the package target to build
@@ -97,7 +98,7 @@ func LoadLocalNamedSpec(name string) {
 		panic(err)
 	}
 
-	err = LoadNamedSpec(name, filepath.Join(beatsDir, packageSpecFile), "packages.yml")
+	err = LoadNamedSpec(name, filepath.Join(beatsDir, packageSpecFileOSS), "packages.yml")
 	if err != nil {
 		panic(err)
 	}
