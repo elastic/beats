@@ -507,6 +507,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
 - Release kubernetes modules `controllermanager`, `scheduler`, `proxy`, `state_cronjob` and `state_resourcequota` as GA. {pull}14584[14584]
 - Add module for ActiveMQ. {pull}14580[14580]
+- Enable script processor. {pull}14711[14711]
 
 *Packetbeat*
 
