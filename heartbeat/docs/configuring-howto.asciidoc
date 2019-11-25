@@ -76,7 +76,7 @@ include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :standalone!:
 
 :autodiscoverHints:
-include::{libbeat-dir}/docs/shared-autodiscover.asciidoc[]
+include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 :autodiscoverHints!:
 
 :autodiscoverAWSELB:
