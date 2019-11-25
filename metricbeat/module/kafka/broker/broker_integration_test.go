@@ -23,6 +23,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	// Register input module and metricset
@@ -36,11 +38,8 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(8779)))
-	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	m := mbtest.NewFetcher(t, getConfig(service.HostForPort(8779)))
+	m.WriteEvents(t, "")
 }
 
 func TestFetch(t *testing.T) {
@@ -48,13 +47,14 @@ func TestFetch(t *testing.T) {
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
-	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(8779)))
-	metricSet.Fetch(reporter)
-
-	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
-	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	m := mbtest.NewFetcher(t, getConfig(service.HostForPort(8779)))
+	events, errs := m.FetchEvents()
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
 }
 
 func getConfig(host string) map[string]interface{} {
