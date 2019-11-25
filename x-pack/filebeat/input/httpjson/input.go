@@ -29,7 +29,7 @@ const (
 	inputName = "httpjson"
 )
 
-var userAgent = useragent.UserAgent("Filebeat")
+var userAgent = useragent.UserAgent("Filebeat", false)
 
 func init() {
 	err := input.Register(inputName, NewInput)
