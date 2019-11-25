@@ -129,6 +129,51 @@ class TestCommandSetupIndexManagement(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    def test_setup_ilm_policy_no_overwrite(self):
+        """
+        Test setup --index-management respects overwrite configuration
+        """
+
+        # update policy to verify overwrite behaviour
+        self.es.transport.perform_request('PUT', '/_ilm/policy/' + self.index_name,
+                                          body={
+                                              "policy": {
+                                                 "phases": {
+                                                     "delete": {
+                                                         "actions": {
+                                                             "delete": {}
+                                                         }
+                                                     }
+                                                 }
+                                              }
+                                          })
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + self.index_name)
+        assert "delete" in resp[self.index_name]["policy"]["phases"]
+        assert "hot" not in resp[self.index_name]["policy"]["phases"]
+
+        # ensure ilm policy is not overwritten
+        self.render_config()
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
+                                              "-E", "setup.ilm.enabled=true",
+                                              "-E", "setup.ilm.overwrite=false"])
+        assert exit_code == 0
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + self.index_name)
+        assert "delete" in resp[self.index_name]["policy"]["phases"]
+        assert "hot" not in resp[self.index_name]["policy"]["phases"]
+
+        # ensure ilm policy is overwritten
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
+                                              "-E", "setup.ilm.enabled=true",
+                                              "-E", "setup.ilm.overwrite=true"])
+        assert exit_code == 0
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + self.index_name)
+        assert "delete" not in resp[self.index_name]["policy"]["phases"]
+        assert "hot" in resp[self.index_name]["policy"]["phases"]
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_setup_rollover_alias(self):
         """
         Test setup --index-management when ilm.rollover_alias is configured

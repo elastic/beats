@@ -45,6 +45,7 @@ type Supporter interface {
 // Manager uses a ClientHandler to install a policy.
 type Manager interface {
 	Enabled() (bool, error)
+	Overwrite() bool
 
 	EnsureAlias() error
 

@@ -37,5 +37,6 @@ func (*noopSupport) Policy() Policy                  { return Policy{} }
 func (*noopSupport) Manager(_ ClientHandler) Manager { return (*noopManager)(nil) }
 
 func (*noopManager) Enabled() (bool, error)            { return false, nil }
+func (*noopManager) Overwrite() bool                   { return false }
 func (*noopManager) EnsureAlias() error                { return errOf(ErrOpNotAvailable) }
 func (*noopManager) EnsurePolicy(_ bool) (bool, error) { return false, errOf(ErrOpNotAvailable) }

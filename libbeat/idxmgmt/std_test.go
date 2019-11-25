@@ -218,17 +218,17 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 
 func TestIndexManager_VerifySetup(t *testing.T) {
 	for name, setup := range map[string]struct {
-		tmpl, ilm         bool
-		loadTmpl, loadILM LoadMode
-		ok                bool
-		warn              string
+		tmpl_enabled, ilm_enabled, ilm_overwrite bool
+		loadTmpl, loadILM                        LoadMode
+		ok                                       bool
+		warn                                     string
 	}{
 		"load template with ilm without loading ilm": {
-			ilm: true, tmpl: true, loadILM: LoadModeDisabled,
+			ilm_enabled: true, tmpl_enabled: true, loadILM: LoadModeDisabled,
 			warn: "whithout loading ILM policy and alias",
 		},
 		"load ilm without template": {
-			ilm: true, loadILM: LoadModeUnset,
+			ilm_enabled: true, loadILM: LoadModeUnset,
 			warn: "without loading template is not recommended",
 		},
 		"template disabled but loading enabled": {
@@ -236,26 +236,33 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 			warn:     "loading not enabled",
 		},
 		"ilm disabled but loading enabled": {
-			loadILM: LoadModeEnabled, tmpl: true,
+			loadILM: LoadModeEnabled, tmpl_enabled: true,
 			warn: "loading not enabled",
 		},
 		"ilm enabled but loading disabled": {
-			ilm: true, loadILM: LoadModeDisabled,
+			ilm_enabled: true, loadILM: LoadModeDisabled,
 			warn: "loading not enabled",
 		},
 		"template enabled but loading disabled": {
-			tmpl: true, loadTmpl: LoadModeDisabled,
+			tmpl_enabled: true, loadTmpl: LoadModeDisabled,
 			warn: "loading not enabled",
 		},
+		"ilm enabled but overwrite disabled": {
+			tmpl_enabled: true,
+			ilm_enabled:  true, ilm_overwrite: false, loadILM: LoadModeEnabled,
+			warn: "Overwriting ILM policy is disabled",
+		},
 		"everything enabled": {
-			tmpl: true, loadTmpl: LoadModeUnset, ilm: true, loadILM: LoadModeUnset,
+			tmpl_enabled: true,
+			ilm_enabled:  true, ilm_overwrite: true,
 			ok: true,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			cfg, err := common.NewConfigFrom(common.MapStr{
-				"setup.ilm.enabled":      setup.ilm,
-				"setup.template.enabled": setup.tmpl,
+				"setup.ilm.enabled":      setup.ilm_enabled,
+				"setup.ilm.overwrite":    setup.ilm_overwrite,
+				"setup.template.enabled": setup.tmpl_enabled,
 			})
 			require.NoError(t, err)
 			support, err := MakeDefaultSupport(ilm.StdSupport)(nil, beat.Info{}, cfg)

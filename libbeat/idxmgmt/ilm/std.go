@@ -101,6 +101,10 @@ func (m *stdManager) Enabled() (bool, error) {
 	return enabled, nil
 }
 
+func (m *stdManager) Overwrite() bool {
+	return m.overwrite
+}
+
 func (m *stdManager) EnsureAlias() error {
 	if !m.checkExists {
 		return nil
@@ -120,7 +124,7 @@ func (m *stdManager) EnsureAlias() error {
 
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
-	overwrite = overwrite || m.overwrite
+	overwrite = overwrite || m.Overwrite()
 
 	exists := true
 	if m.checkExists && !overwrite {

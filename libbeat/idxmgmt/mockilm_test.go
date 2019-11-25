@@ -79,6 +79,12 @@ func (m *mockILMSupport) Enabled() (bool, error) {
 	return args.Bool(0), args.Error(1)
 }
 
+func onOverwrite() onCall { return makeOnCall("Overwrite") }
+func (m *mockILMSupport) Overwrite() bool {
+	args := m.Called()
+	return args.Bool(0)
+}
+
 func onEnsureAlias() onCall { return makeOnCall("EnsureAlias") }
 func (m *mockILMSupport) EnsureAlias() error {
 	args := m.Called()
