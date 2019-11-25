@@ -31,3 +31,10 @@ func DialContext(npipe string) func(context.Context, string, string) (net.Conn, 
 		return nil, errors.New("named pipe doesn't work on linux")
 	}
 }
+
+// Dial create a Dial to be use with an http.Client to connect to a pipe.
+func Dial(npipe string) func(string, string) (net.Conn, error) {
+	return func(_, _ string) (net.Conn, error) {
+		return nil, errors.New("named pipe doesn't work on linux")
+	}
+}
