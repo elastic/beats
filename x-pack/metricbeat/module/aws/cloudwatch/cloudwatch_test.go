@@ -318,6 +318,36 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		},
 	}
 
+	expectedListMetricsEC2WithDim := listMetricWithDetail{
+		metricsWithStats: []metricsWithStatistics{
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-1"),
+					}},
+					MetricName: awssdk.String("CPUUtilization"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+				[]string{"Average"},
+				nil,
+			},
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-1"),
+					}},
+					MetricName: awssdk.String("DiskReadOps"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+				[]string{"Average"},
+				nil,
+			},
+		},
+		resourceTypeFilters: resourceTypeFiltersEC2,
+	}
+
 	cases := []struct {
 		title                         string
 		cloudwatchMetricsConfig       []Config
@@ -587,6 +617,25 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				resourceTypeFilters: map[string][]aws.Tag{},
 			},
 			expectedNamespaceWithDetailEC2WithNoMetricName,
+		},
+		{
+			"test with two metric names and a set of dimension",
+			[]Config{
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: []string{"CPUUtilization", "DiskReadOps"},
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-1",
+						},
+					},
+					ResourceTypeFilter: "ec2:instance",
+					Statistic:          []string{"Average"},
+				},
+			},
+			expectedListMetricsEC2WithDim,
+			map[string][]namespaceDetail{},
 		},
 	}
 

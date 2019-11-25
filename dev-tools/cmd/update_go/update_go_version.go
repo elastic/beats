@@ -31,9 +31,12 @@ var files = []string{
 	"filebeat/Dockerfile",
 	"heartbeat/Dockerfile",
 	"journalbeat/Dockerfile",
+	"libbeat/Dockerfile",
 	"libbeat/docs/version.asciidoc",
 	"metricbeat/Dockerfile",
+	"metricbeat/module/http/_meta/Dockerfile",
 	"x-pack/functionbeat/Dockerfile",
+	"x-pack/libbeat/Dockerfile",
 }
 
 func main() {

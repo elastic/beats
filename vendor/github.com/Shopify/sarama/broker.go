@@ -387,6 +387,23 @@ func (b *Broker) FetchOffset(request *OffsetFetchRequest) (*OffsetFetchResponse,
 		return nil, err
 	}
 
+	// In new consumer group / partition pairs, Microsoft's Azure Event Hubs
+	// communicates the "no error / new offset" state by omitting the requested
+	// entries from the OffsetFetchResponse (in contrast to other implementations
+	// which indicate this by returning an explicit offset of -1). To handle this
+	// case, we check all entries in the request and add an offset to the response
+	// table for any that are missing.
+	for topic, partitions := range request.partitions {
+		if response.Blocks[topic] == nil {
+			response.Blocks[topic] = make(map[int32]*OffsetFetchResponseBlock)
+		}
+		for _, p := range partitions {
+			if response.Blocks[topic][p] == nil {
+				response.Blocks[topic][p] = &OffsetFetchResponseBlock{Offset: -1}
+			}
+		}
+	}
+
 	return response, nil
 }
 
@@ -659,6 +676,38 @@ func (b *Broker) DeleteGroups(request *DeleteGroupsRequest) (*DeleteGroupsRespon
 	return response, nil
 }
 
+//DescribeLogDirs sends a request to get the broker's log dir paths and sizes
+func (b *Broker) DescribeLogDirs(request *DescribeLogDirsRequest) (*DescribeLogDirsResponse, error) {
+	response := new(DescribeLogDirsResponse)
+
+	err := b.sendAndReceive(request, response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// readFull ensures the conn ReadDeadline has been setup before making a
+// call to io.ReadFull
+func (b *Broker) readFull(buf []byte) (n int, err error) {
+	if err := b.conn.SetReadDeadline(time.Now().Add(b.conf.Net.ReadTimeout)); err != nil {
+		return 0, err
+	}
+
+	return io.ReadFull(b.conn, buf)
+}
+
+// write  ensures the conn WriteDeadline has been setup before making a
+// call to conn.Write
+func (b *Broker) write(buf []byte) (n int, err error) {
+	if err := b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout)); err != nil {
+		return 0, err
+	}
+
+	return b.conn.Write(buf)
+}
+
 func (b *Broker) send(rb protocolBody, promiseResponse bool) (*responsePromise, error) {
 	b.lock.Lock()
 	defer b.lock.Unlock()
@@ -680,14 +729,9 @@ func (b *Broker) send(rb protocolBody, promiseResponse bool) (*responsePromise, 
 		return nil, err
 	}
 
-	err = b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout))
-	if err != nil {
-		return nil, err
-	}
-
 	requestTime := time.Now()
-	bytes, err := b.conn.Write(buf)
-	b.updateOutgoingCommunicationMetrics(bytes) //TODO: should it be after error check
+	bytes, err := b.write(buf)
+	b.updateOutgoingCommunicationMetrics(bytes)
 	if err != nil {
 		return nil, err
 	}
@@ -794,14 +838,7 @@ func (b *Broker) responseReceiver() {
 			continue
 		}
 
-		err := b.conn.SetReadDeadline(time.Now().Add(b.conf.Net.ReadTimeout))
-		if err != nil {
-			dead = err
-			response.errors <- err
-			continue
-		}
-
-		bytesReadHeader, err := io.ReadFull(b.conn, header)
+		bytesReadHeader, err := b.readFull(header)
 		requestLatency := time.Since(response.requestTime)
 		if err != nil {
 			b.updateIncomingCommunicationMetrics(bytesReadHeader, requestLatency)
@@ -828,7 +865,7 @@ func (b *Broker) responseReceiver() {
 		}
 
 		buf := make([]byte, decodedHeader.length-4)
-		bytesReadBody, err := io.ReadFull(b.conn, buf)
+		bytesReadBody, err := b.readFull(buf)
 		b.updateIncomingCommunicationMetrics(bytesReadHeader+bytesReadBody, requestLatency)
 		if err != nil {
 			dead = err
@@ -871,22 +908,17 @@ func (b *Broker) sendAndReceiveSASLHandshake(saslType SASLMechanism, version int
 		return err
 	}
 
-	err = b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout))
-	if err != nil {
-		return err
-	}
-
 	requestTime := time.Now()
-	bytes, err := b.conn.Write(buf)
+	bytes, err := b.write(buf)
 	b.updateOutgoingCommunicationMetrics(bytes)
 	if err != nil {
 		Logger.Printf("Failed to send SASL handshake %s: %s\n", b.addr, err.Error())
 		return err
 	}
 	b.correlationID++
-	//wait for the response
+
 	header := make([]byte, 8) // response header
-	_, err = io.ReadFull(b.conn, header)
+	_, err = b.readFull(header)
 	if err != nil {
 		Logger.Printf("Failed to read SASL handshake header : %s\n", err.Error())
 		return err
@@ -894,7 +926,7 @@ func (b *Broker) sendAndReceiveSASLHandshake(saslType SASLMechanism, version int
 
 	length := binary.BigEndian.Uint32(header[:4])
 	payload := make([]byte, length-4)
-	n, err := io.ReadFull(b.conn, payload)
+	n, err := b.readFull(payload)
 	if err != nil {
 		Logger.Printf("Failed to read SASL handshake payload : %s\n", err.Error())
 		return err
@@ -968,14 +1000,8 @@ func (b *Broker) sendAndReceiveV0SASLPlainAuth() error {
 	binary.BigEndian.PutUint32(authBytes, uint32(length))
 	copy(authBytes[4:], []byte("\x00"+b.conf.Net.SASL.User+"\x00"+b.conf.Net.SASL.Password))
 
-	err := b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout))
-	if err != nil {
-		Logger.Printf("Failed to set write deadline when doing SASL auth with broker %s: %s\n", b.addr, err.Error())
-		return err
-	}
-
 	requestTime := time.Now()
-	bytesWritten, err := b.conn.Write(authBytes)
+	bytesWritten, err := b.write(authBytes)
 	b.updateOutgoingCommunicationMetrics(bytesWritten)
 	if err != nil {
 		Logger.Printf("Failed to write SASL auth header to broker %s: %s\n", b.addr, err.Error())
@@ -983,7 +1009,7 @@ func (b *Broker) sendAndReceiveV0SASLPlainAuth() error {
 	}
 
 	header := make([]byte, 4)
-	n, err := io.ReadFull(b.conn, header)
+	n, err := b.readFull(header)
 	b.updateIncomingCommunicationMetrics(n, time.Since(requestTime))
 	// If the credentials are valid, we would get a 4 byte response filled with null characters.
 	// Otherwise, the broker closes the connection and we get an EOF
@@ -1139,16 +1165,12 @@ func (b *Broker) sendSaslAuthenticateRequest(correlationID int32, msg []byte) (i
 		return 0, err
 	}
 
-	if err := b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout)); err != nil {
-		return 0, err
-	}
-
-	return b.conn.Write(buf)
+	return b.write(buf)
 }
 
 func (b *Broker) receiveSaslAuthenticateResponse(correlationID int32) ([]byte, error) {
 	buf := make([]byte, responseLengthSize+correlationIDSize)
-	_, err := io.ReadFull(b.conn, buf)
+	_, err := b.readFull(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -1164,7 +1186,7 @@ func (b *Broker) receiveSaslAuthenticateResponse(correlationID int32) ([]byte, e
 	}
 
 	buf = make([]byte, header.length-correlationIDSize)
-	_, err = io.ReadFull(b.conn, buf)
+	_, err = b.readFull(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -1219,12 +1241,7 @@ func (b *Broker) sendSASLPlainAuthClientResponse(correlationID int32) (int, erro
 		return 0, err
 	}
 
-	err = b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout))
-	if err != nil {
-		Logger.Printf("Failed to set write deadline when doing SASL auth with broker %s: %s\n", b.addr, err.Error())
-		return 0, err
-	}
-	return b.conn.Write(buf)
+	return b.write(buf)
 }
 
 func (b *Broker) sendSASLOAuthBearerClientMessage(initialResp []byte, correlationID int32) (int, error) {
@@ -1238,24 +1255,17 @@ func (b *Broker) sendSASLOAuthBearerClientMessage(initialResp []byte, correlatio
 		return 0, err
 	}
 
-	if err := b.conn.SetWriteDeadline(time.Now().Add(b.conf.Net.WriteTimeout)); err != nil {
-		return 0, err
-	}
-
-	return b.conn.Write(buf)
+	return b.write(buf)
 }
 
 func (b *Broker) receiveSASLServerResponse(res *SaslAuthenticateResponse, correlationID int32) (int, error) {
-
 	buf := make([]byte, responseLengthSize+correlationIDSize)
-
-	bytesRead, err := io.ReadFull(b.conn, buf)
+	bytesRead, err := b.readFull(buf)
 	if err != nil {
 		return bytesRead, err
 	}
 
 	header := responseHeader{}
-
 	err = decode(buf, &header)
 	if err != nil {
 		return bytesRead, err
@@ -1266,8 +1276,7 @@ func (b *Broker) receiveSASLServerResponse(res *SaslAuthenticateResponse, correl
 	}
 
 	buf = make([]byte, header.length-correlationIDSize)
-
-	c, err := io.ReadFull(b.conn, buf)
+	c, err := b.readFull(buf)
 	bytesRead += c
 	if err != nil {
 		return bytesRead, err

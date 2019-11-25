@@ -58,5 +58,4 @@ output.elasticsearch:
 --------------------------------------------------
 
 To learn more about {stack} security features and other types of
-authentication, see {ref}/elasticsearch-security.html[Securing the
-{stack}].
+authentication, see {ref}/secure-cluster.html[Secure a cluster].

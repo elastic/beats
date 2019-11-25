@@ -1,0 +1,56 @@
+- name: socks
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek SOCKS log.
+  fields:
+    - name: version
+      type: integer
+      description: |
+        Protocol version of SOCKS.
+
+    - name: user
+      type: keyword
+      description: |
+        Username used to request a login to the proxy.
+
+    - name: password
+      type: keyword
+      description: |
+        Password used to request a login to the proxy.
+
+    - name: status
+      type: keyword
+      description: |
+        Server status for the attempt at using the proxy.
+
+    - name: request
+      type: group
+      fields:
+        - name: host
+          type: keyword
+          description: |
+            Client requested SOCKS address. Could be an address, a name or both.
+
+        - name: port
+          type: integer
+          description: |
+            Client requested port.
+
+    - name: bound
+      type: group
+      fields:
+        - name: host
+          type: keyword
+          description: |
+            Server bound address. Could be an address, a name or both.
+
+        - name: port
+          type: integer
+          description: |
+            Server bound port.
+
+    - name: capture_password
+      type: boolean
+      description: |
+        Determines if the password will be captured for this request.

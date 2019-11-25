@@ -49,6 +49,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
@@ -147,6 +148,11 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
+	err := setUmaskWithSettings(settings)
+	if err != nil && err != errNotImplemented {
+		return errw.Wrap(err, "could not set umask")
+	}
+
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
 	version := settings.Version
@@ -406,30 +412,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	r, err := b.setupMonitoring(settings)
 	if err != nil {
 		return err
 	}
-
-	if monitoringCfg.Enabled() {
-		settings := report.Settings{
-			DefaultUsername: settings.Monitoring.DefaultUsername,
-			Format:          reporterSettings.Format,
-			ClusterUUID:     reporterSettings.ClusterUUID,
-		}
-		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
-		if err != nil {
-			return err
-		}
-		defer reporter.Stop()
-
-		// Expose monitoring.cluster_uuid in state API
-		if reporterSettings.ClusterUUID != "" {
-			stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-			monitoringRegistry := stateRegistry.NewRegistry("monitoring")
-			clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
-			clusterUUIDRegVar.Set(reporterSettings.ClusterUUID)
-		}
+	if r != nil {
+		defer r.Stop()
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
@@ -549,6 +537,8 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		}
 
 		if setup.MachineLearning && b.SetupMLCallback != nil {
+			cfgwarn.Deprecate("8.0.0", "Setting up ML using %v is going to be removed. Please use the ML app to setup jobs.", strings.Title(b.Info.Beat))
+			fmt.Println("Setting up ML using setup --machine-learning is going to be removed in 8.0.0. Please use the ML app instead.\nSee more: https://www.elastic.co/guide/en/elastic-stack-overview/current/xpack-ml.html")
 			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 			if err != nil {
 				return err
@@ -891,6 +881,41 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 	return callback, nil
 }
 
+func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
+	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	monitoringClusterUUID, err := monitoring.GetClusterUUID(monitoringCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Expose monitoring.cluster_uuid in state API
+	if monitoringClusterUUID != "" {
+		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+		monitoringRegistry := stateRegistry.NewRegistry("monitoring")
+		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
+		clusterUUIDRegVar.Set(monitoringClusterUUID)
+	}
+
+	if monitoring.IsEnabled(monitoringCfg) {
+		settings := report.Settings{
+			DefaultUsername: settings.Monitoring.DefaultUsername,
+			Format:          reporterSettings.Format,
+			ClusterUUID:     monitoringClusterUUID,
+		}
+		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
+		if err != nil {
+			return nil, err
+		}
+		return reporter, nil
+	}
+
+	return nil, nil
+}
+
 // handleError handles the given error by logging it and then returning the
 // error. If the err is nil or is a GracefulExit error then the method will
 // return nil without logging anything.
@@ -1045,4 +1070,11 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
+}
+
+func setUmaskWithSettings(settings Settings) error {
+	if settings.Umask != nil {
+		return setUmask(*settings.Umask)
+	}
+	return setUmask(0027) // 0640 for files | 0750 for dirs
 }
