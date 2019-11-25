@@ -78,7 +78,7 @@ func (m *mockILMSupport) Manager(_ ilm.ClientHandler) ilm.Manager {
 	return m
 }
 
-func onCheckEnabled() onCall { return makeOnCall("Enabled") }
+func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
 func (m *mockILMSupport) CheckEnabled() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
