@@ -55,7 +55,7 @@ func (b *operatorStream) Execute(cfg *configRequest) error {
 
 func streamFactory(cfg *config.Config, client sender, r reporter) func(*logger.Logger, routingKey) (stream, error) {
 	return func(log *logger.Logger, id routingKey) (stream, error) {
-		// new operator per pipeline to isolate processes without using tags
+		// new operator per stream to isolate processes without using tags
 		operator, err := newOperator(log, cfg, r)
 		if err != nil {
 			return nil, err
