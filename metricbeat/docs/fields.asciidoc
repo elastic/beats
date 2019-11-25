@@ -15436,6 +15436,24 @@ type: float
 
 --
 
+*`kafka.broker.request.produce.failed`*::
++
+--
+The number of failed produce requests
+
+type: float
+
+--
+
+*`kafka.broker.request.fetch.failed`*::
++
+--
+The number of client fetch request failures
+
+type: float
+
+--
+
 *`kafka.broker.replication.leader_elections`*::
 +
 --
@@ -15499,7 +15517,43 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_in`*::
+*`kafka.broker.topic.net.in.bytes_per_sec`*::
++
+--
+The incoming byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.out.bytes_per_sec`*::
++
+--
+The outgoing byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.rejected.bytes_per_sec`*::
++
+--
+The rejected byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.messages_in`*::
++
+--
+The incoming message rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.net.in.bytes_per_sec`*::
 +
 --
 The incoming byte rate
@@ -15508,7 +15562,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_out`*::
+*`kafka.broker.net.out.bytes_per_sec`*::
 +
 --
 The outgoing byte rate
@@ -15517,7 +15571,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_rejected`*::
+*`kafka.broker.net.rejected.bytes_per_sec`*::
 +
 --
 The rejected byte rate
@@ -15526,7 +15580,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.messages_in`*::
+*`kafka.broker.messages_in`*::
 +
 --
 The incoming message rate
@@ -15577,10 +15631,46 @@ type: float
 
 --
 
-*`kafka.consumer.bytes_in`*::
+*`kafka.consumer.in.bytes_per_sec`*::
 +
 --
 The rate of bytes coming in to the consumer
+
+type: float
+
+--
+
+*`kafka.consumer.max_lag`*::
++
+--
+The maximum consumer lag
+
+type: float
+
+--
+
+*`kafka.consumer.zookeeper_commits`*::
++
+--
+The rate of offset commits to ZooKeeper
+
+type: float
+
+--
+
+*`kafka.consumer.kafka_commits`*::
++
+--
+The rate of offset commits to Kafka
+
+type: float
+
+--
+
+*`kafka.consumer.messages_in`*::
++
+--
+The rate of consumer message consumption
 
 type: float
 
@@ -16004,10 +16094,19 @@ type: float
 
 --
 
-*`kafka.producer.bytes_out`*::
+*`kafka.producer.out.bytes_per_sec`*::
 +
 --
 The rate of bytes going out for the producer
+
+type: float
+
+--
+
+*`kafka.producer.message_rate`*::
++
+--
+The producer message rate
 
 type: float
 
