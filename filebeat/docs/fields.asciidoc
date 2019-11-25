@@ -1489,6 +1489,133 @@ type: keyword
 
 --
 
+[float]
+=== vpcflow
+
+Fields for AWS VPC flow logs.
+
+
+
+*`aws.vpcflow.version`*::
++
+--
+The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.account_id`*::
++
+--
+The AWS account ID for the flow log.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.interface_id`*::
++
+--
+The ID of the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.action`*::
++
+--
+The action that is associated with the traffic, ACCEPT or REJECT.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.log_status`*::
++
+--
+The logging status of the flow log, OK, NODATA or SKIPDATA.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.instance_id`*::
++
+--
+The ID of the instance that's associated with network interface for which the traffic is recorded, if the instance is owned by you.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.pkt_srcaddr`*::
++
+--
+The packet-level (original) source IP address of the traffic.
+
+
+type: ip
+
+--
+
+*`aws.vpcflow.pkt_dstaddr`*::
++
+--
+The packet-level (original) destination IP address for the traffic.
+
+
+type: ip
+
+--
+
+*`aws.vpcflow.vpc_id`*::
++
+--
+The ID of the VPC that contains the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.subnet_id`*::
++
+--
+The ID of the subnet that contains the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.tcp_flags`*::
++
+--
+The bitmask value for the following TCP flags: 2=SYN,18=SYN-ACK,1=FIN,4=RST
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.type`*::
++
+--
+The type of traffic: IPv4, IPv6, or EFA.
+
+
+type: keyword
+
+--
+
 [[exported-fields-azure]]
 == Azure fields
 
