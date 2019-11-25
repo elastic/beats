@@ -104,9 +104,13 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		tq.timer.Stop()
-		tq.nextRunAt = &tt.runAt
+		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
+		if !tq.timer.Stop() {
+			<-tq.timer.C
+		}
 		tq.timer.Reset(tt.runAt.Sub(time.Now()))
+
+		tq.nextRunAt = &tt.runAt
 	}
 }
 
