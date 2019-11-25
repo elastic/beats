@@ -47,7 +47,7 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 		th:     timerHeap{},
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
-		timer:  time.NewTimer(0),
+		timer:  time.NewTimer(time.Hour * 86400),
 	}
 	heap.Init(&tq.th)
 
@@ -105,7 +105,9 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
 		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
-		if !tq.timer.Stop() {
+		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
+		// channel is empty (and thus would block)
+		if tq.nextRunAt != nil && !tq.timer.Stop() {
 			<-tq.timer.C
 		}
 		tq.timer.Reset(tt.runAt.Sub(time.Now()))
