@@ -61,18 +61,18 @@ func (m MapStr) Update(d MapStr) {
 	}
 }
 
-// DeepUpdate recursively copies the key-value pairs from d to this map.
-// If the key is present and a map as well, the sub-map will be updated recursively
-// via DeepUpdate.
-// DeepUpdateNoOverwrite is a version of this function that does not
-// overwrite existing values.
+// DeepUpdate recursively copies the key-value pairs from d to this map.
+// If the key is present and a map as well, the sub-map will be updated recursively
+// via DeepUpdate.
+// DeepUpdateNoOverwrite is a version of this function that does not
+// overwrite existing values.
 func (m MapStr) DeepUpdate(d MapStr) {
 	m.deepUpdateMap(d, true)
 }
 
-// DeepUpdateNoOverwrite recursively copies the key-value pairs from d to this map.
-// If a key is already present it will not be overwritten.
-// DeepUpdate is a version of this function that overwrites existing values.
+// DeepUpdateNoOverwrite recursively copies the key-value pairs from d to this map.
+// If a key is already present it will not be overwritten.
+// DeepUpdate is a version of this function that overwrites existing values.
 func (m MapStr) DeepUpdateNoOverwrite(d MapStr) {
 	m.deepUpdateMap(d, false)
 }
