@@ -40,7 +40,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
-- google/pubsub: HTTP User agent is now `Elastic-Heartbeat/Version` instead of `Elastic Heartbeat/Version` to stay RFC compliant. {pull}14748[14748]
+- google pubsub & httpjson inputs: HTTP User agent is now `Elastic-Heartbeat/Version` instead of `Elastic Heartbeat/Version` to stay RFC compliant. {pull}14748[14748]
 
 *Heartbeat*
 
