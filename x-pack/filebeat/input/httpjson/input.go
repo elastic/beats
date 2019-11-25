@@ -279,7 +279,7 @@ func (in *httpjsonInput) run() error {
 	}
 	err = in.processHTTPRequest(ctx, client, req, ri)
 	if err == nil && in.Interval > 0 {
-		ticker := time.NewTicker(time.Duration(in.Interval) * time.Second)
+		ticker := time.NewTicker(in.Interval)
 		defer ticker.Stop()
 		for {
 			select {
