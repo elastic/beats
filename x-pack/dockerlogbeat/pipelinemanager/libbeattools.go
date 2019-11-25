@@ -7,6 +7,7 @@ package pipelinemanager
 import (
 	"crypto/sha1"
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -43,11 +44,17 @@ func makeConfigHash(cfg map[string]string) string {
 
 // load pipeline starts up a new pipeline with the given config
 func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Logger) (*Pipeline, error) {
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting hostname")
+	}
+
 	info := beat.Info{
-		Beat:     "dockerlogbeat",
+		Beat:     "elastic-log-plugin",
 		Version:  "0",
 		Name:     name,
-		Hostname: "dockerbeat.test",
+		Hostname: hostname,
 	}
 
 	newCfg, err := parseCfgKeys(logOptsConfig)
