@@ -50,50 +50,26 @@ type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
 
+// PdhCounterInfo struct contains the performance counter details
 type PdhCounterInfo struct {
-	//Size of the structure, including the appended strings, in bytes.
-	DwLength uint32
-	//Counter type. For a list of counter types, see the Counter Types section of the <a "href=http://go.microsoft.com/fwlink/p/?linkid=84422">Windows Server 2003 Deployment Kit</a>.
-	//The counter type constants are defined in Winperf.h.
-	DwType uint32
-	//Counter version information. Not used.
-	CVersion uint32
-	//Counter status that indicates if the counter value is valid. For a list of possible values,
-	//see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa371894(v=vs.85).aspx">Checking PDH Interface Return Values</a>.
-	CStatus uint32
-	//Scale factor to use when computing the displayable value of the counter. The scale factor is a power of ten.
-	//The valid range of this parameter is PDH_MIN_SCALE (–7) (the returned value is the actual value times 10–⁷) to
-	//PDH_MAX_SCALE (+7) (the returned value is the actual value times 10⁺⁷). A value of zero will set the scale to one, so that the actual value is returned
-	LScale int32
-	//Default scale factor as suggested by the counter's provider.
-	LDefaultScale int32
-	//The value passed in the dwUserData parameter when calling PdhAddCounter.
-	DwUserData *uint32
-	//The value passed in the dwUserData parameter when calling PdhOpenQuery.
-	DwQueryUserData *uint32
-	//Null-terminated string that specifies the full counter path. The string follows this structure in memory.
-	SzFullPath *uint16 // pointer to a string
-	//Null-terminated string that contains the name of the computer specified in the counter path. Is NULL, if the path does not specify a computer.
-	//The string follows this structure in memory.
-	SzMachineName *uint16 // pointer to a string
-	//Null-terminated string that contains the name of the performance object specified in the counter path. The string follows this structure in memory.
-	SzObjectName *uint16 // pointer to a string
-	//Null-terminated string that contains the name of the object instance specified in the counter path. Is NULL, if the path does not specify an instance.
-	//The string follows this structure in memory.
-	SzInstanceName *uint16 // pointer to a string
-	//Null-terminated string that contains the name of the parent instance specified in the counter path. Is NULL, if the path does not specify a parent instance.
-	//The string follows this structure in memory.
+	DwLength         uint32
+	DwType           uint32
+	CVersion         uint32
+	CStatus          uint32
+	LScale           int32
+	LDefaultScale    int32
+	DwUserData       *uint32
+	DwQueryUserData  *uint32
+	SzFullPath       *uint16 // pointer to a string
+	SzMachineName    *uint16 // pointer to a string
+	SzObjectName     *uint16 // pointer to a string
+	SzInstanceName   *uint16 // pointer to a string
 	SzParentInstance *uint16 // pointer to a string
-	//Instance index specified in the counter path. Is 0, if the path does not specify an instance index.
-	DwInstanceIndex uint32 // pointer to a string
-	//Null-terminated string that contains the counter name. The string follows this structure in memory.
-	SzCounterName *uint16 // pointer to a string
-	//padding
-	Padding [4]byte
-	//Help text that describes the counter. Is NULL if the source is a log file.
-	SzExplainText *uint16 // pointer to a string
-	//Start of the string data that is appended to the structure.
-	DataBuffer [1]uint32 // pointer to an extra space
+	DwInstanceIndex  uint32  // pointer to a string
+	SzCounterName    *uint16 // pointer to a string
+	Padding          [4]byte
+	SzExplainText    *uint16   // pointer to a string
+	DataBuffer       [1]uint32 // pointer to an extra space
 }
 
 // PdhCounterValueDouble  for double values
@@ -241,7 +217,7 @@ func PdhExpandCounterPath(utfPath *uint16) ([]uint16, error) {
 	return nil, nil
 }
 
-// PdhGetCounterPath returns the counter information for given handle
+// PdhGetCounterInfo returns the counter information for given handle
 func PdhGetCounterInfo(handle PdhCounterHandle) (*PdhCounterInfo, error) {
 	var bufSize uint32
 	var buff []byte
