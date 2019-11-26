@@ -29,6 +29,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/heartbeat/scheduler/schedule"
@@ -38,7 +40,6 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
-	"github.com/stretchr/testify/require"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
