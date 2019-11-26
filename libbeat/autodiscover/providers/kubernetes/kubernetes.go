@@ -217,7 +217,10 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 
 		// This must be an id that doesn't depend on the state of the container
 		// so it works also on `stop` if containers have been already deleted.
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
+		eventID := fmt.Sprintf("%s", pod.GetObjectMeta().GetUID())
+		if p.bus.GetName() != "metricbeat" {
+			eventID = fmt.Sprintf("%s.%s", eventID, c.Name)
+		}
 
 		cmeta := common.MapStr{
 			"id":      cid,

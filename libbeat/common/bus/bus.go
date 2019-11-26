@@ -29,6 +29,9 @@ type Event common.MapStr
 
 // Bus provides a common channel to emit and listen for Events
 type Bus interface {
+	// New initializes a new bus with the given name and returns it
+	GetName() string
+
 	// Publish an event to the bus
 	Publish(Event)
 
@@ -74,6 +77,11 @@ func NewBusWithStore(name string, size int) Bus {
 		listeners: make([]*listener, 0),
 		store:     make(chan Event, size),
 	}
+}
+
+// GetName returns the name of the bus
+func (b *bus) GetName() string {
+	return b.name
 }
 
 func (b *bus) Publish(e Event) {
