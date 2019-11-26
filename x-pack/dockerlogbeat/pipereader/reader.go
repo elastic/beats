@@ -7,7 +7,6 @@ package pipereader
 import (
 	"context"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"syscall"
@@ -103,7 +102,6 @@ func (reader *PipeReader) getValidLengthFrame() (int, error) {
 		if _, err := io.ReadFull(reader.fifoPipe, reader.lenFrameBuf); err != nil {
 			return 0, err
 		}
-		fmt.Printf("Got length frame of %#v\n", reader.lenFrameBuf)
 		bodyLen := int(reader.byteOrder.Uint32(reader.lenFrameBuf))
 		if bodyLen > 0 {
 			return bodyLen, nil
