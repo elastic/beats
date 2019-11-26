@@ -11286,6 +11286,18 @@ type: object
 
 --
 
+*`logstash.log.pipeline_id`*::
++
+--
+The ID of the pipeline.
+
+
+type: keyword
+
+example: main
+
+--
+
 *`logstash.log.message`*::
 +
 --
