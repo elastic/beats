@@ -313,11 +313,11 @@ func TestIndexManager_Setup(t *testing.T) {
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9-*",
-				"settings.index.lifecycle.name": "test-9.9.9",
+				"settings.index.lifecycle.name": "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 			alias:  "test-9.9.9",
-			policy: "test-9.9.9",
+			policy: "test",
 		},
 		"template default ilm default with alias and policy changed": {
 			cfg: common.MapStr{
@@ -370,7 +370,7 @@ func TestIndexManager_Setup(t *testing.T) {
 				"setup.template.enabled": false,
 			},
 			alias:  "test-9.9.9",
-			policy: "test-9.9.9",
+			policy: "test",
 		},
 		"template disabled ilm disabled, loadMode Overwrite": {
 			cfg: common.MapStr{
@@ -386,20 +386,20 @@ func TestIndexManager_Setup(t *testing.T) {
 			},
 			loadILM: LoadModeForce,
 			alias:   "test-9.9.9",
-			policy:  "test-9.9.9",
+			policy:  "test",
 		},
 		"template loadmode disabled ilm loadMode enabled": {
 			loadTemplate: LoadModeDisabled,
 			loadILM:      LoadModeEnabled,
 			alias:        "test-9.9.9",
-			policy:       "test-9.9.9",
+			policy:       "test",
 		},
 		"template default ilm loadMode disabled": {
 			loadILM: LoadModeDisabled,
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9-*",
-				"settings.index.lifecycle.name": "test-9.9.9",
+				"settings.index.lifecycle.name": "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 		},
