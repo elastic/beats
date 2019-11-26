@@ -264,7 +264,7 @@ func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
 
 func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	testPolicy := Policy{
-		Name: "test-9.9.9",
+		Name: "test",
 		Body: DefaultPolicy,
 	}
 
@@ -305,11 +305,6 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := test.cfg
-			if cfg == nil {
-				cfg = map[string]interface{}{"name": "test"}
-			}
-
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
 			created, err := m.EnsurePolicy(test.overwrite)
