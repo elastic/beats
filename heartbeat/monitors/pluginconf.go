@@ -18,6 +18,8 @@
 package monitors
 
 import (
+	"time"
+
 	"github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/pkg/errors"
@@ -32,6 +34,7 @@ type MonitorPluginInfo struct {
 	Name     string             `config:"name"`
 	Type     string             `config:"type" validate:"required"`
 	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
+	Timeout  time.Duration      `config:"timeout"`
 	Enabled  bool               `config:"enabled"`
 }
 

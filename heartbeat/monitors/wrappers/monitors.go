@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/scheduler/schedule"
+
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
@@ -29,28 +31,27 @@ import (
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, id string, name string, typ string, schedule scheduler.Schedule) []jobs.Job {
+func WrapCommon(js []jobs.Job, id string, name string, typ string, sched *schedule.Schedule, timeout time.Duration) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorStatus,
 			addMonitorDuration,
 		), func() jobs.JobWrapper {
-			return addMonitorMeta(id, name, typ, len(js) > 1, schedule)
+			return addMonitorMeta(id, name, typ, len(js) > 1, sched, timeout)
 		}, func() jobs.JobWrapper {
 			return makeAddSummary()
 		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(id string, name string, typ string, isMulti bool, sched scheduler.Schedule) jobs.JobWrapper {
+func addMonitorMeta(id string, name string, typ string, isMulti bool, sched *schedule.Schedule, timeout time.Duration) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			started := time.Now()
@@ -67,25 +68,33 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, sched sche
 				thisID = fmt.Sprintf("%s-%x", id, urlHash)
 			}
 
-			nextRun := sched.Next(started)
-
 			eventext.MergeEventFields(
 				event,
 				common.MapStr{
 					"monitor": common.MapStr{
-						"id":   thisID,
-						"name": name,
-						"type": typ,
-						"timespan": common.MapStr{
-							"gte": started,
-							"lt":  nextRun,
-						},
+						"id":       thisID,
+						"name":     name,
+						"type":     typ,
+						"timespan": timespan(started, sched, timeout),
 					},
 				},
 			)
 
 			return cont, e
 		}
+	}
+}
+
+func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration) common.MapStr {
+	maxEnd := sched.Next(started)
+
+	if maxEnd.Sub(started) < timeout {
+		maxEnd = started.Add(timeout)
+	}
+
+	return common.MapStr{
+		"gte": started,
+		"lt":  maxEnd,
 	}
 }
 

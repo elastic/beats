@@ -76,7 +76,7 @@ func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "tls", "", "http", sched)[0]
+	job := wrappers.WrapCommon(jobs, "tls", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -304,7 +304,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "test", "", "http", sched)[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -476,7 +476,7 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "test", "", "http", sched)[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

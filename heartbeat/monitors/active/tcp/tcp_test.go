@@ -27,6 +27,7 @@ import (
 	"os"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
@@ -57,7 +58,7 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched)[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -81,7 +82,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched)[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

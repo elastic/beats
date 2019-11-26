@@ -20,7 +20,9 @@ package wrappers
 import (
 	"fmt"
 	"net/url"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/hbtestllext"
@@ -53,7 +55,7 @@ type testDef struct {
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
 		schedule, _ := schedule.Parse("@every 1s")
-		wrapped := WrapCommon(tt.jobs, tt.fields.id, tt.fields.name, tt.fields.typ, schedule)
+		wrapped := WrapCommon(tt.jobs, tt.fields.id, tt.fields.name, tt.fields.typ, schedule, time.Duration(0))
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
@@ -319,4 +321,45 @@ func summaryValidator(up int, down int) validator.Validator {
 			"down": uint16(down),
 		},
 	})
+}
+
+func TestTimespan(t *testing.T) {
+	now := time.Now()
+	sched10s, err := schedule.Parse("@every 10s")
+	require.NoError(t, err)
+
+	type args struct {
+		started time.Time
+		sched   *schedule.Schedule
+		timeout time.Duration
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.MapStr
+	}{
+		{
+			"interval longer than timeout",
+			args{now, sched10s, time.Second},
+			common.MapStr{
+				"gte": now,
+				"lt":  now.Add(time.Second * 10),
+			},
+		},
+		{
+			"timeout longer than interval",
+			args{now, sched10s, time.Second * 20},
+			common.MapStr{
+				"gte": now,
+				"lt":  now.Add(time.Second * 20),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := timespan(tt.args.started, tt.args.sched, tt.args.timeout); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("timespan() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
