@@ -406,6 +406,7 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         extra_vars:
+          image_name: '{{.BeatName}}-ubi'
           from: 'registry.access.redhat.com/ubi7/ubi:7.7'
         files:
           '{{.BeatName}}{{.BinaryExt}}':
