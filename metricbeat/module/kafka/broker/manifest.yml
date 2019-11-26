@@ -19,6 +19,14 @@ input:
         attributes:
           - attr: MeanRate
             field: request.fetch.failed_per_second
+      - mbean: 'kafka.server:name=FailedProduceRequestsPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: request.produce.failed
+      - mbean: 'kafka.server:name=FailedFetchRequestsPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: request.fetch.failed
       - mbean: 'kafka.controller:name=LeaderElectionRateAndTimeMs,type=ControllerStats'
         attributes:
           - attr: MeanRate
@@ -47,19 +55,37 @@ input:
         attributes:
           - attr: MeanRate
             field: log.flush_rate
-      - mbean: 'kafka.server:name=BytesRejectedPerSec,type=BrokerTopicMetrics'
+      - mbean: 'kafka.server:name=BytesRejectedPerSec,topic=*,type=BrokerTopicMetrics'
         attributes:
           - attr: MeanRate
-            field: topic.net.bytes_rejected
-      - mbean: 'kafka.server:name=BytesInPerSec,type=BrokerTopicMetrics'
+            field: topic.net.rejected.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesInPerSec,topic=*,type=BrokerTopicMetrics,topic=*'
         attributes:
           - attr: MeanRate
-            field: topic.net.bytes_in
-      - mbean: 'kafka.server:name=BytesOutPerSec,type=BrokerTopicMetrics'
+            field: topic.net.in.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesOutPerSec,topic=*,type=BrokerTopicMetrics,topic=*'
         attributes:
           - attr: MeanRate
-            field: topic.net.bytes_out
-      - mbean: 'kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec'
+            field: topic.net.out.bytes_per_sec
+      - mbean: 'kafka.server:type=BrokerTopicMetrics,topic=*,name=MessagesInPerSec,topic=*'
         attributes:
           - attr: MeanRate
             field: topic.messages_in
+      - mbean: 'kafka.server:name=BytesRejectedPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: net.rejected.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesInPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: net.in.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesOutPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: net.out.bytes_per_sec
+      - mbean: 'kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec'
+        attributes:
+          - attr: MeanRate
+            field: messages_in
+
+
