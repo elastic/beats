@@ -5,10 +5,41 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.99.32.65",
-			"name": "willfail",
+			"external_name": "www.example.com",
+			"labels": {
+				"label_app": "example4"
+			},
+			"name": "test-service4",
 			"service": {
-				"started": "2019-09-16T12:26:07+02:00"
+				"started": "2017-07-14T04:40:00+02:00"
+			},
+			"type": "ExternalName"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"ingress_hostname": "www.example.com",
+			"ingress_ip": "1.2.3.8",
+			"labels": {
+				"label_app": "example5"
+			},
+			"name": "test-service5",
+			"service": {
+				"started": "2017-07-14T04:40:00+02:00"
 			},
 			"type": "LoadBalancer"
 		},
@@ -29,10 +60,41 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.104.70.53",
-			"name": "willsucceed",
+			"cluster_ip": "1.2.3.5",
+			"labels": {
+				"label_app": "example2"
+			},
+			"name": "test-service2",
 			"service": {
-				"started": "2019-09-16T12:26:07+02:00"
+				"started": "2017-07-14T04:40:00+02:00"
+			},
+			"type": "NodePort"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "1.2.3.6",
+			"labels": {
+				"label_app": "example3"
+			},
+			"load_balancer_ip": "1.2.3.7",
+			"name": "test-service3",
+			"service": {
+				"started": "2017-07-14T04:40:00+02:00"
 			},
 			"type": "LoadBalancer"
 		},
@@ -53,34 +115,13 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.111.59.54",
-			"name": "my-nginx",
-			"service": {
-				"started": "2019-09-06T17:17:01+02:00"
+			"external_ip": "1.2.3.10",
+			"labels": {
+				"label_app": "example6"
 			},
-			"type": "LoadBalancer"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "kube-system"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.96.0.10",
-			"name": "kube-dns",
+			"name": "test-service6",
 			"service": {
-				"started": "2019-08-28T18:26:46+02:00"
+				"started": "2017-07-14T04:40:00+02:00"
 			},
 			"type": "ClusterIP"
 		},
@@ -101,58 +142,13 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.96.0.1",
-			"name": "kubernetes",
-			"service": {
-				"started": "2019-08-28T18:26:42+02:00"
+			"cluster_ip": "1.2.3.4",
+			"labels": {
+				"label_app": "example1"
 			},
-			"type": "ClusterIP"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "rqtest"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.97.184.107",
-			"name": "willsucceed",
+			"name": "test-service1",
 			"service": {
-				"started": "2019-09-16T12:31:26+02:00"
-			},
-			"type": "LoadBalancer"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "kube-system"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.111.114.13",
-			"name": "kube-state-metrics",
-			"service": {
-				"started": "2019-09-11T11:45:18+02:00"
+				"started": "2017-07-14T04:40:00+02:00"
 			},
 			"type": "ClusterIP"
 		},

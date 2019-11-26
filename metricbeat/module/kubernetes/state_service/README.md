@@ -5,21 +5,17 @@ This metricset connects to kube-state-metrics endpoint to retrieve and report Se
 
 ## Version history
 
-## Version history
-
 - November 2019, first release using kube-state-metrics `v1.8.0`.
 
 ## Configuration
 
 See the metricset documentation for the configuration reference.
 
-## Service
+## Manual testing
 
+Create a service. Try different types as:
 
-- Make sure kube controller manager uses `--cluster-signing-cert` and `--cluster-signing-key`.
-- Create a CSR with your tool of choice. Base64 encode the file and remove carriage return.
-- Create the CSR object at kubernetes:
-
+Example:
 ```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -37,10 +33,6 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 9080
-    - name: port90
-      protocol: TCP
-      port: 90
-      targetPort: 9090
 ---
 apiVersion: v1
 kind: Service
@@ -55,33 +47,4 @@ spec:
 EOF
 ```
 
-- Operate on the CSR object (approve, deny)
-
-```bash
-kubectl certificate approve testcert
-```
-
-- Create a number of CSRs (pending, approved, denied, labeled ...)
-- Add labels to the CSR (they will be reported by the metricset)
-- Launch metricbeat enabling this metricset
-
-### Configmap
-
-- Create configmap objects at kubernetes at different namespaces
-
-```bash
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: kube-system
-  name: myconfig
-data:
-  set1: /
-    item1.1=one
-    item1.2=two
-  set2: /
-    item2.1=uno
-    item2.2=dos
-EOF
-```
+Then run metricbeat pointing to the kube-state-metrics endpoint.

@@ -51,17 +51,23 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		prometheus:    prometheus,
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
-				"kube_service_info":      p.InfoMetric(),
-				"kube_service_created":   p.Metric("service.started", p.OpUnixTimestampValue()),
-				"kube_service_spec_type": p.InfoMetric(),
+				"kube_service_info":                         p.InfoMetric(),
+				"kube_service_labels":                       p.ExtendedInfoMetric(p.Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "labels"}),
+				"kube_service_created":                      p.Metric("service.started", p.OpUnixTimestampValue()),
+				"kube_service_spec_type":                    p.InfoMetric(),
+				"kube_service_spec_external_ip":             p.InfoMetric(),
+				"kube_service_status_load_balancer_ingress": p.InfoMetric(),
 			},
 			Labels: map[string]p.LabelMap{
 				"namespace":        p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 				"service":          p.KeyLabel("name"),
 				"cluster_ip":       p.Label("cluster_ip"),
 				"external_name":    p.Label("external_name"),
+				"external_ip":      p.Label("external_ip"),
 				"load_balancer_ip": p.Label("load_balancer_ip"),
 				"type":             p.Label("type"),
+				"ip":               p.Label("ingress_ip"),
+				"hostname":         p.Label("ingress_hostname"),
 			},
 		},
 	}, nil
