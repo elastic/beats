@@ -89,8 +89,7 @@ clean-vendor:
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@# Checks also python files which are not part of the beats
-	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -not -path "*/vendor/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
