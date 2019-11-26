@@ -188,7 +188,7 @@ endif::[]
 ifdef::apm-server[]
 ==== Logstash and ILM
 
-When used with {apm-server-ref}/manual-ilm-setup.html[Index lifecycle management], Logstash does not need to create a new index each day.
+When used with {apm-server-ref}/ilm.html[Index lifecycle management], Logstash does not need to create a new index each day.
 Here's a sample Logstash configuration file that would accomplish this:
 
 [source,logstash]

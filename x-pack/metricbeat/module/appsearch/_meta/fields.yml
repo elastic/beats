@@ -1,8 +1,8 @@
 - key: appsearch
-  title: "appsearch"
+  title: "App Search"
   release: beta
   description: >
-    appsearch module
+    App Search module
   fields:
     - name: appsearch
       type: group

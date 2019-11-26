@@ -20,7 +20,7 @@ class Test(metricbeat.BaseTest):
             "name": "dropwizard",
             "metricsets": ["collector"],
             "hosts": self.get_hosts(),
-            "path": "/test/metrics",
+            "metrics_path": "/test/metrics",
             "period": "1s",
             "namespace": "test",
         }])
