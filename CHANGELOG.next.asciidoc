@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
 - Fix a bug, publisher pipeline exits if output returns an error, irrespective of pipeline is closed or not
 - Fix typo in TLS renegotiation configuration and setting the option correctly {issue}10871[10871], {pull}12354[12354]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
