@@ -1542,6 +1542,12 @@ type: keyword
 --
 
 [float]
+=== billing
+
+`billing` contains the estimated charges for your AWS account in Cloudwatch.
+
+
+[float]
 === cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.

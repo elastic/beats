@@ -1,0 +1,10 @@
+You can monitor your estimated AWS charges by using Amazon CloudWatch. When you
+enable the monitoring of estimated charges for your AWS account, the estimated
+charges are calculated and sent several times daily to CloudWatch as metric data.
+
+Billing metric data is stored in the US East (N. Virginia) Region and represents
+worldwide charges. This data includes the estimated charges for every service in
+AWS that you use, in addition to the estimated overall total of your AWS charges.
+
+This aws `billing` metricset collects these Cloudwatch metrics for monitoring
+purposes.
