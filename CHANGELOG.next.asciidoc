@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
 - Change wording when we fail to load a CA file to the cert pool. {issue}14309[14309]
 - Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
+- Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
 
 *Auditbeat*
 
@@ -168,7 +169,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
 - Fix timezone parsing of elasticsearch module ingest pipelines. {pull}13367[13367]
-- Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
+- Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378] {pull}14754[14754]
 - Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
 - Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
 - Fixed early expiration of templates (Netflow v9 and IPFIX). {pull}13821[13821]
@@ -199,6 +200,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
+- Fix a problem in Filebeat input httpjson where interval is not used as time.Duration. {issue}14752[14752] {pull}14753[14753]
 
 *Heartbeat*
 
