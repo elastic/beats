@@ -34,12 +34,7 @@ func TestOpenSuccessful(t *testing.T) {
 // TestAddCounterInvalidArgWhenQueryClosed will check if addcounter func fails when query is closed.
 func TestAddCounterInvalidArgWhenQueryClosed(t *testing.T) {
 	var q Query
-	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	queryPath, err := q.ExpandWildCardPath(validQuery)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = q.AddCounter(queryPath[0], counter, false)
+	_, err := q.GetCounterPaths(validQuery)
 	assert.EqualValues(t, err, PDH_INVALID_ARGUMENT)
 }
 
@@ -68,7 +63,7 @@ func TestSuccessfulQuery(t *testing.T) {
 	}
 	defer q.Close()
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	queryPath, err := q.ExpandWildCardPath(validQuery)
+	queryPath, err := q.GetCounterPaths(validQuery)
 	if err != nil {
 		t.Fatal(err)
 	}

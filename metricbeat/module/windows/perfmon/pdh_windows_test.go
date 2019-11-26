@@ -44,7 +44,7 @@ func TestPdhOpenQueryInvalidQuery(t *testing.T) {
 func TestPdhAddCounterInvalidCounter(t *testing.T) {
 	handle, err := PdhAddCounter(InvalidQueryHandle, validQuery, 0)
 	assert.EqualValues(t, handle, InvalidCounterHandle)
-	assert.EqualValues(t, err, PDH_INVALID_ARGUMENT)
+	assert.EqualValues(t, err, PDH_INVALID_HANDLE)
 }
 
 // TestPdhGetFormattedCounterValueInvalidCounter will test for invalid counters.

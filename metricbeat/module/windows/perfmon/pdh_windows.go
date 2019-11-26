@@ -23,13 +23,15 @@ import (
 	"strconv"
 	"syscall"
 	"unicode/utf16"
+	"unsafe"
 
 	"golang.org/x/sys/windows"
 )
 
 // Windows API calls
 //sys _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhOpenQueryW
-//sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhAddEnglishCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddCounterW
 //sys _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhRemoveCounter
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValueDouble(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueDouble) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
@@ -38,6 +40,7 @@ import (
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 //sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
+//sys _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetCounterInfoW
 
 type PdhQueryHandle uintptr
 
@@ -46,6 +49,52 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
+
+type PdhCounterInfo struct {
+	//Size of the structure, including the appended strings, in bytes.
+	DwLength uint32
+	//Counter type. For a list of counter types, see the Counter Types section of the <a "href=http://go.microsoft.com/fwlink/p/?linkid=84422">Windows Server 2003 Deployment Kit</a>.
+	//The counter type constants are defined in Winperf.h.
+	DwType uint32
+	//Counter version information. Not used.
+	CVersion uint32
+	//Counter status that indicates if the counter value is valid. For a list of possible values,
+	//see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa371894(v=vs.85).aspx">Checking PDH Interface Return Values</a>.
+	CStatus uint32
+	//Scale factor to use when computing the displayable value of the counter. The scale factor is a power of ten.
+	//The valid range of this parameter is PDH_MIN_SCALE (–7) (the returned value is the actual value times 10–⁷) to
+	//PDH_MAX_SCALE (+7) (the returned value is the actual value times 10⁺⁷). A value of zero will set the scale to one, so that the actual value is returned
+	LScale int32
+	//Default scale factor as suggested by the counter's provider.
+	LDefaultScale int32
+	//The value passed in the dwUserData parameter when calling PdhAddCounter.
+	DwUserData *uint32
+	//The value passed in the dwUserData parameter when calling PdhOpenQuery.
+	DwQueryUserData *uint32
+	//Null-terminated string that specifies the full counter path. The string follows this structure in memory.
+	SzFullPath *uint16 // pointer to a string
+	//Null-terminated string that contains the name of the computer specified in the counter path. Is NULL, if the path does not specify a computer.
+	//The string follows this structure in memory.
+	SzMachineName *uint16 // pointer to a string
+	//Null-terminated string that contains the name of the performance object specified in the counter path. The string follows this structure in memory.
+	SzObjectName *uint16 // pointer to a string
+	//Null-terminated string that contains the name of the object instance specified in the counter path. Is NULL, if the path does not specify an instance.
+	//The string follows this structure in memory.
+	SzInstanceName *uint16 // pointer to a string
+	//Null-terminated string that contains the name of the parent instance specified in the counter path. Is NULL, if the path does not specify a parent instance.
+	//The string follows this structure in memory.
+	SzParentInstance *uint16 // pointer to a string
+	//Instance index specified in the counter path. Is 0, if the path does not specify an instance index.
+	DwInstanceIndex uint32 // pointer to a string
+	//Null-terminated string that contains the counter name. The string follows this structure in memory.
+	SzCounterName *uint16 // pointer to a string
+	//padding
+	Padding [4]byte
+	//Help text that describes the counter. Is NULL if the source is a log file.
+	SzExplainText *uint16 // pointer to a string
+	//Start of the string data that is appended to the structure.
+	DataBuffer [1]uint32 // pointer to an extra space
+}
 
 // PdhCounterValueDouble  for double values
 type PdhCounterValueDouble struct {
@@ -86,6 +135,16 @@ func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	if err := _PdhOpenQuery(dataSourcePtr, userData, &handle); err != nil {
 		return InvalidQueryHandle, PdhErrno(err.(syscall.Errno))
 	}
+	return handle, nil
+}
+
+// PdhAddEnglishCounter adds the specified counter to the query.
+func PdhAddEnglishCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
+	var handle PdhCounterHandle
+	if err := _PdhAddEnglishCounter(query, counterPath, userData, &handle); err != nil {
+		return InvalidCounterHandle, PdhErrno(err.(syscall.Errno))
+	}
+
 	return handle, nil
 }
 
@@ -178,6 +237,27 @@ func PdhExpandCounterPath(utfPath *uint16) ([]uint16, error) {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 		return expandPaths, nil
+	}
+	return nil, nil
+}
+
+// PdhGetCounterPath returns the counter information for given handle
+func PdhGetCounterInfo(handle PdhCounterHandle) (*PdhCounterInfo, error) {
+	var bufSize uint32
+	var buff []byte
+	if err := _PdhGetCounterInfo(handle, 0, &bufSize, nil); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		buff = make([]byte, bufSize)
+		bufSize = uint32(len(buff))
+
+		if err = _PdhGetCounterInfo(handle, 0, &bufSize, &buff[0]); err == nil {
+			counterInfo := (*PdhCounterInfo)(unsafe.Pointer(&buff[0]))
+			if counterInfo != nil {
+				return counterInfo, nil
+			}
+		}
 	}
 	return nil, nil
 }
