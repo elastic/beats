@@ -10,6 +10,7 @@ import metricbeat
 HAPROXY_FIELDS = metricbeat.COMMON_FIELDS + ["haproxy"]
 
 
+@metricbeat.parameterized_with_supported_versions
 class HaproxyTest(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['haproxy']
@@ -95,11 +96,3 @@ class HaproxyTest(metricbeat.BaseTest):
             "period": "5s"
         }])
         self._test_stat()
-
-
-class Haproxy_1_6_Test(HaproxyTest):
-    COMPOSE_ENV = {'HAPROXY_VERSION': '1.6'}
-
-
-class Haproxy_1_7_Test(HaproxyTest):
-    COMPOSE_ENV = {'HAPROXY_VERSION': '1.7'}
