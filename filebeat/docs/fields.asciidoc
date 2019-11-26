@@ -1489,6 +1489,133 @@ type: keyword
 
 --
 
+[float]
+=== vpcflow
+
+Fields for AWS VPC flow logs.
+
+
+
+*`aws.vpcflow.version`*::
++
+--
+The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.account_id`*::
++
+--
+The AWS account ID for the flow log.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.interface_id`*::
++
+--
+The ID of the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.action`*::
++
+--
+The action that is associated with the traffic, ACCEPT or REJECT.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.log_status`*::
++
+--
+The logging status of the flow log, OK, NODATA or SKIPDATA.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.instance_id`*::
++
+--
+The ID of the instance that's associated with network interface for which the traffic is recorded, if the instance is owned by you.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.pkt_srcaddr`*::
++
+--
+The packet-level (original) source IP address of the traffic.
+
+
+type: ip
+
+--
+
+*`aws.vpcflow.pkt_dstaddr`*::
++
+--
+The packet-level (original) destination IP address for the traffic.
+
+
+type: ip
+
+--
+
+*`aws.vpcflow.vpc_id`*::
++
+--
+The ID of the VPC that contains the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.subnet_id`*::
++
+--
+The ID of the subnet that contains the network interface for which the traffic is recorded.
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.tcp_flags`*::
++
+--
+The bitmask value for the following TCP flags: 2=SYN,18=SYN-ACK,1=FIN,4=RST
+
+
+type: keyword
+
+--
+
+*`aws.vpcflow.type`*::
++
+--
+The type of traffic: IPv4, IPv6, or EFA.
+
+
+type: keyword
+
+--
+
 [[exported-fields-azure]]
 == Azure fields
 
@@ -11041,6 +11168,18 @@ type: object
 
 --
 
+*`logstash.log.pipeline_id`*::
++
+--
+The ID of the pipeline.
+
+
+type: keyword
+
+example: main
+
+--
+
 *`logstash.log.message`*::
 +
 --
@@ -11827,7 +11966,20 @@ The attack_pattern for this indicator is a STIX Pattern as specified in STIX Ver
 
 type: keyword
 
-example: [source.ip = '198.51.100.1/32']
+example: [destination:ip = '91.219.29.188/32']
+
+
+--
+
+*`misp.threat_indicator.attack_pattern_kql`*::
++
+--
+The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format. 
+
+
+type: keyword
+
+example: destination.ip: "91.219.29.188/32"
 
 
 --
@@ -20811,6 +20963,154 @@ Current number of MIME entities in the HTTP response message body.
 
 
 type: integer
+
+--
+
+[float]
+=== intel
+
+Fields exported by the Zeek Intel log.
+
+
+
+
+*`zeek.intel.seen.indicator`*::
++
+--
+The intelligence indicator.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.indicator_type`*::
++
+--
+The type of data the indicator represents.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.host`*::
++
+--
+If the indicator type was Intel::ADDR, then this field will be present.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.conn`*::
++
+--
+If the data was discovered within a connection, the connection record should go here to give context to the data.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.where`*::
++
+--
+Where the data was discovered.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.node`*::
++
+--
+The name of the node where the match was discovered.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.uid`*::
++
+--
+If the data was discovered within a connection, the connection uid should go here to give context to the data. If the conn field is provided, this will be automatically filled out.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.seen.f`*::
++
+--
+If the data was discovered within a file, the file record should go here to provide context to the data.
+
+
+type: object
+
+--
+
+*`zeek.intel.seen.fuid`*::
++
+--
+If the data was discovered within a file, the file uid should go here to provide context to the data. If the file record f is provided, this will be automatically filled out.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.matched`*::
++
+--
+Event to represent a match in the intelligence data from data that was seen.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.sources`*::
++
+--
+Sources which supplied data for this match.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.fuid`*::
++
+--
+If a file was associated with this intelligence hit, this is the uid for the file.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.file_mime_type`*::
++
+--
+A mime type if the intelligence hit is related to a file. If the $f field is provided this will be automatically filled out.
+
+
+type: keyword
+
+--
+
+*`zeek.intel.file_desc`*::
++
+--
+Frequently files can be described to give a bit more context. If the $f field is provided this field will be automatically filled out.
+
+
+type: keyword
 
 --
 

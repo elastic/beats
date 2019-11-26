@@ -32,6 +32,9 @@ class ComposeMixin(object):
     # add advertised host environment file
     COMPOSE_ADVERTISED_HOST = False
 
+    # port to advertise when COMPOSE_ADVERTISED_HOST is set to true
+    COMPOSE_ADVERTISED_PORT = None
+
     @classmethod
     def compose_up(cls):
         """
@@ -104,7 +107,7 @@ class ComposeMixin(object):
         sends the proper address to use to the container by adding a
         environment file with the SERVICE_HOST variable set to this value.
         """
-        host = cls.compose_host(service=service)
+        host = cls.compose_host(service=service, port=cls.COMPOSE_ADVERTISED_PORT)
 
         content = "SERVICE_HOST=%s" % host
         info = tarfile.TarInfo(name="/run/compose_env")
