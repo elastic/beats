@@ -63,7 +63,7 @@ func createApplication(
 		return nil, err
 	}
 
-	router, err := newRouter(log, pipelineFactory(config, client, reporter))
+	router, err := newRouter(log, streamFactory(config, client, reporter))
 	if err != nil {
 		return nil, errors.Wrap(err, "initiating application")
 	}

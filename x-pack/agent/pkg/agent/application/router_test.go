@@ -44,7 +44,7 @@ type notifyFunc func(routingKey, rOp, ...interface{})
 func TestRouter(t *testing.T) {
 	programs := []program.Program{program.Program{Spec: program.Supported[1]}}
 
-	t.Run("create new and destroy unused pipeline", func(t *testing.T) {
+	t.Run("create new and destroy unused stream", func(t *testing.T) {
 		recorder := &recorder{}
 		r, err := newRouter(nil, recorder.factory)
 		require.NoError(t, err)
@@ -71,7 +71,7 @@ func TestRouter(t *testing.T) {
 		}, recorder.events)
 	})
 
-	t.Run("multiples create new and destroy unused pipeline", func(t *testing.T) {
+	t.Run("multiples create new and destroy unused stream", func(t *testing.T) {
 		k1 := "KEY_1"
 		k2 := "KEY_2"
 
@@ -112,7 +112,7 @@ func TestRouter(t *testing.T) {
 		}, recorder.events)
 	})
 
-	t.Run("create new and delegate program to existing pipeline", func(t *testing.T) {
+	t.Run("create new and delegate program to existing stream", func(t *testing.T) {
 		recorder := &recorder{}
 		r, err := newRouter(nil, recorder.factory)
 		require.NoError(t, err)
@@ -136,7 +136,7 @@ func TestRouter(t *testing.T) {
 		}, recorder.events)
 	})
 
-	t.Run("when no pipelines are detected we shutdown all the running pipelines", func(t *testing.T) {
+	t.Run("when no stream are detected we shutdown all the running streams", func(t *testing.T) {
 		k1 := "KEY_1"
 		k2 := "KEY_2"
 
@@ -174,8 +174,8 @@ type recorder struct {
 	events []event
 }
 
-func (r *recorder) factory(_ *logger.Logger, rk routingKey) (pipeline, error) {
-	return newMockPipeline(rk, r.notify), nil
+func (r *recorder) factory(_ *logger.Logger, rk routingKey) (stream, error) {
+	return newMockStream(rk, r.notify), nil
 }
 
 func (r *recorder) notify(rk routingKey, op rOp, args ...interface{}) {
@@ -186,30 +186,30 @@ func (r *recorder) reset() {
 	r.events = nil
 }
 
-type mockPipeline struct {
+type mockStream struct {
 	rk     routingKey
 	notify notifyFunc
 }
 
-func newMockPipeline(rk routingKey, notify notifyFunc) *mockPipeline {
+func newMockStream(rk routingKey, notify notifyFunc) *mockStream {
 	notify(rk, createOp)
-	return &mockPipeline{
+	return &mockStream{
 		rk:     rk,
 		notify: notify,
 	}
 }
 
-func (m *mockPipeline) Execute(req *configRequest) error {
+func (m *mockStream) Execute(req *configRequest) error {
 	m.event(executeOp, req)
 	return nil
 }
 
-func (m *mockPipeline) Close() error {
+func (m *mockStream) Close() error {
 	m.event(closeOp)
 	return nil
 }
 
-func (m *mockPipeline) event(op rOp, args ...interface{}) {
+func (m *mockStream) event(op rOp, args ...interface{}) {
 	m.notify(m.rk, op, args...)
 }
 
