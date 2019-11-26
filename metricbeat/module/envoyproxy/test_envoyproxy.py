@@ -6,6 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['envoyproxy']
@@ -32,7 +33,3 @@ class Test(metricbeat.BaseTest):
         print(evt)
 
         self.assert_fields_are_documented(evt)
-
-
-class TestEnvoyProxy1_12(Test):
-    COMPOSE_ENV = {'ENVOYPROXY_VERSION': 'v1.12.0'}
