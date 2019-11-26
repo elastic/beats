@@ -23,6 +23,7 @@ CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
                   "max_input_buffer", "max_output_buffer"]
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['redis']
@@ -163,11 +164,3 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(fields, redis_info.keys())
         self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
-
-
-class TestRedis4(Test):
-    COMPOSE_ENV = {'REDIS_VERSION': '4.0.11'}
-
-
-class TestRedis5(Test):
-    COMPOSE_ENV = {'REDIS_VERSION': '5.0.5'}
