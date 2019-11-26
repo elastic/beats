@@ -98,23 +98,23 @@ func (c *syslogClient) CreateSyslogString(event publisher.Event) (string, error)
 	// We need it in RFC3339 format for syslog
 	ts := time.Time(event.Content.Timestamp).UTC().Format(time.RFC3339)
 
-	var local_prog string = c.syslogProgram
-	var local_pri uint64 = c.syslogPriority
-	var local_sev uint64 = c.syslogSeverity
+	var localProg string = c.syslogProgram
+	var localPri uint64 = c.syslogPriority
+	var localSev uint64 = c.syslogSeverity
 
 	// check for overrides from the event, if event["fields"] exists
 	if len(event.Content.Fields) > 0 {
 		// A value for program may have bean supplied in the config.
-		if program_name, ok := event.Content.GetValue("program"); ok == nil {
-			local_prog = program_name.(string)
+		if programName, ok := event.Content.GetValue("program"); ok == nil {
+			localProg = programName.(string)
 		}
 		// A value for priority may have bean supplied in the config.
-		if priority_num, ok := event.Content.GetValue("priority"); ok == nil {
-			local_pri = priority_num.(uint64)
+		if priorityNum, ok := event.Content.GetValue("priority"); ok == nil {
+			localPri = priorityNum.(uint64)
 		}
 		// A value for severity may have bean supplied in the config.
-		if severity_num, ok := event.Content.GetValue("severity"); ok == nil {
-			local_sev = severity_num.(uint64)
+		if severityNum, ok := event.Content.GetValue("severity"); ok == nil {
+			localSev = severityNum.(uint64)
 		}
 	}
 	// Calculate the RPI number for the protocol according to RFC5424
@@ -122,13 +122,13 @@ func (c *syslogClient) CreateSyslogString(event publisher.Event) (string, error)
 	// If the priority is zero but the severity is not, print a
 	// leading zero followed by the severity.
 	// otherwise, multiple the priority by 8, and add the severity
-	var pri_num string
-	if local_pri == 0 && local_sev == 0 {
-		pri_num = "0"
-	} else if local_pri == 0 && local_sev != 0 {
-		pri_num = fmt.Sprintf("0%d", local_sev)
+	var priNum string
+	if localPri == 0 && localSev == 0 {
+		priNum = "0"
+	} else if localPri == 0 && localSev != 0 {
+		priNum = fmt.Sprintf("0%d", localSev)
 	} else {
-		pri_num = fmt.Sprintf("%d", ((local_pri * 8) + local_sev))
+		priNum = fmt.Sprintf("%d", ((localPri * 8) + localSev))
 	}
 
 	var filesetName string = "-"
@@ -138,6 +138,6 @@ func (c *syslogClient) CreateSyslogString(event publisher.Event) (string, error)
 
 	// this is the log line which was read in.
 	msg, err := event.Content.GetValue("message")
-	line := fmt.Sprintf("<%s>%s %s %s[%s]: %s\n", pri_num, ts, c.hostname, local_prog, filesetName, msg)
+	line := fmt.Sprintf("<%s>%s %s %s[%s]: %s\n", priNum, ts, c.hostname, localProg, filesetName, msg)
 	return line, err
 }
