@@ -474,7 +474,8 @@ func TestRedirect(t *testing.T) {
 	jobs, _, err := create("redirect", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
