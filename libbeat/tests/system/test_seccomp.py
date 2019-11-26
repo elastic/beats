@@ -4,8 +4,8 @@ from base import BaseTest
 
 
 def is_version_below(version, target):
-    t = map(int, target.split('.'))
-    v = map(int, version.split('.'))
+    t = list(map(int, target.split('.')))
+    v = list(map(int, version.split('.')))
     v += [0] * (len(t) - len(v))
     for i in range(len(t)):
         if v[i] != t[i]:

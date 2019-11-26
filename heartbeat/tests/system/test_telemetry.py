@@ -1,5 +1,7 @@
 from heartbeat import BaseTest
-import urllib2
+import urllib.request
+import urllib.error
+import urllib.parse
 import json
 import nose.tools
 import os
@@ -90,7 +92,7 @@ class Test(BaseTest):
 
     @staticmethod
     def assert_state(expected={}):
-        stats = json.loads(urllib2.urlopen(
+        stats = json.loads(urllib.request.urlopen(
             "http://localhost:5066/state").read())
 
         total_monitors = 0
@@ -113,7 +115,7 @@ class Test(BaseTest):
 
     @staticmethod
     def assert_stats(expected={}):
-        stats = json.loads(urllib2.urlopen(
+        stats = json.loads(urllib.request.urlopen(
             "http://localhost:5066/stats").read())
 
         for proto in ("http", "tcp", "icmp"):

@@ -93,7 +93,7 @@ class Test(BaseTest):
         es = self.es_client()
         self.copy_files(["template.json"])
         path = os.path.join(self.working_dir, "template.json")
-        print path
+        print(path)
 
         self.render_config_template(
             elasticsearch={"hosts": self.get_host()},

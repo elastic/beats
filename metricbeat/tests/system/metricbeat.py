@@ -97,14 +97,14 @@ class BaseTest(TestCase):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        print output
+        print(output)
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print(evt)
 
         fields = COMMON_FIELDS + fields
-        print fields
-        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+        print(fields)
+        self.assertItemsEqual(self.de_dot(fields), list(evt.keys()))
 
         self.assert_fields_are_documented(evt)
 

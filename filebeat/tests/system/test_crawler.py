@@ -551,19 +551,19 @@ class Test(BaseTest):
         # Sample texts are from http://www.columbia.edu/~kermit/utf8.html
         encodings = [
             # golang, python, sample text
-            ("plain", "ascii", u"I can eat glass"),
+            ("plain", "ascii", "I can eat glass"),
             ("utf-8", "utf_8",
-             u"ὕαλον ϕαγεῖν δύναμαι· τοῦτο οὔ με βλάπτει."),
+             "ὕαλον ϕαγεῖν δύναμαι· τοῦτο οὔ με βλάπτει."),
             ("utf-16be", "utf_16_be",
-             u"Pot să mănânc sticlă și ea nu mă rănește."),
+             "Pot să mănânc sticlă și ea nu mă rănește."),
             ("utf-16le", "utf_16_le",
-             u"काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
+             "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
             ("latin1", "latin1",
-             u"I kå Glas frässa, ond des macht mr nix!"),
-            ("BIG5", "big5", u"我能吞下玻璃而不傷身體。"),
-            ("gb18030", "gb18030", u"我能吞下玻璃而不傷身。體"),
-            ("euc-kr", "euckr", u" 나는 유리를 먹을 수 있어요. 그래도 아프지 않아요"),
-            ("euc-jp", "eucjp", u"私はガラスを食べられます。それは私を傷つけません。")
+             "I kå Glas frässa, ond des macht mr nix!"),
+            ("BIG5", "big5", "我能吞下玻璃而不傷身體。"),
+            ("gb18030", "gb18030", "我能吞下玻璃而不傷身。體"),
+            ("euc-kr", "euckr", " 나는 유리를 먹을 수 있어요. 그래도 아프지 않아요"),
+            ("euc-jp", "eucjp", "私はガラスを食べられます。それは私を傷つけません。")
         ]
 
         # create a file in each encoding

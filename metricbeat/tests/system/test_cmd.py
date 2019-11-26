@@ -143,7 +143,7 @@ class TestCommands(metricbeat.BaseTest):
             ))
         except:
             # Print log to help debugging this if error message changes
-            print self.get_log()
+            print(self.get_log())
             raise
         assert self.log_contains("cpu...OK")
         assert self.log_contains("memory...OK")

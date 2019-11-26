@@ -1,9 +1,9 @@
-from __future__ import absolute_import
+
 import os
 import sys
 import tarfile
 import time
-import StringIO
+import io
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
@@ -111,12 +111,12 @@ class ComposeMixin(object):
 
         content = "SERVICE_HOST=%s" % host
         info = tarfile.TarInfo(name="/run/compose_env")
-        info.mode = 0100644
+        info.mode = 0o100644
         info.size = len(content)
 
-        data = StringIO.StringIO()
+        data = io.StringIO()
         tar = tarfile.TarFile(fileobj=data, mode='w')
-        tar.addfile(info, StringIO.StringIO(content))
+        tar.addfile(info, io.StringIO(content))
         tar.close()
 
         containers = project.containers(service_names=[service])
@@ -150,7 +150,7 @@ class ComposeMixin(object):
         run from another container in the same network. It also works when
         running from the host network if the docker daemon runs natively.
         """
-        networks = info['NetworkSettings']['Networks'].values()
+        networks = list(info['NetworkSettings']['Networks'].values())
         port = port.split("/")[0]
         for network in networks:
             ip = network['IPAddress']
@@ -184,7 +184,7 @@ class ComposeMixin(object):
         if len(portsConfig) == 0:
             raise Exception("No exposed ports for service %s" % service)
         if port is None:
-            port = portsConfig.keys()[0]
+            port = list(portsConfig.keys())[0]
 
         # We can use _exposed_host for all platforms when we can use host network
         # in the metricbeat container
@@ -199,7 +199,7 @@ class ComposeMixin(object):
         def positivehash(x):
             return hash(x) % ((sys.maxsize+1) * 2)
 
-        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
+        return "%s_%X" % (basename, positivehash(frozenset(list(cls.COMPOSE_ENV.items()))))
 
     @classmethod
     def compose_project(cls):

@@ -17,8 +17,8 @@ def is_root():
 
 
 def is_version_below(version, target):
-    t = map(int, target.split('.'))
-    v = map(int, version.split('.'))
+    t = list(map(int, target.split('.')))
+    v = list(map(int, version.split('.')))
     v += [0] * (len(t) - len(v))
     for i in range(len(t)):
         if v[i] != t[i]:
@@ -151,8 +151,8 @@ class Test(AuditbeatXPackTest):
             try:
                 self.wait_until(lambda: self.log_contains('system/socket dataset is running.'),
                                 max_timeout=60)
-            except Exception, e:
-                raise Exception('Auditbeat failed to start start'), None, sys.exc_info()[2]
+            except Exception as e:
+                raise Exception('Auditbeat failed to start start').with_traceback(sys.exc_info()[2])
             self.execute(test)
         finally:
             proc.check_kill_and_wait()
@@ -178,8 +178,8 @@ class Test(AuditbeatXPackTest):
 
         try:
             self.wait_until(lambda: self.output_lines() > 0, max_timeout=15)
-        except Exception, e:
-            raise Exception('No output received form Auditbeat'), None, sys.exc_info()[2]
+        except Exception as e:
+            raise Exception('No output received form Auditbeat').with_traceback(sys.exc_info()[2])
 
         expected = test.expected()
         found = False
@@ -193,7 +193,7 @@ class Test(AuditbeatXPackTest):
             )
 
     def flattened_output(self):
-        return map(lambda x: self.flatten_object(x, {}), self.read_output_json())
+        return [self.flatten_object(x, {}) for x in self.read_output_json()]
 
 
 def pretty_print_json(d):
@@ -671,7 +671,7 @@ class DNSTestCase:
         ]
         if not self.dns_enabled:
             for ev in expected_events:
-                for k in filter(lambda x: x.endswith('.domain'), ev.keys()):
+                for k in [x for x in list(ev.keys()) if x.endswith('.domain')]:
                     ev[k] = None
 
         return HasEvent(expected_events)
@@ -735,7 +735,7 @@ class HasEvent:
         for (iexp, exp) in enumerate(expected):
             for (idoc, doc) in enumerate(documents):
                 if all((k in doc and (doc[k] == v or callable(v) and v(doc[k]))) or (v is None and k not in doc)
-                       for k, v in exp.items()):
+                       for k, v in list(exp.items())):
                     break
             else:
                 return False

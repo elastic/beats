@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 import glob
 import os
@@ -409,7 +409,7 @@ if __name__ == "__main__":
     dependencies = create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile, overrides=overrides)
 
     # check that all licenses are accepted
-    for _, deps in dependencies.items():
+    for _, deps in list(dependencies.items()):
         for dep in deps:
             if dep["license_summary"] not in ACCEPTED_LICENSES:
                 raise Exception("Dependency {} has invalid license {}"

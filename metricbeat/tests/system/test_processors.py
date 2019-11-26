@@ -32,17 +32,17 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         print(evt)
-        print(evt.keys())
+        print(list(evt.keys()))
         self.assertItemsEqual(self.de_dot([
             'agent', '@timestamp', 'system', 'metricset.module',
             'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
-        ]), evt.keys())
+        ]), list(evt.keys()))
         cpu = evt["system"]["cpu"]
-        print(cpu.keys())
+        print(list(cpu.keys()))
         self.assertItemsEqual(self.de_dot([
             "system", "cores", "user", "softirq", "iowait",
             "idle", "irq", "steal", "nice", "total"
-        ]), cpu.keys())
+        ]), list(cpu.keys()))
 
     def test_dropfields_with_condition(self):
         """
@@ -283,7 +283,7 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
 
         print(evt)
-        print(evt.keys())
+        print(list(evt.keys()))
 
         assert "dataset" not in output[0]["event"]
         assert "cpu" in output[0]["hello"]["world"]

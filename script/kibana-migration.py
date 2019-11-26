@@ -3,17 +3,17 @@ import glob
 
 
 def migration():
-    print "Start Kibana files migration"
+    print("Start Kibana files migration")
 
-    print "Migrate all fields to the ECS fields"
+    print("Migrate all fields to the ECS fields")
     migration_fields = read_migration_fields()
     rename_entries(migration_fields)
 
-    print "Postfix all ids with -ecs"
+    print("Postfix all ids with -ecs")
     ids = get_replaceable_ids()
     rename_entries(ids)
 
-    print "Postfix all titles with ` ECS`"
+    print("Postfix all titles with ` ECS`")
     titles = get_replacable_titles()
     rename_entries(titles)
 
@@ -48,7 +48,7 @@ def read_migration_fields():
                     continue
                 if k["alias"] == False:
                     continue
-                if not isinstance(k["to"], basestring):
+                if not isinstance(k["to"], str):
                     continue
 
                 # Add "{}" around fields to make them more unique and not have false positives
@@ -86,7 +86,7 @@ def rename_entries(renames):
     files = get_files()
 
     for file in files:
-        print file
+        print(file)
         s = open(file).read()
         for k in renames:
             s = s.replace(k, renames[k])

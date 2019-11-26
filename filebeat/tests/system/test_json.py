@@ -253,7 +253,7 @@ class Test(BaseTest):
         output = self.read_output()
 
         assert len(output) == 3
-        for i in xrange(len(output)):
+        for i in range(len(output)):
             assert("@metadata.id" in output[i])
             assert(output[i]["@metadata.id"] == str(i))
             assert("json.id" not in output[i])

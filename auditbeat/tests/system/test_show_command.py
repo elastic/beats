@@ -122,5 +122,5 @@ class Test(BaseTest):
             assert n >= 0, "Field '{0}' has negative value {1}".format(k, v)
             fields[k] = True
 
-        for (k, v) in fields.iteritems():
+        for (k, v) in fields.items():
             assert v, "Field {0} not found".format(k)

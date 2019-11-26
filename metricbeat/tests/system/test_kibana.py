@@ -2,7 +2,9 @@ import os
 import metricbeat
 import unittest
 from nose.plugins.skip import SkipTest
-import urllib2
+import urllib.request
+import urllib.error
+import urllib.parse
 import json
 import semver
 
@@ -43,7 +45,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertTrue(len(output) >= 1)
         evt = output[0]
-        print evt
+        print(evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -74,7 +76,7 @@ class Test(metricbeat.BaseTest):
 
     def get_version(self):
         host = self.get_hosts()[0]
-        res = urllib2.urlopen("http://" + host + "/api/status").read()
+        res = urllib.request.urlopen("http://" + host + "/api/status").read()
 
         body = json.loads(res)
         version = body["version"]["number"]

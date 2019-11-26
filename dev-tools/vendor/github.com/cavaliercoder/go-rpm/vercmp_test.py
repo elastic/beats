@@ -71,11 +71,11 @@ versions = [
   "22.svn458.el7",
 ]
 
-print "\t// tests generated with version_test.py"
-print "\ttests := []VerTest{"
+print("\t// tests generated with version_test.py")
+print("\ttests := []VerTest{")
 
 for x in versions:
   for y in versions:
-    print "\t\tVerTest{\"" + x + "\", \"" + y + "\",", rpm.labelCompare(("0", "0", x), ("0", "0", y)), "},"
+    print("\t\tVerTest{\"" + x + "\", \"" + y + "\",", rpm.labelCompare(("0", "0", x), ("0", "0", y)), "},")
 
-print "\t}"
+print("\t}")

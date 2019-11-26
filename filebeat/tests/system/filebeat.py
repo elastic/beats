@@ -116,7 +116,7 @@ class Registry:
             entries = json.load(f)
 
         if filter:
-            entries = [x for x in entries if filter(x)]
+            entries = [x for x in entries if list(filter(x))]
         return entries
 
     def count(self, filter=None):
@@ -138,7 +138,7 @@ class LogState:
             def filter(x): return True
         with open(self.path, "r") as f:
             f.seek(self.off)
-            return [l for l in f if filter(l)]
+            return [l for l in f if list(filter(l))]
 
     def contains(self, msg, ignore_case=False, count=1):
         if ignore_case:
