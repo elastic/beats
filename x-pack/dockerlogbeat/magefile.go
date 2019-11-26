@@ -131,8 +131,8 @@ func Package() {
 	mg.SerialDeps(Build, Install)
 }
 
-// BuildTar builds a "release" tarball that can be used later with `docker pugin create`
-func BuildTar() error {
+// Release builds a "release" tarball that can be used later with `docker pugin create`
+func Release() error {
 	mg.Deps(Build)
 	name, err := getPluginName()
 	if err != nil {
