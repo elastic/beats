@@ -2873,6 +2873,30 @@
 			"versionExact": "v1.4.0"
 		},
 		{
+			"checksumSHA1": "V+r7NSRZqAx2HLhhvOfw9+ctIlI=",
+			"path": "github.com/elastic/go-concert",
+			"revision": "fde4d7dd2a8c9d3f3c1fc9d22c09dace470433ae",
+			"revisionTime": "2019-09-11T17:14:06Z"
+		},
+		{
+			"checksumSHA1": "6FjgowCMg4JtLjSvnbVilbRlNu4=",
+			"path": "github.com/elastic/go-concert/atomic",
+			"revision": "fde4d7dd2a8c9d3f3c1fc9d22c09dace470433ae",
+			"revisionTime": "2019-09-11T17:14:06Z"
+		},
+		{
+			"checksumSHA1": "RErDB+9dmVYyDazSPDeRZ+L5Blo=",
+			"path": "github.com/elastic/go-concert/chorus",
+			"revision": "fde4d7dd2a8c9d3f3c1fc9d22c09dace470433ae",
+			"revisionTime": "2019-09-11T17:14:06Z"
+		},
+		{
+			"checksumSHA1": "Ft8EkWsK3G7gCn093PmgwDtqwyw=",
+			"path": "github.com/elastic/go-concert/unison",
+			"revision": "fde4d7dd2a8c9d3f3c1fc9d22c09dace470433ae",
+			"revisionTime": "2019-09-11T17:14:06Z"
+		},
+		{
 			"checksumSHA1": "vNnw1bUS8Ct+8H64QuA2DWRJ9SQ=",
 			"path": "github.com/elastic/go-libaudit",
 			"revision": "39073a2988f718067d85d27a4d18b1b57de5d947",

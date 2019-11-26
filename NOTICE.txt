@@ -1265,6 +1265,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-concert
+Revision: fde4d7dd2a8c9d3f3c1fc9d22c09dace470433ae
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-concert/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
 Version: v0.4.0
 Revision: 39073a2988f718067d85d27a4d18b1b57de5d947
