@@ -438,16 +438,13 @@ func TestEndToEndACK(t *testing.T) {
 
 	runTestWithACKer(t, cfg, halfAcker, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
 		createTopic(t, client)
+		createSubscription(t, client)
 
-		group, ctx := errgroup.WithContext(context.Background())
+		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
 		const numMsgs = 10
-		time.AfterFunc(10*time.Millisecond, ifNotDone(ctx, func() {
-			for i := 0; i < numMsgs; i++ {
-				publishMessages(t, client, 1)
-			}
-		}))
+		publishMessages(t, client, numMsgs)
 		events, ok := out.waitForEvents(numMsgs)
 		if !ok {
 			t.Fatalf("Expected %d events, but got %d.", 1, len(events))
