@@ -18,7 +18,7 @@ var security = (function () {
         "10": "RemoteInteractive",
         "11": "CachedInteractive",
     };
-    
+
     // User Account Control Attributes Table
     // https://support.microsoft.com/es-us/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties
     var uac_flags = [
@@ -45,7 +45,7 @@ var security = (function () {
         [0x1000000, 'TRUSTED_TO_AUTH_FOR_DELEGATION'],
         [0x04000000, 'PARTIAL_SECRETS_ACCOUNT'],
     ];
-    
+
     // event.action Description Table
     var eventActionTypes = {
         "4624": "logged-in",
@@ -79,10 +79,9 @@ var security = (function () {
         "4767": "unlocked-user-account",
         "4781": "renamed-user-account",
         "4798": "group-membership-enumerated",
-        "4799": "user-member-enumerated",        
+        "4799": "user-member-enumerated",
     };
-    
-    
+
     // Descriptions of failure status codes.
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625
     var logonFailureStatus = {
@@ -1148,7 +1147,7 @@ var security = (function () {
         }
         evt.Put("winlog.logon.failure.sub_status", descriptiveFailureStatus);
     };
-    
+
     var addUACDescription = function(evt) {
         var code = evt.Get("winlog.event_data.NewUacValue");
         if (!code) {
@@ -1163,7 +1162,7 @@ var security = (function () {
         }
         if (uac_result) {
             evt.Put("winlog.event_data.NewUACList",uac_result);
-        }    
+        }
         var uac_list=evt.Get("winlog.event_data.UserAccountControl").replace(/\s/g,'').split("%%").filter(String);
         if (! uac_list) {
             return;
@@ -1171,7 +1170,6 @@ var security = (function () {
         evt.Put("winlog.event_data.UserAccountControl",uac_list);
       };
 
-    
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
@@ -1182,7 +1180,7 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-        
+
     var copyTargetUserToGroup = new processor.Chain()
         .Convert({
             fields: [
@@ -1193,7 +1191,7 @@ var security = (function () {
             ignore_missing: true,
         })
         .Build();
-        
+
     var copyTargetUserLogonId  = new processor.Chain()
         .Convert({
             fields: [
@@ -1315,7 +1313,7 @@ var security = (function () {
         })
         .Add(addActionDesc)
         .Build();
-    
+
     var userMgmtEvts = new processor.Chain()
         .Add(copyTargetUser)
         .Add(copySubjectUserLogonId)
@@ -1328,7 +1326,7 @@ var security = (function () {
         .Add(copyOldTargetUser)
         .Add(copySubjectUserLogonId)
         .Add(addActionDesc)
-        .Build();    
+        .Build();
 
     var groupMgmtEvts = new processor.Chain()
         .Add(copySubjectUser)
@@ -1339,7 +1337,6 @@ var security = (function () {
         .Build();
 
     return {
-    
         // 4624 - An account was successfully logged on.
         4624: logonSuccess.Run,
 
@@ -1376,16 +1373,16 @@ var security = (function () {
         // 4726 - An user account was deleted.
         4726: userMgmtEvts.Run,
 
-        // 4727 - A security-enabled global group was created. 
+        // 4727 - A security-enabled global group was created.
         4727: groupMgmtEvts.Run,
 
-        // 4728 - A member was added to a security-enabled global group. 
+        // 4728 - A member was added to a security-enabled global group.
         4728: groupMgmtEvts.Run,
 
-        // 4729 - A member was removed from a security-enabled global group. 
+        // 4729 - A member was removed from a security-enabled global group.
         4729: groupMgmtEvts.Run,
 
-        // 4730 - A security-enabled global group was deleted. 
+        // 4730 - A security-enabled global group was deleted.
         4730: groupMgmtEvts.Run,
 
         // 4731 - A security-enabled local group was created.
@@ -1412,19 +1409,19 @@ var security = (function () {
         // 4740 - An account was locked out
         4740: userMgmtEvts.Run,
 
-        // 4754 -  A security-enabled universal group was created. 
+        // 4754 -  A security-enabled universal group was created.
         4754: groupMgmtEvts.Run,
 
-        // 4755 - A security-enabled universal group was changed. 
+        // 4755 - A security-enabled universal group was changed.
         4755: groupMgmtEvts.Run,
 
-        // 4756 - A member was added to a security-enabled universal group. 
+        // 4756 - A member was added to a security-enabled universal group.
         4756: groupMgmtEvts.Run,
 
-        // 4757 - A member was removed from a security-enabled universal group. 
+        // 4757 - A member was removed from a security-enabled universal group.
         4757: groupMgmtEvts.Run,
 
-        // 4758 - A security-enabled universal group was deleted. 
+        // 4758 - A security-enabled universal group was deleted.
         4758: groupMgmtEvts.Run,
 
         // 4764 - A group\'s type was changed.
@@ -1441,17 +1438,16 @@ var security = (function () {
 
         // 4799 - A security-enabled local group membership was enumerated.
         4799: groupMgmtEvts.Run,
-        
 
-    process: function(evt) {
-        var event_id = evt.Get("winlog.event_id");
-        var processor = this[event_id];
-        if (processor === undefined) {
-            return;
-        }
-        evt.Put("event.module", "security");
-        processor(evt);
-    },
+        process: function(evt) {
+            var event_id = evt.Get("winlog.event_id");
+            var processor = this[event_id];
+            if (processor === undefined) {
+                return;
+            }
+            evt.Put("event.module", "security");
+            processor(evt);
+        },
     };
 })();
 
