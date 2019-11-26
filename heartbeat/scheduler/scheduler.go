@@ -118,9 +118,6 @@ func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.
 func (s *Scheduler) Start() error {
 	if s.state.Load() == stateStopped {
 		return ErrInvalidTransition
-		//} else if !s.state.CAS(statePreRunning, stateRunning) {
-		// We already were running, so just return nil and do nothing.
-		return nil
 	}
 	if !s.state.CAS(statePreRunning, stateRunning) {
 		return nil // we already running, just exit
