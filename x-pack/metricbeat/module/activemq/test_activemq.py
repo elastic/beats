@@ -9,6 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 from xpack_metricbeat import XPackTest, metricbeat
 
 
+@metricbeat.parameterized_with_supported_versions
 class ActiveMqTest(XPackTest):
     COMPOSE_SERVICES = ['activemq']
 
@@ -95,7 +96,3 @@ class ActiveMqTest(XPackTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_topic_metrics_collected(self):
         self.verify_destination_metrics_collection('topic')
-
-
-class TestRelease5130(ActiveMqTest):
-    COMPOSE_ENV = {'ACTIVEMQ_VERSION': '5.13.0'}
