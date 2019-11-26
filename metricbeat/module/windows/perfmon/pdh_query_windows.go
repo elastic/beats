@@ -100,12 +100,13 @@ func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard b
 	return nil
 }
 
+// GetCounterPaths func will check the computer or log file and return the counter paths that match the given counter path which contains wildcard characters.
 func (q *Query) GetCounterPaths(counterPath string) ([]string, error) {
 	paths, err := q.ExpandWildCardPath(counterPath)
 	if err == nil {
 		return paths, err
 	}
-	//check if Windows installed language is not EN, the ExpandWildCardPath will return either one of the errors below.
+	//check if Windows installed language is not ENG, the ExpandWildCardPath will return either one of the errors below.
 	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
 		handle, err := q.AddEnglishCounter(counterPath)
 		if err != nil {

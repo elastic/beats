@@ -88,8 +88,20 @@ func TestPdhSuccessfulCounterRetrieval(t *testing.T) {
 		t.Fatal(err)
 	}
 	queryList, err := PdhExpandWildCardPath(utfPath)
-	if err != nil {
-		t.Fatal(err)
+	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
+		handle, err := PdhAddEnglishCounter(queryHandle, validQuery, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer PdhRemoveCounter(handle)
+		info, err := PdhGetCounterInfo(handle)
+		if err != nil {
+			t.Fatal(err)
+		}
+		queryList, err = PdhExpandWildCardPath(info.SzFullPath)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 	queries := UTF16ToStringArray(queryList)
 	var counters []PdhCounterHandle
