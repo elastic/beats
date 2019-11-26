@@ -29,7 +29,8 @@ type Schedule struct {
 	scheduler.Schedule
 }
 
-type IntervalScheduler struct {
+// intervalScheduler defines a schedule that runs at fixed intervals.
+type intervalScheduler struct {
 	interval time.Duration
 }
 
@@ -44,7 +45,7 @@ func Parse(in string) (*Schedule, error) {
 			return nil, err
 		}
 
-		return &Schedule{IntervalScheduler{d}}, nil
+		return &Schedule{intervalScheduler{d}}, nil
 	}
 
 	// fallback on cron scheduler parsers
@@ -55,7 +56,7 @@ func Parse(in string) (*Schedule, error) {
 	return &Schedule{s}, nil
 }
 
-func (s IntervalScheduler) Next(t time.Time) time.Time {
+func (s intervalScheduler) Next(t time.Time) time.Time {
 	return t.Add(s.interval)
 }
 

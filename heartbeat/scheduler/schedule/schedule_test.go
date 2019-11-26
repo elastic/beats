@@ -36,13 +36,13 @@ func TestParse(t *testing.T) {
 		{
 			"every second",
 			"@every 1s",
-			&Schedule{IntervalScheduler{time.Duration(1 * time.Second)}},
+			&Schedule{intervalScheduler{time.Duration(1 * time.Second)}},
 			false,
 		},
 		{
 			"every year",
 			"@every 1m",
-			&Schedule{IntervalScheduler{time.Duration(1 * time.Minute)}},
+			&Schedule{intervalScheduler{time.Duration(1 * time.Minute)}},
 			false,
 		},
 		{
@@ -88,24 +88,24 @@ func Test_intervalScheduler_Next(t *testing.T) {
 
 	tests := []struct {
 		name string
-		s    IntervalScheduler
+		s    intervalScheduler
 		want time.Time
 	}{
 		{
 			"one second",
-			IntervalScheduler{time.Duration(time.Second)},
+			intervalScheduler{time.Duration(time.Second)},
 			now.Add(time.Second),
 		},
 		{
 			"one minute",
-			IntervalScheduler{time.Duration(time.Minute)},
+			intervalScheduler{time.Duration(time.Minute)},
 			now.Add(time.Minute),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.s.Next(now); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("IntervalScheduler.Next() = %v, want %v", got, tt.want)
+				t.Errorf("intervalScheduler.Next() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -121,30 +121,30 @@ func TestSchedule_Unpack(t *testing.T) {
 	}{
 		{
 			"one minute -> one second",
-			&Schedule{IntervalScheduler{time.Minute}},
+			&Schedule{intervalScheduler{time.Minute}},
 			"@every 1s",
-			IntervalScheduler{time.Second},
+			intervalScheduler{time.Second},
 			false,
 		},
 		{
 			"every 15 cron -> every second interval",
 			&Schedule{cron.MustParse("*/15 * * * *")},
 			"@every 1s",
-			IntervalScheduler{time.Second},
+			intervalScheduler{time.Second},
 			false,
 		},
 		{
 			"every second interval -> every 15 cron",
-			&Schedule{IntervalScheduler{time.Second}},
+			&Schedule{intervalScheduler{time.Second}},
 			"*/15 * * * *",
 			cron.MustParse("*/15 * * * *"),
 			false,
 		},
 		{
 			"bad format",
-			&Schedule{IntervalScheduler{time.Minute}},
+			&Schedule{intervalScheduler{time.Minute}},
 			"foobar",
-			IntervalScheduler{time.Minute},
+			intervalScheduler{time.Minute},
 			true,
 		},
 	}
