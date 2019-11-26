@@ -131,9 +131,6 @@ func NewProject(name string, files []string) (*Project, error) {
 
 // Start the container, unless it's running already
 func (c *Project) Start(service string, options UpOptions) error {
-	c.Lock()
-	defer c.Unlock()
-
 	servicesStatus, err := c.getServices(service)
 	if err != nil {
 		return err
@@ -145,6 +142,9 @@ func (c *Project) Start(service string, options UpOptions) error {
 			return nil
 		}
 	}
+
+	c.Lock()
+	defer c.Unlock()
 
 	return c.Driver.Up(context.Background(), options, service)
 }
@@ -206,6 +206,9 @@ func (c *Project) HostInformation(service string) (ServiceInfo, error) {
 
 // Kill a container
 func (c *Project) Kill(service string) error {
+	c.Lock()
+	defer c.Unlock()
+
 	return c.Driver.Kill(context.Background(), "KILL", service)
 }
 
@@ -331,6 +334,9 @@ type ServiceInfo interface {
 }
 
 func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) {
+	c.Lock()
+	defer c.Unlock()
+
 	result := make(map[string]ServiceInfo)
 	services, err := c.Driver.Ps(context.Background(), filter...)
 	if err != nil {

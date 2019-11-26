@@ -194,9 +194,6 @@ class ComposeMixin(object):
 
     @classmethod
     def compose_project_name(cls):
-        if 'DOCKER_COMPOSE_PROJECT_NAME' in os.environ:
-            return os.environ['DOCKER_COMPOSE_PROJECT_NAME']
-
         basename = os.path.basename(cls.find_compose_path())
 
         def positivehash(x):
