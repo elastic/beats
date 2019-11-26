@@ -15,6 +15,12 @@
     - name: request.fetch.failed_per_second
       description: The rate of client fetch request failures per second
       type: float
+    - name: request.produce.failed
+      description: The number of failed produce requests
+      type: float
+    - name: request.fetch.failed
+      description: The number of client fetch request failures
+      type: float
     - name: replication.leader_elections
       description: The leader election rate
       type: float
@@ -36,15 +42,27 @@
     - name: log.flush_rate
       description: The log flush rate
       type: float
-    - name: topic.net.bytes_in
-      description: The incoming byte rate
+    - name: topic.net.in.bytes_per_sec
+      description: The incoming byte rate per topic
       type: float
-    - name: topic.net.bytes_out
-      description: The outgoing byte rate
+    - name: topic.net.out.bytes_per_sec
+      description: The outgoing byte rate per topic
       type: float
-    - name: topic.net.bytes_rejected
-      description: The rejected byte rate
+    - name: topic.net.rejected.bytes_per_sec
+      description: The rejected byte rate per topic
       type: float
     - name: topic.messages_in
+      description: The incoming message rate per topic
+      type: float
+    - name: net.in.bytes_per_sec
+      description: The incoming byte rate
+      type: float
+    - name: net.out.bytes_per_sec
+      description: The outgoing byte rate
+      type: float
+    - name: net.rejected.bytes_per_sec
+      description: The rejected byte rate
+      type: float
+    - name: messages_in
       description: The incoming message rate
       type: float
