@@ -49,9 +49,5 @@ winlogbeat.event_logs:
 
 [float]
 === Modules
-//pass macro block used here to remove Edit links from modules documentation because it is generated
-pass::[<?edit_url?>]
+
 include::modules_list.asciidoc[]
-
-
-

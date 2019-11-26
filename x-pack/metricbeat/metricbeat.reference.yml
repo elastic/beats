@@ -131,6 +131,45 @@ metricbeat.modules:
   # Diskio configurations
   #diskio.include_devices: []
 
+#------------------------------- Activemq Module -------------------------------
+- module: activemq
+  metricsets: ['broker', 'queue', 'topic']
+  period: 10s
+  hosts: ['localhost:8161']
+  path: '/api/jolokia/?ignoreErrors=true&canonicalNaming=false'
+  username: admin # default username
+  password: admin # default password
+  processors:
+    - script:
+        lang: javascript
+        source: >
+          function process(event) {
+            var broker_memory_broker_pct = event.Get("activemq.broker.memory.broker.pct")
+            if (broker_memory_broker_pct != null) {
+              event.Put("activemq.broker.memory.broker.pct", broker_memory_broker_pct / 100.0)
+            }
+
+            var broker_memory_temp_pct = event.Get("activemq.broker.memory.temp.pct")
+            if (broker_memory_temp_pct != null) {
+              event.Put("activemq.broker.memory.temp.pct", broker_memory_temp_pct / 100.0)
+            }
+
+            var broker_memory_store_pct = event.Get("activemq.broker.memory.store.pct")
+            if (broker_memory_store_pct != null) {
+              event.Put("activemq.broker.memory.store.pct", broker_memory_store_pct / 100.0)
+            }
+
+            var queue_memory_broker_pct = event.Get("activemq.queue.memory.broker.pct")
+            if (queue_memory_broker_pct != null) {
+              event.Put("activemq.queue.memory.broker.pct", queue_memory_broker_pct / 100.0)
+            }
+
+            var topic_memory_broker_pct = event.Get("activemq.topic.memory.broker.pct")
+            if (topic_memory_broker_pct != null) {
+              event.Put("activemq.topic.memory.broker.pct", topic_memory_broker_pct / 100.0)
+            }
+          }
+
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]
@@ -156,23 +195,26 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#------------------------------ App Search Module ------------------------------
+- module: appsearch
+  metricsets: ["stats"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  #username: "elastic"
+  #password: "changeme"
+
 #--------------------------------- Aws Module ---------------------------------
 - module: aws
   period: 300s
+  credential_profile_name: test-mb
   metricsets:
     - ec2
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
 - module: aws
   period: 300s
+  credential_profile_name: test-mb
   metricsets:
     - sqs
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   regions:
     - us-west-1
 - module: aws
@@ -183,18 +225,14 @@ metricbeat.modules:
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
 - module: aws
   period: 300s
+  credential_profile_name: test-mb
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EC2
-      metricname: CPUUtilization
+      name: ["CPUUtilization"]
       dimensions:
         - name: InstanceId
           value: i-0686946e22cf9494a
@@ -203,12 +241,45 @@ metricbeat.modules:
       tags.resource_type_filter: elasticloadbalancing
 - module: aws
   period: 60s
+  credential_profile_name: test-mb
   metricsets:
     - rds
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
+
+#-------------------------------- Azure Module --------------------------------
+- module: azure
+  metricsets:
+  - monitor
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  resources:
+    - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
+      metrics:
+      - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+
+- module: azure
+  metricsets:
+  - compute_vm
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - compute_vm_scaleset
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
@@ -444,11 +515,13 @@ metricbeat.modules:
   jmx.instance:
 
 #-------------------------------- Kafka Module --------------------------------
+# Kafka metrics collected using the Kafka protocol
 - module: kafka
-  metricsets: ["consumergroup", "partition"]
+  #metricsets:
+  #  - partition
+  #  - consumergroup
   period: 10s
   hosts: ["localhost:9092"]
-  enabled: true
 
   #client_id: metricbeat
   #retries: 3
@@ -470,6 +543,27 @@ metricbeat.modules:
   # SASL authentication
   #username: ""
   #password: ""
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
@@ -505,6 +599,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # State metrics from kube-state-metrics service:
@@ -518,6 +614,7 @@ metricbeat.modules:
     - state_pod
     - state_container
     - state_cronjob
+    - state_resourcequota
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
@@ -525,6 +622,8 @@ metricbeat.modules:
   add_metadata: true
   # When used outside the cluster:
   #host: node_name
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
 
 # Kubernetes events
@@ -696,13 +795,13 @@ metricbeat.modules:
   # Nginx hosts
   hosts: ["http://127.0.0.1"]
 
-  # Path to server status. Default server-status
-  server_status_path: "server-status"
+  # Path to server status. Default nginx_status
+  server_status_path: "nginx_status"
 
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
-  metricsets: ["tablespace"]
-  enabled: false
+  metricsets: ["tablespace", "performance"]
+  enabled: true
   period: 10s
   hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
 
@@ -812,6 +911,13 @@ metricbeat.modules:
   port: "8125"
   enabled: false
   #ttl: "30s"
+
+#-------------------------------- Tomcat Module --------------------------------
+- module: tomcat
+  metricsets: ['threading', 'cache', 'memory', 'requests']
+  period: 10s
+  hosts: ['localhost:8080']
+  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
 
 #------------------------------- Traefik Module -------------------------------
 - module: traefik
@@ -1163,8 +1269,11 @@ output.elasticsearch:
   # Configure escaping HTML symbols in strings.
   #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
@@ -1826,7 +1935,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'metricbeat-%{[agent.version]}'. 
+# name is 'metricbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "metricbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
@@ -2001,8 +2110,11 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 
@@ -2089,11 +2201,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 

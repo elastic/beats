@@ -61,7 +61,6 @@ Kubernetes YAML chunk should look like:
     - state_cronjob
   period: 10s
   hosts: ["kube-state-metrics:8080"]
-  in_cluster: true
 ```
 
 Deploy kube-state-metrics. You can find the manifests [here](https://github.com/kubernetes/kube-state-metrics/tree/release-1.7/kubernetes)

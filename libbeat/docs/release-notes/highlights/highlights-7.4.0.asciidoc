@@ -1,0 +1,53 @@
+[[release-highlights-7.4.0]]
+=== 7.4 release highlights
+++++
+<titleabbrev>7.4</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Following are the most notable features and enhancements in 7.4.
+
+For a complete list of highlights, see the 
+https://www.elastic.co/blog/beats-7-4-0-released[{beats} 7.4 release blog].
+
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-7.4, Breaking Changes>> and <<release-notes, Release Notes>>.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+// ADD NOTABLE HIGHLIGHTS HERE
+[float]
+==== New {filebeat} inputs for ingesting S3 and Kafka logs
+
+The {filebeat-ref}/filebeat-input-s3.html[S3 input] in {filebeat} is a beta
+feature available under the Basic license, meaning it’s free to use. It ingests
+raw log lines from S3 buckets by leveraging SQS queues for scalable consumption.
+We recommend using this {filebeat} input instead of the {ls} S3 input if you are
+looking for a horizontally scalable solution for ingesting logs from S3.
+
+The {filebeat-ref}/filebeat-input-kafka.html[kafka input] in {filebeat} enables
+data consumption from Kafka topics. Multiple {filebeat} instances can subscribe
+to the same Kafka consumer group for parallel processing from topics.
+Additionally, the Kafka input can consume data from Azure Event Hubs given the
+service supports Kafka interface compatibility.
+// end::notable-highlights[]
+
+[float]
+==== {functionbeat} improvements
+
+{functionbeat} now supports {ls} as an output for data processing.
+
+We've also added configurable function tags that you can use for grouping,
+filtering, and cost allocation with AWS Lambda.
+
+[float]
+==== Expanded platform support
+In Beats 7.4.0, we’ve added support for the following platforms:
+
+* RHEL 8
+* Amazon Linux 2
+* Ubuntu 18.04
+* Windows Server 2019. 
+

@@ -76,8 +76,9 @@ type Field struct {
 	UrlTemplate          []VersionizedString `config:"url_template"`
 	OpenLinkInCurrentTab *bool               `config:"open_link_in_current_tab"`
 
-	Overwrite bool `config:"overwrite"`
-	Path      string
+	Overwrite    bool  `config:"overwrite"`
+	DefaultField *bool `config:"default_field"`
+	Path         string
 }
 
 // ObjectTypeCfg defines type and configuration of object attributes

@@ -26,38 +26,37 @@ import (
 
 	"github.com/docker/docker/api"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
 
 func TestNewClient(t *testing.T) {
-	host := "unix:///var/run/docker.sock"
-
-	client, err := NewClient(host, nil, nil)
+	c, err := NewClient(client.DefaultDockerHost, nil, nil)
 	assert.NoError(t, err)
-	assert.NotNil(t, client)
+	assert.NotNil(t, c)
 
-	_, err = client.ContainerList(context.Background(), types.ContainerListOptions{})
+	_, err = c.ContainerList(context.Background(), types.ContainerListOptions{})
 	assert.NoError(t, err)
 
 	// This test only works on newer Docker versions (any supported one really)
-	switch client.ClientVersion() {
+	switch c.ClientVersion() {
 	case "1.22":
 		t.Skip("Docker version is too old for this test")
 	case api.DefaultVersion:
 		t.Logf("Using default API version: %s", api.DefaultVersion)
 	default:
-		t.Logf("Negotiated version: %s", client.ClientVersion())
+		t.Logf("Negotiated version: %s", c.ClientVersion())
 	}
 
 	// Test we can hardcode version
 	os.Setenv("DOCKER_API_VERSION", "1.22")
 
-	client, err = NewClient(host, nil, nil)
+	c, err = NewClient(client.DefaultDockerHost, nil, nil)
 	assert.NoError(t, err)
-	assert.NotNil(t, client)
-	assert.Equal(t, "1.22", client.ClientVersion())
+	assert.NotNil(t, c)
+	assert.Equal(t, "1.22", c.ClientVersion())
 
-	_, err = client.ContainerList(context.Background(), types.ContainerListOptions{})
+	_, err = c.ContainerList(context.Background(), types.ContainerListOptions{})
 	assert.NoError(t, err)
 }

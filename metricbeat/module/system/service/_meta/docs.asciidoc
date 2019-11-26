@@ -1,0 +1,23 @@
+The `service` metricset reports on the status of systemd services.
+
+This metricset is available on:
+
+- Linux
+
+[float]
+== systemd resource accounting and process metrics
+
+If systemd resource accounting is enabled, this metricset will report any resources tracked by systemd. On most distributions, `tasks` and `memory` are the only resources with accounting enabled by default.
+For more information, https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html[see the systemd manual pages].
+
+[float]
+=== Configuration
+
+*`service.state_filter`* - A list of service states to filter by. This can be any of the states or sub-states known to systemd.
+
+[float]
+=== Dashboard
+
+The system service metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-services-host.png[]

@@ -4,7 +4,11 @@
     "event": {
       "code": 16,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -37,7 +41,11 @@
     "event": {
       "code": 4,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -77,10 +85,14 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_start"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_start"
     },
     "hash": {
       "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -148,10 +160,14 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_start"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_start"
     },
     "hash": {
       "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -222,7 +238,11 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -263,7 +283,11 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -304,10 +328,14 @@
       "code": 1,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_start"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_start"
     },
     "hash": {
       "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -380,7 +408,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -438,7 +470,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -497,7 +533,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -556,7 +596,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -615,7 +659,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -678,7 +726,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -739,7 +791,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -798,7 +854,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -856,7 +916,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -917,7 +981,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -978,7 +1046,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1036,7 +1108,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1094,7 +1170,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1156,7 +1236,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1218,7 +1302,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1280,7 +1368,11 @@
     "event": {
       "code": 3,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1340,7 +1432,11 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1381,7 +1477,11 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1420,10 +1520,14 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1466,10 +1570,14 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1512,10 +1620,14 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1558,10 +1670,14 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1606,7 +1722,11 @@
       "code": 5,
       "kind": "event",
       "module": "sysmon",
-      "type:": "process_end"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": "process_end"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1645,10 +1765,14 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"
@@ -1691,10 +1815,14 @@
     "event": {
       "code": 2,
       "kind": "event",
-      "module": "sysmon"
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
     },
     "log": {
       "level": "information"

@@ -6,6 +6,7 @@ package licenser
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -16,12 +17,16 @@ import (
 // Enforce setups the corresponding callbacks in libbeat to verify the license on the
 // remote elasticsearch cluster.
 func Enforce(log *logp.Logger, name string, checks ...CheckFunc) {
+	name = strings.Title(name)
+
 	cb := func(client *elasticsearch.Client) error {
 		fetcher := NewElasticFetcher(client)
 		license, err := fetcher.Fetch()
 
 		if err != nil {
-			return errors.Wrapf(err, "cannot retrieve the elasticsearch license")
+			return errors.Wrapf(err, "cannot retrieve the elasticsearch license from the /_xpack endpoint, "+
+				"%s requires the default distribution of Elasticsearch. Please make the endpoint accessible "+
+				"to %s so it can verify the license.", name, name)
 		}
 
 		if license == OSSLicense {

@@ -110,7 +110,7 @@ func init() {
 
 type guessInetSockIPv6 struct {
 	ctx                    Context
-	loopback               ipv6loopback
+	loopback               helper.IPv6Loopback
 	clientAddr, serverAddr unix.SockaddrInet6
 	client, server         int
 	offsets                []int
@@ -130,6 +130,7 @@ func (g *guessInetSockIPv6) Provides() []string {
 		"INET_SOCK_V6_RADDR_B",
 		"INET_SOCK_V6_LADDR_A",
 		"INET_SOCK_V6_LADDR_B",
+		"INET_SOCK_V6_LIMIT",
 	}
 }
 
@@ -139,6 +140,20 @@ func (g *guessInetSockIPv6) Requires() []string {
 		"RET",
 		"INET_SOCK_RADDR_LIST",
 	}
+}
+
+// Condition allows this probe to run only when IPv6 is enabled.
+func (g *guessInetSockIPv6) Condition(ctx Context) (bool, error) {
+	runs, err := isIPv6Enabled(ctx.Vars)
+	if err != nil {
+		return false, err
+	}
+	if !runs {
+		// Set a safe default for INET_SOCK_V6_LIMIT so that guesses
+		// depending on it can run.
+		ctx.Vars["INET_SOCK_V6_LIMIT"] = 2048
+	}
+	return runs, nil
 }
 
 // eventWrapper is used to wrap events from one of the probes for differentiation.
@@ -216,7 +231,7 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 	if err != nil {
 		return err
 	}
-	g.loopback, err = newIPv6Loopback()
+	g.loopback, err = helper.NewIPv6Loopback()
 	if err != nil {
 		return errors.Wrap(err, "detect IPv6 loopback failed")
 	}
@@ -225,11 +240,11 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 			g.loopback.Cleanup()
 		}
 	}()
-	clientIP, err := g.loopback.addRandomAddress()
+	clientIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
 		return errors.Wrap(err, "failed adding first device address")
 	}
-	serverIP, err := g.loopback.addRandomAddress()
+	serverIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
 		return errors.Wrap(err, "failed adding second device address")
 	}

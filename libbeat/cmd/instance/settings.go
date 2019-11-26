@@ -43,4 +43,6 @@ type Settings struct {
 	ILM             ilm.SupportFactory
 
 	Processing processing.SupportFactory
+
+	Umask *int
 }

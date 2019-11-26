@@ -194,6 +194,8 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	es := &testOutputer{}
 	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient)
 	es.esConnection = connection
+	es.Connect()
+
 	return es
 }
 
