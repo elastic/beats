@@ -111,12 +111,13 @@ func (cfg *Config) Validate() error {
 
 func defaultConfig(info beat.Info) Config {
 	name := info.Beat + "-%{[agent.version]}"
-	nameFmt := fmtstr.MustCompileEvent(name)
+	aliasFmt := fmtstr.MustCompileEvent(name)
+	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 
 	return Config{
 		Mode:          ModeAuto,
-		PolicyName:    *nameFmt,
-		RolloverAlias: *nameFmt,
+		PolicyName:    *policyFmt,
+		RolloverAlias: *aliasFmt,
 		Pattern:       ilmDefaultPattern,
 		PolicyFile:    "",
 		CheckExists:   true,

@@ -22,3 +22,5 @@ processors:
       lang: javascript
       id: googlecloud_vpcflow_script
       file: ${path.home}/module/googlecloud/vpcflow/config/pipeline.js
+      params:
+        keep_original_message: {{ .keep_original_message }}

@@ -2,7 +2,7 @@
 [role="xpack"]
 == Getting Started With {beatname_uc}
 
-include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
@@ -150,20 +150,20 @@ from Amazon SQS:
     - event_source_arn: arn:aws:sqs:us-east-1:123456789012:myevents
 ----
 
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
-include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/step-test-config.asciidoc[]
 
-include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
 [role="xpack"]
 === Step 3: Load the index template in Elasticsearch
 
 :allplatforms:
-include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared-template-load.asciidoc[]
 
 [id="{beatname_lc}-deploying"]
 [role="xpack"]

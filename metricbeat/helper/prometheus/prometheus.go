@@ -230,7 +230,7 @@ func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.Report
 }
 
 func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {
-	hash := labels.String()
+	hash := LabelHash(labels.Flatten())
 	res, ok := m[hash]
 	if !ok {
 		res = labels

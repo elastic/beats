@@ -42,4 +42,4 @@ timeseries.enabled: true
 ----
 
 
-include::{libbeat-dir}/docs/generalconfig.asciidoc[]
+include::{libbeat-dir}/generalconfig.asciidoc[]
