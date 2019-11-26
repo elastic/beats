@@ -7,12 +7,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
 
 
+@metricbeat.parameterized_with_supported_versions
 class KafkaTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['kafka']
     COMPOSE_ADVERTISED_HOST = True
     COMPOSE_ADVERTISED_PORT = "9092/tcp"
-
-    VERSION = "2.0.0"
 
     PRODUCER_USERNAME = "producer"
     PRODUCER_PASSWORD = "producer-secret"
@@ -33,7 +32,7 @@ class KafkaTest(metricbeat.BaseTest):
             "metricsets": ["partition"],
             "hosts": self.get_hosts(),
             "period": "1s",
-            "version": self.VERSION,
+            "version": self.version(),
             "username": self.USERNAME,
             "password": self.PASSWORD,
         }])
@@ -90,15 +89,11 @@ class KafkaTest(metricbeat.BaseTest):
         producer.send('foobar', b'some_message_bytes')
 
     @classmethod
+    def version(cls):
+        if 'KAFKA_VERSION' in cls.COMPOSE_ENV:
+            return cls.COMPOSE_ENV['KAFKA_VERSION']
+        return '2.0.0'
+
+    @classmethod
     def get_hosts(cls):
         return [cls.compose_host(port=cls.COMPOSE_ADVERTISED_PORT)]
-
-
-class Kafka_1_1_0_Test(KafkaTest):
-    COMPOSE_ENV = {"KAFKA_VERSION": "1.1.0"}
-    VERSION = "1.1.0"
-
-
-class Kafka_0_10_2_Test(KafkaTest):
-    COMPOSE_ENV = {"KAFKA_VERSION": "0.10.2.2"}
-    VERSION = "0.10.2.2"
