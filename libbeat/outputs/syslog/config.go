@@ -23,6 +23,7 @@ type config struct {
 	Network        string                `config:"network"`
 }
 
+// backoff
 type Backoff struct {
 	Init time.Duration
 	Max  time.Duration
