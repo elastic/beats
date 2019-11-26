@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/heartbeat/scheduler"
-	"github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -53,6 +52,7 @@ func WrapCommon(js []jobs.Job, id string, name string, typ string, schedule sche
 func addMonitorMeta(id string, name string, typ string, isMulti bool, sched scheduler.Schedule) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
+			started := time.Now()
 			cont, e := job(event)
 			thisID := id
 
@@ -66,34 +66,18 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool, sched sche
 				thisID = fmt.Sprintf("%s-%x", id, urlHash)
 			}
 
-			now := time.Now()
-			nextRun := sched.Next(now)
-
-			var quantizedRangeStart time.Time
-
-			if isched, ok := sched.(schedule.IntervalScheduler); ok {
-				quantizedRangeStart, _ = isched.QuantizedPeriod(now)
-			} else {
-				// TODO actually calculate the correct start time accurately for cron.
-				quantizedRangeStart = now
-			}
+			nextRun := sched.Next(started)
 
 			eventext.MergeEventFields(
 				event,
 				common.MapStr{
 					"monitor": common.MapStr{
-						"id":          thisID,
-						"name":        name,
-						"type":        typ,
-						"next_run":    nextRun,
-						"next_run_in": common.MapStr{"us": nextRun.Sub(now)},
-						"quantized_range": common.MapStr{
-							"gte": quantizedRangeStart,
+						"id":   thisID,
+						"name": name,
+						"type": typ,
+						"timespan": common.MapStr{
+							"gte": started,
 							"lt":  nextRun,
-						},
-						"quantized_grace_range": common.MapStr{
-							"gte": quantizedRangeStart,
-							"lt":  sched.Next(nextRun),
 						},
 					},
 				},

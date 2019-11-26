@@ -63,31 +63,10 @@
           description: >
             A token unique to a simultaneously invoked group of checks as in the case where multiple IPs are checked for a single DNS entry.
 
-        - name: quantized_range
+        - name: timespan
           type: date_range
           description: >
-            Time range this ping reported on quantized based on timestamp
-
-        - name: quantized_grace_range
-          type: date_range
-          description: >
-            Same as start time as quantized range but twice as long. This should overlap with the next check.
-            Useful in queries where you want the latest value.
-
-        - name: next_run
-          type: date
-          description: >
-            The next expected time this monitor will run on the reporting heartbeat agent based on its schedule.
-            It may run sooner than this if the heartbeat daemon is restarted,
-            and it may run later than this time for any number of reasons
-        - name: next_run_in
-          type: group
-          description: Duration between when this run occurred and when the next one is expected.
-          fields:
-            - name: us
-              type: long
-              description: Duration between when this run occurred and when the next one is expected in microseconds.
-
+            Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
 
 - key: summary
   title: "Monitor summary"

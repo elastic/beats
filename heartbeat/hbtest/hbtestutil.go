@@ -114,15 +114,15 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
 				"ip":          ipCheck,
-				"duration.us": isdef.IsDuration,
 				"status":      status,
+				"duration.us": isdef.IsDuration,
 				"id":          isdef.IsNonEmptyString,
 				"name":        isdef.IsString,
 				"type":        typ,
 				"check_group": isdef.IsString,
 			},
 		}),
-		hbtestllext.MonitorNextRunValidator,
+		hbtestllext.MonitorTimespanValidator,
 	)
 }
 

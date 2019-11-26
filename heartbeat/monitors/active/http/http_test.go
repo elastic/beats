@@ -31,12 +31,9 @@ import (
 	"testing"
 	"time"
 
-	schedule "github.com/elastic/beats/heartbeat/scheduler/schedule"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
+	schedule "github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -47,6 +44,7 @@ import (
 	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
+	"github.com/stretchr/testify/require"
 )
 
 func testRequest(t *testing.T, testURL string) *beat.Event {

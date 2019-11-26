@@ -118,7 +118,7 @@ func mockEventMonitorValidator(id string) validator.Validator {
 				"check_group": isdef.IsString,
 			},
 		}),
-		hbtestllext.MonitorNextRunValidator,
+		hbtestllext.MonitorTimespanValidator,
 		hbtest.SummaryChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
 	))

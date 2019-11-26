@@ -21,8 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/scheduler/schedule/quantize"
-
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/heartbeat/scheduler/schedule/cron"
 )
@@ -33,10 +31,6 @@ type Schedule struct {
 
 type IntervalScheduler struct {
 	interval time.Duration
-}
-
-func (s IntervalScheduler) QuantizedPeriod(now time.Time) (gte time.Time, lt time.Time) {
-	return quantize.Quantize(now, s.interval)
 }
 
 func Parse(in string) (*Schedule, error) {

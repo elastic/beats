@@ -97,7 +97,7 @@ func TestSimpleJob(t *testing.T) {
 						"check_group": isdef.IsString,
 					},
 				}),
-				hbtestllext.MonitorNextRunValidator,
+				hbtestllext.MonitorTimespanValidator,
 				summaryValidator(1, 0),
 			)},
 		nil,
@@ -132,7 +132,7 @@ func TestErrorJob(t *testing.T) {
 		[]validator.Validator{
 			lookslike.Compose(
 				errorJobValidator,
-				hbtestllext.MonitorNextRunValidator,
+				hbtestllext.MonitorTimespanValidator,
 				summaryValidator(0, 1),
 			)},
 		nil,
@@ -157,7 +157,7 @@ func TestMultiJobNoConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo("check_group"),
 				},
 			}),
-			hbtestllext.MonitorNextRunValidator,
+			hbtestllext.MonitorTimespanValidator,
 			summaryValidator(1, 0),
 		)
 	}
@@ -206,7 +206,7 @@ func TestMultiJobConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
-			hbtestllext.MonitorNextRunValidator,
+			hbtestllext.MonitorTimespanValidator,
 		)
 	}
 
@@ -266,7 +266,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
-			hbtestllext.MonitorNextRunValidator,
+			hbtestllext.MonitorTimespanValidator,
 		)
 	}
 

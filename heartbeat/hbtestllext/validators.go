@@ -19,13 +19,14 @@ package hbtestllext
 
 import (
 	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
 )
 
-// MonitorNextRunValidator is tests for the `next_run` and `next_run_in.us` keys.
-var MonitorNextRunValidator = lookslike.MustCompile(map[string]interface{}{
+// MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.
+var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
 	"monitor": map[string]interface{}{
-		"next_run":       IsTime,
-		"next_run_in.us": isdef.IsDuration,
+		"timespan": map[string]interface{}{
+			"gte": IsTime,
+			"lt":  IsTime,
+		},
 	},
 })
