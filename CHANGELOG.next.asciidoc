@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
+- CEF extensions are now mapped to the data types defined in the CEF guide. {pull}14342[14342]
 
 *Heartbeat*
 
@@ -423,6 +424,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
 - Add document for Filebeat input httpjson. {pull}14602[14602]
 - Add more configuration options to the Netflow module. {pull}14628{14628}
+- Add dashboards to the CEF module (ported from the Logstash ArcSight module).
+- Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
