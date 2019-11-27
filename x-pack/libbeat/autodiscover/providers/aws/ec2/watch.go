@@ -29,7 +29,7 @@ type watcher struct {
 func newWatcher(
 	fetcher fetcher,
 	period time.Duration,
-	onStart func(uuid string, lblMap *ec2Instance),
+	onStart func(uuid string, instanceMap *ec2Instance),
 	onStop func(uuid string)) *watcher {
 	return &watcher{
 		fetcher:      fetcher,
@@ -59,7 +59,7 @@ func (w *watcher) forever() {
 		case <-w.ticker.C:
 			err := w.once()
 			if err != nil {
-				logp.Error(errors.Wrap(err, "error while fetching AWS ELBs"))
+				logp.Error(errors.Wrap(err, "error while fetching AWS EC2s"))
 			}
 		}
 	}

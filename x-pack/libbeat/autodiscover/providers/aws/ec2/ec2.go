@@ -5,7 +5,9 @@
 package ec2
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -14,24 +16,24 @@ import (
 
 type ec2Instance struct {
 	ec2Instance ec2.Instance
-	logger      *logp.Logger
 }
 
 // toMap converts this ec2Instance into the form consumed as metadata in the autodiscovery process.
 func (i *ec2Instance) toMap() common.MapStr {
 	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
+	fmt.Println("instance type = ", instanceType)
 	if err != nil {
-		i.logger.Error("MarshalValue failed for instance type: ", err)
+		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
 	}
 
 	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
 	if err != nil {
-		i.logger.Error("MarshalValue failed for monitoring state: ", err)
+		logp.Error(errors.Wrap(err, "MarshalValue failed for monitoring state: "))
 	}
 
 	architecture, err := i.ec2Instance.Architecture.MarshalValue()
 	if err != nil {
-		i.logger.Error("MarshalValue failed for architecture: ", err)
+		logp.Error(errors.Wrap(err, "MarshalValue failed for architecture: "))
 	}
 
 	m := common.MapStr{
@@ -80,7 +82,7 @@ func (i *ec2Instance) stateMap() (stateMap common.MapStr) {
 	stateMap = common.MapStr{}
 	nameString, err := state.Name.MarshalValue()
 	if err != nil {
-		i.logger.Error("MarshalValue failed for instance state name: ", err)
+		logp.Error(errors.Wrap(err,"MarshalValue failed for instance state name: "))
 	}
 
 	stateMap["name"] = nameString

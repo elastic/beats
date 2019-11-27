@@ -113,7 +113,6 @@ type fetchRequest struct {
 	pendingTasks sync.WaitGroup
 	context      context.Context
 	cancel       func()
-	logger       *logp.Logger
 }
 
 func (p *fetchRequest) fetch() ([]*ec2Instance, error) {
@@ -140,14 +139,14 @@ func (p *fetchRequest) fetchAllPages() {
 	for {
 		select {
 		case <-p.context.Done():
-			p.logger.Debug(logSelector, "done fetching EC2 instances, context cancelled")
+			logp.Debug(logSelector, "done fetching EC2 instances, context cancelled")
 			return
 		default:
 			if !p.fetchNextPage() {
-				p.logger.Debug(logSelector, "fetched all EC2 instances")
+				logp.Debug(logSelector, "fetched all EC2 instances")
 				return
 			}
-			p.logger.Debug(logSelector, "fetched EC2 instance")
+			logp.Debug(logSelector, "fetched EC2 instance")
 		}
 	}
 }
@@ -217,7 +216,7 @@ func (p *fetchRequest) recordGoodResult(instance ec2.Instance) {
 	p.resultsLock.Lock()
 	defer p.resultsLock.Unlock()
 
-	p.ec2Instances = append(p.ec2Instances, &ec2Instance{instance, logp.NewLogger(logSelector)})
+	p.ec2Instances = append(p.ec2Instances, &ec2Instance{instance})
 }
 
 func (p *fetchRequest) recordErrResult(err error) {

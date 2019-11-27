@@ -29,7 +29,6 @@ type Config struct {
 	Period time.Duration `config:"period" validate:"nonzero,required"`
 
 	// AWS Specific autodiscover fields
-
 	Regions   []string      `config:"regions" validate:"required"`
 	AWSConfig aws.ConfigAWS `config:",inline"`
 }
