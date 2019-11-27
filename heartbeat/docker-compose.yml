@@ -15,6 +15,7 @@ services:
     # We launch docker containers to test docker autodiscover:
     - /var/run/docker.sock:/var/run/docker.sock
     command: make
+    user: ${USER_ID}
 
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369

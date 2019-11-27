@@ -15,6 +15,7 @@ services:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
+    user: ${USER_ID}
 
   googlepubsub:
     build: input/googlepubsub/_meta
@@ -32,4 +33,3 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
       service: elasticsearch
-

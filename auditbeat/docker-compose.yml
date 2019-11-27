@@ -19,6 +19,7 @@ services:
     pid: host
     cap_add:
       - AUDIT_CONTROL
+    user: ${USER_ID}
 
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369

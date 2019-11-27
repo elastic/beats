@@ -28,6 +28,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /go/src/github.com/elastic/beats/libbeat
     command: make
+    user: ${USER_ID}
 
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369

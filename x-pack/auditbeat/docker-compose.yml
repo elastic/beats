@@ -12,3 +12,4 @@ services:
     cap_add:
       - AUDIT_CONTROL
       - NET_ADMIN
+    user: ${USER_ID}
