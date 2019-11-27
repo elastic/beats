@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Config for kubernetes autodiscover provider
@@ -76,6 +77,9 @@ func (c *Config) Validate() error {
 		}
 
 	default:
+		if c.Scope == "host" {
+			logp.L().Warnf("can not set scope to `host` when using resource %s. resetting scope to `cluster`", c.Resource)
+		}
 		c.Scope = "cluster"
 	}
 

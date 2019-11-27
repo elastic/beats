@@ -79,7 +79,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 
 // OnAdd ensures processing of service objects that are newly created
 func (s *service) OnAdd(obj interface{}) {
-	s.logger.Debugf("Watcher Service add: %+v", obj)
+	s.logger.Debugf("Watcher Node add: %+v", obj)
 	s.emit(obj.(*kubernetes.Service), "start")
 }
 
@@ -90,7 +90,7 @@ func (s *service) OnUpdate(obj interface{}) {
 	if svc.GetObjectMeta().GetDeletionTimestamp() != nil {
 		time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(svc, "stop") })
 	} else {
-		s.logger.Debugf("Watcher Service update: %+v", obj)
+		s.logger.Debugf("Watcher Node update: %+v", obj)
 		s.emit(svc, "stop")
 		s.emit(svc, "start")
 	}
@@ -98,7 +98,7 @@ func (s *service) OnUpdate(obj interface{}) {
 
 // OnDelete ensures processing of service objects that are deleted
 func (s *service) OnDelete(obj interface{}) {
-	s.logger.Debugf("Watcher Service delete: %+v", obj)
+	s.logger.Debugf("Watcher Node delete: %+v", obj)
 	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(obj.(*kubernetes.Service), "stop") })
 }
 
@@ -123,8 +123,6 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 	}
 	if port, ok := event["port"]; ok {
 		e["port"] = port
-	} else {
-		e["port"] = 0
 	}
 
 	hints := builder.GenerateHints(annotations, "", s.config.Prefix)
@@ -161,7 +159,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 
 	// TODO: Refactor metagen to make sure that this is seamless
 	meta.Put("service.name", svc.Name)
-	meta.Put("service.uid", svc.UID)
+	meta.Put("service.uid", string(svc.GetObjectMeta().GetUID()))
 
 	kubemeta := meta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
@@ -170,16 +168,20 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		safemapstr.Put(annotations, k, v)
 	}
 	kubemeta["annotations"] = annotations
-	event := bus.Event{
-		"provider":   s.uuid,
-		"id":         eventID,
-		flag:         true,
-		"host":       host,
-		"kubernetes": kubemeta,
-		"meta": common.MapStr{
-			"kubernetes": meta,
-		},
+
+	for _, port := range svc.Spec.Ports {
+		event := bus.Event{
+			"provider":   s.uuid,
+			"id":         eventID,
+			flag:         true,
+			"host":       host,
+			"port":       int(port.Port),
+			"kubernetes": kubemeta,
+			"meta": common.MapStr{
+				"kubernetes": meta,
+			},
+		}
+		s.publish(event)
 	}
-	s.publish(event)
 
 }

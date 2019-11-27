@@ -91,7 +91,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 
 // OnAdd ensures processing of service objects that are newly added
 func (p *pod) OnAdd(obj interface{}) {
-	p.logger.Debugf("Watcher Pod add: %+v", obj)
+	p.logger.Debugf("Watcher Node add: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
@@ -101,8 +101,8 @@ func (p *pod) OnAdd(obj interface{}) {
 func (p *pod) OnUpdate(obj interface{}) {
 	pod := obj.(*kubernetes.Pod)
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
-		// Pod is terminating, don't reload its configuration and ignore the event
+		p.logger.Debugf("Watcher Node update (terminating): %+v", obj)
+		// Node is terminating, don't reload its configuration and ignore the event
 		// if some pod is still running, we will receive more events when containers
 		// terminate.
 		for _, container := range pod.Status.ContainerStatuses {
@@ -112,7 +112,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 		}
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
 	} else {
-		p.logger.Debugf("Watcher Pod update: %+v", obj)
+		p.logger.Debugf("Watcher Node update: %+v", obj)
 		p.emit(pod, "stop")
 		p.emit(pod, "start")
 	}
@@ -120,7 +120,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 
 // GenerateHints creates hints needed for hints builder
 func (p *pod) OnDelete(obj interface{}) {
-	p.logger.Debugf("Watcher Pod delete: %+v", obj)
+	p.logger.Debugf("Watcher Node delete: %+v", obj)
 	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 }
 

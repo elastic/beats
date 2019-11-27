@@ -140,8 +140,6 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 	}
 	if port, ok := event["port"]; ok {
 		e["port"] = port
-	} else {
-		e["port"] = 0
 	}
 
 	hints := builder.GenerateHints(annotations, "", n.config.Prefix)
@@ -178,7 +176,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 
 	// TODO: Refactor metagen to make sure that this is seamless
 	meta.Put("node.name", node.Name)
-	meta.Put("node.uid", node.UID)
+	meta.Put("node.uid", string(node.GetObjectMeta().GetUID()))
 
 	kubemeta := meta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
