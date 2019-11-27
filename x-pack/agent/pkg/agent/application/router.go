@@ -18,20 +18,20 @@ var defautlRK = "DEFAULT"
 
 type routingKey = string
 
-type pipeline interface {
+type stream interface {
 	Execute(*configRequest) error
 	Close() error
 }
 
-type pipelineFunc func(*logger.Logger, routingKey) (pipeline, error)
+type streamFunc func(*logger.Logger, routingKey) (stream, error)
 
 type router struct {
-	log             *logger.Logger
-	routes          *sorted.Set
-	pipelineFactory pipelineFunc
+	log           *logger.Logger
+	routes        *sorted.Set
+	streamFactory streamFunc
 }
 
-func newRouter(log *logger.Logger, factory pipelineFunc) (*router, error) {
+func newRouter(log *logger.Logger, factory streamFunc) (*router, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New()
@@ -39,7 +39,7 @@ func newRouter(log *logger.Logger, factory pipelineFunc) (*router, error) {
 			return nil, err
 		}
 	}
-	return &router{log: log, pipelineFactory: factory, routes: sorted.NewSet()}, nil
+	return &router{log: log, streamFactory: factory, routes: sorted.NewSet()}, nil
 }
 
 func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) error {
@@ -54,13 +54,13 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 	for _, rk := range s.Keys() {
 		active[rk] = true
 
-		// Are we already runnings this pipeline?
-		// If we don't we create it otherwise we just forward the config request.
+		// Are we already runnings this streams?
+		// When it doesn't exist we just create it, if it already exist we forward the configuration.
 		p, ok := r.routes.Get(rk)
 		var err error
 		if !ok {
-			r.log.Debugf("Creating pipeline %s", rk)
-			p, err = r.pipelineFactory(r.log, rk)
+			r.log.Debugf("Creating stream %s", rk)
+			p, err = r.streamFactory(r.log, rk)
 			if err != nil {
 				return err
 			}
@@ -78,20 +78,20 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 		}
 
 		r.log.Debugf(
-			"Pipeline %s need to run config with ID %s and programs: %s",
+			"Streams %s need to run config with ID %s and programs: %s",
 			rk,
 			req.ShortID(),
 			strings.Join(req.ProgramNames(), ", "),
 		)
 
-		err = p.(pipeline).Execute(req)
+		err = p.(stream).Execute(req)
 		if err != nil {
 			return err
 		}
 	}
 
-	// cleanup inactive pipelines.
-	// pipelines are shutdown down in alphabetical order.
+	// cleanup inactive streams.
+	// streams are shutdown down in alphabetical order.
 	keys := r.routes.Keys()
 	for _, k := range keys {
 		_, ok := active[k]
@@ -104,7 +104,7 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 			continue
 		}
 
-		p.(pipeline).Close()
+		p.(stream).Close()
 		r.routes.Remove(k)
 	}
 
