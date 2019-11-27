@@ -423,6 +423,17 @@ metricbeat.modules:
     namespace: "example"
     path: "/debug/vars"
 
+#------------------------ Google Cloud Platform Module ------------------------
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+    - firestore
+    - firebase
+    - storage
+    - loadbalancing
+  period: 300s
+
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
   metricsets: ["server"]

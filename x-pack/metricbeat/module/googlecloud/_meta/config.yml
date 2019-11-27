@@ -1,0 +1,9 @@
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+    - firestore
+    - firebase
+    - storage
+    - loadbalancing
+  period: 300s

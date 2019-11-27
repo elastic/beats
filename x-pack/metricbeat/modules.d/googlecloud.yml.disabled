@@ -1,0 +1,12 @@
+# Module: googlecloud
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-googlecloud.html
+
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+    - firestore
+    - firebase
+    - storage
+    - loadbalancing
+  period: 300s

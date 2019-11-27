@@ -1,0 +1,45 @@
+- name: compute
+  release: beta
+  type: group
+  description: >
+    Contains statistics related to the coreDNS service
+  fields:
+    - name: instance
+      type: group
+      fields:
+        - name: firewall
+          type: group
+          fields:
+            - name: dropped_bytes_count
+              type: long
+            - name: dropped_packets_count
+              type: long
+        - name: cpu
+          type: group
+          fields:
+            - name: utilization
+              type: double
+            - name: usage_time
+              type: double
+        - name: disk
+          type: group
+          fields:
+            - name: read_bytes_count
+              type: long
+            - name: read_ops_count
+              type: long
+            - name: write_bytes_count
+              type: long
+            - name: write_ops_count
+              type: long
+        - name: uptime
+          type: long
+        - name: network
+          type: group
+          fields:
+            - name: received_bytes_count
+              type: long
+            - name: received_packets_count
+              type: long
+            - name: sent_bytes_count
+              type: long

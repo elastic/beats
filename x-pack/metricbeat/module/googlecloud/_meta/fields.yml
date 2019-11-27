@@ -1,0 +1,5 @@
+- key: gcp
+  title: 'Google Cloud Platform'
+  release: beta
+  description: >
+    GCP module

@@ -1,0 +1,30 @@
+default: true
+input:
+  module: googlecloud
+  metricset: stackdriver
+  defaults:
+    stackdriver:
+      service: firebase
+      metrics:
+        - "firebasedatabase.googleapis.com/io/database_load"
+        - "firebasedatabase.googleapis.com/io/persisted_bytes_count"
+        - "firebasedatabase.googleapis.com/io/sent_responses_count"
+        - "firebasedatabase.googleapis.com/io/utilization"
+        - "firebasedatabase.googleapis.com/network/active_connections"
+        - "firebasedatabase.googleapis.com/network/api_hits_count"
+        - "firebasedatabase.googleapis.com/network/broadcast_load"
+        - "firebasedatabase.googleapis.com/network/disabled_for_overages"
+        - "firebasedatabase.googleapis.com/network/https_requests_count"
+        - "firebasedatabase.googleapis.com/network/monthly_sent"
+        - "firebasedatabase.googleapis.com/network/monthly_sent_limit"
+        - "firebasedatabase.googleapis.com/network/sent_bytes_count"
+        - "firebasedatabase.googleapis.com/network/sent_payload_and_protocol_bytes_count"
+        - "firebasedatabase.googleapis.com/network/sent_payload_bytes_count"
+        - "firebasedatabase.googleapis.com/storage/disabled_for_overages"
+        - "firebasedatabase.googleapis.com/storage/limit"
+        - "firebasedatabase.googleapis.com/storage/total_bytes"
+        - "firebasehosting.googleapis.com/network/monthly_sent"
+        - "firebasehosting.googleapis.com/network/monthly_sent_limit"
+        - "firebasehosting.googleapis.com/network/sent_bytes_count"
+        - "firebasehosting.googleapis.com/storage/limit"
+        - "firebasehosting.googleapis.com/storage/total_bytes"

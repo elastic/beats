@@ -1,0 +1,65 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-googlecloud]]
+[role="xpack"]
+== Google Cloud Platform module
+
+beta[]
+
+
+
+[float]
+=== Example configuration
+
+The Google Cloud Platform module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+    - firestore
+    - firebase
+    - storage
+    - loadbalancing
+  period: 300s
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-googlecloud-compute,compute>>
+
+* <<metricbeat-metricset-googlecloud-firebase,firebase>>
+
+* <<metricbeat-metricset-googlecloud-firestore,firestore>>
+
+* <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
+
+* <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
+
+* <<metricbeat-metricset-googlecloud-stackdriver,stackdriver>>
+
+* <<metricbeat-metricset-googlecloud-storage,storage>>
+
+include::googlecloud/compute.asciidoc[]
+
+include::googlecloud/firebase.asciidoc[]
+
+include::googlecloud/firestore.asciidoc[]
+
+include::googlecloud/loadbalancing.asciidoc[]
+
+include::googlecloud/pubsub.asciidoc[]
+
+include::googlecloud/stackdriver.asciidoc[]
+
+include::googlecloud/storage.asciidoc[]
+

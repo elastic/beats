@@ -1,9 +1,0 @@
-- key: tomcat
-  title: 'Tomcat'
-  release: beta
-  description: >
-    Tomcat module
-  fields:
-    - name: tomcat
-      type: group
-      fields:

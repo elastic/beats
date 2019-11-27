@@ -1,0 +1,11 @@
+default: true
+input:
+  module: googlecloud
+  metricset: stackdriver
+  defaults:
+    stackdriver:
+      service: firestore
+      metrics:
+        - "firestore.googleapis.com/document/delete_count"
+        - "firestore.googleapis.com/document/read_count"
+        - "firestore.googleapis.com/document/write_count"

@@ -49,6 +49,12 @@
 			"versionExact": "v0.40.0"
 		},
 		{
+			"checksumSHA1": "fkIr/Nq8prntyXUg8LvtIJp8EjI=",
+			"path": "cloud.google.com/go/monitoring/apiv3",
+			"revision": "7ad705f3932a730d492d20009b5ab5556d57e790",
+			"revisionTime": "2019-11-20T18:38:35Z"
+		},
+		{
 			"checksumSHA1": "jRv9Aa00+thzDjjgM9Sjzw9bcvE=",
 			"path": "cloud.google.com/go/pubsub",
 			"revision": "457ea5c15ccf3b87db582c450e80101989da35f7",
@@ -3919,10 +3925,10 @@
 			"revisionTime": "2019-06-11T19:02:12Z"
 		},
 		{
-			"checksumSHA1": "wYd0U3wOyD64pNUYdBRIXu4EEzs=",
+			"checksumSHA1": "tPsMOfjWDzlmqQt4i+B/vTU1Kxg=",
 			"path": "google.golang.org/genproto/googleapis/monitoring/v3",
-			"revision": "f660b865573183437d2d868f703fe88bb8af0b55",
-			"revisionTime": "2019-09-16T21:42:12Z"
+			"revision": "83cc0476cb11ea0da33dacd4c6354ab192de6fe6",
+			"revisionTime": "2019-11-15T22:14:24Z"
 		},
 		{
 			"checksumSHA1": "mWjsifWBYj/tA+lOpAnJzk+x4hw=",

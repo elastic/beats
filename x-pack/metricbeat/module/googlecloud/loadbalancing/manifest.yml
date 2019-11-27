@@ -1,0 +1,33 @@
+default: true
+input:
+  module: googlecloud
+  metricset: stackdriver
+  defaults:
+    stackdriver:
+      service: loadbalancing
+      metrics:
+        - "loadbalancing.googleapis.com/https/backend_latencies"
+        - "loadbalancing.googleapis.com/https/backend_request_bytes_count"
+        - "loadbalancing.googleapis.com/https/backend_request_count"
+        - "loadbalancing.googleapis.com/https/backend_response_bytes_count"
+        - "loadbalancing.googleapis.com/https/frontend_tcp_rtt"
+        - "loadbalancing.googleapis.com/https/backend_latencies"
+        - "loadbalancing.googleapis.com/https/request_bytes_count"
+        - "loadbalancing.googleapis.com/https/request_count"
+        - "loadbalancing.googleapis.com/https/response_bytes_count"
+        - "loadbalancing.googleapis.com/https/total_latencies"
+        - "loadbalancing.googleapis.com/https/request_bytes_count"
+        - "loadbalancing.googleapis.com/https/request_count"
+        - "loadbalancing.googleapis.com/https/response_bytes_count"
+        - "loadbalancing.googleapis.com/https/total_latencies"
+        - "loadbalancing.googleapis.com/l3/internal/egress_bytes_count"
+        - "loadbalancing.googleapis.com/l3/internal/egress_packets_count"
+        - "loadbalancing.googleapis.com/l3/internal/ingress_bytes_count"
+        - "loadbalancing.googleapis.com/l3/internal/ingress_packets_count"
+        - "loadbalancing.googleapis.com/l3/internal/rtt_latencies"
+        - "loadbalancing.googleapis.com/tcp_ssl_proxy/closed_connections"
+        - "loadbalancing.googleapis.com/tcp_ssl_proxy/egress_bytes_count"
+        - "loadbalancing.googleapis.com/tcp_ssl_proxy/frontend_tcp_rtt"
+        - "loadbalancing.googleapis.com/tcp_ssl_proxy/ingress_bytes_count"
+        - "loadbalancing.googleapis.com/tcp_ssl_proxy/new_connections"
+        - "loadbalancing.googleapis.com/tcp_ssl_proxy/open_connections"

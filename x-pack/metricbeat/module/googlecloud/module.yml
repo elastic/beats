@@ -1,0 +1,8 @@
+name: googlecloud
+metricsets:
+- compute
+- pubsub
+- firestore
+- firebase
+- storage
+- loadbalancing

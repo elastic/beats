@@ -31,7 +31,7 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // The protocol for the `ListUptimeCheckConfigs` request.
 type ListUptimeCheckConfigsRequest struct {
-	// The project whose uptime check configurations are listed. The format
+	// The project whose Uptime check configurations are listed. The format
 	//   is `projects/[PROJECT_ID]`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The maximum number of results to return in a single response. The server
@@ -96,7 +96,7 @@ func (m *ListUptimeCheckConfigsRequest) GetPageToken() string {
 
 // The protocol for the `ListUptimeCheckConfigs` response.
 type ListUptimeCheckConfigsResponse struct {
-	// The returned uptime check configurations.
+	// The returned Uptime check configurations.
 	UptimeCheckConfigs []*UptimeCheckConfig `protobuf:"bytes,1,rep,name=uptime_check_configs,json=uptimeCheckConfigs,proto3" json:"uptime_check_configs,omitempty"`
 	// This field represents the pagination token to retrieve the next page of
 	// results. If the value is empty, it means no further results for the
@@ -104,7 +104,7 @@ type ListUptimeCheckConfigsResponse struct {
 	// next_page_token is passed to the subsequent List method call (in the
 	// request message's page_token field).
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
-	// The total number of uptime check configurations for the project,
+	// The total number of Uptime check configurations for the project,
 	// irrespective of any pagination.
 	TotalSize            int32    `protobuf:"varint,3,opt,name=total_size,json=totalSize,proto3" json:"total_size,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -160,7 +160,7 @@ func (m *ListUptimeCheckConfigsResponse) GetTotalSize() int32 {
 
 // The protocol for the `GetUptimeCheckConfig` request.
 type GetUptimeCheckConfigRequest struct {
-	// The uptime check configuration to retrieve. The format
+	// The Uptime check configuration to retrieve. The format
 	//   is `projects/[PROJECT_ID]/uptimeCheckConfigs/[UPTIME_CHECK_ID]`.
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -202,10 +202,10 @@ func (m *GetUptimeCheckConfigRequest) GetName() string {
 
 // The protocol for the `CreateUptimeCheckConfig` request.
 type CreateUptimeCheckConfigRequest struct {
-	// The project in which to create the uptime check. The format
+	// The project in which to create the Uptime check. The format
 	//   is `projects/[PROJECT_ID]`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// The new uptime check configuration.
+	// The new Uptime check configuration.
 	UptimeCheckConfig    *UptimeCheckConfig `protobuf:"bytes,2,opt,name=uptime_check_config,json=uptimeCheckConfig,proto3" json:"uptime_check_config,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
@@ -253,16 +253,16 @@ func (m *CreateUptimeCheckConfigRequest) GetUptimeCheckConfig() *UptimeCheckConf
 
 // The protocol for the `UpdateUptimeCheckConfig` request.
 type UpdateUptimeCheckConfigRequest struct {
-	// Optional. If present, only the listed fields in the current uptime check
+	// Optional. If present, only the listed fields in the current Uptime check
 	// configuration are updated with values from the new configuration. If this
 	// field is empty, then the current configuration is completely replaced with
 	// the new configuration.
 	UpdateMask *field_mask.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
-	// Required. If an `"updateMask"` has been specified, this field gives
-	// the values for the set of fields mentioned in the `"updateMask"`. If an
-	// `"updateMask"` has not been given, this uptime check configuration replaces
-	// the current configuration. If a field is mentioned in `"updateMask"` but
-	// the corresonding field is omitted in this partial uptime check
+	// Required. If an `updateMask` has been specified, this field gives
+	// the values for the set of fields mentioned in the `updateMask`. If an
+	// `updateMask` has not been given, this Uptime check configuration replaces
+	// the current configuration. If a field is mentioned in `updateMask` but
+	// the corresonding field is omitted in this partial Uptime check
 	// configuration, it has the effect of deleting/clearing the field from the
 	// configuration on the server.
 	//
@@ -316,7 +316,7 @@ func (m *UpdateUptimeCheckConfigRequest) GetUptimeCheckConfig() *UptimeCheckConf
 
 // The protocol for the `DeleteUptimeCheckConfig` request.
 type DeleteUptimeCheckConfigRequest struct {
-	// The uptime check configuration to delete. The format
+	// The Uptime check configuration to delete. The format
 	//   is `projects/[PROJECT_ID]/uptimeCheckConfigs/[UPTIME_CHECK_ID]`.
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -552,23 +552,23 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UptimeCheckServiceClient interface {
-	// Lists the existing valid uptime check configurations for the project,
-	// leaving out any invalid configurations.
+	// Lists the existing valid Uptime check configurations for the project
+	// (leaving out any invalid configurations).
 	ListUptimeCheckConfigs(ctx context.Context, in *ListUptimeCheckConfigsRequest, opts ...grpc.CallOption) (*ListUptimeCheckConfigsResponse, error)
-	// Gets a single uptime check configuration.
+	// Gets a single Uptime check configuration.
 	GetUptimeCheckConfig(ctx context.Context, in *GetUptimeCheckConfigRequest, opts ...grpc.CallOption) (*UptimeCheckConfig, error)
-	// Creates a new uptime check configuration.
+	// Creates a new Uptime check configuration.
 	CreateUptimeCheckConfig(ctx context.Context, in *CreateUptimeCheckConfigRequest, opts ...grpc.CallOption) (*UptimeCheckConfig, error)
-	// Updates an uptime check configuration. You can either replace the entire
+	// Updates an Uptime check configuration. You can either replace the entire
 	// configuration with a new one or replace only certain fields in the current
-	// configuration by specifying the fields to be updated via `"updateMask"`.
+	// configuration by specifying the fields to be updated via `updateMask`.
 	// Returns the updated configuration.
 	UpdateUptimeCheckConfig(ctx context.Context, in *UpdateUptimeCheckConfigRequest, opts ...grpc.CallOption) (*UptimeCheckConfig, error)
-	// Deletes an uptime check configuration. Note that this method will fail
-	// if the uptime check configuration is referenced by an alert policy or
+	// Deletes an Uptime check configuration. Note that this method will fail
+	// if the Uptime check configuration is referenced by an alert policy or
 	// other dependent configs that would be rendered invalid by the deletion.
 	DeleteUptimeCheckConfig(ctx context.Context, in *DeleteUptimeCheckConfigRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	// Returns the list of IPs that checkers run from
+	// Returns the list of IP addresses that checkers run from
 	ListUptimeCheckIps(ctx context.Context, in *ListUptimeCheckIpsRequest, opts ...grpc.CallOption) (*ListUptimeCheckIpsResponse, error)
 }
 
@@ -636,23 +636,23 @@ func (c *uptimeCheckServiceClient) ListUptimeCheckIps(ctx context.Context, in *L
 
 // UptimeCheckServiceServer is the server API for UptimeCheckService service.
 type UptimeCheckServiceServer interface {
-	// Lists the existing valid uptime check configurations for the project,
-	// leaving out any invalid configurations.
+	// Lists the existing valid Uptime check configurations for the project
+	// (leaving out any invalid configurations).
 	ListUptimeCheckConfigs(context.Context, *ListUptimeCheckConfigsRequest) (*ListUptimeCheckConfigsResponse, error)
-	// Gets a single uptime check configuration.
+	// Gets a single Uptime check configuration.
 	GetUptimeCheckConfig(context.Context, *GetUptimeCheckConfigRequest) (*UptimeCheckConfig, error)
-	// Creates a new uptime check configuration.
+	// Creates a new Uptime check configuration.
 	CreateUptimeCheckConfig(context.Context, *CreateUptimeCheckConfigRequest) (*UptimeCheckConfig, error)
-	// Updates an uptime check configuration. You can either replace the entire
+	// Updates an Uptime check configuration. You can either replace the entire
 	// configuration with a new one or replace only certain fields in the current
-	// configuration by specifying the fields to be updated via `"updateMask"`.
+	// configuration by specifying the fields to be updated via `updateMask`.
 	// Returns the updated configuration.
 	UpdateUptimeCheckConfig(context.Context, *UpdateUptimeCheckConfigRequest) (*UptimeCheckConfig, error)
-	// Deletes an uptime check configuration. Note that this method will fail
-	// if the uptime check configuration is referenced by an alert policy or
+	// Deletes an Uptime check configuration. Note that this method will fail
+	// if the Uptime check configuration is referenced by an alert policy or
 	// other dependent configs that would be rendered invalid by the deletion.
 	DeleteUptimeCheckConfig(context.Context, *DeleteUptimeCheckConfigRequest) (*empty.Empty, error)
-	// Returns the list of IPs that checkers run from
+	// Returns the list of IP addresses that checkers run from
 	ListUptimeCheckIps(context.Context, *ListUptimeCheckIpsRequest) (*ListUptimeCheckIpsResponse, error)
 }
 
