@@ -23,8 +23,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -211,7 +209,7 @@ func TestFetchGroupInfo(t *testing.T) {
 
 		groups := makeNameSet(test.groups...).pred()
 		topics := makeNameSet(test.topics...).pred()
-		err := fetchGroupInfo(collectEvents, test.client, groups, topics, sarama.NewConfig(), "somehost")
+		err := fetchGroupInfo(collectEvents, test.client, groups, topics)
 		if err != nil {
 			switch {
 			case test.err == nil:

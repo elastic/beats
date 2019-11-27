@@ -30,7 +30,7 @@ type mockClient struct {
 	listGroups                      func() ([]string, error)
 	describeGroups                  func(group []string) (map[string]kafka.GroupDescription, error)
 	fetchGroupOffsets               func(group string) (*sarama.OffsetFetchResponse, error)
-	getPartitionOffsetFromTheLeader func(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error)
+	getPartitionOffsetFromTheLeader func(topic string, partitionID int32) (int64, error)
 }
 
 type mockState struct {
@@ -46,7 +46,7 @@ func defaultMockClient(state mockState) *mockClient {
 		listGroups:        makeListGroups(state),
 		describeGroups:    makeDescribeGroups(state),
 		fetchGroupOffsets: makeFetchGroupOffsets(state),
-		getPartitionOffsetFromTheLeader: func(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error) {
+		getPartitionOffsetFromTheLeader: func(topic string, partitionID int32) (int64, error) {
 			return 42, nil
 		},
 	}
@@ -55,12 +55,6 @@ func defaultMockClient(state mockState) *mockClient {
 func (c *mockClient) with(fn func(*mockClient)) *mockClient {
 	fn(c)
 	return c
-}
-
-func makePartitonOffset(state mockState) func() (int64, error) {
-	return func() (int64, error) {
-		return 42, nil
-	}
 }
 
 func makeListGroups(state mockState) func() ([]string, error) {
@@ -155,6 +149,6 @@ func (c *mockClient) DescribeGroups(groups []string) (map[string]kafka.GroupDesc
 func (c *mockClient) FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error) {
 	return c.fetchGroupOffsets(group)
 }
-func (c *mockClient) GetPartitionOffsetFromTheLeader(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error) {
-	return c.getPartitionOffsetFromTheLeader(topic, partitionID, cfg, brokerAddr)
+func (c *mockClient) GetPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
+	return c.getPartitionOffsetFromTheLeader(topic, partitionID)
 }

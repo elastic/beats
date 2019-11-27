@@ -148,11 +148,6 @@ func (b *Broker) AdvertisedAddr() string {
 	return b.advertisedAddr
 }
 
-// BrokerCfg returns the client configuration attached to the broker
-func (b *Broker) BrokerCfg() *sarama.Config {
-	return b.cfg
-}
-
 // GetMetadata fetches most recent cluster metadata from the broker.
 func (b *Broker) GetMetadata(topics ...string) (*sarama.MetadataResponse, error) {
 	return queryMetadataWithRetry(b.broker, b.cfg, topics)
@@ -276,8 +271,8 @@ func (b *Broker) FetchGroupOffsets(group string, partitions map[string][]int32) 
 }
 
 // GetPartitionOffsetFromTheLeader fetches the OffsetNewest from the leader.
-func (b *Broker) GetPartitionOffsetFromTheLeader(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error) {
-	client, err := sarama.NewClient([]string{brokerAddr}, cfg)
+func (b *Broker) GetPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
+	client, err := sarama.NewClient([]string{b.Addr()}, b.cfg)
 	if err != nil {
 		return -1, err
 	}

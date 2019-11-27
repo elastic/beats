@@ -111,7 +111,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			MetricSetFields: event,
 		})
 	}
-	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred(), broker.BrokerCfg(), broker.Addr())
+	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred())
 	if err != nil {
 		return errors.Wrap(err, "error in fetch")
 	}
