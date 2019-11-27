@@ -370,5 +370,5 @@ type opUnixTimestampValue struct {
 
 // Process converts a value in seconds into an unix time
 func (o opUnixTimestampValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
-	return field, time.Unix(int64(value.(float64)), 0), labels
+	return field, common.Time(time.Unix(int64(value.(float64)), 0)), labels
 }

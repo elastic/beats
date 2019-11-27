@@ -5,7 +5,7 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"created": "2017-07-14T04:40:00+02:00",
+			"created": "2017-07-14T02:40:00.000Z",
 			"external_ip": "1.2.3.10",
 			"labels": {
 				"label_app": "example6"
@@ -30,7 +30,7 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"created": "2017-07-14T04:40:00+02:00",
+			"created": "2017-07-14T02:40:00.000Z",
 			"ingress_hostname": "www.example.com",
 			"ingress_ip": "1.2.3.8",
 			"labels": {
@@ -57,7 +57,7 @@
 		},
 		"MetricSetFields": {
 			"cluster_ip": "1.2.3.4",
-			"created": "2017-07-14T04:40:00+02:00",
+			"created": "2017-07-14T02:40:00.000Z",
 			"labels": {
 				"label_app": "example1"
 			},
@@ -82,7 +82,7 @@
 		},
 		"MetricSetFields": {
 			"cluster_ip": "1.2.3.5",
-			"created": "2017-07-14T04:40:00+02:00",
+			"created": "2017-07-14T02:40:00.000Z",
 			"labels": {
 				"label_app": "example2"
 			},
@@ -106,7 +106,7 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"created": "2017-07-14T04:40:00+02:00",
+			"created": "2017-07-14T02:40:00.000Z",
 			"external_name": "www.example.com",
 			"labels": {
 				"label_app": "example4"
@@ -132,7 +132,7 @@
 		},
 		"MetricSetFields": {
 			"cluster_ip": "1.2.3.6",
-			"created": "2017-07-14T04:40:00+02:00",
+			"created": "2017-07-14T02:40:00.000Z",
 			"labels": {
 				"label_app": "example3"
 			},

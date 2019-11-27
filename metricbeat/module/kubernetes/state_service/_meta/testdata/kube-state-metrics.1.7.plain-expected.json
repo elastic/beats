@@ -9,7 +9,7 @@
             "namespace": "default",
             "service": {
                 "cluster_ip": "10.96.0.1",
-                "created": "2019-07-19T12:39:29+02:00",
+                "created": "2019-07-19T10:39:29.000Z",
                 "labels": {
                     "label_component": "apiserver",
                     "label_provider": "kubernetes"
@@ -37,7 +37,7 @@
             "namespace": "kube-system",
             "service": {
                 "cluster_ip": "10.96.0.10",
-                "created": "2019-07-19T12:39:31+02:00",
+                "created": "2019-07-19T10:39:31.000Z",
                 "labels": {
                     "label_k8s_app": "kube-dns",
                     "label_kubernetes_io_cluster_service": "true",
@@ -66,7 +66,7 @@
             "namespace": "kube-system",
             "service": {
                 "cluster_ip": "10.105.144.35",
-                "created": "2019-07-19T12:41:47+02:00",
+                "created": "2019-07-19T10:41:47.000Z",
                 "labels": {
                     "label_k8s_app": "kube-state-metrics"
                 },
