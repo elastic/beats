@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
 )
 
 const (
@@ -20,7 +21,7 @@ const (
 	monitoringEnabledSubkey = "enabled"
 )
 
-func (o *Operator) handleStartSidecar(s configrequest.Step) error {
+func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 	cfg, err := getConfigFromStep(s)
 	if err != nil {
 		return errors.Wrap(err, "operator.handleStartSidecar failed to retrieve config from step")
@@ -36,7 +37,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) error {
 		o.logger.Info("operator.handleStartSidecar: monitoring is not running and disabled, no action taken")
 		return nil
 	}
-	var result error
+
 	o.isMonitoring = true
 
 	for _, step := range o.getMonitoringSteps(s) {
@@ -60,9 +61,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) error {
 	return result
 }
 
-func (o *Operator) handleStopSidecar(s configrequest.Step) error {
-	var result error
-
+func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 	for _, step := range o.getMonitoringSteps(s) {
 		p, _, err := getProgramFromStepWithTags(step, monitoringTags())
 		if err != nil {
@@ -123,7 +122,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 
 	outputIface, found := config[outputKey]
 	if !found {
-		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar: %v", config)
+		o.logger.Errorf("operator.getMonitoringSteps: monitoring configuration not found for sidecar of type %s", step.Process)
 		return nil
 	}
 
@@ -135,12 +134,17 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 
 	output, found := outputMap["elasticsearch"]
 	if !found {
-		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an elasticsearch configuration from output: %v", outputMap)
+		o.logger.Error("operator.getMonitoringSteps: monitoring is missing an elasticsearch output configuration configuration for sidecar of type: %s", step.Process)
 		return nil
 	}
 
+	return o.generateMonitoringSteps(o.config.MonitoringConfig, step.Version, output)
+}
+
+func (o *Operator) generateMonitoringSteps(cfg *monitoring.Config, version string, output interface{}) []configrequest.Step {
 	var steps []configrequest.Step
-	if o.config.MonitoringConfig.MonitorLogs {
+
+	if cfg.MonitorLogs {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
@@ -148,7 +152,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		}
 		filebeatStep := configrequest.Step{
 			ID:      stepID,
-			Version: step.Version,
+			Version: version,
 			Process: "filebeat",
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: fbConfig,
@@ -158,7 +162,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		steps = append(steps, filebeatStep)
 	}
 
-	if o.config.MonitoringConfig.MonitorMetrics {
+	if cfg.MonitorMetrics {
 		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
@@ -167,7 +171,7 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 
 		metricbeatStep := configrequest.Step{
 			ID:      stepID,
-			Version: step.Version,
+			Version: version,
 			Process: "metricbeat",
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,
