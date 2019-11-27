@@ -1,27 +1,8 @@
-INFO  | admin called org.apache.activemq.broker.jmx.QueueView.pause[] at 27-11-2019 08:26:10,233 | qtp443290224-46
-INFO  | admin called org.apache.activemq.broker.jmx.QueueView.purge[] at 27-11-2019 08:26:21,372 | qtp443290224-46
-INFO  | admin called org.apache.activemq.broker.jmx.QueueView.purge[] at 27-11-2019 08:26:26,348 | qtp443290224-46
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:56,917 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:56,933 | qtp443290224-45
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:56,950 | qtp443290224-46
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:56,965 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:56,982 | qtp443290224-45
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:56,998 | qtp443290224-46
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,015 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,033 | qtp443290224-45
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,051 | qtp443290224-46
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,068 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,084 | qtp443290224-45
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,100 | qtp443290224-46
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,117 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,133 | qtp443290224-45
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,150 | qtp443290224-46
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,167 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,182 | qtp443290224-45
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,198 | qtp443290224-46
 INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,213 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,229 | qtp443290224-45
+INFO  | admin called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,229 | qtp443290224-45
 INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,245 | qtp443290224-46
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,260 | qtp443290224-47
-INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,276 | qtp443290224-45
+WARN  | admin called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,260 | qtp443290224-47
+ERROR | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,276 | qtp443290224-45
 INFO  | anonymous called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,292 | qtp443290224-46
+WARN  | admin requested /admin/createDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='4eb0bc3e-9d7a-4256-844c-24f40fda98f1' ] from 127.0.0.1 | qtp12205619-39
+INFO  | admin requested /admin/purgeDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='eff6a932-1b58-45da-a64a-1b30b246cfc9' ] from 127.0.0.1 | qtp12205619-36
