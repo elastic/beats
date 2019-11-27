@@ -1,7 +1,6 @@
 package program
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -88,10 +87,6 @@ func TestGroupBy(t *testing.T) {
 
 		defaultConfig, ok := grouped["default"]
 		require.True(t, ok)
-		fmt.Println("initial")
-		fmt.Println(c1)
-		fmt.Println("compareWith")
-		fmt.Println(defaultConfig)
 		require.Equal(t, c1.Hash(), defaultConfig.Hash())
 
 		infosec1Config, ok := grouped["infosec1"]
