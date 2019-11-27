@@ -13,7 +13,15 @@
 2019-11-27 10:16:37,350 | INFO  | Starting Jetty server | org.apache.activemq.transport.WebTransportServerSupport | main
 2019-11-27 10:16:37,438 | INFO  | Creating Jetty connector | org.apache.activemq.transport.WebTransportServerSupport | main
 2019-11-27 10:16:37,538 | WARN  | ServletContext@o.e.j.s.ServletContextHandler@479ceda0{/,null,STARTING} has uncovered http methods for path: / | org.eclipse.jetty.security.SecurityHandler | main
-2019-11-27 10:16:37,590 | INFO  | Listening for connections at ws://5338986a6080:61614?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.ws.WSTransportServer | main
+2019-11-27 10:16:37,590 | ERROR | Listening for connections at ws://5338986a6080:61614?maximumConnections=1000&wireFormat.maxFrameSize=104857600 | org.apache.activemq.transport.ws.WSTransportServer | main
+javax.jms.JMSException: Connection refused
+	at org.apache.activemq.util.JMSExceptionSupport.create(JMSExceptionSupport.java:62)
+	at org.apache.activemq.ActiveMQConnection.syncSendPacket(ActiveMQConnection.java:1380)
+	at org.apache.activemq.ActiveMQConnection.ensureConnectionInfoSent(ActiveMQConnection.java:1466)
+	at org.apache.activemq.ActiveMQConnection.start(ActiveMQConnection.java:503)
+	at org.apache.activemq.pool.ConnectionPool.start(ConnectionPool.java:90)
+	at org.apache.activemq.pool.PooledConnection.start(PooledConnection.java:87)
+	at org.logicblaze.lingo.jms.JmsProducerConfig.createConnection(JmsProducerConfig.java:87)
 2019-11-27 10:16:37,591 | INFO  | Connector ws started | org.apache.activemq.broker.TransportConnector | main
 2019-11-27 10:16:37,593 | INFO  | Apache ActiveMQ 5.15.9 (localhost, ID:5338986a6080-34627-1574849797155-0:1) started | org.apache.activemq.broker.BrokerService | main
 2019-11-27 10:16:37,595 | INFO  | For help or more information please see: http://activemq.apache.org | org.apache.activemq.broker.BrokerService | main
