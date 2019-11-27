@@ -30,7 +30,6 @@ The following Metricsets are already included:
 
 `performance` Metricset fetches information from what's commonly known as https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017[Performance Counters] in MSSQL.
 
-[float]
 === Module-specific configuration notes
 
 When configuring the `hosts` option, you can specify native user credentials 
@@ -43,7 +42,6 @@ hosts: ["sqlserver://sa@localhost"]]
 To use Active Directory domain credentials, you can separately specify the username and password
 using the respective configuration options to allow the domain to be included in the username:
 
-[source,yaml]
 ----
 metricbeat.modules:
 - module: mssql
