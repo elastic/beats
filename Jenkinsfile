@@ -635,3 +635,10 @@ class GetProjectDependencies extends co.elastic.beats.BeatsFunction {
     return output?.split('\n').collect{ item -> item as String }
   }
 }
+
+def isChanged(patterns){
+  return (params.runAllStages
+    || isGitRegionMatch(patterns: patterns, comparator: 'regexp')
+    || isGitRegionMatch(patterns: ["^libbeat/.*"], comparator: 'regexp')
+  )
+}
