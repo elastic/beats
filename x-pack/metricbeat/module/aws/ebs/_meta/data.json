@@ -5,30 +5,36 @@
             "namespace": "AWS/EBS"
         },
         "dimensions": {
-            "VolumeId": "vol-092bd3981e4e05170"
+            "VolumeId": "vol-0f3766bc5920c34de"
         },
         "ebs": {
             "metrics": {
                 "BurstBalance": {
-                    "avg": 100
+                    "avg": 99.9467222222222
                 },
                 "VolumeIdleTime": {
-                    "sum": 299.99
+                    "sum": 599.83
                 },
                 "VolumeQueueLength": {
-                    "avg": 0.0007
+                    "avg": 0.003533333333333335
+                },
+                "VolumeReadBytes": {
+                    "avg": 30935.57894736842
                 },
                 "VolumeReadOps": {
-                    "avg": 0
+                    "avg": 19
+                },
+                "VolumeTotalReadTime": {
+                    "sum": 0.02
                 },
                 "VolumeTotalWriteTime": {
-                    "sum": 0.21
+                    "sum": 2.0999999999999996
                 },
                 "VolumeWriteBytes": {
-                    "avg": 5898.666666666667
+                    "avg": 11735.04
                 },
                 "VolumeWriteOps": {
-                    "avg": 96
+                    "avg": 262.5
                 }
             }
         }
