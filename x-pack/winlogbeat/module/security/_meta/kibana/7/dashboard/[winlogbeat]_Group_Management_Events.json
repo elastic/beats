@@ -299,7 +299,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[winlogbeat] Group Management Events", 
+                "title": "[Winlogbeat security] Management Events", 
                 "version": 1
             }, 
             "id": "bb858830-f412-11e9-8405-516218e3d268", 
@@ -419,7 +419,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Description", 
+                "title": "Group Management Events - Description [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -581,7 +581,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Event Actions - Donut", 
+                "title": "Group Management Events - Event Actions - Donut [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -811,7 +811,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Event Actions - Table", 
+                "title": "Group Management Events - Event Actions - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -954,7 +954,7 @@
                         }
                     }
                 }, 
-                "title": "Users Added - Metric", 
+                "title": "Users Added - Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1039,7 +1039,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Deleted - Metric", 
+                "title": "Groups Deleted - Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1124,7 +1124,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Created - Metric", 
+                "title": "Groups Created - Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1209,7 +1209,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Changed - Metric", 
+                "title": "Groups Changed - Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1294,7 +1294,7 @@
                         }
                     }
                 }, 
-                "title": "Users Removed - Table", 
+                "title": "Users Removed - Table [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1373,7 +1373,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Enumeration - Metric", 
+                "title": "Groups Enumeration - Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1579,7 +1579,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Groups vs Actions - Heatmap", 
+                "title": "Group Management Events - Groups vs Actions - Heatmap [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -1784,7 +1784,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Created - Table", 
+                "title": "Groups Created - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2030,7 +2030,7 @@
                         }
                     }
                 }, 
-                "title": "Group Changes - Table", 
+                "title": "Group Changes - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2276,7 +2276,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Deleted - Table", 
+                "title": "Groups Deleted - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2522,7 +2522,7 @@
                         }
                     }
                 }, 
-                "title": "Users Added - Table", 
+                "title": "Users Added - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2798,7 +2798,7 @@
                         }
                     }
                 }, 
-                "title": "Users Removed from Group - Table", 
+                "title": "Users Removed from Group - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -3062,7 +3062,7 @@
                         }
                     }
                 }, 
-                "title": "5_Group_Enum", 
+                "title": "5_Group_Enum [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -3472,7 +3472,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Action Distribution over Time", 
+                "title": "Group Management Action Distribution over Time [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {

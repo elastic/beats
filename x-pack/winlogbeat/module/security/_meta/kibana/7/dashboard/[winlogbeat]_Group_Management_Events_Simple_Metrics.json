@@ -298,7 +298,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[winlogbeat] Group Management Events - Simple Metrics", 
+                "title": "[Winlogbeat security] Group Management Events - Simple Metrics", 
                 "version": 1
             }, 
             "id": "01c54730-fee6-11e9-8405-516218e3d268", 
@@ -418,7 +418,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Description", 
+                "title": "Group Management Events - Description [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -580,7 +580,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Event Actions - Donut", 
+                "title": "Group Management Events - Event Actions - Donut [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -810,7 +810,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Event Actions - Table", 
+                "title": "Group Management Events - Event Actions - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1080,7 +1080,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Events - Groups vs Actions - Heatmap", 
+                "title": "Group Management Events - Groups vs Actions - Heatmap [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -1285,7 +1285,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Created - Table", 
+                "title": "Groups Created - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1531,7 +1531,7 @@
                         }
                     }
                 }, 
-                "title": "Group Changes - Table", 
+                "title": "Group Changes - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1777,7 +1777,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Deleted - Table", 
+                "title": "Groups Deleted - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2023,7 +2023,7 @@
                         }
                     }
                 }, 
-                "title": "Users Added - Table", 
+                "title": "Users Added - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2299,7 +2299,7 @@
                         }
                     }
                 }, 
-                "title": "Users Removed from Group - Table", 
+                "title": "Users Removed from Group - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2563,7 +2563,7 @@
                         }
                     }
                 }, 
-                "title": "5_Group_Enum", 
+                "title": "5_Group_Enum [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2889,7 +2889,7 @@
                         }
                     }
                 }, 
-                "title": "Users Added - Simple Metric", 
+                "title": "Users Added - Simple Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3024,7 +3024,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Deleted- Simple Metric", 
+                "title": "Groups Deleted- Simple Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3159,7 +3159,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Created - Simple Metric", 
+                "title": "Groups Created - Simple Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3300,7 +3300,7 @@
                         }
                     }
                 }, 
-                "title": "Groups Changes - Simple Metric", 
+                "title": "Groups Changes - Simple Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3435,7 +3435,7 @@
                         }
                     }
                 }, 
-                "title": "Users Removed from Group  - Simple Metric", 
+                "title": "Users Removed from Group  - Simple Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3554,7 +3554,7 @@
                         }
                     }
                 }, 
-                "title": "Group Membership Enumeration  - Simple Metric", 
+                "title": "Group Membership Enumeration  - Simple Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3773,7 +3773,7 @@
                         }
                     }
                 }, 
-                "title": "Group Management Action Distribution over Time", 
+                "title": "Group Management Action Distribution over Time [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {

@@ -354,7 +354,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[winlogbeat] User Management Events", 
+                "title": "[Winlogbeat security] User Management Events", 
                 "version": 1
             }, 
             "id": "71f720f0-ff18-11e9-8405-516218e3d268", 
@@ -494,7 +494,7 @@
                         }
                     }
                 }, 
-                "title": "User  Management Events - Description", 
+                "title": "User  Management Events - Description [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -650,7 +650,7 @@
                         }
                     }
                 }, 
-                "title": "User Management Events - Event Actions - Donut", 
+                "title": "User Management Events - Event Actions - Donut [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -780,7 +780,7 @@
                         }
                     }
                 }, 
-                "title": "Users Created - Table", 
+                "title": "Users Created - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1074,7 +1074,7 @@
                         }
                     }
                 }, 
-                "title": "User Management Events - Event Actions - Table", 
+                "title": "User Management Events - Event Actions - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1244,7 +1244,7 @@
                         }
                     }
                 }, 
-                "title": "Users Enabled - Table", 
+                "title": "Users Enabled - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1444,7 +1444,7 @@
                         }
                     }
                 }, 
-                "title": "Users Disabled - Table", 
+                "title": "Users Disabled - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1644,7 +1644,7 @@
                         }
                     }
                 }, 
-                "title": "Users Deleted - Table", 
+                "title": "Users Deleted - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -1938,7 +1938,7 @@
                         }
                     }
                 }, 
-                "title": "User Management Events - Affected Users vs Actions - Heatmap", 
+                "title": "User Management Events - Affected Users vs Actions - Heatmap [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -2138,7 +2138,7 @@
                         }
                     }
                 }, 
-                "title": "Users Password Changes - Table", 
+                "title": "Users Password Changes - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2338,7 +2338,7 @@
                         }
                     }
                 }, 
-                "title": "Unlocked Users - Table", 
+                "title": "Unlocked Users - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2538,7 +2538,7 @@
                         }
                     }
                 }, 
-                "title": "Users Changes  Table", 
+                "title": "Users Changes  Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -2738,7 +2738,7 @@
                         }
                     }
                 }, 
-                "title": "Users Locked Out - Table", 
+                "title": "Users Locked Out - Table [Winlogbeat security]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -3002,7 +3002,7 @@
                         }
                     }
                 }, 
-                "title": "4_Event_Distribution in time", 
+                "title": "4_Event_Distribution in time [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3408,7 +3408,7 @@
                         }
                     }
                 }, 
-                "title": "Users Disabled - VB Metric", 
+                "title": "Users Disabled - VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3492,7 +3492,7 @@
                         }
                     }
                 }, 
-                "title": "Users Enabled - VB Metric", 
+                "title": "Users Enabled - VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3576,7 +3576,7 @@
                         }
                     }
                 }, 
-                "title": "Users Deleted - VB Metric", 
+                "title": "Users Deleted - VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3660,7 +3660,7 @@
                         }
                     }
                 }, 
-                "title": "Users Created - VB Metric", 
+                "title": "Users Created - VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3744,7 +3744,7 @@
                         }
                     }
                 }, 
-                "title": "Users Unlocks - VB Metric", 
+                "title": "Users Unlocks - VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3828,7 +3828,7 @@
                         }
                     }
                 }, 
-                "title": "Users Password Changes - VB Metric", 
+                "title": "Users Password Changes - VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3912,7 +3912,7 @@
                         }
                     }
                 }, 
-                "title": "Users locked Out - VB Metric", 
+                "title": "Users locked Out - VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -3996,7 +3996,7 @@
                         }
                     }
                 }, 
-                "title": "Users Changes  VB Metric", 
+                "title": "Users Changes  VB Metric [Winlogbeat security]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
