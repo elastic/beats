@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/binary"
 	"io"
+	"io/ioutil"
 	"syscall"
 
 	"github.com/containerd/fifo"
@@ -60,7 +61,7 @@ func (reader *PipeReader) ReadMessage(log *logdriver.LogEntry) error {
 		}
 
 		// 2) we have a too-large message. Disregard length bytes
-		_, err = io.CopyBuffer(nil, io.LimitReader(reader.fifoPipe, int64(lenFrame)), reader.bodyBuf)
+		_, err = io.CopyBuffer(ioutil.Discard, io.LimitReader(reader.fifoPipe, int64(lenFrame)), reader.bodyBuf)
 		if err != nil {
 			return errors.Wrap(err, "error emptying buffer")
 		}
