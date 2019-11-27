@@ -148,6 +148,11 @@ func (b *Broker) AdvertisedAddr() string {
 	return b.advertisedAddr
 }
 
+// BrokerCfg returns the client configuration attached to the broker
+func (b *Broker) BrokerCfg() *sarama.Config {
+	return b.cfg
+}
+
 // GetMetadata fetches most recent cluster metadata from the broker.
 func (b *Broker) GetMetadata(topics ...string) (*sarama.MetadataResponse, error) {
 	return queryMetadataWithRetry(b.broker, b.cfg, topics)

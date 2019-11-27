@@ -34,7 +34,7 @@ type client interface {
 func fetchGroupInfo(
 	emit func(common.MapStr),
 	b client,
-	groupsFilter, topicsFilter func(string) bool,
+	groupsFilter, topicsFilter func(string) bool, cfg *sarama.Config, brokerAddr string,
 ) error {
 	type result struct {
 		err    error
@@ -113,12 +113,22 @@ func fetchGroupInfo(
 
 		for topic, partitions := range ret.off.Blocks {
 			for partition, info := range partitions {
+				partitionOffset, err := getPartitonOffsetFromTheLeader(topic, partition, cfg, brokerAddr)
+				if err != nil {
+					logp.Err("failed to fetch offset for (topic, partition): ('%v', %v)", topic, partition)
+					continue
+				}
+				consumerLag := info.Offset - partitionOffset
+				if consumerLag < 0 {
+					consumerLag = 0
+				}
 				event := common.MapStr{
-					"id":        ret.group,
-					"topic":     topic,
-					"partition": partition,
-					"offset":    info.Offset,
-					"meta":      info.Metadata,
+					"id":           ret.group,
+					"topic":        topic,
+					"partition":    partition,
+					"offset":       info.Offset,
+					"meta":         info.Metadata,
+					"consumer_lag": consumerLag,
 					"error": common.MapStr{
 						"code": info.Err,
 					},
@@ -143,6 +153,18 @@ func fetchGroupInfo(
 	close(results)
 
 	return err
+}
+
+func getPartitonOffsetFromTheLeader(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error) {
+	client, err := sarama.NewClient([]string{brokerAddr}, cfg)
+	if err != nil {
+		return -1, err
+	}
+	offset, err := client.GetOffset(topic, partitionID, sarama.OffsetNewest)
+	if err != nil {
+		return -1, err
+	}
+	return offset, nil
 }
 
 func listGroups(b client, filter func(string) bool) ([]string, error) {

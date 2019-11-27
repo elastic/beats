@@ -15761,6 +15761,15 @@ type: keyword
 
 --
 
+*`kafka.consumergroup.consumer_lag`*::
++
+--
+consumer lag for partition/topic
+
+type: long
+
+--
+
 *`kafka.consumergroup.error.code`*::
 +
 --
