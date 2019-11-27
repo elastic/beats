@@ -1,0 +1,15 @@
+- name: log
+  type: group
+  description: >
+    ActiveMQ audit log lines.
+  fields:
+    - name: level
+      type: alias
+      path: log.level
+    - name: message
+      type: alias
+      path: message
+    - name: thread
+      type: keyword
+      description: >
+        Thread that generated the logging event.

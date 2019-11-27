@@ -1,7 +1,7 @@
 - key: activemq
   title: "activemq"
   description: >
-    activemq Module
+    Module for parsing ActiveMQ log files.
   fields:
     - name: activemq
       type: group
