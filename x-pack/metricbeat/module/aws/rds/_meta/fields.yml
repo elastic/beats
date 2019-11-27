@@ -216,3 +216,15 @@
       type: long
       description: >
         The average number of transactions in the database that are blocked per second.
+    - name: db_instance.db_cluster_identifier
+      type: keyword
+      description: >
+        This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
+    - name: db_instance.role
+      type: keyword
+      description: >
+        DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
+    - name: db_instance.engine_name
+      type: keyword
+      description: >
+        Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
