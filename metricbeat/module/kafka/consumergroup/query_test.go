@@ -226,7 +226,7 @@ func TestFetchGroupInfo(t *testing.T) {
 		for key, expected := range indexEvents(test.expected) {
 			event, found := indexed[key]
 			if !found {
-				t.Errorf("Missing event: %v", key)
+				t.Errorf("Missing key %v from events: %v", key, events)
 				continue
 			}
 			assertEvent(t, expected, event)

@@ -275,6 +275,19 @@ func (b *Broker) FetchGroupOffsets(group string, partitions map[string][]int32) 
 	return b.broker.FetchOffset(requ)
 }
 
+// GetPartitionOffsetFromTheLeader fetches the OffsetNewest from the leader.
+func (b *Broker) GetPartitionOffsetFromTheLeader(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error) {
+	client, err := sarama.NewClient([]string{brokerAddr}, cfg)
+	if err != nil {
+		return -1, err
+	}
+	offset, err := client.GetOffset(topic, partitionID, sarama.OffsetNewest)
+	if err != nil {
+		return -1, err
+	}
+	return offset, nil
+}
+
 // ID returns the broker or -1 if the broker id is unknown.
 func (b *Broker) ID() int32 {
 	if b.id == noID {

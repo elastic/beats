@@ -29,6 +29,7 @@ type client interface {
 	ListGroups() ([]string, error)
 	DescribeGroups(group []string) (map[string]kafka.GroupDescription, error)
 	FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error)
+	GetPartitionOffsetFromTheLeader(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error)
 }
 
 func fetchGroupInfo(
@@ -113,12 +114,12 @@ func fetchGroupInfo(
 
 		for topic, partitions := range ret.off.Blocks {
 			for partition, info := range partitions {
-				partitionOffset, err := getPartitonOffsetFromTheLeader(topic, partition, cfg, brokerAddr)
+				partitionOffset, err := getPartitionOffsetFromTheLeader(b, topic, partition, cfg, brokerAddr)
 				if err != nil {
 					logp.Err("failed to fetch offset for (topic, partition): ('%v', %v)", topic, partition)
 					continue
 				}
-				consumerLag := info.Offset - partitionOffset
+				consumerLag := partitionOffset - info.Offset
 				if consumerLag < 0 {
 					consumerLag = 0
 				}
@@ -143,7 +144,6 @@ func fetchGroupInfo(
 						}
 					}
 				}
-
 				emit(event)
 			}
 		}
@@ -155,12 +155,8 @@ func fetchGroupInfo(
 	return err
 }
 
-func getPartitonOffsetFromTheLeader(topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error) {
-	client, err := sarama.NewClient([]string{brokerAddr}, cfg)
-	if err != nil {
-		return -1, err
-	}
-	offset, err := client.GetOffset(topic, partitionID, sarama.OffsetNewest)
+func getPartitionOffsetFromTheLeader(b client, topic string, partitionID int32, cfg *sarama.Config, brokerAddr string) (int64, error) {
+	offset, err := b.GetPartitionOffsetFromTheLeader(topic, partitionID, cfg, brokerAddr)
 	if err != nil {
 		return -1, err
 	}
