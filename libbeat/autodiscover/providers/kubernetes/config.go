@@ -37,6 +37,7 @@ type Config struct {
 
 	// Needed when resource is a pod
 	Host string `config:"host"`
+	Node string `config:"node"`
 	// Scope can be either host or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
@@ -68,19 +69,29 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("no configs or hints defined for autodiscover provider")
 	}
 
+	// Check if host is being defined and change it to node instead.
+	if c.Node == "" && c.Host != "" {
+		c.Node = c.Host
+		logp.L().Warnf("`host` will be deprecated in 8.0. use `node` instead")
+	}
+
 	// Check if resource is either node or pod. If yes then default the scope to "host" if not provided.
 	// Default the scope to "cluster" for everything else.
 	switch c.Resource {
 	case "node", "pod":
 		if c.Scope == "" {
-			c.Scope = "host"
+			c.Scope = "node"
 		}
 
 	default:
-		if c.Scope == "host" {
+		if c.Scope == "node" {
 			logp.L().Warnf("can not set scope to `host` when using resource %s. resetting scope to `cluster`", c.Resource)
 		}
 		c.Scope = "cluster"
+	}
+
+	if c.Scope != "node" && c.Scope != "cluster" {
+		return fmt.Errorf("invalid `scope` configured. supported values are `node` and `cluster`")
 	}
 
 	return nil
