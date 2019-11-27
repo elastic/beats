@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/x-pack/dockerlogbeat/pipereader"
+
 	"github.com/docker/docker/daemon/logger"
 	"github.com/pkg/errors"
 
@@ -80,8 +82,13 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig logger.Info, f
 		return nil, errors.Wrap(err, "error getting pipeline")
 	}
 
+	pipeRead, err := pipereader.NewReaderFromPath(file)
+	if err != nil {
+		return nil, errors.Wrap(err, "")
+	}
+
 	//actually get to crafting the new client.
-	cl, err := newClientFromPipeline(pipeline.pipeline, file, hashstring, containerConfig)
+	cl, err := newClientFromPipeline(pipeline.pipeline, pipeRead, hashstring, containerConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating client")
 	}
