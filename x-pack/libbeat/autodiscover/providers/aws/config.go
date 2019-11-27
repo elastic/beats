@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package ec2
+package aws
 
 import (
 	"time"
@@ -34,7 +34,7 @@ type Config struct {
 	AWSConfig aws.ConfigAWS `config:",inline"`
 }
 
-func defaultConfig() *Config {
+func DefaultConfig() *Config {
 	return &Config{
 		Period: time.Minute,
 	}

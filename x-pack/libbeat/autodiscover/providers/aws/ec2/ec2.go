@@ -5,94 +5,112 @@
 package ec2
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 )
 
-// lbListener is a tuple type representing an elasticloadbalancingv2.Listener and its associated elasticloadbalancingv2.LoadBalancer.
-type lbListener struct {
-	lb       *elasticloadbalancingv2.LoadBalancer
-	listener *elasticloadbalancingv2.Listener
+type ec2Instance struct {
+	ec2Instance ec2.Instance
+	logger      *logp.Logger
 }
 
-// toMap converts this lbListener into the form consumed as metadata in the autodiscovery process.
-func (l *lbListener) toMap() common.MapStr {
-	// We fully spell out listener_arn to avoid confusion with the ARN for the whole ELB
+// toMap converts this ec2Instance into the form consumed as metadata in the autodiscovery process.
+func (i *ec2Instance) toMap() common.MapStr {
+	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
+	if err != nil {
+		i.logger.Error("MarshalValue failed for instance type: ", err)
+	}
+
+	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
+	if err != nil {
+		i.logger.Error("MarshalValue failed for monitoring state: ", err)
+	}
+
+	architecture, err := i.ec2Instance.Architecture.MarshalValue()
+	if err != nil {
+		i.logger.Error("MarshalValue failed for architecture: ", err)
+	}
+
 	m := common.MapStr{
-		"listener_arn":       l.listener.ListenerArn,
-		"load_balancer_arn":  safeStrp(l.lb.LoadBalancerArn),
-		"host":               safeStrp(l.lb.DNSName),
-		"protocol":           l.listener.Protocol,
-		"type":               string(l.lb.Type),
-		"scheme":             l.lb.Scheme,
-		"availability_zones": l.azStrings(),
-		"created":            l.lb.CreatedTime,
-		"state":              l.stateMap(),
-		"ip_address_type":    string(l.lb.IpAddressType),
-		"security_groups":    l.lb.SecurityGroups,
-		"vpc_id":             safeStrp(l.lb.VpcId),
-		"ssl_policy":         l.listener.SslPolicy,
+		"image_id":         awsauto.SafeStrp(i.ec2Instance.ImageId),
+		"vpc_id":           awsauto.SafeStrp(i.ec2Instance.VpcId),
+		"subnet_id":        awsauto.SafeStrp(i.ec2Instance.SubnetId),
+		"host_id":          awsauto.SafeStrp(i.ec2Instance.Placement.HostId),
+		"group_name":       awsauto.SafeStrp(i.ec2Instance.Placement.GroupName),
+		"arn":              awsauto.SafeStrp(i.ec2Instance.IamInstanceProfile.Arn),
+		"instance_id":      awsauto.SafeStrp(i.ec2Instance.IamInstanceProfile.Id),
+		"type":             instanceType,
+		"private_ip":       awsauto.SafeStrp(i.ec2Instance.PrivateIpAddress),
+		"private_dns_name": awsauto.SafeStrp(i.ec2Instance.PrivateDnsName),
+		"public_ip":        awsauto.SafeStrp(i.ec2Instance.PublicIpAddress),
+		"public_dns_name":  awsauto.SafeStrp(i.ec2Instance.PublicDnsName),
+		"monitoring_state": monitoringState,
+		"architecture":     architecture,
+		"root_device_name": awsauto.SafeStrp(i.ec2Instance.RootDeviceName),
+		"kernel_id":        awsauto.SafeStrp(i.ec2Instance.KernelId),
+		"state":            i.stateMap(),
+		"state_reason":     i.stateReasonMap(),
+		"tags":             i.tagMap(),
 	}
-
-	if l.listener.Port != nil {
-		m["port"] = *l.listener.Port
-	}
-
 	return m
 }
 
-// safeStrp makes handling AWS *string types easier.
-// The AWS lib never returns plain strings, always using pointers, probably for memory efficiency reasons.
-// This is a bit odd, because strings are just pointers into byte arrays, however this is the choice they've made.
-// This will return the plain version of the given string or an empty string if the pointer is null
-func safeStrp(strp *string) string {
-	if strp == nil {
-		return ""
-	}
-
-	return *strp
-}
-
-func (l *lbListener) toCloudMap() common.MapStr {
+func (i *ec2Instance) toCloudMap() common.MapStr {
 	m := common.MapStr{}
-
-	var azs []string
-	for _, az := range l.lb.AvailabilityZones {
-		azs = append(azs, *az.ZoneName)
-	}
-	m["availability_zone"] = azs
+	availabilityZone := awsauto.SafeStrp(i.ec2Instance.Placement.AvailabilityZone)
+	m["availability_zone"] = availabilityZone
 	m["provider"] = "aws"
 
 	// The region is just an AZ with the last character removed
-	firstAz := azs[0]
-	m["region"] = firstAz[:len(firstAz)-2]
-
+	m["region"] = availabilityZone[:len(availabilityZone)-2]
 	return m
 }
 
-// arn returns a globally unique ID. In the case of an lbListener, that would be its listenerArn.
-func (l *lbListener) arn() string {
-	return *l.listener.ListenerArn
+// arn returns a globally unique ID. In the case of an ec2Instance, that would be its listenerArn.
+func (i *ec2Instance) arn() string {
+	return awsauto.SafeStrp(i.ec2Instance.IamInstanceProfile.Arn)
 }
 
-// azStrings transforms the weird list of availability zone string pointers to a slice of plain strings.
-func (l *lbListener) azStrings() []string {
-	azs := l.lb.AvailabilityZones
-	res := make([]string, 0, len(azs))
-	for _, az := range azs {
-		res = append(res, *az.ZoneName)
-	}
-	return res
-}
-
-// stateMap converts the State part of the lb struct into a friendlier map with 'reason' and 'code' fields.
-func (l *lbListener) stateMap() (stateMap common.MapStr) {
-	state := l.lb.State
+// stateMap converts the State part of the ec2 struct into a friendlier map with 'reason' and 'code' fields.
+func (i *ec2Instance) stateMap() (stateMap common.MapStr) {
+	state := i.ec2Instance.State
 	stateMap = common.MapStr{}
-	if state.Reason != nil {
-		stateMap["reason"] = *state.Reason
+	nameString, err := state.Name.MarshalValue()
+	if err != nil {
+		i.logger.Error("MarshalValue failed for instance state name: ", err)
 	}
+
+	stateMap["name"] = nameString
 	stateMap["code"] = state.Code
+
+	stateReason := i.ec2Instance.StateReason
+	stateMap["state_reason"] = awsauto.SafeStrp(stateReason.Code)
+	stateMap[""] = awsauto.SafeStrp(stateReason.Message)
 	return stateMap
+}
+
+// stateReasonMap converts the State Reason part of the ec2 struct into a friendlier map with 'reason' and 'code' fields.
+func (i *ec2Instance) stateReasonMap() (stateReasonMap common.MapStr) {
+	stateReasonMap = common.MapStr{}
+	stateReason := i.ec2Instance.StateReason
+	stateReasonMap["code"] = awsauto.SafeStrp(stateReason.Code)
+	stateReasonMap["message"] = awsauto.SafeStrp(stateReason.Message)
+	return stateReasonMap
+}
+
+// stateMap converts the State part of the ec2 struct into a friendlier map with 'reason' and 'code' fields.
+func (i *ec2Instance) tagMap() (tagsMap []common.MapStr) {
+	tags := i.ec2Instance.Tags
+	tagsMap = []common.MapStr{}
+	tagPair := common.MapStr{}
+	for _, tag := range tags {
+		tagPair["key"] = awsauto.SafeStrp(tag.Key)
+		tagPair["value"] = awsauto.SafeStrp(tag.Value)
+		tagsMap = append(tagsMap, tagPair)
+	}
+
+	return tagsMap
 }
