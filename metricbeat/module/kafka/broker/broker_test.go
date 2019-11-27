@@ -15,28 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
-
-package info
+package broker
 
 import (
-	"testing"
+	"os"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/mb"
+	// Register input module and metricset
+	_ "github.com/elastic/beats/metricbeat/module/jolokia"
+	_ "github.com/elastic/beats/metricbeat/module/jolokia/jmx"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
-}
-
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "docker",
-		"metricsets": []string{"info"},
-		"hosts":      []string{"unix:///var/run/docker.sock"},
-	}
+func init() {
+	// To be moved to some kind of helper
+	os.Setenv("BEAT_STRICT_PERMS", "false")
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
 }
