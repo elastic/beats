@@ -1,0 +1,9 @@
+- key: activemq
+  title: "activemq"
+  description: >
+    activemq Module
+  fields:
+    - name: activemq
+      type: group
+      description: >
+      fields:
