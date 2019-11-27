@@ -3,6 +3,7 @@ import metricbeat
 import unittest
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
+from parameterized import parameterized
 
 
 class KafkaTest(metricbeat.BaseTest):
@@ -36,7 +37,36 @@ class KafkaTest(metricbeat.BaseTest):
             "password": self.PASSWORD,
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=60)
+        proc.check_kill_and_wait()
+
+        output = self.read_output_json()
+        self.assertTrue(len(output) >= 1)
+        evt = output[0]
+        print(evt)
+
+        self.assert_fields_are_documented(evt)
+
+    @parameterized.expand([
+        ('consumer', '8774/tcp'),
+        ('producer', '8775/tcp'),
+        ('broker', '8779/tcp'),
+    ])
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_kafka_jmx(self, metricset, port):
+        """
+        kafka jmx metricsets tests
+        """
+        host = self.compose_host(port=port)
+        modules = [{
+            "name": "kafka",
+            "metricsets": [metricset],
+            "hosts": [host],
+            "period": "1s"
+        }]
+        self.render_config_template(modules=modules)
+        proc = self.start_beat(home=self.beat_path)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=60)
         proc.check_kill_and_wait()
 
         output = self.read_output_json()
