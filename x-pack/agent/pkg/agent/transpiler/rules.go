@@ -62,7 +62,7 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 		case *FilterValuesWithRegexpRule:
 			name = "filter_values_with_regexp"
 		default:
-			return nil, fmt.Errorf("unkown rule of type %T", rule)
+			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
 
 		subdoc := map[string]Rule{
