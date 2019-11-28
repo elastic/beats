@@ -280,6 +280,7 @@ func (b *Broker) GetPartitionOffsetFromTheLeader(topic string, partitionID int32
 	if err != nil {
 		return -1, err
 	}
+	defer client.Close()
 	return offset, nil
 }
 
