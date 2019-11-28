@@ -498,9 +498,6 @@ func TestConfiguration(t *testing.T) {
 		"enabled_output_false": {
 			expected: 0,
 		},
-		// "multiple_output_true": { //TODO NEED TO FIX IT
-		// 	err: true,
-		// },
 	}
 
 	for name, test := range testcases {
