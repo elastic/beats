@@ -78,8 +78,8 @@ func NewReader(config Config) (*Reader, error) {
 		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
 			// covering cases when PdhExpandWildCardPathW returns no counter paths or is unable to expand and the ignore_non_existent_counters flag is set
 			if config.IgnoreNECounters {
-				r.log.Infow("Ignoring non existent counter", "error", err,
-					logp.Namespace("perfmon"), "query", counter.Query)
+				r.log.Infow("Ignoring non existent counter", "initial query", counter.Query,
+					logp.Namespace("perfmon"), "expanded query", childQueries)
 				continue
 			}
 			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.Query)
