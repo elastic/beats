@@ -1648,6 +1648,8 @@ In case the two timestamps are identical, @timestamp should be used.
 
 type: date
 
+example: 2016-05-23 08:05:34.857000
+
 --
 
 *`event.dataset`*::
@@ -1703,6 +1705,19 @@ Unique ID to describe the event.
 type: keyword
 
 example: 8a4f500d
+
+--
+
+*`event.ingested`*::
++
+--
+Timestamp when an event arrived in the central data store.
+This is different from `@timestamp`, which is when the event originally occurred.  It's also different from `event.created`, which is meant to capture the first time an agent saw the event.
+In normal conditions, assuming no tampering, the timestamps should chronologically look like this: `@timestamp` < `event.created` < `event.ingested`.
+
+type: date
+
+example: 2016-05-23 08:05:35.101000
 
 --
 
@@ -2265,6 +2280,18 @@ Operating system architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`host.domain`*::
++
+--
+Name of the domain of which the host is a member. 
+For example, on Windows this could be the host's Active Directory domain or NetBIOS domain name.  For Linux this could be the domain of the host's LDAP provider.
+
+type: keyword
+
+example: CONTOSO
 
 --
 
@@ -3374,6 +3401,18 @@ example: x86_64
 
 --
 
+*`package.build_version`*::
++
+--
+Additional information about the build version of the installed package.
+For example use the commit SHA of a non-released package.
+
+type: keyword
+
+example: 36f4f7e89dd61b0988b12ee000b98966867710cd
+
+--
+
 *`package.checksum`*::
 +
 --
@@ -3450,6 +3489,17 @@ example: /usr/local/Cellar/go/1.12.9/
 
 --
 
+*`package.reference`*::
++
+--
+Home page or reference URL of the software in this package, if available.
+
+type: keyword
+
+example: https://golang.org
+
+--
+
 *`package.size`*::
 +
 --
@@ -3460,6 +3510,18 @@ type: long
 example: 62231
 
 format: string
+
+--
+
+*`package.type`*::
++
+--
+Type of package.
+This should contain the package file type, rather than the package manager name. Examples: rpm, dpkg, brew, npm, gem, nupkg, jar.
+
+type: keyword
+
+example: rpm
 
 --
 
@@ -3484,12 +3546,36 @@ These fields can help you correlate metrics information with a process id/name f
 *`process.args`*::
 +
 --
-Array of process arguments.
+Array of process arguments, starting with the absolute path to the executable.
 May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['ssh', '-l', 'user', '10.0.0.16']
+example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+
+--
+
+*`process.args_count`*::
++
+--
+Length of the process.args array.
+This field can be useful for querying or performing bucket analysis on how many arguments were provided to start a process. More arguments may be an indication of suspicious activity.
+
+type: long
+
+example: 4
+
+--
+
+*`process.command_line`*::
++
+--
+Full command line that started the process, including the absolute path to the executable, and all arguments.
+Some arguments may be filtered to protect sensitive information.
+
+type: keyword
+
+example: /usr/bin/ssh -l user 10.0.0.16
 
 --
 
@@ -3501,6 +3587,18 @@ Absolute path to the process executable.
 type: keyword
 
 example: /usr/bin/ssh
+
+--
+
+*`process.exit_code`*::
++
+--
+The exit code of the process, if this is a termination event.
+The field should be absent if there is no exit code for the event (e.g. process start).
+
+type: long
+
+example: 137
 
 --
 
@@ -3549,6 +3647,181 @@ Sometimes called program name or similar.
 type: keyword
 
 example: ssh
+
+--
+
+*`process.parent.args`*::
++
+--
+Array of process arguments.
+May be filtered to protect sensitive information.
+
+type: keyword
+
+example: ['ssh', '-l', 'user', '10.0.0.16']
+
+--
+
+*`process.parent.args_count`*::
++
+--
+Length of the process.args array.
+This field can be useful for querying or performing bucket analysis on how many arguments were provided to start a process. More arguments may be an indication of suspicious activity.
+
+type: long
+
+example: 4
+
+--
+
+*`process.parent.command_line`*::
++
+--
+Full command line that started the process, including the absolute path to the executable, and all arguments.
+Some arguments may be filtered to protect sensitive information.
+
+type: keyword
+
+example: /usr/bin/ssh -l user 10.0.0.16
+
+--
+
+*`process.parent.executable`*::
++
+--
+Absolute path to the process executable.
+
+type: keyword
+
+example: /usr/bin/ssh
+
+--
+
+*`process.parent.exit_code`*::
++
+--
+The exit code of the process, if this is a termination event.
+The field should be absent if there is no exit code for the event (e.g. process start).
+
+type: long
+
+example: 137
+
+--
+
+*`process.parent.name`*::
++
+--
+Process name.
+Sometimes called program name or similar.
+
+type: keyword
+
+example: ssh
+
+--
+
+*`process.parent.pgid`*::
++
+--
+Identifier of the group of processes the process belongs to.
+
+type: long
+
+format: string
+
+--
+
+*`process.parent.pid`*::
++
+--
+Process id.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.parent.ppid`*::
++
+--
+Parent process' pid.
+
+type: long
+
+example: 4241
+
+format: string
+
+--
+
+*`process.parent.start`*::
++
+--
+The time the process started.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
+*`process.parent.thread.id`*::
++
+--
+Thread ID.
+
+type: long
+
+example: 4242
+
+format: string
+
+--
+
+*`process.parent.thread.name`*::
++
+--
+Thread name.
+
+type: keyword
+
+example: thread-0
+
+--
+
+*`process.parent.title`*::
++
+--
+Process title.
+The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
+
+type: keyword
+
+--
+
+*`process.parent.uptime`*::
++
+--
+Seconds the process has been up.
+
+type: long
+
+example: 1325
+
+--
+
+*`process.parent.working_directory`*::
++
+--
+The working directory of the process.
+
+type: keyword
+
+example: /home/alice
 
 --
 
@@ -4505,6 +4778,338 @@ example: https://attack.mitre.org/techniques/T1499/
 --
 
 [float]
+=== tls
+
+Fields related to a TLS connection. These fields focus on the TLS protocol itself and intentionally avoids in-depth analysis of the related x.509 certificate files.
+
+
+*`tls.cipher`*::
++
+--
+String indicating the cipher used during the current connection.
+
+type: keyword
+
+example: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+
+--
+
+*`tls.client.certificate`*::
++
+--
+PEM-encoded stand-alone certificate offered by the client. This is usually mutually-exclusive of `client.certificate_chain` since this value also exists in that list.
+
+type: keyword
+
+example: MII...
+
+--
+
+*`tls.client.certificate_chain`*::
++
+--
+Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
+
+type: keyword
+
+example: ['MII...', 'MII...']
+
+--
+
+*`tls.client.hash.md5`*::
++
+--
+Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+
+--
+
+*`tls.client.hash.sha1`*::
++
+--
+Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+
+--
+
+*`tls.client.hash.sha256`*::
++
+--
+Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+
+--
+
+*`tls.client.issuer`*::
++
+--
+Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
+
+type: keyword
+
+example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.client.ja3`*::
++
+--
+A hash that identifies clients based on how they perform an SSL/TLS handshake.
+
+type: keyword
+
+example: d4e5b18d6b55c71272893221c96ba240
+
+--
+
+*`tls.client.not_after`*::
++
+--
+Date/Time indicating when client certificate is no longer considered valid.
+
+type: date
+
+example: 2021-01-01T00:00:00.000Z
+
+--
+
+*`tls.client.not_before`*::
++
+--
+Date/Time indicating when client certificate is first considered valid.
+
+type: date
+
+example: 1970-01-01T00:00:00.000Z
+
+--
+
+*`tls.client.server_name`*::
++
+--
+Also called an SNI, this tells the server which hostname to which the client is attempting to connect. When this value is available, it should get copied to `destination.domain`.
+
+type: keyword
+
+example: www.elastic.co
+
+--
+
+*`tls.client.subject`*::
++
+--
+Distinguished name of subject of the x.509 certificate presented by the client.
+
+type: keyword
+
+example: CN=myclient, OU=Documentation Team, DC=mydomain, DC=com
+
+--
+
+*`tls.client.supported_ciphers`*::
++
+--
+Array of ciphers offered by the client during the client hello.
+
+type: keyword
+
+example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+
+--
+
+*`tls.curve`*::
++
+--
+String indicating the curve used for the given cipher, when applicable.
+
+type: keyword
+
+example: secp256r1
+
+--
+
+*`tls.established`*::
++
+--
+Boolean flag indicating if the TLS negotiation was successful and transitioned to an encrypted tunnel.
+
+type: boolean
+
+--
+
+*`tls.next_protocol`*::
++
+--
+String indicating the protocol being tunneled. Per the values in the IANA registry (https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids), this string should be lower case.
+
+type: keyword
+
+example: http/1.1
+
+--
+
+*`tls.resumed`*::
++
+--
+Boolean flag indicating if this TLS connection was resumed from an existing TLS negotiation.
+
+type: boolean
+
+--
+
+*`tls.server.certificate`*::
++
+--
+PEM-encoded stand-alone certificate offered by the server. This is usually mutually-exclusive of `server.certificate_chain` since this value also exists in that list.
+
+type: keyword
+
+example: MII...
+
+--
+
+*`tls.server.certificate_chain`*::
++
+--
+Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
+
+type: keyword
+
+example: ['MII...', 'MII...']
+
+--
+
+*`tls.server.hash.md5`*::
++
+--
+Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC
+
+--
+
+*`tls.server.hash.sha1`*::
++
+--
+Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 9E393D93138888D288266C2D915214D1D1CCEB2A
+
+--
+
+*`tls.server.hash.sha256`*::
++
+--
+Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
+
+type: keyword
+
+example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
+
+--
+
+*`tls.server.issuer`*::
++
+--
+Subject of the issuer of the x.509 certificate presented by the server.
+
+type: keyword
+
+example: CN=MyDomain Root CA, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.server.ja3s`*::
++
+--
+A hash that identifies servers based on how they perform an SSL/TLS handshake.
+
+type: keyword
+
+example: 394441ab65754e2207b1e1b457b3641d
+
+--
+
+*`tls.server.not_after`*::
++
+--
+Timestamp indicating when server certificate is no longer considered valid.
+
+type: date
+
+example: 2021-01-01T00:00:00.000Z
+
+--
+
+*`tls.server.not_before`*::
++
+--
+Timestamp indicating when server certificate is first considered valid.
+
+type: date
+
+example: 1970-01-01T00:00:00.000Z
+
+--
+
+*`tls.server.subject`*::
++
+--
+Subject of the x.509 certificate presented by the server.
+
+type: keyword
+
+example: CN=www.mydomain.com, OU=Infrastructure Team, DC=mydomain, DC=com
+
+--
+
+*`tls.server.supported_ciphers`*::
++
+--
+Array of ciphers offered by the server during the server hello.
+
+type: keyword
+
+example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+
+--
+
+*`tls.version`*::
++
+--
+Numeric part of the version parsed from the original string.
+
+type: keyword
+
+example: 1.2
+
+--
+
+*`tls.version_protocol`*::
++
+--
+Normalized lowercase protocol name parsed from original string.
+
+type: keyword
+
+example: tls
+
+--
+
+[float]
 === tracing
 
 Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
@@ -4895,6 +5500,158 @@ Version of the user agent.
 type: keyword
 
 example: 12.0
+
+--
+
+[float]
+=== vulnerability
+
+The vulnerability fields describe information about a vulnerability that is relevant to an event.
+
+
+*`vulnerability.category`*::
++
+--
+The type of system or architecture that the vulnerability affects. These may be platform-specific (for example, Debian or SUSE) or general (for example, Database or Firewall). For example (https://qualysguard.qualys.com/qwebhelp/fo_portal/knowledgebase/vulnerability_categories.htm)
+This field must be an array.
+
+type: keyword
+
+example: ["Firewall"]
+
+--
+
+*`vulnerability.classification`*::
++
+--
+The classification of the vulnerability scoring system. For example (https://www.first.org/cvss/)
+
+type: keyword
+
+example: CVSS
+
+--
+
+*`vulnerability.description`*::
++
+--
+The description of the vulnerability that provides additional context of the vulnerability. For example (https://cve.mitre.org/about/faqs.html#cve_entry_descriptions_created)
+
+type: keyword
+
+example: In macOS before 2.12.6, there is a vulnerability in the RPC...
+
+--
+
+*`vulnerability.enumeration`*::
++
+--
+The type of identifier used for this vulnerability. For example (https://cve.mitre.org/about/)
+
+type: keyword
+
+example: CVE
+
+--
+
+*`vulnerability.id`*::
++
+--
+The identification (ID) is the number portion of a vulnerability entry. It includes a unique identification number for the vulnerability. For example (https://cve.mitre.org/about/faqs.html#what_is_cve_id)
+
+type: keyword
+
+example: CVE-2019-00001
+
+--
+
+*`vulnerability.reference`*::
++
+--
+A resource that provides additional information, context, and mitigations for the identified vulnerability.
+
+type: keyword
+
+example: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-6111
+
+--
+
+*`vulnerability.report_id`*::
++
+--
+The report or scan identification number.
+
+type: keyword
+
+example: 20191018.0001
+
+--
+
+*`vulnerability.scanner.vendor`*::
++
+--
+The name of the vulnerability scanner vendor.
+
+type: keyword
+
+example: Tenable
+
+--
+
+*`vulnerability.score.base`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Base scores cover an assessment for exploitability metrics (attack vector, complexity, privileges, and user interaction), impact metrics (confidentialy, integrity, and availability), and scope. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+example: 5.5
+
+--
+
+*`vulnerability.score.environmental`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Environmental scores cover an assessment for any modified Base metrics, confidentiality, integrity, and availability requirements. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+example: 5.5
+
+--
+
+*`vulnerability.score.temporal`*::
++
+--
+Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
+Temporal scores cover an assessment for code maturity, remediation level, and confidence. For example (https://www.first.org/cvss/specification-document)
+
+type: float
+
+--
+
+*`vulnerability.score.version`*::
++
+--
+The National Vulnerability Database (NVD) provides qualitative severity rankings of "Low", "Medium", and "High" for CVSS v2.0 base score ranges in addition to the severity ratings for CVSS v3.0 as they are defined in the CVSS v3.0 specification.
+CVSS is owned and managed by FIRST.Org, Inc. (FIRST), a US-based non-profit organization, whose mission is to help computer security incident response teams across the world. For example (https://nvd.nist.gov/vuln-metrics/cvss)
+
+type: keyword
+
+example: 2.0
+
+--
+
+*`vulnerability.severity`*::
++
+--
+The severity of the vulnerability can help with metrics and internal prioritization regarding remediation. For example (https://nvd.nist.gov/vuln-metrics/cvss)
+
+type: keyword
+
+example: Critical
 
 --
 
