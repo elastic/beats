@@ -34,7 +34,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/kibana"
-	"github.com/elastic/fleet/x-pack/pkg/core/plugin/server"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/server"
 
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
