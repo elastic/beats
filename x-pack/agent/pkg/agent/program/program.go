@@ -139,6 +139,8 @@ func groupBy(single *transpiler.AST) (map[string]*transpiler.AST, error) {
 			return nil, fmt.Errorf("invalid type received %T and expecting a string", t)
 		}
 
+		delete(outputsOptions, typeKey)
+
 		grouped[k] = map[string]interface{}{
 			outputKey:  map[string]interface{}{n: v},
 			streamsKey: make([]map[string]interface{}, 0),
@@ -181,6 +183,10 @@ func groupBy(single *transpiler.AST) (map[string]*transpiler.AST, error) {
 	transpiled := make(map[string]*transpiler.AST)
 
 	for name, group := range grouped {
+		if len(group[streamsKey].([]map[string]interface{})) == 0 {
+			continue
+		}
+
 		ast, err := transpiler.NewAST(group)
 		if err != nil {
 			return nil, errors.Wrapf(err, "fail to generate configuration for output name %s", name)
@@ -210,5 +216,6 @@ func findNamedOutput(m map[string]interface{}) string {
 	if !ok {
 		return defaultOutputName
 	}
+
 	return name.(string)
 }
