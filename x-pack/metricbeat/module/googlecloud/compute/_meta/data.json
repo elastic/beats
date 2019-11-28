@@ -1,61 +1,77 @@
 {
-    "@timestamp": "2019-11-27T18:59:00.000Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "googlecloud": {
-        "compute": {
-            "labels": {
-                "user": {
-                    "label_key": "label_value"
-                },
-                "metadata": {
-                    "metadata_key": "metadata_value"
-                }
+    "_index": "metricbeat-8.0.0-2019.11.27-000001",
+    "_id": "H4iRrm4B7vvv-udOwwFO",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+        "@timestamp": "2019-11-27T20:30:00.000Z",
+        "ecs": {
+            "version": "1.2.0"
+        },
+        "host": {
+            "name": "mcastro"
+        },
+        "agent": {
+            "version": "8.0.0",
+            "type": "metricbeat",
+            "ephemeral_id": "cb56f25c-fc0e-4bbc-9c49-4551c1a97ab5",
+            "hostname": "mcastro",
+            "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228"
+        },
+        "cloud": {
+            "availability_zone": "us-central1-a",
+            "account": {
+                "id": "elastic-metricbeat"
             },
+            "provider": "googlecloud",
             "instance": {
-                "cpu": {
-                    "usage_time": 0.04395832907931663
+                "id": "3296438752514919533",
+                "name": "instance-3"
+            }
+        },
+        "event": {
+            "module": "googlecloud",
+            "duration": 1252249339,
+            "dataset": "googlecloud.compute"
+        },
+        "metricset": {
+            "period": 300000,
+            "name": "compute"
+        },
+        "service": {
+            "type": "googlecloud"
+        },
+        "googlecloud": {
+            "compute": {
+                "labels": {
+                    "user": {
+                        "label_key": "label_value"
+                    },
+                    "metadata": {
+                        "metadata_key": "metadata_value"
+                    }
+                },
+                "instance": {
+                    "uptime": 60,
+                    "cpu": {
+                        "usage_time": 0.049102112533603304,
+                        "utilization": 0.004462245110474328
+                    }
                 }
             }
         }
     },
-    "ecs": {
-        "version": "1.2.0"
+    "fields": {
+        "@timestamp": [
+            "2019-11-27T20:30:00.000Z"
+        ]
     },
-    "host": {
-        "name": "mcastro"
+    "highlight": {
+        "metricset.name": [
+            "@kibana-highlighted-field@compute@/kibana-highlighted-field@"
+        ]
     },
-    "agent": {
-        "version": "8.0.0",
-        "type": "metricbeat",
-        "ephemeral_id": "ae98808d-8f78-4144-9a0f-f5e97983778c",
-        "hostname": "mcastro",
-        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228"
-    },
-    "cloud": {
-        "instance": {
-            "name": "instance-3",
-            "id": "3296438752514919533"
-        },
-        "availability_zone": "us-central1-a",
-        "account": {
-            "id": "elastic-metricbeat"
-        },
-        "provider": "googlecloud"
-    },
-    "event": {
-        "duration": 1834676563,
-        "dataset": "googlecloud.compute",
-        "module": "googlecloud"
-    },
-    "metricset": {
-        "name": "compute",
-        "period": 300000
-    },
-    "service": {
-        "type": "googlecloud"
-    }
+    "sort": [
+        1574886600000
+    ]
 }

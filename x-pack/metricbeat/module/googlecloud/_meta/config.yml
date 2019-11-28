@@ -6,4 +6,8 @@
     - firebase
     - storage
     - loadbalancing
+  zone: "your zone"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  include_labels: true
   period: 300s

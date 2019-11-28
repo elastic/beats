@@ -1,0 +1,19 @@
+Compute Metricset to fetch metrics from instances in Google Cloud Platform
+
+[float]
+=== Fields exported
+
+* `instance.firewall.dropped_bytes_count`: Incoming bytes dropped by the firewall
+* `instance.firewall.dropped_packets_count`: Incoming packets dropped by the firewall
+* `instance.cpu.reserved_cores`: Number of cores reserved on the host of the `instance
+* `instance.cpu.utilization`: The fraction of the allocated CPU that is currently in use on the `instance
+* `instance.cpu.usage_time`: Usage for all cores in seconds
+* `instance.disk.read_bytes_count`: Count of bytes read from disk
+* `instance.disk.read_ops_count`: Count of disk read IO operations
+* `instance.disk.write_bytes_count`: Count of bytes written to disk
+* `instance.disk.write_ops_count`: Count of disk write IO operations
+* `instance.uptime`: How long the VM has been running, in seconds
+* `instance.network.received_bytes_count`: Count of bytes received from the network
+* `instance.network.received_packets_count`: Count of packets received from the network
+* `instance.network.sent_bytes_count`: Count of bytes sent over the network
+* `instance.network.sent_packets_count`: Count of packets sent over the network

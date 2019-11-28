@@ -106,7 +106,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	return m, ecs, nil
 }
 
-// ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.
+// ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.`El trickerionEl trickerion
 func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *MetadataCollectorInputData) (string, error) {
 	m := common.MapStr{
 		KEY_TIMESTAMP: in.Timestamp.UnixNano(),
