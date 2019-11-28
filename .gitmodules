@@ -1,3 +1,0 @@
-[submodule "vendor/github.com/elastic/fleet"]
-	path = vendor/github.com/elastic/fleet
-	url = git@github.com:elastic/fleet.git
