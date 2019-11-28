@@ -4,11 +4,16 @@ processors:
   - grok:
       field: message
       pattern_definitions:
-        GREEDYMULTILINE": "(.|\n|\t)*"
-        NOPIPEGREEDYDATA: "((?! \|).)*"
+        GREEDYMULTILINE: "(.|\\n|\\t)*"
+        NOPIPEGREEDYDATA: "((?! \\|).)*"
+        THREAD_NAME: "((?! \n).)*"
       patterns:
-        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\|%{SPACE}%{JAVACLASS:class}%{SPACE}\|%{SPACE}%{WORD:thread}%{SPACE}?%{GREEDYMULTILINE:java_exception}"
+        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{JAVACLASS:activemq.log.class}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.log.thread}%{SPACE}?%{GREEDYMULTILINE:activemq.log.java_exception}"
       ignore_missing: true
+  - set:
+      field: activemq.log.java_exception
+      if: "ctx.activemq.log.java_exception == null"
+      value: ""
   - date:
       if: "ctx.event.timezone == null"
       field: timestamp

@@ -4,9 +4,10 @@ processors:
   - grok:
       field: message
       pattern_definitions:
-        NOPIPEGREEDYDATA: "((?! \|).)*"
+        NOPIPEGREEDYDATA: "((?! \\|).)*"
+        THREAD_NAME: "((?! \n).)*"
       patterns:
-        - "%{LOGLEVEL:log.level}%{SPACE}\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\|%{SPACE}%{WORD:thread}"
+        - "%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.audit.thread}"
       ignore_missing: true
 on_failure:
   - set:

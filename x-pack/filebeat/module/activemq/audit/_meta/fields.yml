@@ -1,4 +1,4 @@
-- name: log
+- name: audit
   type: group
   description: >
     ActiveMQ audit log lines.

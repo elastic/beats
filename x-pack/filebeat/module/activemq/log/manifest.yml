@@ -9,5 +9,5 @@ var:
     os.windows:
       - c:/apache-activemq-*/data/activemq.log*
 
-ingest_pipeline: ingest/pipeline.json
-input: config/audit.yml
+ingest_pipeline: ingest/pipeline.yml
+input: config/log.yml

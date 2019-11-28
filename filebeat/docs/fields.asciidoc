@@ -12,6 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
+* <<exported-fields-activemq>>
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
@@ -61,6 +62,106 @@ grouped in the following categories:
 * <<exported-fields-zeek>>
 
 --
+[[exported-fields-activemq]]
+== activemq fields
+
+Module for parsing ActiveMQ log files.
+
+
+
+[float]
+=== activemq
+
+
+
+
+[float]
+=== audit
+
+ActiveMQ audit log lines.
+
+
+
+*`activemq.audit.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`activemq.audit.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`activemq.audit.thread`*::
++
+--
+Thread that generated the logging event.
+
+
+type: keyword
+
+--
+
+[float]
+=== log
+
+ActiveMQ application log lines.
+
+
+
+*`activemq.log.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`activemq.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`activemq.log.class`*::
++
+--
+Fully qualified class name of the caller issuing the logging request.
+
+
+type: keyword
+
+--
+
+*`activemq.log.thread`*::
++
+--
+Thread that issued the logging request.
+
+
+type: keyword
+
+--
+
+*`activemq.log.java_exception`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-apache]]
 == Apache fields
 

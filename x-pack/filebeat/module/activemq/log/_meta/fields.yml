@@ -18,5 +18,4 @@
       description: >
         Thread that issued the logging request.
     - name: java_exception
-      type: alias
-      path: java_exception
+      type: keyword
