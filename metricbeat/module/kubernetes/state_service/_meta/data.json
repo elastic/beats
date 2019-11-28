@@ -1,56 +1,50 @@
 {
-    "@timestamp": "2019-09-16T18:37:16.237Z",
+    "@timestamp": "2019-11-27T18:13:26.661Z",
     "@metadata": {
       "beat": "metricbeat",
       "type": "_doc",
       "version": "8.0.0"
     },
-    "agent": {
-      "ephemeral_id": "9a223001-a65f-4460-b106-553151987b09",
-      "hostname": "minikube",
-      "id": "191c7322-6d36-4f6c-b451-d0302b96841b",
-      "version": "8.0.0",
-      "type": "metricbeat"
-    },
-    "kubernetes": {
-      "namespace": "rqtest",
-      "resourcequota": {
-        "quota": 2,
-        "name": "objects",
-        "resource": "services",
-        "type": "hard"
-      }
-    },
-    "event": {
-      "module": "kubernetes",
-      "duration": 13626177,
-      "dataset": "kubernetes.resourcequota"
-    },
     "metricset": {
       "period": 10000,
-      "name": "state_resourcequota"
+      "name": "state_service"
     },
     "service": {
       "address": "kube-state-metrics.kube-system:8080",
       "type": "kubernetes"
     },
+    "kubernetes": {
+      "namespace": "istio-system",
+      "service": {
+        "name": "prometheus",
+        "created": "2019-11-25T21:00:49.000Z",
+        "cluster_ip": "10.98.33.120",
+        "type": "ClusterIP",
+        "labels": {
+          "label_release": "istio",
+          "label_app": "prometheus",
+          "label_operator_istio_io_component": "Prometheus",
+          "label_operator_istio_io_managed": "Reconcile",
+          "label_operator_istio_io_version": "1.4.0"
+        }
+      }
+    },
     "ecs": {
-      "version": "1.1.0"
+      "version": "1.2.0"
     },
     "host": {
-      "name": "minikube",
-      "architecture": "x86_64",
-      "os": {
-        "kernel": "4.15.0",
-        "codename": "bionic",
-        "platform": "ubuntu",
-        "version": "18.04.3 LTS (Bionic Beaver)",
-        "family": "debian",
-        "name": "Ubuntu"
-      },
-      "containerized": false,
-      "hostname": "minikube"
+      "name": "minikube"
+    },
+    "agent": {
+      "ephemeral_id": "74d75916-9e2d-4d4c-8b5d-30dfdec1eb34",
+      "hostname": "minikube",
+      "id": "228b79ac-d00f-4272-89ea-867e9b07faa3",
+      "version": "8.0.0",
+      "type": "metricbeat"
+    },
+    "event": {
+      "dataset": "kubernetes.service",
+      "module": "kubernetes",
+      "duration": 45413119
     }
-  }
-}
-  
+ }

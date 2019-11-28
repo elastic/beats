@@ -5,83 +5,12 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.99.32.65",
-			"name": "willfail",
-			"service": {
-				"started": "2019-09-16T12:26:07+02:00"
+			"created": "2017-07-14T02:40:00.000Z",
+			"external_ip": "1.2.3.10",
+			"labels": {
+				"label_app": "example6"
 			},
-			"type": "LoadBalancer"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "default"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.104.70.53",
-			"name": "willsucceed",
-			"service": {
-				"started": "2019-09-16T12:26:07+02:00"
-			},
-			"type": "LoadBalancer"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "default"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.111.59.54",
-			"name": "my-nginx",
-			"service": {
-				"started": "2019-09-06T17:17:01+02:00"
-			},
-			"type": "LoadBalancer"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "kube-system"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.96.0.10",
-			"name": "kube-dns",
-			"service": {
-				"started": "2019-08-28T18:26:46+02:00"
-			},
+			"name": "test-service6",
 			"type": "ClusterIP"
 		},
 		"Index": "",
@@ -101,35 +30,13 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.96.0.1",
-			"name": "kubernetes",
-			"service": {
-				"started": "2019-08-28T18:26:42+02:00"
+			"created": "2017-07-14T02:40:00.000Z",
+			"ingress_hostname": "www.example.com",
+			"ingress_ip": "1.2.3.8",
+			"labels": {
+				"label_app": "example5"
 			},
-			"type": "ClusterIP"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "rqtest"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.97.184.107",
-			"name": "willsucceed",
-			"service": {
-				"started": "2019-09-16T12:31:26+02:00"
-			},
+			"name": "test-service5",
 			"type": "LoadBalancer"
 		},
 		"Index": "",
@@ -146,15 +53,92 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.111.114.13",
-			"name": "kube-state-metrics",
-			"service": {
-				"started": "2019-09-11T11:45:18+02:00"
+			"cluster_ip": "1.2.3.4",
+			"created": "2017-07-14T02:40:00.000Z",
+			"labels": {
+				"label_app": "example1"
 			},
+			"name": "test-service1",
 			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "1.2.3.5",
+			"created": "2017-07-14T02:40:00.000Z",
+			"labels": {
+				"label_app": "example2"
+			},
+			"name": "test-service2",
+			"type": "NodePort"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"created": "2017-07-14T02:40:00.000Z",
+			"external_name": "www.example.com",
+			"labels": {
+				"label_app": "example4"
+			},
+			"name": "test-service4",
+			"type": "ExternalName"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "1.2.3.6",
+			"created": "2017-07-14T02:40:00.000Z",
+			"labels": {
+				"label_app": "example3"
+			},
+			"load_balancer_ip": "1.2.3.7",
+			"name": "test-service3",
+			"type": "LoadBalancer"
 		},
 		"Index": "",
 		"ID": "",

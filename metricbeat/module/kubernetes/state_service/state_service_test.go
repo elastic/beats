@@ -31,8 +31,8 @@ func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "state_service",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/kube-state-metrics.1.7",
-				ExpectedFile: "./_meta/test/kube-state-metrics.1.7.expected",
+				MetricsFile:  "./_meta/test/ksm-unit-1.8",
+				ExpectedFile: "./_meta/test/ksm-unit-1.8.expected",
 			},
 		},
 	)

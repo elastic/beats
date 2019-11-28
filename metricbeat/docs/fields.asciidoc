@@ -19481,12 +19481,66 @@ type: keyword
 
 --
 
+*`kubernetes.service.external_ip`*::
++
+--
+Service external IP
+
+type: keyword
+
+--
+
 *`kubernetes.service.load_balancer_ip`*::
 +
 --
-Load Balancer service IP name
+Load Balancer service IP
 
 type: keyword
+
+--
+
+*`kubernetes.service.type`*::
++
+--
+Service type
+
+type: keyword
+
+--
+
+*`kubernetes.service.ingress_ip`*::
++
+--
+Ingress IP
+
+type: keyword
+
+--
+
+*`kubernetes.service.ingress_hostname`*::
++
+--
+Ingress Hostname
+
+type: ip
+
+--
+
+*`kubernetes.service.labels.*`*::
++
+--
+Labels for service
+
+type: object
+
+--
+
+*`kubernetes.service.created`*::
++
+--
+Service creation date
+
+type: date
 
 --
 

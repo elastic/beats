@@ -13,9 +13,28 @@
     - name: external_name
       type: keyword
       description: Service external DNS name
+    - name: external_ip
+      type: keyword
+      description: Service external IP
     - name: load_balancer_ip
       type: keyword
-      description: Load Balancer service IP name
+      description: Load Balancer service IP
+    - name: type
+      type: keyword
+      description: Service type
+    - name: ingress_ip
+      type: keyword
+      description: Ingress IP
+    - name: ingress_hostname
+      type: ip
+      description: Ingress Hostname
+    - name: labels.*
+      type: object
+      object_type: keyword
+      description: Labels for service
+    - name: created
+      type: date
+      description: Service creation date
       
       
 
