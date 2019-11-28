@@ -87,11 +87,6 @@ func (d *Dict) String() string {
 	return sb.String()
 }
 
-// Len returns the number of items in the dictionnary.
-func (d *Dict) Len() int {
-	return len(d.value)
-}
-
 // Value returns the value of dict which is a slice of node.
 func (d *Dict) Value() interface{} {
 	return d.value
@@ -159,11 +154,6 @@ func (k *Key) Hash() []byte {
 	return h.Sum(nil)
 }
 
-// Name return the name of the key.
-func (k *Key) Name() string {
-	return k.name
-}
-
 // List represents a slice in our Tree.
 type List struct {
 	value []Node
@@ -180,11 +170,6 @@ func (l *List) String() string {
 		}
 	}
 	return sb.String()
-}
-
-// Len returns the number of items in the list.
-func (l *List) Len() int {
-	return len(l.value)
 }
 
 // Hash compute a sha256 hash of the current node and recursively call any children.
