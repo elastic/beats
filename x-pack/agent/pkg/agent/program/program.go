@@ -49,6 +49,10 @@ func (p *Program) Configuration() map[string]interface{} {
 // Programs take a Tree representation of the main configuration and apply all the different
 // programs rules and generate individual configuration from the rules.
 func Programs(singleConfig *transpiler.AST) ([]Program, error) {
+	return detectPrograms(singleConfig)
+}
+
+func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 	programs := make([]Program, 0)
 	for _, spec := range Supported {
 		// TODO: better error handling here.
@@ -83,6 +87,7 @@ func Programs(singleConfig *transpiler.AST) ([]Program, error) {
 		programs = append(programs, program)
 	}
 	return programs, nil
+
 }
 
 // KnownProgramNames returns a list of runnable programs by the agent.
