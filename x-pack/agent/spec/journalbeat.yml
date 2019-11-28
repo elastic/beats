@@ -2,13 +2,16 @@ name: Journalbeat
 cmd: journalbeat
 rules:
 - filter_values:
-    selector: inputs
+    selector: streams
     key: type
     values:
     - log/journal
 - copy:
-    from: inputs
+    from: streams
     to: journalbeat
+- rename:
+    from: journalbeat.streams
+    to: inputs
 - filter:
     selectors:
     - journalbeat

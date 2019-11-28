@@ -57,6 +57,7 @@ func Programs(singleConfig *transpiler.AST) (map[string][]Program, error) {
 	groupedPrograms := make(map[string][]Program)
 	for k, config := range grouped {
 		programs, err := detectPrograms(config)
+		fmt.Println(programs)
 		if err != nil {
 			return nil, errors.Wrap(err, "fail to generate program configuration")
 		}
