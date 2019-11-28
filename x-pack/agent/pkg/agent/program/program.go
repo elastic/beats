@@ -141,10 +141,13 @@ func groupBy(single *transpiler.AST) (map[string]*transpiler.AST, error) {
 
 		delete(outputsOptions, typeKey)
 
-		grouped[k] = map[string]interface{}{
-			outputKey:  map[string]interface{}{n: v},
-			streamsKey: make([]map[string]interface{}, 0),
-		}
+		// Propagate global configuration to each individual configuration.
+		clone := cloneMap(normMap)
+		delete(clone, outputsKey)
+		clone[outputKey] = map[string]interface{}{n: v}
+		clone[streamsKey] = make([]map[string]interface{}, 0)
+
+		grouped[k] = clone
 	}
 
 	s, ok := normMap[streamsKey]
@@ -165,7 +168,7 @@ func groupBy(single *transpiler.AST) (map[string]*transpiler.AST, error) {
 				item,
 			)
 		}
-		targetName := findNamedOutput(stream)
+		targetName := findOutputName(stream)
 
 		// Do we have configuration for that specific outputs if not we fail to load the configuration.
 		config, ok := grouped[targetName]
@@ -198,7 +201,7 @@ func groupBy(single *transpiler.AST) (map[string]*transpiler.AST, error) {
 	return transpiled, nil
 }
 
-func findNamedOutput(m map[string]interface{}) string {
+func findOutputName(m map[string]interface{}) string {
 	const (
 		defaultOutputName = "default"
 		outputKey         = "output"
@@ -218,4 +221,18 @@ func findNamedOutput(m map[string]interface{}) string {
 	}
 
 	return name.(string)
+}
+
+func cloneMap(m map[string]interface{}) map[string]interface{} {
+	newMap := make(map[string]interface{})
+	for k, v := range m {
+		sV, ok := v.(map[string]interface{})
+		if ok {
+			newMap[k] = cloneMap(sV)
+			continue
+		}
+		newMap[k] = v
+	}
+
+	return newMap
 }
