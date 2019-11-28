@@ -25,6 +25,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change wording when we fail to load a CA file to the cert pool. {issue}14309[14309]
 - Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
 - Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
+- Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 
 *Auditbeat*
 
@@ -274,6 +275,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Vshpere module splits `virtualmachine.host` into `virtualmachine.host.id` and `virtualmachine.host.hostname`. {issue}7187[7187] {pull}7213[7213]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 - Add extra check on `ignore_non_existent_counters` flag if the PdhExpandWildCardPathW returns no errors but does not expand the counter path successfully in windows/perfmon metricset. {pull}14797[14797]
+- Fix rds metricset from reporting same values for different instances. {pull}14702[14702]
 - Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
 
 *Packetbeat*
@@ -430,6 +432,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more configuration options to the Netflow module. {pull}14628{14628}
 - Add dashboards to the CEF module (ported from the Logstash ArcSight module).
 - Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
+- Fix timezone parsing in haproxy pipeline. {pull}14755[14755]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
