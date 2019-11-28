@@ -70,11 +70,16 @@ func Factory(cfg *common.Config) FactoryFunc {
 
 	if modeCfg.Mode == "fleet" {
 		fleetFeat, err := feature.GlobalRegistry().Lookup(Namespace, "x-pack-fleet")
-		if err == nil {
-			if factory, ok := fleetFeat.Factory().(FactoryFunc); ok {
-				return factory
-			}
+		if err != nil {
+			return nilFactory
 		}
+
+		factory, ok := fleetFeat.Factory().(FactoryFunc)
+		if !ok {
+			return nilFactory
+		}
+
+		return factory
 	}
 
 	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
