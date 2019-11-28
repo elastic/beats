@@ -25,7 +25,9 @@ jobs:
     - os: linux
       env: TARGETS="check"
       go: $TRAVIS_GO_VERSION
-      stage: check
+      # XXX: Change back to stage: check when migration to Python 3 is finished
+      # stage: check
+      stage: test
 
     # Filebeat
     - os: linux
