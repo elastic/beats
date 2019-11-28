@@ -29,7 +29,7 @@ type client interface {
 	ListGroups() ([]string, error)
 	DescribeGroups(group []string) (map[string]kafka.GroupDescription, error)
 	FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error)
-	GetPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error)
+	FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error)
 }
 
 func fetchGroupInfo(
@@ -120,9 +120,6 @@ func fetchGroupInfo(
 					continue
 				}
 				consumerLag := partitionOffset - info.Offset
-				if consumerLag < 0 {
-					consumerLag = 0
-				}
 				event := common.MapStr{
 					"id":           ret.group,
 					"topic":        topic,
@@ -156,7 +153,7 @@ func fetchGroupInfo(
 }
 
 func getPartitionOffsetFromTheLeader(b client, topic string, partitionID int32) (int64, error) {
-	offset, err := b.GetPartitionOffsetFromTheLeader(topic, partitionID)
+	offset, err := b.FetchPartitionOffsetFromTheLeader(topic, partitionID)
 	if err != nil {
 		return -1, err
 	}

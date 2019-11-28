@@ -149,6 +149,6 @@ func (c *mockClient) DescribeGroups(groups []string) (map[string]kafka.GroupDesc
 func (c *mockClient) FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error) {
 	return c.fetchGroupOffsets(group)
 }
-func (c *mockClient) GetPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
+func (c *mockClient) FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
 	return c.getPartitionOffsetFromTheLeader(topic, partitionID)
 }

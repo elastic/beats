@@ -138,7 +138,7 @@ func (b *Broker) Connect() error {
 	b.id = other.ID()
 	b.advertisedAddr = other.Addr()
 
-	c, err := getClusteWideClient(b.Addr(), b.cfg)
+	c, err := getClusterWideClient(b.Addr(), b.cfg)
 	if err != nil {
 		closeBroker(b.broker)
 		return fmt.Errorf("Could not get cluster client for advertised broker with address %v", b.Addr())
@@ -280,8 +280,8 @@ func (b *Broker) FetchGroupOffsets(group string, partitions map[string][]int32) 
 	return b.broker.FetchOffset(requ)
 }
 
-// GetPartitionOffsetFromTheLeader fetches the OffsetNewest from the leader.
-func (b *Broker) GetPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
+// FetchPartitionOffsetFromTheLeader fetches the OffsetNewest from the leader.
+func (b *Broker) FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
 	offset, err := b.client.GetOffset(topic, partitionID, sarama.OffsetNewest)
 	if err != nil {
 		return -1, err
@@ -289,7 +289,7 @@ func (b *Broker) GetPartitionOffsetFromTheLeader(topic string, partitionID int32
 	return offset, nil
 }
 
-// ID returns the broker or -1 if the broker id is unknown.
+// ID returns the broker ID or -1 if the broker id is unknown.
 func (b *Broker) ID() int32 {
 	if b.id == noID {
 		return b.broker.ID()
@@ -543,7 +543,7 @@ func anyIPsMatch(as, bs []net.IP) bool {
 	return false
 }
 
-func getClusteWideClient(addr string, cfg *sarama.Config) (sarama.Client, error) {
+func getClusterWideClient(addr string, cfg *sarama.Config) (sarama.Client, error) {
 	client, err := sarama.NewClient([]string{addr}, cfg)
 	if err != nil {
 		return nil, err
