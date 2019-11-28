@@ -6,7 +6,7 @@ processors:
       pattern_definitions:
         NOPIPEGREEDYDATA: "((?! \|).)*"
       patterns:
-        - "%{LOGLEVEL:level}%{SPACE}\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\|%{SPACE}%{WORD:thread}"
+        - "%{LOGLEVEL:log.level}%{SPACE}\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\|%{SPACE}%{WORD:thread}"
       ignore_missing: true
 on_failure:
   - set:

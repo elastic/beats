@@ -3,8 +3,6 @@
 2019-11-27 15:09:34,538 | INFO  | Page File: /opt/activemq/data/kahadb/db.data. Recovered pageFile free list of size: 0 | org.apache.activemq.store.kahadb.disk.page.PageFile | KahaDB Index Free Page Recovery
 2019-11-27 15:09:34,690 | INFO  | Apache ActiveMQ 5.15.9 (localhost, ID:5338986a6080-37033-1574867374550-0:1) is starting | org.apache.activemq.broker.BrokerService | main
 2019-11-27 15:09:34,712 | ERROR | Failed to start Apache ActiveMQ (localhost, ID:5338986a6080-37033-1574867374550-0:1) | org.apache.activemq.broker.BrokerService | main
-java.io.IOException: Transport Connector could not be registered in JMX: java.io.IOException: Failed to bind to server socket: tcp://0.0.0.0:61616?maximumConnections=1000&wireFormat.maxFrameSize=104857600 due
- to: java.net.BindException: Address in use (Bind failed)
 	at org.apache.activemq.util.IOExceptionSupport.create(IOExceptionSupport.java:28)[activemq-client-5.15.9.jar:5.15.9]
 	at org.apache.activemq.broker.BrokerService.registerConnectorMBean(BrokerService.java:2264)[activemq-broker-5.15.9.jar:5.15.9]
 	at org.apache.activemq.broker.BrokerService.startTransportConnector(BrokerService.java:2744)[activemq-broker-5.15.9.jar:5.15.9]

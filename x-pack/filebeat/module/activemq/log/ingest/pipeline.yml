@@ -4,23 +4,22 @@ processors:
   - grok:
       field: message
       pattern_definitions:
+        GREEDYMULTILINE": "(.|\n|\t)*"
         NOPIPEGREEDYDATA: "((?! \|).)*"
       patterns:
-        - "%{LOGLEVEL:level}%{SPACE}\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\|%{SPACE}%{WORD:thread}"
+        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\|%{SPACE}%{JAVACLASS:class}%{SPACE}\|%{SPACE}%{WORD:thread}%{SPACE}?%{GREEDYMULTILINE:java_exception}"
       ignore_missing: true
   - date:
       if: "ctx.event.timezone == null"
       field: timestamp
       target_field: "@timestamp"
-      formats:
-        - yy-MM-dd HH:mm:ss.SSS
+      formats: ["yyyy-MM-dd HH:mm:ss,SSS"]
   - date:
       if: "ctx.event.timezone != null"
       field: "timestamp"
       target_field: "@timestamp"
       timezone: "{{ event.timezone }}"
-      formats:
-        - yy-MM-dd HH:mm:ss.SSS
+      formats: ["yyyy-MM-dd HH:mm:ss,SSS"]
   - remove:
       field:
         - timestamp
