@@ -1,2 +1,2 @@
-This is the appsearch module.
+This is the App Search module.
 
