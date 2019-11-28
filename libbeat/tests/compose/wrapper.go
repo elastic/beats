@@ -169,9 +169,13 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 }
 
 func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) error {
-	var args, buildArgs []string
+	var args []string
 
 	args = append(args, "-d")
+
+	if opts.Create.Build {
+		args = append(args, "--build")
+	}
 
 	if opts.Create.ForceRecreate {
 		args = append(args, "--force-recreate")
@@ -179,26 +183,15 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 
 	if service != "" {
 		args = append(args, service)
-		buildArgs = append(buildArgs, service)
 	}
-
-	buildNeeded := true
 
 	// Try to pull the image before building it
 	var stderr bytes.Buffer
-	pull := d.cmd(ctx, "pull", service)
+	pull := d.cmd(ctx, "pull", "--ignore-pull-failures", service)
 	pull.Stdout = nil
 	pull.Stderr = &stderr
-	if err := pull.Run(); err == nil {
-		buildNeeded = false
-	}
-
-	// Make build blocking, so wait timeout only waits for the startup
-	if buildNeeded || opts.Create.Build {
-		err := d.cmd(ctx, "build", buildArgs...).Run()
-		if err != nil {
-			return errors.Wrapf(err, "docker-compose build")
-		}
+	if err := pull.Run(); err != nil {
+		return errors.Wrapf(err, "failed to pull images using docker-compose: %s", stderr.String())
 	}
 
 	err := d.cmd(ctx, "up", args...).Run()

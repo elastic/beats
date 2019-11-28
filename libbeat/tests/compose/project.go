@@ -146,7 +146,7 @@ func (c *Project) Start(service string, options UpOptions) error {
 	c.Lock()
 	defer c.Unlock()
 
-	return c.Driver.Up(context.TODO(), options, service)
+	return c.Driver.Up(context.Background(), options, service)
 }
 
 // Wait ensures all wanted services are healthy. Wait loop (60s timeout)
