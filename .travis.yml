@@ -1,12 +1,9 @@
 sudo: required
-dist: trusty
+dist: bionic
 services:
   - docker
 
 language: go
-
-# Migration to Python 3
-python: 3.8
 
 # Make sure project can also be built on travis for clones of the repo
 go_import_path: github.com/elastic/beats
