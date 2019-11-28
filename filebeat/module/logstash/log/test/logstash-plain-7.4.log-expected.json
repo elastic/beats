@@ -1,0 +1,16 @@
+[
+    {
+        "@timestamp": "2019-11-20T19:04:48.468-02:00",
+        "event.dataset": "logstash.log",
+        "event.module": "logstash",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 0,
+        "logstash.log.module": "org.logstash.dissect.Dissector",
+        "logstash.log.pipeline_id": "the_pipeline_id",
+        "message": "Dissector mapping, pattern not found {\"field\"=>\"message\", \"pattern\"=>\"%{LogLineTimeStamp->}\\t%{Healthy}\\t%{Fatals}\\t%{Errors}\\t%{Warnings}\\t%{TimeToBuildPatternsCache}\\t%{CachedPatternsCount}\\t%{MessagesEnqueued}\\t%{DropMsgNoSubscribers}\\t%{MessagesEnqueued}\\t%{TotalDests}\\t%{CycleProcTime}\\t%{TimeSinceNap}\\t%{QUtilPermilAvg}\\t%{QUtilPermilMax}\\t%{QUtilPermilCount}\\t%{NotifierRequests}\\t%{NotifierProcessedRequests}\\t%{NotifierRequestsChangeDynamicSubs}\\t%{NotifierSentRequestsChangeExtDynamicSubs}\\t%{NotifierProcessedRequestsDropped}\\t%{NotifierBadTargets}\\t%{NotifierCycleTimeNetAvg}\\t%{NotifierCycleTimeNetCount}\\t%{NotifierUtilAvg->}\", \"event\"=>{\"fields\"=>{\"pipeline\"=>\"mypipeline\", \"indexprefix\"=>\"idx\", \"regid\"=>\"w\", \"env\"=>\"production\"}, \"beat\"=>{\"version\"=>\"6.8.3\", \"hostname\"=>\"myhostname\", \"name\"=>\"myname\"}, \"message\"=>\"msg\", \"tags\"=>[\"production\", \"beats_input_codec_plain_applied\"], \"host\"=>{\"name\"=>\"myhostname\"}}}",
+        "service.type": "logstash"
+    }
+]

@@ -1227,9 +1227,9 @@ type: long
 --
 
 [[exported-fields-appsearch]]
-== appsearch fields
+== App Search fields
 
-appsearch module
+App Search module
 
 
 
@@ -2471,6 +2471,36 @@ The average number of transactions in the database that are blocked per second.
 
 
 type: long
+
+--
+
+*`aws.rds.db_instance.db_cluster_identifier`*::
++
+--
+This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.role`*::
++
+--
+DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.engine_name`*::
++
+--
+Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
+
+
+type: keyword
 
 --
 
@@ -15436,6 +15466,24 @@ type: float
 
 --
 
+*`kafka.broker.request.produce.failed`*::
++
+--
+The number of failed produce requests
+
+type: float
+
+--
+
+*`kafka.broker.request.fetch.failed`*::
++
+--
+The number of client fetch request failures
+
+type: float
+
+--
+
 *`kafka.broker.replication.leader_elections`*::
 +
 --
@@ -15499,7 +15547,43 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_in`*::
+*`kafka.broker.topic.net.in.bytes_per_sec`*::
++
+--
+The incoming byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.out.bytes_per_sec`*::
++
+--
+The outgoing byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.rejected.bytes_per_sec`*::
++
+--
+The rejected byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.messages_in`*::
++
+--
+The incoming message rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.net.in.bytes_per_sec`*::
 +
 --
 The incoming byte rate
@@ -15508,7 +15592,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_out`*::
+*`kafka.broker.net.out.bytes_per_sec`*::
 +
 --
 The outgoing byte rate
@@ -15517,7 +15601,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.net.bytes_rejected`*::
+*`kafka.broker.net.rejected.bytes_per_sec`*::
 +
 --
 The rejected byte rate
@@ -15526,7 +15610,7 @@ type: float
 
 --
 
-*`kafka.broker.topic.messages_in`*::
+*`kafka.broker.messages_in`*::
 +
 --
 The incoming message rate
@@ -15577,10 +15661,46 @@ type: float
 
 --
 
-*`kafka.consumer.bytes_in`*::
+*`kafka.consumer.in.bytes_per_sec`*::
 +
 --
 The rate of bytes coming in to the consumer
+
+type: float
+
+--
+
+*`kafka.consumer.max_lag`*::
++
+--
+The maximum consumer lag
+
+type: float
+
+--
+
+*`kafka.consumer.zookeeper_commits`*::
++
+--
+The rate of offset commits to ZooKeeper
+
+type: float
+
+--
+
+*`kafka.consumer.kafka_commits`*::
++
+--
+The rate of offset commits to Kafka
+
+type: float
+
+--
+
+*`kafka.consumer.messages_in`*::
++
+--
+The rate of consumer message consumption
 
 type: float
 
@@ -16004,10 +16124,19 @@ type: float
 
 --
 
-*`kafka.producer.bytes_out`*::
+*`kafka.producer.out.bytes_per_sec`*::
 +
 --
 The rate of bytes going out for the producer
+
+type: float
+
+--
+
+*`kafka.producer.message_rate`*::
++
+--
+The producer message rate
 
 type: float
 
