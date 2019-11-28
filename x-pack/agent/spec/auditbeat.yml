@@ -4,25 +4,25 @@ rules:
 - filter_values_with_regexp:
     key: type
     re: ^audit/.+
-    selector: inputs
+    selector: streams
 - map:
-    path: inputs
+    path: streams
     rules:
     - translate_with_regexp:
         path: type
         re: ^audit/(.+)
         with: $1
 - copy:
-    from: inputs
+    from: streams
     to: auditbeat
 - map:
-    path: auditbeat.inputs
+    path: auditbeat.streams
     rules:
     - rename:
         from: type
         to: module
 - rename:
-    from: auditbeat.inputs
+    from: auditbeat.streams
     to: modules
 - filter:
     selectors:
