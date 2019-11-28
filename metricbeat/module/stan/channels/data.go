@@ -43,6 +43,7 @@ var channelSchema = s.Schema{
 	"depth":      c.Int("depth", s.Optional), // aggregated by the module
 }
 
+// Subscription stores subscription related information
 type Subscription struct {
 	QueueName    string `json:"queue_name"`
 	IsDurable    bool   `json:"is_durable"`
@@ -51,6 +52,8 @@ type Subscription struct {
 	PendingCount int64  `json:"pending_count"`
 	LastSent     int64  `json:"last_sent"`
 }
+
+// Channel stores channel related information
 type Channel struct {
 	Name          string         `json:"name"`
 	Msgs          int64          `json:"msgs"`
@@ -60,6 +63,7 @@ type Channel struct {
 	Subscriptions []Subscription `json:"subscriptions,omitempty"`
 }
 
+// Channels stores channels related information
 type Channels struct {
 	ClusterID string    `json:"cluster_id"`
 	ServerID  string    `json:"server_id"`
