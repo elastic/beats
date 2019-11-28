@@ -54,14 +54,14 @@ func TestErrorSerialization(t *testing.T) {
 
 func TestErrors(t *testing.T) {
 	t.Run("single error", func(t *testing.T) {
-		errors := Errors{newConfigError(errors.New("error1"))}
+		errors := Errors{NewConfigError(errors.New("error1"))}
 		assert.Equal(t, "1 error: error1", errors.Error())
 	})
 
 	t.Run("multiple errors", func(t *testing.T) {
 		errors := Errors{
-			newConfigError(errors.New("error1")),
-			newConfigError(errors.New("error2")),
+			NewConfigError(errors.New("error1")),
+			NewConfigError(errors.New("error2")),
 		}
 		assert.Equal(t, "2 errors: error1; error2", errors.Error())
 	})
