@@ -1,0 +1,79 @@
+[[add-nomad-metadata]]
+=== Add Nomad metadata
+
+The `add_nomad_metadata` processor annotates each event with relevant metadata
+from Nomad allocations. 
+The events are annotated with Nomad metadata, only if a valid configuration
+is detected and the processor is able to reach Nomad API.
+
+Each event is annotated with:
+
+* Region
+* Dc
+* Namespace
+* Job
+* Group
+* Task
+* Allocation ID
+* Allocation Index
+* Stream
+* Metadata 
+
+
+
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_nomad_metadata:
+    #address: "http://127.0.0.1:4646"
+    #secret_id: ""
+    #node: ""
+    #region: ""
+    #meta_prefix: "logger_"
+    #cleanup_timeout: 60
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`address`:: (Optional) The address of the nomad API. If not provided,
+the value of the environment variable `NOMAD_ADDR` is used. Defaults to 
+`http://127.0.0.1:4646`
+
+`secret_id`:: (Optional) The Token used to query the Nomad API. If empty,
+the environment variable `NOMAD_TOKEN` is used. If none is provided queries 
+will be perfermed without token.
+
+`node`:: (Optional) Node ID used to search for the allocation info. If not
+specified the local agent ID is used. Note that if ACL is enabled and this value
+if empty a token with agent read is needed.
+
+`region`:: (Optional) Region where to perfor the search for the allocations.
+Defaults to the local one.
+
+`meta_prefix`:: (Optional) Prefix used to add metadata to the event. All those 
+meta that prefixed by this will be added. Defaults to `logger_`
+
+`cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
+forget metadata for an allocation, 60s by default.
+
+[NOTE]
+=====
+The allocation ID is taken from filebeat log file path by splitting it. An example
+configuration follows:
+=====
+
+[source,yaml]
+-------------------------------------------------------------------------------
+filebeat.inputs:
+- type: log
+  paths:
+    - /opt/nomad/data/alloc/*/alloc/logs/*
+  exclude_files: ['\.fifo$']
+
+processors:
+- add_nomad_metadata:
+    when:
+      regexp:
+        log.file.path: "/opt/nomad/data/alloc/.*"
+-------------------------------------------------------------------------------
