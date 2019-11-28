@@ -48,14 +48,27 @@ func (p *Program) Configuration() map[string]interface{} {
 
 // Programs take a Tree representation of the main configuration and apply all the different
 // programs rules and generate individual configuration from the rules.
-func Programs(singleConfig *transpiler.AST) ([]Program, error) {
-	return detectPrograms(singleConfig)
+func Programs(singleConfig *transpiler.AST) (map[string][]Program, error) {
+	grouped, err := groupBy(singleConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "fail to extract program configuration")
+	}
+
+	groupedPrograms := make(map[string][]Program)
+	for k, config := range grouped {
+		programs, err := detectPrograms(config)
+		if err != nil {
+			return nil, errors.Wrap(err, "fail to generate program configuration")
+		}
+		groupedPrograms[k] = programs
+	}
+
+	return groupedPrograms, nil
 }
 
 func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 	programs := make([]Program, 0)
 	for _, spec := range Supported {
-		// TODO: better error handling here.
 		specificAST := singleConfig.Clone()
 		err := spec.Rules.Apply(specificAST)
 		if err != nil {
