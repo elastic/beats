@@ -66,11 +66,10 @@ type Dict struct {
 
 // Find takes a string which is a key and try to find the elements in the associated K/V.
 func (d *Dict) Find(key string) (Node, bool) {
-	i := sort.Search(len(d.value), func(i int) bool {
-		return d.value[i].(*Key).name >= key
-	})
-	if i < len(d.value) && d.value[i].(*Key).name == key {
-		return d.value[i], true
+	for _, i := range d.value {
+		if i.(*Key).name == key {
+			return i, true
+		}
 	}
 	return nil, false
 }

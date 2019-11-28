@@ -424,7 +424,7 @@ func (r *FilterRule) Apply(ast *AST) error {
 	mergedAST := &AST{root: &Dict{}}
 	var err error
 	for _, selector := range r.Selectors {
-		newAST, ok := Select(ast, selector)
+		newAST, ok := Select(ast.Clone(), selector)
 		if !ok {
 			continue
 		}

@@ -23,5 +23,5 @@ rules:
     - heartbeat
     - output
     - keystore
-when: HasItems(%{[heartbeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
-  'kafka', 'logstash')
+when: HasItems(%{[heartbeat.monitors]}) && HasNamespace('output', 'elasticsearch',
+  'redis', 'kafka', 'logstash')
