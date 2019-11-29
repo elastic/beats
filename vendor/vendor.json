@@ -3932,6 +3932,13 @@
 			"revisionTime": "2019-08-01T16:59:51Z"
 		},
 		{
+			"checksumSHA1": "XtdXJebhq+gy8FLEG3G/tehnMA4=",
+			"path": "google.golang.org/genproto/googleapis/api/label",
+			"revision": "83cc0476cb11ea0da33dacd4c6354ab192de6fe6",
+			"revisionTime": "2019-11-15T22:14:24Z",
+			"tree": true
+		},
+		{
 			"checksumSHA1": "Q6rQgtPQaREcxvmoo12Wmsx9glM=",
 			"path": "google.golang.org/genproto/googleapis/api/metric",
 			"revision": "f660b865573183437d2d868f703fe88bb8af0b55",
