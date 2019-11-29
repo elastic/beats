@@ -1167,6 +1167,11 @@ logging.files:
 # output configuration, so if you have the Elasticsearch output configured such
 # that it is pointing to your Elasticsearch monitoring cluster, you can simply
 # uncomment the following line.
+#
+# Deprecation warning: The use of monitoring.elasticsearch settings are discouraged and will be
+# removed in 8.0. Please use the `beat-xpack` module in Metricbeat to send Beats monitoring data
+# to Elasticsearch.
+#
 #monitoring.elasticsearch:
 
   # Array of hosts to connect to.
