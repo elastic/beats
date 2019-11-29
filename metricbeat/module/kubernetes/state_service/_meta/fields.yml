@@ -2,7 +2,7 @@
   type: group
   description: >
     kubernetes service metrics
-  release: ga
+  release: experimental
   fields:
     - name: name
       type: keyword
