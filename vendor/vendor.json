@@ -3907,6 +3907,12 @@
 			"versionExact": "v1.6.1"
 		},
 		{
+			"checksumSHA1": "ry/q3NHOR3uq4UVhn0KfFEVeTFk=",
+			"path": "google.golang.org/genproto/googleapis/api",
+			"revision": "83cc0476cb11ea0da33dacd4c6354ab192de6fe6",
+			"revisionTime": "2019-11-15T22:14:24Z"
+		},
+		{
 			"checksumSHA1": "GlPZsxfa/OYvumlfU8+2j4cVai8=",
 			"path": "google.golang.org/genproto/googleapis/api/annotations",
 			"revision": "a7e196e89fd3a3c4d103ca540bd5dac3a736e375",
