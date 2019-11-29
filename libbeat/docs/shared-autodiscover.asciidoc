@@ -110,6 +110,17 @@ autodiscover.providers:
               - "/mnt/logs/${data.docker.container.id}/*.log"
 -------------------------------------------------------------------------------------
 
+It has the following settings:
+
+`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
+`unix:///var/run/docker.sock` by default.
+`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
+socket.
+`cleanup_timeout`:: (Optional) Time of inactivity to consider we can stop the
+running configuration for a container, 60s by default.
+`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
+ labels with `_`.
+
 =======================================
 endif::[]
 
@@ -185,6 +196,8 @@ The `kubernetes` autodiscover provider has the following configuration settings:
 `namespace`:: (Optional) Select the namespace from which to collect the
   metadata. If it is not set, the processor collects metadata from all
   namespaces. It is unset by default.
+`cleanup_timeout`:: (Optional) Time of inactivity to consider we can stop the
+running configuration for a container, 60s by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
   client. If kube_config is not set, KUBECONFIG environment variable will be
   checked and if not present it will fall back to InCluster.
