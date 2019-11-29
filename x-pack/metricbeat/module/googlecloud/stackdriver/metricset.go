@@ -75,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	err := validatePeriodForGCP(m.Module().Config().Period)
 	if err != nil {
-		return errors.Wrapf(err, "invalid time period for GCP", err)
+		return errors.Wrap(err, "invalid time period for GCP")
 	}
 
 	//TODO Add credentials check?

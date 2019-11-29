@@ -29,7 +29,7 @@ func newStackdriverMetricsRequester(c config, window time.Duration, logger *logp
 
 	client, err := monitoring.NewMetricClient(context.Background(), c.opt)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error creating Stackdriver client", err)
+		return nil, errors.Wrap(err, "error creating Stackdriver client")
 	}
 
 	return &stackdriverMetricsRequester{

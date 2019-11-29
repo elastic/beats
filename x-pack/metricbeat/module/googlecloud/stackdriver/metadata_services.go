@@ -26,6 +26,6 @@ func NewMetadataServiceForConfig(ctx context.Context, c config) (googlecloud.Met
 	case googlecloud.SERVICE_STORAGE:
 		return nil, nil
 	default:
-		return nil, errors.Errorf("service 's' not found", c.ServiceName)
+		return nil, errors.Errorf("service '%s' not found", c.ServiceName)
 	}
 }
