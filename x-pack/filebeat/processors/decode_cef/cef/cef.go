@@ -4,7 +4,12 @@
 
 package cef
 
-import "bytes"
+import (
+	"bytes"
+
+	"github.com/pkg/errors"
+	"go.uber.org/multierr"
+)
 
 // Parser is generated from a ragel state machine using the following command:
 //go:generate ragel -Z -G1 cef.rl -o parser.go
@@ -14,6 +19,13 @@ import "bytes"
 // Chrome / Firefox.
 //go:generate ragel -V -p cef.rl -o cef.dot
 //go:generate dot -T svg cef.dot -o cef.svg
+
+// Field is CEF extension field value.
+type Field struct {
+	String    string      // Raw value.
+	Type      DataType    // Data type from CEF guide.
+	Interface interface{} // Converted value.
+}
 
 // Event is a single CEF message.
 type Event struct {
@@ -44,7 +56,7 @@ type Event struct {
 	// predefined set. The standard allows for including additional keys as
 	// outlined in "ArcSight Extension Directory". An event can contain any
 	// number of key-value pairs in any order.
-	Extensions map[string]string `json:"extensions,omitempty"`
+	Extensions map[string]*Field `json:"extensions,omitempty"`
 }
 
 func (e *Event) init() {
@@ -60,9 +72,9 @@ func (e *Event) init() {
 
 func (e *Event) pushExtension(key []byte, value []byte) {
 	if e.Extensions == nil {
-		e.Extensions = map[string]string{}
+		e.Extensions = map[string]*Field{}
 	}
-	e.Extensions[string(key)] = string(value)
+	e.Extensions[string(key)] = &Field{String: string(value)}
 }
 
 // Unpack unpacks a common event format (CEF) message. The data is expected to
@@ -93,21 +105,36 @@ func (e *Event) Unpack(data []byte, opts ...Option) error {
 		opt.Apply(&settings)
 	}
 
-	err := e.unpack(data)
+	var errs []error
+	var err error
+	if err = e.unpack(data); err != nil {
+		errs = append(errs, err)
+	}
 
-	if settings.fullExtensionNames {
-		for key, v := range e.Extensions {
-			fullName, found := fullNameMapping[key]
-			if !found || key == fullName {
-				continue
-			}
+	for key, field := range e.Extensions {
+		mapping, found := extensionMapping[key]
+		if !found {
+			continue
+		}
 
-			e.Extensions[fullName] = v
+		// Mark the data type and do the actual conversion.
+		field.Type = mapping.Type
+		field.Interface, err = ToType(field.String, mapping.Type)
+		if err != nil {
+			// Drop the key because the field value is invalid.
+			delete(e.Extensions, key)
+			errs = append(errs, errors.Wrapf(err, "error in field '%v'", key))
+			continue
+		}
+
+		// Rename extension.
+		if settings.fullExtensionNames && key != mapping.Target {
+			e.Extensions[mapping.Target] = field
 			delete(e.Extensions, key)
 		}
 	}
 
-	return err
+	return multierr.Combine(errs...)
 }
 
 var (

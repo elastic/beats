@@ -25,6 +25,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change wording when we fail to load a CA file to the cert pool. {issue}14309[14309]
 - Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
 - Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
+- Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 
 *Auditbeat*
 
@@ -41,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
+- CEF extensions are now mapped to the data types defined in the CEF guide. {pull}14342[14342]
 
 *Heartbeat*
 
@@ -82,6 +84,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
+- Fix a bug, publisher pipeline exits if output returns an error, irrespective of pipeline is closed or not
 - Fix typo in TLS renegotiation configuration and setting the option correctly {issue}10871[10871], {pull}12354[12354]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
 - Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
@@ -270,6 +274,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
 - Vshpere module splits `virtualmachine.host` into `virtualmachine.host.id` and `virtualmachine.host.hostname`. {issue}7187[7187] {pull}7213[7213]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
+- Fix rds metricset from reporting same values for different instances. {pull}14702[14702]
+- Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
+- Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
 
 *Packetbeat*
 
@@ -423,6 +430,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New fileset googlecloud/firewall for ingesting Google Cloud Firewall logs. {pull}14553[14553]
 - Add document for Filebeat input httpjson. {pull}14602[14602]
 - Add more configuration options to the Netflow module. {pull}14628{14628}
+- Add dashboards to the CEF module (ported from the Logstash ArcSight module).
+- Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
+- Fix timezone parsing in haproxy pipeline. {pull}14755[14755]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
