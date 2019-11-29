@@ -116,6 +116,13 @@ func (b *Broker) Connect() error {
 		return errors.Wrap(err, "broker.Open failed")
 	}
 
+	c, err := getClusterWideClient(b.Addr(), b.cfg)
+	if err != nil {
+		closeBroker(b.broker)
+		return fmt.Errorf("Could not get cluster client for advertised broker with address %v", b.Addr())
+	}
+	b.client = c
+
 	if b.id != noID || !b.matchID {
 		return nil
 	}
@@ -138,12 +145,6 @@ func (b *Broker) Connect() error {
 	b.id = other.ID()
 	b.advertisedAddr = other.Addr()
 
-	c, err := getClusterWideClient(b.Addr(), b.cfg)
-	if err != nil {
-		closeBroker(b.broker)
-		return fmt.Errorf("Could not get cluster client for advertised broker with address %v", b.Addr())
-	}
-	b.client = c
 	return nil
 }
 
