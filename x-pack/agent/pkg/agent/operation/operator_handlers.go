@@ -38,7 +38,7 @@ func (o *Operator) handleRun(step configrequest.Step) error {
 func (o *Operator) handleRemove(step configrequest.Step) error {
 	p, _, err := getProgramFromStep(step)
 	if err != nil {
-		return errors.Wrap(err, "operator.handleStart failed to create program")
+		return errors.Wrap(err, "operator.handleRemove failed to stop program")
 	}
 
 	return o.stop(p)
@@ -56,15 +56,22 @@ func (o *Operator) handleStopSidecar(step configrequest.Step) error {
 
 func getProgramFromStep(step configrequest.Step) (Descriptor, map[string]interface{}, error) {
 	metConfig, ok := step.Meta[configrequest.MetaConfigKey]
-	if !ok {
+	if !ok && needsMetaConfig(step) {
 		return nil, nil, fmt.Errorf("step: %s, no config in metadata", step.ID)
 	}
 
-	config, ok := metConfig.(map[string]interface{})
-	if !ok {
-		return nil, nil, fmt.Errorf("step: %s, program config is in invalid format", step.ID)
+	var config map[string]interface{}
+	if ok {
+		config, ok = metConfig.(map[string]interface{})
+		if !ok && needsMetaConfig(step) {
+			return nil, nil, fmt.Errorf("step: %s, program config is in invalid format", step.ID)
+		}
 	}
 
 	p := app.NewDescriptor(step.Process, step.Version, nil)
 	return p, config, nil
+}
+
+func needsMetaConfig(step configrequest.Step) bool {
+	return step.ID == configrequest.StepRun || step.ID == configrequest.StepStartSidecar
 }
