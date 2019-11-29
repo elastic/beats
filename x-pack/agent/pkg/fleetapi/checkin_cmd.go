@@ -8,67 +8,47 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 )
 
 // CheckinRequest consists of multiple events reported to fleet ui.
-//
-// Example:
-// POST /api/fleet/agents/a4937110-e53e-11e9-934f-47a8e38a522c/checkin
-// {
-//   "events": [{
-//     "type": "STATE",
-//     "subtype": "STARTING",
-//     "message": "state changed from STOPPED to STARTING",
-//     "timestamp": "2019-10-01T13:42:54.323Z",
-//     "payload": {},
-//     "data": "{}"
-//   }]
-// }
 type CheckinRequest struct {
-	Events []Event `json:"events"`
+	Events []SerializableEvent `json:"events"`
 }
 
-// Event is a single event out of collection of reported events.
-type Event struct {
-	EventType string                 `json:"type"`
-	Timestamp string                 `json:"timestamp"`
-	SubType   string                 `json:"subtype"`
-	Message   string                 `json:"message"`
-	Payload   map[string]interface{} `json:"payload,omitempty"`
-	Data      string                 `json:"data,omitempty"`
+// SerializableEvent is a representation of the event to be send to the Fleet API via the checkin
+// endpoint, we are liberal into what we accept to be send you only need a type and be able to be
+// serialized into JSON.
+type SerializableEvent interface {
+	// Type return the type of the event, this must be included in the serialized document.
+	Type() string
+
+	// Timestamp is used to keep track when the event was created in the system.
+	Timestamp() time.Time
+
+	// Message is a human readable string to explain what the event does, this would be displayed in
+	// the UI as a string of text.
+	Message() string
 }
 
 // Validate validates the enrollment request before sending it to the API.
 func (e *CheckinRequest) Validate() error {
-	if len(e.Events) == 0 {
-		return errors.New("no events to report")
-	}
-
 	return nil
 }
 
-// CheckinResponse is a fleets response to checking API request.
-//
-// Example:
-// 	{
-// 		"action": "checkin",
-// 		"success": true,
-// 		"policy": {
-// 		},
-// 		"actions": []
-//  }
+// CheckinResponse is the response send back from the server which contains all the action that
+// need to be executed or proxy to running processes.
 type CheckinResponse struct {
-	Action  string `json:"action"`
-	Success bool   `json:"success"`
+	Actions Actions `json:"actions"`
+	Success bool    `json:"success"`
 }
 
 // Validate validates the response send from the server.
 func (e *CheckinResponse) Validate() error {
-	var err error
-
-	return err
+	return nil
 }
 
 // CheckinCmd is a fleet API command.
@@ -100,9 +80,13 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 
 	resp, err := e.client.Send("POST", e.checkinPath, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "fail to checkin to fleet")
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, extract(resp.Body)
+	}
 
 	checkinResponse := &CheckinResponse{}
 	decoder := json.NewDecoder(resp.Body)

@@ -73,19 +73,19 @@ func TestInfoDrop(t *testing.T) {
 	}
 
 	// check both are errors
-	if reportedEvents[0].EventType != reportedEvents[1].EventType || reportedEvents[0].EventType != reporter.EventTypeError {
-		t.Fatalf("expected ERROR events got [1]: '%v', [2]: '%v'", reportedEvents[0].EventType, reportedEvents[1].EventType)
+	if reportedEvents[0].Type() != reportedEvents[1].Type() || reportedEvents[0].Type() != reporter.EventTypeError {
+		t.Fatalf("expected ERROR events got [1]: '%v', [2]: '%v'", reportedEvents[0].Type(), reportedEvents[1].Type())
 	}
 }
 
 type testClient struct {
-	reportedEvents []fleetapi.Event
+	reportedEvents []fleetapi.SerializableEvent
 	lock           sync.Mutex
 }
 
 func newTestClient() *testClient {
 	return &testClient{
-		reportedEvents: make([]fleetapi.Event, 0),
+		reportedEvents: make([]fleetapi.SerializableEvent, 0),
 	}
 }
 
@@ -100,10 +100,10 @@ func (tc *testClient) Execute(r *fleetapi.CheckinRequest) (*fleetapi.CheckinResp
 func (tc *testClient) reset() {
 	tc.lock.Lock()
 	defer tc.lock.Unlock()
-	tc.reportedEvents = make([]fleetapi.Event, 0)
+	tc.reportedEvents = make([]fleetapi.SerializableEvent, 0)
 }
 
-func (tc *testClient) events() []fleetapi.Event {
+func (tc *testClient) events() []fleetapi.SerializableEvent {
 	tc.lock.Lock()
 	defer tc.lock.Unlock()
 

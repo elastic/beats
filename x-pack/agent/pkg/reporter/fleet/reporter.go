@@ -18,8 +18,28 @@ import (
 
 const (
 	defaultThreshold = 1000
-	timeFormat       = time.RFC3339
 )
+
+type event struct {
+	EventType string                 `json:"type"`
+	Ts        fleetapi.Time          `json:"timestamp"`
+	SubType   string                 `json:"subtype"`
+	Msg       string                 `json:"message"`
+	Payload   map[string]interface{} `json:"payload,omitempty"`
+	Data      string                 `json:"data,omitempty"`
+}
+
+func (e *event) Type() string {
+	return e.EventType
+}
+
+func (e *event) Timestamp() time.Time {
+	return time.Time(e.Ts)
+}
+
+func (e *event) Message() string {
+	return e.Msg
+}
 
 type checkinExecutor interface {
 	Execute(r *fleetapi.CheckinRequest) (*fleetapi.CheckinResponse, error)
@@ -126,18 +146,19 @@ func (r *Reporter) queueCopy() []reporter.Event {
 
 func (r *Reporter) reportBatch(ee []reporter.Event) error {
 	req := &fleetapi.CheckinRequest{
-		Events: make([]fleetapi.Event, 0, len(ee)),
+		Events: make([]fleetapi.SerializableEvent, 0, len(ee)),
 	}
 
 	for _, e := range ee {
-		req.Events = append(req.Events, fleetapi.Event{
-			EventType: e.Type(),
-			Timestamp: e.Time().Format(timeFormat),
-			SubType:   e.SubType(),
-			Message:   e.Message(),
-			Payload:   e.Payload(),
-			Data:      e.Data(),
-		})
+		req.Events = append(req.Events,
+			&event{
+				EventType: e.Type(),
+				Ts:        fleetapi.Time(e.Time()),
+				SubType:   e.SubType(),
+				Msg:       e.Message(),
+				Payload:   e.Payload(),
+				Data:      e.Data(),
+			})
 	}
 
 	_, err := r.checkingCmd.Execute(req)
