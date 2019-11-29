@@ -11,7 +11,3 @@
       type: keyword
       description: >
         User that generated the logging event.
-    - name: thread
-      type: keyword
-      description: >
-        Thread that generated the logging event.

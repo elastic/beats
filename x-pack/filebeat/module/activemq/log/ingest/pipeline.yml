@@ -8,12 +8,8 @@ processors:
         NOPIPEGREEDYDATA: "((?! \\|).)*"
         THREAD_NAME: "((?! \n).)*"
       patterns:
-        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:activemq.log.caller}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.log.thread}%{SPACE}?%{GREEDYMULTILINE:activemq.log.java_exception}"
+        - "%{TIMESTAMP_ISO8601:timestamp}%{SPACE}\\|%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{NOPIPEGREEDYDATA:activemq.log.caller}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}%{SPACE}?%{GREEDYMULTILINE:activemq.log.stack_trace}"
       ignore_missing: true
-  - set:
-      field: activemq.log.java_exception
-      if: "ctx.activemq.log.java_exception == null"
-      value: ""
   - date:
       if: "ctx.event.timezone == null"
       field: timestamp

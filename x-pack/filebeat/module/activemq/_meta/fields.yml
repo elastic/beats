@@ -7,3 +7,7 @@
       type: group
       description: >
       fields:
+        - name: thread
+          type: keyword
+          description: >
+            Thread that generated the logging event.

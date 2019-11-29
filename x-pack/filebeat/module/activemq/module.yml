@@ -1,5 +1,0 @@
-dashboards:
-- id: Filebeat-activemq-log-Dashboard
-  file: Filebeat-activemq-log.json
-- id: Filebeat-activemq-audit-Dashboard
-  file: Filebeat-activemq-audit.json

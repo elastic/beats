@@ -75,6 +75,16 @@ Module for parsing ActiveMQ log files.
 
 
 
+*`activemq.thread`*::
++
+--
+Thread that generated the logging event.
+
+
+type: keyword
+
+--
+
 [float]
 === audit
 
@@ -102,16 +112,6 @@ type: keyword
 
 --
 
-*`activemq.audit.thread`*::
-+
---
-Thread that generated the logging event.
-
-
-type: keyword
-
---
-
 [float]
 === log
 
@@ -129,17 +129,7 @@ type: keyword
 
 --
 
-*`activemq.log.thread`*::
-+
---
-Thread that issued the logging request.
-
-
-type: keyword
-
---
-
-*`activemq.log.java_exception`*::
+*`activemq.log.stack_trace`*::
 +
 --
 type: keyword

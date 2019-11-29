@@ -7,9 +7,5 @@
       type: keyword
       description: >
         Name of the caller issuing the logging request (class or resource).
-    - name: thread
-      type: keyword
-      description: >
-        Thread that issued the logging request.
-    - name: java_exception
+    - name: stack_trace
       type: keyword
