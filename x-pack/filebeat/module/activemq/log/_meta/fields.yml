@@ -1,18 +1,12 @@
 - name: log
   type: group
   description: >
-    ActiveMQ application log lines.
+    Fields from ActiveMQ application logs.
   fields:
-    - name: level
-      type: alias
-      path: log.level
-    - name: message
-      type: alias
-      path: message
-    - name: class
+    - name: caller
       type: keyword
       description: >
-        Fully qualified class name of the caller issuing the logging request.
+        Name of the caller issuing the logging request (class or resource).
     - name: thread
       type: keyword
       description: >

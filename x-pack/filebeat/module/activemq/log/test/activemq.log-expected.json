@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2019-11-27T15:09:34.491Z",
-        "activemq.log.class": "org.apache.activemq.store.kahadb.MessageDatabase",
+        "activemq.log.caller": "org.apache.activemq.store.kahadb.MessageDatabase",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -15,7 +15,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.531Z",
-        "activemq.log.class": "org.apache.activemq.store.kahadb.plist.PListStoreImpl",
+        "activemq.log.caller": "org.apache.activemq.store.kahadb.plist.PListStoreImpl",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -29,7 +29,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.538Z",
-        "activemq.log.class": "org.apache.activemq.store.kahadb.disk.page.PageFile",
+        "activemq.log.caller": "org.apache.activemq.store.kahadb.disk.page.PageFile",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "KahaDB Index Free Page Recovery",
         "event.dataset": "activemq.log",
@@ -43,7 +43,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.690Z",
-        "activemq.log.class": "org.apache.activemq.broker.BrokerService",
+        "activemq.log.caller": "org.apache.activemq.broker.BrokerService",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -57,7 +57,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.712Z",
-        "activemq.log.class": "org.apache.activemq.broker.BrokerService",
+        "activemq.log.caller": "org.apache.activemq.broker.BrokerService",
         "activemq.log.java_exception": "at org.apache.activemq.util.IOExceptionSupport.create(IOExceptionSupport.java:28)[activemq-client-5.15.9.jar:5.15.9]\n\tat org.apache.activemq.broker.BrokerService.registerConnectorMBean(BrokerService.java:2264)[activemq-broker-5.15.9.jar:5.15.9]\n\tat org.apache.activemq.broker.BrokerService.startTransportConnector(BrokerService.java:2744)[activemq-broker-5.15.9.jar:5.15.9]\n\tat org.apache.activemq.broker.BrokerService.startAllConnectors(BrokerService.java:2640)[activemq-broker-5.15.9.jar:5.15.9]\n\tat org.apache.activemq.broker.BrokerService.doStartBroker(BrokerService.java:771)[activemq-broker-5.15.9.jar:5.15.9]\n\tat org.apache.activemq.broker.BrokerService.startBroker(BrokerService.java:733)[activemq-broker-5.15.9.jar:5.15.9]\n\tat org.apache.activemq.broker.BrokerService.start(BrokerService.java:636)[activemq-broker-5.15.9.jar:5.15.9]\n\tat org.apache.activemq.xbean.XBeanBrokerService.afterPropertiesSet(XBeanBrokerService.java:73)[activemq-spring-5.15.9.jar:5.15.9]\n\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)[:1.8.0_212]\n\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)[:1.8.0_212]\n\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)[:1.8.0_212]\n\tat java.lang.reflect.Method.invoke(Method.java:498)[:1.8.0_212]\n\tat org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeCustomInitMethod(AbstractAutowireCapableBeanFactory.java:1763)[spring-beans-4.3.18.RELEASE.jar:4.3.18.RELEASE]\n\tat org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1700)[spring-beans-4.3.18.RELEASE.jar:4.3.18.RELEASE]",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -74,7 +74,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.716Z",
-        "activemq.log.class": "org.apache.activemq.broker.BrokerService",
+        "activemq.log.caller": "org.apache.activemq.broker.BrokerService",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -88,7 +88,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.718Z",
-        "activemq.log.class": "org.apache.activemq.broker.TransportConnector",
+        "activemq.log.caller": "org.apache.activemq.broker.TransportConnector",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -102,7 +102,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.719Z",
-        "activemq.log.class": "org.apache.activemq.broker.TransportConnector",
+        "activemq.log.caller": "org.apache.activemq.broker.TransportConnector",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -116,7 +116,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.721Z",
-        "activemq.log.class": "org.apache.activemq.broker.TransportConnector",
+        "activemq.log.caller": "org.apache.activemq.broker.TransportConnector",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -130,7 +130,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.722Z",
-        "activemq.log.class": "org.apache.activemq.broker.TransportConnector",
+        "activemq.log.caller": "org.apache.activemq.broker.TransportConnector",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -144,7 +144,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.723Z",
-        "activemq.log.class": "org.apache.activemq.broker.TransportConnector",
+        "activemq.log.caller": "org.apache.activemq.broker.TransportConnector",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -158,7 +158,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.727Z",
-        "activemq.log.class": "org.apache.activemq.store.kahadb.plist.PListStoreImpl",
+        "activemq.log.caller": "org.apache.activemq.store.kahadb.plist.PListStoreImpl",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -172,7 +172,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.728Z",
-        "activemq.log.class": "org.apache.activemq.store.kahadb.KahaDBStore",
+        "activemq.log.caller": "org.apache.activemq.store.kahadb.KahaDBStore",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -186,7 +186,7 @@
     },
     {
         "@timestamp": "2019-11-27T15:09:34.730Z",
-        "activemq.log.class": "org.apache.activemq.store.kahadb.KahaDBStore",
+        "activemq.log.caller": "org.apache.activemq.store.kahadb.KahaDBStore",
         "activemq.log.java_exception": "",
         "activemq.log.thread": "main",
         "event.dataset": "activemq.log",
@@ -196,6 +196,34 @@
         "log.level": "INFO",
         "log.offset": 3536,
         "message": "Stopping async topic tasks",
+        "service.type": "activemq"
+    },
+    {
+        "@timestamp": "2019-11-29T10:59:49.515Z",
+        "activemq.log.caller": "/admin",
+        "activemq.log.java_exception": "",
+        "activemq.log.thread": "main",
+        "event.dataset": "activemq.log",
+        "event.module": "activemq",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 3651,
+        "message": "No Spring WebApplicationInitializer types detected on classpath",
+        "service.type": "activemq"
+    },
+    {
+        "@timestamp": "2019-11-29T10:59:49.779Z",
+        "activemq.log.caller": "/admin",
+        "activemq.log.java_exception": "",
+        "activemq.log.thread": "main",
+        "event.dataset": "activemq.log",
+        "event.module": "activemq",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 3765,
+        "message": "Initializing Spring FrameworkServlet 'dispatcher'",
         "service.type": "activemq"
     }
 ]

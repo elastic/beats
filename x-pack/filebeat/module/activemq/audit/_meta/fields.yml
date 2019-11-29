@@ -1,14 +1,16 @@
 - name: audit
   type: group
   description: >
-    ActiveMQ audit log lines.
+    Fields from ActiveMQ audit logs.
   fields:
-    - name: level
-      type: alias
-      path: log.level
-    - name: message
-      type: alias
-      path: message
+    - name: action
+      type: keyword
+      description: >
+        Describes user activity.
+    - name: user
+      type: keyword
+      description: >
+        User that generated the logging event.
     - name: thread
       type: keyword
       description: >

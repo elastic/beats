@@ -26,3 +26,5 @@
 2019-11-27 15:09:34,727 | INFO  | PListStore:[/opt/activemq/data/localhost/tmp_storage] stopped | org.apache.activemq.store.kahadb.plist.PListStoreImpl | main
 2019-11-27 15:09:34,728 | INFO  | Stopping async queue tasks | org.apache.activemq.store.kahadb.KahaDBStore | main
 2019-11-27 15:09:34,730 | INFO  | Stopping async topic tasks | org.apache.activemq.store.kahadb.KahaDBStore | main
+2019-11-29 10:59:49,515 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /admin | main
+2019-11-29 10:59:49,779 | INFO  | Initializing Spring FrameworkServlet 'dispatcher' | /admin | main
