@@ -1,7 +1,3 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
-
 package fleetapi
 
 import (
@@ -24,7 +20,6 @@ func TestCheckin(t *testing.T) {
 
 	t.Run("Send back status of actions", skip)
 	t.Run("Propagate any errors from the server", skip)
-	t.Run("Checkin receives no action to execute", skip)
 	t.Run("Checkin receives a PolicyChange", skip)
 	t.Run("Checkin receives known and unknown action type", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
@@ -38,21 +33,13 @@ func TestCheckin(t *testing.T) {
        "id": "policy-id",
         "outputs": {
           "default": {
-            "api_token": "another-token",
-            "id": "default",
-            "name": "Default",
-            "type": "elasticsearch",
-            "url": "https://localhost:9200"
+            "hosts": "https://localhost:9200"
           }
         },
         "streams": [
-          {
-            "metricsets": [
-              "container",
-              "cpu"
-            ],
             "id": "string",
-            "type": "etc",
+            "type": "logs",
+						"path": "/var/log/hello.log",
             "output": {
               "use_output": "default"
             }
@@ -86,10 +73,43 @@ func TestCheckin(t *testing.T) {
 			require.True(t, r.Success)
 
 			require.Equal(t, 2, len(r.Actions))
-			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "id2", r.Actions[1].ID())
 
-			fmt.Println(r.Actions[0].(*PolicyChangeAction).Policy)
+			// PolicyChangeAction
+			require.Equal(t, "id1", r.Actions[0].ID())
+			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
+
+			// UnknownAction
+			require.Equal(t, "id2", r.Actions[1].ID())
+			require.Equal(t, "UNKNOWN", r.Actions[1].Type())
+			require.Equal(t, "WHAT_TO_DO_WITH_IT", r.Actions[1].(*UnknownAction).OriginalType())
+		},
+	))
+	t.Run("When we receive no action", withServerWithAuthClient(
+		func(t *testing.T) *http.ServeMux {
+			raw := `
+{
+  "actions": [],
+	"success": true
+}
+`
+			mux := http.NewServeMux()
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			mux.HandleFunc(path, accessTokenHandler(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintf(w, raw)
+			}, withAccessToken))
+			return mux
+		}, withAccessToken,
+		func(t *testing.T, client clienter) {
+			cmd := NewCheckinCmd(agentID, client)
+
+			request := CheckinRequest{}
+
+			r, err := cmd.Execute(&request)
+			require.NoError(t, err)
+			require.True(t, r.Success)
+
+			require.Equal(t, 0, len(r.Actions))
 		},
 	))
 }
