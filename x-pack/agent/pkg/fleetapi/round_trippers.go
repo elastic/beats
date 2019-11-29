@@ -12,7 +12,7 @@ import (
 )
 
 // ErrInvalidAPIKey is returned when authentication fail to fleet.
-var ErrInvalidAPIKey = errors.New("invalid credentials to connect to fleet")
+var ErrInvalidAPIKey = errors.New("invalid api key to authenticate with fleet")
 
 // FleetUserAgentRoundTripper adds the Fleet user agent.
 type FleetUserAgentRoundTripper struct {
