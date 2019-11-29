@@ -42,33 +42,19 @@ type Event struct {
 
 // Validate validates the enrollment request before sending it to the API.
 func (e *CheckinRequest) Validate() error {
-	if len(e.Events) == 0 {
-		return errors.New("no events to report")
-	}
-
 	return nil
 }
 
-// CheckinResponse is a fleets response to checking API request.
-//
-// Example:
-// 	{
-// 		"action": "checkin",
-// 		"success": true,
-// 		"policy": {
-// 		},
-// 		"actions": []
-//  }
+// CheckinResponse is the response send back from the server which contains all the action that
+// need to be executed or proxy to running processes.
 type CheckinResponse struct {
-	Action  string `json:"action"`
-	Success bool   `json:"success"`
+	Actions Actions `json:"actions"`
+	Success bool    `json:"success"`
 }
 
 // Validate validates the response send from the server.
 func (e *CheckinResponse) Validate() error {
-	var err error
-
-	return err
+	return nil
 }
 
 // CheckinCmd is a fleet API command.

@@ -7,9 +7,7 @@ package fleetapi
 import (
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -79,30 +77,6 @@ func TestHTTPClient(t *testing.T) {
 			assert.Equal(t, `{ message: "hello" }`, string(body))
 		},
 	))
-}
-
-func accessTokenHandler(handler http.HandlerFunc, accessToken string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("kbn-fleet-access-token") != accessToken {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		handler(w, r)
-	}
-}
-
-func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, host string)) func(t *testing.T) {
-	return func(t *testing.T) {
-		listener, err := net.Listen("tcp", ":0")
-		require.NoError(t, err)
-		defer listener.Close()
-
-		port := listener.Addr().(*net.TCPAddr).Port
-
-		go http.Serve(listener, m(t))
-
-		test(t, "localhost:"+strconv.Itoa(port))
-	}
 }
 
 // NOTE(ph): Usually I would be agaisnt testing private methods as much as possible but in this
