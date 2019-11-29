@@ -57,19 +57,19 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 		return nil, err
 	}
 
-	// Ensure that host is set correctly whenever the scope is set to "host". Make sure that host is empty
+	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
-	if config.Scope == "host" {
-		config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+	if config.Scope == "node" {
+		config.Node = kubernetes.DiscoverKubernetesNode(config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
 	} else {
-		config.Host = ""
+		config.Node = ""
 	}
 
-	logger.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
+	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
-		Node:        config.Host,
+		Node:        config.Node,
 	})
 
 	if err != nil {

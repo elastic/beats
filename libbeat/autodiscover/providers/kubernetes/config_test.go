@@ -55,7 +55,7 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 
 func TestConfigWithIncorrectScope(t *testing.T) {
 	cfg := common.MapStr{
-		"scope":         "host",
+		"scope":         "node",
 		"resource":      "service",
 		"hints.enabled": true,
 	}

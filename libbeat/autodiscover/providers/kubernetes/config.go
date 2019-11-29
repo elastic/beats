@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -36,9 +37,9 @@ type Config struct {
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	// Needed when resource is a pod
-	Host string `config:"host"`
-	Node string `config:"node"`
-	// Scope can be either host or cluster.
+	HostDeprecated string `config:"host"`
+	Node           string `config:"node"`
+	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
 
@@ -70,12 +71,12 @@ func (c *Config) Validate() error {
 	}
 
 	// Check if host is being defined and change it to node instead.
-	if c.Node == "" && c.Host != "" {
-		c.Node = c.Host
-		logp.L().Warnf("`host` will be deprecated in 8.0. use `node` instead")
+	if c.Node == "" && c.HostDeprecated != "" {
+		c.Node = c.HostDeprecated
+		cfgwarn.Deprecate("8.0", "`host` will be deprecated, use `node` instead")
 	}
 
-	// Check if resource is either node or pod. If yes then default the scope to "host" if not provided.
+	// Check if resource is either node or pod. If yes then default the scope to "node" if not provided.
 	// Default the scope to "cluster" for everything else.
 	switch c.Resource {
 	case "node", "pod":
@@ -85,7 +86,7 @@ func (c *Config) Validate() error {
 
 	default:
 		if c.Scope == "node" {
-			logp.L().Warnf("can not set scope to `host` when using resource %s. resetting scope to `cluster`", c.Resource)
+			logp.L().Warnf("can not set scope to `node` when using resource %s. resetting scope to `cluster`", c.Resource)
 		}
 		c.Scope = "cluster"
 	}
