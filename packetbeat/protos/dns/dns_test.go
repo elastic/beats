@@ -57,8 +57,8 @@ type dnsTestMessage struct {
 	qType       string
 	qName       string
 	qEtld       string
-	qSubdomain 	string
-	qTLD 		string
+	qSubdomain  interface{}
+	qTLD        interface{}
 	answers     []string
 	authorities []string
 	additionals []string
