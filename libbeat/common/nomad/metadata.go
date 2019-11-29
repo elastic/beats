@@ -18,9 +18,15 @@
 package nomad
 
 import (
+	"regexp"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/imdario/mergo"
+)
+
+var (
+	envRe = regexp.MustCompile(`\${[a-zA-Z0-9_\-\.]+}`)
 )
 
 // MetaGenerator builds metadata objects for allocations
@@ -82,7 +88,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 		"region":      *obj.Job.Region,
 		"type":        *obj.Job.Type,
 		"alloc_id":    obj.ID,
-		"status":      obj.Job.Status,
+		"status":      *obj.Job.Status,
 	}
 
 	return meta
@@ -193,7 +199,7 @@ func generateMapSubset(input common.MapStr, keys []string, dedot bool) common.Ma
 
 // AllocationNodeName returns Name of the node where the task is allocated. It
 // does one additional API call to circunvent the empty NodeName property of
-// older Nomad versions
+// older Nomad versions (up to v0.8)
 func (g *metaGenerator) AllocationNodeName(id string) (string, error) {
 	if name, ok := g.nodesCache[id]; ok {
 		return name, nil

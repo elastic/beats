@@ -122,6 +122,7 @@ func TestEmitEvent(t *testing.T) {
 					Region:      helper.StringToPtr("global"),
 					Name:        helper.StringToPtr("my-job"),
 					Type:        helper.StringToPtr(structs.JobTypeService),
+					Status:      helper.StringToPtr(structs.AllocClientStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
@@ -185,6 +186,7 @@ func TestEmitEvent(t *testing.T) {
 					"region":    "global",
 					"type":      "service",
 					"alloc_id":  UUID.String(),
+					"status":    structs.AllocClientStatusRunning,
 				},
 			},
 		},
@@ -202,6 +204,7 @@ func TestEmitEvent(t *testing.T) {
 					Region:      helper.StringToPtr("global"),
 					Name:        helper.StringToPtr("my-job"),
 					Type:        helper.StringToPtr(structs.JobTypeService),
+					Status:      helper.StringToPtr(structs.AllocClientStatusRunning),
 					Datacenters: []string{"europe-west4"},
 					Meta: map[string]string{
 						"key1":    "job-value",
