@@ -15791,6 +15791,15 @@ type: keyword
 
 --
 
+*`kafka.consumergroup.consumer_lag`*::
++
+--
+consumer lag for partition/topic calculated as the difference between the partition offset and consumer offset
+
+type: long
+
+--
+
 *`kafka.consumergroup.error.code`*::
 +
 --
