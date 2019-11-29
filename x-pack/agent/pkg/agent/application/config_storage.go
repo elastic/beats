@@ -7,8 +7,8 @@ package application
 import "github.com/elastic/beats/agent/kibana"
 
 type fleetConfig struct {
-	AccessToken string         `config:"access_token"`
-	Kibana      *kibana.Config `config:"kibana"`
+	AccessAPIKey string         `config:"access_api_key"`
+	Kibana       *kibana.Config `config:"kibana"`
 }
 
 type store interface {
