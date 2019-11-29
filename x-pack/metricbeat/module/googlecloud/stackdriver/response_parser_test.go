@@ -29,7 +29,7 @@ var fake *monitoring.TimeSeries = &monitoring.TimeSeries{
 		Labels: map[string]string{
 			"instance_name": "instance-1",
 		},
-		Type: m,
+		Type: "compute.googleapis.com/instance/cpu/usage_time",
 	},
 	MetricKind: metric.MetricDescriptor_GAUGE,
 	ValueType:  metric.MetricDescriptor_DOUBLE,
