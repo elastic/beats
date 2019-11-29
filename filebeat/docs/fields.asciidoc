@@ -78,25 +78,27 @@ Module for parsing ActiveMQ log files.
 [float]
 === audit
 
-ActiveMQ audit log lines.
+Fields from ActiveMQ audit logs.
 
 
 
-*`activemq.audit.level`*::
+*`activemq.audit.action`*::
 +
 --
-type: alias
+Describes user activity.
 
-alias to: log.level
+
+type: keyword
 
 --
 
-*`activemq.audit.message`*::
+*`activemq.audit.user`*::
 +
 --
-type: alias
+User that generated the logging event.
 
-alias to: message
+
+type: keyword
 
 --
 
@@ -113,32 +115,14 @@ type: keyword
 [float]
 === log
 
-ActiveMQ application log lines.
+Fields from ActiveMQ application logs.
 
 
 
-*`activemq.log.level`*::
+*`activemq.log.caller`*::
 +
 --
-type: alias
-
-alias to: log.level
-
---
-
-*`activemq.log.message`*::
-+
---
-type: alias
-
-alias to: message
-
---
-
-*`activemq.log.class`*::
-+
---
-Fully qualified class name of the caller issuing the logging request.
+Name of the caller issuing the logging request (class or resource).
 
 
 type: keyword
