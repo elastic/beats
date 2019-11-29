@@ -48,15 +48,15 @@ func NewPersistentVolumeMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		prometheus:    prometheus,
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
-				"kube_persistenvolume_capacity_bytes": p.Metric("capacity.bytes"),
-				"kube_persistentvolume_status_phase":  p.InfoMetric(),
-				"kube_persistentvolume_labels":        p.ExtendedInfoMetric(p.Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "labels"}),
-				"kube_persistentvolume_info":          p.InfoMetric(),
+				"kube_persistentvolume_capacity_bytes": p.Metric("capacity.bytes"),
+				"kube_persistentvolume_status_phase":   p.LabelMetric("phase", "phase"),
+				"kube_persistentvolume_labels":         p.ExtendedInfoMetric(p.Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "labels"}),
+				"kube_persistentvolume_info":           p.InfoMetric(),
 			},
 			Labels: map[string]p.LabelMap{
 				"persistentvolume": p.KeyLabel("name"),
-				"phase":            p.Label("phase"),
-				"storageclass":     p.Label("storage_class"),
+
+				"storageclass": p.Label("storage_class"),
 			},
 		},
 	}, nil
