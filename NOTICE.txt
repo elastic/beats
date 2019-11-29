@@ -5716,7 +5716,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: google.golang.org/genproto
-Revision: a7e196e89fd3a3c4d103ca540bd5dac3a736e375
+Revision: 83cc0476cb11ea0da33dacd4c6354ab192de6fe6
 License type (autodetected): Apache-2.0
 ./vendor/google.golang.org/genproto/LICENSE:
 --------------------------------------------------------------------
