@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
 - CEF extensions are now mapped to the data types defined in the CEF guide. {pull}14342[14342]
+- Remove --machine-learning from setup subcommand. {pull}14705[14705]
 
 *Heartbeat*
 
