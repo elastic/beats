@@ -477,7 +477,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "kafka.consumergroup.topic.name",
+                "terms_field": "kafka.consumergroup.topic",
                 "type": "timeseries"
               }
             ],
