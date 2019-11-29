@@ -44,7 +44,7 @@ const (
 
 var (
 	warnXPackMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use Metricbeat with the beat-xpack module to collect and ship monitoring data."
-	warnMonitoringDeprecatedConfig = "monitoring.* settings are deprecated. Use Metricbeat with the beat-xpack module to collect and ship monitoring data."
+	warnMonitoringDeprecatedConfig      = "monitoring.* settings are deprecated. Use Metricbeat with the beat-xpack module to collect and ship monitoring data."
 )
 
 // Default is the global default metrics registry provided by the monitoring package.
