@@ -11,7 +11,8 @@ import (
 	"github.com/elastic/beats/agent/kibana"
 )
 
-var InvalidCredentialsErr = errors.New("invalid credentials to connect to fleet")
+// ErrInvalidAPIKey is returned when authentication fail to fleet.
+var ErrInvalidAPIKey = errors.New("invalid credentials to connect to fleet")
 
 // FleetUserAgentRoundTripper adds the Fleet user agent.
 type FleetUserAgentRoundTripper struct {
@@ -50,7 +51,7 @@ func (r *FleetAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, er
 
 	if resp.StatusCode == http.StatusUnauthorized {
 		defer resp.Body.Close()
-		return resp, InvalidCredentialsErr
+		return resp, ErrInvalidAPIKey
 	}
 	return resp, err
 }
