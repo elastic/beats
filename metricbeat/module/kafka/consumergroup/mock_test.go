@@ -27,9 +27,10 @@ import (
 )
 
 type mockClient struct {
-	listGroups        func() ([]string, error)
-	describeGroups    func(group []string) (map[string]kafka.GroupDescription, error)
-	fetchGroupOffsets func(group string) (*sarama.OffsetFetchResponse, error)
+	listGroups                      func() ([]string, error)
+	describeGroups                  func(group []string) (map[string]kafka.GroupDescription, error)
+	fetchGroupOffsets               func(group string) (*sarama.OffsetFetchResponse, error)
+	getPartitionOffsetFromTheLeader func(topic string, partitionID int32) (int64, error)
 }
 
 type mockState struct {
@@ -45,6 +46,9 @@ func defaultMockClient(state mockState) *mockClient {
 		listGroups:        makeListGroups(state),
 		describeGroups:    makeDescribeGroups(state),
 		fetchGroupOffsets: makeFetchGroupOffsets(state),
+		getPartitionOffsetFromTheLeader: func(topic string, partitionID int32) (int64, error) {
+			return 42, nil
+		},
 	}
 }
 
@@ -144,4 +148,7 @@ func (c *mockClient) DescribeGroups(groups []string) (map[string]kafka.GroupDesc
 }
 func (c *mockClient) FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error) {
 	return c.fetchGroupOffsets(group)
+}
+func (c *mockClient) FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
+	return c.getPartitionOffsetFromTheLeader(topic, partitionID)
 }
