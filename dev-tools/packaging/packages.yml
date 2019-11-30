@@ -175,7 +175,7 @@ shared:
 
   - &docker_ubi_spec
     extra_vars:
-      image_name: '{{.BeatName}}-ubi'
+      image_name: '{{.BeatName}}-ubi7'
       from: 'registry.access.redhat.com/ubi7/ubi:7.7'
 
   #
