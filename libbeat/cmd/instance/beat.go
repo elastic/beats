@@ -508,7 +508,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadTemplate = idxmgmt.LoadModeOverwrite
 			}
 			if setup.IndexManagement || setup.ILMPolicy {
-				loadILM = idxmgmt.LoadModeOverwrite
+				loadILM = idxmgmt.LoadModeEnabled
 			}
 			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {

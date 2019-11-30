@@ -36,15 +36,20 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // Supporter implements ILM support. For loading the policies and creating
 // write alias a manager instance must be generated.
 type Supporter interface {
+	// Query settings
 	Mode() Mode
 	Alias() Alias
 	Policy() Policy
+	Overwrite() bool
+
+	// Manager creates a new Manager instance for checking and installing
+	// resources.
 	Manager(h ClientHandler) Manager
 }
 
 // Manager uses a ClientHandler to install a policy.
 type Manager interface {
-	Enabled() (bool, error)
+	CheckEnabled() (bool, error)
 
 	EnsureAlias() error
 
