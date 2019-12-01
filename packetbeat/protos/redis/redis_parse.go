@@ -19,6 +19,7 @@ package redis
 
 import (
 	"time"
+	"bytes"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
@@ -423,7 +424,7 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 	}
 
 	// handle top-level request command
-	if depth == 0 && isRedisCommand(content[0]) {
+	if depth == 0 && (isRedisCommand(content[0]) || (count > 1 && isRedisCommand(bytes.Join(content[0:2], []byte(" "))))) {
 		p.message.isRequest = true
 		p.message.method = content[0]
 		if len(content) > 1 {
