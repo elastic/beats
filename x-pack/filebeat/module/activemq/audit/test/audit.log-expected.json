@@ -1,6 +1,5 @@
 [
     {
-        "activemq.audit.action": "called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,213",
         "activemq.audit.user": "anonymous",
         "activemq.thread": "qtp443290224-47",
         "event.dataset": "activemq.audit",
@@ -9,10 +8,10 @@
         "input.type": "log",
         "log.level": "INFO",
         "log.offset": 0,
+        "message": "called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,213",
         "service.type": "activemq"
     },
     {
-        "activemq.audit.action": "called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,229",
         "activemq.audit.user": "admin",
         "activemq.thread": "qtp443290224-45",
         "event.dataset": "activemq.audit",
@@ -21,10 +20,10 @@
         "input.type": "log",
         "log.level": "INFO",
         "log.offset": 127,
+        "message": "called org.apache.activemq.broker.jmx.QueueView.retryMessages[] at 27-11-2019 08:45:57,229",
         "service.type": "activemq"
     },
     {
-        "activemq.audit.action": "requested /admin/createDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='4eb0bc3e-9d7a-4256-844c-24f40fda98f1' ] from 127.0.0.1",
         "activemq.audit.user": "admin",
         "activemq.thread": "qtp12205619-39",
         "event.dataset": "activemq.audit",
@@ -33,10 +32,10 @@
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 250,
+        "message": "requested /admin/createDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='4eb0bc3e-9d7a-4256-844c-24f40fda98f1' ] from 127.0.0.1",
         "service.type": "activemq"
     },
     {
-        "activemq.audit.action": "requested /admin/purgeDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='eff6a932-1b58-45da-a64a-1b30b246cfc9' ] from 127.0.0.1",
         "activemq.audit.user": "guest",
         "activemq.thread": "qtp12205619-36",
         "event.dataset": "activemq.audit",
@@ -45,6 +44,7 @@
         "input.type": "log",
         "log.level": "INFO",
         "log.offset": 436,
+        "message": "requested /admin/purgeDestination.action [JMSDestination='test' JMSDestinationType='queue' secret='eff6a932-1b58-45da-a64a-1b30b246cfc9' ] from 127.0.0.1",
         "service.type": "activemq"
     }
 ]

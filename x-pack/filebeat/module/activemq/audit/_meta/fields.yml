@@ -3,10 +3,6 @@
   description: >
     Fields from ActiveMQ audit logs.
   fields:
-    - name: action
-      type: keyword
-      description: >
-        Describes user activity.
     - name: user
       type: keyword
       description: >
