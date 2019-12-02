@@ -36,9 +36,8 @@ func (c *MockBeatClient) PublishAll(events []beat.Event) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	for _, e := range events {
-		c.publishes = append(c.publishes, e)
-	}
+	c.publishes = append(c.publishes, events...)
+
 }
 
 // Close mocks the Client Close method
@@ -62,7 +61,6 @@ type MockPipelineConnector struct {
 
 // GetAllEvents returns all events associated with a pipeline
 func (pc *MockPipelineConnector) GetAllEvents() []beat.Event {
-
 	evList := []beat.Event{}
 	for _, clientEvents := range pc.clients {
 		evList = append(evList, clientEvents.GetEvents()...)

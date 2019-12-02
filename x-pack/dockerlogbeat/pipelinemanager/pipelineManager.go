@@ -82,13 +82,13 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig logger.Info, f
 		return nil, errors.Wrap(err, "error getting pipeline")
 	}
 
-	pipeRead, err := pipereader.NewReaderFromPath(file)
+	reader, err := pipereader.NewReaderFromPath(file)
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
 
 	//actually get to crafting the new client.
-	cl, err := newClientFromPipeline(pipeline.pipeline, pipeRead, hashstring, containerConfig)
+	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, containerConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating client")
 	}

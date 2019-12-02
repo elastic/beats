@@ -7,22 +7,23 @@ package pipereader
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/docker/docker/api/types/plugins/logdriver"
+	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPipeReader(t *testing.T) {
 
-	rawBytes := pipeineMock.CreateTestInput(t)
+	TestLine := "This is a log line"
+	reader := pipelinemock.CreateTestInputFromLine(t, TestLine)
 
 	// actual test
-	pipeRead, err := NewReaderFromReadCloser(rawBytes)
+	pipeRead, err := NewReaderFromReadCloser(reader)
 	assert.NoError(t, err)
 	var outLog logdriver.LogEntry
 	err = pipeRead.ReadMessage(&outLog)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "This is a log line", string(outLog.Line))
+	assert.Equal(t, TestLine, string(outLog.Line))
 
 }

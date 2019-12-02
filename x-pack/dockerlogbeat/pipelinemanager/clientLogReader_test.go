@@ -5,6 +5,7 @@
 package pipelinemanager
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/docker/docker/daemon/logger"
@@ -16,14 +17,28 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
+	client, teardown := setupTestClient(t)
+	defer teardown()
+
+	event := testReturn(t, client)
+	assert.Equal(t, event.Fields["message"], "This is a log line")
+}
+
+func setupTestClient(t *testing.T) (*pipelinemock.MockPipelineConnector, func()) {
 	mockConnector := &pipelinemock.MockPipelineConnector{}
 	client := createNewClient(t, mockConnector)
-	// ConsumePipelineAndSent is what does the actual reading and sending.
-	// After we spawn this goroutine, we wait until we get something back
-	go client.ConsumePipelineAndSend()
-	event := testReturnAndClose(t, mockConnector, client)
-	assert.Equal(t, event.Fields["message"], "This is a log line")
 
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		client.ConsumePipelineAndSend()
+	}()
+
+	return mockConnector, func() {
+		client.Close()
+		wg.Wait()
+	}
 }
 
 func createNewClient(t *testing.T, mockConnector *pipelinemock.MockPipelineConnector) *ClientLogger {
@@ -46,8 +61,7 @@ func createNewClient(t *testing.T, mockConnector *pipelinemock.MockPipelineConne
 	return client
 }
 
-func testReturnAndClose(t *testing.T, conn *pipelinemock.MockPipelineConnector, client *ClientLogger) beat.Event {
-	defer client.Close()
+func testReturn(t *testing.T, conn *pipelinemock.MockPipelineConnector) beat.Event {
 	for {
 		// wait until we get our example event back
 		if events := conn.GetAllEvents(); len(events) > 0 {
