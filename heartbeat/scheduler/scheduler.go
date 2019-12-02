@@ -39,6 +39,8 @@ const (
 	stateStopped
 )
 
+var debugf = logp.MakeDebug("scheduler")
+
 // ErrInvalidTransition is returned from start/stop when making an invalid state transition, say from preRunning to stopped
 var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
@@ -190,6 +192,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
 		s.stats.activeJobs.Dec()
 		s.runOnce(sched.Next(lastRanAt), taskFn)
+		debugf("Job '%v' returned at %v", id, time.Now())
 	}
 
 	// We skip using the scheduler to execute the initial tasks for jobs that have RunOnInit returning true.
@@ -202,7 +205,10 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		s.runOnce(sched.Next(lastRanAt), taskFn)
 	}
 
-	return jobCtxCancel, nil
+	return func() {
+		debugf("Remove scheduler job '%v'", id)
+		jobCtxCancel()
+	}, nil
 }
 
 func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
