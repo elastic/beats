@@ -192,6 +192,10 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		s.runOnce(sched.Next(lastRanAt), taskFn)
 	}
 
+	// We skip using the scheduler to execute the initial tasks for jobs that have RunOnInit returning true.
+	// You might think it'd be simpler to just invoke runOnce in either case with 0 as a lastRanAt value,
+	// however, that would caused the missed deadline stats to be incremented. Given that, it's easier
+	// and slightly more efficient to simply run these tasks immediately in a goroutine.
 	if sched.RunOnInit() {
 		go taskFn(time.Now())
 	} else {
