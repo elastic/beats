@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 - cisco/asa fileset: Renamed log.original to event.original and cisco.asa.list_id to cisco.asa.rule_name. {pull}13286[13286]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}13476[13476]
+- google pubsub & httpjson inputs: HTTP User agent is now `Elastic-Heartbeat/Version` instead of `Elastic Heartbeat/Version` to stay RFC compliant. {pull}14748[14748]
 - CEF extensions are now mapped to the data types defined in the CEF guide. {pull}14342[14342]
 - Remove --machine-learning from setup subcommand. {pull}14705[14705]
 
@@ -51,7 +52,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removed the `add_host_metadata` and `add_cloud_metadata` processors from the default config. These don't fit well with ECS for Heartbeat and were rarely used.
 - Fixed/altered redirect behavior. `max_redirects` now defaults to 0 (no redirects). Following redirects now works across hosts, but some timing fields will not be reported. {pull}14125[14125]
 - Removed `host.name` field that should never have been included. Heartbeat uses `observer.*` fields instead. {pull}14140[14140]
-- Changed default user-agent to be `Elastic Heartbeat/VERSION (PLATFORM_INFO)` as the current default `Go-http-client/1.1` is often blacklisted. {pull}14291[14291]
+- Changed default user-agent to be `Elastic-Heartbeat/VERSION (PLATFORM_INFO)` as the current default `Go-http-client/1.1` is often blacklisted. {pull}14291[14291]
 - JSON/Regex checks against HTTP bodies will only consider the first 100MiB of the HTTP body to prevent excessive memory usage. {pull}14223[pull]
 
 *Journalbeat*
