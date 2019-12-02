@@ -1,3 +1,4 @@
+from builtins import object
 from elasticsearch import NotFoundError
 from nose.tools import raises
 import datetime

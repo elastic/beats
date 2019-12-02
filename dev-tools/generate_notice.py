@@ -1,4 +1,4 @@
-
+from __future__ import print_function
 
 import glob
 import os
@@ -9,6 +9,8 @@ import csv
 import re
 import pdb
 import copy
+
+from builtins import bytes
 
 
 def read_file(filename):
@@ -320,7 +322,7 @@ def detect_license_summary(content):
     # replace all white spaces with a single space
     content = re.sub(r"\s+", ' ', content)
     # replace smart quotes with less intelligent ones
-    content = content.replace(b'\xe2\x80\x9c'.decode(), '"').replace(b'\xe2\x80\x9d'.decode(), '"')
+    content = content.replace(bytes(b'\xe2\x80\x9c').decode(), '"').replace(bytes(b'\xe2\x80\x9d').decode(), '"')
     if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
         return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):

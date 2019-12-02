@@ -1,3 +1,4 @@
+from __future__ import print_function
 from filebeat import BaseTest
 import os
 import socket

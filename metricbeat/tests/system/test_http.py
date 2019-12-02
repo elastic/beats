@@ -1,3 +1,4 @@
+from builtins import str
 import os
 import metricbeat
 import unittest

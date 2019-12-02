@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import os
 import shutil
 import sys
@@ -45,7 +47,7 @@ class BaseTest(MetricbeatTest):
         return p
 
 
-class PathCleanup:
+class PathCleanup(object):
     def __init__(self, paths):
         self.paths = paths
 

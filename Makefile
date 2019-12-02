@@ -90,6 +90,7 @@ clean-vendor:
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
 	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -not -path "*/vendor/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -not -path "*/build/*" -not -path "*/vendor/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
@@ -142,7 +143,7 @@ notice: python-env
 .PHONY: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || virtualenv -p $(PYTHON_EXE) $(VIRTUALENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 six
+	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.3.5 pylint==1.9.5 future==0.18.2
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 

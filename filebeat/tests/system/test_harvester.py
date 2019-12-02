@@ -1,5 +1,7 @@
 # coding=utf-8
 
+from builtins import str
+from builtins import range
 from filebeat import BaseTest
 import os
 import codecs
@@ -792,14 +794,14 @@ class Test(BaseTest):
         logfile = self.working_dir + "/log/test.log"
 
         with io.open(logfile, 'w', encoding="utf-16le") as file:
-            file.write('hello world1')
-            file.write("\n")
+            file.write(str(u'hello world1'))
+            file.write(str(u"\n"))
         with io.open(logfile, 'a', encoding="utf-16le") as file:
-            file.write("\U00012345=Ra")
+            file.write(str(u"\U00012345=Ra"))
         with io.open(logfile, 'a', encoding="utf-16le") as file:
-            file.write("\n")
-            file.write("hello world2")
-            file.write("\n")
+            file.write(str(u"\n"))
+            file.write(str(u"hello world2"))
+            file.write(str(u"\n"))
 
         filebeat = self.start_beat()
 

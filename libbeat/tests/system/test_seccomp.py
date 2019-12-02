@@ -1,3 +1,5 @@
+from builtins import map
+from builtins import range
 import platform
 import unittest
 from base import BaseTest

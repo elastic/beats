@@ -1,3 +1,4 @@
+from __future__ import print_function
 from base import BaseTest
 from elasticsearch import Elasticsearch, TransportError
 

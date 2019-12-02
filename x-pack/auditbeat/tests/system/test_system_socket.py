@@ -1,3 +1,7 @@
+from builtins import map
+from builtins import str
+from builtins import range
+from builtins import object
 import json
 import operator
 import platform
@@ -200,7 +204,7 @@ def pretty_print_json(d):
     return json.dumps(d, indent=3, default=lambda o: o.to_json(), sort_keys=True)
 
 
-class TCP4TestCase:
+class TCP4TestCase(object):
     def __init__(self):
         pass
 
@@ -241,7 +245,7 @@ class TCP4TestCase:
         })
 
 
-class UDP4TestCase:
+class UDP4TestCase(object):
     def __init__(self):
         pass
 
@@ -280,7 +284,7 @@ class UDP4TestCase:
         })
 
 
-class ConnectedUDP4TestCase:
+class ConnectedUDP4TestCase(object):
     def __init__(self):
         pass
 
@@ -323,7 +327,7 @@ class ConnectedUDP4TestCase:
         })
 
 
-class ConnectedUDP6TestCase:
+class ConnectedUDP6TestCase(object):
     def __init__(self):
         pass
 
@@ -370,7 +374,7 @@ class ConnectedUDP6TestCase:
         })
 
 
-class UDP6TestCase:
+class UDP6TestCase(object):
     def __init__(self):
         pass
 
@@ -413,7 +417,7 @@ class UDP6TestCase:
         })
 
 
-class MultiUDP4TestCase:
+class MultiUDP4TestCase(object):
     def __init__(self):
         self.client_addr = None
         self.server_addr = [None] * 3
@@ -497,7 +501,7 @@ class MultiUDP4TestCase:
         ])
 
 
-class SocketFactory:
+class SocketFactory(object):
 
     def __init__(self, network, transport):
         self.network = network
@@ -544,7 +548,7 @@ def transaction_udp_oneway(client, client_addr, server, server_addr, req, resp):
     msg, _ = server.recvfrom(len(req))
 
 
-class DNSTestCase:
+class DNSTestCase(object):
 
     def __init__(self, enabled=True, delay_seconds=0, network="ipv4", transport="tcp", bidirectional=True):
         self.dns_enabled = enabled
@@ -715,7 +719,7 @@ def random_address_ipv6():
     return 'fdee:' + ':'.join(['{:x}'.format(random.randint(1, 65535)) for _ in range(7)])
 
 
-class HasEvent:
+class HasEvent(object):
     def __init__(self, expected):
         if isinstance(expected, dict):
             self.expected = [expected]
@@ -743,7 +747,7 @@ class HasEvent:
         return True
 
 
-class Comparison:
+class Comparison(object):
     def __init__(self, op, value):
         self.op = op
         self.value = value

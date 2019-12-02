@@ -1,3 +1,4 @@
+from builtins import oct
 from base import BaseTest
 
 import os

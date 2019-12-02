@@ -1,3 +1,4 @@
+from builtins import input
 import os
 import argparse
 

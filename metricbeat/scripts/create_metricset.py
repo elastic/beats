@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import input
 import os
 import argparse
 

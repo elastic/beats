@@ -1,3 +1,4 @@
+from builtins import range
 from filebeat import BaseTest
 import os
 import time

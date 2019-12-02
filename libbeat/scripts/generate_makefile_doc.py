@@ -7,6 +7,7 @@ Example usage:
 
    python generate_makefile_doc.py Makefile1 Makefile2 ...
 """
+from __future__ import print_function
 
 import argparse
 import re
