@@ -28,7 +28,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
@@ -54,7 +54,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.name": "Windows 7",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
         "user_agent.version": "15.0.a2"
     },
     {
@@ -82,8 +84,8 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 52.4908,
-        "source.geo.location.lon": 13.3275,
+        "source.geo.location.lat": 52.4473,
+        "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
@@ -95,7 +97,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
@@ -120,8 +122,8 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 52.4908,
-        "source.geo.location.lon": 13.3275,
+        "source.geo.location.lat": 52.4473,
+        "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
@@ -133,7 +135,7 @@
         "user_agent.os.full": "Mac OS X 10.14.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.0",
-        "user_agent.version": "70.0.3538"
+        "user_agent.version": "70.0.3538.102"
     },
     {
         "@timestamp": "2016-01-22T13:18:29.000Z",
@@ -161,8 +163,8 @@
         "source.geo.city_name": "Springfield",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
-        "source.geo.location.lat": 39.772,
-        "source.geo.location.lon": -89.6859,
+        "source.geo.location.lat": 39.7647,
+        "source.geo.location.lon": -89.7379,
         "source.geo.region_iso_code": "US-IL",
         "source.geo.region_name": "Illinois",
         "source.ip": "199.96.1.1",
@@ -192,8 +194,6 @@
         ],
         "service.type": "nginx",
         "source.address": "2a03:0000:10ff:f00f:0000:0000:0:8000",
-        "source.as.number": 204094,
-        "source.as.organization.name": "Ricardo Rodrigues Charneca",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PT",
         "source.geo.location.lat": 39.5,
@@ -269,7 +269,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.name": "Windows 7",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
         "user_agent.version": "15.0.a2"
     },
     {
@@ -296,7 +298,9 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.name": "Windows 7",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
         "user_agent.version": "15.0.a2"
     }
 ]
