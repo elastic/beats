@@ -24,6 +24,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adding new `Enterprise` license type to the licenser. {issue}14246[14246]
 - Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 - Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
+- Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
+- Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 
 *Auditbeat*
 
@@ -166,7 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
 - Fix timezone parsing of system module ingest pipelines. {pull}13308[13308]
 - Fix timezone parsing of elasticsearch module ingest pipelines. {pull}13367[13367]
-- Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378]
+- Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378] {pull}14754[14754]
 - Fix timezone parsing of nginx module ingest pipelines. {pull}13369[13369]
 - Fix incorrect field references in envoyproxy dashboard {issue}13420[13420] {pull}13421[13421]
 - Fixed early expiration of templates (Netflow v9 and IPFIX). {pull}13821[13821]
@@ -190,10 +192,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve error message in s3 input when handleSQSMessage failed. {pull}14113[14113]
 - Fix race condition in S3 input plugin. {pull}14359[14359]
 - Decode hex values in auditd module. {pull}14471[14471]
+- Fix parse of remote addresses that are not IPs in nginx logs. {pull}14505[14505]
 - Fix handling multiline log entries in nginx module. {issue}14349[14349] {pull}14499[14499]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
+- Fix a problem in Filebeat input httpjson where interval is not used as time.Duration. {pull}14728[14728] 
+- Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
 
 *Heartbeat*
 
@@ -261,6 +266,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 - Vshpere module splits `virtualmachine.host` into `virtualmachine.host.id` and `virtualmachine.host.hostname`. {issue}7187[7187] {pull}7213[7213]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
+- Fix rds metricset from reporting same values for different instances. {pull}14702[14702]
+- Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
+- Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
 
 *Packetbeat*
 
@@ -335,6 +343,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `fingerprint` processor. {issue}11173[11173] {pull}14205[14205]
 - Add support for API keys in Elasticsearch outputs. {pull}14324[14324]
 - Ensure that init containers are no longer tailed after they stop {pull}14394[14394]
+- Add consumer_lag in Kafka consumergroup metricset {pull}14822[14822]
 
 *Auditbeat*
 
@@ -405,8 +414,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kibana Dashboard for MISP module. {pull}14147[14147]
 - Add JSON options to autodiscover hints {pull}14208[14208]
 - Add more filesets to Zeek module. {pull}14150[14150]
+- Add support for http hostname in nginx filebeat module. {pull}14505[14505]
 - Add attack_pattern_kql field to MISP threat indicators. {pull}14470[14470]
 - Add fileset to the Zeek module for the intel.log. {pull}14404[14404]
+- Add vpc flow log fileset to AWS module. {issue}13880[13880] {pull}14345[14345]
 - Add document for Filebeat input httpjson. {pull}14602[14602]
 
 *Heartbeat*
@@ -492,6 +503,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release aws ebs metricset as GA. {pull}14312[14312] {issue}14060[14060]
 - Add Kafka JMX metricsets. {pull}14330[14330]
 - Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
+- Add module for ActiveMQ. {pull}14788[14788]
 
 *Packetbeat*
 
