@@ -16,3 +16,24 @@ purposes.
 The aws billing metricset comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-billing-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 12h
+  metricsets:
+    - billing
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+----
+
+[float]
+=== Metrics
+|===
+|Metric Name|Statistic Method
+|EstimatedCharges | Maximum
+|===
+
+Supported dimensions for billing metrics: Currency and ServiceName.
