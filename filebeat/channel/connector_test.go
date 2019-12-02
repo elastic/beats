@@ -84,7 +84,7 @@ func TestProcessorsForConfig(t *testing.T) {
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
 						"fields": common.MapStr{"testField": "clientConfig"},
-					}, false)),
+					}, false, true)),
 				},
 			},
 			expectedFields: map[string]string{
@@ -97,7 +97,7 @@ func TestProcessorsForConfig(t *testing.T) {
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
 						"fields": common.MapStr{"testField": "clientConfig"},
-					}, false)),
+					}, false, true)),
 				},
 			},
 			expectedFields: map[string]string{

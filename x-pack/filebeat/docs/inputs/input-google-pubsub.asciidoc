@@ -9,8 +9,6 @@
 <titleabbrev>Google Pub/Sub</titleabbrev>
 ++++
 
-beta[]
-
 Use the `google-pubsub` input to read messages from a Google Cloud Pub/Sub topic
 subscription.
 
