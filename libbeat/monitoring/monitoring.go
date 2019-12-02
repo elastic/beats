@@ -45,6 +45,7 @@ const (
 var (
 	warnXPackMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use Metricbeat with the beat-xpack module to collect and ship monitoring data."
 	warnMonitoringDeprecatedConfig      = "monitoring.* settings are deprecated. Use Metricbeat with the beat-xpack module to collect and ship monitoring data."
+	errMonitoringBothConfigEnabled		= errors.New("both xpack.monitoring.* and monitoring.* are set. Use Metricbeat with the beat-xpack module to collect and ship monitoring data.")
 )
 
 // Default is the global default metrics registry provided by the monitoring package.
@@ -89,6 +90,8 @@ func Clear() error {
 // use xpack.monitoring.* settings OR monitoring.* settings but not both.
 func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) {
 	switch {
+	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
+		return nil, nil, errMonitoringBothConfigEnabled
 	case beatCfg.XPackMonitoring.Enabled():
 		cfgwarn.Deprecate("8.0.0", warnXPackMonitoringDeprecatedConfig)
 		monitoringCfg := beatCfg.XPackMonitoring
