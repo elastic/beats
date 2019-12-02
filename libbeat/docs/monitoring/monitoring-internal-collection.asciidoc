@@ -19,7 +19,7 @@
 to a monitoring cluster.
 
 If you have previously configured internal collection, you should migrate to
-using Metricbeat collection. One should either use Metricbeat collection or
+using {metricbeat} collection. One should either use {metricbeat} collection or
 internal collection described below but not both.
 
 Learn more about <<monitoring-metricbeat,Monitoring with Metricbeat>>.
