@@ -18,9 +18,11 @@
 {metricbeat} is the recommended method for collecting and shipping monitoring data
 to a monitoring cluster.
 
-If you have previously configured internal collection, you should migrate to
-using {metricbeat} collection. One should either use {metricbeat} collection or
-internal collection described below but not both.
+If you have previously configured internal collection, migrate to
+using {metricbeat} collection. When using {metricbeat} collection, make
+sure that internal collection is disabled.
+
+You cannot use both {metricbeat} and internal collection.
 
 Learn more about <<monitoring-metricbeat,Monitoring with Metricbeat>>.
 =========================
