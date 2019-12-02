@@ -49,7 +49,7 @@ func (p *Program) Configuration() map[string]interface{} {
 // Programs take a Tree representation of the main configuration and apply all the different
 // programs rules and generate individual configuration from the rules.
 func Programs(singleConfig *transpiler.AST) (map[string][]Program, error) {
-	grouped, err := groupByOutput(singleConfig)
+	grouped, err := groupByOutputs(singleConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to extract program configuration")
 	}
@@ -112,7 +112,7 @@ func KnownProgramNames() []string {
 	return names
 }
 
-func groupByOutput(single *transpiler.AST) (map[string]*transpiler.AST, error) {
+func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) {
 	const (
 		outputsKey = "outputs"
 		outputKey  = "output"

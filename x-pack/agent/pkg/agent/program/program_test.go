@@ -61,7 +61,7 @@ func TestGroupBy(t *testing.T) {
 		ast, err := transpiler.NewAST(sConfig)
 		require.NoError(t, err)
 
-		grouped, err := groupBy(ast)
+		grouped, err := groupByOutputs(ast)
 		require.NoError(t, err)
 		require.Equal(t, 2, len(grouped))
 
@@ -174,7 +174,7 @@ func TestGroupBy(t *testing.T) {
 		ast, err := transpiler.NewAST(sConfig)
 		require.NoError(t, err)
 
-		grouped, err := groupBy(ast)
+		grouped, err := groupByOutputs(ast)
 		require.NoError(t, err)
 		require.Equal(t, 2, len(grouped))
 
@@ -294,7 +294,7 @@ func TestGroupBy(t *testing.T) {
 		ast, err := transpiler.NewAST(sConfig)
 		require.NoError(t, err)
 
-		_, err = groupBy(ast)
+		_, err = groupByOutputs(ast)
 		require.Error(t, err)
 	})
 
@@ -332,7 +332,7 @@ func TestGroupBy(t *testing.T) {
 		ast, err := transpiler.NewAST(sConfig)
 		require.NoError(t, err)
 
-		grouped, err := groupBy(ast)
+		grouped, err := groupByOutputs(ast)
 		require.NoError(t, err)
 		require.Equal(t, 1, len(grouped))
 
@@ -407,7 +407,7 @@ func TestGroupBy(t *testing.T) {
 		ast, err := transpiler.NewAST(sConfig)
 		require.NoError(t, err)
 
-		grouped, err := groupBy(ast)
+		grouped, err := groupByOutputs(ast)
 		require.NoError(t, err)
 		require.Equal(t, 2, len(grouped))
 
