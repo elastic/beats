@@ -91,7 +91,7 @@ Requires root access. See <<monitor-icmp-options>>.
 * `tcp`: Connects via TCP and optionally verifies the endpoint by sending and/or
 receiving a custom payload. See <<monitor-tcp-options>>.
 * `http`: Connects via HTTP and optionally verifies that the host returns the
-expected response. See <<monitor-http-options>>.
+expected response. See <<monitor-http-options>>. Will use `Elastic-Heartbeat` as the user agent product.
 
 The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
