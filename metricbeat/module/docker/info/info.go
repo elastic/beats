@@ -22,7 +22,6 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
@@ -59,17 +58,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch creates a new event for info.
 // See: https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	info, err := m.dockerClient.Info(context.TODO())
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return eventMapping(&info), nil
+	r.Event(mb.Event{MetricSetFields: eventMapping(&info)})
+
+	return nil
 }
 
-//Close stops the metricset
+// Close stops the metricset
 func (m *MetricSet) Close() error {
-
 	return m.dockerClient.Close()
 }
