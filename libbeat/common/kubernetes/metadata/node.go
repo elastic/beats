@@ -18,23 +18,50 @@
 package metadata
 
 import (
+	"k8s.io/client-go/tools/cache"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
-// MetaGen allows creation of metadata from either Kubernetes resources or their resource names.
-type MetaGen interface {
-	Generate(kubernetes.Resource, ...FieldOptions) common.MapStr
-	GenerateFromName(string, ...FieldOptions) common.MapStr
+type node struct {
+	store    cache.Store
+	resource *resource
 }
 
-// FieldOptions allows additional enrichment to be done on top of existing metadata
-type FieldOptions func(common.MapStr)
+func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store) MetaGen {
+	no := &node{
+		resource: NewResourceMetadataGenerator(cfg),
+		store:    nodes,
+	}
 
-// WithFields FieldOption allows adding specific fields into the generated metadata
-func WithFields(key string, value interface{}) FieldOptions {
-	return func(meta common.MapStr) {
-		safemapstr.Put(meta, key, value)
+	return no
+}
+
+func (n *node) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
+	_, ok := obj.(*kubernetes.Node)
+	if !ok {
+		return nil
+	}
+
+	meta := n.resource.Generate(obj, opts...)
+	// TODO: Add extra fields in here if need be
+	return meta
+}
+
+func (n *node) GenerateFromName(name string, opts ...FieldOptions) common.MapStr {
+	if n.store == nil {
+		return nil
+	}
+
+	if obj, ok, _ := n.store.GetByKey(name); ok {
+		no, ok := obj.(*kubernetes.Node)
+		if !ok {
+			return nil
+		}
+
+		return n.Generate(no, opts...)
+	} else {
+		return nil
 	}
 }

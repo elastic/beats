@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
@@ -33,42 +35,54 @@ import (
 )
 
 type service struct {
-	uuid    uuid.UUID
-	config  *Config
-	metagen kubernetes.MetaGenerator
-	logger  *logp.Logger
-	publish func(bus.Event)
-	watcher kubernetes.Watcher
+	uuid             uuid.UUID
+	config           *Config
+	metagen          metadata.MetaGen
+	logger           *logp.Logger
+	publish          func(bus.Event)
+	watcher          kubernetes.Watcher
+	namespaceWatcher kubernetes.Watcher
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
 func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
-	metagen, err := kubernetes.NewMetaGenerator(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	logger := logp.NewLogger("autodiscover.service")
 
 	config := defaultConfig()
-	err = cfg.Unpack(&config)
+	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
-	})
+	}, nil)
 
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Service{}, err)
+	}
+
+	var namespaceMeta metadata.MetaGen
+	var namespaceWatcher kubernetes.Watcher
+	metaConf := config.AddResourceMetadata
+	if metaConf != nil {
+		if metaConf.Namespace != nil && metaConf.Namespace.Enabled() {
+			namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			}
+
+			namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
+		}
 	}
 
 	p := &service{
 		config:  config,
 		uuid:    uuid,
 		publish: publish,
-		metagen: metagen,
+		metagen: metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta),
 		logger:  logger,
 		watcher: watcher,
 	}
@@ -155,11 +169,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	}
 
 	eventID := fmt.Sprint(svc.GetObjectMeta().GetUID())
-	meta := s.metagen.ResourceMetadata(svc)
-
-	// TODO: Refactor metagen to make sure that this is seamless
-	meta.Put("service.name", svc.Name)
-	meta.Put("service.uid", string(svc.GetObjectMeta().GetUID()))
+	meta := s.metagen.Generate(svc)
 
 	kubemeta := meta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.

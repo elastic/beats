@@ -27,14 +27,13 @@ import (
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
-type resource struct {
-	config *Config
-}
+type resource = Config
 
-func NewResourceMetadataGenerator(config *Config) *resource {
-	return &resource{
-		config: config,
-	}
+func NewResourceMetadataGenerator(cfg *common.Config) *resource {
+	config := defaultConfig()
+	config.Unmarshal(cfg)
+
+	return &config
 }
 
 func (r *resource) Generate(obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
@@ -43,10 +42,15 @@ func (r *resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 		return nil
 	}
 
+	typeAccessor, err := meta.TypeAccessor(obj)
+	if err != nil {
+		return nil
+	}
+
 	labelMap := common.MapStr{}
-	if len(r.config.IncludeLabels) == 0 {
+	if len(r.IncludeLabels) == 0 {
 		for k, v := range accessor.GetLabels() {
-			if r.config.LabelsDedot {
+			if r.LabelsDedot {
 				label := common.DeDot(k)
 				labelMap.Put(label, v)
 			} else {
@@ -54,22 +58,30 @@ func (r *resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 			}
 		}
 	} else {
-		labelMap = generateMapSubset(accessor.GetLabels(), r.config.IncludeLabels, g.LabelsDedot)
+		labelMap = generateMapSubset(accessor.GetLabels(), r.IncludeLabels, r.LabelsDedot)
 	}
 
 	// Exclude any labels that are present in the exclude_labels config
-	for _, label := range r.config.ExcludeLabels {
+	for _, label := range r.ExcludeLabels {
 		labelMap.Delete(label)
 	}
 
-	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, g.AnnotationsDedot)
-	meta := common.MapStr{}
+	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.IncludeAnnotations, r.AnnotationsDedot)
+	resource := strings.ToLower(typeAccessor.GetKind())
+
+	meta := common.MapStr{
+		resource: common.MapStr{
+			"name": accessor.GetName(),
+			"uid":  accessor.GetUID(),
+		},
+	}
+
 	if accessor.GetNamespace() != "" {
 		safemapstr.Put(meta, "namespace.name", accessor.GetNamespace())
 	}
 
 	// Add controller metadata if present
-	if r.config.IncludeCreatorMetadata {
+	if r.IncludeCreatorMetadata {
 		for _, ref := range accessor.GetOwnerReferences() {
 			if ref.Controller != nil && *ref.Controller {
 				switch ref.Kind {
@@ -84,11 +96,11 @@ func (r *resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 	}
 
 	if len(labelMap) != 0 {
-		meta["labels"] = labelMap
+		safemapstr.Put(meta, resource+".labels", labelMap)
 	}
 
 	if len(annotationsMap) != 0 {
-		meta["annotations"] = annotationsMap
+		safemapstr.Put(meta, resource+".annotations", annotationsMap)
 	}
 
 	return meta

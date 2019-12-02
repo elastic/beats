@@ -26,59 +26,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
-// MetaGenerator builds metadata objects for pods and containers
-type MetaGenerator interface {
-	// ResourceMetadata generates metadata for the given kubernetes object taking to account certain filters
-	ResourceMetadata(obj Resource) common.MapStr
-
-	// PodMetadata generates metadata for the given pod taking to account certain filters
-	PodMetadata(pod *Pod) common.MapStr
-
-	// Containermetadata generates metadata for the given container of a pod
-	ContainerMetadata(pod *Pod, container string, image string) common.MapStr
-}
-
-type MetaGen interface {
-	Metadata(obj Resource) common.MapStr
-}
-
-// MetaGeneratorConfig settings
-type MetaGeneratorConfig struct {
-	IncludeLabels      []string `config:"include_labels"`
-	ExcludeLabels      []string `config:"exclude_labels"`
-	IncludeAnnotations []string `config:"include_annotations"`
-
-	LabelsDedot      bool `config:"labels.dedot"`
-	AnnotationsDedot bool `config:"annotations.dedot"`
-
-	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
-}
-
-type metaGenerator = MetaGeneratorConfig
-
-// DefaultMetaGeneratorConfig initializes and returns a new MetaGeneratorConfig with default values
-func DefaultMetaGeneratorConfig() MetaGeneratorConfig {
-	return MetaGeneratorConfig{
-		IncludeCreatorMetadata: true,
-		LabelsDedot:            true,
-		AnnotationsDedot:       true,
-	}
-}
-
-// NewMetaGenerator initializes and returns a new kubernetes metadata generator
-func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
-	generator := DefaultMetaGeneratorConfig()
-
-	err := cfg.Unpack(&generator)
-	return &generator, err
-}
-
-// NewMetaGeneratorFromConfig initializes and returns a new kubernetes metadata generator
-func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
-	return cfg
-}
-
 // ResourceMetadata generates metadata for the given kubernetes object taking to account certain filters
 func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	accessor, err := meta.Accessor(obj)

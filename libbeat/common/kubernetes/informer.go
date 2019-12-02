@@ -39,7 +39,7 @@ func nameSelector(options *metav1.ListOptions, opt WatchOptions) {
 	}
 }
 
-func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptions) (cache.SharedInformer, string, error) {
+func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (cache.SharedInformer, string, error) {
 	var objType string
 
 	var listwatch *cache.ListWatch
@@ -84,6 +84,18 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		}
 
 		objType = "node"
+	case *Namespace:
+		ns := client.CoreV1().Namespaces()
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return ns.List(options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return ns.Watch(options)
+			},
+		}
+
+		objType = "namespace"
 	case *Deployment:
 		d := client.AppsV1().Deployments(opts.Namespace)
 		listwatch = &cache.ListWatch{
@@ -136,6 +148,9 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		return nil, "", fmt.Errorf("unsupported resource type for watching %T", resource)
 	}
 
-	informer := cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout)
-	return informer, objType, nil
+	if indexers != nil {
+		return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
+	} else {
+		return cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout), objType, nil
+	}
 }

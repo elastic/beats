@@ -53,6 +53,9 @@ type Watcher interface {
 
 	// AddEventHandler add event handlers for corresponding event type watched
 	AddEventHandler(ResourceEventHandler)
+
+	// Store returns the store object for the watcher
+	Store() cache.Store
 }
 
 // WatchOptions controls watch behaviors
@@ -83,11 +86,11 @@ type watcher struct {
 
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
-func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions) (Watcher, error) {
+func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
 	var store cache.Store
 	var queue workqueue.RateLimitingInterface
 
-	informer, objType, err := NewInformer(client, resource, opts)
+	informer, objType, err := NewInformer(client, resource, opts, indexers)
 	if err != nil {
 		return nil, err
 	}
@@ -104,6 +107,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		ctx:      ctx,
 		stop:     cancel,
 		logger:   logp.NewLogger("kubernetes"),
+		handler:  NoOpEventHandlerFuncs{},
 	}
 
 	w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -127,21 +131,14 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	return w, nil
 }
 
-// enqueue takes the most recent object that was received, figures out the namespace/name of the object
-// and adds it to the work queue for processing.
-func (w *watcher) enqueue(obj interface{}, state string) {
-	// DeletionHandlingMetaNamespaceKeyFunc that we get a key only if the resource's state is not Unknown.
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
-	if err != nil {
-		return
-	}
-
-	w.queue.Add(&item{key, state})
-}
-
 // AddEventHandler adds a resource handler to process each request that is coming into the watcher
 func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 	w.handler = h
+}
+
+// Store returns the store object for the resource that is being watched
+func (w *watcher) Store() cache.Store {
+	return w.store
 }
 
 // Start watching pods
@@ -163,6 +160,23 @@ func (w *watcher) Start() error {
 	}, time.Second*1, w.ctx.Done())
 
 	return nil
+}
+
+func (w *watcher) Stop() {
+	w.queue.ShutDown()
+	w.stop()
+}
+
+// enqueue takes the most recent object that was received, figures out the namespace/name of the object
+// and adds it to the work queue for processing.
+func (w *watcher) enqueue(obj interface{}, state string) {
+	// DeletionHandlingMetaNamespaceKeyFunc that we get a key only if the resource's state is not Unknown.
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
+	if err != nil {
+		return
+	}
+
+	w.queue.Add(&item{key, state})
 }
 
 // process gets the top of the work queue and processes the object that is received.
@@ -211,9 +225,4 @@ func (w *watcher) process(ctx context.Context) bool {
 	}
 
 	return true
-}
-
-func (w *watcher) Stop() {
-	w.queue.ShutDown()
-	w.stop()
 }

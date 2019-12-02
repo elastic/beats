@@ -37,7 +37,7 @@ type AddResourceMetadataConfig struct {
 	Namespace *common.Config `config:"config"`
 }
 
-func DefaultConfig() Config {
+func defaultConfig() Config {
 	return Config{
 		IncludeCreatorMetadata: true,
 		LabelsDedot:            true,
@@ -45,6 +45,6 @@ func DefaultConfig() Config {
 	}
 }
 
-func (c *Config) ApplyConfig(cfg *common.Config) error {
+func (c *Config) Unmarshal(cfg *common.Config) error {
 	return cfg.Unpack(c)
 }

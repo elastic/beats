@@ -20,64 +20,56 @@ package metadata
 import (
 	"k8s.io/client-go/tools/cache"
 
+	"github.com/elastic/beats/libbeat/common/safemapstr"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
-type pod struct {
+type service struct {
 	store     cache.Store
-	node      MetaGen
 	namespace MetaGen
 	resource  *resource
 }
 
-func NewPodMetadataGenerator(cfg *common.Config, pods cache.Store, node MetaGen, namespace MetaGen) MetaGen {
-	po := &pod{
+func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, namespace MetaGen) MetaGen {
+	po := &service{
 		resource:  NewResourceMetadataGenerator(cfg),
-		store:     pods,
-		node:      node,
+		store:     services,
 		namespace: namespace,
 	}
 
 	return po
 }
 
-func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
+func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
 	po, ok := obj.(*kubernetes.Pod)
 	if !ok {
 		return nil
 	}
 
-	out := p.resource.Generate(obj, opts...)
+	out := s.resource.Generate(obj, opts...)
 
-	if p.node != nil {
-		meta := p.node.GenerateFromName(po.Spec.NodeName)
-		safemapstr.Put(out, "node", meta)
-	} else {
-		safemapstr.Put(out, "node.name", po.Spec.NodeName)
-	}
-
-	if p.namespace != nil {
-		meta := p.namespace.GenerateFromName(po.GetNamespace())
+	if s.namespace != nil {
+		meta := s.namespace.GenerateFromName(po.GetNamespace())
 		safemapstr.Put(out, "namespace", meta)
 	}
 
 	return out
 }
 
-func (p *pod) GenerateFromName(name string, opts ...FieldOptions) common.MapStr {
-	if p.store == nil {
+func (s *service) GenerateFromName(name string, opts ...FieldOptions) common.MapStr {
+	if s.store == nil {
 		return nil
 	}
 
-	if obj, ok, _ := p.store.GetByKey(name); ok {
+	if obj, ok, _ := s.store.GetByKey(name); ok {
 		po, ok := obj.(*kubernetes.Pod)
 		if !ok {
 			return nil
 		}
 
-		return p.Generate(po, opts...)
+		return s.Generate(po, opts...)
 	} else {
 		return nil
 	}
