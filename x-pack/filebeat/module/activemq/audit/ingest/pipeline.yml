@@ -7,7 +7,7 @@ processors:
         NOPIPEGREEDYDATA: "((?! \\|).)*"
         THREAD_NAME: "((?! \n).)*"
       patterns:
-        - "%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{WORD:activemq.audit.user}%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}"
+        - "%{LOGLEVEL:log.level}%{SPACE}\\|%{SPACE}%{WORD:activemq.user}%{SPACE}%{NOPIPEGREEDYDATA:message}%{SPACE}\\|%{SPACE}%{THREAD_NAME:activemq.thread}"
       ignore_missing: true
 on_failure:
   - set:

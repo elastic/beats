@@ -3,9 +3,5 @@
   description: >
     Fields from ActiveMQ application logs.
   fields:
-    - name: caller
-      type: keyword
-      description: >
-        Name of the caller issuing the logging request (class or resource).
     - name: stack_trace
       type: keyword

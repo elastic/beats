@@ -1,7 +1,7 @@
 [
     {
-        "activemq.audit.user": "anonymous",
         "activemq.thread": "qtp443290224-47",
+        "activemq.user": "anonymous",
         "event.dataset": "activemq.audit",
         "event.module": "activemq",
         "fileset.name": "audit",
@@ -12,8 +12,8 @@
         "service.type": "activemq"
     },
     {
-        "activemq.audit.user": "admin",
         "activemq.thread": "qtp443290224-45",
+        "activemq.user": "admin",
         "event.dataset": "activemq.audit",
         "event.module": "activemq",
         "fileset.name": "audit",
@@ -24,8 +24,8 @@
         "service.type": "activemq"
     },
     {
-        "activemq.audit.user": "admin",
         "activemq.thread": "qtp12205619-39",
+        "activemq.user": "admin",
         "event.dataset": "activemq.audit",
         "event.module": "activemq",
         "fileset.name": "audit",
@@ -36,8 +36,8 @@
         "service.type": "activemq"
     },
     {
-        "activemq.audit.user": "guest",
         "activemq.thread": "qtp12205619-36",
+        "activemq.user": "guest",
         "event.dataset": "activemq.audit",
         "event.module": "activemq",
         "fileset.name": "audit",

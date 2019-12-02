@@ -3,7 +3,3 @@
   description: >
     Fields from ActiveMQ audit logs.
   fields:
-    - name: user
-      type: keyword
-      description: >
-        User that generated the logging event.
