@@ -142,7 +142,7 @@
             }
           }
         },
-        "title": "Current Memory Usage [Metricbeat NATS] ECS",
+        "title": "Current Memory Usage [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -186,7 +186,7 @@
             },
             "type": "metric"
           },
-          "title": "Current Memory Usage [Metricbeat NATS] ECS",
+          "title": "Current Memory Usage [Metricbeat STAN] ECS",
           "type": "metric"
         }
       },
@@ -208,7 +208,7 @@
             }
           }
         },
-        "title": "Server Uptime [Metricbeat NATS] ECS",
+        "title": "Server Uptime [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -507,7 +507,7 @@
               }
             ]
           },
-          "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS] ECS",
+          "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat STAN] ECS",
           "type": "area"
         }
       },
@@ -529,7 +529,7 @@
             }
           }
         },
-        "title": "Subscription Stats Timeline [Metricbeat NATS] ECS",
+        "title": "Subscription Stats Timeline [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -714,7 +714,7 @@
               }
             ]
           },
-          "title": "Subscription Stats Timeline [Metricbeat NATS] ECS",
+          "title": "Subscription Stats Timeline [Metricbeat STAN] ECS",
           "type": "line"
         }
       },
@@ -736,7 +736,7 @@
             }
           }
         },
-        "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
+        "title": "Slow Consumers Timeline [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -833,7 +833,7 @@
               }
             ]
           },
-          "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
+          "title": "Slow Consumers Timeline [Metricbeat STAN] ECS",
           "type": "line"
         }
       },
@@ -855,7 +855,7 @@
             }
           }
         },
-        "title": "IO Bytes Stats [Metricbeat NATS] ECS",
+        "title": "IO Bytes Stats [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -974,7 +974,7 @@
               }
             ]
           },
-          "title": "IO Bytes Stats [Metricbeat NATS] ECS",
+          "title": "IO Bytes Stats [Metricbeat STAN] ECS",
           "type": "line"
         }
       },
@@ -996,7 +996,7 @@
             }
           }
         },
-        "title": "Memory Utilization Timeline [Metricbeat NATS] ECS",
+        "title": "Memory Utilization Timeline [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1093,7 +1093,7 @@
               }
             ]
           },
-          "title": "Memory Utilization Timeline [Metricbeat NATS] ECS",
+          "title": "Memory Utilization Timeline [Metricbeat STAN] ECS",
           "type": "line"
         }
       },
@@ -1115,7 +1115,7 @@
             }
           }
         },
-        "title": "IO Messages Stats [Metricbeat NATS] ECS",
+        "title": "IO Messages Stats [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1234,7 +1234,7 @@
               }
             ]
           },
-          "title": "IO Messages Stats [Metricbeat NATS] ECS",
+          "title": "IO Messages Stats [Metricbeat STAN] ECS",
           "type": "line"
         }
       },
@@ -1256,7 +1256,7 @@
             }
           }
         },
-        "title": "CPU Utilization Timeline [Metricbeat NATS] ECS",
+        "title": "CPU Utilization Timeline [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1353,7 +1353,7 @@
               }
             ]
           },
-          "title": "CPU Utilization Timeline [Metricbeat NATS] ECS",
+          "title": "CPU Utilization Timeline [Metricbeat STAN] ECS",
           "type": "line"
         }
       },
@@ -1375,7 +1375,7 @@
             }
           }
         },
-        "title": "Cache Hit Rate Timeline [Metricbeat NATS] ECS",
+        "title": "Cache Hit Rate Timeline [Metricbeat STAN] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1472,7 +1472,7 @@
               }
             ]
           },
-          "title": "Cache Hit Rate Timeline [Metricbeat NATS] ECS",
+          "title": "Cache Hit Rate Timeline [Metricbeat STAN] ECS",
           "type": "line"
         }
       },
@@ -1483,7 +1483,7 @@
     },
     {
       "attributes": {
-        "description": "Overview of NATS server status",
+        "description": "Overview of STAN server status",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -1676,10 +1676,10 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat NATS] Overview ECS",
+        "title": "[Metricbeat STAN] Overview ECS",
         "version": 1
       },
-      "id": "Metricbeat-Nats-Dashboard-ecs",
+      "id": "Metricbeat-STAN-Dashboard-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-24T08:13:29.732Z",
       "version": 4
