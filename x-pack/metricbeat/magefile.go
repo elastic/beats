@@ -20,6 +20,8 @@ import (
 
 	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
 )
 
 const (

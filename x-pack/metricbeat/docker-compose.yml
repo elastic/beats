@@ -3,6 +3,7 @@ services:
   beat:
     build: ../../metricbeat
     environment:
+      - BEAT_STRICT_PERMS=false
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/x-pack/metricbeat
     volumes:
@@ -12,6 +13,16 @@ services:
     command: make
 
   # Modules
+  activemq:
+    image: docker.elastic.co/observability-ci/beats-integration-activemq:${ACTIVEMQ_VERSION:-5.15.9}-1
+    build:
+      context: ./module/activemq/_meta
+      args:
+        ACTIVEMQ_VERSION: ${ACTIVEMQ_VERSION:-5.15.9}
+    ports:
+      - 8161
+      - 61613
+
   appsearch:
     build:
       context: ./module/appsearch/_meta

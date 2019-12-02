@@ -41,17 +41,17 @@ const (
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka",
-		compose.UpWithTimeout(120*time.Second),
-		compose.UpWithAdvertisedHostEnvFile,
+		compose.UpWithTimeout(600*time.Second),
+		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.Host(), "metricbeat-test")
+	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
 	defer c.Close()
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092)))
 	for retries := 0; retries < 3; retries++ {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
@@ -63,22 +63,25 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(600*time.Second),
+		compose.UpWithAdvertisedHostEnvFileForPort(9092),
+	)
 
-	c, err := startConsumer(t, service.Host(), "metricbeat-test")
+	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
 	defer c.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092)))
 
 	var data []mb.Event
 	var errors []error
 	for retries := 0; retries < 3; retries++ {
 		data, errors = mbtest.ReportingFetchV2Error(f)
 		if len(data) > 0 {
-			break
+			continue
 		}
 		time.Sleep(500 * time.Millisecond)
 	}

@@ -12,6 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
+* <<exported-fields-activemq>>
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-appsearch>>
@@ -71,6 +72,407 @@ grouped in the following categories:
 * <<exported-fields-zookeeper>>
 
 --
+[[exported-fields-activemq]]
+== activemq fields
+
+activemq module
+
+
+
+[float]
+=== activemq
+
+
+
+
+[float]
+=== broker
+
+Broker metrics from org.apache.activemq:brokerName=*,type=Broker
+
+
+*`activemq.broker.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`activemq.broker.name`*::
++
+--
+Broker name
+
+type: keyword
+
+--
+
+*`activemq.broker.memory.broker.pct`*::
++
+--
+The percentage of the memory limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.broker.memory.store.pct`*::
++
+--
+Percent of store limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.broker.memory.temp.pct`*::
++
+--
+The percentage of the temp usage limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.broker.connections.count`*::
++
+--
+Total number of connections.
+
+type: long
+
+--
+
+*`activemq.broker.consumers.count`*::
++
+--
+Number of message consumers.
+
+type: long
+
+--
+
+*`activemq.broker.messages.dequeue.count`*::
++
+--
+Number of messages that have been acknowledged on the broker.
+
+type: long
+
+--
+
+*`activemq.broker.messages.enqueue.count`*::
++
+--
+Number of messages that have been sent to the destination.
+
+type: long
+
+--
+
+*`activemq.broker.messages.count`*::
++
+--
+Number of unacknowledged messages on the broker.
+
+type: long
+
+--
+
+*`activemq.broker.producers.count`*::
++
+--
+Number of message producers active on destinations on the broker.
+
+type: long
+
+--
+
+[float]
+=== queue
+
+Queue metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Queue,type=Broker
+
+
+*`activemq.queue.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`activemq.queue.name`*::
++
+--
+Queue name
+
+type: keyword
+
+--
+
+*`activemq.queue.size`*::
++
+--
+Queue size
+
+type: long
+
+--
+
+*`activemq.queue.messages.enqueue.time.avg`*::
++
+--
+Average time a message was held on this destination.
+
+type: double
+
+--
+
+*`activemq.queue.messages.size.avg`*::
++
+--
+Average message size on this destination.
+
+type: long
+
+--
+
+*`activemq.queue.consumers.count`*::
++
+--
+Number of consumers subscribed to this destination.
+
+type: long
+
+--
+
+*`activemq.queue.messages.dequeue.count`*::
++
+--
+Number of messages that has been acknowledged (and removed) from the destination.
+
+type: long
+
+--
+
+*`activemq.queue.messages.dispatch.count`*::
++
+--
+Number of messages that has been delivered to consumers, including those not acknowledged.
+
+type: long
+
+--
+
+*`activemq.queue.messages.enqueue.count`*::
++
+--
+Number of messages that have been sent to the destination.
+
+type: long
+
+--
+
+*`activemq.queue.messages.expired.count`*::
++
+--
+Number of messages that have been expired.
+
+type: long
+
+--
+
+*`activemq.queue.messages.inflight.count`*::
++
+--
+Number of messages that have been dispatched to, but not acknowledged by, consumers.
+
+type: long
+
+--
+
+*`activemq.queue.messages.enqueue.time.max`*::
++
+--
+The longest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.queue.memory.broker.pct`*::
++
+--
+Percent of memory limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.queue.messages.enqueue.time.min`*::
++
+--
+The shortest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.queue.producers.count`*::
++
+--
+Number of producers attached to this destination.
+
+type: long
+
+--
+
+[float]
+=== topic
+
+Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
+
+
+*`activemq.topic.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`activemq.topic.name`*::
++
+--
+Topic name
+
+type: keyword
+
+--
+
+*`activemq.topic.messages.enqueue.time.avg`*::
++
+--
+Average time a message was held on this destination.
+
+type: double
+
+--
+
+*`activemq.topic.messages.size.avg`*::
++
+--
+Average message size on this destination.
+
+type: long
+
+--
+
+*`activemq.topic.consumers.count`*::
++
+--
+Number of consumers subscribed to this destination.
+
+type: long
+
+--
+
+*`activemq.topic.messages.dequeue.count`*::
++
+--
+Number of messages that has been acknowledged (and removed) from the destination.
+
+type: long
+
+--
+
+*`activemq.topic.messages.dispatch.count`*::
++
+--
+Number of messages that has been delivered to consumers, including those not acknowledged.
+
+type: long
+
+--
+
+*`activemq.topic.messages.enqueue.count`*::
++
+--
+Number of messages that have been sent to the destination.
+
+type: long
+
+--
+
+*`activemq.topic.messages.expired.count`*::
++
+--
+Number of messages that have been expired.
+
+type: long
+
+--
+
+*`activemq.topic.messages.inflight.count`*::
++
+--
+Number of messages that have been dispatched to, but not acknowledged by, consumers.
+
+type: long
+
+--
+
+*`activemq.topic.messages.enqueue.time.max`*::
++
+--
+The longest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.topic.memory.broker.pct`*::
++
+--
+Percent of memory limit used.
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`activemq.topic.messages.enqueue.time.min`*::
++
+--
+The shortest time a message was held on this destination.
+
+type: long
+
+--
+
+*`activemq.topic.producers.count`*::
++
+--
+Number of producers attached to this destination.
+
+type: long
+
+--
+
 [[exported-fields-aerospike]]
 == Aerospike fields
 
@@ -825,9 +1227,9 @@ type: long
 --
 
 [[exported-fields-appsearch]]
-== appsearch fields
+== App Search fields
 
-appsearch module
+App Search module
 
 
 
@@ -2069,6 +2471,36 @@ The average number of transactions in the database that are blocked per second.
 
 
 type: long
+
+--
+
+*`aws.rds.db_instance.db_cluster_identifier`*::
++
+--
+This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.role`*::
++
+--
+DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.engine_name`*::
++
+--
+Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
+
+
+type: keyword
 
 --
 
@@ -3827,6 +4259,33 @@ The document type. Always set to "doc".
 example: metricsets
 
 required: True
+
+--
+
+*`process.exit_code`*::
++
+--
+the exit code of a process
+
+type: long
+
+--
+
+*`systemd.fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
+
+type: keyword
 
 --
 
@@ -12052,6 +12511,46 @@ type: integer
 
 --
 
+*`envoyproxy.server.cluster_manager.cluster_updated`*::
++
+--
+Total cluster updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.cluster_updated_via_merge`*::
++
+--
+Total cluster updates applied as merged updates
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_merge_cancelled`*::
++
+--
+Total merged updates that got cancelled and delivered early
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.cluster_manager.update_out_of_merge_window`*::
++
+--
+Total updates which arrived out of a merge window
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.filesystem.flushed_by_timer`*::
 +
@@ -12103,11 +12602,21 @@ type: integer
 
 --
 
+*`envoyproxy.server.filesystem.write_failed`*::
++
+--
+Total number of times an error occurred during a file write operation
+
+
+type: integer
+
+--
+
 
 *`envoyproxy.server.runtime.load_error`*::
 +
 --
-Total number of load attempts that resulted in an error
+Total number of load attempts that resulted in an error in any layer
 
 
 type: integer
@@ -12117,7 +12626,7 @@ type: integer
 *`envoyproxy.server.runtime.load_success`*::
 +
 --
-Total number of load attempts that were successful
+Total number of load attempts that were successful at all layers
 
 
 type: integer
@@ -12157,6 +12666,29 @@ type: integer
 *`envoyproxy.server.runtime.admin_overrides_active`*::
 +
 --
+1 if any admin overrides are active otherwise 0
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.deprecated_feature_use`*::
++
+--
+Total number of times deprecated features were used.
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.runtime.num_layers`*::
++
+--
+Number of layers currently active (without loading errors)
+
+
 type: integer
 
 --
@@ -12236,6 +12768,16 @@ type: integer
 +
 --
 Number of currently warming listeners
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.listener_manager.listener_stopped`*::
++
+--
+Total listeners stopped
 
 
 type: integer
@@ -12354,6 +12896,60 @@ type: integer
 Current hot restart epoch
 
 
+type: integer
+
+--
+
+*`envoyproxy.server.server.concurrency`*::
++
+--
+Number of worker threads
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.debug_assertion_failures`*::
++
+--
+type: integer
+
+--
+
+*`envoyproxy.server.server.dynamic_unknown_fields`*::
++
+--
+Number of messages in dynamic configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.state`*::
++
+--
+Current state of the Server
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.static_unknown_fields`*::
++
+--
+Number of messages in static configuration with unknown fields
+
+
+type: integer
+
+--
+
+*`envoyproxy.server.server.stats_recent_lookups`*::
++
+--
 type: integer
 
 --
@@ -14829,6 +15425,288 @@ type: keyword
 --
 
 [float]
+=== broker
+
+Broker metrics from Kafka Broker JMX
+
+
+*`kafka.broker.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`kafka.broker.request.channel.queue.size`*::
++
+--
+The size of the request queue
+
+type: long
+
+--
+
+*`kafka.broker.request.produce.failed_per_second`*::
++
+--
+The rate of failed produce requests per second
+
+type: float
+
+--
+
+*`kafka.broker.request.fetch.failed_per_second`*::
++
+--
+The rate of client fetch request failures per second
+
+type: float
+
+--
+
+*`kafka.broker.request.produce.failed`*::
++
+--
+The number of failed produce requests
+
+type: float
+
+--
+
+*`kafka.broker.request.fetch.failed`*::
++
+--
+The number of client fetch request failures
+
+type: float
+
+--
+
+*`kafka.broker.replication.leader_elections`*::
++
+--
+The leader election rate
+
+type: float
+
+--
+
+*`kafka.broker.replication.unclean_leader_elections`*::
++
+--
+The unclean leader election rate
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.disconnect`*::
++
+--
+The ZooKeeper closed sessions per second
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.expire`*::
++
+--
+The ZooKeeper expired sessions per second
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.readonly`*::
++
+--
+The ZooKeeper readonly sessions per second
+
+type: float
+
+--
+
+*`kafka.broker.session.zookeeper.sync`*::
++
+--
+The ZooKeeper client connections per second
+
+type: float
+
+--
+
+*`kafka.broker.log.flush_rate`*::
++
+--
+The log flush rate
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.in.bytes_per_sec`*::
++
+--
+The incoming byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.out.bytes_per_sec`*::
++
+--
+The outgoing byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.net.rejected.bytes_per_sec`*::
++
+--
+The rejected byte rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.topic.messages_in`*::
++
+--
+The incoming message rate per topic
+
+type: float
+
+--
+
+*`kafka.broker.net.in.bytes_per_sec`*::
++
+--
+The incoming byte rate
+
+type: float
+
+--
+
+*`kafka.broker.net.out.bytes_per_sec`*::
++
+--
+The outgoing byte rate
+
+type: float
+
+--
+
+*`kafka.broker.net.rejected.bytes_per_sec`*::
++
+--
+The rejected byte rate
+
+type: float
+
+--
+
+*`kafka.broker.messages_in`*::
++
+--
+The incoming message rate
+
+type: float
+
+--
+
+[float]
+=== consumer
+
+Consumer metrics from Kafka Consumer JMX
+
+
+*`kafka.consumer.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`kafka.consumer.fetch_rate`*::
++
+--
+The minimum rate at which the consumer sends fetch requests to a broker
+
+type: float
+
+--
+
+*`kafka.consumer.bytes_consumed`*::
++
+--
+The average number of bytes consumed for a specific topic per second
+
+type: float
+
+--
+
+*`kafka.consumer.records_consumed`*::
++
+--
+The average number of records consumed per second for a specific topic
+
+type: float
+
+--
+
+*`kafka.consumer.in.bytes_per_sec`*::
++
+--
+The rate of bytes coming in to the consumer
+
+type: float
+
+--
+
+*`kafka.consumer.max_lag`*::
++
+--
+The maximum consumer lag
+
+type: float
+
+--
+
+*`kafka.consumer.zookeeper_commits`*::
++
+--
+The rate of offset commits to ZooKeeper
+
+type: float
+
+--
+
+*`kafka.consumer.kafka_commits`*::
++
+--
+The rate of offset commits to Kafka
+
+type: float
+
+--
+
+*`kafka.consumer.messages_in`*::
++
+--
+The rate of consumer message consumption
+
+type: float
+
+--
+
+[float]
 === consumergroup
 
 consumergroup
@@ -14910,6 +15788,15 @@ type: long
 custom consumer meta data string
 
 type: keyword
+
+--
+
+*`kafka.consumergroup.consumer_lag`*::
++
+--
+consumer lag for partition/topic calculated as the difference between the partition offset and consumer offset
+
+type: long
 
 --
 
@@ -15120,6 +16007,147 @@ Broker address
 
 
 type: keyword
+
+--
+
+[float]
+=== producer
+
+Producer metrics from Kafka Producer JMX
+
+
+*`kafka.producer.mbean`*::
++
+--
+Mbean that this event is related to
+
+type: keyword
+
+--
+
+*`kafka.producer.available_buffer_bytes`*::
++
+--
+The total amount of buffer memory
+
+type: float
+
+--
+
+*`kafka.producer.batch_size_avg`*::
++
+--
+The average number of bytes sent
+
+type: float
+
+--
+
+*`kafka.producer.batch_size_max`*::
++
+--
+The maximum number of bytes sent
+
+type: long
+
+--
+
+*`kafka.producer.record_send_rate`*::
++
+--
+The average number of records sent per second
+
+type: float
+
+--
+
+*`kafka.producer.record_retry_rate`*::
++
+--
+The average number of retried record sends per second
+
+type: float
+
+--
+
+*`kafka.producer.record_error_rate`*::
++
+--
+The average number of retried record sends per second
+
+type: float
+
+--
+
+*`kafka.producer.records_per_request`*::
++
+--
+The average number of records sent per second
+
+type: float
+
+--
+
+*`kafka.producer.record_size_avg`*::
++
+--
+The average record size
+
+type: float
+
+--
+
+*`kafka.producer.record_size_max`*::
++
+--
+The maximum record size
+
+type: long
+
+--
+
+*`kafka.producer.request_rate`*::
++
+--
+The number of producer requests per second
+
+type: float
+
+--
+
+*`kafka.producer.response_rate`*::
++
+--
+The number of producer responses per second
+
+type: float
+
+--
+
+*`kafka.producer.io_wait`*::
++
+--
+The producer I/O wait time
+
+type: float
+
+--
+
+*`kafka.producer.out.bytes_per_sec`*::
++
+--
+The rate of bytes going out for the producer
+
+type: float
+
+--
+
+*`kafka.producer.message_rate`*::
++
+--
+The producer message rate
+
+type: float
 
 --
 
@@ -30892,6 +31920,146 @@ type: long
 --
 
 [float]
+=== service
+
+metrics for system services
+
+
+
+*`system.service.name`*::
++
+--
+The name of the service
+
+type: keyword
+
+--
+
+*`system.service.load_state`*::
++
+--
+The load state of the service
+
+type: keyword
+
+--
+
+*`system.service.state`*::
++
+--
+The activity state of the service
+
+type: keyword
+
+--
+
+*`system.service.sub_state`*::
++
+--
+The sub-state of the service
+
+type: keyword
+
+--
+
+*`system.service.state_since`*::
++
+--
+The timestamp of the last state change. If the service is active and running, this is its uptime.
+
+type: date
+
+--
+
+*`system.service.exec_code`*::
++
+--
+The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+[float]
+=== resources
+
+system metrics associated with the service
+
+
+*`system.service.resources.cpu.usage.ns`*::
++
+--
+CPU usage in nanoseconds
+
+type: long
+
+--
+
+*`system.service.resources.memory.usage.bytes`*::
++
+--
+memory usage in bytes
+
+type: long
+
+--
+
+*`system.service.resources.tasks.count`*::
++
+--
+number of tasks associated with the service
+
+type: long
+
+--
+
+[float]
+=== network
+
+network resource usage
+
+
+*`system.service.resources.network.in.bytes`*::
++
+--
+bytes in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.in.packets`*::
++
+--
+packets in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.out.packets`*::
++
+--
+packets out
+
+type: long
+
+--
+
+*`system.service.resources.network.out.bytes`*::
++
+--
+bytes out
+
+type: long
+
+--
+
+[float]
 === socket
 
 TCP sockets that are active.
@@ -32165,10 +33333,20 @@ virtualmachine
 
 
 
-*`vsphere.virtualmachine.host`*::
+*`vsphere.virtualmachine.host.id`*::
 +
 --
-Host name
+Host id
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.host.hostname`*::
++
+--
+Host name of the host
 
 
 type: keyword

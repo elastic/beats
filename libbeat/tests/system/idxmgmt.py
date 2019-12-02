@@ -12,15 +12,15 @@ class IdxMgmt(object):
     def needs_init(self, s):
         return s == '' or s == '*'
 
-    def delete(self, indices=[]):
+    def delete(self, indices=[], policies=[]):
         indices = list(filter(lambda x: x != '', indices))
         if not indices:
             indices == [self._index]
         for i in indices:
             self.delete_index_and_alias(i)
             self.delete_template(template=i)
-        for i in indices:
-            self.delete_policy(policy=i)
+        for i in list(filter(lambda x: x != '', policies)):
+            self.delete_policy(i)
 
     def delete_index_and_alias(self, index=""):
         if self.needs_init(index):
@@ -40,10 +40,7 @@ class IdxMgmt(object):
         except NotFoundError:
             pass
 
-    def delete_policy(self, policy=""):
-        if self.needs_init(policy):
-            policy = self._index
-
+    def delete_policy(self, policy):
         # Delete any existing policy starting with given policy
         policies = self._client.transport.perform_request('GET', "/_ilm/policy")
         for p, _ in policies.items():
