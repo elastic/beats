@@ -12,6 +12,10 @@
 [role="xpack"]
 [[monitoring-internal-collection]]
 
+== Collect {beatname_uc} monitoring data with internal collectors
+++++
+<titleabbrev>Internal collection</titleabbrev>
+++++
 
 [IMPORTANT]
 =========================
@@ -24,13 +28,8 @@ sure that internal collection is disabled.
 
 You cannot use both {metricbeat} and internal collection.
 
-Learn more about <<monitoring-metricbeat,Monitoring with Metricbeat>>.
+Learn more about <<monitoring-metricbeat-collection,Monitoring with Metricbeat>>.
 =========================
-
-== Collect {beatname_uc} monitoring data with internal collectors
-++++
-<titleabbrev>Internal collection</titleabbrev>
-++++
 
 The following method involves sending the metrics to the production cluster,
 which ultimately routes them to the monitoring cluster.
