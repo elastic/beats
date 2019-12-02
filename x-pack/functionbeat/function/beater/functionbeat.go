@@ -16,10 +16,12 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/libbeat/licenser"
 )
 
@@ -31,6 +33,7 @@ var (
 		"logstash",
 		"console", // for local debugging
 	}
+	metrics = monitoring.Default.NewRegistry("functionbeat")
 )
 
 // Functionbeat is a beat designed to run under a serverless environment and listen to external triggers,
@@ -42,11 +45,12 @@ var (
 // - Run on a read only filesystem
 // - More execution constraints based on speed and memory usage.
 type Functionbeat struct {
-	ctx      context.Context
-	log      *logp.Logger
-	cancel   context.CancelFunc
-	Provider provider.Provider
-	Config   *config.Config
+	ctx       context.Context
+	log       *logp.Logger
+	cancel    context.CancelFunc
+	telemetry telemetry.T
+	Provider  provider.Provider
+	Config    *config.Config
 }
 
 // New creates an instance of functionbeat.
@@ -63,11 +67,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	bt := &Functionbeat{
-		ctx:      ctx,
-		cancel:   cancel,
-		log:      logp.NewLogger("functionbeat"),
-		Provider: provider,
-		Config:   c,
+		ctx:       ctx,
+		log:       logp.NewLogger("functionbeat"),
+		cancel:    cancel,
+		telemetry: telemetry.New(metrics),
+		Provider:  provider,
+		Config:    c,
 	}
 	return bt, nil
 }
@@ -120,7 +125,7 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	// When an error reach the coordinator we assume that we cannot recover from it and we initiate
 	// a shutdown and return an aggregated errors.
 	coordinator := core.NewCoordinator(logp.NewLogger("coordinator"), functions...)
-	err = coordinator.Run(bt.ctx)
+	err = coordinator.Run(bt.ctx, bt.telemetry)
 	if err != nil {
 		return err
 	}

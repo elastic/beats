@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -69,12 +70,12 @@ func CloudwatchKinesisDetails() *feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client) error {
-	lambdarunner.Start(c.createHandler(client))
+func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	lambdarunner.Start(c.createHandler(client, t))
 	return nil
 }
 
-func (c *CloudwatchKinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
+func (c *CloudwatchKinesis) createHandler(client core.Client, t telemetry.T) func(request events.KinesisEvent) error {
 	return func(request events.KinesisEvent) error {
 		c.log.Debugf("The handler receives %d events", len(request.Records))
 
@@ -82,6 +83,8 @@ func (c *CloudwatchKinesis) createHandler(client core.Client) func(request event
 		if err != nil {
 			return err
 		}
+
+		t.AddTriggeredFunction(c.Name(), c.triggerCount(), int64(len(events)))
 
 		if err := client.PublishAll(events); err != nil {
 			c.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
@@ -95,6 +98,10 @@ func (c *CloudwatchKinesis) createHandler(client core.Client) func(request event
 // Name return the name of the lambda function.
 func (c *CloudwatchKinesis) Name() string {
 	return "cloudwatch_logs_kinesis"
+}
+
+func (c *CloudwatchKinesis) triggerCount() int64 {
+	return int64(len(c.config.Triggers))
 }
 
 // LambdaConfig returns the configuration to use when creating the lambda.

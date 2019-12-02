@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
@@ -105,13 +106,14 @@ func CloudwatchLogsDetails() *feature.Details {
 }
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.
-func (c *CloudwatchLogs) Run(_ context.Context, client core.Client) error {
-	lambdarunner.Start(c.createHandler(client))
+func (c *CloudwatchLogs) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	lambdarunner.Start(c.createHandler(client, t))
 	return nil
 }
 
 func (c *CloudwatchLogs) createHandler(
 	client core.Client,
+	t telemetry.T,
 ) func(request events.CloudwatchLogsEvent) error {
 	return func(request events.CloudwatchLogsEvent) error {
 		parsedEvent, err := request.AWSLogs.Parse()
@@ -130,6 +132,9 @@ func (c *CloudwatchLogs) createHandler(
 		)
 
 		events := transformer.CloudwatchLogs(parsedEvent)
+
+		t.AddTriggeredFunction(c.Name(), c.triggerCount(), int64(len(events)))
+
 		if err := client.PublishAll(events); err != nil {
 			c.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
 			return err
@@ -142,6 +147,10 @@ func (c *CloudwatchLogs) createHandler(
 // Name returns the name of the function.
 func (c CloudwatchLogs) Name() string {
 	return "cloudwatch_logs"
+}
+
+func (c *CloudwatchLogs) triggerCount() int64 {
+	return int64(len(c.config.Triggers))
 }
 
 // AWSLogsSubscriptionFilter overrides the type from goformation to allow to pass an empty string.

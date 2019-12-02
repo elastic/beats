@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
 )
 
 func TestAPIGatewayProxy(t *testing.T) {
@@ -31,7 +32,7 @@ func TestAPIGatewayProxy(t *testing.T) {
 		}
 
 		c, _ := s.(*APIGatewayProxy)
-		handler := c.createHandler(client)
+		handler := c.createHandler(client, telemetry.NewMock())
 		res, err := handler(generateAPIGatewayProxyEvent())
 		assert.NoError(t, err)
 		assert.Equal(t, res.StatusCode, http.StatusOK)
@@ -58,7 +59,7 @@ func TestAPIGatewayProxy(t *testing.T) {
 		}
 
 		c, _ := s.(*APIGatewayProxy)
-		res, err := c.createHandler(client)(generateAPIGatewayProxyEvent())
+		res, err := c.createHandler(client, telemetry.NewMock())(generateAPIGatewayProxyEvent())
 		assert.Equal(t, e, err)
 		assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 		ty, _ := res.Headers["Content-Type"]
