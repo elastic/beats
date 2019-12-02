@@ -36,7 +36,7 @@ type Config struct {
 
 // Scheduler defines the syntax of a heartbeat.yml scheduler block.
 type Scheduler struct {
-	Limit    uint   `config:"limit"  validate:"min=0"`
+	Limit    int64  `config:"limit"  validate:"min=0"`
 	Location string `config:"location"`
 }
 
