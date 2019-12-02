@@ -23,11 +23,9 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -83,121 +81,17 @@ type watcher struct {
 	logger   *logp.Logger
 }
 
-func nodeSelector(options *metav1.ListOptions, opt WatchOptions) {
-	if opt.Node != "" {
-		options.FieldSelector = "spec.nodeName=" + opt.Node
-	}
-}
-
-func nameSelector(options *metav1.ListOptions, opt WatchOptions) {
-	if opt.Node != "" {
-		options.FieldSelector = "metadata.name=" + opt.Node
-	}
-}
-
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
 func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions) (Watcher, error) {
-	var informer cache.SharedInformer
 	var store cache.Store
 	var queue workqueue.RateLimitingInterface
-	var objType string
 
-	var listwatch *cache.ListWatch
-	switch resource.(type) {
-	case *Pod:
-		p := client.CoreV1().Pods(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				nodeSelector(&options, opts)
-				return p.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				nodeSelector(&options, opts)
-				return p.Watch(options)
-			},
-		}
-
-		objType = "pod"
-	case *Event:
-		e := client.CoreV1().Events(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return e.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return e.Watch(options)
-			},
-		}
-
-		objType = "event"
-	case *Node:
-		n := client.CoreV1().Nodes()
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				nameSelector(&options, opts)
-				return n.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				nameSelector(&options, opts)
-				return n.Watch(options)
-			},
-		}
-
-		objType = "node"
-	case *Deployment:
-		d := client.AppsV1().Deployments(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return d.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return d.Watch(options)
-			},
-		}
-
-		objType = "deployment"
-	case *ReplicaSet:
-		rs := client.AppsV1().ReplicaSets(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return rs.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return rs.Watch(options)
-			},
-		}
-
-		objType = "replicaset"
-	case *StatefulSet:
-		ss := client.AppsV1().StatefulSets(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return ss.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return ss.Watch(options)
-			},
-		}
-
-		objType = "statefulset"
-	case *Service:
-		svc := client.CoreV1().Services(opts.Namespace)
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return svc.List(options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return svc.Watch(options)
-			},
-		}
-
-		objType = "service"
-	default:
-		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
+	informer, objType, err := NewInformer(client, resource, opts)
+	if err != nil {
+		return nil, err
 	}
 
-	informer = cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout)
 	store = informer.GetStore()
 	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
 	ctx, cancel := context.WithCancel(context.Background())

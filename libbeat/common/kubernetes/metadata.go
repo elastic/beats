@@ -38,6 +38,10 @@ type MetaGenerator interface {
 	ContainerMetadata(pod *Pod, container string, image string) common.MapStr
 }
 
+type MetaGen interface {
+	Metadata(obj Resource) common.MapStr
+}
+
 // MetaGeneratorConfig settings
 type MetaGeneratorConfig struct {
 	IncludeLabels      []string `config:"include_labels"`
