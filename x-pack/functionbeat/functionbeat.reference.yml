@@ -1093,8 +1093,8 @@ logging.files:
 # uncomment the following line.
 #
 # Deprecation warning: The use of monitoring.elasticsearch settings are discouraged and will be
-# removed in 8.0.0. Please use the `beat-xpack` module in Metricbeat to send Beats monitoring data
-# to Elasticsearch.
+# removed in 8.0.0. Please use the `beat-xpack` module in Metricbeat to send Functionbeat
+# monitoring data # to Elasticsearch.
 #
 #monitoring.elasticsearch:
 
