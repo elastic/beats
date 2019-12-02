@@ -112,8 +112,8 @@ type harvesterProgressMetrics struct {
 	metricsRegistry             *monitoring.Registry
 	filename                    *monitoring.String
 	started                     *monitoring.String
-	lastPublished               *monitoring.String
-	lastPublishedEventTimestamp *monitoring.String
+	lastPublished               *monitoring.Timestamp
+	lastPublishedEventTimestamp *monitoring.Timestamp
 	currentSize                 *monitoring.Int
 	readOffset                  *monitoring.Int
 }
@@ -215,8 +215,8 @@ func newHarvesterProgressMetrics(id string) *harvesterProgressMetrics {
 		metricsRegistry:             r,
 		filename:                    monitoring.NewString(r, "name"),
 		started:                     monitoring.NewString(r, "start_time"),
-		lastPublished:               monitoring.NewString(r, "last_event_published_time"),
-		lastPublishedEventTimestamp: monitoring.NewString(r, "last_event_timestamp"),
+		lastPublished:               monitoring.NewTimestamp(r, "last_event_published_time"),
+		lastPublishedEventTimestamp: monitoring.NewTimestamp(r, "last_event_timestamp"),
 		currentSize:                 monitoring.NewInt(r, "size"),
 		readOffset:                  monitoring.NewInt(r, "read_offset"),
 	}
@@ -351,8 +351,8 @@ func (h *Harvester) Run() error {
 
 		// Update metics of harvester as event was sent
 		h.metrics.readOffset.Set(state.Offset)
-		h.metrics.lastPublished.Set(common.Time(time.Now()).String())
-		h.metrics.lastPublishedEventTimestamp.Set(common.Time(message.Ts).String())
+		h.metrics.lastPublished.Set(time.Now())
+		h.metrics.lastPublishedEventTimestamp.Set(message.Ts)
 		h.checkSize <- struct{}{}
 	}
 }
