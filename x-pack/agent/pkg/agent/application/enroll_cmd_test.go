@@ -62,7 +62,7 @@ func TestEnroll(t *testing.T) {
             "version": "8.0.0"
         },
         "actions": [],
-        "access_token": "my-access-token"
+        "access_api_key": "my-access-api-key"
     }
 }`))
 			})
@@ -78,7 +78,7 @@ func TestEnroll(t *testing.T) {
 				log,
 				url,
 				[]string{caFile},
-				"my-enrollment-token",
+				"my-enrollment-api-key",
 				"my-id",
 				map[string]interface{}{"custom": "customize"},
 				store,
@@ -89,7 +89,7 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
-			require.Equal(t, store.Config.AccessToken, "my-access-token")
+			require.Equal(t, store.Config.AccessAPIKey, "my-access-api-key")
 			require.Equal(t, store.Config.Kibana.Host, host)
 			require.Equal(t, store.Config.Kibana.Protocol, kibana.Protocol("https"))
 			require.Equal(t, store.Config.Kibana.Username, "")
@@ -120,7 +120,7 @@ func TestEnroll(t *testing.T) {
             "version": "8.0.0"
         },
         "actions": [],
-        "access_token": "my-access-token"
+        "access_api_key": "my-access-api-key"
     }
 }`))
 			})
@@ -132,7 +132,7 @@ func TestEnroll(t *testing.T) {
 				log,
 				url,
 				make([]string, 0),
-				"my-enrollment-token",
+				"my-enrollment-api-key",
 				"my-id",
 				map[string]interface{}{"custom": "customize"},
 				store,
@@ -143,7 +143,7 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
-			require.Equal(t, store.Config.AccessToken, "my-access-token")
+			require.Equal(t, store.Config.AccessAPIKey, "my-access-api-key")
 			require.Equal(t, store.Config.Kibana.Host, host)
 			require.Equal(t, store.Config.Kibana.Protocol, kibana.Protocol("http"))
 			require.Equal(t, store.Config.Kibana.Username, "")
