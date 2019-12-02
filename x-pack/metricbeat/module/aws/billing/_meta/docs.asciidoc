@@ -8,3 +8,11 @@ AWS that you use, in addition to the estimated overall total of your AWS charges
 
 This aws `billing` metricset collects these Cloudwatch metrics for monitoring
 purposes.
+
+
+[float]
+=== Dashboard
+
+The aws billing metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-billing-overview.png[]
