@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"testing"
 
 	"github.com/elastic/go-lookslike/validator"
@@ -102,7 +103,7 @@ func Test_runPublishJob(t *testing.T) {
 				}
 				tf := queue[0]
 				queue = queue[1:]
-				conts := tf()
+				conts := tf(context.Background())
 				for _, cont := range conts {
 					queue = append(queue, cont)
 				}

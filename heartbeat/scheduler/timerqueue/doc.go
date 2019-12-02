@@ -15,43 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cron
+/*
+Package timerqueue implements lets you defer execution of functions to a later time using an efficient implementation
+based upon a priority queue and a single timer. The priority queue is implemented with the container/heap package.
 
-import (
-	"time"
-
-	"github.com/gorhill/cronexpr"
-)
-
-type Schedule cronexpr.Expression
-
-func MustParse(in string) *Schedule {
-	s, err := Parse(in)
-	if err != nil {
-		panic(err)
-	}
-	return s
-}
-
-func Parse(in string) (*Schedule, error) {
-	expr, err := cronexpr.Parse(in)
-	return (*Schedule)(expr), err
-}
-
-func (s *Schedule) Next(t time.Time) time.Time {
-	expr := (*cronexpr.Expression)(s)
-	return expr.Next(t)
-}
-
-func (s *Schedule) Unpack(str string) error {
-	tmp, err := Parse(str)
-	if err == nil {
-		*s = *tmp
-	}
-	return err
-}
-
-// RunOnInit returns false for interval schedulers.
-func (s *Schedule) RunOnInit() bool {
-	return false
-}
+Internally timerqueue uses a single blocking thread to execute all tasks. If your tasks perform anything other than
+trivial operations it is recommended that you spawn goroutines from each task.
+*/
+package timerqueue

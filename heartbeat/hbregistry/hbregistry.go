@@ -15,43 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cron
+package hbregistry
 
-import (
-	"time"
+import "github.com/elastic/beats/libbeat/monitoring"
 
-	"github.com/gorhill/cronexpr"
-)
+// StatsRegistry contains a singleton instance of the heartbeat stats registry
+var StatsRegistry = monitoring.Default.NewRegistry("heartbeat")
 
-type Schedule cronexpr.Expression
+// SchedulerRegistry holds scheduler stats
+var SchedulerRegistry = StatsRegistry.NewRegistry("scheduler")
 
-func MustParse(in string) *Schedule {
-	s, err := Parse(in)
-	if err != nil {
-		panic(err)
-	}
-	return s
-}
-
-func Parse(in string) (*Schedule, error) {
-	expr, err := cronexpr.Parse(in)
-	return (*Schedule)(expr), err
-}
-
-func (s *Schedule) Next(t time.Time) time.Time {
-	expr := (*cronexpr.Expression)(s)
-	return expr.Next(t)
-}
-
-func (s *Schedule) Unpack(str string) error {
-	tmp, err := Parse(str)
-	if err == nil {
-		*s = *tmp
-	}
-	return err
-}
-
-// RunOnInit returns false for interval schedulers.
-func (s *Schedule) RunOnInit() bool {
-	return false
-}
+// TelemetryRegistry contains a singleton instance of the heartbeat telemetry registry
+var TelemetryRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
