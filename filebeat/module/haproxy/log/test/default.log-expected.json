@@ -4,6 +4,7 @@
         "destination.port": 5000,
         "event.dataset": "haproxy.log",
         "event.module": "haproxy",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.frontend_name": "main",
         "haproxy.mode": "HTTP",
