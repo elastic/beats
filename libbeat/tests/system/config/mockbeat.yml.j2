@@ -62,6 +62,9 @@ output:
     path: {{ output_file_path|default(beat.working_dir + "/output") }}
     filename: "{{ output_file_filename|default("mockbeat") }}"
     rotate_every_kb: 1000
+    {% if output_file_permissions %}
+    permissions: {{ output_file_permissions }}
+    {% endif %}
     #number_of_files: 7
   {%- endif %}
 
@@ -113,10 +116,20 @@ xpack.monitoring.elasticsearch.state.period: 3s      # to speed up tests
 
 {% if monitoring -%}
 #================================ X-Pack Monitoring (direct) =====================================
-monitoring.elasticsearch.hosts: {{monitoring.elasticsearch.hosts}}
-monitoring.elasticsearch.metrics.period: 2s    # to speed up tests
-monitoring.elasticsearch.state.period: 3s      # to speed up tests
+monitoring:
+    {% if monitoring.elasticsearch -%}
+    elasticsearch.hosts: {{monitoring.elasticsearch.hosts}}
+    elasticsearch.metrics.period: 2s    # to speed up tests
+    elasticsearch.state.period: 3s      # to speed up tests
+    {% endif -%}
+
+    {% if monitoring.cluster_uuid -%}
+    cluster_uuid: {{monitoring.cluster_uuid}}
+    {% endif -%}
 {% endif -%}
 
 # vim: set ft=jinja:
 
+{% if http_enabled -%}
+http.enabled: {{http_enabled}}
+{% endif -%}

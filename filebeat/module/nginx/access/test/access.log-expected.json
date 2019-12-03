@@ -19,10 +19,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/",
         "user.name": "-",
@@ -32,7 +35,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.59"
     },
     {
         "@timestamp": "2016-10-25T12:49:34.000Z",
@@ -54,10 +57,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/favicon.ico",
         "user.name": "-",
@@ -67,7 +73,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.59"
     },
     {
         "@timestamp": "2016-10-25T12:50:44.000Z",
@@ -89,10 +95,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/adsasd",
         "user.name": "-",
@@ -102,7 +111,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.59"
     },
     {
         "@timestamp": "2016-12-07T09:34:43.000Z",
@@ -124,10 +133,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/",
         "user.name": "-",
@@ -137,7 +149,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:34:43.000Z",
@@ -159,10 +171,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/favicon.ico",
         "user.name": "-",
@@ -172,7 +187,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:43:18.000Z",
@@ -194,10 +209,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/test",
         "user.name": "-",
@@ -207,7 +225,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:43:21.000Z",
@@ -229,10 +247,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/test",
         "user.name": "-",
@@ -242,7 +263,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T09:43:23.000Z",
@@ -264,10 +285,13 @@
         "source.address": "77.179.66.156",
         "source.as.number": 6805,
         "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Germersheim",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
-        "source.geo.location.lat": 51.2993,
-        "source.geo.location.lon": 9.491,
+        "source.geo.location.lat": 49.2231,
+        "source.geo.location.lon": 8.3639,
+        "source.geo.region_iso_code": "DE-RP",
+        "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/test1",
         "user.name": "-",
@@ -277,7 +301,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T10:04:37.000Z",
@@ -306,7 +330,7 @@
         "user_agent.os.full": "Mac OS X 10.12.0",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12.0",
-        "user_agent.version": "54.0.2840"
+        "user_agent.version": "54.0.2840.98"
     },
     {
         "@timestamp": "2016-12-07T10:04:58.000Z",
@@ -335,7 +359,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2016-12-07T10:04:59.000Z",
@@ -364,7 +388,7 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
@@ -393,6 +417,6 @@
         "user_agent.os.full": "Mac OS X 10.12",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
-        "user_agent.version": "49.0"
+        "user_agent.version": "49.0."
     }
 ]

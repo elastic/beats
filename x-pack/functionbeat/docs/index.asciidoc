@@ -1,8 +1,8 @@
 = Functionbeat Reference
 
-:libbeat-dir: {docdir}/../../../libbeat
+:libbeat-dir: {docdir}/../../../libbeat/docs
 
-include::{libbeat-dir}/docs/version.asciidoc[]
+include::{libbeat-dir}/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
 
@@ -25,8 +25,12 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :linux_os:
 :no_dashboards:
 :no_repos:
+:no_decode_cef_processor:
+:no_decode_csv_fields_processor:
+:no_script_processor:
+:no_timestamp_processor:
 
-include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -40,10 +44,10 @@ include::./configuring-howto.asciidoc[]
 include::./fields.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
+include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
+include::{libbeat-dir}/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 

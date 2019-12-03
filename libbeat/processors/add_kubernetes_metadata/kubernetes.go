@@ -109,11 +109,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		if kubernetes.IsInCluster(config.KubeConfig) {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config", "add_kubernetes_metadata")
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using in_cluster config: %v", "add_kubernetes_metadata", err)
 		} else if config.KubeConfig == "" {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", os.Getenv("KUBECONFIG"))
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", os.Getenv("KUBECONFIG"), err)
 		} else {
-			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v", "add_kubernetes_metadata", config.KubeConfig)
+			logp.Debug("kubernetes", "%v: could not create kubernetes client using config: %v: %v", "add_kubernetes_metadata", config.KubeConfig, err)
 		}
 		return processor, nil
 	}
@@ -152,14 +152,19 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			processor.addPod(obj.(*kubernetes.Pod))
+			pod := obj.(*kubernetes.Pod)
+			logp.Debug("kubernetes", "%v: adding pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+			processor.addPod(pod)
 		},
 		UpdateFunc: func(obj interface{}) {
-			processor.removePod(obj.(*kubernetes.Pod))
-			processor.addPod(obj.(*kubernetes.Pod))
+			pod := obj.(*kubernetes.Pod)
+			logp.Debug("kubernetes", "%v: updating pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+			processor.updatePod(pod)
 		},
 		DeleteFunc: func(obj interface{}) {
-			processor.removePod(obj.(*kubernetes.Pod))
+			pod := obj.(*kubernetes.Pod)
+			logp.Debug("kubernetes", "%v: removing pod: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+			processor.removePod(pod)
 		},
 	})
 
@@ -196,6 +201,18 @@ func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	for _, m := range metadata {
 		k.cache.set(m.Index, m.Data)
 	}
+}
+
+func (k *kubernetesAnnotator) updatePod(pod *kubernetes.Pod) {
+	k.removePod(pod)
+
+	// Add it again only if it is not being deleted
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		logp.Debug("kubernetes", "%v: removing pod being terminated: %s/%s", "add_kubernetes_metadata", pod.GetNamespace(), pod.GetName())
+		return
+	}
+
+	k.addPod(pod)
 }
 
 func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {

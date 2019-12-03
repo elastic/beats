@@ -11,6 +11,9 @@ var:
     default: 30m
   - name: queue_size
     default: 8192
+  - name: read_buffer
+  - name: timeout
+  - name: custom_definitions
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/netflow.yml

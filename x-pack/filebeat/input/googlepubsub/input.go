@@ -8,8 +8,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
-	"runtime"
 	"sync"
 	"time"
 
@@ -22,8 +20,8 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/common/useragent"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/version"
 )
 
 const (
@@ -58,20 +56,10 @@ func NewInput(
 	cfg *common.Config,
 	connector channel.Connector,
 	inputContext input.Context,
-) (input.Input, error) {
+) (inp input.Input, err error) {
 	// Extract and validate the input's configuration.
 	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		return nil, err
-	}
-
-	// Build outlet for events.
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
-	if err != nil {
+	if err = cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
 
@@ -96,13 +84,31 @@ func NewInput(
 			"pubsub_project", conf.ProjectID,
 			"pubsub_topic", conf.Topic,
 			"pubsub_subscription", conf.Subscription),
-		outlet:       out,
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 		ackedCount:   atomic.NewUint32(0),
 	}
 
+	// Build outlet for events.
+	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: inputContext.DynamicFields,
+		},
+		ACKEvents: func(privates []interface{}) {
+			for _, priv := range privates {
+				if msg, ok := priv.(*pubsub.Message); ok {
+					msg.Ack()
+					in.ackedCount.Inc()
+				} else {
+					in.log.Error("Failed ACKing pub/sub event")
+				}
+			}
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
 	in.log.Info("Initialized Google Pub/Sub input.")
 	return in, nil
 }
@@ -130,7 +136,7 @@ func (in *pubsubInput) run() error {
 	defer cancel()
 
 	// Make pubsub client.
-	opts := []option.ClientOption{option.WithUserAgent(userAgent())}
+	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat"))}
 	if in.CredentialsFile != "" {
 		opts = append(opts, option.WithCredentialsFile(in.CredentialsFile))
 	} else if len(in.CredentialsJSON) > 0 {
@@ -154,15 +160,11 @@ func (in *pubsubInput) run() error {
 	// Start receiving messages.
 	topicID := makeTopicID(in.ProjectID, in.Topic)
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); ok {
-			msg.Ack()
-			in.ackedCount.Inc()
-			return
+		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
+			msg.Nack()
+			in.log.Debug("OnEvent returned false. Stopping input worker.")
+			cancel()
 		}
-
-		msg.Nack()
-		in.log.Debug("OnEvent returned false. Stopping input worker.")
-		cancel()
 	})
 }
 
@@ -175,12 +177,6 @@ func (in *pubsubInput) Stop() {
 // Wait is an alias for Stop.
 func (in *pubsubInput) Wait() {
 	in.Stop()
-}
-
-func userAgent() string {
-	return fmt.Sprintf("Elastic Filebeat/%s (%s; %s; %s; %s)",
-		version.GetDefaultVersion(), runtime.GOOS, runtime.GOARCH,
-		version.Commit(), version.BuildTime())
 }
 
 // makeTopicID returns a short sha256 hash of the project ID plus topic name.
@@ -213,7 +209,8 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 		Meta: common.MapStr{
 			"id": id,
 		},
-		Fields: fields,
+		Fields:  fields,
+		Private: msg,
 	}
 }
 

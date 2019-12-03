@@ -4,6 +4,7 @@ services:
   beat:
     build: ${PWD}/.
     environment:
+      - BEAT_STRICT_PERMS=false
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
@@ -29,6 +30,7 @@ services:
       context: ./module/beat/_meta
       args:
         BEAT_VERSION: ${BEAT_VERSION:-7.3.0}
+    command: '-e'
     ports:
       - 5066
 
@@ -128,7 +130,7 @@ services:
 
   haproxy:
     image: docker.elastic.co/observability-ci/beats-integration-haproxy:${HAPROXY_VERSION:-1.8}-1
-    build: 
+    build:
       context: ./module/haproxy/_meta
       args:
         HAPROXY_VERSION: ${HAPROXY_VERSION:-1.8}
@@ -154,13 +156,16 @@ services:
       - 8778
 
   kafka:
-    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-1
+    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-2
     build:
       context: ./module/kafka/_meta
       args:
         KAFKA_VERSION: ${KAFKA_VERSION:-2.1.1}
     ports:
       - 9092
+      - 8779
+      - 8775
+      - 8774
 
   kibana:
     image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
@@ -230,15 +235,6 @@ services:
     ports:
       - 4949
 
-  mysql:
-    image: docker.elastic.co/observability-ci/beats-integration-mysql:${MYSQL_VARIANT:-mysql}-${MYSQL_VERSION:-5.7.12}-1
-    build:
-      context: ./module/mysql/_meta
-      args:
-        MYSQL_IMAGE: ${MYSQL_VARIANT:-mysql}:${MYSQL_VERSION:-5.7.12}
-    ports:
-      - 3306
-
   nats:
     image: docker.elastic.co/observability-ci/beats-integration-nats:${NATS_VERSION:-2.0.4}-1
     build:
@@ -261,7 +257,7 @@ services:
 
   nginx:
     image: docker.elastic.co/observability-ci/beats-integration-nginx:${NGINX_VERSION:-1.9}-1
-    build: 
+    build:
       context: ./module/nginx/_meta
       args:
         NGINX_VERSION: ${NGINX_VERSION:-1.9}
@@ -270,7 +266,7 @@ services:
 
   phpfpm:
     image: docker.elastic.co/observability-ci/beats-integration-phpfpm:${PHPFPM_VERSION:-7.1}-1
-    build: 
+    build:
       context: ./module/php_fpm/_meta
       args:
         PHPFPM_VERSION: ${PHPFPM_VERSION:-7.1}
