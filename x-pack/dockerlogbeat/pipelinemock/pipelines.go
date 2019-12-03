@@ -61,7 +61,7 @@ type MockPipelineConnector struct {
 
 // GetAllEvents returns all events associated with a pipeline
 func (pc *MockPipelineConnector) GetAllEvents() []beat.Event {
-	evList := []beat.Event{}
+	var evList []beat.Event
 	for _, clientEvents := range pc.clients {
 		evList = append(evList, clientEvents.GetEvents()...)
 	}

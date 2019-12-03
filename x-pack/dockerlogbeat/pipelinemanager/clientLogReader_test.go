@@ -18,16 +18,17 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	client, teardown := setupTestClient(t)
+	logString := "This is a log line"
+	client, teardown := setupTestClient(t, logString)
 	defer teardown()
 
 	event := testReturn(t, client)
-	assert.Equal(t, event.Fields["message"], "This is a log line")
+	assert.Equal(t, event.Fields["message"], logString)
 }
 
-func setupTestClient(t *testing.T) (*pipelinemock.MockPipelineConnector, func()) {
+func setupTestClient(t *testing.T, logString string) (*pipelinemock.MockPipelineConnector, func()) {
 	mockConnector := &pipelinemock.MockPipelineConnector{}
-	client := createNewClient(t, mockConnector)
+	client := createNewClient(t, logString, mockConnector)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -42,7 +43,7 @@ func setupTestClient(t *testing.T) (*pipelinemock.MockPipelineConnector, func())
 	}
 }
 
-func createNewClient(t *testing.T, mockConnector *pipelinemock.MockPipelineConnector) *ClientLogger {
+func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock.MockPipelineConnector) *ClientLogger {
 	// an example container metadata struct
 	cfgObject := logger.Info{
 		Config:             map[string]string{"output.elasticsearch": "localhost:9200"},
@@ -53,7 +54,7 @@ func createNewClient(t *testing.T, mockConnector *pipelinemock.MockPipelineConne
 	}
 
 	// create a new pipeline reader for use with the libbeat client
-	reader, err := pipereader.NewReaderFromReadCloser(pipelinemock.CreateTestInput(t))
+	reader, err := pipereader.NewReaderFromReadCloser(pipelinemock.CreateTestInputFromLine(t, logString))
 	require.NoError(t, err)
 
 	client, err := newClientFromPipeline(mockConnector, reader, "aaa", cfgObject)
