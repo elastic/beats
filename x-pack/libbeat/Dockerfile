@@ -3,8 +3,10 @@ FROM golang:1.13.4
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-         netcat python-pip rsync virtualenv && \
+         netcat python-pip rsync virtualenv python3 && \
     apt-get clean
+
+ENV PYTHON_ENV=/tmp/python-env
 
 RUN pip install --upgrade setuptools
 

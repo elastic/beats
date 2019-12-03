@@ -4,8 +4,10 @@ MAINTAINER Noémi Ványi <noemi.vanyi@elastic.co>
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-      python-pip virtualenv libsystemd-dev libc6-dev-i386 gcc-arm-linux-gnueabi && \
+      python-pip virtualenv python3 libsystemd-dev libc6-dev-i386 gcc-arm-linux-gnueabi && \
     apt-get clean
+
+ENV PYTHON_ENV=/tmp/python-env
 
 RUN pip install --upgrade setuptools
 
