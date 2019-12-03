@@ -9,7 +9,6 @@ class TestNats(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['stan']
 
-
     @parameterized.expand([
         "stats",
         "channels",
