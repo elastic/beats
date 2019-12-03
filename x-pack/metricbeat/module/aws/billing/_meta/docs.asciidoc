@@ -9,6 +9,17 @@ AWS that you use, in addition to the estimated overall total of your AWS charges
 This aws `billing` metricset collects these Cloudwatch metrics for monitoring
 purposes.
 
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect estimated
+billing metrics.
+----
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+tag:getResources
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----
 
 [float]
 === Dashboard
