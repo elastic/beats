@@ -10,6 +10,7 @@ import (
 
 	"github.com/docker/docker/daemon/logger"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemock"
@@ -53,10 +54,10 @@ func createNewClient(t *testing.T, mockConnector *pipelinemock.MockPipelineConne
 
 	// create a new pipeline reader for use with the libbeat client
 	reader, err := pipereader.NewReaderFromReadCloser(pipelinemock.CreateTestInput(t))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	client, err := newClientFromPipeline(mockConnector, reader, "aaa", cfgObject)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return client
 }

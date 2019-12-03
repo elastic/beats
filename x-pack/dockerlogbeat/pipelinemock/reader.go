@@ -13,7 +13,7 @@ import (
 
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/gogo/protobuf/proto"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // CreateTestInputFromLine returns a ReadCloser based on an input string
@@ -38,13 +38,13 @@ func CreateTestInputFromLine(t *testing.T, line string) io.ReadCloser {
 
 func encodeLog(t *testing.T, out io.Writer, entry *logdriver.LogEntry) {
 	rawBytes, err := proto.Marshal(entry)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	sizeBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(sizeBytes, uint32(len(rawBytes)))
 
 	_, err = out.Write(sizeBytes)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = out.Write(rawBytes)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
