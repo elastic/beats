@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package streaming
+package stats
 
 import (
 	"encoding/json"
@@ -29,7 +29,7 @@ var (
 		"clients":       c.Int("clients"),
 		"subscriptions": c.Int("subscriptions"),
 		"channels":      c.Int("channels"),
-		"msgs":          c.Int("total_msgs"),
+		"messages":      c.Int("total_msgs"),
 		"bytes":         c.Int("total_bytes"),
 	}
 )

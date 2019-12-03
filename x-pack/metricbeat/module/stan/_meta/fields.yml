@@ -13,7 +13,7 @@
           type: keyword
           description: >
             The server ID
-        - name: server.time
-          type: date
+        - name: cluster.id
+          type: keyword
           description: >
-            Server time of metric creation
+            The cluster ID

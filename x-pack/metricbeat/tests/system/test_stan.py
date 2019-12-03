@@ -13,12 +13,12 @@ class TestNats(XPackTest):
 
     @parameterized.expand([
         "stats",
-        "channels",
-        "subscriptions",
+        #         "channels",
+        #         "subscriptions",
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricset(self, metricset):
         """
         etcd metricset tests
         """
-        self.check_metricset("stan", metricset, self.get_hosts(), ['stan.' + metricset])
+        self.check_metricset("stan", metricset, self.get_hosts(), STAN_FIELDS)
