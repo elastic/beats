@@ -79,3 +79,12 @@ services:
         MSSQL_VERSION: ${MSSQL_VERSION:-2017-GA}
     ports:
       - 1433
+
+  stan:
+    image: docker.elastic.co/observability-ci/beats-integration-stan:${STAN_VERSION:-0.15.1}-1
+    build:
+      context: ./module/stan/_meta
+      args:
+        STAN_VERSION: ${STAN_VERSION:-0.15.1}
+    ports:
+      - 8222
