@@ -243,33 +243,63 @@ func TestKafkaPublish(t *testing.T) {
 				validate = makeValidateFmtStr(fmt.(string))
 			}
 
-			for i, d := range expected {
-				validate(t, stored[i].Value, d)
+			seenMsgs := map[string]struct{}{}
+			for _, s := range stored {
+				msg := validate(t, s.Value, expected)
+				seenMsgs[msg] = struct{}{}
 			}
+			assert.Equal(t, len(expected), len(seenMsgs))
 		})
 	}
 }
 
-func validateJSON(t *testing.T, value []byte, event beat.Event) {
+func validateJSON(t *testing.T, value []byte, events []beat.Event) string {
 	var decoded map[string]interface{}
 	err := json.Unmarshal(value, &decoded)
 	if err != nil {
 		t.Errorf("can not json decode event value: %v", value)
-		return
+		return ""
 	}
+
+	msg := decoded["message"].(string)
+	event := findEvent(events, msg)
+	if event == nil {
+		t.Errorf("could not find expected event with message: %v", msg)
+		return ""
+	}
+
 	assert.Equal(t, decoded["type"], event.Fields["type"])
-	assert.Equal(t, decoded["message"], event.Fields["message"])
+
+	return msg
 }
 
-func makeValidateFmtStr(fmt string) func(*testing.T, []byte, beat.Event) {
+func makeValidateFmtStr(fmt string) func(*testing.T, []byte, []beat.Event) string {
 	fmtString := fmtstr.MustCompileEvent(fmt)
-	return func(t *testing.T, value []byte, event beat.Event) {
-		expectedMessage, err := fmtString.Run(&event)
+	return func(t *testing.T, value []byte, events []beat.Event) string {
+		msg := string(value)
+		event := findEvent(events, msg)
+		if event == nil {
+			t.Errorf("could not find expected event with message: %v", msg)
+			return ""
+		}
+
+		_, err := fmtString.Run(event)
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.Equal(t, string(expectedMessage), string(value))
+
+		return msg
 	}
+}
+
+func findEvent(events []beat.Event, msg string) *beat.Event {
+	for _, e := range events {
+		if e.Fields["message"] == msg {
+			return &e
+		}
+	}
+
+	return nil
 }
 
 func strDefault(a, defaults string) string {
