@@ -38,6 +38,7 @@ func init() {
 	autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
 }
 
+// Eventer allows defining ways in which kubernetes resource events are observed and processed
 type Eventer interface {
 	kubernetes.ResourceEventHandler
 	GenerateHints(event bus.Event) bus.Event
