@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/hbregistry"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/config"
@@ -63,7 +65,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	scheduler := scheduler.NewWithLocation(limit, location)
+	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location)
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
