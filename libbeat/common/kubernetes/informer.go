@@ -33,9 +33,9 @@ func nodeSelector(options *metav1.ListOptions, opt WatchOptions) {
 	}
 }
 
-func nameSelector(options *metav1.ListOptions, opt WatchOptions) {
-	if opt.Node != "" {
-		options.FieldSelector = "metadata.name=" + opt.Node
+func nameSelector(options *metav1.ListOptions, name string) {
+	if name != "" {
+		options.FieldSelector = "metadata.name=" + name
 	}
 }
 
@@ -74,11 +74,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		n := client.CoreV1().Nodes()
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				nameSelector(&options, opts)
+				nameSelector(&options, opts.Node)
 				return n.List(options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				nameSelector(&options, opts)
+				nameSelector(&options, opts.Node)
 				return n.Watch(options)
 			},
 		}
@@ -88,9 +88,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		ns := client.CoreV1().Namespaces()
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				nameSelector(&options, opts.Namespace)
 				return ns.List(options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				nameSelector(&options, opts.Namespace)
 				return ns.Watch(options)
 			},
 		}

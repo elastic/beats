@@ -27,13 +27,17 @@ import (
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
-type Resource = Config
+type Resource struct {
+	config *Config
+}
 
 func NewResourceMetadataGenerator(cfg *common.Config) *Resource {
 	config := defaultConfig()
 	config.Unmarshal(cfg)
 
-	return &config
+	return &Resource{
+		config: &config,
+	}
 }
 
 func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
@@ -48,9 +52,9 @@ func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 	}
 
 	labelMap := common.MapStr{}
-	if len(r.IncludeLabels) == 0 {
+	if len(r.config.IncludeLabels) == 0 {
 		for k, v := range accessor.GetLabels() {
-			if r.LabelsDedot {
+			if r.config.LabelsDedot {
 				label := common.DeDot(k)
 				labelMap.Put(label, v)
 			} else {
@@ -58,15 +62,15 @@ func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 			}
 		}
 	} else {
-		labelMap = generateMapSubset(accessor.GetLabels(), r.IncludeLabels, r.LabelsDedot)
+		labelMap = generateMapSubset(accessor.GetLabels(), r.config.IncludeLabels, r.config.LabelsDedot)
 	}
 
 	// Exclude any labels that are present in the exclude_labels config
-	for _, label := range r.ExcludeLabels {
+	for _, label := range r.config.ExcludeLabels {
 		labelMap.Delete(label)
 	}
 
-	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.IncludeAnnotations, r.AnnotationsDedot)
+	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.AnnotationsDedot)
 	resource := strings.ToLower(typeAccessor.GetKind())
 
 	meta := common.MapStr{
@@ -81,7 +85,7 @@ func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 	}
 
 	// Add controller metadata if present
-	if r.IncludeCreatorMetadata {
+	if r.config.IncludeCreatorMetadata {
 		for _, ref := range accessor.GetOwnerReferences() {
 			if ref.Controller != nil && *ref.Controller {
 				switch ref.Kind {

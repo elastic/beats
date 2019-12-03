@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
 type pod struct {
@@ -53,16 +52,21 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName)
-		safemapstr.Put(out, "node", meta)
+		if meta != nil {
+			out.Put("node", meta["node"])
+		} else {
+			out.Put("node.name", po.Spec.NodeName)
+		}
 	} else {
-		safemapstr.Put(out, "node.name", po.Spec.NodeName)
+		out.Put("node.name", po.Spec.NodeName)
 	}
 
 	if p.namespace != nil {
 		meta := p.namespace.GenerateFromName(po.GetNamespace())
-		safemapstr.Put(out, "namespace", meta)
+		if meta != nil {
+			out.Put("namespace", meta["namespace"])
+		}
 	}
-
 	return out
 }
 

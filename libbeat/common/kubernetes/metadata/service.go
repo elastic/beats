@@ -20,8 +20,6 @@ package metadata
 import (
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
@@ -52,7 +50,9 @@ func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common
 
 	if s.namespace != nil {
 		meta := s.namespace.GenerateFromName(svc.GetNamespace())
-		safemapstr.Put(out, "namespace", meta)
+		if meta != nil {
+			out.Put("namespace", meta["namespace"])
+		}
 	}
 
 	return out

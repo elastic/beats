@@ -33,8 +33,8 @@ type Config struct {
 }
 
 type AddResourceMetadataConfig struct {
-	Node      *common.Config `config:"config"`
-	Namespace *common.Config `config:"config"`
+	Node      *common.Config `config:"node"`
+	Namespace *common.Config `config:"namespace"`
 }
 
 func defaultConfig() Config {

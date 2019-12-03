@@ -56,6 +56,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
+		Namespace: config.Namespace,
 	}, nil)
 
 	if err != nil {
@@ -69,6 +70,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 		if metaConf.Namespace != nil && metaConf.Namespace.Enabled() {
 			namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 				SyncTimeout: config.SyncPeriod,
+				Namespace:   config.Namespace,
 			}, nil)
 			if err != nil {
 				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
@@ -83,6 +85,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 		uuid:    uuid,
 		publish: publish,
 		metagen: metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta),
+		namespaceWatcher: namespaceWatcher,
 		logger:  logger,
 		watcher: watcher,
 	}
@@ -93,7 +96,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 
 // OnAdd ensures processing of service objects that are newly created
 func (s *service) OnAdd(obj interface{}) {
-	s.logger.Debugf("Watcher Node add: %+v", obj)
+	s.logger.Debugf("Watcher service add: %+v", obj)
 	s.emit(obj.(*kubernetes.Service), "start")
 }
 
@@ -104,7 +107,7 @@ func (s *service) OnUpdate(obj interface{}) {
 	if svc.GetObjectMeta().GetDeletionTimestamp() != nil {
 		time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(svc, "stop") })
 	} else {
-		s.logger.Debugf("Watcher Node update: %+v", obj)
+		s.logger.Debugf("Watcher service update: %+v", obj)
 		s.emit(svc, "stop")
 		s.emit(svc, "start")
 	}
@@ -112,7 +115,7 @@ func (s *service) OnUpdate(obj interface{}) {
 
 // OnDelete ensures processing of service objects that are deleted
 func (s *service) OnDelete(obj interface{}) {
-	s.logger.Debugf("Watcher Node delete: %+v", obj)
+	s.logger.Debugf("Watcher service delete: %+v", obj)
 	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(obj.(*kubernetes.Service), "stop") })
 }
 
@@ -152,12 +155,21 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 
 // Start starts the eventer
 func (s *service) Start() error {
+	if s.namespaceWatcher != nil {
+		if err := s.namespaceWatcher.Start(); err != nil {
+			return err
+		}
+	}
 	return s.watcher.Start()
 }
 
 // Stop stops the eventer
 func (s *service) Stop() {
 	s.watcher.Stop()
+
+	if s.namespaceWatcher != nil {
+		s.namespaceWatcher.Stop()
+	}
 }
 
 func (s *service) emit(svc *kubernetes.Service, flag string) {
