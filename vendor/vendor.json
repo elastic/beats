@@ -79,6 +79,96 @@
 			"revisionTime": "2019-07-18T21:44:46Z"
 		},
 		{
+			"checksumSHA1": "HQcIMbB77iOZ4CEQApiZ2i0KvTw=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "vtpnUL+bIYMLIL1/ZFoy5lQJHLk=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/aad",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "QNAsD7SqjAJLGXLD4HCvtrdtzNY=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/auth",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "cedNNdMLDJHfjY7g7nPcoS00Byg=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/cbs",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "3CJsOEbWH2SripSXsqOXSCmPsrM=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/conn",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "6ihpRHHPLnLyc+0dGF4r0Uw2U5Y=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/internal",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "amwT7CTU4VDvX5WYMv7hLj4TcLI=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/internal/tracing",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "EJtmas7BlFbGP5sJfxEI2J6p8W0=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/rpc",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "iKe0+JlmiuxOTaeRKI6mh5a8jiA=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/sas",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "14QZbiy023Zn3cjbQrzg5/NPg2E=",
+			"path": "github.com/Azure/azure-amqp-common-go/v2/uuid",
+			"revision": "a53768da34b4eb6279e7956c669b029256488960",
+			"revisionTime": "2019-09-20T05:42:36Z"
+		},
+		{
+			"checksumSHA1": "JJSP/FKdUhcSjAnn0EG3Z+tmMCM=",
+			"path": "github.com/Azure/azure-event-hubs-go/v2",
+			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
+			"revisionTime": "2019-10-25T17:10:56Z"
+		},
+		{
+			"checksumSHA1": "sWr58u5em31rGEvfNKdavd1yWhc=",
+			"path": "github.com/Azure/azure-event-hubs-go/v2/atom",
+			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
+			"revisionTime": "2019-10-25T17:10:56Z"
+		},
+		{
+			"checksumSHA1": "CO+TERG7OPcR9vFbskSk60+xpeI=",
+			"path": "github.com/Azure/azure-event-hubs-go/v2/eph",
+			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
+			"revisionTime": "2019-10-25T17:10:56Z"
+		},
+		{
+			"checksumSHA1": "zHin56hacLawiVqznvHDJIhKrzc=",
+			"path": "github.com/Azure/azure-event-hubs-go/v2/persist",
+			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
+			"revisionTime": "2019-10-25T17:10:56Z"
+		},
+		{
+			"checksumSHA1": "GVp7N0DIODyCsll/xnTh+oCRC+0=",
+			"path": "github.com/Azure/azure-sdk-for-go/services/eventhub/mgmt/2017-04-01/eventhub",
+			"revision": "0820c0553d6c410603056869f7b0e52d61ce5bee",
+			"revisionTime": "2019-11-18T06:05:48Z"
+		},
+		{
 			"checksumSHA1": "ngNSB6sT1BYbWf0U6wuld3pIRXM=",
 			"path": "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights",
 			"revision": "7a9d2769e4a581b0b1bc609c71b59af043e05c98",
@@ -873,6 +963,12 @@
 			"path": "github.com/denisenkom/go-mssqldb/internal/cp",
 			"revision": "4e0d7dc8888fbb59764060e99b7b68e77a6f9698",
 			"revisionTime": "2018-10-14T14:49:52Z"
+		},
+		{
+			"checksumSHA1": "9JQRv6+pOd3p+594rtCqIn5tYLM=",
+			"path": "github.com/devigned/tab",
+			"revision": "0c15cf42f9a213a393bbc9ddbd13c231c7a36af0",
+			"revisionTime": "2019-06-07T22:24:03Z"
 		},
 		{
 			"checksumSHA1": "0cytTxS0qPVjtknc7OrfuNmxvBE=",
@@ -2437,6 +2533,12 @@
 			"revisionTime": "2014-01-24T17:37:10Z"
 		},
 		{
+			"checksumSHA1": "eH5fWNpm9ZUA195fLBNe7gyUU9k=",
+			"path": "github.com/jpillora/backoff",
+			"revision": "d80867952dff4e2fbfb4280ded4ff94d67790457",
+			"revisionTime": "2019-10-03T12:57:08Z"
+		},
+		{
 			"checksumSHA1": "4DgEcOv2o9NyZAHCbdS76mToqpU=",
 			"path": "github.com/json-iterator/go",
 			"revision": "27518f6661eba504be5a7a9a9f6d9460d892ade3",
@@ -2620,10 +2722,12 @@
 			"revisionTime": "2017-01-16T05:20:23Z"
 		},
 		{
-			"checksumSHA1": "+OwSloMUOgkUXkJmGr7pQyNsh4Q=",
+			"checksumSHA1": "D0sCJA0nRJ9GP3xcnPpkSkqHZQE=",
 			"path": "github.com/mitchellh/mapstructure",
-			"revision": "740c764bc6149d3f1806231418adb9f52c11bcbf",
-			"revisionTime": "2014-07-21T15:06:20Z"
+			"revision": "3536a929edddb9a5b34bd6861dc4a9647cb459fe",
+			"revisionTime": "2018-10-05T04:51:35Z",
+			"version": "v1.1.2",
+			"versionExact": "v1.1.2"
 		},
 		{
 			"checksumSHA1": "ZTcgWKWHsrX0RXYVXn5Xeb8Q0go=",
@@ -3427,6 +3531,12 @@
 			"path": "golang.org/x/net/trace",
 			"revision": "d28f0bde5980168871434b95cfc858db9f2a7a99",
 			"revisionTime": "2019-06-13T09:12:16Z"
+		},
+		{
+			"checksumSHA1": "n3mE8lM/N2dNMAZVtawNQR6DhGk=",
+			"path": "golang.org/x/net/websocket",
+			"revision": "ef20fe5d793301b553005db740f730d87993f778",
+			"revisionTime": "2019-11-25T22:01:29Z"
 		},
 		{
 			"checksumSHA1": "uRlaEkyMCxyjj57KBa81GEfvCwg=",
@@ -5505,6 +5615,18 @@
 			"path": "k8s.io/utils/trace",
 			"revision": "3dccf664f023863740c508fb4284e49742bedfa4",
 			"revisionTime": "2019-07-12T20:47:05Z"
+		},
+		{
+			"checksumSHA1": "u5HnoVf8q9jCzImIBi6aNiSPFlM=",
+			"path": "pack.ag/amqp",
+			"revision": "ddf76e6b06138e7e73606c99f40d6f21a02c0be5",
+			"revisionTime": "2019-12-02T23:41:47Z"
+		},
+		{
+			"checksumSHA1": "AzKkoCvCPLKwVqwEdx4JwY0td88=",
+			"path": "pack.ag/amqp/internal/testconn",
+			"revision": "ddf76e6b06138e7e73606c99f40d6f21a02c0be5",
+			"revisionTime": "2019-12-02T23:41:47Z"
 		},
 		{
 			"checksumSHA1": "ZExWoMcqJ9WKc9KMJQUtIST3nTc=",

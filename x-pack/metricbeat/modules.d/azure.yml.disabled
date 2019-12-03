@@ -16,17 +16,6 @@
 #    metrics:
 #    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
 #      namespace: "Microsoft.DocumentDb/databaseAccounts"
-       dimensions: "Slotid"
-     - name : ["dsds"m]
-       namespace: "vmname"
-
-      - name :["*"]
-        namespace: "Microsoft.DocumentDb/databaseAccounts"
-        agregations: ["Avg", "Sum"]
-        dimensions:
-          - name: "*"
-            value: ["*"]
-
 
 
 #- module: azure

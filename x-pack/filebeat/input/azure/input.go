@@ -14,8 +14,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/pkg/errors"
 
-	"github.com/Azure/azure-event-hubs-go"
-	"github.com/Azure/azure-event-hubs-go/eph"
+	"github.com/Azure/azure-event-hubs-go/v2"
+	"github.com/Azure/azure-event-hubs-go/v2/eph"
 )
 
 var eventHubConnector = ";EntityPath="
@@ -31,6 +31,7 @@ type azureInput struct {
 	workerCancel context.CancelFunc // Used to signal that the worker should stop.
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
+	processor    *eph.EventProcessorHost
 }
 
 func init() {
@@ -113,8 +114,12 @@ func (a *azureInput) run() error {
 	if leaserCheckpointer == nil {
 		// handle err
 	}
-
-	processor, err := eph.NewFromConnectionString(ctx, a.config.ConnectionString + eventHubConnector + a.config.EventHubName, leaserCheckpointer, leaserCheckpointer)
+	var opt eph.EventProcessorHostOption
+    if a.config.ConsumerGroup!= "" {
+    	opt = eph.WithConsumerGroup(a.config.ConsumerGroup)
+	}
+	_= opt
+	processor, err := eph.NewFromConnectionString(ctx, a.config.ConnectionString + eventHubConnector + a.config.EventHubName, leaserCheckpointer, leaserCheckpointer, opt)
 	if err != nil {
 		return err
 	}
@@ -144,10 +149,10 @@ func (a *azureInput) run() error {
 	//signal.Notify(signalChan, os.Interrupt, os.Kill)
 	//<-signalChan
 
-	err = processor.Close(ctx)
-	if err != nil {
-		return err
-	}
+	//err = processor.Close(ctx)
+	//if err != nil {
+	//	return err
+	//}
 	return nil
 }
 

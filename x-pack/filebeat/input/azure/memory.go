@@ -6,13 +6,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Azure/azure-event-hubs-go"
-	"github.com/Azure/azure-event-hubs-go/eph"
+	"github.com/Azure/azure-event-hubs-go/v2"
+	"github.com/Azure/azure-event-hubs-go/v2/eph"
 
 	"github.com/Azure/azure-amqp-common-go/v2/uuid"
 	"github.com/devigned/tab"
 
-	"github.com/Azure/azure-event-hubs-go/persist"
+	"github.com/Azure/azure-event-hubs-go/v2/persist"
 
 )
 
@@ -181,6 +181,11 @@ func (l *MemoryLease) IsExpired(_ context.Context) bool {
 
 func (l *MemoryLease) expireAfter(d time.Duration) {
 	l.expirationTime = time.Now().Add(d)
+}
+
+// GetEpoch returns the value of the epoch
+func (l *MemoryLease) GetEpoch() int64 {
+	return l.Epoch
 }
 
 func NewMemoryLeaserCheckpointer(leaseDuration time.Duration, store *SharedStore) *MemoryLeaserCheckpointer {
