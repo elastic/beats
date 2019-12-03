@@ -5,8 +5,11 @@ RUN \
       && apt-get install -y --no-install-recommends \
          python-pip \
          virtualenv \
+         python3 \
          librpm-dev \
       && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHON_ENV=/tmp/python-env
 
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools

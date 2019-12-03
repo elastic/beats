@@ -7,8 +7,11 @@ RUN \
          python-pip \
          rsync \
          virtualenv \
+         python3 \
          libpcap-dev \
       && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHON_ENV=/tmp/python-env
 
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
