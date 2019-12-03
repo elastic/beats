@@ -43,7 +43,7 @@ you plan to monitor {beatname_uc} in {kib} and have not yet set up the
 password, set it up now.
 
 For more information about {security}, see
-{xpack-ref}/xpack-security.html[Securing the {stack}].
+{ref}/elasticsearch-security.html[Security overview].
 
 [[feature-roles]]
 === {beatname_uc} features that require authorization
