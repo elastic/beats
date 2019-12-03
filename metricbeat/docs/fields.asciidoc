@@ -29366,13 +29366,13 @@ type: keyword
 
 --
 
-*`stan.server.time`*::
+*`stan.cluster.id`*::
 +
 --
-Server time of metric creation
+The cluster ID
 
 
-type: date
+type: keyword
 
 --
 
