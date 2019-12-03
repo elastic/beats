@@ -21,6 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
@@ -175,6 +177,11 @@ func TestEmitEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Pod",
+		APIVersion: "v1",
+	}
+
 	tests := []struct {
 		Message  string
 		Flag     string
@@ -192,6 +199,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
@@ -233,12 +241,16 @@ func TestEmitEvent(t *testing.T) {
 					"node": common.MapStr{
 						"name": "node",
 					},
-					"namespace":   "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": "default",
+						"namespace": common.MapStr{
+							"name": "default",
+						},
 						"container": common.MapStr{
 							"name":  "filebeat",
 							"image": "elastic/filebeat:6.3.0",
@@ -264,6 +276,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
@@ -295,6 +308,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
@@ -326,6 +340,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
@@ -362,12 +377,16 @@ func TestEmitEvent(t *testing.T) {
 					"node": common.MapStr{
 						"name": "node",
 					},
-					"namespace":   "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": "default",
+						"namespace": common.MapStr{
+							"name": "default",
+						},
 						"container": common.MapStr{
 							"name":  "filebeat",
 							"image": "elastic/filebeat:6.3.0",
@@ -393,6 +412,7 @@ func TestEmitEvent(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.PodStatus{
 					PodIP: podIP,
 					ContainerStatuses: []kubernetes.PodContainerStatus{
@@ -430,12 +450,16 @@ func TestEmitEvent(t *testing.T) {
 					"node": common.MapStr{
 						"name": "node",
 					},
-					"namespace":   "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": "default",
+						"namespace": common.MapStr{
+							"name": "default",
+						},
 						"container": common.MapStr{
 							"name":  "filebeat",
 							"image": "elastic/filebeat:6.3.0",
@@ -459,11 +483,7 @@ func TestEmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New("test"),

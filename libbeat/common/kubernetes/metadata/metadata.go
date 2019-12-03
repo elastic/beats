@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
-// MetaGen allows creation of metadata from either Kubernetes resources or their resource names.
+// MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
 type MetaGen interface {
 	Generate(kubernetes.Resource, ...FieldOptions) common.MapStr
 	GenerateFromName(string, ...FieldOptions) common.MapStr

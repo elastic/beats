@@ -26,7 +26,7 @@ import (
 
 type namespace struct {
 	store    cache.Store
-	resource *resource
+	resource *Resource
 }
 
 func NewNamespaceMetadataGenerator(cfg *common.Config, namespaces cache.Store) MetaGen {

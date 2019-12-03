@@ -169,7 +169,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	}
 
 	eventID := fmt.Sprint(node.GetObjectMeta().GetUID())
-	meta := n.metagen.Generate(node, metadata.WithFields("node.name", node.Name), metadata.WithFields("node.uid"))
+	meta := n.metagen.Generate(node)
 
 	kubemeta := meta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.

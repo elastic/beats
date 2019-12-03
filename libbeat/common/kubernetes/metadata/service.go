@@ -29,7 +29,7 @@ import (
 type service struct {
 	store     cache.Store
 	namespace MetaGen
-	resource  *resource
+	resource  *Resource
 }
 
 func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, namespace MetaGen) MetaGen {
@@ -43,7 +43,7 @@ func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, names
 }
 
 func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
-	po, ok := obj.(*kubernetes.Pod)
+	svc, ok := obj.(*kubernetes.Service)
 	if !ok {
 		return nil
 	}
@@ -51,7 +51,7 @@ func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common
 	out := s.resource.Generate(obj, opts...)
 
 	if s.namespace != nil {
-		meta := s.namespace.GenerateFromName(po.GetNamespace())
+		meta := s.namespace.GenerateFromName(svc.GetNamespace())
 		safemapstr.Put(out, "namespace", meta)
 	}
 
@@ -64,12 +64,12 @@ func (s *service) GenerateFromName(name string, opts ...FieldOptions) common.Map
 	}
 
 	if obj, ok, _ := s.store.GetByKey(name); ok {
-		po, ok := obj.(*kubernetes.Pod)
+		svc, ok := obj.(*kubernetes.Service)
 		if !ok {
 			return nil
 		}
 
-		return s.Generate(po, opts...)
+		return s.Generate(svc, opts...)
 	} else {
 		return nil
 	}

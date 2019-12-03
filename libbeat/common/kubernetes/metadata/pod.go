@@ -29,7 +29,7 @@ type pod struct {
 	store     cache.Store
 	node      MetaGen
 	namespace MetaGen
-	resource  *resource
+	resource  *Resource
 }
 
 func NewPodMetadataGenerator(cfg *common.Config, pods cache.Store, node MetaGen, namespace MetaGen) MetaGen {

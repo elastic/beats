@@ -26,7 +26,7 @@ import (
 
 type node struct {
 	store    cache.Store
-	resource *resource
+	resource *Resource
 }
 
 func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store) MetaGen {

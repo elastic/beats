@@ -27,16 +27,16 @@ import (
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
-type resource = Config
+type Resource = Config
 
-func NewResourceMetadataGenerator(cfg *common.Config) *resource {
+func NewResourceMetadataGenerator(cfg *common.Config) *Resource {
 	config := defaultConfig()
 	config.Unmarshal(cfg)
 
 	return &config
 }
 
-func (r *resource) Generate(obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
+func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return nil
@@ -72,7 +72,7 @@ func (r *resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 	meta := common.MapStr{
 		resource: common.MapStr{
 			"name": accessor.GetName(),
-			"uid":  accessor.GetUID(),
+			"uid":  string(accessor.GetUID()),
 		},
 	}
 
@@ -101,6 +101,10 @@ func (r *resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 
 	if len(annotationsMap) != 0 {
 		safemapstr.Put(meta, resource+".annotations", annotationsMap)
+	}
+
+	for _, option := range options {
+		option(meta)
 	}
 
 	return meta
