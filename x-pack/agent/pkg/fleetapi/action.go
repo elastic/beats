@@ -19,38 +19,38 @@ type Action interface {
 	ID() string
 }
 
-// BaseAction is the base of all actions to be executed.
-type BaseAction struct {
+// ActionBase is the base of all actions to be executed.
+type ActionBase struct {
 	ActionID   string
 	ActionType string
 }
 
 // Type returns the action type.
-func (a *BaseAction) Type() string {
+func (a *ActionBase) Type() string {
 	return a.ActionType
 }
 
 // ID returns the action ID.
-func (a *BaseAction) ID() string {
+func (a *ActionBase) ID() string {
 	return a.ActionID
 }
 
-// UnknownAction is an action that is not know by the current version of the Agent and we don't want
+// ActionUnknown is an action that is not know by the current version of the Agent and we don't want
 // to return an error at parsing time but at execution time we can report or ignore.
 //
 // NOTE: We only keep the original type and the action id, the payload of the event is dropped, we
 // do this to make sure we do not leak any unwanted information.
-type UnknownAction struct {
-	*BaseAction
+type ActionUnknown struct {
+	*ActionBase
 	originalType string
 }
 
 // Type returns the type of the Action.
-func (a *UnknownAction) Type() string {
+func (a *ActionUnknown) Type() string {
 	return "UNKNOWN"
 }
 
-func (a *UnknownAction) String() string {
+func (a *ActionUnknown) String() string {
 	var s strings.Builder
 	s.WriteString("action_id: ")
 	s.WriteString(a.ID())
@@ -63,17 +63,17 @@ func (a *UnknownAction) String() string {
 }
 
 // OriginalType returns the original type of the action as returned by the API.
-func (a *UnknownAction) OriginalType() string {
+func (a *ActionUnknown) OriginalType() string {
 	return a.originalType
 }
 
-// PolicyChangeAction is a request to apply a new
-type PolicyChangeAction struct {
-	*BaseAction
+// ActionPolicyChange is a request to apply a new
+type ActionPolicyChange struct {
+	*ActionBase
 	Policy map[string]interface{} `json:"policy"`
 }
 
-func (a *PolicyChangeAction) String() string {
+func (a *ActionPolicyChange) String() string {
 	var s strings.Builder
 	s.WriteString("action_id: ")
 	s.WriteString(a.ID())
@@ -105,8 +105,8 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 	for _, response := range responses {
 		switch response.ActionType {
 		case "POLICY_CHANGE":
-			action = &PolicyChangeAction{
-				BaseAction: &BaseAction{
+			action = &ActionPolicyChange{
+				ActionBase: &ActionBase{
 					ActionID:   response.ActionID,
 					ActionType: response.ActionType,
 				},
@@ -115,8 +115,8 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				return errors.Wrap(err, "fail to decode POLICY_CHANGE action")
 			}
 		default:
-			action = &UnknownAction{
-				BaseAction:   &BaseAction{ActionID: response.ActionID, ActionType: "UNKNOWN"},
+			action = &ActionUnknown{
+				ActionBase:   &ActionBase{ActionID: response.ActionID, ActionType: "UNKNOWN"},
 				originalType: response.ActionType,
 			}
 		}

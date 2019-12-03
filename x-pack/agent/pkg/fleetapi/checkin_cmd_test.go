@@ -62,8 +62,8 @@ func TestCheckin(t *testing.T) {
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			action := &PolicyChangeAction{
-				BaseAction: &BaseAction{
+			action := &ActionPolicyChange{
+				ActionBase: &ActionBase{
 					ActionID:   "my-id",
 					ActionType: "POLICY_CHANGE",
 				},
@@ -164,7 +164,7 @@ Something went wrong
 
 			require.Equal(t, 1, len(r.Actions))
 
-			// PolicyChangeAction
+			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
 			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
 		},
@@ -226,14 +226,14 @@ Something went wrong
 
 			require.Equal(t, 2, len(r.Actions))
 
-			// PolicyChangeAction
+			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
 			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
 
 			// UnknownAction
 			require.Equal(t, "id2", r.Actions[1].ID())
 			require.Equal(t, "UNKNOWN", r.Actions[1].Type())
-			require.Equal(t, "WHAT_TO_DO_WITH_IT", r.Actions[1].(*UnknownAction).OriginalType())
+			require.Equal(t, "WHAT_TO_DO_WITH_IT", r.Actions[1].(*ActionUnknown).OriginalType())
 		},
 	))
 
