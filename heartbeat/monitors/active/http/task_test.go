@@ -178,7 +178,7 @@ func TestRequestBuildingWithNoUserAgent(t *testing.T) {
 	request, err := buildRequest("localhost", &Config{}, nilEncoder{})
 
 	require.Nil(t, err)
-	assert.Equal(t, useragent.UserAgent("Heartbeat"), request.Header.Get("User-Agent"))
+	assert.Equal(t, useragent.UserAgent("Heartbeat", true), request.Header.Get("User-Agent"))
 }
 
 func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {

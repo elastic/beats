@@ -20,7 +20,8 @@ class TestCommandSetupIndexManagement(BaseTest):
 
         self.cmd = "--index-management"
         # auto-derived default settings, if nothing else is set
-        self.index_name = self.alias_name = self.policy_name = self.beat_name + "-9.9.9"
+        self.policy_name = self.beat_name
+        self.index_name = self.alias_name = self.beat_name + "-9.9.9"
 
         self.custom_alias = self.beat_name + "_foo"
         self.custom_policy = self.beat_name + "_bar"
@@ -28,13 +29,15 @@ class TestCommandSetupIndexManagement(BaseTest):
 
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
+                            policies=[self.policy_name, self.custom_policy])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -94,7 +97,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_index_template_not_loaded(self.index_name)
         self.idxmgmt.assert_alias_created(self.index_name)
-        self.idxmgmt.assert_policy_created(self.index_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -126,6 +129,53 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
         self.idxmgmt.assert_policy_created(self.custom_policy)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_ilm_policy_no_overwrite(self):
+        """
+        Test setup --index-management respects overwrite configuration
+        """
+        policy_name = "mockbeat-test"
+        # update policy to verify overwrite behaviour
+        self.es.transport.perform_request('PUT', '/_ilm/policy/' + policy_name,
+                                          body={
+                                              "policy": {
+                                                 "phases": {
+                                                     "delete": {
+                                                         "actions": {
+                                                             "delete": {}
+                                                         }
+                                                     }
+                                                 }
+                                              }
+                                          })
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
+        assert "delete" in resp[policy_name]["policy"]["phases"]
+        assert "hot" not in resp[policy_name]["policy"]["phases"]
+
+        # ensure ilm policy is not overwritten
+        self.render_config()
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
+                                              "-E", "setup.ilm.enabled=true",
+                                              "-E", "setup.ilm.overwrite=false",
+                                              "-E", "setup.ilm.policy_name="+policy_name])
+        assert exit_code == 0
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
+        assert "delete" in resp[policy_name]["policy"]["phases"]
+        assert "hot" not in resp[policy_name]["policy"]["phases"]
+
+        # ensure ilm policy is overwritten
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
+                                              "-E", "setup.ilm.enabled=true",
+                                              "-E", "setup.ilm.overwrite=true",
+                                              "-E", "setup.ilm.policy_name="+policy_name])
+        assert exit_code == 0
+        resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
+        assert "delete" not in resp[policy_name]["policy"]["phases"]
+        assert "hot" in resp[policy_name]["policy"]["phases"]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -239,7 +289,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.pattern=" + self.custom_alias + "*"])
         assert exit_code == 0
         self.idxmgmt.assert_index_template_loaded(self.custom_alias)
-        self.idxmgmt.assert_policy_not_created(self.index_name)
+        self.idxmgmt.assert_policy_not_created(self.policy_name)
 
         # ensure ilm policy is created, triggering overwriting existing template
         exit_code = self.run_beat(extra_args=["setup", self.cmd,
@@ -247,8 +297,8 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2",
                                               "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.index_name, self.custom_alias)
-        self.idxmgmt.assert_policy_created(self.index_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_policy_created(self.policy_name)
         # check that template was overwritten
         resp = self.es.transport.perform_request('GET', '/_template/' + self.custom_alias)
         assert self.custom_alias in resp

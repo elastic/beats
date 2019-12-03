@@ -24,7 +24,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUserAgent(t *testing.T) {
-	ua := UserAgent("FakeBeat")
+func TestUserAgentNoDash(t *testing.T) {
+	ua := UserAgent("FakeBeat", false)
 	assert.Regexp(t, regexp.MustCompile("^Elastic FakeBeat"), ua)
+}
+
+func TestUserAgentDash(t *testing.T) {
+	ua := UserAgent("FakeBeat", true)
+	assert.Regexp(t, regexp.MustCompile("^Elastic-FakeBeat"), ua)
 }
