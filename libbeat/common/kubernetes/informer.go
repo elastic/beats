@@ -39,6 +39,7 @@ func nameSelector(options *metav1.ListOptions, name string) {
 	}
 }
 
+// NewInformer creates an informer for a given resource
 func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (cache.SharedInformer, string, error) {
 	var objType string
 

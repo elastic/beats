@@ -31,6 +31,7 @@ type pod struct {
 	resource  *Resource
 }
 
+// NewPodMetadataGenerator creates a metagen for pod resources
 func NewPodMetadataGenerator(cfg *common.Config, pods cache.Store, node MetaGen, namespace MetaGen) MetaGen {
 	po := &pod{
 		resource:  NewResourceMetadataGenerator(cfg),
@@ -42,13 +43,14 @@ func NewPodMetadataGenerator(cfg *common.Config, pods cache.Store, node MetaGen,
 	return po
 }
 
+// Generate generates pod metadata from a resource object
 func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
 	po, ok := obj.(*kubernetes.Pod)
 	if !ok {
 		return nil
 	}
 
-	out := p.resource.Generate(obj, opts...)
+	out := p.resource.Generate("pod", obj, opts...)
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName)
@@ -70,6 +72,7 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 	return out
 }
 
+// GenerateFromName generates pod metadata from a pod name
 func (p *pod) GenerateFromName(name string, opts ...FieldOptions) common.MapStr {
 	if p.store == nil {
 		return nil

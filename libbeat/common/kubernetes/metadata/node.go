@@ -29,6 +29,7 @@ type node struct {
 	resource *Resource
 }
 
+// NewNodeMetadataGenerator creates a metagen for service resources
 func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store) MetaGen {
 	no := &node{
 		resource: NewResourceMetadataGenerator(cfg),
@@ -38,17 +39,19 @@ func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store) MetaGen {
 	return no
 }
 
+// Generate generates service metadata from a resource object
 func (n *node) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
 	_, ok := obj.(*kubernetes.Node)
 	if !ok {
 		return nil
 	}
 
-	meta := n.resource.Generate(obj, opts...)
+	meta := n.resource.Generate("node", obj, opts...)
 	// TODO: Add extra fields in here if need be
 	return meta
 }
 
+// GenerateFromName generates pod metadata from a service name
 func (n *node) GenerateFromName(name string, opts ...FieldOptions) common.MapStr {
 	if n.store == nil {
 		return nil

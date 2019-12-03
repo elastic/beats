@@ -150,10 +150,18 @@ func NewResourceMetadataEnricher(
 					}
 				}
 
-				m[id] = metaGen.Generate(r)
+				m[id] = metaGen.Generate("node", r)
 
+			case *kubernetes.Deployment:
+				m[id] = metaGen.Generate("deployment", r)
+			case *kubernetes.StatefulSet:
+				m[id] = metaGen.Generate("statefulset", r)
+			case *kubernetes.Namespace:
+				m[id] = metaGen.Generate("namespace", r)
+			case *kubernetes.ReplicaSet:
+				m[id] = metaGen.Generate("replicaset", r)
 			default:
-				m[id] = metaGen.Generate(r)
+				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
 		},
 		// delete

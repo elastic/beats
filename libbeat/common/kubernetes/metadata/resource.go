@@ -27,10 +27,12 @@ import (
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
+// Resource generates metadata for any kubernetes resource
 type Resource struct {
 	config *Config
 }
 
+// NewResourceMetadataGenerator creates a metadata generator for a generic resource
 func NewResourceMetadataGenerator(cfg *common.Config) *Resource {
 	config := defaultConfig()
 	config.Unmarshal(cfg)
@@ -40,13 +42,9 @@ func NewResourceMetadataGenerator(cfg *common.Config) *Resource {
 	}
 }
 
-func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
+// Generate takes a kind and an object and creates metadata for the same
+func (r *Resource) Generate(kind string, obj kubernetes.Resource, options ...FieldOptions) common.MapStr {
 	accessor, err := meta.Accessor(obj)
-	if err != nil {
-		return nil
-	}
-
-	typeAccessor, err := meta.TypeAccessor(obj)
 	if err != nil {
 		return nil
 	}
@@ -71,10 +69,9 @@ func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 	}
 
 	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.AnnotationsDedot)
-	resource := strings.ToLower(typeAccessor.GetKind())
 
 	meta := common.MapStr{
-		resource: common.MapStr{
+		strings.ToLower(kind): common.MapStr{
 			"name": accessor.GetName(),
 			"uid":  string(accessor.GetUID()),
 		},
@@ -100,11 +97,11 @@ func (r *Resource) Generate(obj kubernetes.Resource, options ...FieldOptions) co
 	}
 
 	if len(labelMap) != 0 {
-		safemapstr.Put(meta, resource+".labels", labelMap)
+		safemapstr.Put(meta, strings.ToLower(kind)+".labels", labelMap)
 	}
 
 	if len(annotationsMap) != 0 {
-		safemapstr.Put(meta, resource+".annotations", annotationsMap)
+		safemapstr.Put(meta, strings.ToLower(kind)+".annotations", annotationsMap)
 	}
 
 	for _, option := range options {

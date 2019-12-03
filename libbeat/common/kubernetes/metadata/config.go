@@ -32,6 +32,7 @@ type Config struct {
 	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 }
 
+// AddResourceMetadataConfig allows adding config for enriching additional resources
 type AddResourceMetadataConfig struct {
 	Node      *common.Config `config:"node"`
 	Namespace *common.Config `config:"namespace"`

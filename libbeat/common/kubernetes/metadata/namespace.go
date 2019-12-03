@@ -29,6 +29,7 @@ type namespace struct {
 	resource *Resource
 }
 
+// NewNamespaceMetadataGenerator creates a metagen for namespace resources
 func NewNamespaceMetadataGenerator(cfg *common.Config, namespaces cache.Store) MetaGen {
 	no := &namespace{
 		resource: NewResourceMetadataGenerator(cfg),
@@ -38,17 +39,19 @@ func NewNamespaceMetadataGenerator(cfg *common.Config, namespaces cache.Store) M
 	return no
 }
 
+// Generate generates namespace metadata from a resource object
 func (n *namespace) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
 	_, ok := obj.(*kubernetes.Namespace)
 	if !ok {
 		return nil
 	}
 
-	meta := n.resource.Generate(obj, opts...)
+	meta := n.resource.Generate("namespace", obj, opts...)
 	// TODO: Add extra fields in here if need be
 	return meta
 }
 
+// GenerateFromName generates pod metadata from a namespace name
 func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.MapStr {
 	if n.store == nil {
 		return nil

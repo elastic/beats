@@ -56,7 +56,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
-		Namespace: config.Namespace,
+		Namespace:   config.Namespace,
 	}, nil)
 
 	if err != nil {
@@ -81,13 +81,13 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 	}
 
 	p := &service{
-		config:  config,
-		uuid:    uuid,
-		publish: publish,
-		metagen: metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta),
+		config:           config,
+		uuid:             uuid,
+		publish:          publish,
+		metagen:          metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta),
 		namespaceWatcher: namespaceWatcher,
-		logger:  logger,
-		watcher: watcher,
+		logger:           logger,
+		watcher:          watcher,
 	}
 
 	watcher.AddEventHandler(p)
