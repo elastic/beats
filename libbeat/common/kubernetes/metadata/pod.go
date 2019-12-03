@@ -85,7 +85,7 @@ func (p *pod) GenerateFromName(name string, opts ...FieldOptions) common.MapStr 
 		}
 
 		return p.Generate(po, opts...)
-	} else {
-		return nil
 	}
+
+	return nil
 }

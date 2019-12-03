@@ -64,7 +64,7 @@ func (n *node) GenerateFromName(name string, opts ...FieldOptions) common.MapStr
 		}
 
 		return n.Generate(no, opts...)
-	} else {
-		return nil
 	}
+
+	return nil
 }

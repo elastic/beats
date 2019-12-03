@@ -46,6 +46,7 @@ func defaultConfig() Config {
 	}
 }
 
+// Unmarshal unpacks a Config into the metagen Config
 func (c *Config) Unmarshal(cfg *common.Config) error {
 	return cfg.Unpack(c)
 }

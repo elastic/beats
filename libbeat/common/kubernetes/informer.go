@@ -153,7 +153,7 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 
 	if indexers != nil {
 		return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
-	} else {
-		return cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout), objType, nil
 	}
+
+	return cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout), objType, nil
 }

@@ -73,7 +73,7 @@ func (s *service) GenerateFromName(name string, opts ...FieldOptions) common.Map
 		}
 
 		return s.Generate(svc, opts...)
-	} else {
-		return nil
 	}
+
+	return nil
 }

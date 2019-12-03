@@ -78,12 +78,12 @@ func (n NoOpEventHandlerFuncs) OnAdd(obj interface{}) {
 
 }
 
-// OnAdd does a no-op on an update event
+// OnUpdate does a no-op on an update event
 func (n NoOpEventHandlerFuncs) OnUpdate(obj interface{}) {
 
 }
 
-// OnAdd does a no-op on a delete event
+// OnDelete does a no-op on a delete event
 func (n NoOpEventHandlerFuncs) OnDelete(obj interface{}) {
 
 }
