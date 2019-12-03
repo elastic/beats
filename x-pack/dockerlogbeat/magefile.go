@@ -99,7 +99,7 @@ func Build() error {
 	return sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(packageStagingDir, "rootfs"))
 }
 
-// Clean removes working objects and containers
+// CleanDocker removes working objects and containers
 func CleanDocker() error {
 	name, err := getPluginName()
 	if err != nil {
