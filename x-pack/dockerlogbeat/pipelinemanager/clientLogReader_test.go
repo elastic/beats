@@ -19,14 +19,15 @@ import (
 
 func TestNewClient(t *testing.T) {
 	logString := "This is a log line"
-	client, teardown := setupTestClient(t, logString)
+	client, teardown := setupTestReader(t, logString)
 	defer teardown()
 
 	event := testReturn(t, client)
 	assert.Equal(t, event.Fields["message"], logString)
 }
 
-func setupTestClient(t *testing.T, logString string) (*pipelinemock.MockPipelineConnector, func()) {
+// setupTestReader sets up the "read side" of the pipeline, spawing a goroutine to read and event and send it back to the test.
+func setupTestReader(t *testing.T, logString string) (*pipelinemock.MockPipelineConnector, func()) {
 	mockConnector := &pipelinemock.MockPipelineConnector{}
 	client := createNewClient(t, logString, mockConnector)
 
@@ -43,6 +44,7 @@ func setupTestClient(t *testing.T, logString string) (*pipelinemock.MockPipeline
 	}
 }
 
+// createNewClient sets up the "write side" of the pipeline, creating a log event to write and send back into the test.
 func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock.MockPipelineConnector) *ClientLogger {
 	// an example container metadata struct
 	cfgObject := logger.Info{
@@ -63,6 +65,7 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 	return client
 }
 
+// testReturn waits in a loop until we get back an event
 func testReturn(t *testing.T, conn *pipelinemock.MockPipelineConnector) beat.Event {
 	for {
 		// wait until we get our example event back
