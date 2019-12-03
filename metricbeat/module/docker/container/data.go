@@ -29,11 +29,11 @@ import (
 
 func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool) {
 	for _, container := range containersList {
-		eventMapping(r, &container, dedot)
+		eventMapping(r, container, dedot)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
+func eventMapping(r mb.ReporterV2, cont types.Container, dedot bool) {
 	event := common.MapStr{
 		"container": common.MapStr{
 			"id": cont.ID,
