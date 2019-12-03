@@ -52,14 +52,7 @@ func TestEventMapping(t *testing.T) {
 }
 
 func TestFetchEventContent(t *testing.T) {
-	absPath, _ := filepath.Abs("./_meta/test/")
-
-	response, _ := ioutil.ReadFile(absPath + "/channels.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
-	}))
+	server := initServer()
 	defer server.Close()
 
 	config := map[string]interface{}{
@@ -77,4 +70,16 @@ func TestFetchEventContent(t *testing.T) {
 		t.Logf("[%d] %s/%s event: %+v", idx, metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 	}
 
+}
+
+func initServer() *httptest.Server {
+	absPath, _ := filepath.Abs("./_meta/test/")
+
+	response, _ := ioutil.ReadFile(absPath + "/channels.json")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json;")
+		w.Write([]byte(response))
+	}))
+	return server
 }

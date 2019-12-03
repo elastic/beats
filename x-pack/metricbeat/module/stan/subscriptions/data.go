@@ -87,7 +87,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 			}
 
 			if !r.Event(evt) {
-				r.Error(errors.New("Error emitting event"))
+				return nil
 			}
 		}
 	}

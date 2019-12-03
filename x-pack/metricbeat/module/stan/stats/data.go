@@ -46,9 +46,7 @@ func eventMapping(content []byte, r mb.ReporterV2) error {
 		ModuleFields:    moduleFields,
 	}
 	if !r.Event(event) {
-		err := errors.New("Failed to report event")
-		r.Error(err)
-		return err
+		return nil
 	}
 	return nil
 }

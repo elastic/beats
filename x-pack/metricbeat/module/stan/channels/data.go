@@ -5,10 +5,6 @@
 package channels
 
 import (
-
-	// "github.com/pkg/errors"
-
-	// "github.com/elastic/beats/libbeat/common"
 	"encoding/json"
 
 	"github.com/pkg/errors"
@@ -63,9 +59,6 @@ type Channels struct {
 func eventMapping(content map[string]interface{}) (mb.Event, error) {
 	fields, err := channelSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, err
-	}
-	if err != nil {
 		return mb.Event{}, errors.Wrap(err, "failure applying channels schema")
 	}
 
@@ -107,7 +100,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 			r.Error(errors.Wrap(err, "failure to map channel to its schema"))
 		}
 		if !r.Event(evt) {
-			r.Error(errors.New("error emitting event"))
+			return nil
 		}
 	}
 
