@@ -116,7 +116,8 @@ func NewInput(
 		WithProtocols(config.Protocols...).
 		WithExpiration(config.ExpirationTimeout).
 		WithLogOutput(&logDebugWrapper{Logger: logger}).
-		WithCustomFields(customFields...))
+		WithCustomFields(customFields...).
+		WithSequenceResetEnabled(config.DetectSequenceReset))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error initializing netflow decoder")
 	}
