@@ -9,16 +9,21 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
+	moduleSchema = s.Schema{
+		"server": s.Object{
+			"id": c.Str("server_id"),
+		},
+		"cluster": s.Object{
+			"id": c.Str("cluster_id"),
+		},
+	}
 	clientsSchema = s.Schema{
-		"cluster_id":    c.Str("cluster_id"),
-		"server_id":     c.Str("server_id"),
 		"state":         c.Str("state"),
 		"role":          c.Str("role", s.Optional), // cluster role is optional
 		"clients":       c.Int("clients"),
@@ -40,7 +45,10 @@ func eventMapping(content []byte, r mb.ReporterV2) error {
 		return errors.Wrap(err, "failure parsing Nats streaming server API response")
 	}
 
-	moduleFields := common.MapStr{}
+	moduleFields, err := moduleSchema.Apply(streaming)
+	if err != nil {
+		return errors.Wrap(err, "failure applying module schema")
+	}
 	event := mb.Event{
 		MetricSetFields: fields,
 		ModuleFields:    moduleFields,

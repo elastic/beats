@@ -1,4 +1,5 @@
 import os
+from xpack_metricbeat import XPackTest
 import metricbeat
 import unittest
 from parameterized import parameterized
@@ -6,7 +7,7 @@ from parameterized import parameterized
 STAN_FIELDS = metricbeat.COMMON_FIELDS + ["stan"]
 
 
-class TestNats(metricbeat.BaseTest):
+class TestNats(XPackTest):
 
     COMPOSE_SERVICES = ['stan']
 
