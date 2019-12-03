@@ -34,6 +34,7 @@ func TestCheckin(t *testing.T) {
 				type E struct {
 					ActionID  string    `json:"action_id"`
 					Type      string    `json:"type"`
+					SubType   string    `json:"subtype"`
 					Message   string    `json:"message"`
 					Timestamp time.Time `json:"timestamp"`
 				}
@@ -52,7 +53,8 @@ func TestCheckin(t *testing.T) {
 
 				e := responses.Events[0]
 				require.Equal(t, "my-id", e.ActionID)
-				require.Equal(t, "ACTION_ACKNOWLEDGED", e.Type)
+				require.Equal(t, "ACTION", e.Type)
+				require.Equal(t, "ACKNOWLEDGED", e.SubType)
 				require.Equal(t, "Acknowledge action my-id", e.Message)
 
 				fmt.Fprintf(w, raw)
