@@ -284,7 +284,6 @@ type Conn interface {
 	NewSubscription(string, func(Event)) (*Subscription, error)
 	Startup(StartupMode) error
 	Shutdown(ShutdownMode) error
-	NewData(baseType interface{}, SliceLen, BufSize int) ([]*Data, error)
 }
 
 // DriverConn returns the *goracle.conn of the database/sql.Conn

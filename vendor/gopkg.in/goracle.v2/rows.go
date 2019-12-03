@@ -352,12 +352,7 @@ func (r *rows) Next(dest []driver.Value) error {
 				dest[i] = printFloat(float64(C.dpiData_getDouble(d)))
 			default:
 				b := C.dpiData_getBytes(d)
-				s := C.GoStringN(b.ptr, C.int(b.length))
-				if r.NumberAsString() {
-					dest[i] = s
-				} else {
-					dest[i] = Number(s)
-				}
+				dest[i] = Number(C.GoStringN(b.ptr, C.int(b.length)))
 				if Log != nil {
 					Log("msg", "b", "i", i, "ptr", b.ptr, "length", b.length, "typ", col.NativeType, "int64", C.dpiData_getInt64(d), "dest", dest[i])
 				}
