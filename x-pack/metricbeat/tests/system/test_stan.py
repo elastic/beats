@@ -19,6 +19,6 @@ class TestNats(XPackTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricset(self, metricset):
         """
-        etcd metricset tests
+        stan metricset tests
         """
         self.check_metricset("stan", metricset, self.get_hosts(), STAN_FIELDS)

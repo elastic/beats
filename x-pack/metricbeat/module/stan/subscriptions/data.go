@@ -9,13 +9,20 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
+	moduleSchema = s.Schema{
+		"server": s.Object{
+			"id": c.Str("server_id"),
+		},
+		"cluster": s.Object{
+			"id": c.Str("cluster_id"),
+		},
+	}
 	subscriptionsSchema = s.Schema{
 		"id":        c.Str("client_id"),
 		"channel":   c.Str("channel"),                // this is a computed field added AFTER schema.Apply
@@ -34,9 +41,15 @@ func eventMapping(content map[string]interface{}) (mb.Event, error) {
 	if err != nil {
 		return mb.Event{}, errors.Wrap(err, "failure applying subscription schema")
 	}
+
+	moduleFields, err := moduleSchema.Apply(content)
+	if err != nil {
+		return mb.Event{}, errors.Wrap(err, "failure applying module schema")
+	}
+
 	event := mb.Event{
 		MetricSetFields: fields,
-		ModuleFields:    common.MapStr{},
+		ModuleFields:    moduleFields,
 	}
 	return event, nil
 }

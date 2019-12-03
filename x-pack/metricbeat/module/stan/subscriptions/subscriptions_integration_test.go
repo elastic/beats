@@ -16,6 +16,7 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
@@ -23,6 +24,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))

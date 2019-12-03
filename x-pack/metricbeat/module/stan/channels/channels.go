@@ -25,7 +25,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
-		PathConfigKey: "streaming.metrics_path",
+		PathConfigKey: "channels.metrics_path",
 		QueryParams:   queryParams,
 	}.Build()
 )

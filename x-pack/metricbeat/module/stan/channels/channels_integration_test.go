@@ -16,6 +16,7 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
@@ -23,9 +24,12 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
+	t.Log(service.Host())
+	t.Log(getConfig(service.Host()))
 	events, errs := m.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

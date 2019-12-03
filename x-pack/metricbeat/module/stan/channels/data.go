@@ -9,22 +9,30 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-var channelSchema = s.Schema{
-	"cluster_id": c.Str("cluster_id"),
-	"server_id":  c.Str("server_id"),
-	"name":       c.Str("name"),
-	"msgs":       c.Int("msgs"),
-	"bytes":      c.Int("bytes"),
-	"first_seq":  c.Int("first_seq"),
-	"last_seq":   c.Int("last_seq"),
-	"depth":      c.Int("depth", s.Optional), // aggregated by the module
-}
+
+var (
+	moduleSchema = s.Schema{
+		"server": s.Object{
+			"id": c.Str("server_id"),
+		},
+		"cluster": s.Object{
+			"id": c.Str("cluster_id"),
+		},
+	}
+	channelSchema = s.Schema{
+		"name":       c.Str("name"),
+		"messages":       c.Int("msgs"),
+		"bytes":      c.Int("bytes"),
+		"first_seq":  c.Int("first_seq"),
+		"last_seq":   c.Int("last_seq"),
+		"depth":      c.Int("depth", s.Optional), // aggregated by the module
+	}
+)
 
 // Subscription stores subscription related information
 type Subscription struct {
@@ -62,9 +70,14 @@ func eventMapping(content map[string]interface{}) (mb.Event, error) {
 		return mb.Event{}, errors.Wrap(err, "failure applying channels schema")
 	}
 
+	moduleFields, err := moduleSchema.Apply(content)
+	if err != nil {
+		return mb.Event{}, errors.Wrap(err, "failure applying module schema")
+	}
+
 	event := mb.Event{
 		MetricSetFields: fields,
-		ModuleFields:    common.MapStr{},
+		ModuleFields:    moduleFields,
 	}
 	return event, nil
 }
@@ -86,10 +99,8 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 			}
 		}
 		chWrapper := map[string]interface{}{
-			"cluster_id": channelsIn.ClusterID,
-			"server_id":  channelsIn.ServerID,
 			"name":       ch.Name,
-			"msgs":       ch.Msgs,
+			"messages":       ch.Msgs,
 			"bytes":      ch.Bytes,
 			"first_seq":  ch.FirstSeq,
 			"last_seq":   ch.LastSeq,
