@@ -1,6 +1,7 @@
 import os
 import metricbeat
 import unittest
+from parameterized import parameterized
 
 STAN_FIELDS = metricbeat.COMMON_FIELDS + ["stan"]
 
