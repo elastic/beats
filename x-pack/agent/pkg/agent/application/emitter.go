@@ -41,10 +41,6 @@ func emitter(log *logger.Logger, router *router) emitterFunc {
 			return err
 		}
 
-		grouped := map[routingKey][]program.Program{
-			defautlRK: programsToRun,
-		}
-
-		return router.Dispatch(ast.HashStr(), grouped)
+		return router.Dispatch(ast.HashStr(), programsToRun)
 	}
 }

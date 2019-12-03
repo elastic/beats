@@ -1,5 +1,5 @@
 heartbeat:
-  inputs:
+  monitors:
     - type: icmp
       name: icmp
       schedule: "*/5 * * * * * *"

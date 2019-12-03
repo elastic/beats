@@ -4,9 +4,9 @@ rules:
 - filter_values_with_regexp:
     key: type
     re: ^metric/.+
-    selector: inputs
+    selector: streams
 - map:
-    path: inputs
+    path: streams
     rules:
     - translate_with_regexp:
         path: type
@@ -16,10 +16,10 @@ rules:
         from: type
         to: module
 - copy:
-    from: inputs
+    from: streams
     to: metricbeat
 - rename:
-    from: metricbeat.inputs
+    from: metricbeat.streams
     to: modules
 - filter:
     selectors:
