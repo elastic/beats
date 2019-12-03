@@ -5,7 +5,7 @@
 
 # goracle
 
-[goracle](driver.go) is a package which is a
+[goracle](https://godoc.org/pkg/gopkg.in/goracle.v2) is a package which is a
 [database/sql/driver.Driver](http://golang.org/pkg/database/sql/driver/#Driver)
 for connecting to Oracle DB, using Anthony Tuininga's excellent OCI wrapper,
 [ODPI-C](https://www.github.com/oracle/odpi).
@@ -29,7 +29,7 @@ A configuration like this is how you would add functionality such as load balanc
 described in parenthesis above can also be set in the `SID` field of `ConnectionParams`.
 
 For other possible connection strings, see https://oracle.github.io/node-oracledb/doc/api.html#connectionstrings
-and https://docs.oracle.com/en/database/oracle/oracle-database/12.2/netag/configuring-naming-methods.html#GUID-B0437826-43C1-49EC-A94D-B650B6A4A6EE .
+and https://www.oracle.com/pls/topic/lookup?ctx=dblatest&id=GUID-B0437826-43C1-49EC-A94D-B650B6A4A6EE .
 
 TL;DR; the short form is `username@[//]host[:port][/service_name][:server][/instance_name]`, the long form is
 `(DESCRIPTION= (ADDRESS=(PROTOCOL=tcp)(HOST=host)(PORT=port)) (CONNECT_DATA= (SERVICE_NAME=service_name) (SERVER=server) (INSTANCE_NAME=instance_name)))`.

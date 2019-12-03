@@ -21,10 +21,14 @@ package goracle
 */
 import "C"
 import (
+	"database/sql"
 	"database/sql/driver"
 	"fmt"
 	"time"
 	"unsafe"
+	"reflect"
+
+	"github.com/pkg/errors"
 )
 
 // Data holds the data to/from Oracle.
@@ -36,7 +40,20 @@ type Data struct {
 
 // IsNull returns whether the data is null.
 func (d *Data) IsNull() bool {
+	// Use of C.dpiData_getIsNull(d.dpiData) would be safer,
+	// but ODPI-C 3.1.4 just returns dpiData->isNull, so do the same
+	// without calling CGO.
 	return d == nil || d.dpiData == nil || d.dpiData.isNull == 1
+}
+
+// SetNull sets the value of the data to be the null value.
+func (d *Data) SetNull() {
+	if !d.IsNull() {
+		// Maybe C.dpiData_setNull(d.dpiData) would be safer, but as we don't use C.dpiData_getIsNull,
+		// and those functions (at least in ODPI-C 3.1.4) just operate on data->isNull directly,
+		// don't use CGO if possible.
+		d.dpiData.isNull = 1
+	}
 }
 
 // GetBool returns the bool data.
@@ -268,6 +285,100 @@ func (d *Data) Get() interface{} {
 // IsObject returns whether the data contains an Object or not.
 func (d *Data) IsObject() bool {
 	return d.NativeTypeNum == C.DPI_NATIVE_TYPE_OBJECT
+}
+
+// NewData returns Data for input parameters on Object/ObjectCollection.
+func (c *conn) NewData(baseType interface{}, sliceLen, bufSize int) ([]*Data, error) {
+	if c == nil || c.dpiConn == nil {
+		return nil, errors.New("connection is nil")
+	}
+
+	vi, err := newVarInfo(baseType, sliceLen, bufSize)
+	if err != nil {
+		return nil, err
+	}
+
+	_, dpiData, err := c.newVar(vi)
+	if err != nil {
+		return nil, err
+	}
+			
+	data := make([]*Data, sliceLen)
+	for i := 0; i < sliceLen; i++ {
+		data[i] = &Data{dpiData: &dpiData[i], NativeTypeNum: vi.NatTyp}
+	}		
+
+	return data, nil
+}
+
+func newVarInfo(baseType interface{}, sliceLen, bufSize int) (varInfo, error) {
+	var vi varInfo		
+
+	switch v := baseType.(type) {
+	case Lob, []Lob:
+		vi.NatTyp = C.DPI_NATIVE_TYPE_LOB
+		var isClob bool
+		switch v := v.(type) {
+		case Lob:
+			isClob = v.IsClob
+		case []Lob:
+			isClob = len(v) > 0 && v[0].IsClob
+		}		
+		if isClob {
+			vi.Typ = C.DPI_ORACLE_TYPE_CLOB
+		} else {
+			vi.Typ = C.DPI_ORACLE_TYPE_BLOB
+		}			
+	case int, []int, int64, []int64, sql.NullInt64, []sql.NullInt64:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_NUMBER, C.DPI_NATIVE_TYPE_INT64		
+	case int32, []int32:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_NATIVE_INT, C.DPI_NATIVE_TYPE_INT64	
+	case uint, []uint, uint64, []uint64:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_NUMBER, C.DPI_NATIVE_TYPE_UINT64		
+	case uint32, []uint32:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_NATIVE_UINT, C.DPI_NATIVE_TYPE_UINT64			
+	case float32, []float32:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_NATIVE_FLOAT, C.DPI_NATIVE_TYPE_FLOAT		
+	case float64, []float64, sql.NullFloat64, []sql.NullFloat64:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_NATIVE_DOUBLE, C.DPI_NATIVE_TYPE_DOUBLE			
+	case bool, []bool:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_BOOLEAN, C.DPI_NATIVE_TYPE_BOOLEAN		
+	case []byte, [][]byte:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_RAW, C.DPI_NATIVE_TYPE_BYTES
+		switch v := v.(type) {
+		case []byte:
+			bufSize = len(v)
+		case [][]byte:
+			for _, b := range v {
+				if n := len(b); n > bufSize {
+					bufSize = n
+				}
+			}
+		}	
+	case string, []string, nil:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_VARCHAR, C.DPI_NATIVE_TYPE_BYTES
+		bufSize = 32767
+	case time.Time, []time.Time:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_DATE, C.DPI_NATIVE_TYPE_TIMESTAMP		
+	case userType, []userType:
+		vi.Typ, vi.NatTyp = C.DPI_ORACLE_TYPE_OBJECT, C.DPI_NATIVE_TYPE_OBJECT	
+		switch v := v.(type) {
+		case userType:						
+			vi.ObjectType = v.ObjectRef().ObjectType.dpiObjectType
+		case []userType:
+			if len(v) > 0 {
+				vi.ObjectType = v[0].ObjectRef().ObjectType.dpiObjectType
+			}
+		}		
+	default:		
+		return vi, errors.Errorf("unknown type %T", v)
+	}
+
+	vi.IsPLSArray = reflect.TypeOf(baseType).Kind() == reflect.Slice
+	vi.SliceLen = sliceLen
+	vi.BufSize = bufSize	
+
+	return vi, nil
 }
 
 func (d *Data) reset() {

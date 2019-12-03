@@ -45,6 +45,7 @@ type stmtOptions struct {
 	plSQLArrays         bool
 	lobAsReader         bool
 	magicTypeConversion bool
+	numberAsString      bool
 }
 
 func (o stmtOptions) ExecMode() C.dpiExecMode {
@@ -72,6 +73,7 @@ func (o stmtOptions) ClobAsString() bool { return !o.lobAsReader }
 func (o stmtOptions) LobAsReader() bool  { return o.lobAsReader }
 
 func (o stmtOptions) MagicTypeConversion() bool { return o.magicTypeConversion }
+func (o stmtOptions) NumberAsString() bool      { return o.numberAsString }
 
 // Option holds statement options.
 type Option func(*stmtOptions)
@@ -133,6 +135,11 @@ func LobAsReader() Option { return func(o *stmtOptions) { o.lobAsReader = true }
 // MagicTypeConversion returns an option to force converting named scalar types (e.g. "type underlying int64") to their scalar underlying type.
 func MagicTypeConversion() Option {
 	return func(o *stmtOptions) { o.magicTypeConversion = true }
+}
+
+// NumberAsString returns an option to return numbers as string, not Number.
+func NumberAsString() Option {
+	return func(o *stmtOptions) { o.numberAsString = true }
 }
 
 // CallTimeout sets the round-trip timeout (OCI_ATTR_CALL_TIMEOUT).
@@ -469,6 +476,12 @@ func (st *statement) QueryContext(ctx context.Context, args []driver.NamedValue)
 		return nil, closeIfBadConn(err)
 	}
 
+	mode := st.ExecMode()
+	//fmt.Printf("%p.%p: inTran? %t\n%s\n", st.conn, st, st.inTransaction, st.query)
+	if !st.inTransaction {
+		mode |= C.DPI_MODE_EXEC_COMMIT_ON_SUCCESS
+	}
+
 	// execute
 	var colCount C.uint32_t
 	done := make(chan error, 1)
@@ -481,7 +494,7 @@ func (st *statement) QueryContext(ctx context.Context, args []driver.NamedValue)
 				return
 			}
 			st.setCallTimeout(ctx)
-			if C.dpiStmt_execute(st.dpiStmt, st.ExecMode(), &colCount) != C.DPI_FAILURE {
+			if C.dpiStmt_execute(st.dpiStmt, mode, &colCount) != C.DPI_FAILURE {
 				break
 			}
 			if err = ctx.Err(); err == nil {
@@ -1139,6 +1152,13 @@ func dataSetBool(dv *C.dpiVar, data []C.dpiData, vv interface{}) error {
 		return dataSetNull(dv, data, nil)
 	}
 	b := C.int(0)
+	if v, ok := vv.(bool); ok {
+		if v {
+			b = 1
+		}
+		C.dpiData_setBool(&data[0], b)
+		return nil
+	}
 	if bb, ok := vv.([]bool); ok {
 		for i, v := range bb {
 			if v {
@@ -1146,10 +1166,10 @@ func dataSetBool(dv *C.dpiVar, data []C.dpiData, vv interface{}) error {
 			}
 			C.dpiData_setBool(&data[i], b)
 		}
-	} else {
-		for i := range data {
-			data[i].isNull = 1
-		}
+		return nil
+	}
+	for i := range data {
+		data[i].isNull = 1
 	}
 	return nil
 }

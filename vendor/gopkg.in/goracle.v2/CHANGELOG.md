@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Fix bool input (#166).
+
+## [2.16.2] - 2019-05-27
+### Changed
+- Make Query AUTOCOMMIT like Exec - it's needed to release Rows for "FOR UPDATE".
+
+## [2.16.1] - 2019-05-27
+### Added
+- Data.SetNull
+- Expose dpiConn_newVar
+
+## [2.16.0] - 2019-05-17
+### Changed
+- NumberAsString new option for #159.
 
 ## [2.15.3] - 2019-05-16
 ### Changed
@@ -212,5 +227,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - update ODPI-C to v2.4.0
 - initialize context / load lib only on first Open, to allow import without Oracle Client installed
 - use golangci-lint
-
 

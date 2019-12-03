@@ -400,7 +400,7 @@ func (c *conn) init() error {
 		return errors.Wrap(err, qry)
 	}
 	defer st.Close()
-	rows, err := st.Query([]driver.Value{})
+	rows, err := st.Query([]driver.Value{}) //nolint:staticcheck
 	if err != nil {
 		return errors.Wrap(err, qry)
 	}

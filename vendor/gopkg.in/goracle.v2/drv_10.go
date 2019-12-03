@@ -90,12 +90,12 @@ func NewConnector(name string, onInit func(driver.Conn) error) (driver.Connector
 func NewSessionIniter(m map[string]string) func(driver.Conn) error {
 	return func(cx driver.Conn) error {
 		for k, v := range m {
-			qry := fmt.Sprintf("ALTER SESSION SET %s = '%s'", k, strings.ReplaceAll(v, "'", "''"))
+			qry := fmt.Sprintf("ALTER SESSION SET %s = '%s'", k, strings.Replace(v, "'", "''", -1))
 			st, err := cx.Prepare(qry)
 			if err != nil {
 				return errors.Wrap(err, qry)
 			}
-			_, err = st.Exec(nil) //nolint:SA1019
+			_, err = st.Exec(nil) //nolint:staticcheck
 			st.Close()
 			if err != nil {
 				return err

@@ -424,15 +424,19 @@ func (d *drv) openConn(P ConnectionParams) (*conn, error) {
 		d.mu.Unlock()
 		if dp != nil {
 			//Proxy authenticated connections to database will be provided by methods with context
+			c.mu.Lock()
 			c.Client, c.Server = d.clientVersion, dp.serverVersion
 			c.timeZone, c.tzOffSecs = dp.timeZone, dp.tzOffSecs
+			c.mu.Unlock()
 			if err := c.acquireConn("", ""); err != nil {
 				return nil, err
 			}
 			err := c.init()
 			if err == nil {
+				c.mu.Lock()
 				dp.serverVersion = c.Server
 				dp.timeZone, dp.tzOffSecs = c.timeZone, c.tzOffSecs
+				c.mu.Unlock()
 			}
 			return &c, err
 		}
@@ -575,15 +579,19 @@ func (c *conn) acquireConn(user, pass string) error {
 		return errors.Wrapf(c.getError(), "acquirePoolConnection")
 	}
 
+	c.mu.Lock()
 	c.dpiConn = (*C.dpiConn)(dc)
 	c.currentUser = user
 	c.newSession = connCreateParams.outNewSession == 1
 	c.Client, c.Server = c.drv.clientVersion, pool.serverVersion
 	c.timeZone, c.tzOffSecs = pool.timeZone, pool.tzOffSecs
+	c.mu.Unlock()
 	err := c.init()
 	if err == nil {
+		c.mu.Lock()
 		pool.serverVersion = c.Server
 		pool.timeZone, pool.tzOffSecs = c.timeZone, c.tzOffSecs
+		c.mu.Unlock()
 	}
 
 	return err

@@ -131,6 +131,15 @@ func (O *Object) ObjectRef() *Object {
 	return O
 }
 
+// Collection returns &ObjectCollection{Object: O} iff the Object is a collection.
+// Otherwise it returns nil.
+func (O *Object) Collection() *ObjectCollection {
+	if O.ObjectType.CollectionOf == nil {
+		return nil
+	}
+	return &ObjectCollection{Object: O}
+}
+
 // Close releases a reference to the object.
 func (O *Object) Close() error {
 	if O.dpiObject == nil {

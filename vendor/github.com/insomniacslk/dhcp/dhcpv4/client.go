@@ -1,5 +1,3 @@
-// +build !windows
-
 package dhcpv4
 
 import (
