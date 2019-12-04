@@ -79,88 +79,130 @@
 			"revisionTime": "2019-07-18T21:44:46Z"
 		},
 		{
-			"checksumSHA1": "HQcIMbB77iOZ4CEQApiZ2i0KvTw=",
+			"checksumSHA1": "8qQV+3YUN+ma8h4xgxgeCs8+wAs=",
+			"origin": "github.com/Azure/azure-amqp-common-go",
 			"path": "github.com/Azure/azure-amqp-common-go/v2",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "vtpnUL+bIYMLIL1/ZFoy5lQJHLk=",
+			"checksumSHA1": "RKIDQ8xYqwB/XZWun2vl5z7jY1s=",
+			"origin": "github.com/Azure/azure-amqp-common-go/aad",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/aad",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "QNAsD7SqjAJLGXLD4HCvtrdtzNY=",
+			"checksumSHA1": "BpALEQY/8SpC0vqJYai9YnxUbSc=",
+			"origin": "github.com/Azure/azure-amqp-common-go/auth",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/auth",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "cedNNdMLDJHfjY7g7nPcoS00Byg=",
+			"checksumSHA1": "vLqH6H0y0MJeB2xac8xKVsqyEOE=",
+			"origin": "github.com/Azure/azure-amqp-common-go/cbs",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/cbs",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "3CJsOEbWH2SripSXsqOXSCmPsrM=",
+			"checksumSHA1": "rrIhxm6Xqil2vpny2oGauBLz134=",
+			"origin": "github.com/Azure/azure-amqp-common-go/conn",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/conn",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "6ihpRHHPLnLyc+0dGF4r0Uw2U5Y=",
+			"checksumSHA1": "5J3Jq0M8UOiDmjuA/qIztORW5rc=",
+			"origin": "github.com/Azure/azure-amqp-common-go/internal",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/internal",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "amwT7CTU4VDvX5WYMv7hLj4TcLI=",
+			"checksumSHA1": "V1N9/yMX66MfsVEt/D0xlgLgLeY=",
+			"origin": "github.com/Azure/azure-amqp-common-go/internal/tracing",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/internal/tracing",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "EJtmas7BlFbGP5sJfxEI2J6p8W0=",
+			"checksumSHA1": "pLh4MkFIu7tuJbAzq7FrbZl/Tos=",
+			"origin": "github.com/Azure/azure-amqp-common-go/rpc",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/rpc",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "iKe0+JlmiuxOTaeRKI6mh5a8jiA=",
+			"checksumSHA1": "XnI0zvnbrC1F35u/QX10+Pak3Uk=",
+			"origin": "github.com/Azure/azure-amqp-common-go/sas",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/sas",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "14QZbiy023Zn3cjbQrzg5/NPg2E=",
+			"checksumSHA1": "+CcW61qnjJTM7xBsOqyP3yqBTvw=",
+			"origin": "github.com/Azure/azure-amqp-common-go/uuid",
 			"path": "github.com/Azure/azure-amqp-common-go/v2/uuid",
-			"revision": "a53768da34b4eb6279e7956c669b029256488960",
-			"revisionTime": "2019-09-20T05:42:36Z"
+			"revision": "b722019cbc3b95d5e90d19a58848279e15793196",
+			"revisionTime": "2019-07-19T18:03:39Z",
+			"version": "v2.1.0",
+			"versionExact": "v2.1.0"
 		},
 		{
-			"checksumSHA1": "JJSP/FKdUhcSjAnn0EG3Z+tmMCM=",
+			"checksumSHA1": "HF7nwdxbNHGulhsCWRJwwbceRyk=",
+			"origin": "github.com/Azure/azure-event-hubs-go",
 			"path": "github.com/Azure/azure-event-hubs-go/v2",
 			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
-			"revisionTime": "2019-10-25T17:10:56Z"
+			"revisionTime": "2019-10-25T17:10:56Z",
+			"version": "v2.0.4",
+			"versionExact": "v2.0.4"
 		},
 		{
-			"checksumSHA1": "sWr58u5em31rGEvfNKdavd1yWhc=",
+			"checksumSHA1": "nIXHxxl6EETNrozT/h61U/4Ym/M=",
+			"origin": "github.com/Azure/azure-event-hubs-go/atom",
 			"path": "github.com/Azure/azure-event-hubs-go/v2/atom",
 			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
-			"revisionTime": "2019-10-25T17:10:56Z"
+			"revisionTime": "2019-10-25T17:10:56Z",
+			"version": "v2.0.4",
+			"versionExact": "v2.0.4"
 		},
 		{
-			"checksumSHA1": "CO+TERG7OPcR9vFbskSk60+xpeI=",
+			"checksumSHA1": "IOWohEidmOhlFRQDhlUP/t7Obj8=",
+			"origin": "github.com/Azure/azure-event-hubs-go/eph",
 			"path": "github.com/Azure/azure-event-hubs-go/v2/eph",
 			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
-			"revisionTime": "2019-10-25T17:10:56Z"
+			"revisionTime": "2019-10-25T17:10:56Z",
+			"version": "v2.0.4",
+			"versionExact": "v2.0.4"
 		},
 		{
-			"checksumSHA1": "zHin56hacLawiVqznvHDJIhKrzc=",
+			"checksumSHA1": "qBY5JK907UWAwlsWUGE5Att/fWc=",
+			"origin": "github.com/Azure/azure-event-hubs-go/persist",
 			"path": "github.com/Azure/azure-event-hubs-go/v2/persist",
 			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
-			"revisionTime": "2019-10-25T17:10:56Z"
+			"revisionTime": "2019-10-25T17:10:56Z",
+			"version": "v2.0.4",
+			"versionExact": "v2.0.4"
 		},
 		{
 			"checksumSHA1": "GVp7N0DIODyCsll/xnTh+oCRC+0=",

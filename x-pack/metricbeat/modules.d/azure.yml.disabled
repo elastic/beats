@@ -17,7 +17,6 @@
 #    - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
 #      namespace: "Microsoft.DocumentDb/databaseAccounts"
 
-
 #- module: azure
 #  metricsets:
 #  - compute_vm

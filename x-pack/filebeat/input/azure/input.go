@@ -105,7 +105,7 @@ func (a *azureInput) Run() {
 	})
 }
 
-// Run runs the input
+// run runs the input
 func (a *azureInput) run() error {
 	ctx, cancel := context.WithCancel(a.workerCtx)
 	defer cancel()
