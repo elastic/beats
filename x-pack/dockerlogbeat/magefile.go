@@ -18,7 +18,11 @@ import (
 
 	"github.com/elastic/beats/dev-tools/mage"
 
+	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/pkg/errors"
+
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 var hubID = "elastic"
@@ -28,6 +32,11 @@ var dockerPluginName = filepath.Join(hubID, name)
 var packageStagingDir = "build/package/"
 var packageEndDir = "build/distributions/"
 var dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
+
+func init() {
+	devtools.BeatLicense = "Elastic License"
+	devtools.BeatDescription = "The Docker Logging Driver is a docker plugin for the Elastic Stack."
+}
 
 // getPluginName returns the fully qualified name:version string
 func getPluginName() (string, error) {
@@ -41,7 +50,7 @@ func getPluginName() (string, error) {
 
 // Build builds docker rootfs container root
 func Build() error {
-	mg.Deps(Clean)
+	mg.Deps(CleanDocker)
 	mage.CreateDir(packageStagingDir)
 	mage.CreateDir(packageEndDir)
 
@@ -90,8 +99,8 @@ func Build() error {
 	return sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(packageStagingDir, "rootfs"))
 }
 
-// Clean removes working objects and containers
-func Clean() error {
+// CleanDocker removes working objects and containers
+func CleanDocker() error {
 	name, err := getPluginName()
 	if err != nil {
 		return err
