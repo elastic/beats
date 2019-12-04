@@ -29393,7 +29393,7 @@ type: keyword
 
 --
 
-*`stan.channels.msgs`*::
+*`stan.channels.messages`*::
 +
 --
 The number of STAN streaming messages
