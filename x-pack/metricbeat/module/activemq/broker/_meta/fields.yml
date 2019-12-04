@@ -1,0 +1,41 @@
+- name: broker
+  type: group
+  description: Broker metrics from org.apache.activemq:brokerName=*,type=Broker
+  release: beta
+  fields:
+  - name: mbean
+    description: Mbean that this event is related to
+    type: keyword
+  - name: name
+    description: Broker name
+    type: keyword
+  - name: memory.broker.pct
+    description: The percentage of the memory limit used.
+    type: scaled_float
+    format: percent
+  - name: memory.store.pct
+    description: Percent of store limit used.
+    type: scaled_float
+    format: percent
+  - name: memory.temp.pct
+    description: The percentage of the temp usage limit used.
+    type: scaled_float
+    format: percent
+  - name: connections.count
+    description: Total number of connections.
+    type: long
+  - name: consumers.count
+    description: Number of message consumers.
+    type: long
+  - name: messages.dequeue.count
+    description: Number of messages that have been acknowledged on the broker.
+    type: long
+  - name: messages.enqueue.count
+    description: Number of messages that have been sent to the destination.
+    type: long
+  - name: messages.count
+    description: Number of unacknowledged messages on the broker.
+    type: long
+  - name: producers.count
+    description: Number of message producers active on destinations on the broker.
+    type: long

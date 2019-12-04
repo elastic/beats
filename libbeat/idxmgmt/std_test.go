@@ -218,17 +218,17 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 
 func TestIndexManager_VerifySetup(t *testing.T) {
 	for name, setup := range map[string]struct {
-		tmpl, ilm         bool
-		loadTmpl, loadILM LoadMode
-		ok                bool
-		warn              string
+		tmplEnabled, ilmEnabled, ilmOverwrite bool
+		loadTmpl, loadILM                     LoadMode
+		ok                                    bool
+		warn                                  string
 	}{
 		"load template with ilm without loading ilm": {
-			ilm: true, tmpl: true, loadILM: LoadModeDisabled,
+			ilmEnabled: true, tmplEnabled: true, loadILM: LoadModeDisabled,
 			warn: "whithout loading ILM policy and alias",
 		},
 		"load ilm without template": {
-			ilm: true, loadILM: LoadModeUnset,
+			ilmEnabled: true, loadILM: LoadModeUnset,
 			warn: "without loading template is not recommended",
 		},
 		"template disabled but loading enabled": {
@@ -236,26 +236,33 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 			warn:     "loading not enabled",
 		},
 		"ilm disabled but loading enabled": {
-			loadILM: LoadModeEnabled, tmpl: true,
+			loadILM: LoadModeEnabled, tmplEnabled: true,
 			warn: "loading not enabled",
 		},
 		"ilm enabled but loading disabled": {
-			ilm: true, loadILM: LoadModeDisabled,
+			ilmEnabled: true, loadILM: LoadModeDisabled,
 			warn: "loading not enabled",
 		},
 		"template enabled but loading disabled": {
-			tmpl: true, loadTmpl: LoadModeDisabled,
+			tmplEnabled: true, loadTmpl: LoadModeDisabled,
 			warn: "loading not enabled",
 		},
+		"ilm enabled but overwrite disabled": {
+			tmplEnabled: true,
+			ilmEnabled:  true, ilmOverwrite: false, loadILM: LoadModeEnabled,
+			warn: "Overwriting ILM policy is disabled",
+		},
 		"everything enabled": {
-			tmpl: true, loadTmpl: LoadModeUnset, ilm: true, loadILM: LoadModeUnset,
+			tmplEnabled: true,
+			ilmEnabled:  true, ilmOverwrite: true,
 			ok: true,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			cfg, err := common.NewConfigFrom(common.MapStr{
-				"setup.ilm.enabled":      setup.ilm,
-				"setup.template.enabled": setup.tmpl,
+				"setup.ilm.enabled":      setup.ilmEnabled,
+				"setup.ilm.overwrite":    setup.ilmOverwrite,
+				"setup.template.enabled": setup.tmplEnabled,
 			})
 			require.NoError(t, err)
 			support, err := MakeDefaultSupport(ilm.StdSupport)(nil, beat.Info{}, cfg)
@@ -313,11 +320,11 @@ func TestIndexManager_Setup(t *testing.T) {
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9-*",
-				"settings.index.lifecycle.name": "test-9.9.9",
+				"settings.index.lifecycle.name": "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 			alias:  "test-9.9.9",
-			policy: "test-9.9.9",
+			policy: "test",
 		},
 		"template default ilm default with alias and policy changed": {
 			cfg: common.MapStr{
@@ -370,7 +377,7 @@ func TestIndexManager_Setup(t *testing.T) {
 				"setup.template.enabled": false,
 			},
 			alias:  "test-9.9.9",
-			policy: "test-9.9.9",
+			policy: "test",
 		},
 		"template disabled ilm disabled, loadMode Overwrite": {
 			cfg: common.MapStr{
@@ -386,20 +393,20 @@ func TestIndexManager_Setup(t *testing.T) {
 			},
 			loadILM: LoadModeForce,
 			alias:   "test-9.9.9",
-			policy:  "test-9.9.9",
+			policy:  "test",
 		},
 		"template loadmode disabled ilm loadMode enabled": {
 			loadTemplate: LoadModeDisabled,
 			loadILM:      LoadModeEnabled,
 			alias:        "test-9.9.9",
-			policy:       "test-9.9.9",
+			policy:       "test",
 		},
 		"template default ilm loadMode disabled": {
 			loadILM: LoadModeDisabled,
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9-*",
-				"settings.index.lifecycle.name": "test-9.9.9",
+				"settings.index.lifecycle.name": "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 		},

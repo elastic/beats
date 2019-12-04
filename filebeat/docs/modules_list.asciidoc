@@ -3,6 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
   * <<filebeat-modules-overview>>
+  * <<filebeat-module-activemq>>
   * <<filebeat-module-apache>>
   * <<filebeat-module-auditd>>
   * <<filebeat-module-aws>>
@@ -43,6 +44,7 @@ This file is generated! See scripts/docs_collector.py
 --
 
 include::modules-overview.asciidoc[]
+include::modules/activemq.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/auditd.asciidoc[]
 include::modules/aws.asciidoc[]
