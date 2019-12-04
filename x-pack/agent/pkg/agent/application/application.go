@@ -101,13 +101,13 @@ func getKibanaClient(log *logger.Logger, c *ManagementConfig) (_ sender, err err
 		return nil, errors.New("fleet mode enabled but management.fleet.kibana not specified")
 	}
 
-	if c.Fleet.AccessToken != "" {
+	if c.Fleet.AccessAPIKey != "" {
 		rawConfig, err := config.NewConfigFrom(kibanaConfig)
 		if err != nil {
 			return nil, err
 		}
 
-		return fleetapi.NewAuthWithConfig(log, rawConfig, c.Fleet.AccessToken)
+		return fleetapi.NewAuthWithConfig(log, rawConfig, c.Fleet.AccessAPIKey)
 	}
 
 	return fleetapi.NewWithConfig(log, kibanaConfig)

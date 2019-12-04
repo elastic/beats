@@ -44,16 +44,14 @@ func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) em
 		}
 
 		for _, decorator := range decorators {
-			programsToRun, err = decorator(ast, programsToRun)
-			if err != nil {
-				return err
+			for group, ptr := range programsToRun {
+				programsToRun[group], err = decorator(ast, ptr)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
-		grouped := map[routingKey][]program.Program{
-			defautlRK: programsToRun,
-		}
-
-		return router.Dispatch(ast.HashStr(), grouped)
+		return router.Dispatch(ast.HashStr(), programsToRun)
 	}
 }

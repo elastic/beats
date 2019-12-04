@@ -31,7 +31,7 @@ type clienter interface {
 // EnrollCmd is an enroll subcommand that interacts between the Kibana API and the Agent.
 type EnrollCmd struct {
 	log                  *logger.Logger
-	enrollmentToken      string
+	enrollAPIKey         string
 	client               clienter
 	id                   string
 	userProvidedMetadata map[string]interface{}
@@ -45,7 +45,7 @@ func NewEnrollCmd(
 	log *logger.Logger,
 	url string,
 	CAs []string,
-	enrollmentToken string,
+	enrollAPIKey string,
 	id string,
 	userProvidedMetadata map[string]interface{},
 	configStore store,
@@ -70,7 +70,7 @@ func NewEnrollCmd(
 	return &EnrollCmd{
 		log:                  log,
 		client:               client,
-		enrollmentToken:      enrollmentToken,
+		enrollAPIKey:         enrollAPIKey,
 		id:                   id,
 		userProvidedMetadata: userProvidedMetadata,
 		kibanaConfig:         cfg,
@@ -83,9 +83,9 @@ func (c *EnrollCmd) Execute() error {
 	cmd := fleetapi.NewEnrollCmd(c.client)
 
 	r := &fleetapi.EnrollRequest{
-		EnrollmentToken: c.enrollmentToken,
-		SharedID:        c.id,
-		Type:            fleetapi.PermanentEnroll,
+		EnrollAPIKey: c.enrollAPIKey,
+		SharedID:     c.id,
+		Type:         fleetapi.PermanentEnroll,
 		Metadata: fleetapi.Metadata{
 			Local:        metadata(),
 			UserProvided: c.userProvidedMetadata,
@@ -98,8 +98,8 @@ func (c *EnrollCmd) Execute() error {
 	}
 
 	if err := c.configStore.Save(fleetConfig{
-		AccessToken: resp.Item.AccessToken,
-		Kibana:      c.kibanaConfig,
+		AccessAPIKey: resp.Item.AccessAPIKey,
+		Kibana:       c.kibanaConfig,
 	}); err != nil {
 		return errors.Wrap(err, "could not save credentials")
 	}
@@ -113,5 +113,3 @@ func metadata() map[string]interface{} {
 		"version":  release.Version(),
 	}
 }
-
-// info Enrollment token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiRU5ST0xNRU5UX1RPS0VOIiwicG9saWN5Ijp7ImlkIjoiNjlmM2Y1YTAtZWM1Mi0xMWU5LTkzYzQtZDcyYWI4YTY5MzkxIn0sImlhdCI6MTU3MDgxNzQzMn0.tVxm4JY9gAcd14YlQTmi_y-8AqbGtKyS_PXXI2gdLBY

@@ -26,7 +26,7 @@ func TestEnroll(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 
 				// Assert Enrollment Token.
-				require.Equal(t, "my-enrollment-token", r.Header.Get("kbn-fleet-enrollment-token"))
+				require.Equal(t, "ApiKey my-enrollment-api-key", r.Header.Get("Authorization"))
 
 				decoder := json.NewDecoder(r.Body)
 				defer r.Body.Close()
@@ -53,7 +53,7 @@ func TestEnroll(t *testing.T) {
 						EnrolledAt:           time.Now(),
 						UserProvidedMetadata: make(map[string]interface{}),
 						LocalMetadata:        make(map[string]interface{}),
-						AccessToken:          "my-access-token",
+						AccessAPIKey:         "my-access-api-key",
 					},
 				}
 
@@ -72,9 +72,9 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 
 			req := &EnrollRequest{
-				Type:            PermanentEnroll,
-				EnrollmentToken: "my-enrollment-token",
-				SharedID:        "im-a-beat",
+				Type:         PermanentEnroll,
+				EnrollAPIKey: "my-enrollment-api-key",
+				SharedID:     "im-a-beat",
 				Metadata: Metadata{
 					Local: map[string]interface{}{
 						"os": "linux",
@@ -87,7 +87,7 @@ func TestEnroll(t *testing.T) {
 			resp, err := cmd.Execute(req)
 			require.NoError(t, err)
 
-			require.Equal(t, "my-access-token", resp.Item.AccessToken)
+			require.Equal(t, "my-access-api-key", resp.Item.AccessAPIKey)
 			require.Equal(t, "created", resp.Action)
 			require.True(t, resp.Success)
 		},
@@ -111,9 +111,9 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 
 			req := &EnrollRequest{
-				Type:            PermanentEnroll,
-				EnrollmentToken: "my-enrollment-token",
-				SharedID:        "im-a-beat",
+				Type:         PermanentEnroll,
+				EnrollAPIKey: "my-enrollment-api-key",
+				SharedID:     "im-a-beat",
 				Metadata: Metadata{
 					Local: map[string]interface{}{
 						"os": "linux",

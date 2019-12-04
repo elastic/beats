@@ -11,6 +11,9 @@ import (
 	"github.com/elastic/beats/agent/kibana"
 )
 
+// ErrInvalidAPIKey is returned when authentication fail to fleet.
+var ErrInvalidAPIKey = errors.New("invalid api key to authenticate with fleet")
+
 // FleetUserAgentRoundTripper adds the Fleet user agent.
 type FleetUserAgentRoundTripper struct {
 	rt      http.RoundTripper
@@ -31,27 +34,35 @@ func NewFleetUserAgentRoundTripper(wrapped http.RoundTripper, version string) ht
 	}
 }
 
-// FleetAccessTokenRoundTripper allow all calls to be authenticated using the accessToken.
+// FleetAuthRoundTripper allow all calls to be authenticated using the api key.
 // The token is added as a header key.
-type FleetAccessTokenRoundTripper struct {
-	rt          http.RoundTripper
-	accessToken string
+type FleetAuthRoundTripper struct {
+	rt     http.RoundTripper
+	apiKey string
 }
 
 // RoundTrip makes all the calls to the service authenticated.
-func (r *FleetAccessTokenRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	const key = "kbn-fleet-access-token"
-	req.Header.Set(key, r.accessToken)
-	return r.rt.RoundTrip(req)
+func (r *FleetAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	const key = "Authorization"
+	const prefix = "ApiKey "
+
+	req.Header.Set(key, prefix+r.apiKey)
+	resp, err := r.rt.RoundTrip(req)
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		defer resp.Body.Close()
+		return resp, ErrInvalidAPIKey
+	}
+	return resp, err
 }
 
-// NewFleetAccessTokenRoundTripper wrap an existing http.RoundTripper and adds the accessToken in the header.
-func NewFleetAccessTokenRoundTripper(
+// NewFleetAuthRoundTripper wrap an existing http.RoundTripper and adds the API in the header.
+func NewFleetAuthRoundTripper(
 	wrapped http.RoundTripper,
-	accessToken string,
+	apiKey string,
 ) (http.RoundTripper, error) {
-	if len(accessToken) == 0 {
-		return nil, errors.New("empty access token received")
+	if len(apiKey) == 0 {
+		return nil, errors.New("empty api key received")
 	}
-	return &FleetAccessTokenRoundTripper{rt: wrapped, accessToken: accessToken}, nil
+	return &FleetAuthRoundTripper{rt: wrapped, apiKey: apiKey}, nil
 }
