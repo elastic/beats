@@ -34,9 +34,11 @@ type apiClient interface {
 // Managed application, when the application is run in managed mode, most of the configuration are
 // coming from the Fleet App.
 type Managed struct {
-	log    *logger.Logger
-	Config FleetAgentConfig
-	api    apiClient
+	log     *logger.Logger
+	Config  FleetAgentConfig
+	api     apiClient
+	log     *logger.Logger
+	agentID string
 }
 
 func newManaged(
@@ -81,9 +83,24 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
 
+	emit := emitter(log, router)
+
+	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{})
+	if err != nil {
+		return nil, err
+	}
+
+	actionDispatcher.Register(
+		&fleetapi.ActionPolicyChange{},
+		&handlerPolicyChange{emitter: emit},
+	)
+
+	actionDispatcher.Register(&fleetapi.ActionPolicyChange{},
+		&handlerUnknown{},
+	)
+
 	return &Managed{
 		log: log,
-		api: client,
 	}, nil
 }
 
