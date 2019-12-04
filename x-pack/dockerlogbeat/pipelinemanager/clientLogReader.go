@@ -11,12 +11,10 @@ import (
 
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/docker/docker/daemon/logger"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/x-pack/dockerlogbeat/pipereader"
 )
 
@@ -33,14 +31,14 @@ type ClientLogger struct {
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string, info logger.Info) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hashstring string, info logger.Info) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
 	}
 	clientLogger := logp.NewLogger("clientLogReader")
 	settings.ACKCount = func(n int) {
-		clientLogger.Debugf("Pipeline client (%s) ACKS; %v", file, n)
+		clientLogger.Debugf("Pipeline client ACKS; %v", n)
 	}
 	settings.PublishMode = beat.DefaultGuarantees
 	client, err := pipeline.ConnectWith(settings)
@@ -48,12 +46,7 @@ func newClientFromPipeline(pipeline *pipeline.Pipeline, file, hashstring string,
 		return nil, err
 	}
 
-	// Create the FIFO reader client from the FIPO pipe
-	inputFile, err := pipereader.NewReaderFromPath(file)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error opening logger fifo: %q", file)
-	}
-	clientLogger.Debugf("Created new logger for %s", file)
+	clientLogger.Debugf("Created new logger for %s", hashstring)
 
 	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
 }
