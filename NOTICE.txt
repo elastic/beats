@@ -1256,8 +1256,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/ecs
-Version: v1.3.0
-Revision: e93644ad1b603259d602cbe56704f62cc6976651
+Version: v1.3.1
+Revision: e9c85195b644845b9628f556d2c702c112560e0b
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/ecs/LICENSE.txt:
 --------------------------------------------------------------------
