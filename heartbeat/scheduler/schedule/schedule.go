@@ -33,6 +33,11 @@ type intervalScheduler struct {
 	interval time.Duration
 }
 
+// RunOnInit returns true for interval schedulers.
+func (s intervalScheduler) RunOnInit() bool {
+	return true
+}
+
 func Parse(in string) (*Schedule, error) {
 	every := "@every"
 

@@ -1,0 +1,7 @@
+- name: log
+  type: group
+  description: >
+    Fields from ActiveMQ application logs.
+  fields:
+    - name: stack_trace
+      type: keyword

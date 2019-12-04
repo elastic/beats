@@ -56,5 +56,5 @@ func createAddLabels(c *common.Config) (processors.Processor, error) {
 func NewAddLabels(labels common.MapStr, shared bool) processors.Processor {
 	return NewAddFields(common.MapStr{
 		LabelsKey: labels.Flatten(),
-	}, shared)
+	}, shared, true)
 }
