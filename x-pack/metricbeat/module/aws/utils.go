@@ -76,7 +76,7 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 		for i := 0; i <= iter; i++ {
 			metricDataQueriesPartial := metricDataQueries[iter*100:]
 			if i != iter {
-				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100-1]
+				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100]
 			}
 
 			if len(metricDataQueriesPartial) == 0 {
