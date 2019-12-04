@@ -110,9 +110,6 @@ type Tls struct {
 	// handshake.
 	ServerJa3s string `ecs:"server.ja3s"`
 
-	// Array of ciphers offered by the server during the server hello.
-	ServerSupportedCiphers string `ecs:"server.supported_ciphers"`
-
 	// Subject of the x.509 certificate presented by the server.
 	ServerSubject string `ecs:"server.subject"`
 

@@ -3197,7 +3197,7 @@ example: QUERY
 *`dns.question.class`*::
 +
 --
-The class of of records being queried.
+The class of records being queried.
 
 type: keyword
 
@@ -6856,17 +6856,6 @@ example: CN=www.mydomain.com, OU=Infrastructure Team, DC=mydomain, DC=com
 
 --
 
-*`tls.server.supported_ciphers`*::
-+
---
-Array of ciphers offered by the server during the server hello.
-
-type: keyword
-
-example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
-
---
-
 *`tls.version`*::
 +
 --
@@ -7292,7 +7281,7 @@ The vulnerability fields describe information about a vulnerability that is rele
 *`vulnerability.category`*::
 +
 --
-The type of system or architecture that the vulnerability affects. These may be platform-specific (for example, Debian or SUSE) or general (for example, Database or Firewall). For example (https://qualysguard.qualys.com/qwebhelp/fo_portal/knowledgebase/vulnerability_categories.htm)
+The type of system or architecture that the vulnerability affects. These may be platform-specific (for example, Debian or SUSE) or general (for example, Database or Firewall). For example (https://qualysguard.qualys.com/qwebhelp/fo_portal/knowledgebase/vulnerability_categories.htm[Qualys vulnerability categories])
 This field must be an array.
 
 type: keyword
@@ -7315,7 +7304,7 @@ example: CVSS
 *`vulnerability.description`*::
 +
 --
-The description of the vulnerability that provides additional context of the vulnerability. For example (https://cve.mitre.org/about/faqs.html#cve_entry_descriptions_created)
+The description of the vulnerability that provides additional context of the vulnerability. For example (https://cve.mitre.org/about/faqs.html#cve_entry_descriptions_created[Common Vulnerabilities and Exposure CVE description])
 
 type: keyword
 
@@ -7337,7 +7326,7 @@ example: CVE
 *`vulnerability.id`*::
 +
 --
-The identification (ID) is the number portion of a vulnerability entry. It includes a unique identification number for the vulnerability. For example (https://cve.mitre.org/about/faqs.html#what_is_cve_id)
+The identification (ID) is the number portion of a vulnerability entry. It includes a unique identification number for the vulnerability. For example (https://cve.mitre.org/about/faqs.html#what_is_cve_id)[Common Vulnerabilities and Exposure CVE ID]
 
 type: keyword
 
@@ -7382,7 +7371,7 @@ example: Tenable
 +
 --
 Scores can range from 0.0 to 10.0, with 10.0 being the most severe.
-Base scores cover an assessment for exploitability metrics (attack vector, complexity, privileges, and user interaction), impact metrics (confidentialy, integrity, and availability), and scope. For example (https://www.first.org/cvss/specification-document)
+Base scores cover an assessment for exploitability metrics (attack vector, complexity, privileges, and user interaction), impact metrics (confidentiality, integrity, and availability), and scope. For example (https://www.first.org/cvss/specification-document)
 
 type: float
 
