@@ -32,20 +32,28 @@ func GetStartTimeEndTime(period time.Duration) (time.Time, time.Time) {
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
 func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
-	listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
-	reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+	var metricsTotal []cloudwatch.Metric
+	init := true
+	var nextToken *string
 
-	// List metrics of a given namespace for each region
-	listMetricsOutput, err := reqListMetrics.Send(context.TODO())
-	if err != nil {
-		return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
+	for init || nextToken != nil {
+		init = false
+		listMetricsInput := &cloudwatch.ListMetricsInput{
+			NextToken: nextToken,
+			Namespace: &namespace,
+		}
+		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+
+		// List metrics of a given namespace for each region
+		listMetricsOutput, err := reqListMetrics.Send(context.TODO())
+		if err != nil {
+			return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
+		}
+		metricsTotal = append(metricsTotal, listMetricsOutput.Metrics...)
+		nextToken = listMetricsOutput.NextToken
 	}
 
-	if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
-		// No metrics in this region
-		return nil, nil
-	}
-	return listMetricsOutput.Metrics, nil
+	return metricsTotal, nil
 }
 
 func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
