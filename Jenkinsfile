@@ -325,6 +325,25 @@ pipeline {
             }
           }
         }
+        stage('dockerlogbeat'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_DOCKERLOGBEAT != "false"
+            }
+          }
+          stages {
+            stage('Dockerlogbeat'){
+              steps {
+                withBeatsEnv(){
+                  makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogdriver unit-tests")
+                }
+              }
+            }
+          }
+        }
         stage('Winlogbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
