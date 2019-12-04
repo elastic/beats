@@ -1,0 +1,33 @@
+{
+    "actions": [
+        {
+            "type": "POLICY_CHANGE",
+            "id": "id-1",
+            "data": {
+                "policy": {
+                    "id": "policy-id",
+                    "outputs": {
+                        "default": {
+                            "hosts": "https://localhost:9200"
+                        }
+                    },
+                    "streams": [
+                        {
+                            "id": "string",
+                            "type": "logs",
+                            "path": "/var/log/hello.log",
+                            "output": {
+                                "use_output": "default"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "WHAT_TO_DO_WITH_IT",
+            "id": "id2"
+        }
+    ],
+    "success": true
+}
