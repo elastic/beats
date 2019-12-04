@@ -24,11 +24,11 @@ import (
 
 func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
 	for _, blkioStats := range blkioStatsList {
-		eventMapping(r, &blkioStats)
+		eventMapping(r, blkioStats)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
+func eventMapping(r mb.ReporterV2, stats BlkioStats) {
 	fields := common.MapStr{
 		"reads":  stats.reads,
 		"writes": stats.writes,

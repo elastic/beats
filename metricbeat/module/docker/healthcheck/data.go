@@ -31,11 +31,11 @@ import (
 
 func eventsMapping(r mb.ReporterV2, containers []types.Container, m *MetricSet) {
 	for _, container := range containers {
-		eventMapping(r, &container, m)
+		eventMapping(r, container, m)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
+func eventMapping(r mb.ReporterV2, cont types.Container, m *MetricSet) {
 	if !hasHealthCheck(cont.Status) {
 		return
 	}

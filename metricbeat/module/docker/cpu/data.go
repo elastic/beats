@@ -24,11 +24,11 @@ import (
 
 func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
 	for _, cpuStats := range cpuStatsList {
-		eventMapping(r, &cpuStats)
+		eventMapping(r, cpuStats)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, stats *CPUStats) {
+func eventMapping(r mb.ReporterV2, stats CPUStats) {
 	fields := common.MapStr{
 		"core": stats.PerCPUUsage,
 		"total": common.MapStr{
