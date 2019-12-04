@@ -3,6 +3,7 @@
         "event.dataset": "haproxy.log",
         "event.duration": 2000000,
         "event.module": "haproxy",
+        "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "docs_microservice",
         "haproxy.backend_queue": 0,

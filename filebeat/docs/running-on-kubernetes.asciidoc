@@ -59,6 +59,21 @@ in the manifest file:
 ------------------------------------------------
 
 [float]
+===== Running {beatname_uc} on master nodes
+
+Kubernetes master nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
+to limit the workloads that can run on them. To run {beatname_uc} on master nodes you may need to
+update the Daemonset spec to include proper tolerations:
+
+[source,yaml]
+------------------------------------------------
+spec:
+ tolerations:
+ - key: node-role.kubernetes.io/master
+   effect: NoSchedule
+------------------------------------------------
+
+[float]
 ===== Red Hat OpenShift configuration
 
 If you are using Red Hat OpenShift, you need to specify additional settings in
