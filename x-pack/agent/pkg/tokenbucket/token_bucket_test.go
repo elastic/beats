@@ -15,6 +15,7 @@ import (
 func TestTokenBucket(t *testing.T) {
 	dropSize := 1
 	dropRate := 50 * time.Millisecond
+	delta := 10 * time.Millisecond
 	bucketSize := 3
 	itemsToRun := 5
 	workload := make(chan int, itemsToRun)
@@ -28,14 +29,14 @@ func TestTokenBucket(t *testing.T) {
 	go runSomething(b, itemsToRun, workload, &wg)
 
 	wg.Wait()
-	<-time.After(10 * time.Millisecond)
+	<-time.After(delta)
 
 	assert.Equal(t, bucketSize, len(workload))
 
-	<-time.After(dropRate)
+	<-time.After(dropRate + delta)
 	assert.Equal(t, bucketSize+1, len(workload))
 
-	<-time.After(dropRate)
+	<-time.After(dropRate + delta)
 	assert.Equal(t, bucketSize+2, len(workload))
 }
 
