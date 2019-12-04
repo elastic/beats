@@ -21,12 +21,27 @@
         },
         {
             "date": {
+                "if" : "ctx.event.timezone == null",
                 "field": "haproxy.request_date",
                 "target_field": "@timestamp",
                 "formats": [
                     "dd/MMM/yyyy:HH:mm:ss.SSS",
                     "MMM dd HH:mm:ss"
-                ]
+                ],
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
+        },
+        {
+            "date": {
+                "if" : "ctx.event.timezone != null",
+                "field": "haproxy.request_date",
+                "target_field": "@timestamp",
+                "formats": [
+                    "dd/MMM/yyyy:HH:mm:ss.SSS",
+                    "MMM dd HH:mm:ss"
+                ],
+                "timezone" : "{{ event.timezone }}",
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
         },
         {

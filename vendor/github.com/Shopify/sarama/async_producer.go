@@ -520,7 +520,6 @@ func (pp *partitionProducer) dispatch() {
 	}()
 
 	for msg := range pp.input {
-
 		if pp.brokerProducer != nil && pp.brokerProducer.abandoned != nil {
 			select {
 			case <-pp.brokerProducer.abandoned:
@@ -652,6 +651,7 @@ func (p *asyncProducer) newBrokerProducer(broker *Broker) *brokerProducer {
 		input:          input,
 		output:         bridge,
 		responses:      responses,
+		stopchan:       make(chan struct{}),
 		buffer:         newProduceSet(p),
 		currentRetries: make(map[string]map[int32]error),
 	}
@@ -696,6 +696,7 @@ type brokerProducer struct {
 	output    chan<- *produceSet
 	responses <-chan *brokerProducerResponse
 	abandoned chan struct{}
+	stopchan  chan struct{}
 
 	buffer     *produceSet
 	timer      <-chan time.Time
@@ -711,10 +712,15 @@ func (bp *brokerProducer) run() {
 
 	for {
 		select {
-		case msg := <-bp.input:
-			if msg == nil {
+		case msg, ok := <-bp.input:
+			if !ok {
+				Logger.Printf("producer/broker/%d input chan closed\n", bp.broker.ID())
 				bp.shutdown()
 				return
+			}
+
+			if msg == nil {
+				continue
 			}
 
 			if msg.flags&syn == syn {
@@ -760,8 +766,14 @@ func (bp *brokerProducer) run() {
 			bp.timerFired = true
 		case output <- bp.buffer:
 			bp.rollOver()
-		case response := <-bp.responses:
-			bp.handleResponse(response)
+		case response, ok := <-bp.responses:
+			if ok {
+				bp.handleResponse(response)
+			}
+		case <-bp.stopchan:
+			Logger.Printf(
+				"producer/broker/%d run loop asked to stop\n", bp.broker.ID())
+			return
 		}
 
 		if bp.timerFired || bp.buffer.readyToFlush() {
@@ -785,7 +797,7 @@ func (bp *brokerProducer) shutdown() {
 	for response := range bp.responses {
 		bp.handleResponse(response)
 	}
-
+	close(bp.stopchan)
 	Logger.Printf("producer/broker/%d shut down\n", bp.broker.ID())
 }
 

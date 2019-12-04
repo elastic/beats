@@ -413,7 +413,7 @@ processors:
      if: "[\"302014\", \"302016\", \"302018\", \"302021\", \"302036\", \"302304\", \"302306\"].contains(ctx._temp_.cisco.message_id)"
      patterns:
       - "Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int} (?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int} (?:%{NOTSPACE:_temp_.cisco.destination_username} )?(?:duration %{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes:int})%{GREEDYDATA}"
-      - "Teardown %{NOTSPACE:network.transport} connection for faddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSDESTIPORHOST}/%{NUMBER} (?:%{NOTSPACE:_temp_.cisco.destination_username} )?gaddr (?:%{NOTCOLON}:)?%{MAPPEDSRC}/%{NUMBER} laddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSSOURCEIPORHOST}/%{NUMBER:_temp_.cisco.icmp_code:int}(?: %{NOTSPACE:_temp_.cisco.source_username})?%{GREEDYDATA}"
+      - "Teardown %{NOTSPACE:network.transport} connection for faddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSDESTIPORHOST}/%{NUMBER} (?:%{NOTSPACE:_temp_.cisco.destination_username} )?gaddr (?:%{NOTCOLON}:)?%{MAPPEDSRC}/%{NUMBER} laddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSSOURCEIPORHOST}/%{NUMBER}(?: %{NOTSPACE:_temp_.cisco.source_username})?%{GREEDYDATA}"
      pattern_definitions:
       NOTCOLON: "[^:]*"
       ECSSOURCEIPORHOST: "(?:%{IP:source.address}|%{HOSTNAME:source.domain})"

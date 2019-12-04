@@ -1,6 +1,7 @@
 # Module: kafka
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kafka.html
 
+# Kafka metrics collected using the Kafka protocol
 - module: kafka
   #metricsets:
   #  - partition
@@ -28,3 +29,24 @@
   # SASL authentication
   #username: ""
   #password: ""
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]

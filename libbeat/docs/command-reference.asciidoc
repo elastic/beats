@@ -674,11 +674,6 @@ endif::no_dashboards[]
 *`-h, --help`*::
 Shows help for the `setup` command.
 
-ifdef::has_ml_jobs[]
-*`--machine-learning`*::
-Sets up machine learning job configurations only.
-endif::[]
-
 ifeval::["{beatname_lc}"=="filebeat"]
 *`--modules MODULE_LIST`*::
 Specifies a comma-separated list of modules. Use this flag to avoid errors when
@@ -718,7 +713,6 @@ ifeval::["{beatname_lc}"=="filebeat"]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} setup --dashboards
-{beatname_lc} setup --machine-learning
 {beatname_lc} setup --pipelines
 {beatname_lc} setup --pipelines --modules system,nginx,mysql <1>
 {beatname_lc} setup --index-management
@@ -734,7 +728,6 @@ ifndef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} setup --dashboards
-{beatname_lc} setup --machine-learning
 {beatname_lc} setup --index-management
 -----
 endif::no_dashboards[]
@@ -743,7 +736,6 @@ ifndef::apm-server[]
 ifdef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} setup --machine-learning
 {beatname_lc} setup --index-management
 -----
 endif::no_dashboards[]
