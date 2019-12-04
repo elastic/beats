@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2019-12-04T22:09:17.578Z",
+    "aws": {
+        "metrics": {
+            "NumberOfMessagesPublished": {
+                "max": 1
+            },
+            "PublishSize": {
+                "avg": 5
+            }
+        },
+        "cloudwatch": {
+            "dimensions": {
+                "TopicName": "FirstTopic"
+            },
+            "namespace": "AWS/SNS"
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-west-2",
+        "account": {
+            "id": "624870917934"
+        }
+    },
+
+    "event": {
+        "duration": 1151481682,
+        "dataset": "aws.sns",
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "sns",
+        "period": 300000
+    },
+    "service": {
+        "type": "aws"
+    }
+}
