@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-
 var (
 	moduleSchema = s.Schema{
 		"server": s.Object{
@@ -25,12 +24,12 @@ var (
 		},
 	}
 	channelSchema = s.Schema{
-		"name":       c.Str("name"),
-		"messages":       c.Int("msgs"),
-		"bytes":      c.Int("bytes"),
-		"first_seq":  c.Int("first_seq"),
-		"last_seq":   c.Int("last_seq"),
-		"depth":      c.Int("depth", s.Optional), // aggregated by the module
+		"name":      c.Str("name"),
+		"messages":  c.Int("msgs"),
+		"bytes":     c.Int("bytes"),
+		"first_seq": c.Int("first_seq"),
+		"last_seq":  c.Int("last_seq"),
+		"depth":     c.Int("depth", s.Optional), // aggregated by the module
 	}
 )
 
@@ -99,8 +98,10 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 			}
 		}
 		chWrapper := map[string]interface{}{
+			"cluster_id": channelsIn.ClusterID,
+			"server_id":  channelsIn.ServerID,
 			"name":       ch.Name,
-			"messages":       ch.Msgs,
+			"msgs":       ch.Msgs,
 			"bytes":      ch.Bytes,
 			"first_seq":  ch.FirstSeq,
 			"last_seq":   ch.LastSeq,

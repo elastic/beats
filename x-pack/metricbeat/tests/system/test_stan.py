@@ -7,14 +7,14 @@ from parameterized import parameterized
 STAN_FIELDS = metricbeat.COMMON_FIELDS + ["stan"]
 
 
-class TestNats(XPackTest):
+class TestStan(XPackTest):
 
     COMPOSE_SERVICES = ['stan']
 
     @parameterized.expand([
         "stats",
-        #         "channels",
-        #         "subscriptions",
+        "channels",
+        "subscriptions",
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricset(self, metricset):

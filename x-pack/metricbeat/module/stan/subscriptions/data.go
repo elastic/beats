@@ -77,6 +77,7 @@ type Channel struct {
 // Channels stores channels related information
 type Channels struct {
 	ClusterID string    `json:"cluster_id"`
+	ServerID  string    `json:"server_id"`
 	Limit     uint64    `json:"limit"`
 	Total     uint64    `json:"total"`
 	Channels  []Channel `json:"channels,omitempty"`
@@ -94,6 +95,8 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 		for _, sub := range ch.Subscriptions {
 			var evt mb.Event
 			sub["channel"] = ch.Name
+			sub["server_id"] = channels.ServerID
+			sub["cluster_id"] = channels.ClusterID
 			evt, err = eventMapping(sub)
 			if err != nil {
 				r.Error(errors.Wrap(err, "error mapping subscription event"))
