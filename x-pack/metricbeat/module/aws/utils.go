@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"math"
 	"strings"
 	"time"
 
@@ -75,18 +76,15 @@ func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, next
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
 	init := true
+	maxQuerySize := 100
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 	for init || getMetricDataOutput.NextToken != nil {
 		init = false
 		// Split metricDataQueries into smaller slices that length no longer than 100.
+		// 100 is defined in maxQuerySize.
 		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
-		iter := len(metricDataQueries) / 100
-		for i := 0; i <= iter; i++ {
-			metricDataQueriesPartial := metricDataQueries[iter*100:]
-			if i != iter {
-				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100]
-			}
-
+		for i := 0; i < len(metricDataQueries); i += maxQuerySize {
+			metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
 			if len(metricDataQueriesPartial) == 0 {
 				return getMetricDataOutput.MetricDataResults, nil
 			}
