@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
+- Fix job scheduling issues with new scheduler implementation. {pull}14569[14569]
 
 *Journalbeat*
 
