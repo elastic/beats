@@ -37,6 +37,14 @@ The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jo
 
 
 [float]
+=== Dashboard
+
+The Kafka module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_kafka_dashboard.png[]
+
+
+[float]
 === Example configuration
 
 The Kafka module supports the standard configuration options that are described

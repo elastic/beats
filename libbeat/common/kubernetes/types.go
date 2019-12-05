@@ -67,6 +67,9 @@ type ReplicaSet = extv1.ReplicaSet
 // StatefulSet data
 type StatefulSet = appsv1.StatefulSet
 
+// Service data
+type Service = v1.Service
+
 // Time extracts time from k8s.Time type
 func Time(t *metav1.Time) time.Time {
 	return t.Time

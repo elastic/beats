@@ -56,20 +56,10 @@ func NewInput(
 	cfg *common.Config,
 	connector channel.Connector,
 	inputContext input.Context,
-) (input.Input, error) {
+) (inp input.Input, err error) {
 	// Extract and validate the input's configuration.
 	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		return nil, err
-	}
-
-	// Build outlet for events.
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
-	if err != nil {
+	if err = cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
 
@@ -94,13 +84,31 @@ func NewInput(
 			"pubsub_project", conf.ProjectID,
 			"pubsub_topic", conf.Topic,
 			"pubsub_subscription", conf.Subscription),
-		outlet:       out,
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 		ackedCount:   atomic.NewUint32(0),
 	}
 
+	// Build outlet for events.
+	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: inputContext.DynamicFields,
+		},
+		ACKEvents: func(privates []interface{}) {
+			for _, priv := range privates {
+				if msg, ok := priv.(*pubsub.Message); ok {
+					msg.Ack()
+					in.ackedCount.Inc()
+				} else {
+					in.log.Error("Failed ACKing pub/sub event")
+				}
+			}
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
 	in.log.Info("Initialized Google Pub/Sub input.")
 	return in, nil
 }
@@ -152,15 +160,11 @@ func (in *pubsubInput) run() error {
 	// Start receiving messages.
 	topicID := makeTopicID(in.ProjectID, in.Topic)
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); ok {
-			msg.Ack()
-			in.ackedCount.Inc()
-			return
+		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
+			msg.Nack()
+			in.log.Debug("OnEvent returned false. Stopping input worker.")
+			cancel()
 		}
-
-		msg.Nack()
-		in.log.Debug("OnEvent returned false. Stopping input worker.")
-		cancel()
 	})
 }
 
@@ -205,7 +209,8 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 		Meta: common.MapStr{
 			"id": id,
 		},
-		Fields: fields,
+		Fields:  fields,
+		Private: msg,
 	}
 }
 
