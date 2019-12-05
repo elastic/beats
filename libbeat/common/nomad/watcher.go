@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	api "github.com/hashicorp/nomad/api"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Max back off time for retries

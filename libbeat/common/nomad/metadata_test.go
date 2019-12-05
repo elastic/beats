@@ -24,9 +24,10 @@ import (
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/hashicorp/nomad/helper"
 	"github.com/hashicorp/nomad/helper/uuid"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func newJob(jobID string) *Job {

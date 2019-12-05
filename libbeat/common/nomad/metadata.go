@@ -20,9 +20,10 @@ package nomad
 import (
 	"regexp"
 
+	"github.com/imdario/mergo"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/imdario/mergo"
 )
 
 var (

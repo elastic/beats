@@ -22,16 +22,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/nomad"
 	"github.com/gofrs/uuid"
 	"github.com/hashicorp/nomad/api"
 	"github.com/hashicorp/nomad/helper"
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/jarcoal/httpmock.v1"
+
+	"github.com/elastic/beats/libbeat/autodiscover/template"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/nomad"
 )
 
 func TestGenerateHints(t *testing.T) {
