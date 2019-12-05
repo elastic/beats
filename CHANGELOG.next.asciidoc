@@ -283,6 +283,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix rds metricset from reporting same values for different instances. {pull}14702[14702]
 - Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
 - Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
+- Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
 
 *Packetbeat*
 
@@ -358,6 +359,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for API keys in Elasticsearch outputs. {pull}14324[14324]
 - Ensure that init containers are no longer tailed after they stop {pull}14394[14394]
 - Add consumer_lag in Kafka consumergroup metricset {pull}14822[14822]
+- Make use of consumer_lag in Kafka dashboard {pull}14863[14863]
+- Refactor kubernetes autodiscover to enable different resource based discovery {pull}14738[14738]
 
 *Auditbeat*
 
@@ -440,6 +443,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboards to the CEF module (ported from the Logstash ArcSight module).
 - Add dashboards to the CEF module (ported from the Logstash ArcSight module). {pull}14342[14342]
 - Fix timezone parsing in haproxy pipeline. {pull}14755[14755]
+- Add module for ActiveMQ. {pull}14840[14840]
 - Add dashboards for the ActiveMQ Filebeat module. {pull}14880[14880]
 
 *Heartbeat*
@@ -533,6 +537,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add module for ActiveMQ. {pull}14580[14580]
 - Enable script processor. {pull}14711[14711]
 - Add billing metricset in aws modules. {pull}14801[14801] {issue}14934[14934]
+- Add AWS SNS metricset. {pull}14946[14946]
 
 *Packetbeat*
 
