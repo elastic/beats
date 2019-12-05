@@ -2713,6 +2713,12 @@ format: duration
 --
 
 [float]
+=== sns
+
+`sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+
+
+[float]
 === sqs
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
