@@ -15,7 +15,9 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
-func emitter(log *logger.Logger, router *router) emitterFunc {
+type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program.Program, error)
+
+func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) emitterFunc {
 	return func(files []string) error {
 		c, err := config.LoadFiles(files...)
 		if err != nil {
@@ -39,6 +41,15 @@ func emitter(log *logger.Logger, router *router) emitterFunc {
 		programsToRun, err := program.Programs(ast)
 		if err != nil {
 			return err
+		}
+
+		for _, decorator := range decorators {
+			for outputType, ptr := range programsToRun {
+				programsToRun[outputType], err = decorator(outputType, ast, ptr)
+				if err != nil {
+					return err
+				}
+			}
 		}
 
 		return router.Dispatch(ast.HashStr(), programsToRun)

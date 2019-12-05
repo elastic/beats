@@ -6,6 +6,7 @@ package operation
 
 import (
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
 )
 
@@ -32,6 +33,7 @@ type Application interface {
 	Stop()
 	Configure(config map[string]interface{}) error
 	State() state.State
+	Monitor() monitoring.Monitor
 }
 
 // Descriptor defines a program which needs to be run.
