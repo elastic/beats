@@ -74,8 +74,8 @@ GROUPLOOP:
 			if uname, found := esMap["username"]; !found {
 				t.Errorf("output.elasticsearch.username output not found for '%s'", group)
 				continue GROUPLOOP
-			} else if uname != "xxx" {
-				t.Errorf("output.elasticsearch.username has incorrect value expected '%s', got '%s for %s", "xxx", uname, group)
+			} else if uname != "monitoring-uname" {
+				t.Errorf("output.elasticsearch.username has incorrect value expected '%s', got '%s for %s", "monitoring-uname", uname, group)
 				continue GROUPLOOP
 			}
 		}
@@ -87,6 +87,12 @@ var inputConfigMap = map[string]interface{}{
 		"enabled": true,
 		"logs":    true,
 		"metrics": true,
+		"elasticsearch": map[string]interface{}{
+			"index_name": "general",
+			"pass":       "xxx",
+			"url":        "xxxxx",
+			"username":   "monitoring-uname",
+		},
 	},
 	"outputs": map[string]interface{}{
 		"default": map[string]interface{}{
