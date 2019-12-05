@@ -47,7 +47,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, makeErrConfigUnpack(err)
 	}
 
-	gen, err := generator.Factory(p.config.Type)
+	gen, err := generator.Factory(config.Type)
 	if err != nil {
 		return nil, makeErrComputeID(err)
 	}
