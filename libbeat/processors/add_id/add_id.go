@@ -37,6 +37,7 @@ const processorName = "add_id"
 
 type addID struct {
 	config config
+	gen    generator.IDGenerator
 }
 
 // New constructs a new Add ID processor.
@@ -46,8 +47,14 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, makeErrConfigUnpack(err)
 	}
 
+	gen, err := generator.Factory(p.config.Type)
+	if err != nil {
+		return nil, makeErrComputeID(err)
+	}
+
 	p := &addID{
 		config,
+		gen,
 	}
 
 	return p, nil
@@ -55,12 +62,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with an ID
 func (p *addID) Run(event *beat.Event) (*beat.Event, error) {
-	idFn, err := generator.Factory(p.config.Type)
-	if err != nil {
-		return nil, makeErrComputeID(err)
-	}
+	id := p.gen.NextID()
 
-	id := idFn()
 	if _, err := event.PutValue(p.config.TargetField, id); err != nil {
 		return nil, makeErrComputeID(err)
 	}

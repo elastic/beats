@@ -18,8 +18,6 @@
 package generator
 
 import (
-	"reflect"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,11 +25,11 @@ import (
 
 func TestFactory(t *testing.T) {
 	tests := map[string]struct {
-		expectedIDGenerator func() IDGenerator
-		expectedErr         error
+		expectedGen IDGenerator
+		expectedErr error
 	}{
 		"elasticsearch": {
-			ESTimeBasedUUIDGenerator,
+			ESTimeBasedUUIDGenerator(),
 			nil,
 		},
 		"foobar": {
@@ -43,19 +41,13 @@ func TestFactory(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			typ := name
-			ctor, err := Factory(typ)
-			if test.expectedIDGenerator != nil {
-				ctorName := getGeneratorFuncName(ctor)
-				expectedCtorName := getGeneratorFuncName(test.expectedIDGenerator)
-				assert.Equal(t, ctorName, expectedCtorName)
+			gen, err := Factory(typ)
+			if test.expectedGen != nil {
+				assert.Equal(t, test.expectedGen, gen)
 			}
 			if test.expectedErr != nil {
 				assert.EqualError(t, err, test.expectedErr.Error())
 			}
 		})
 	}
-}
-
-func getGeneratorFuncName(ctor func() IDGenerator) string {
-	return runtime.FuncForPC(reflect.ValueOf(ctor).Pointer()).Name()
 }

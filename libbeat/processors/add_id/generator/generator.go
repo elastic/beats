@@ -22,15 +22,12 @@ type IDGenerator interface {
 	NextID() string
 }
 
-// Fn represents an ID generator constructor function.
-type Fn func() string
-
-// Factory takes as input the type of ID to generate and returns the constructor
-// for the generator of that ID type.
-func Factory(typ string) (func() IDGenerator, error) {
+// Factory takes as input the type of ID to generate and returns the
+// generator of that ID type.
+func Factory(typ string) (IDGenerator, error) {
 	switch typ {
 	case "elasticsearch":
-		return ESTimeBasedUUIDGenerator, nil
+		return ESTimeBasedUUIDGenerator(), nil
 	default:
 		return nil, makeErrUnknownType(typ)
 	}
