@@ -143,7 +143,7 @@ func TestProcessorRun(t *testing.T) {
 			},
 		}
 
-		evt, err = dec.Run(evt)
+		_, err = dec.Run(evt)
 		if assert.Error(t, err) {
 			assert.Contains(t, err.Error(), "does not contain a CEF header")
 		}
