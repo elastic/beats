@@ -20,8 +20,10 @@
 package instance
 
 import (
+	_ "github.com/elastic/beats/filebeat/processor/add_nomad_metadata"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker" // Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/nomad"
 	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 )

@@ -2381,6 +2381,12 @@
 			"revisionTime": "2019-05-20T14:04:33Z"
 		},
 		{
+			"checksumSHA1": "u/Y/Ayy8bYnb/rA0UFAuxvRfWO0=",
+			"path": "github.com/hashicorp/nomad/api",
+			"revision": "b7a48a99cc5c196f432f3352e5f5e7ee2d63fc89",
+			"revisionTime": "2019-12-04T22:49:16Z"
+		},
+		{
 			"checksumSHA1": "3LWNcQT7yTaLpEmjhI/3fi8puv0=",
 			"path": "github.com/imdario/mergo",
 			"revision": "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4",
@@ -2608,13 +2614,13 @@
 			"versionExact": "v1.1.15"
 		},
 		{
-			"checksumSHA1": "QCDNcDE+mokVH3qx9kjMP9OZfpc=",
+			"checksumSHA1": "7zLQC+jG19ndjH24FVh/+ZliHac=",
 			"path": "github.com/mitchellh/go-homedir",
 			"revision": "af06845cf3004701891bf4fdb884bfe4920b3727",
 			"revisionTime": "2019-01-27T04:21:35Z"
 		},
 		{
-			"checksumSHA1": "7zLQC+jG19ndjH24FVh/+ZliHac=",
+			"checksumSHA1": "QCDNcDE+mokVH3qx9kjMP9OZfpc=",
 			"path": "github.com/mitchellh/go-homedir",
 			"revision": "af06845cf3004701891bf4fdb884bfe4920b3727",
 			"revisionTime": "2019-01-27T04:21:35Z"
