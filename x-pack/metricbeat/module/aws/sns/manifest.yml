@@ -10,7 +10,7 @@ input:
           - PublishSize
           - SMSSuccessRate
       - namespace: AWS/SNS
-        statistic: ["Maximum"]
+        statistic: ["Sum"]
         name:
           - NumberOfMessagesPublished
           - NumberOfNotificationsDelivered

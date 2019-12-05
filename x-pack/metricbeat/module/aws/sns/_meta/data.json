@@ -1,33 +1,33 @@
 {
-    "@timestamp": "2019-12-04T22:09:17.578Z",
+    "@timestamp": "2019-12-05T20:15:30.847Z",
+    "cloud": {
+        "account": {
+            "name": "elastic-beats",
+            "id": "428152502467"
+        },
+        "provider": "aws",
+        "region": "eu-west-1"
+    },
     "aws": {
         "metrics": {
-            "NumberOfMessagesPublished": {
-                "max": 1
-            },
             "PublishSize": {
-                "avg": 5
+                "avg": 28
+            },
+            "NumberOfMessagesPublished": {
+                "sum": 140
             }
         },
         "cloudwatch": {
             "dimensions": {
-                "TopicName": "FirstTopic"
+                "TopicName": "Incoming"
             },
             "namespace": "AWS/SNS"
         }
     },
-    "cloud": {
-        "provider": "aws",
-        "region": "us-west-2",
-        "account": {
-            "id": "624870917934"
-        }
-    },
-
     "event": {
-        "duration": 1151481682,
         "dataset": "aws.sns",
-        "module": "aws"
+        "module": "aws",
+        "duration": 860534784
     },
     "metricset": {
         "name": "sns",
@@ -35,5 +35,8 @@
     },
     "service": {
         "type": "aws"
+    },
+    "ecs": {
+        "version": "1.2.0"
     }
 }

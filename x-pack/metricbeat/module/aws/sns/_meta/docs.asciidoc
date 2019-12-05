@@ -33,15 +33,15 @@ https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html#S
 
 |===
 |Metric Name|Statistic Method
-|NumberOfMessagesPublished | Maximum
-|NumberOfNotificationsDelivered | Maximum
-|NumberOfNotificationsFailed | Maximum
-|NumberOfNotificationsFilteredOut | Maximum
-|NumberOfNotificationsFilteredOut-InvalidAttributes | Maximum
-|NumberOfNotificationsFilteredOut-NoMessageAttributes | Maximum
-|NumberOfNotificationsRedrivenToDlq | Maximum
-|NumberOfNotificationsFailedToRedriveToDlq | Maximum
+|NumberOfMessagesPublished | Sum
+|NumberOfNotificationsDelivered | Sum
+|NumberOfNotificationsFailed | Sum
+|NumberOfNotificationsFilteredOut | Sum
+|NumberOfNotificationsFilteredOut-InvalidAttributes | Sum
+|NumberOfNotificationsFilteredOut-NoMessageAttributes | Sum
+|NumberOfNotificationsRedrivenToDlq | Sum
+|NumberOfNotificationsFailedToRedriveToDlq | Sum
 |PublishSize | Average
-|SMSMonthToDateSpentUSD | Maximum
+|SMSMonthToDateSpentUSD | Sum
 |SMSSuccessRate | Average
 |===
