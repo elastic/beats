@@ -55,8 +55,7 @@ func NewPersistentVolumeMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			},
 			Labels: map[string]p.LabelMap{
 				"persistentvolume": p.KeyLabel("name"),
-
-				"storageclass": p.Label("storage_class"),
+				"storageclass":     p.Label("storage_class"),
 			},
 		},
 	}, nil
