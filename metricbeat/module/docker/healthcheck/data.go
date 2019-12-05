@@ -70,7 +70,7 @@ func eventMapping(r mb.ReporterV2, cont types.Container, m *MetricSet) {
 	}
 
 	r.Event(mb.Event{
-		RootFields:      docker.NewContainer(cont, m.dedot).ToMapStr(),
+		RootFields:      docker.NewContainer(&cont, m.dedot).ToMapStr(),
 		MetricSetFields: fields,
 	})
 }

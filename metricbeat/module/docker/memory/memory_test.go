@@ -99,7 +99,7 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	//WHEN
 	rawStats := memoryService.getMemoryStats(memoryRawStats, false)
 	r := &mbtest.CapturingReporterV2{}
-	eventMapping(r, &rawStats)
+	eventMapping(r, rawStats)
 	events := r.GetEvents()
 	//THEN
 	assert.Empty(t, r.GetErrors())
