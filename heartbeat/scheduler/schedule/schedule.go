@@ -35,7 +35,7 @@ type intervalScheduler struct {
 
 // RunOnInit returns true for interval schedulers.
 func (s intervalScheduler) RunOnInit() bool {
-	return true
+	return false
 }
 
 func Parse(in string) (*Schedule, error) {
