@@ -151,7 +151,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			// Convert labels
 			labels := common.MapStr{}
 			keyLabels := common.MapStr{}
-
 			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
