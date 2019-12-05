@@ -17,18 +17,20 @@
 
 package generator
 
-import "github.com/elastic/beats/libbeat/processors/uuid/generator/elasticsearch"
-
 // Fn represents an ID generator function.
 type Fn func() string
 
-// Factory takes as input the type of ID to generate and returns the generator
-// function for that ID type.
+// Factory takes as input the type of ID to generate and returns the constructor
+// for the generator of that ID type.
 func Factory(typ string) (Fn, error) {
 	switch typ {
 	case "elasticsearch":
-		return elasticsearch.GetBase64UUID, nil
+		return ESTimeBasedUUIDGenerator, nil
 	default:
 		return nil, makeErrUnknownType(typ)
 	}
+}
+
+type IDGenerator interface {
+	NextID() string
 }

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package generator
 
 import (
 	"encoding/base64"
@@ -24,8 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetBase64UUIDLen(t *testing.T) {
-	id := GetBase64UUID()
+func TestIDLen(t *testing.T) {
+	g := ESTimeBasedUUIDGenerator()
+	id := g.NextID()
 
 	// Check that decoded ID is 15 bytes long
 	decodedBytes, err := base64.RawURLEncoding.DecodeString(id)
@@ -33,8 +34,9 @@ func TestGetBase64UUIDLen(t *testing.T) {
 	assert.Len(t, decodedBytes, 15)
 }
 
-func TestGetBase64UUIDBytes(t *testing.T) {
-	id := GetBase64UUID()
+func TestIDDBytes(t *testing.T) {
+	g := ESTimeBasedUUIDGenerator()
+	id := g.NextID()
 
 	// Check that bytes 7-12 are secure munged mac address
 	decodedBytes, err := base64.RawURLEncoding.DecodeString(id)
@@ -42,13 +44,15 @@ func TestGetBase64UUIDBytes(t *testing.T) {
 	assert.Equal(t, mac, decodedBytes[6:6+addrLen])
 }
 
-func TestGetBase64UUIDConsecutiveOrdering(t *testing.T) {
-	prevID := GetBase64UUID()
+func TestIDConsecutiveOrdering(t *testing.T) {
+	g := ESTimeBasedUUIDGenerator()
+
+	prevID := g.NextID()
 	for i := 0; i < 10000; i++ {
 		decodedPrevID, err := base64.RawURLEncoding.DecodeString(prevID)
 		assert.NoError(t, err)
 
-		currID := GetBase64UUID()
+		currID := g.NextID()
 		decodedCurrID, err := base64.RawURLEncoding.DecodeString(currID)
 		assert.NoError(t, err)
 
@@ -74,9 +78,10 @@ func TestGetBase64UUIDConsecutiveOrdering(t *testing.T) {
 	}
 }
 
-func BenchmarkGetBase64UUID(b *testing.B) {
+func BenchmarkID(b *testing.B) {
+	g := ESTimeBasedUUIDGenerator()
 	for n := 0; n < b.N; n++ {
-		GetBase64UUID()
+		g.NextID()
 	}
 }
 

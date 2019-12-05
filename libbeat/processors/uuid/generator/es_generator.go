@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package generator
 
 import (
 	"encoding/base64"
@@ -24,9 +24,18 @@ import (
 	"time"
 )
 
+type esTimeBasedUUIDGenerator struct{}
+
+// Singleton instance and constructor returning it
+var _esTimeBasedUUIDGenerator IDGenerator = (*esTimeBasedUUIDGenerator)(nil)
+
+func ESTimeBasedUUIDGenerator() IDGenerator {
+	return _esTimeBasedUUIDGenerator
+}
+
 var (
 	sequenceNumber uint32
-	lastTimestamp  *time.Time
+	lastTimestamp  time.Time
 	mac            []byte
 	mu             sync.Mutex
 )
@@ -40,10 +49,10 @@ func init() {
 	sequenceNumber = rand.Uint32()
 }
 
-// GetBase64UUID returns a base64-encoded, randomly-generated, but roughly ordered (over time), unique
+// NextID returns a base64-encoded, randomly-generated, but roughly ordered (over time), unique
 // ID. The algorithm used to generate the ID is the same as used by Elasticsearch.
 // See https://github.com/elastic/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
-func GetBase64UUID() string {
+func (_ *esTimeBasedUUIDGenerator) NextID() string {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -93,19 +102,19 @@ func GetBase64UUID() string {
 	return base64.RawURLEncoding.EncodeToString(uuidBytes)
 }
 
-func getTimestamp() *time.Time {
+func getTimestamp() time.Time {
 	// Don't let timestamp go backwards, at least "on our watch" (while this process is running).  We are still vulnerable if we are
 	// shut down, clock goes backwards, and we restart... for this we randomize the sequenceNumber on init to decrease chance of
 	// collision.
 	now := time.Now()
 
-	if lastTimestamp == nil {
-		return &now
+	if lastTimestamp.IsZero() {
+		return now
 	}
 
 	if lastTimestamp.After(now) {
 		return lastTimestamp
 	}
 
-	return &now
+	return now
 }
