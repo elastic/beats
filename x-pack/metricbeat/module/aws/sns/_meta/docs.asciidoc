@@ -29,7 +29,7 @@ iam:ListAccountAliases
 [float]
 === Metrics
 Please see more details for each metric in
-https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html#SNS_ViewMetrics .
+https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html#SNS_ViewMetrics[CloudWatch SNS Metrics].
 
 |===
 |Metric Name|Statistic Method
