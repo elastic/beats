@@ -89,7 +89,7 @@ func (c *wrapperContainer) Old() bool {
 	unit := match[2]
 	switch unit {
 	case "minute":
-		return n > 10
+		return n > 3
 	default:
 		return true
 	}
@@ -336,6 +336,28 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 	}
 
 	return containers, nil
+}
+
+// KillOld is a workaround for issues in CI with heavy load caused by having too many
+// running containers.
+// It kills all containers not related to services in `except`.
+func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
+	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	if err != nil {
+		return errors.Wrap(err, "listing containers to be killed")
+	}
+	for _, container := range list {
+		container := wrapperContainer{info: container}
+		serviceName, ok := container.info.Labels[labelComposeService]
+		if !ok || contains(except, serviceName) {
+			continue
+		}
+
+		if container.Running() && container.Old() {
+			d.client.ContainerKill(ctx, container.info.ID, "KILL")
+		}
+	}
+	return nil
 }
 
 func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
