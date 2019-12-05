@@ -13,5 +13,5 @@ include $(ES_BEATS)/dev-tools/make/xpack.mk
 
 
 .PHONY: unit-tests
-unit-tests:
+unit-tests: mage
 	mage unitTest
