@@ -23,7 +23,7 @@ func TestNewClient(t *testing.T) {
 	defer teardown()
 
 	event := testReturn(t, client)
-	assert.Equal(t, event.Fields["message"], "fail")
+	assert.Equal(t, event.Fields["message"], logString)
 }
 
 // setupTestReader sets up the "read side" of the pipeline, spawing a goroutine to read and event and send it back to the test.
