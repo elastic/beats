@@ -27,7 +27,7 @@ type Fn func() string
 
 // Factory takes as input the type of ID to generate and returns the constructor
 // for the generator of that ID type.
-func Factory(typ string) (Fn, error) {
+func Factory(typ string) (func() IDGenerator, error) {
 	switch typ {
 	case "elasticsearch":
 		return ESTimeBasedUUIDGenerator, nil

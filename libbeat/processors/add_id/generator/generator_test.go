@@ -43,11 +43,11 @@ func TestFactory(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			typ := name
-			fn, err := Factory(typ)
+			ctor, err := Factory(typ)
 			if test.expectedIDGenerator != nil {
-				fnName := getGeneratorFuncName(fn)
-				expectedFnName := getGeneratorFuncName(test.expectedIDGenerator)
-				assert.Equal(t, fnName, expectedFnName)
+				ctorName := getGeneratorFuncName(ctor)
+				expectedCtorName := getGeneratorFuncName(test.expectedIDGenerator)
+				assert.Equal(t, ctorName, expectedCtorName)
 			}
 			if test.expectedErr != nil {
 				assert.EqualError(t, err, test.expectedErr.Error())
@@ -56,6 +56,6 @@ func TestFactory(t *testing.T) {
 	}
 }
 
-func getGeneratorFuncName(fn Fn) string {
-	return runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+func getGeneratorFuncName(ctor func() IDGenerator) string {
+	return runtime.FuncForPC(reflect.ValueOf(ctor).Pointer()).Name()
 }
