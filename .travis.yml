@@ -136,7 +136,7 @@ jobs:
 
     # Docker Log Driver
     - os: linux
-      env: TARGETS="-C x-pack/dockerlogbeat unit-tests"
+      env: TARGETS="-C x-pack/dockerlogbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 

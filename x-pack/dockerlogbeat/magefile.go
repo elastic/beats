@@ -25,6 +25,8 @@ import (
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/test"
 )
 
 var hubID = "elastic"
@@ -168,4 +170,13 @@ docker plugin enable %s
 		filepath.Join(packageStagingDir, "install.sh"))
 
 	return nil
+}
+
+// IntegTest is currently a dummy test
+func IntegTest() {
+	fmt.Printf("There are no Integration tests for The Elastic Log Plugin\n")
+}
+
+func Update() {
+	fmt.Printf("There is no Update for The Elastic Log Plugin\n")
 }

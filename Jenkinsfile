@@ -339,7 +339,7 @@ pipeline {
             stage('Dockerlogbeat'){
               steps {
                 withBeatsEnv(){
-                  makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogbeat unit-tests")
+                  makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogbeat testsuite")
                 }
               }
             }
