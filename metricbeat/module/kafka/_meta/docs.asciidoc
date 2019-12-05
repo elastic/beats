@@ -18,6 +18,20 @@ kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allo
 -----
 
 [float]
-=== Compability
+=== Compatibility
 
 This module is tested with Kafka 0.10.2.1, 1.1.0 and 2.1.1.
+
+The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for Jolokia's compatibility notes.
+
+[float]
+=== Usage
+The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to those Metricsets' documentation about how to use Jolokia.
+
+
+[float]
+=== Dashboard
+
+The Kafka module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_kafka_dashboard.png[]

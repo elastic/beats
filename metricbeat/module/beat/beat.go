@@ -19,13 +19,68 @@ package beat
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
 )
+
+func init() {
+	// Register the ModuleFactory function for this module.
+	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
+		panic(err)
+	}
+}
+
+// NewModule creates a new module after performing validation.
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	if err := validateXPackMetricsets(base); err != nil {
+		return nil, err
+	}
+
+	return &base, nil
+}
+
+// Validate that correct metricsets have been specified if xpack.enabled = true.
+func validateXPackMetricsets(base mb.BaseModule) error {
+	config := struct {
+		Metricsets   []string `config:"metricsets"`
+		XPackEnabled bool     `config:"xpack.enabled"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return err
+	}
+
+	// Nothing to validate if xpack.enabled != true
+	if !config.XPackEnabled {
+		return nil
+	}
+
+	expectedXPackMetricsets := []string{
+		"state",
+		"stats",
+	}
+
+	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
+		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
+	}
+
+	return nil
+}
 
 // ModuleName is the name of this module.
 const ModuleName = "beat"
+
+var (
+	// ErrClusterUUID is the error to be returned when the monitored beat is using the Elasticsearch output but hasn't
+	// yet connected or is having trouble connecting to that Elasticsearch, so the cluster UUID cannot be
+	// determined
+	ErrClusterUUID = fmt.Errorf("monitored beat is using Elasticsearch output but cluster UUID cannot be determined")
+)
 
 // Info construct contains the relevant data from the Beat's / endpoint
 type Info struct {
@@ -38,6 +93,12 @@ type Info struct {
 
 // State construct contains the relevant data from the Beat's /state endpoint
 type State struct {
+	Monitoring struct {
+		ClusterUUID string `json:"cluster_uuid"`
+	} `json:"monitoring"`
+	Output struct {
+		Name string `json:"name"`
+	} `json:"output"`
 	Outputs struct {
 		Elasticsearch struct {
 			ClusterUUID string `json:"cluster_uuid"`

@@ -1,6 +1,9 @@
 package sarama
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type CreateTopicsResponse struct {
 	Version      int16
@@ -81,6 +84,14 @@ func (c *CreateTopicsResponse) requiredVersion() KafkaVersion {
 type TopicError struct {
 	Err    KError
 	ErrMsg *string
+}
+
+func (t *TopicError) Error() string {
+	text := t.Err.Error()
+	if t.ErrMsg != nil {
+		text = fmt.Sprintf("%s - %s", text, *t.ErrMsg)
+	}
+	return text
 }
 
 func (t *TopicError) encode(pe packetEncoder, version int16) error {

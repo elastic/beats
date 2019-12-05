@@ -48,7 +48,7 @@ const (
 )
 
 var (
-	configFilePattern      = regexp.MustCompile(`.*beat\.yml|apm-server\.yml`)
+	configFilePattern      = regexp.MustCompile(`.*beat\.yml$|apm-server\.yml$`)
 	manifestFilePattern    = regexp.MustCompile(`manifest.yml`)
 	modulesDirPattern      = regexp.MustCompile(`module/.+`)
 	modulesDDirPattern     = regexp.MustCompile(`modules.d/$`)
@@ -60,6 +60,7 @@ var (
 var (
 	files             = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
 	modules           = flag.Bool("modules", false, "check modules folder contents")
+	minModules        = flag.Int("min-modules", 4, "minimum number of modules to expect in modules folder")
 	modulesd          = flag.Bool("modules.d", false, "check modules.d folder contents")
 	monitorsd         = flag.Bool("monitors.d", false, "check monitors.d folder contents")
 	rootOwner         = flag.Bool("root-owner", false, "expect root to own package files")
@@ -122,6 +123,7 @@ func checkRPM(t *testing.T, file string) {
 	checkModulesDPresent(t, "/etc/", p)
 	checkMonitorsDPresent(t, "/etc", p)
 	checkSystemdUnitPermissions(t, p)
+	ensureNoBuildIDLinks(t, p)
 }
 
 func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
@@ -339,7 +341,7 @@ func checkMonitorsDPresent(t *testing.T, prefix string, p *packageFile) {
 
 func checkModules(t *testing.T, name, prefix string, r *regexp.Regexp, p *packageFile) {
 	t.Run(fmt.Sprintf("%s %s contents", p.Name, name), func(t *testing.T) {
-		minExpectedModules := 4
+		minExpectedModules := *minModules
 		total := 0
 		for _, entry := range p.Contents {
 			if strings.HasPrefix(entry.File, prefix) && r.MatchString(entry.File) {
@@ -420,6 +422,18 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 	t.Run(fmt.Sprintf("%s user", p.Name), func(t *testing.T) {
 		if expectRoot != (info.Config.User == "root") {
 			t.Errorf("unexpected docker user: %s", info.Config.User)
+		}
+	})
+}
+
+// ensureNoBuildIDLinks checks for regressions related to
+// https://github.com/elastic/beats/issues/12956.
+func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
+	t.Run(fmt.Sprintf("%s no build_id links", p.Name), func(t *testing.T) {
+		for name := range p.Contents {
+			if strings.Contains(name, "/usr/lib/.build-id") {
+				t.Error("found unexpected /usr/lib/.build-id in package")
+			}
 		}
 	})
 }

@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/util"
 )
 
 // Harvester contains all redis harvester data
@@ -133,8 +132,7 @@ func (h *Harvester) Run() error {
 			log.args = args[2:]
 		}
 
-		data := util.NewData()
-		subEvent := common.MapStr{
+		slowlogEntry := common.MapStr{
 			"id":  log.id,
 			"cmd": log.cmd,
 			"key": log.key,
@@ -144,24 +142,21 @@ func (h *Harvester) Run() error {
 		}
 
 		if log.args != nil {
-			subEvent["args"] = log.args
-
+			slowlogEntry["args"] = log.args
 		}
 
-		data.Event = beat.Event{
+		h.forwarder.Send(beat.Event{
 			Timestamp: time.Unix(log.timestamp, 0).UTC(),
 			Fields: common.MapStr{
 				"message": strings.Join(args, " "),
 				"redis": common.MapStr{
-					"slowlog": subEvent,
+					"slowlog": slowlogEntry,
 				},
 				"event": common.MapStr{
 					"created": time.Now(),
 				},
 			},
-		}
-
-		h.forwarder.Send(data)
+		})
 	}
 	return nil
 }

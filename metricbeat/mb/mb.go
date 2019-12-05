@@ -22,6 +22,7 @@ to implement Modules and their associated MetricSets.
 package mb
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -29,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 )
 
 const (
@@ -208,6 +210,13 @@ type ReportingMetricSetV2Error interface {
 	Fetch(r ReporterV2) error
 }
 
+// ReportingMetricSetV2WithContext is a MetricSet that reports events or errors through the
+// ReporterV2 interface. Fetch is called periodically to collect events.
+type ReportingMetricSetV2WithContext interface {
+	MetricSet
+	Fetch(ctx context.Context, r ReporterV2) error
+}
+
 // PushMetricSetV2 is a MetricSet that pushes events (rather than pulling them
 // periodically via a Fetch callback). Run is invoked to start the event
 // subscription and it should block until the MetricSet is ready to stop or
@@ -217,10 +226,23 @@ type PushMetricSetV2 interface {
 	Run(r PushReporterV2)
 }
 
+// PushMetricSetV2WithContext is a MetricSet that pushes events (rather than pulling them
+// periodically via a Fetch callback). Run is invoked to start the event
+// subscription and it should block until the MetricSet is ready to stop or
+// the context is closed.
+type PushMetricSetV2WithContext interface {
+	MetricSet
+	Run(ctx context.Context, r ReporterV2)
+}
+
 // HostData contains values parsed from the 'host' configuration. Other
 // configuration data like protocols, usernames, and passwords may also be
-// used to construct this HostData data.
+// used to construct this HostData data. HostData also contains information when combined scheme are
+// used, like doing HTTP request over a UNIX socket.
+//
 type HostData struct {
+	Transport dialer.Builder // The transport builder to use when creating the connection.
+
 	URI          string // The full URI that should be used in connections.
 	SanitizedURI string // A sanitized version of the URI without credentials.
 

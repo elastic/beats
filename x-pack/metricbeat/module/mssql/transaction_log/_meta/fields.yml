@@ -1,6 +1,7 @@
 - name: transaction_log
   type: group
   description: transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
+  release: beta
   fields:
     - name: space_usage
       type: group

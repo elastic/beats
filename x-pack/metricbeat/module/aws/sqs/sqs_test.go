@@ -7,6 +7,7 @@
 package sqs
 
 import (
+	"net/http"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -17,15 +18,17 @@ import (
 
 // MockSQSClient struct is used for unit tests.
 type MockSQSClient struct {
-	sqsiface.SQSAPI
+	sqsiface.ClientAPI
 }
 
 func (m *MockSQSClient) ListQueuesRequest(input *sqs.ListQueuesInput) sqs.ListQueuesRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
 	return sqs.ListQueuesRequest{
 		Request: &awssdk.Request{
 			Data: &sqs.ListQueuesOutput{
 				QueueUrls: []string{"https://sqs.us-east-1.amazonaws.com/123/sqs1", "https://sqs.us-east-1.amazonaws.com/123/sqs2"},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }

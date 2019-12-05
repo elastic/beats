@@ -24,14 +24,14 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"os"
+	"runtime"
 	"sync"
 	"time"
 
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type icmpLoop struct {
@@ -85,6 +85,10 @@ var (
 	loop     *icmpLoop
 )
 
+func noPingCapabilityError(message string) error {
+	return fmt.Errorf(fmt.Sprintf("Insufficient privileges to perform ICMP ping. %s", message))
+}
+
 func newICMPLoop() (*icmpLoop, error) {
 	// Log errors at info level, as the loop is setup globally when ICMP module is loaded
 	// first (not yet configured).
@@ -92,7 +96,7 @@ func newICMPLoop() (*icmpLoop, error) {
 	// IPv4/IPv6 checking
 	conn4 := createListener("IPv4", "ip4:icmp")
 	conn6 := createListener("IPv6", "ip6:ipv6-icmp")
-
+	unprivilegedPossible := false
 	l := &icmpLoop{
 		conn4:    conn4,
 		conn6:    conn6,
@@ -100,11 +104,33 @@ func newICMPLoop() (*icmpLoop, error) {
 		requests: map[requestID]*requestContext{},
 	}
 
-	if conn4 != nil {
-		go l.runICMPRecv(conn4, protocolICMP)
+	if l.conn4 == nil && l.conn6 == nil {
+		switch runtime.GOOS {
+		case "linux", "darwin":
+			unprivilegedPossible = true
+			//This is non-privileged ICMP, not udp
+			l.conn4 = createListener("Unprivileged IPv4", "udp4")
+			l.conn6 = createListener("Unprivileged IPv6", "udp6")
+		}
 	}
-	if conn6 != nil {
-		go l.runICMPRecv(conn6, protocolIPv6ICMP)
+
+	if l.conn4 != nil {
+		go l.runICMPRecv(l.conn4, protocolICMP)
+	}
+	if l.conn6 != nil {
+		go l.runICMPRecv(l.conn6, protocolIPv6ICMP)
+	}
+
+	if l.conn4 == nil && l.conn6 == nil {
+		if unprivilegedPossible {
+			var buffer bytes.Buffer
+			path, _ := os.Executable()
+			buffer.WriteString("You can run without root by setting cap_net_raw:\n sudo setcap cap_net_raw+eip ")
+			buffer.WriteString(path + " \n")
+			buffer.WriteString("Your system allows the use of unprivileged ping by setting net.ipv4.ping_group_range \n sysctl -w net.ipv4.ping_group_range='<min-uid> <max-uid>' ")
+			return nil, noPingCapabilityError(buffer.String())
+		}
+		return nil, noPingCapabilityError("You must provide the appropriate permissions to this executable")
 	}
 
 	return l, nil
@@ -124,10 +150,10 @@ func (l *icmpLoop) checkNetworkMode(mode string) error {
 	}
 
 	if ip4 && l.conn4 == nil {
-		return errors.New("failed to initiate IPv4 support")
+		return errors.New("failed to initiate IPv4 support. Check log details for permission configuration")
 	}
 	if ip6 && l.conn6 == nil {
-		return errors.New("failed to initiate IPv6 support")
+		return errors.New("failed to initiate IPv6 support. Check log details for permission configuration")
 	}
 
 	return nil
@@ -272,6 +298,7 @@ func (l *icmpLoop) ping(
 	if !success {
 		return 0, requests, timeoutError{}
 	}
+
 	return rtt, requests, nil
 }
 
@@ -344,7 +371,6 @@ func createListener(name, network string) *icmp.PacketConn {
 	//      true, even if error value itself is `nil`. Checking for conn suppresses
 	//      misleading log message.
 	if conn == nil && err != nil {
-		logp.Info("%v ICMP not supported: %v", name, err)
 		return nil
 	}
 	return conn

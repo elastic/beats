@@ -54,21 +54,9 @@
         type: keyword
         description: BLAKE2b-512 hash of the executable.
 
-      - name: md5
-        type: keyword
-        description: MD5 hash of the executable.
-
-      - name: sha1
-        type: keyword
-        description: SHA1 hash of the executable.
-
       - name: sha224
         type: keyword
         description: SHA224 hash of the executable.
-
-      - name: sha256
-        type: keyword
-        description: SHA256 hash of the executable.
 
       - name: sha384
         type: keyword
@@ -89,10 +77,6 @@
       - name: sha3_512
         type: keyword
         description: SHA3_512 hash of the executable.
-
-      - name: sha512
-        type: keyword
-        description: SHA512 hash of the executable.
 
       - name: sha512_224
         type: keyword

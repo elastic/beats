@@ -30,9 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func makeBadRequest(config map[string]interface{}) error {
-	host := config["hosts"].([]string)[0]
-
+func makeBadRequest(host string) error {
 	resp, err := http.Get("http://" + host + "/foobar")
 	if err != nil {
 		return err
@@ -42,12 +40,11 @@ func makeBadRequest(config map[string]interface{}) error {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "traefik")
+	service := compose.EnsureUp(t, "traefik")
 
-	config := mtest.GetConfig("health")
+	makeBadRequest(service.Host())
 
-	makeBadRequest(config)
-
+	config := mtest.GetConfig("health", service.Host())
 	ms := mbtest.NewReportingMetricSetV2Error(t, config)
 	reporter := &mbtest.CapturingReporterV2{}
 

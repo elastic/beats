@@ -1,9 +1,5 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "rabbitmq.node",
         "duration": 115000,
@@ -16,7 +12,7 @@
         "node": {
             "disk": {
                 "free": {
-                    "bytes": 51687411712,
+                    "bytes": 485213712384,
                     "limit": {
                         "bytes": 50000000
                     }
@@ -24,14 +20,14 @@
             },
             "fd": {
                 "total": 1048576,
-                "used": 25
+                "used": 54
             },
             "gc": {
                 "num": {
-                    "count": 7153
+                    "count": 5724
                 },
                 "reclaimed": {
-                    "bytes": 454566560
+                    "bytes": 294021640
                 }
             },
             "io": {
@@ -75,21 +71,21 @@
             },
             "mem": {
                 "limit": {
-                    "bytes": 2498702540
+                    "bytes": 13340778496
                 },
                 "used": {
-                    "bytes": 91295744
+                    "bytes": 71448312
                 }
             },
             "mnesia": {
                 "disk": {
                     "tx": {
-                        "count": 12
+                        "count": 0
                     }
                 },
                 "ram": {
                     "tx": {
-                        "count": 9
+                        "count": 43
                     }
                 }
             },
@@ -101,12 +97,12 @@
                     "count": 0
                 }
             },
-            "name": "rabbit@d7a26155daf9",
+            "name": "rabbit@my-rabbit",
             "proc": {
                 "total": 1048576,
-                "used": 367
+                "used": 234
             },
-            "processors": 4,
+            "processors": 12,
             "queue": {
                 "index": {
                     "journal_write": {
@@ -128,11 +124,11 @@
                 "used": 0
             },
             "type": "disc",
-            "uptime": 758100
+            "uptime": 155275
         }
     },
     "service": {
-        "address": "localhost:15672",
+        "address": "172.17.0.2:15672",
         "type": "rabbitmq"
     }
 }

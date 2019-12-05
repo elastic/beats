@@ -28,12 +28,24 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/generator/common/beatgen"
+	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
 	devtools.BeatServiceName = "heartbeat-elastic"
+}
+
+// VendorUpdate updates elastic/beats in the vendor dir
+func VendorUpdate() error {
+	return beatgen.VendorUpdate()
 }
 
 // Build builds the Beat binary.
@@ -67,11 +79,6 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -101,6 +108,16 @@ func Update() error {
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML("monitors/active")
+}
+
+// Imports generates an include/list.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	options := devtools.DefaultIncludeListOptions()
+	options.ModuleDirs = []string{"monitors"}
+	options.Outfile = "monitors/defaults/default.go"
+	options.Pkg = "defaults"
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // GoTestUnit executes the Go unit tests.
@@ -137,4 +154,9 @@ func customizePackaging() {
 			args.Spec.Files[unixMonitorsDir] = monitorsD
 		}
 	}
+}
+
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
 }

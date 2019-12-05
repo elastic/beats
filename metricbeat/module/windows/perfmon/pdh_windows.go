@@ -30,12 +30,14 @@ import (
 // Windows API calls
 //sys _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhOpenQueryW
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhRemoveCounter
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValueDouble(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueDouble) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
 //sys _PdhGetFormattedCounterValueLarge(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLarge) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
 //sys _PdhGetFormattedCounterValueLong(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLong) (errcode error) [failretval!=0]= pdh.PdhGetFormattedCounterValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
+//sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 
 type PdhQueryHandle uintptr
 
@@ -97,6 +99,15 @@ func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (
 	return handle, nil
 }
 
+// PdhRemoveCounter removes the specified counter to the query.
+func PdhRemoveCounter(counter PdhCounterHandle) error {
+	if err := _PdhRemoveCounter(counter); err != nil {
+		return PdhErrno(err.(syscall.Errno))
+	}
+
+	return nil
+}
+
 // PdhCollectQueryData collects the current raw data value for all counters in the specified query.
 func PdhCollectQueryData(query PdhQueryHandle) error {
 	if err := _PdhCollectQueryData(query); err != nil {
@@ -140,23 +151,33 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 }
 
 // PdhExpandWildCardPath returns counter paths that match the given counter path.
-func PdhExpandWildCardPath(wildCardPath string) ([]uint16, error) {
-	utfPath, err := syscall.UTF16PtrFromString(wildCardPath)
-	if err != nil {
-		return nil, err
-	}
+func PdhExpandWildCardPath(utfPath *uint16) ([]uint16, error) {
 	var bufferSize uint32
 	if err := _PdhExpandWildCardPath(nil, utfPath, nil, &bufferSize); err != nil {
 		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-
-		expdPaths := make([]uint16, bufferSize)
-		bufferSize = uint32(len(expdPaths))
-		if err := _PdhExpandWildCardPath(nil, utfPath, &expdPaths[0], &bufferSize); err != nil {
+		expandPaths := make([]uint16, bufferSize)
+		if err := _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-		return expdPaths, nil
+		return expandPaths, nil
+	}
+	return nil, nil
+}
+
+// PdhExpandCounterPath returns counter paths that match the given counter path, for 32 bit windows.
+func PdhExpandCounterPath(utfPath *uint16) ([]uint16, error) {
+	var bufferSize uint32
+	if err := _PdhExpandCounterPath(utfPath, nil, &bufferSize); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		expandPaths := make([]uint16, bufferSize)
+		if err := _PdhExpandCounterPath(utfPath, &expandPaths[0], &bufferSize); err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		return expandPaths, nil
 	}
 	return nil, nil
 }

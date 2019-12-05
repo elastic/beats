@@ -45,7 +45,7 @@ type Update mg.Namespace
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.Dashboards, Update.Config, Update.FieldDocs, Update.ModuleDocs)
+	mg.Deps(Update.Fields, Update.Dashboards, Update.Config, Update.FieldDocs, Update.ModuleDocs, Update.Includes)
 }
 
 // Config updates the Beat's config files.
@@ -73,4 +73,14 @@ func (Update) FieldDocs() error {
 // ModuleDocs collects and updates the module documentation.
 func (Update) ModuleDocs() error {
 	return moduleDocs()
+}
+
+// Includes generates the include/list.go file.
+func (Update) Includes() error {
+	switch SelectLogic {
+	case devtools.XPackProject:
+		return devtools.GenerateModuleIncludeListGo()
+	default:
+		return nil
+	}
 }

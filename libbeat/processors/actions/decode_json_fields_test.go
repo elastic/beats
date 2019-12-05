@@ -333,6 +333,40 @@ func TestArrayWithInvalidArray(t *testing.T) {
 	assert.Equal(t, expected.String(), actual.String())
 }
 
+func TestAddErrKeyOption(t *testing.T) {
+	tests := []struct {
+		name           string
+		addErrOption   bool
+		expectedOutput common.MapStr
+	}{
+		{name: "With add_error_key option", addErrOption: true, expectedOutput: common.MapStr{
+			"error": common.MapStr{"message": "@timestamp not overwritten (parse error on {})", "type": "json"},
+			"msg":   "{\"@timestamp\":\"{}\"}",
+		}},
+		{name: "Without add_error_key option", addErrOption: false, expectedOutput: common.MapStr{
+			"msg": "{\"@timestamp\":\"{}\"}",
+		}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			input := common.MapStr{
+				"msg": "{\"@timestamp\":\"{}\"}",
+			}
+
+			testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+				"fields":         fields,
+				"add_error_key":  test.addErrOption,
+				"overwrite_keys": true,
+				"target":         "",
+			})
+			actual := getActualValue(t, testConfig, input)
+
+			assert.Equal(t, test.expectedOutput.String(), actual.String())
+
+		})
+	}
+}
+
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	logp.TestingSetup()
 

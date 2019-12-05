@@ -9,6 +9,8 @@ Some specific AWS permissions are required for IAM user to collect AWS s3_daily_
 ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]
@@ -17,3 +19,16 @@ cloudwatch:ListMetrics
 The aws s3_daily_storage metricset and s3_request metricset shares one predefined dashboard. For example:
 
 image::./images/metricbeat-aws-s3-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 86400s
+  metricsets:
+    - s3_daily_storage
+  access_key_id: '<access_key_id>'
+  secret_access_key: '<secret_access_key>'
+  session_token: '<session_token>'
+----

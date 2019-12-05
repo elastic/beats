@@ -2,7 +2,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -15,7 +15,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -31,7 +31,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -43,7 +43,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -55,7 +55,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -68,7 +68,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -84,7 +84,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -96,7 +96,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -108,7 +108,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -121,7 +121,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -137,7 +137,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -149,7 +149,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -161,7 +161,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -174,7 +174,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -190,7 +190,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -202,7 +202,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -214,7 +214,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -227,7 +227,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -243,7 +243,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -255,7 +255,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -267,7 +267,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -280,7 +280,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "input.type": "log",
         "log.offset": 3355,
@@ -292,7 +292,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -308,7 +308,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -320,7 +320,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -332,7 +332,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -345,7 +345,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -361,7 +361,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -373,7 +373,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -385,7 +385,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -398,7 +398,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -414,7 +414,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -426,7 +426,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -438,7 +438,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -451,7 +451,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -467,7 +467,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -479,7 +479,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -491,7 +491,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -504,7 +504,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -520,7 +520,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -532,7 +532,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -544,7 +544,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -557,7 +557,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -573,7 +573,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -585,7 +585,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -597,7 +597,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -610,7 +610,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -626,7 +626,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -638,7 +638,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -650,7 +650,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -663,7 +663,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -679,7 +679,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -691,7 +691,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -703,7 +703,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -716,7 +716,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -732,7 +732,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -744,7 +744,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -756,7 +756,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -769,7 +769,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -785,7 +785,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -797,7 +797,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -809,7 +809,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -825,7 +825,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -837,7 +837,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -849,7 +849,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -861,7 +861,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -874,7 +874,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -887,7 +887,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -903,7 +903,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -915,7 +915,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -927,7 +927,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -940,7 +940,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -956,7 +956,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -968,7 +968,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -980,7 +980,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -993,7 +993,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1009,7 +1009,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1021,7 +1021,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1033,7 +1033,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1046,7 +1046,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1062,7 +1062,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1074,7 +1074,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1086,7 +1086,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1099,7 +1099,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1115,7 +1115,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1127,7 +1127,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1139,7 +1139,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1152,7 +1152,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1168,7 +1168,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1180,7 +1180,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1192,7 +1192,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1205,7 +1205,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1221,7 +1221,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1233,7 +1233,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1245,7 +1245,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1258,7 +1258,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1274,7 +1274,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1286,7 +1286,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1298,7 +1298,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1311,7 +1311,7 @@
     {
         "event.dataset": "system.auth",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",

@@ -80,10 +80,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	for _, fs := range fss {
 		stat, err := filesystem.GetFileSystemStat(fs)
 		if err != nil {
-			m.Logger().Debug("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+			m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
 			continue
 		}
-		m.Logger().Debug("filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
+		m.Logger().Debugf("filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
 
 		totalFiles += stat.Files
 		totalSize += stat.Total

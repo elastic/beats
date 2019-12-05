@@ -30,10 +30,14 @@ import (
 
 var (
 	schema = s.Schema{
-		"name":        c.Str("name"),
+		"name": c.Str("name"),
+		"client_provided": s.Object{
+			"name": c.Str("client_properties.connection_name"),
+		},
 		"vhost":       c.Str("vhost", s.Required),
 		"user":        c.Str("user", s.Required),
 		"node":        c.Str("node", s.Required),
+		"state":       c.Str("state"),
 		"channels":    c.Int("channels"),
 		"channel_max": c.Int("channel_max"),
 		"frame_max":   c.Int("frame_max"),

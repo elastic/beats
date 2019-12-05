@@ -159,6 +159,8 @@ var (
 	V2_0_0_0  = newKafkaVersion(2, 0, 0, 0)
 	V2_0_1_0  = newKafkaVersion(2, 0, 1, 0)
 	V2_1_0_0  = newKafkaVersion(2, 1, 0, 0)
+	V2_2_0_0  = newKafkaVersion(2, 2, 0, 0)
+	V2_3_0_0  = newKafkaVersion(2, 3, 0, 0)
 
 	SupportedVersions = []KafkaVersion{
 		V0_8_2_0,
@@ -181,11 +183,14 @@ var (
 		V2_0_0_0,
 		V2_0_1_0,
 		V2_1_0_0,
+		V2_2_0_0,
+		V2_3_0_0,
 	}
 	MinVersion = V0_8_2_0
-	MaxVersion = V2_1_0_0
+	MaxVersion = V2_3_0_0
 )
 
+//ParseKafkaVersion parses and returns kafka version or error from a string
 func ParseKafkaVersion(s string) (KafkaVersion, error) {
 	if len(s) < 5 {
 		return MinVersion, fmt.Errorf("invalid version `%s`", s)

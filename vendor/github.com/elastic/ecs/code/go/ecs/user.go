@@ -40,4 +40,8 @@ type User struct {
 	// Useful if `user.id` or `user.name` contain confidential information and
 	// cannot be used.
 	Hash string `ecs:"hash"`
+
+	// Name of the directory the user is a member of.
+	// For example, an LDAP or Active Directory domain name.
+	Domain string `ecs:"domain"`
 }

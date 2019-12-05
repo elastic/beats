@@ -7,19 +7,20 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "kube-state-metrics",
+                "name": "tiller-deploy",
                 "paused": false,
                 "replicas": {
                     "available": 1,
-                    "desired": 2,
-                    "unavailable": 1,
-                    "updated": 2
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
                 }
             },
             "namespace": "kube-system"
         },
         "metricset": {
-            "name": "state_deployment"
+            "name": "state_deployment",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -46,34 +47,8 @@
             "namespace": "jenkins"
         },
         "metricset": {
-            "name": "state_deployment"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "tiller-deploy",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": "kube-system"
-        },
-        "metricset": {
-            "name": "state_deployment"
+            "name": "state_deployment",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -100,7 +75,8 @@
             "namespace": "test"
         },
         "metricset": {
-            "name": "state_deployment"
+            "name": "state_deployment",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -127,7 +103,36 @@
             "namespace": "default"
         },
         "metricset": {
-            "name": "state_deployment"
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "kube-state-metrics",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 2,
+                    "unavailable": 1,
+                    "updated": 2
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
         },
         "service": {
             "address": "127.0.0.1:55555",

@@ -1,11 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-couchdb]]
 == couchdb module
-
-beta[]
 
 This is the couchdb module.
 
@@ -15,6 +13,14 @@ The default metricset is `server`.
 === Compatibility
 
 The Couchdb module is tested with Couchdb 1.7.
+
+
+[float]
+=== Dashboard
+
+The CouchDB module comes with a predefined dashboard for CouchDB database specific stats. For example:
+
+image::./images/metricbeat-couchdb-overview.png[]
 
 
 [float]

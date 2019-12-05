@@ -152,9 +152,33 @@ func TestESClientHandler_Alias(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
+
+	t.Run("resource exists but is not an alias", func(t *testing.T) {
+		alias := makeAlias("esch-alias-3create")
+
+		es := newRawESClient(t)
+
+		_, _, err := es.Request("PUT", "/"+alias.Name, "", nil, nil)
+		require.NoError(t, err)
+
+		h := newESClientHandler(t)
+
+		b, err := h.HasAlias(alias.Name)
+		assert.Equal(t, ilm.ErrInvalidAlias, ilm.ErrReason(err))
+		assert.False(t, b)
+
+		err = h.CreateAlias(alias)
+		require.Error(t, err)
+		assert.Equal(t, ilm.ErrInvalidAlias, ilm.ErrReason(err))
+	})
 }
 
 func newESClientHandler(t *testing.T) ilm.ClientHandler {
+	client := newRawESClient(t)
+	return ilm.NewESClientHandler(client)
+}
+
+func newRawESClient(t *testing.T) ilm.ESClient {
 	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
 		URL:              getURL(),
 		Index:            outil.MakeSelector(),
@@ -171,7 +195,7 @@ func newESClientHandler(t *testing.T) ilm.ClientHandler {
 		t.Fatalf("Failed to connect to Test Elasticsearch instance: %v", err)
 	}
 
-	return ilm.NewESClientHandler(client)
+	return client
 }
 
 func makeName(base string) string {

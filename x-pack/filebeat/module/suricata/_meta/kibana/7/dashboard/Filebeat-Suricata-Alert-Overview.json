@@ -13,7 +13,7 @@
           }
         },
         "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Alerting Hosts [Suricata] ECS",
+        "title": "Top Alerting Hosts [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -123,7 +123,7 @@
               }
             ]
           },
-          "title": "Top Alerting Hosts [Suricata] ECS",
+          "title": "Top Alerting Hosts [Filebeat Suricata] ECS",
           "type": "histogram"
         }
       },
@@ -145,7 +145,7 @@
           }
         },
         "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Alert Signatures [Suricata] ECS",
+        "title": "Top Alert Signatures [Filebeat Suricata] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -212,7 +212,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Alert Signatures [Suricata] ECS",
+          "title": "Top Alert Signatures [Filebeat Suricata] ECS",
           "type": "table"
         }
       },
@@ -304,7 +304,7 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Alerts [Suricata] ECS",
+        "title": "Alerts [Filebeat Suricata] ECS",
         "version": 1
       },
       "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
@@ -325,7 +325,7 @@
           }
         },
         "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alert - Source Location [Suricata] ECS",
+        "title": "Alert - Source Location [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -395,7 +395,7 @@
               ]
             }
           },
-          "title": "Alert - Source Location [Suricata] ECS",
+          "title": "Alert - Source Location [Filebeat Suricata] ECS",
           "type": "tile_map"
         }
       },
@@ -417,7 +417,7 @@
           }
         },
         "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alert - Destination Location [Suricata] ECS",
+        "title": "Alert - Destination Location [Filebeat Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -487,7 +487,7 @@
               ]
             }
           },
-          "title": "Alert - Destination Location [Suricata] ECS",
+          "title": "Alert - Destination Location [Filebeat Suricata] ECS",
           "type": "tile_map"
         }
       },
@@ -509,7 +509,7 @@
           }
         },
         "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alerts - Top Destination Countries [Suricata] ECS",
+        "title": "Alerts - Top Destination Countries [Filebeat Suricata] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -559,7 +559,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Alerts - Top Destination Countries [Suricata] ECS",
+          "title": "Alerts - Top Destination Countries [Filebeat Suricata] ECS",
           "type": "table"
         }
       },
@@ -581,7 +581,7 @@
           }
         },
         "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alerts - Top Source Countries [Suricata] ECS",
+        "title": "Alerts - Top Source Countries [Filebeat Suricata] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -631,7 +631,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Alerts - Top Source Countries [Suricata] ECS",
+          "title": "Alerts - Top Source Countries [Filebeat Suricata] ECS",
           "type": "table"
         }
       },
@@ -773,7 +773,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Suricata] Alert Overview ECS",
+        "title": "[Filebeat Suricata] Alert Overview ECS",
         "version": 1
       },
       "id": "05268ee0-86d1-11e8-b59d-21efb914e65c-ecs",

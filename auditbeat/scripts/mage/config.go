@@ -67,12 +67,12 @@ func configFileParams(dirs ...string) (devtools.ConfigFileParams, error) {
 			devtools.OSSBeatDir("_meta/common.p1.yml"),
 			configFiles,
 			devtools.OSSBeatDir("_meta/common.p2.yml"),
-			devtools.LibbeatDir("_meta/config.yml"),
+			devtools.LibbeatDir("_meta/config.yml.tmpl"),
 		),
 		ReferenceParts: join(
 			devtools.OSSBeatDir("_meta/common.reference.yml"),
 			configFiles,
-			devtools.LibbeatDir("_meta/config.reference.yml"),
+			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		),
 		DockerParts: []string{
 			devtools.OSSBeatDir("_meta/beat.docker.yml"),

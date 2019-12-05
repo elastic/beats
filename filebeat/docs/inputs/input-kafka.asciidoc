@@ -1,0 +1,157 @@
+:type: kafka
+
+[id="{beatname_lc}-input-{type}"]
+=== Kafka input
+
+++++
+<titleabbrev>Kafka</titleabbrev>
+++++
+
+Use the `kafka` input to read from topics in a Kafka cluster.
+
+To configure this input, specify a list of one or more <<hosts,`hosts`>> in the
+cluster to bootstrap the connection with, a list of <<topics,`topics`>> to
+track, and a <<groupid,`group_id`>> for the connection.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: kafka
+  hosts:
+    - kafka-broker-1:9092
+    - kafka-broker-2:9092
+  topics: ["my-topic"]
+  group_id: "filebeat"
+
+----
+
+The following example shows how to use the `kafka` input to ingest data from
+Microsoft Azure Event Hubs that have Kafka compatibility enabled:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: kafka
+  hosts: ["<your event hub namespace>.servicebus.windows.net:9093"]
+  topics: ["<your event hub instance>"]
+  group_id: "<your consumer group>"
+
+  username: "$ConnectionString"
+  password: "<your connection string>"
+  ssl.enabled: true
+
+----
+
+For more details on the mapping between Kafka and Event Hubs configuration
+parameters, see the
+link:https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-for-kafka-ecosystem-overview[Azure documentation].
+
+[id="{beatname_lc}-input-{type}-options"]
+==== Configuration options
+
+The `kafka` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+[[kafka-hosts]]
+===== `hosts`
+
+A list of Kafka bootstrapping hosts (brokers) for this cluster.
+
+[float]
+[[topics]]
+===== `topics`
+
+A list of topics to read from.
+
+[float]
+[[groupid]]
+===== `group_id`
+
+The Kafka consumer group id.
+
+[float]
+===== `client_id`
+
+The Kafka client id (optional).
+
+[float]
+===== `version`
+
+The version of the Kafka protocol to use (defaults to `"1.0.0"`).
+
+[float]
+===== `initial_offset`
+
+The initial offset to start reading, either "oldest" or "newest". Defaults to
+"oldest".
+
+===== `connect_backoff`
+
+How long to wait before trying to reconnect to the kafka cluster after a
+fatal error. Default is 30s.
+
+===== `consume_backoff`
+
+How long to wait before retrying a failed read. Default is 2s.
+
+===== `max_wait_time`
+
+How long to wait for the minimum number of input bytes while reading. Default
+is 250ms.
+
+===== `wait_close`
+
+When shutting down, how long to wait for in-flight messages to be delivered
+and acknowledged.
+
+===== `isolation_level`
+
+This configures the Kafka group isolation level:
+
+- `"read_uncommitted"` returns _all_ messages in the message channel.
+- `"read_committed"` hides messages that are part of an aborted transaction.
+
+The default is `"read_uncommitted"`.
+
+===== `fetch`
+
+Kafka fetch settings:
+
+*`min`*:: The minimum number of bytes to wait for. Defaults to 1.
+
+*`default`*:: The default number of bytes to read per request. Defaults to 1MB.
+
+*`max`*:: The maximum number of bytes to read per request. Defaults to 0
+(no limit).
+
+===== `expand_event_list_from_field`
+
+If the fileset using this input expects to receive multiple messages bundled under a specific field then the config option `expand_event_list_from_field` value can be assigned the name of the field.
+For example in the case of azure filesets the events are found under the json object "records".
+```
+{
+"records": [ {event1}, {event2}]
+}
+```
+This setting will be able to split the messages under the group value ('records') into separate events.
+
+===== `rebalance`
+
+Kafka rebalance settings:
+
+*`strategy`*:: Either `"range"` or `"roundrobin"`. Defaults to `"range"`.
+
+*`timeout`*:: How long to wait for an attempted rebalance. Defaults to 60s.
+
+*`max_retries`*:: How many times to retry if rebalancing fails. Defaults to 4.
+
+*`retry_backoff`*:: How long to wait after an unsuccessful rebalance attempt.
+Defaults to 2s.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

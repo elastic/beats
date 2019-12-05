@@ -6,6 +6,7 @@ package aws
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -19,12 +20,12 @@ import (
 
 // MockCloudwatchClient struct is used for unit tests.
 type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
+	cloudwatchiface.ClientAPI
 }
 
 // MockResourceGroupsTaggingClient is used for unit tests.
 type MockResourceGroupsTaggingClient struct {
-	resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI
+	resourcegroupstaggingapiiface.ClientAPI
 }
 
 var (
@@ -55,6 +56,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 		Name:  &dimName,
 		Value: &instanceID,
 	}
+	httpReq, _ := http.NewRequest("", "", nil)
 	return cloudwatch.ListMetricsRequest{
 		Request: &awssdk.Request{
 			Data: &cloudwatch.ListMetricsOutput{
@@ -66,6 +68,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -75,6 +78,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	value2 := 0.0
 	value3 := 0.0
 	value4 := 0.0
+	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
 		Request: &awssdk.Request{
@@ -102,11 +106,13 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
 
 func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
 	return resourcegroupstaggingapi.GetResourcesRequest{
 		Request: &awssdk.Request{
 			Data: &resourcegroupstaggingapi.GetResourcesOutput{
@@ -140,6 +146,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -346,6 +353,14 @@ func TestFindIdentifierFromARN(t *testing.T) {
 		{
 			"arn:aws:sns:us-east-1:627959692251:notification-topic-1",
 			"notification-topic-1",
+		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/app/ece-ui/b195d6cf21493989",
+			"app/ece-ui/b195d6cf21493989",
+		},
+		{
+			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+			"net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 		},
 	}
 

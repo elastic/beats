@@ -7,3 +7,6 @@ In these examples, we use `github.com/Shopify/sarama` as import path. We do this
 #### HTTP server
 
 [http_server](./http_server) is a simple HTTP server uses both the sync producer to produce data as part of the request handling cycle, as well as the async producer to maintain an access log. It also uses the [mocks subpackage](https://godoc.org/github.com/Shopify/sarama/mocks) to test both.
+
+#### SASL SCRAM Authentication
+[sasl_scram_authentication](./sasl_scram_authentication) is an example of how to authenticate to a Kafka cluster using SASL SCRAM-SHA-256 or SCRAM-SHA-512 mechanisms.

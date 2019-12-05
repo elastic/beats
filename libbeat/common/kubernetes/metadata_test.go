@@ -20,9 +20,10 @@ package kubernetes
 import (
 	"testing"
 
-	v1 "github.com/ericchiang/k8s/apis/core/v1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -36,18 +37,20 @@ func TestPodMetadata(t *testing.T) {
 	True := true
 	False := false
 	tests := []struct {
+		name string
 		pod  *Pod
 		meta common.MapStr
 	}{
 		{
+			name: "standalone Pod",
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:    map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:       &UID,
-					Namespace: &test,
+					UID:       types.UID(UID),
+					Namespace: test,
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{
@@ -61,25 +64,26 @@ func TestPodMetadata(t *testing.T) {
 			},
 		},
 		{
+			name: "Deployment + Replicaset owned Pod",
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:    &UID,
-					OwnerReferences: []*metav1.OwnerReference{
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
 						{
-							Kind:       &Deployment,
-							Name:       &test,
+							Kind:       Deployment,
+							Name:       test,
 							Controller: &True,
 						},
 						{
-							Kind:       &ReplicaSet,
-							Name:       &ReplicaSet,
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
 							Controller: &False,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{
@@ -93,30 +97,31 @@ func TestPodMetadata(t *testing.T) {
 			},
 		},
 		{
+			name: "StatefulSet + Deployment owned Pod",
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:    &UID,
-					OwnerReferences: []*metav1.OwnerReference{
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
 						{
-							Kind:       &Deployment,
-							Name:       &test,
+							Kind:       Deployment,
+							Name:       test,
 							Controller: &False,
 						},
 						{
-							Kind:       &ReplicaSet,
-							Name:       &ReplicaSet,
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
 							Controller: &True,
 						},
 						{
-							Kind:       &StatefulSet,
-							Name:       &StatefulSet,
+							Kind:       StatefulSet,
+							Name:       StatefulSet,
 							Controller: &True,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{
@@ -130,6 +135,29 @@ func TestPodMetadata(t *testing.T) {
 				"statefulset": common.MapStr{"name": "StatefulSet"},
 			},
 		},
+		{
+			name: "empty owner reference Pod",
+			pod: &Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:          map[string]string{"a.key": "foo", "a": "bar"},
+					UID:             types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{{}},
+					Namespace:       test,
+				},
+				Spec: v1.PodSpec{
+					NodeName: test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":      common.MapStr{"name": "test"},
+				"namespace": "test",
+				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -141,9 +169,9 @@ func TestPodMetadata(t *testing.T) {
 
 		metaGen, err := NewMetaGenerator(config)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("case %q failed: %s", test.name, err.Error())
 		}
-		assert.Equal(t, metaGen.PodMetadata(test.pod), test.meta)
+		assert.Equal(t, metaGen.PodMetadata(test.pod), test.meta, "test failed for case %q", test.name)
 	}
 }
 
@@ -161,14 +189,14 @@ func TestPodMetadataDeDot(t *testing.T) {
 	}{
 		{
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:         &UID,
-					Namespace:   &test,
+					UID:         types.UID(UID),
+					Namespace:   test,
 					Annotations: map[string]string{"b.key": "foo", "b": "bar"},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{
@@ -184,24 +212,24 @@ func TestPodMetadataDeDot(t *testing.T) {
 		},
 		{
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:    &UID,
-					OwnerReferences: []*metav1.OwnerReference{
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
 						{
-							Kind:       &Deployment,
-							Name:       &test,
+							Kind:       Deployment,
+							Name:       test,
 							Controller: &True,
 						},
 						{
-							Kind:       &ReplicaSet,
-							Name:       &ReplicaSet,
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
 							Controller: &False,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{
@@ -216,29 +244,29 @@ func TestPodMetadataDeDot(t *testing.T) {
 		},
 		{
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:    &UID,
-					OwnerReferences: []*metav1.OwnerReference{
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
 						{
-							Kind:       &Deployment,
-							Name:       &test,
+							Kind:       Deployment,
+							Name:       test,
 							Controller: &False,
 						},
 						{
-							Kind:       &ReplicaSet,
-							Name:       &ReplicaSet,
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
 							Controller: &True,
 						},
 						{
-							Kind:       &StatefulSet,
-							Name:       &StatefulSet,
+							Kind:       StatefulSet,
+							Name:       StatefulSet,
 							Controller: &True,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{

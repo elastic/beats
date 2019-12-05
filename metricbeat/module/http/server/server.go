@@ -65,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Run method provides the Graphite server with a reporter with which events can be reported.
+// Run method provides the module with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	m.server.Start()

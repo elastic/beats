@@ -28,6 +28,7 @@ type fieldsConfig struct {
 	SourcePort        string `config:"source_port"`
 	DestinationIP     string `config:"destination_ip"`
 	DestinationPort   string `config:"destination_port"`
+	IANANumber        string `config:"iana_number"` // Transport protocol's IANA number.
 	TransportProtocol string `config:"transport"`
 	ICMPType          string `config:"icmp_type"`
 	ICMPCode          string `config:"icmp_code"`
@@ -40,6 +41,7 @@ func defaultConfig() config {
 			SourcePort:        "source.port",
 			DestinationIP:     "destination.ip",
 			DestinationPort:   "destination.port",
+			IANANumber:        "network.iana_number",
 			TransportProtocol: "network.transport",
 			ICMPType:          "icmp.type",
 			ICMPCode:          "icmp.code",

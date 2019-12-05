@@ -75,6 +75,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		},
 	}
 
+	vmstat, err := mem.GetVMStat()
+	if err != nil {
+		return errors.Wrap(err, "VMStat")
+	}
+
 	swap := common.MapStr{
 		"total": swapStat.Total,
 		"used": common.MapStr{
@@ -83,6 +88,24 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		},
 		"free": swapStat.Free,
 	}
+
+	if vmstat != nil {
+		// Swap in and swap out numbers
+		swap["in"] = common.MapStr{
+			"pages": vmstat.Pswpin,
+		}
+		swap["out"] = common.MapStr{
+			"pages": vmstat.Pswpout,
+		}
+		//Swap readahead
+		//See https://www.kernel.org/doc/ols/2007/ols2007v2-pages-273-284.pdf
+		swap["readahead"] = common.MapStr{
+			"pages":  vmstat.SwapRa,
+			"cached": vmstat.SwapRaHit,
+		}
+
+	}
+
 	memory["swap"] = swap
 
 	hugePagesStat, err := mem.GetHugeTLBPages()
@@ -91,7 +114,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 	if hugePagesStat != nil {
 		mem.AddHugeTLBPagesPercentage(hugePagesStat)
-		memory["hugepages"] = common.MapStr{
+		thp := common.MapStr{
 			"total": hugePagesStat.Total,
 			"used": common.MapStr{
 				"bytes": hugePagesStat.TotalAllocatedSize,
@@ -102,6 +125,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			"surplus":      hugePagesStat.Surplus,
 			"default_size": hugePagesStat.DefaultSize,
 		}
+		if vmstat != nil {
+			thp["swap"] = common.MapStr{
+				"out": common.MapStr{
+					"pages":    vmstat.ThpSwpout,
+					"fallback": vmstat.ThpSwpoutFallback,
+				},
+			}
+		}
+		memory["hugepages"] = thp
 	}
 
 	r.Event(mb.Event{

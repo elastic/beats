@@ -46,23 +46,23 @@ func TestData(t *testing.T) {
 				"query":             `\Processor Information(_Total)\% Processor Time`,
 			},
 			{
-				"instance_label":    "disk.bytes.name",
-				"measurement_label": "disk.bytes.read.total",
-				"query":             `\FileSystem Disk Activity(_Total)\FileSystem Bytes Read`,
+				"instance_label":    "process.name",
+				"measurement_label": "process.ID",
+				"query":             `\Process(_Total)\ID Process`,
 			},
 			{
 				"instance_label":    "processor.name",
-				"measurement_label": "processor.time.idle.average.ns",
-				"query":             `\Processor Information(_Total)\Average Idle Time`,
+				"measurement_label": "processor.time.user.ns",
+				"query":             `\Processor Information(_Total)\% User Time`,
 			},
 		},
 	}
 
-	ms := mbtest.NewReportingMetricSetV2(t, config)
-	mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	mbtest.ReportingFetchV2Error(ms)
 	time.Sleep(60 * time.Millisecond)
 
-	events, errs := mbtest.ReportingFetchV2(ms)
+	events, errs := mbtest.ReportingFetchV2Error(ms)
 	if len(errs) > 0 {
 		t.Fatal(errs)
 	}
@@ -87,11 +87,11 @@ func TestCounterWithNoInstanceName(t *testing.T) {
 		},
 	}
 
-	ms := mbtest.NewReportingMetricSetV2(t, config)
-	mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	mbtest.ReportingFetchV2Error(ms)
 	time.Sleep(60 * time.Millisecond)
 
-	events, errs := mbtest.ReportingFetchV2(ms)
+	events, errs := mbtest.ReportingFetchV2Error(ms)
 	if len(errs) > 0 {
 		t.Fatal(errs)
 	}
@@ -389,8 +389,8 @@ func TestGroupByInstance(t *testing.T) {
 	config.CounterConfig[1].Format = "float"
 
 	config.CounterConfig[2].InstanceLabel = "processor.name"
-	config.CounterConfig[2].MeasurementLabel = "processor.time.idle.average.ns"
-	config.CounterConfig[2].Query = `\Processor Information(_Total)\Average Idle Time`
+	config.CounterConfig[2].MeasurementLabel = "processor.time.privileged.ns"
+	config.CounterConfig[2].Query = `\Processor Information(_Total)\% Privileged Time`
 	config.CounterConfig[2].Format = "float"
 
 	handle, err := NewReader(config)
@@ -423,7 +423,7 @@ func TestGroupByInstance(t *testing.T) {
 	}
 	assert.True(t, pctKey)
 
-	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.idle.average.ns")
+	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.privileged.ns")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -94,6 +94,8 @@ include::../include/var-paths.asciidoc[]
 The configured Logstash log format. Possible values are: `json` or `plain`. The
 default is `plain`.
 
+include::../include/timezone-support.asciidoc[]
+
 :has-dashboards!:
 
 :fileset_ex!:

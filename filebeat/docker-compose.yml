@@ -12,6 +12,8 @@ services:
       - ES_PORT=9200
       - ES_USER=beats
       - ES_PASS=testing
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
     working_dir: /go/src/github.com/elastic/beats/filebeat
@@ -27,6 +29,7 @@ services:
     image: busybox
     depends_on:
       elasticsearch: { condition: service_healthy }
+      kafka:         { condition: service_healthy }
       kibana:        { condition: service_healthy }
       redis:         { condition: service_healthy }
 
@@ -34,6 +37,14 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+
+  kafka:
+    build: ${ES_BEATS}/testing/environments/docker/kafka
+    expose:
+      - 9092
+      - 2181
+    environment:
+      - ADVERTISED_HOST=kafka
 
   kibana:
     extends:

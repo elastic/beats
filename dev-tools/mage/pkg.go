@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"strconv"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -101,6 +102,7 @@ type testPackagesParams struct {
 	HasMonitorsD         bool
 	HasModulesD          bool
 	HasRootUserContainer bool
+	MinModules           *int
 }
 
 // TestPackagesOption defines a option to the TestPackages target.
@@ -110,6 +112,14 @@ type TestPackagesOption func(params *testPackagesParams)
 func WithModules() func(params *testPackagesParams) {
 	return func(params *testPackagesParams) {
 		params.HasModules = true
+	}
+}
+
+// MinModules sets the minimum number of modules to require
+func MinModules(n int) func(params *testPackagesParams) {
+	return func(params *testPackagesParams) {
+		minModules := n
+		params.MinModules = &minModules
 	}
 }
 
@@ -154,6 +164,10 @@ func TestPackages(options ...TestPackagesOption) error {
 
 	if params.HasModules {
 		args = append(args, "--modules")
+	}
+
+	if params.MinModules != nil {
+		args = append(args, "--min-modules", strconv.Itoa(*params.MinModules))
 	}
 
 	if params.HasMonitorsD {

@@ -23,16 +23,14 @@ import (
 	"context"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 // Build builds the Beat binary.
 func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Fields generates a fields.yml for the Beat.
@@ -52,4 +50,9 @@ func GoTestUnit(ctx context.Context) error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+}
+
+// Config generates example and reference configuration for libbeat.
+func Config() error {
+	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
 }

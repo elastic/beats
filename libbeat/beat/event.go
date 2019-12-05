@@ -124,3 +124,10 @@ func metadataKey(key string) (string, bool) {
 	}
 	return "", false
 }
+
+// SetErrorWithOption sets jsonErr value in the event fields according to addErrKey value.
+func (e *Event) SetErrorWithOption(jsonErr common.MapStr, addErrKey bool) {
+	if addErrKey {
+		e.Fields["error"] = jsonErr
+	}
+}

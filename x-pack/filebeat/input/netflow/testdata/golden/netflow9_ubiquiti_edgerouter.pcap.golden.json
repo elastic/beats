@@ -65,12 +65,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 421,
           "ip": "10.100.5.2",
           "locality": "private",
+          "packets": 6,
           "port": 43376
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -136,12 +139,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 7621,
           "ip": "10.100.6.93",
           "locality": "private",
+          "packets": 131,
           "port": 54520
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -207,12 +213,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 95,
           "ip": "10.100.4.1",
           "locality": "private",
+          "packets": 1,
           "port": 53
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -278,12 +287,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 3162,
           "ip": "10.100.6.93",
           "locality": "private",
+          "packets": 30,
           "port": 54497
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -349,12 +361,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 2711,
           "ip": "10.100.6.80",
           "locality": "private",
+          "packets": 13,
           "port": 50030
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -420,12 +435,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 20855,
           "ip": "10.100.6.93",
           "locality": "private",
+          "packets": 346,
           "port": 54517
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -491,12 +509,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 7495,
           "ip": "10.100.6.93",
           "locality": "private",
+          "packets": 129,
           "port": 54518
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -562,12 +583,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 7049,
           "ip": "10.100.6.93",
           "locality": "private",
+          "packets": 119,
           "port": 54519
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -633,12 +657,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 1348,
           "ip": "10.100.6.93",
           "locality": "private",
+          "packets": 13,
           "port": 54521
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-08-09T16:49:04Z",
@@ -704,12 +731,15 @@
           "ip": "10.100.4.1"
         },
         "source": {
+          "bytes": 82,
           "ip": "192.168.1.4",
           "locality": "private",
+          "packets": 1,
           "port": 57253
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

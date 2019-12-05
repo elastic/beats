@@ -1,0 +1,117 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-azure]]
+[role="xpack"]
+
+:modulename: azure
+:has-dashboards: false
+
+== azure module
+
+beta[]
+
+This is the azure module.
+
+The azure module will concentrate on retrieving different types of log data from Azure.
+There are several requirements before using the module since the logs will actually be read from azure event hubs.
+
+   - the event hubs the azure module will read logs from must have the kafka option enabled .
+   -  the logs have to be exported first to the event hubs https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-create-kafka-enabled
+   - to export activity logs to event hubs users can follow the steps here https://docs.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-export
+   - to export audit and sign-in logs to event hubs users can follow the steps here https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/tutorial-azure-monitor-stream-logs-to-event-hub
+
+The module will contain the following filesets:
+
+`activitylogs` ::
+Will retrieve azure activity logs. Control-plane events on Azure Resource Manager resources. Activity logs provide insight into the operations that were performed on resources in your subscription.
+
+`signinlogs` ::
+Will retrieve azure Active Directory sign-in logs. The sign-ins report provides information about the usage of managed applications and user sign-in activities.
+
+`auditlogs` ::
+Will retrieve azure Active Directory audit logs. The audit logs provide traceability through logs for all changes done by various features within Azure AD. Examples of audit logs include changes made to any resources within Azure AD like adding or removing users, apps, groups, roles and policies.
+
+[float]
+=== Dashboards
+
+The azure module comes with several predefined dashboards for general cloud overview, user activity and alerts. For example:
+
+image::./images/filebeat-azure-overview.png[]
+
+
+[float]
+=== Module configuration
+
+```
+- module: azure
+  activitylogs:
+    enabled: true
+    var:
+      namespace: "obseventhubs.servicebus.windows.net:9093"
+      eventhub: ["insights-operational-logs"]
+      consumer_group: "$Default"
+      connection_string: ""
+   auditlogs:
+     enabled: true
+     var:
+       namespace: ""
+       eventhub: ["insights-logs-auditlogs"]
+       consumer_group: "$Default"
+       connection_string: ""
+
+   signinlogs:
+     enabled: true
+     var:
+       namespace: ""
+       eventhub: ["insights-logs-signinlogs"]
+       consumer_group: "$Default"
+       connection_string: ""
+
+```
+
+
+A side by side kafka/event hubs notation, we will follow Azure notations in this case.
+
+
+`namespace` ::
+_string_
+An Event Hubs namespace provides a unique scoping container, referenced by its fully qualified domain name, in which users can create one or more event hubs or Kafka topics.
+
+`eventhub` ::
+  _[]string_
+Or kafka topic, is a fully managed, real-time data ingestion service.
+Default value `insights-operational-logs`
+
+`consumer_group` ::
+_string_
+ The publish/subscribe mechanism of Event Hubs is enabled through consumer groups. A consumer group is a view (state, position, or offset) of an entire event hub. Consumer groups enable multiple consuming applications to each have a separate view of the event stream, and to read the stream independently at their own pace and with their own offsets.
+Default value: `$Default`
+
+`connection_string` ::
+_string_
+The connection string required to communicate with Event Hubs, steps here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string.
+
+
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+TODO: document with what versions of the software is this tested
+
+
+
+
+
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-azure,exported fields>> section.
+

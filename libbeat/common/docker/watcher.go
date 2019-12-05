@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package docker
 
 import (
@@ -128,6 +130,12 @@ func NewWatcher(host string, tls *TLSConfig, storeShortID bool) (Watcher, error)
 	}
 
 	client, err := NewClient(host, httpClient, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extra check to confirm that Docker is available
+	_, err = client.Info(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -334,9 +342,12 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 	var result []*Container
 	for _, c := range containers {
 		var ipaddresses []string
-		for _, net := range c.NetworkSettings.Networks {
-			if net.IPAddress != "" {
-				ipaddresses = append(ipaddresses, net.IPAddress)
+		if c.NetworkSettings != nil {
+			// Handle alternate platforms like VMWare's VIC that might not have this data.
+			for _, net := range c.NetworkSettings.Networks {
+				if net.IPAddress != "" {
+					ipaddresses = append(ipaddresses, net.IPAddress)
+				}
 			}
 		}
 

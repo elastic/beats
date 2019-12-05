@@ -99,9 +99,12 @@ func (g *UdpServer) watchMetrics() {
 			continue
 		}
 
+		bufCopy := make([]byte, length)
+		copy(bufCopy, buffer)
+
 		g.eventQueue <- &UdpEvent{
 			event: common.MapStr{
-				server.EventDataKey: buffer[:length],
+				server.EventDataKey: bufCopy,
 			},
 			meta: server.Meta{
 				"client_ip": addr.IP.String(),

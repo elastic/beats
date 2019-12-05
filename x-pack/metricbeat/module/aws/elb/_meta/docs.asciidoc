@@ -1,0 +1,114 @@
+Elastic Load Balancing publishes data points to Amazon CloudWatch for your load
+balancers and your back-end instances. This aws `elb` metricset collects these
+Cloudwatch metrics for monitoring purposes.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS ELB metrics.
+----
+ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+tag:getResources
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----
+
+[float]
+=== Dashboard
+
+The aws elb metricset comes with a predefined dashboard for classic ELB. For example:
+
+image::./images/metricbeat-aws-elb-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - elb
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+----
+
+[float]
+=== Metrics
+elb metricset collects Cloudwatch metrics from https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-cloudwatch-metrics.html[classic ELB],
+https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html[application ELB] and
+https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html[network ELB].
+
+[float]
+==== Metrics for Classic ELB
+|===
+|Metric Name|Statistic Method
+|BackendConnectionErrors | Sum
+|HealthyHostCount | Maximum
+|HTTPCode_Backend_2XX | Sum
+|HTTPCode_Backend_3XX | Sum
+|HTTPCode_Backend_4XX | Sum
+|HTTPCode_Backend_5XX | Sum
+|HTTPCode_ELB_4XX | Sum
+|HTTPCode_ELB_5XX | Sum
+|Latency | Average
+|RequestCount | Sum
+|SpilloverCount | Sum
+|SurgeQueueLength | Maximum
+|UnHealthyHostCount | Maximum
+|EstimatedALBActiveConnectionCount | Average
+|EstimatedALBConsumedLCUs | Average
+|EstimatedALBNewConnectionCount | Average
+|EstimatedProcessedBytes | Average
+|===
+
+[float]
+==== Metrics for Application ELB
+|===
+|Metric Name|Statistic Method
+|ActiveConnectionCount | Sum
+|ClientTLSNegotiationErrorCount | Sum
+|ConsumedLCUs | Average
+|HTTP_Fixed_Response_Count | Sum
+|HTTP_Redirect_Count | Sum
+|HTTP_Redirect_Url_Limit_Exceeded_Count | Sum
+|HTTPCode_ELB_3XX_Count | Sum
+|HTTPCode_ELB_4XX_Count | Sum
+|HTTPCode_ELB_5XX_Count | Sum
+|HTTPCode_ELB_500_Count | Sum
+|HTTPCode_ELB_502_Count | Sum
+|HTTPCode_ELB_503_Count | Sum
+|HTTPCode_ELB_504_Count | Sum
+|IPv6ProcessedBytes | Sum
+|IPv6RequestCount | Sum
+|NewConnectionCount | Sum
+|ProcessedBytes | Sum
+|RejectedConnectionCount | Sum
+|RequestCount | Sum
+|RuleEvaluations | Sum
+|===
+
+[float]
+==== Metrics for Network ELB
+|===
+|Metric Name|Statistic Method
+|ActiveFlowCount | Average
+|ActiveFlowCount_TLS | Average
+|ClientTLSNegotiationErrorCount | Sum
+|ConsumedLCUs | Average
+|HealthyHostCount | Maximum
+|NewFlowCount | Sum
+|NewFlowCount_TLS | Sum
+|ProcessedBytes | Sum
+|ProcessedBytes_TLS | Sum
+|TargetTLSNegotiationErrorCount | Sum
+|TCP_Client_Reset_Count | Sum
+|TCP_ELB_Reset_Count | Sum
+|TCP_Target_Reset_Count | Sum
+|UnHealthyHostCount | Average
+|EstimatedALBConsumedLCUs | Maximum
+|===

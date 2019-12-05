@@ -58,10 +58,12 @@ var (
 
 	procPdhOpenQueryW               = modpdh.NewProc("PdhOpenQueryW")
 	procPdhAddEnglishCounterW       = modpdh.NewProc("PdhAddEnglishCounterW")
+	procPdhRemoveCounter            = modpdh.NewProc("PdhRemoveCounter")
 	procPdhCollectQueryData         = modpdh.NewProc("PdhCollectQueryData")
 	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
 	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
 	procPdhExpandWildCardPathW      = modpdh.NewProc("PdhExpandWildCardPathW")
+	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
@@ -83,6 +85,14 @@ func _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, 
 
 func __PdhAddCounter(query PdhQueryHandle, counterPath *uint16, userData uintptr, counter *PdhCounterHandle) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhAddEnglishCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) {
+	r0, _, _ := syscall.Syscall(procPdhRemoveCounter.Addr(), 1, uintptr(counter), 0, 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}
@@ -131,6 +141,14 @@ func _PdhCloseQuery(query PdhQueryHandle) (errcode error) {
 
 func _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhExpandWildCardPathW.Addr(), 4, uintptr(unsafe.Pointer(dataSource)), uintptr(unsafe.Pointer(wildcardPath)), uintptr(unsafe.Pointer(expandedPathList)), uintptr(unsafe.Pointer(pathListLength)), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) {
+	r0, _, _ := syscall.Syscall(procPdhExpandCounterPathW.Addr(), 3, uintptr(unsafe.Pointer(wildcardPath)), uintptr(unsafe.Pointer(expandedPathList)), uintptr(unsafe.Pointer(pathListLength)))
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

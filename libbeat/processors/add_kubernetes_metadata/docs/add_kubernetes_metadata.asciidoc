@@ -1,0 +1,92 @@
+[[add-kubernetes-metadata]]
+=== Add Kubernetes metadata
+
+The `add_kubernetes_metadata` processor annotates each event with relevant
+metadata based on which Kubernetes pod the event originated from.
+At startup it detects an `in_cluster` environment and caches the
+Kubernetes-related metadata. Events are only annotated if a valid configuration
+is detected. If it's not able to detect a valid Kubernetes configuration,
+the events are not annotated with Kubernetes-related metadata.
+
+Each event is annotated with:
+
+* Pod Name
+* Pod UID
+* Namespace
+* Labels
+
+The `add_kubernetes_metadata` processor has two basic building blocks which are:
+
+* Indexers
+* Matchers
+
+Indexers take in a pod's metadata and builds indices based on the pod metadata.
+For example, the `ip_port` indexer can take a Kubernetes pod and index the pod
+metadata based on all `pod_ip:container_port` combinations.
+
+Matchers are used to construct lookup keys for querying indices. For example,
+when the `fields` matcher takes `["metricset.host"]` as a lookup field, it would
+construct a lookup key with the value of the field `metricset.host`.
+
+Each Beat can define its own default indexers and matchers which are enabled by
+default. For example, FileBeat enables the `container` indexer, which indexes
+pod metadata based on all container IDs, and a `logs_path` matcher, which takes
+the `log.file.path` field, extracts the container ID, and uses it to retrieve
+metadata.
+
+The configuration below enables the processor when {beatname_lc} is run as a pod in
+Kubernetes.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_kubernetes_metadata:
+-------------------------------------------------------------------------------
+
+The configuration below enables the processor on a Beat running as a process on
+the Kubernetes node.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_kubernetes_metadata:
+    host: <hostname>
+    # If kube_config is not set, KUBECONFIG environment variable will be checked
+    # and if not present it will fall back to InCluster
+    kube_config: ${HOME}/.kube/config
+-------------------------------------------------------------------------------
+
+The configuration below has the default indexers and matchers disabled and
+enables ones that the user is interested in.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_kubernetes_metadata:
+    host: <hostname>
+    # If kube_config is not set, KUBECONFIG environment variable will be checked
+    # and if not present it will fall back to InCluster
+    kube_config: ~/.kube/config
+    default_indexers.enabled: false
+    default_matchers.enabled: false
+    indexers:
+      - ip_port:
+    matchers:
+      - fields:
+          lookup_fields: ["metricset.host"]
+-------------------------------------------------------------------------------
+
+The `add_kubernetes_metadata` processor has the following configuration settings:
+
+`host`:: (Optional) Specify the node to scope {beatname_lc} to in case it
+cannot be accurately detected, as when running {beatname_lc} in host network
+mode.
+`namespace`:: (Optional) Select the namespace from which to collect the
+metadata. If it is not set, the processor collects metadata from all namespaces.
+It is unset by default.
+`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
+client. It defaults to `KUBECONFIG` environment variable if present.
+`default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
+case you want to specify your own.
+`default_matchers.enabled`:: (Optional) Enable/Disable default pod matchers, in
+case you want to specify your own.

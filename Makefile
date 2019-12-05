@@ -7,7 +7,7 @@ PYTHON_ENV?=$(BUILD_DIR)/python-env
 VIRTUALENV_PARAMS?=
 FIND=find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 GOLINT=golint
-GOLINT_REPO=github.com/golang/lint/golint
+GOLINT_REPO=golang.org/x/lint/golint
 REVIEWDOG=reviewdog
 REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
@@ -98,16 +98,12 @@ check: python-env
 	@git diff-index --exit-code HEAD --
 
 .PHONY: check-headers
-check-headers:
-	@go get -u github.com/elastic/go-licenser
-	@go-licenser -d -exclude x-pack
-	@go-licenser -d -license Elastic x-pack
+check-headers: mage
+	@mage checkLicenseHeaders
 
 .PHONY: add-headers
-add-headers:
-	@go get github.com/elastic/go-licenser
-	@go-licenser -exclude x-pack
-	@go-licenser -license Elastic x-pack
+add-headers: mage
+	@mage addLicenseHeaders
 
 # Corrects spelling errors
 .PHONY: misspell

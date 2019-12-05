@@ -20,9 +20,9 @@ package event
 import (
 	"testing"
 
-	v1 "github.com/ericchiang/k8s/apis/core/v1"
-	k8s_io_apimachinery_pkg_apis_meta_v1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -80,7 +80,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 	}{
 		"no dedots": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},
@@ -96,7 +96,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 		"dedot labels": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},
@@ -112,7 +112,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 		"dedot annotatoins": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},
@@ -128,7 +128,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 		"dedot both labels and annotations": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},

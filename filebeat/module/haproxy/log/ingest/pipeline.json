@@ -21,12 +21,27 @@
         },
         {
             "date": {
+                "if" : "ctx.event.timezone == null",
                 "field": "haproxy.request_date",
                 "target_field": "@timestamp",
                 "formats": [
                     "dd/MMM/yyyy:HH:mm:ss.SSS",
                     "MMM dd HH:mm:ss"
-                ]
+                ],
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
+        },
+        {
+            "date": {
+                "if" : "ctx.event.timezone != null",
+                "field": "haproxy.request_date",
+                "target_field": "@timestamp",
+                "formats": [
+                    "dd/MMM/yyyy:HH:mm:ss.SSS",
+                    "MMM dd HH:mm:ss"
+                ],
+                "timezone" : "{{ event.timezone }}",
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
             }
         },
         {
@@ -52,6 +67,32 @@
             "geoip": {
                 "field": "source.ip",
                 "target_field": "source.geo",
+                "ignore_missing": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
                 "ignore_missing": true
             }
         },

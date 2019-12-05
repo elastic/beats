@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
@@ -98,7 +98,7 @@ type Process struct {
 
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	h.WriteString(strconv.Itoa(p.Info.PID))
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()
@@ -170,7 +170,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms.log.Debug("No state timestamp found")
 	}
 
-	if os.Geteuid() != 0 {
+	if runtime.GOOS != "windows" && os.Geteuid() != 0 {
 		ms.log.Warn("Running as non-root user, will likely not report all processes.")
 	}
 

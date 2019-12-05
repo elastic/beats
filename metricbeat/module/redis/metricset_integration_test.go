@@ -39,7 +39,8 @@ const (
 func TestPasswords(t *testing.T) {
 	t.Skip("Changing password affects other tests, see https://github.com/elastic/beats/issues/10955")
 
-	compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
+	host := service.Host()
 
 	registry := mb.NewRegister()
 	err := registry.AddModule("redis", mb.DefaultModuleFactory)
@@ -63,21 +64,21 @@ func TestPasswords(t *testing.T) {
 	}
 
 	// Test Fetch metrics with missing password
-	ms := getMetricSet(t, registry, getConfig(""))
+	ms := getMetricSet(t, registry, getConfig(host, ""))
 	_, err = ms.Connection().Do("PING")
 	if assert.Error(t, err, "missing password") {
 		assert.Contains(t, err, "NOAUTH Authentication required.")
 	}
 
 	// Config redis and metricset with an invalid password
-	ms = getMetricSet(t, registry, getConfig("blah"))
+	ms = getMetricSet(t, registry, getConfig(host, "blah"))
 	_, err = ms.Connection().Do("PING")
 	if assert.Error(t, err, "invalid password") {
 		assert.Contains(t, err, "ERR invalid password")
 	}
 
 	// Config redis and metricset with a valid password
-	ms = getMetricSet(t, registry, getConfig(password))
+	ms = getMetricSet(t, registry, getConfig(host, password))
 	_, err = ms.Connection().Do("PING")
 	assert.Empty(t, err, "valid password")
 }
@@ -141,7 +142,7 @@ func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interfa
 	return ms.MetricSet
 }
 
-func getConfig(password string) map[string]interface{} {
+func getConfig(host string, password string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": "test",

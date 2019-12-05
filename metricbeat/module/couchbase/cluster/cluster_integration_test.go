@@ -30,9 +30,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "couchbase")
+	service := compose.EnsureUp(t, "couchbase")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -42,10 +42,10 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "couchbase",
 		"metricsets": []string{"cluster"},
-		"hosts":      []string{couchbase.GetEnvDSN()},
+		"hosts":      []string{couchbase.GetDSN(host)},
 	}
 }
