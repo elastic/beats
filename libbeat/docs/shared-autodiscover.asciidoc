@@ -116,7 +116,7 @@ It has the following settings:
 `unix:///var/run/docker.sock` by default.
 `ssl`:: (Optional) SSL configuration to use when connecting to the Docker
 socket.
-`cleanup_timeout`:: (Optional) Time of inactivity to consider we can stop the
+`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
 running configuration for a container, 60s by default.
 `labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
  labels with `_`.
