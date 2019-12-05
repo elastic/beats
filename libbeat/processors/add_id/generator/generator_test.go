@@ -22,18 +22,16 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/processors/uuid/generator/elasticsearch"
-
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFactory(t *testing.T) {
 	tests := map[string]struct {
-		expectedGeneratorFn Fn
+		expectedIDGenerator func() IDGenerator
 		expectedErr         error
 	}{
 		"elasticsearch": {
-			elasticsearch.GetBase64UUID,
+			ESTimeBasedUUIDGenerator,
 			nil,
 		},
 		"foobar": {
@@ -46,9 +44,9 @@ func TestFactory(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			typ := name
 			fn, err := Factory(typ)
-			if test.expectedGeneratorFn != nil {
+			if test.expectedIDGenerator != nil {
 				fnName := getGeneratorFuncName(fn)
-				expectedFnName := getGeneratorFuncName(test.expectedGeneratorFn)
+				expectedFnName := getGeneratorFuncName(test.expectedIDGenerator)
 				assert.Equal(t, fnName, expectedFnName)
 			}
 			if test.expectedErr != nil {

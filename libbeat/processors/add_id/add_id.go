@@ -20,7 +20,7 @@ package add_id
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/processors/uuid/generator"
+	"github.com/elastic/beats/libbeat/processors/add_id/generator"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -29,24 +29,24 @@ import (
 )
 
 func init() {
-	processors.RegisterPlugin("uuid", New)
-	jsprocessor.RegisterPlugin("UUID", New)
+	processors.RegisterPlugin("add_id", New)
+	jsprocessor.RegisterPlugin("AddID", New)
 }
 
-const processorName = "uuid"
+const processorName = "add_id"
 
-type uuid struct {
+type addID struct {
 	config Config
 }
 
-// New constructs a new UUID processor.
+// New constructs a new Add ID processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
 	}
 
-	p := &uuid{
+	p := &addID{
 		config,
 	}
 
@@ -54,7 +54,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 // Run enriches the given event with an ID
-func (p *uuid) Run(event *beat.Event) (*beat.Event, error) {
+func (p *addID) Run(event *beat.Event) (*beat.Event, error) {
 	idFn, err := generator.Factory(p.config.Type)
 	if err != nil {
 		return nil, makeErrComputeID(err)
@@ -68,6 +68,6 @@ func (p *uuid) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *uuid) String() string {
+func (p *addID) String() string {
 	return fmt.Sprintf("%v=[target_field=[%v]]", processorName, p.config.TargetField)
 }
