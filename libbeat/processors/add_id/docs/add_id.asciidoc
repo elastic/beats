@@ -1,4 +1,4 @@
-[[add_id]]
+[[add-id]]
 === Generate an ID for an event
 
 The `add_id` processor generates a unique ID for an event.
