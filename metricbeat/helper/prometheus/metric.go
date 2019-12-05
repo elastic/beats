@@ -52,18 +52,15 @@ type Configuration struct {
 	// NonMappedLabelsPlacement is used when StoreNonMappedLabels is set to true, and
 	// defines the key path at the event under which to store the dynamically found labels.
 	// This key path will be added to the events that match this metric along with a subset of
-	// key/value pairs will be created under it, one for each non mapped label found:
+	// key/value pairs will be created under it, one for each non mapped label found.
+	//
+	// Example:
 	//
 	// given a metric family in a prometheus resource in the form:
-	//
 	// 		metric1{label1="value1",label2="value2"} 1
-	//
 	// and not mapping labels but using this entry on a the MetriMap definition:
-	//
 	// 		"metric1": ExtendedInfoMetric(Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "mypath"}),
-	//
 	// would output an event that contains a metricset field as follows
-	//
 	// 		"mypath": {"label1":"value1","label2":"value2"}
 	//
 	NonMappedLabelsPlacement string
