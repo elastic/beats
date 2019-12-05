@@ -17,14 +17,14 @@
 
 package add_id
 
-// Config for Add ID processor.
-type Config struct {
+// configuration for Add ID processor.
+type config struct {
 	TargetField string `config:"target_field"` // Target field for the ID
 	Type        string `config:"type"`         // Type of ID
 }
 
-func defaultConfig() Config {
-	return Config{
+func defaultConfig() config {
+	return config{
 		TargetField: "@metadata.id",
 		Type:        "elasticsearch",
 	}

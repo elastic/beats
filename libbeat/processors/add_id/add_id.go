@@ -36,7 +36,7 @@ func init() {
 const processorName = "add_id"
 
 type addID struct {
-	config Config
+	config config
 }
 
 // New constructs a new Add ID processor.
