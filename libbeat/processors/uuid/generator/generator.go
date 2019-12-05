@@ -17,7 +17,12 @@
 
 package generator
 
-// Fn represents an ID generator function.
+// IDGenerator implementors know how to generate and return a new ID
+type IDGenerator interface {
+	NextID() string
+}
+
+// Fn represents an ID generator constructor function.
 type Fn func() string
 
 // Factory takes as input the type of ID to generate and returns the constructor
@@ -29,8 +34,4 @@ func Factory(typ string) (Fn, error) {
 	default:
 		return nil, makeErrUnknownType(typ)
 	}
-}
-
-type IDGenerator interface {
-	NextID() string
 }

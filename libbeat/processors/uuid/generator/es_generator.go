@@ -26,9 +26,10 @@ import (
 
 type esTimeBasedUUIDGenerator struct{}
 
-// Singleton instance and constructor returning it
+// Singleton instance
 var _esTimeBasedUUIDGenerator IDGenerator = (*esTimeBasedUUIDGenerator)(nil)
 
+// ESTimeBasedUUIDGenerator returns the singleton instance for this generator
 func ESTimeBasedUUIDGenerator() IDGenerator {
 	return _esTimeBasedUUIDGenerator
 }
@@ -52,7 +53,7 @@ func init() {
 // NextID returns a base64-encoded, randomly-generated, but roughly ordered (over time), unique
 // ID. The algorithm used to generate the ID is the same as used by Elasticsearch.
 // See https://github.com/elastic/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
-func (_ *esTimeBasedUUIDGenerator) NextID() string {
+func (*esTimeBasedUUIDGenerator) NextID() string {
 	mu.Lock()
 	defer mu.Unlock()
 
