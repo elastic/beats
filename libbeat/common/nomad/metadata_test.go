@@ -35,6 +35,7 @@ func newJob(jobID string) *Job {
 		Region:      helper.StringToPtr("global"),
 		Name:        helper.StringToPtr("my-job"),
 		Type:        helper.StringToPtr(structs.JobTypeService),
+		Status:      helper.StringToPtr(structs.TaskStateRunning),
 		Datacenters: []string{"europe-west4"},
 		Meta: map[string]string{
 			"key1":    "job-value",
@@ -95,12 +96,10 @@ func TestAllocationMetadata(t *testing.T) {
 	}
 
 	meta := metaGen.ResourceMetadata(alloc)
-	tasks, _ := meta["tasks"].([]common.MapStr)
-	flat := tasks[0].Flatten()
+	tasks := metaGen.GroupMeta(alloc.Job)
 
 	assert.Equal(t, "my-job", meta["job"])
-	assert.Equal(t, "task-value", flat["key1"])
-	assert.Equal(t, 1, len(tasks))
+	assert.Equal(t, "task-value", tasks[0]["key1"])
 	assert.Equal(t, []string{"europe-west4"}, meta["datacenters"])
 }
 
@@ -123,12 +122,10 @@ func TestExcludeMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	meta := metaGen.ResourceMetadata(alloc)
-	tasks := meta["tasks"].([]common.MapStr)
-	flat := tasks[0].Flatten()
+	tasks := metaGen.GroupMeta(alloc.Job)
 
 	// verify that key1 is not included in the tasks metadata
-	exists, err := flat.HasKey("key1")
+	exists, err := tasks[0].HasKey("key1")
 	assert.Nil(t, err)
 	assert.False(t, exists)
 }
