@@ -51,6 +51,7 @@ pipeline {
           env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
           env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
           env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
+          env.BUILD_DOCKERLOGBEAT = isChanged(["^x-pack/dockerlogbeat/.*"])
           env.BUILD_FUNCTIONBEAT = isChanged(["^x-pack/functionbeat/.*"])
           env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
           env.BUILD_GENERATOR = isChanged(["^generator/.*"])
