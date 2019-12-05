@@ -30078,7 +30078,7 @@ type: float
 *`system.diskio.iostat.request.avg_size`*::
 +
 --
-The average size (in sectors) of the requests that were issued to the device.
+The average size (in bytes) of the requests that were issued to the device.
 
 
 type: float
