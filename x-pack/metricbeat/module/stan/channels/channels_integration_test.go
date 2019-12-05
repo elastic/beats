@@ -26,8 +26,6 @@ func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
-	t.Log(service.Host())
-	t.Log(getConfig(service.Host()))
 	events, errs := m.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
