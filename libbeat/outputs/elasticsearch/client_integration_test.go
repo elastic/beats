@@ -319,27 +319,18 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	return client, client
 }
 
+// getTestingElasticsearch creates a test client.
 func getTestingElasticsearch(t internal.TestLogger) *Client {
-	settings := getTestingElasticsearchClientSettings()
-	return getTestingElasticsearchForSettings(t, settings)
-}
-
-// getTestingElasticsearchForConfig creates a test client with a set of client settings.
-func getTestingElasticsearchForSettings(t internal.TestLogger, s ClientSettings) *Client {
-	client, err := NewClient(s, nil)
-	internal.InitClient(t, client, err)
-	return client
-}
-
-func getTestingElasticsearchClientSettings() ClientSettings {
-	return ClientSettings{
+	client, err := NewClient(ClientSettings{
 		URL:              internal.GetURL(),
 		Index:            outil.MakeSelector(),
 		Username:         internal.GetUser(),
 		Password:         internal.GetUser(),
 		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
-	}
+	}, nil)
+	internal.InitClient(t, client, err)
+	return client
 }
 
 func randomClient(grp outputs.Group) outputs.NetworkClient {
