@@ -119,12 +119,8 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
 			m, ok := mapping.Metrics[family.GetName()]
-			if m == nil {
-				continue
-			}
-
-			// Ignore unknown metrics
-			if !ok {
+			if m == nil || !ok {
+				// Ignore unknown metrics
 				continue
 			}
 
