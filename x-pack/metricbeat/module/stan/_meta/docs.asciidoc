@@ -6,11 +6,3 @@ The default metricsets are `channels`, `stats` and `subscriptions`.
 === Compatibility
 
 The STAN module is tested with STAN 0.15.1.
-
-
-[float]
-=== Dashboard
-
-The STAN module comes with a predefined dashboard. For example:
-
-image::./images/metricbeat_stan_dashboard.png[]
