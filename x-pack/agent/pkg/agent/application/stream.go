@@ -56,7 +56,7 @@ func (b *operatorStream) Execute(cfg *configRequest) error {
 func streamFactory(cfg *config.Config, client sender, r reporter) func(*logger.Logger, routingKey) (stream, error) {
 	return func(log *logger.Logger, id routingKey) (stream, error) {
 		// new operator per stream to isolate processes without using tags
-		operator, err := newOperator(log, cfg, r)
+		operator, err := newOperator(log, id, cfg, r)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +68,7 @@ func streamFactory(cfg *config.Config, client sender, r reporter) func(*logger.L
 	}
 }
 
-func newOperator(log *logger.Logger, config *config.Config, r reporter) (*operation.Operator, error) {
+func newOperator(log *logger.Logger, id routingKey, config *config.Config, r reporter) (*operation.Operator, error) {
 	operatorConfig := &operatorCfg.Config{}
 	if err := config.Unpack(&operatorConfig); err != nil {
 		return nil, err
@@ -87,6 +87,7 @@ func newOperator(log *logger.Logger, config *config.Config, r reporter) (*operat
 
 	return operation.NewOperator(
 		log,
+		id,
 		config,
 		fetcher,
 		installer,

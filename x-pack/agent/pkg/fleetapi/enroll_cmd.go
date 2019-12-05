@@ -74,10 +74,10 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 //   }
 // }
 type EnrollRequest struct {
-	EnrollmentToken string     `json:"-"`
-	Type            EnrollType `json:"type"`
-	SharedID        string     `json:"sharedId,omitempty"`
-	Metadata        Metadata   `json:"metadata"`
+	EnrollAPIKey string     `json:"-"`
+	Type         EnrollType `json:"type"`
+	SharedID     string     `json:"sharedId,omitempty"`
+	Metadata     Metadata   `json:"metadata"`
 }
 
 // Metadata is a all the metadata send or received from the agent.
@@ -90,8 +90,8 @@ type Metadata struct {
 func (e *EnrollRequest) Validate() error {
 	var err error
 
-	if len(e.EnrollmentToken) == 0 {
-		err = multierror.Append(err, errors.New("missing enrollment token"))
+	if len(e.EnrollAPIKey) == 0 {
+		err = multierror.Append(err, errors.New("missing enrollment api key"))
 	}
 
 	if len(e.Type) == 0 {
@@ -116,7 +116,7 @@ func (e *EnrollRequest) Validate() error {
 //     "user_provided_metadata": {},
 //     "local_metadata": {},
 //     "actions": [],
-//     "access_token": "ACCESS_TOKEN"
+//     "access_api_key": "API_KEY"
 //   }
 // }
 type EnrollResponse struct {
@@ -135,7 +135,7 @@ type EnrollItemResponse struct {
 	UserProvidedMetadata map[string]interface{} `json:"user_provided_metadata"`
 	LocalMetadata        map[string]interface{} `json:"local_metadata"`
 	Actions              []interface{}          `json:"actions"`
-	AccessToken          string                 `json:"access_token"`
+	AccessAPIKey         string                 `json:"access_api_key"`
 }
 
 // Validate validates the response send from the server.
@@ -150,8 +150,8 @@ func (e *EnrollResponse) Validate() error {
 		err = multierror.Append(err, errors.New("missing enrollment type"))
 	}
 
-	if len(e.Item.AccessToken) == 0 {
-		err = multierror.Append(err, errors.New("access token is missing"))
+	if len(e.Item.AccessAPIKey) == 0 {
+		err = multierror.Append(err, errors.New("access api key is missing"))
 	}
 
 	return err
@@ -165,14 +165,15 @@ type EnrollCmd struct {
 // Execute enroll the Agent in the Fleet.
 func (e *EnrollCmd) Execute(r *EnrollRequest) (*EnrollResponse, error) {
 	const p = "/api/fleet/agents/enroll"
-	const key = "kbn-fleet-enrollment-token"
+	const key = "Authorization"
+	const prefix = "ApiKey "
 
 	if err := r.Validate(); err != nil {
 		return nil, err
 	}
 
 	headers := map[string][]string{
-		key: []string{r.EnrollmentToken},
+		key: []string{prefix + r.EnrollAPIKey},
 	}
 
 	b, err := json.Marshal(r)

@@ -62,7 +62,7 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 		case *FilterValuesWithRegexpRule:
 			name = "filter_values_with_regexp"
 		default:
-			return nil, fmt.Errorf("unkown rule of type %T", rule)
+			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
 
 		subdoc := map[string]Rule{
@@ -424,7 +424,7 @@ func (r *FilterRule) Apply(ast *AST) error {
 	mergedAST := &AST{root: &Dict{}}
 	var err error
 	for _, selector := range r.Selectors {
-		newAST, ok := Select(ast, selector)
+		newAST, ok := Select(ast.Clone(), selector)
 		if !ok {
 			continue
 		}

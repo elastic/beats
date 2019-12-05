@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/artifact"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/state"
@@ -38,12 +39,18 @@ type ReportFailureFunc func(string, error)
 type Application struct {
 	id              string
 	name            string
+	pipelineID      string
 	spec            Specifier
 	state           state.State
 	grpcClient      remoteconfig.Client
 	clientFactory   remoteconfig.ConnectionCreator
 	limiter         *tokenbucket.Bucket
 	failureReporter ReportFailureFunc
+
+	uid int
+	gid int
+
+	monitor monitoring.Monitor
 
 	processConfig  *process.Config
 	downloadConfig *artifact.Config
@@ -54,13 +61,34 @@ type Application struct {
 	appLock sync.Mutex
 }
 
+// ArgsDecorator decorates arguments before calling an application
+type ArgsDecorator func([]string) []string
+
 // NewApplication creates a new instance of an applications. It will not automatically start
 // the application.
-func NewApplication(id, appName string, spec Specifier, factory remoteconfig.ConnectionCreator, cfg *config.Config, logger *logger.Logger, failureReporter ReportFailureFunc) *Application {
+func NewApplication(id, appName, pipelineID string,
+	spec Specifier,
+	factory remoteconfig.ConnectionCreator,
+	cfg *config.Config,
+	logger *logger.Logger,
+	failureReporter ReportFailureFunc,
+	monitor monitoring.Monitor) (*Application, error) {
+
+	s, err := spec.Spec(cfg.DownloadConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	uid, gid, err := getUserGroup(s)
+	if err != nil {
+		return nil, err
+	}
+
 	b, _ := tokenbucket.NewTokenBucket(3, 3, 1*time.Second)
 	return &Application{
 		id:              id,
 		name:            appName,
+		pipelineID:      pipelineID,
 		spec:            spec,
 		clientFactory:   factory,
 		processConfig:   cfg.ProcessConfig,
@@ -69,7 +97,15 @@ func NewApplication(id, appName string, spec Specifier, factory remoteconfig.Con
 		logger:          logger,
 		limiter:         b,
 		failureReporter: failureReporter,
-	}
+		monitor:         monitor,
+		uid:             uid,
+		gid:             gid,
+	}, nil
+}
+
+// Monitor returns monitoring handler of this app.
+func (a *Application) Monitor() monitoring.Monitor {
+	return a.monitor
 }
 
 // Name returns application name
@@ -100,6 +136,9 @@ func (a *Application) Stop() {
 			// ignoring error: not critical
 			os.Remove(filePath)
 		}
+
+		// cleanup drops
+		a.monitor.Cleanup()
 	}
 }
 
@@ -139,6 +178,8 @@ func (a *Application) watch(proc *os.Process, cfg map[string]interface{}) {
 }
 
 func (a *Application) reportCrash() {
+	a.monitor.Cleanup()
+
 	// TODO: reporting crash
 	if a.failureReporter != nil {
 		crashError := errors.New(

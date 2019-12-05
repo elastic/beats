@@ -7,9 +7,7 @@ package fleetapi
 import (
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -21,11 +19,11 @@ import (
 )
 
 func TestHTTPClient(t *testing.T) {
-	t.Run("Access Token is valid", withServer(
+	t.Run("API Key is valid", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ message: "hello" }`
 			mux := http.NewServeMux()
-			mux.HandleFunc("/echo-hello", accessTokenHandler(func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/echo-hello", authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, msg)
 			}, "abc123"))
@@ -36,7 +34,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
-				return NewFleetAccessTokenRoundTripper(wrapped, "abc123")
+				return NewFleetAuthRoundTripper(wrapped, "abc123")
 			})
 
 			require.NoError(t, err)
@@ -47,6 +45,30 @@ func TestHTTPClient(t *testing.T) {
 			require.NoError(t, err)
 			defer resp.Body.Close()
 			assert.Equal(t, `{ message: "hello" }`, string(body))
+		},
+	))
+
+	t.Run("API Key is not valid", withServer(
+		func(t *testing.T) *http.ServeMux {
+			msg := `{ message: "hello" }`
+			mux := http.NewServeMux()
+			mux.HandleFunc("/echo-hello", authHandler(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintf(w, msg)
+			}, "secret"))
+			return mux
+		}, func(t *testing.T, host string) {
+			cfg := config.MustNewConfigFrom(map[string]interface{}{
+				"host": host,
+			})
+
+			client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
+				return NewFleetAuthRoundTripper(wrapped, "abc123")
+			})
+
+			require.NoError(t, err)
+			_, err = client.Send("GET", "/echo-hello", nil, nil, nil)
+			require.Error(t, err)
 		},
 	))
 
@@ -79,30 +101,6 @@ func TestHTTPClient(t *testing.T) {
 			assert.Equal(t, `{ message: "hello" }`, string(body))
 		},
 	))
-}
-
-func accessTokenHandler(handler http.HandlerFunc, accessToken string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("kbn-fleet-access-token") != accessToken {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		handler(w, r)
-	}
-}
-
-func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, host string)) func(t *testing.T) {
-	return func(t *testing.T) {
-		listener, err := net.Listen("tcp", ":0")
-		require.NoError(t, err)
-		defer listener.Close()
-
-		port := listener.Addr().(*net.TCPAddr).Port
-
-		go http.Serve(listener, m(t))
-
-		test(t, "localhost:"+strconv.Itoa(port))
-	}
 }
 
 // NOTE(ph): Usually I would be agaisnt testing private methods as much as possible but in this

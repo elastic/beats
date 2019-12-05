@@ -1,4 +1,4 @@
-inputs:
+streams:
   - type: event/file
     enabled: true
     paths:
@@ -8,8 +8,9 @@ management:
   host: "localhost"
 config:
   reload: 123
-output:
-  elasticsearch:
+outputs:
+  default:
+    type: elasticsearch
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
     username: elastic
     password: changeme

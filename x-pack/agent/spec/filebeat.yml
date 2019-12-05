@@ -2,7 +2,7 @@ name: Filebeat
 cmd: filebeat
 rules:
 - map:
-    path: inputs
+    path: streams
     rules:
     - translate:
         path: type
@@ -15,7 +15,7 @@ rules:
           log/redis_slowlog: redis
           log/syslog: syslog
 - filter_values:
-    selector: inputs
+    selector: streams
     key: type
     values:
     - log
@@ -26,8 +26,11 @@ rules:
     - redis
     - syslog
 - copy:
-    from: inputs
+    from: streams
     to: filebeat
+- rename:
+    from: filebeat.streams
+    to: inputs
 - filter:
     selectors:
     - filebeat

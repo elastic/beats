@@ -4,21 +4,24 @@ rules:
 - filter_values_with_regexp:
     key: type
     re: ^monitor/.+
-    selector: inputs
+    selector: streams
 - map:
-    path: inputs
+    path: streams
     rules:
     - translate_with_regexp:
         path: type
         re: ^monitor/(?P<type>.+)
         with: $type
 - copy:
-    from: inputs
+    from: streams
     to: heartbeat
+- rename:
+    from: heartbeat.streams
+    to: monitors
 - filter:
     selectors:
     - heartbeat
     - output
     - keystore
-when: HasItems(%{[heartbeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
-  'kafka', 'logstash')
+when: HasItems(%{[heartbeat.monitors]}) && HasNamespace('output', 'elasticsearch',
+  'redis', 'kafka', 'logstash')
