@@ -15,9 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package uuid
+package add_id
 
-// Config for Elasticsearch ID processor.
+// Config for Add ID processor.
 type Config struct {
 	TargetField string `config:"target_field"` // Target field for the ID
 	Type        string `config:"type"`         // Type of ID

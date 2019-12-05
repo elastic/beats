@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package uuid
+package add_id
 
 import (
 	"testing"
