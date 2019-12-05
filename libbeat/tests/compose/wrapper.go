@@ -89,7 +89,7 @@ func (c *wrapperContainer) Old() bool {
 	unit := match[2]
 	switch unit {
 	case "minute":
-		return n > 3
+		return n > 10
 	default:
 		return true
 	}

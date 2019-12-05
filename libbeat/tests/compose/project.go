@@ -221,7 +221,7 @@ func (c *Project) KillOld(except []string) error {
 	// it can happen that an other package tries to start them at the same time
 	// which leads to a conflict. We need a better solution long term but that should
 	// solve the problem for now.
-	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes")
+	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes", "kafka")
 
 	servicesStatus, err := c.getServices()
 	if err != nil {
