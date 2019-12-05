@@ -55,6 +55,21 @@ may want to change that behavior, so just edit the YAML file and modify them:
 ------------------------------------------------
 
 [float]
+===== Running {beatname_uc} on master nodes
+
+Kubernetes master nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
+to limit the workloads that can run on them. To run {beatname_uc} on master nodes you may need to
+update the Daemonset spec to include proper tolerations:
+
+[source,yaml]
+------------------------------------------------
+spec:
+ tolerations:
+ - key: node-role.kubernetes.io/master
+   effect: NoSchedule
+------------------------------------------------
+
+[float]
 ==== Deploy
 
 To deploy {beatname_uc} to Kubernetes just run:
