@@ -5,7 +5,7 @@ This metricset connects to kube-state-metrics endpoint to retrieve and report Se
 
 ## Version history
 
-- November 2019, first release using kube-state-metrics `v1.8.0`.
+- December 2019, first release using kube-state-metrics `v1.8.0`.
 
 ## Configuration
 
