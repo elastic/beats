@@ -1,0 +1,1233 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Overview of AWS SNS Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "aws.sns"
+                  },
+                  "type": "phrase",
+                  "value": "aws.sns"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "aws.sns",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 5,
+              "i": "3b9b0cee-b175-4268-8c5b-4ce869a09caf",
+              "w": 9,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "3b9b0cee-b175-4268-8c5b-4ce869a09caf",
+            "panelRefName": "panel_0",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "5f0d72c5-0f28-449f-9c93-3b4074f068f7",
+              "w": 13,
+              "x": 9,
+              "y": 0
+            },
+            "panelIndex": "5f0d72c5-0f28-449f-9c93-3b4074f068f7",
+            "panelRefName": "panel_1",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "6ea802d2-66d5-41c4-9cc0-ffd603eef29d",
+              "w": 13,
+              "x": 22,
+              "y": 0
+            },
+            "panelIndex": "6ea802d2-66d5-41c4-9cc0-ffd603eef29d",
+            "panelRefName": "panel_2",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "1f9c137f-567f-4d31-afe3-22a33447e7b2",
+              "w": 13,
+              "x": 35,
+              "y": 0
+            },
+            "panelIndex": "1f9c137f-567f-4d31-afe3-22a33447e7b2",
+            "panelRefName": "panel_3",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 5,
+              "i": "5a9d5f2f-b075-4892-8188-c6e808a1163d",
+              "w": 9,
+              "x": 0,
+              "y": 5
+            },
+            "panelIndex": "5a9d5f2f-b075-4892-8188-c6e808a1163d",
+            "panelRefName": "panel_4",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f",
+              "w": 9,
+              "x": 0,
+              "y": 10
+            },
+            "panelIndex": "c6d5a54d-61a4-470b-8769-c5b6d6ab6c0f",
+            "panelRefName": "panel_5",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "0684c25d-34e8-425e-9069-dd8364e6325b",
+              "w": 13,
+              "x": 9,
+              "y": 10
+            },
+            "panelIndex": "0684c25d-34e8-425e-9069-dd8364e6325b",
+            "panelRefName": "panel_6",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "923bd4cd-d8fe-47b5-afcf-577bf2c5987c",
+              "w": 13,
+              "x": 22,
+              "y": 10
+            },
+            "panelIndex": "923bd4cd-d8fe-47b5-afcf-577bf2c5987c",
+            "panelRefName": "panel_7",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "72e987da-9a49-4dd4-99c4-4acbc49a0e0b",
+              "w": 13,
+              "x": 35,
+              "y": 10
+            },
+            "panelIndex": "72e987da-9a49-4dd4-99c4-4acbc49a0e0b",
+            "panelRefName": "panel_8",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "f3c5915b-6848-4950-afca-53653d13d6af",
+              "w": 9,
+              "x": 0,
+              "y": 20
+            },
+            "panelIndex": "f3c5915b-6848-4950-afca-53653d13d6af",
+            "panelRefName": "panel_9",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "f176153f-4588-42f9-a7bb-3015909d5610",
+              "w": 13,
+              "x": 9,
+              "y": 20
+            },
+            "panelIndex": "f176153f-4588-42f9-a7bb-3015909d5610",
+            "panelRefName": "panel_10",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "3b3cc747-b57c-44e0-a18c-77155072bee4",
+              "w": 13,
+              "x": 22,
+              "y": 20
+            },
+            "panelIndex": "3b3cc747-b57c-44e0-a18c-77155072bee4",
+            "panelRefName": "panel_11",
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "ee130150-c1de-465b-8a8e-013f466528bf",
+              "w": 13,
+              "x": 35,
+              "y": 20
+            },
+            "panelIndex": "ee130150-c1de-465b-8a8e-013f466528bf",
+            "panelRefName": "panel_12",
+            "version": "7.4.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] SNS Overview",
+        "version": 1
+      },
+      "id": "d17b1000-17a4-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "b5308940-7347-11e9-816b-07687310a99a",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "13e624c0-180e-11ea-8e91-03c7047cbb9d",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "ee7ccfe0-180d-11ea-8e91-03c7047cbb9d",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "a686c3c0-180e-11ea-8e91-03c7047cbb9d",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "59defc90-17a5-11ea-8e91-03c7047cbb9d",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "6f7f7680-180c-11ea-8e91-03c7047cbb9d",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "bf81e030-180e-11ea-8e91-03c7047cbb9d",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "dffa19e0-180e-11ea-8e91-03c7047cbb9d",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "d19a71b0-180e-11ea-8e91-03c7047cbb9d",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "abdc7480-180b-11ea-8e91-03c7047cbb9d",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "09857a20-180f-11ea-8e91-03c7047cbb9d",
+          "name": "panel_10",
+          "type": "visualization"
+        },
+        {
+          "id": "fc0869c0-180e-11ea-8e91-03c7047cbb9d",
+          "name": "panel_11",
+          "type": "visualization"
+        },
+        {
+          "id": "b7f8bf90-180f-11ea-8e91-03c7047cbb9d",
+          "name": "panel_12",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-12-09T08:44:25.127Z",
+      "version": "WzU0MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Region Filter [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "cloud.region",
+                "id": "1549397251041",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "region",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": false
+          },
+          "title": "AWS Region Filter",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "b5308940-7347-11e9-816b-07687310a99a",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-05T19:18:14.083Z",
+      "version": "WzEwNSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Messages Published",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Messages Published",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfMessagesPublished.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Messages Published",
+          "type": "metrics"
+        }
+      },
+      "id": "13e624c0-180e-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:42:45.237Z",
+      "version": "WzUzMywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Notifications Delivered",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Notifications Delivered",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfNotificationsDelivered.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Notifications Delivered",
+          "type": "metrics"
+        }
+      },
+      "id": "ee7ccfe0-180d-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:43:15.631Z",
+      "version": "WzUzNiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Notifications Failed",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Notifications Failed",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfNotificationsFailed.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Notifications Failed",
+          "type": "metrics"
+        }
+      },
+      "id": "a686c3c0-180e-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:43:43.576Z",
+      "version": "WzUzOSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Topic Name Filter [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "aws.cloudwatch.dimensions.TopicName",
+                "id": "1565034367477",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "topic name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": true
+          },
+          "title": "SNS Topic Name Filter [Metricbeat AWS]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "59defc90-17a5-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-12-05T21:32:44.559Z",
+      "version": "WzUwMSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Publish Size",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Publish Size",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.PublishSize.avg",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Publish Size",
+          "type": "metrics"
+        }
+      },
+      "id": "6f7f7680-180c-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:42:17.307Z",
+      "version": "WzUzMSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Notifications Filtered Out",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Notifications Filtered Out",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfNotificationsFilteredOut.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Notifications Filtered Out",
+          "type": "metrics"
+        }
+      },
+      "id": "bf81e030-180e-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:42:52.011Z",
+      "version": "WzUzNCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Notifications Filtered Out No Message Attributes",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Notifications Filtered Out No Message Attributes",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfNotificationsFilteredOut-NoMessageAttributes.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Notifications Filtered Out No Message Attributes",
+          "type": "metrics"
+        }
+      },
+      "id": "dffa19e0-180e-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:43:22.190Z",
+      "version": "WzUzNywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Notifications Filtered Out Invalid Attributes",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Notifications Filtered Out Invalid Attributes",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Notifications Filtered Out Invalid Attributes",
+          "type": "metrics"
+        }
+      },
+      "id": "d19a71b0-180e-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:43:51.074Z",
+      "version": "WzU0MCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS SMS Success Rate",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "SMS Success Rate",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.SMSSuccessRate.avg",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS SMS Success Rate",
+          "type": "metrics"
+        }
+      },
+      "id": "abdc7480-180b-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:42:37.614Z",
+      "version": "WzUzMiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Notifications Failed To Redrive To DLQ",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Notifications Failed To Redrive To DLQ",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Notifications Failed To Redrive To DLQ",
+          "type": "metrics"
+        }
+      },
+      "id": "09857a20-180f-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:43:01.104Z",
+      "version": "WzUzNSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS Notifications Redriven To DLQ",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Notifications Redriven To DLQ",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.NumberOfNotificationsRedrivenToDlq.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS Notifications Redriven To DLQ",
+          "type": "metrics"
+        }
+      },
+      "id": "fc0869c0-180e-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:43:28.432Z",
+      "version": "WzUzOCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "SNS SMS Month To Date Spent USD",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "legend_position": "bottom",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "s,s,3",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "SMS Month To Date Spent USD",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.metrics.SMSMonthToDateSpentUSD.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": null,
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "SNS SMS Month To Date Spent USD",
+          "type": "metrics"
+        }
+      },
+      "id": "b7f8bf90-180f-11ea-8e91-03c7047cbb9d",
+      "migrationVersion": {
+        "visualization": "7.3.1"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-12-09T08:43:57.500Z",
+      "version": "WzU0MSwxXQ=="
+    }
+  ],
+  "version": "7.4.0"
+}
