@@ -49,6 +49,7 @@ type ConfigManager interface {
 	CheckRawConfig(cfg *common.Config) error
 }
 
+// PluginFunc for creating FactoryFunc if it matches a config
 type PluginFunc func(*common.Config) FactoryFunc
 
 // FactoryFunc for creating a config manager
