@@ -288,7 +288,7 @@ NOTE: The "ttl" option is not yet supported on an async Logstash client (one wit
 
 Configures number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
-batches have been written. Pipelining is disabled if a values of 0 is
+batches have been written. Pipelining is disabled if a value of 0 is
 configured. The default value is 2.
 
 ===== `proxy_url`
