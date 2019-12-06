@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// Config for the aws_ec2 autodiscover provider.
+// Config for all aws autodiscover providers.
 type Config struct {
 	Type string `config:"type"`
 
@@ -33,6 +33,7 @@ type Config struct {
 	AWSConfig aws.ConfigAWS `config:",inline"`
 }
 
+// DefaultConfig for all aws autodiscover providers.
 func DefaultConfig() *Config {
 	return &Config{
 		Period: time.Minute,
