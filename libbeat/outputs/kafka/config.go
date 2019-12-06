@@ -131,11 +131,13 @@ func (c *saslConfig) configureSarama(config *sarama.Config) error {
 	case saslTypePlaintext:
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
 	case saslTypeSCRAMSHA256:
+		config.Net.SASL.Handshake = true
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
 		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
 		}
 	case saslTypeSCRAMSHA512:
+		config.Net.SASL.Handshake = true
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
 		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
@@ -213,6 +215,8 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
 		err = config.Sasl.configureSarama(k)
+		fmt.Println("-------------------")
+		fmt.Println(k.Net.SASL)
 		if err != nil {
 			return nil, err
 		}
