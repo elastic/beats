@@ -20,8 +20,6 @@ func (o *Operator) initHandlerMap() {
 
 	hm[configrequest.StepRun] = o.handleRun
 	hm[configrequest.StepRemove] = o.handleRemove
-	hm[configrequest.StepStartSidecar] = o.handleStartSidecar
-	hm[configrequest.StepStopSidecar] = o.handleStopSidecar
 
 	o.handlers = hm
 }
@@ -86,5 +84,5 @@ func getConfigFromStep(step configrequest.Step) (map[string]interface{}, error) 
 }
 
 func needsMetaConfig(step configrequest.Step) bool {
-	return step.ID == configrequest.StepRun || step.ID == configrequest.StepStartSidecar
+	return step.ID == configrequest.StepRun
 }

@@ -6,6 +6,7 @@ package fleet
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"sync"
 
@@ -18,28 +19,26 @@ import (
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/management"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/server"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 
 	xmanagement "github.com/elastic/beats/x-pack/libbeat/management"
 )
 
-var errEmptyAccessToken = errors.New("access_token is empty, you must re-enroll your Beat")
-
 // ConfigManager provides a functionality to retrieve config channel
-// using which manager is informed about config changes
+// using which manager is informed about config changes.
 type ConfigManager interface {
 	ConfigChan() chan<- map[string]interface{}
 }
 
 func init() {
-	management.Register("x-pack-fleet", NewFleetManager, feature.Beta)
+	management.Register("fleet", NewFleetManager, feature.Beta)
 }
 
 // Manager handles internal config updates. By retrieving
-// new configs from Kibana and applying them to the Beat
+// new configs from Kibana and applying them to the Beat.
 type Manager struct {
 	config    *Config
-	cache     *xmanagement.Cache
 	logger    *logp.Logger
 	beatUUID  uuid.UUID
 	done      chan struct{}
@@ -50,20 +49,19 @@ type Manager struct {
 	configChan chan map[string]interface{}
 }
 
-// NewFleetManager returns a X-Pack Beats Central Management manager
+// NewFleetManager returns a X-Pack Beats Fleet Management manager.
 func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
-			return nil, errors.Wrap(err, "parsing central management settings")
+			return nil, errors.Wrap(err, "parsing fleet management settings")
 		}
 	}
 	return NewFleetManagerWithConfig(c, registry, beatUUID)
 }
 
-// NewFleetManagerWithConfig returns a X-Pack Beats Central Management manager
+// NewFleetManagerWithConfig returns a X-Pack Beats Fleet Management manager.
 func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
-	var cache *xmanagement.Cache
 	var blacklist *xmanagement.ConfigBlacklist
 
 	if c.Enabled && c.Mode == xmanagement.ModeFleet {
@@ -74,29 +72,26 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 		if err != nil {
 			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
 		}
-
-		// Initialize central management settings cache
-		cache = &xmanagement.Cache{}
-		if err := cache.Load(); err != nil {
-			return nil, errors.Wrap(err, "reading central management internal cache")
-		}
 	}
 
 	log := logp.NewLogger(management.DebugK)
 
-	return &Manager{
+	m := &Manager{
 		config:     c,
-		cache:      cache,
 		blacklist:  blacklist,
-		logger:     log,
+		logger:     log.Named("fleet"),
 		done:       make(chan struct{}),
 		beatUUID:   beatUUID,
 		registry:   registry,
 		configChan: make(chan map[string]interface{}),
-	}, nil
+	}
+
+	go m.startGrpcServer()
+
+	return m, nil
 }
 
-// Enabled returns true if config management is enabled
+// Enabled returns true if config management is enabled.
 func (cm *Manager) Enabled() bool {
 	return cm.config.Enabled && cm.config.Mode == xmanagement.ModeFleet
 }
@@ -112,8 +107,8 @@ func (cm *Manager) Start() {
 		return
 	}
 
-	cfgwarn.Beta("Central management is enabled")
-	cm.logger.Info("Starting central management service")
+	cfgwarn.Beta("Fleet management is enabled")
+	cm.logger.Info("Starting fleet management service")
 
 	cm.wg.Add(1)
 	go cm.worker()
@@ -126,14 +121,14 @@ func (cm *Manager) Stop() {
 	}
 
 	// stop collecting configuration
-	cm.logger.Info("Stopping central management service")
+	cm.logger.Info("Stopping fleet management service")
 	close(cm.done)
 	cm.wg.Wait()
 }
 
 // CheckRawConfig check settings are correct to start the beat. This method
 // checks there are no collision between the existing configuration and what
-// central management can configure.
+// fleet management can configure.
 func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 	// TODO implement this method
 	return nil
@@ -142,28 +137,20 @@ func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 func (cm *Manager) worker() {
 	defer cm.wg.Done()
 
-	// Start worker loop: fetch + apply + cache new settings
+	// Start worker loop: fetch + apply  new settings
 WORKERLOOP:
 	for {
 		select {
 		case cfg := <-cm.configChan:
-			// store in cache
 			blocks, err := cm.toConfigBlocks(cfg)
 			if err != nil {
 				cm.logger.Errorf("Could not apply the configuration, error: %+v", err)
 				continue WORKERLOOP
 			}
 
-			cm.cache.Configs = blocks
-			if errs := cm.apply(); !errs.IsEmpty() {
+			if errs := cm.apply(blocks); !errs.IsEmpty() {
 				cm.logger.Errorf("Could not apply the configuration, error: %+v", errs)
 				continue WORKERLOOP
-			}
-
-			// store new configs (already applied)
-			cm.logger.Info("Storing new state")
-			if err := cm.cache.Save(); err != nil {
-				cm.logger.Errorf("error storing central management state: %s", err)
 			}
 		case <-cm.done:
 			return
@@ -171,7 +158,7 @@ WORKERLOOP:
 	}
 }
 
-func (cm *Manager) apply() xmanagement.Errors {
+func (cm *Manager) apply(blocks api.ConfigBlocks) xmanagement.Errors {
 	var errors xmanagement.Errors
 	missing := map[string]bool{}
 	for _, name := range cm.registry.GetRegisteredNames() {
@@ -179,13 +166,13 @@ func (cm *Manager) apply() xmanagement.Errors {
 	}
 
 	// Detect unwanted configs from the list
-	if errs := cm.blacklist.Detect(cm.cache.Configs); !errs.IsEmpty() {
+	if errs := cm.blacklist.Detect(blocks); !errs.IsEmpty() {
 		errors = append(errors, errs...)
 		return errors
 	}
 
 	// Reload configs
-	for _, b := range cm.cache.Configs {
+	for _, b := range blocks {
 		if err := cm.reload(b.Type, b.Blocks); err != nil {
 			errors = append(errors, err)
 		}
@@ -284,6 +271,14 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 	}
 
 	return res, nil
+}
+
+func (cm *Manager) startGrpcServer() {
+	cm.logger.Info("initiating fleet config manager")
+	s := NewConfigServer(cm.ConfigChan())
+	if err := server.NewGrpcServer(os.Stdin, s); err != nil {
+		panic(err)
+	}
 }
 
 var _ ConfigManager = &Manager{}

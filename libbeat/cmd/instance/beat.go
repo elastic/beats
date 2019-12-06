@@ -34,7 +34,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/kibana"
-	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/server"
 
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
@@ -441,8 +440,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Launch config manager
 	b.ConfigManager.Start()
 	defer b.ConfigManager.Stop()
-
-	go startGrpcServer(b)
 
 	return beater.Run(&b.Beat)
 }
@@ -1068,18 +1065,4 @@ func setUmaskWithSettings(settings Settings) error {
 		return setUmask(*settings.Umask)
 	}
 	return setUmask(0027) // 0640 for files | 0750 for dirs
-}
-
-type fleetConfigManager interface {
-	ConfigChan() chan<- map[string]interface{}
-}
-
-func startGrpcServer(b *Beat) {
-	if cm, ok := b.ConfigManager.(fleetConfigManager); ok {
-		logp.Info("initiating fleet config manager")
-		s := NewConfigServer(cm.ConfigChan())
-		if err := server.NewGrpcServer(os.Stdin, s); err != nil {
-			panic(err)
-		}
-	}
 }
