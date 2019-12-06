@@ -54,6 +54,14 @@ func init() {
 // ID. The algorithm used to generate the ID is the same as used by Elasticsearch.
 // See https://github.com/elastic/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
 func (*esTimeBasedUUIDGenerator) NextID() string {
+	ts, seq := nextIDData()
+	var uuidBytes [15]byte
+
+	packID(uuidBytes[:], ts, seq)
+	return base64.RawURLEncoding.EncodeToString(uuidBytes[:])
+}
+
+func nextIDData() (int64, uint32) {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -70,37 +78,7 @@ func (*esTimeBasedUUIDGenerator) NextID() string {
 	lastTimestamp = timestamp
 
 	t := timestamp.UnixNano() / 1000 // timestamp in ms-since-epoch
-
-	uuidBytes := make([]byte, 15)
-
-	//// We have auto-generated ids, which are usually used for append-only workloads.
-	//// So we try to optimize the order of bytes for indexing speed (by having quite
-	//// unique bytes close to the beginning of the ids so that sorting is fast) and
-	//// compression (by making sure we share common prefixes between enough ids).
-
-	// We use the sequence number rather than the timestamp because the distribution of
-	// the timestamp depends too much on the indexing rate, so it is less reliable.
-	uuidBytes[0] = byte(s)       // copy lowest-order byte from sequence number
-	uuidBytes[1] = byte(s >> 16) // copy 3rd lowest-order byte from sequence number
-
-	// Now we start focusing on compression and put bytes that should not change too often.
-	uuidBytes[2] = byte(t >> 16) // 3rd lowest-order byte from timestamp; changes every ~65 secs
-	uuidBytes[3] = byte(t >> 24) // 4th lowest-order byte from timestamp; changes every ~4.5h
-	uuidBytes[4] = byte(t >> 32) // 5th lowest-order byte from timestamp; changes every ~50 days
-	uuidBytes[5] = byte(t >> 40) // 6th lowest-order byte from timestamp; changes every 35 years
-
-	// Copy mac address bytes (6 bytes)
-	copy(uuidBytes[6:6+addrLen], mac)
-
-	// Finally we put the remaining bytes, which will likely not be compressed at all.
-	uuidBytes[12] = byte(t >> 8) // 2nd lowest-order byte from timestamp
-	uuidBytes[13] = byte(s >> 8) // 2nd lowest-order byte from sequence number
-	uuidBytes[14] = byte(t)
-
-	// See also: more detailed explanation of byte choices at
-	// https://github.com/elastic/elasticsearch/blob/a666fb22664284d8e2114841ebb58ea4e1924691/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java#L80-L95
-
-	return base64.RawURLEncoding.EncodeToString(uuidBytes)
+	return t, s
 }
 
 func getTimestamp() time.Time {
@@ -118,4 +96,33 @@ func getTimestamp() time.Time {
 	}
 
 	return now
+}
+
+func packID(buf []byte, ts int64, seq uint32) {
+	//// We have auto-generated ids, which are usually used for append-only workloads.
+	//// So we try to optimize the order of bytes for indexing speed (by having quite
+	//// unique bytes close to the beginning of the ids so that sorting is fast) and
+	//// compression (by making sure we share common prefixes between enough ids).
+
+	// We use the sequence number rather than the timestamp because the distribution of
+	// the timestamp depends too much on the indexing rate, so it is less reliable.
+	buf[0] = byte(seq)       // copy lowest-order byte from sequence number
+	buf[1] = byte(seq >> 16) // copy 3rd lowest-order byte from sequence number
+
+	// Now we start focusing on compression and put bytes that should not change too often.
+	buf[2] = byte(ts >> 16) // 3rd lowest-order byte from timestamp; changes every ~65 secs
+	buf[3] = byte(ts >> 24) // 4th lowest-order byte from timestamp; changes every ~4.5h
+	buf[4] = byte(ts >> 32) // 5th lowest-order byte from timestamp; changes every ~50 days
+	buf[5] = byte(ts >> 40) // 6th lowest-order byte from timestamp; changes every 35 years
+
+	// Copy mac address bytes (6 bytes)
+	copy(buf[6:6+addrLen], mac)
+
+	// Finally we put the remaining bytes, which will likely not be compressed at all.
+	buf[12] = byte(ts >> 8)  // 2nd lowest-order byte from timestamp
+	buf[13] = byte(seq >> 8) // 2nd lowest-order byte from sequence number
+	buf[14] = byte(ts)
+
+	// See also: more detailed explanation of byte choices at
+	// https://github.com/elastic/elasticsearch/blob/a666fb22664284d8e2114841ebb58ea4e1924691/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java#L80-L95
 }
