@@ -1,4 +1,3 @@
-from builtins import range
 from base import BaseTest
 import os
 from elasticsearch import Elasticsearch

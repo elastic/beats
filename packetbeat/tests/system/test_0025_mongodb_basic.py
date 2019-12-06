@@ -1,4 +1,3 @@
-from __future__ import print_function
 import re
 from packetbeat import BaseTest
 
@@ -253,6 +252,6 @@ class Test(BaseTest):
             re.compile(r'Unknown operation code: (\d+)'), 1)
 
         assert len(unknown_counts) > 0
-        for k, v in list(unknown_counts.items()):
+        for k, v in unknown_counts.items():
             assert v == 1, "Unknown opcode reported more than once: opcode={0}, count={1}".format(
                 k, v)

@@ -1,4 +1,3 @@
-from builtins import range
 import random
 import string
 import sys

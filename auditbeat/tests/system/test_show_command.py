@@ -1,5 +1,3 @@
-from __future__ import print_function
-from builtins import range
 import os
 import platform
 import sys

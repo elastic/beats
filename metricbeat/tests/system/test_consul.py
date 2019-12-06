@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import metricbeat
 import unittest
@@ -44,14 +43,14 @@ class ConsulAgentTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(CONSUL_FIELDS), list(evt.keys()))
+        self.assertItemsEqual(self.de_dot(CONSUL_FIELDS), evt.keys())
         consul_agent = evt["consul"]["agent"]
 
         consul_agent.pop("raft", None)
         consul_agent.pop("autopilot", None)
 
         print(consul_agent)
-        self.assertItemsEqual(self.de_dot(AGENT_FIELDS), list(consul_agent.keys()))
+        self.assertItemsEqual(self.de_dot(AGENT_FIELDS), consul_agent.keys())
 
         assert(consul_agent["runtime"]["heap_objects"] > 0)
 

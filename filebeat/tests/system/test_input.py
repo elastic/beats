@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from builtins import str
-from builtins import range
 from filebeat import BaseTest
 import os
 import time

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from builtins import range
 from filebeat import BaseTest
 import os
 

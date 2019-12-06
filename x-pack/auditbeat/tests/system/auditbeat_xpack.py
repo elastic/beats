@@ -1,4 +1,3 @@
-from __future__ import print_function
 import jinja2
 import os
 import sys

@@ -32,4 +32,4 @@ class Test(XPackTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            self.assertItemsEqual(self.de_dot(COREDNS_FIELDS), list(evt.keys()), evt)
+            self.assertItemsEqual(self.de_dot(COREDNS_FIELDS), evt.keys(), evt)

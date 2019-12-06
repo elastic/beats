@@ -1,7 +1,3 @@
-from builtins import map
-from builtins import str
-from builtins import range
-from builtins import object
 import json
 import operator
 import platform
@@ -204,7 +200,7 @@ def pretty_print_json(d):
     return json.dumps(d, indent=3, default=lambda o: o.to_json(), sort_keys=True)
 
 
-class TCP4TestCase(object):
+class TCP4TestCase:
     def __init__(self):
         pass
 
@@ -245,7 +241,7 @@ class TCP4TestCase(object):
         })
 
 
-class UDP4TestCase(object):
+class UDP4TestCase:
     def __init__(self):
         pass
 
@@ -284,7 +280,7 @@ class UDP4TestCase(object):
         })
 
 
-class ConnectedUDP4TestCase(object):
+class ConnectedUDP4TestCase:
     def __init__(self):
         pass
 
@@ -327,7 +323,7 @@ class ConnectedUDP4TestCase(object):
         })
 
 
-class ConnectedUDP6TestCase(object):
+class ConnectedUDP6TestCase:
     def __init__(self):
         pass
 
@@ -374,7 +370,7 @@ class ConnectedUDP6TestCase(object):
         })
 
 
-class UDP6TestCase(object):
+class UDP6TestCase:
     def __init__(self):
         pass
 
@@ -417,7 +413,7 @@ class UDP6TestCase(object):
         })
 
 
-class MultiUDP4TestCase(object):
+class MultiUDP4TestCase:
     def __init__(self):
         self.client_addr = None
         self.server_addr = [None] * 3
@@ -501,7 +497,7 @@ class MultiUDP4TestCase(object):
         ])
 
 
-class SocketFactory(object):
+class SocketFactory:
 
     def __init__(self, network, transport):
         self.network = network
@@ -548,7 +544,7 @@ def transaction_udp_oneway(client, client_addr, server, server_addr, req, resp):
     msg, _ = server.recvfrom(len(req))
 
 
-class DNSTestCase(object):
+class DNSTestCase:
 
     def __init__(self, enabled=True, delay_seconds=0, network="ipv4", transport="tcp", bidirectional=True):
         self.dns_enabled = enabled
@@ -675,7 +671,7 @@ class DNSTestCase(object):
         ]
         if not self.dns_enabled:
             for ev in expected_events:
-                for k in [x for x in list(ev.keys()) if x.endswith('.domain')]:
+                for k in [x for x in ev.keys() if x.endswith('.domain')]:
                     ev[k] = None
 
         return HasEvent(expected_events)
@@ -719,7 +715,7 @@ def random_address_ipv6():
     return 'fdee:' + ':'.join(['{:x}'.format(random.randint(1, 65535)) for _ in range(7)])
 
 
-class HasEvent(object):
+class HasEvent:
     def __init__(self, expected):
         if isinstance(expected, dict):
             self.expected = [expected]
@@ -739,7 +735,7 @@ class HasEvent(object):
         for (iexp, exp) in enumerate(expected):
             for (idoc, doc) in enumerate(documents):
                 if all((k in doc and (doc[k] == v or callable(v) and v(doc[k]))) or (v is None and k not in doc)
-                       for k, v in list(exp.items())):
+                       for k, v in exp.items()):
                     break
             else:
                 return False
@@ -747,7 +743,7 @@ class HasEvent(object):
         return True
 
 
-class Comparison(object):
+class Comparison:
     def __init__(self, op, value):
         self.op = op
         self.value = value

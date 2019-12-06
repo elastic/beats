@@ -1,4 +1,3 @@
-from builtins import str
 import os
 import metricbeat
 import unittest
@@ -38,7 +37,7 @@ class Test(metricbeat.BaseTest):
 
         del evt["http"]["test"]["hello"]
 
-        self.assertItemsEqual(self.de_dot(HTTP_FIELDS), list(evt.keys()), evt)
+        self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -71,7 +70,7 @@ class Test(metricbeat.BaseTest):
         # Delete dynamic namespace part for fields comparison
         del evt["http"]["server"]
 
-        self.assertItemsEqual(self.de_dot(HTTP_FIELDS), list(evt.keys()), evt)
+        self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 

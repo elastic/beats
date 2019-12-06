@@ -1,4 +1,3 @@
-from __future__ import print_function
 from filebeat import BaseTest
 from beat.beat import INTEGRATION_TESTS
 import os

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from builtins import range
 from filebeat import BaseTest
 import io
 import os

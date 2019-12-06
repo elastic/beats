@@ -1,5 +1,3 @@
-from future import standard_library
-standard_library.install_aliases()
 import os
 import unittest
 from nose.plugins.attrib import attr
@@ -78,16 +76,16 @@ class ApacheStatusTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def verify_fields(self, evt):
-        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), list(evt.keys()))
+        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
         apache_status = evt["apache"]["status"]
         if self.old_apache_version():
             self.assertItemsEqual(
-                self.de_dot(APACHE_OLD_STATUS_FIELDS), list(apache_status.keys()))
+                self.de_dot(APACHE_OLD_STATUS_FIELDS), apache_status.keys())
         else:
             self.assertItemsEqual(
-                self.de_dot(APACHE_STATUS_FIELDS), list(apache_status.keys()))
+                self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
             self.assertItemsEqual(
-                self.de_dot(CPU_FIELDS), list(apache_status["cpu"].keys()))
+                self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
             # There are more fields that could be checked.
 
     def old_apache_version(self):

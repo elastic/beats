@@ -1,9 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
-from builtins import object
 import os
 import sys
 import tarfile
@@ -204,7 +198,7 @@ class ComposeMixin(object):
         def positivehash(x):
             return hash(x) % ((sys.maxsize+1) * 2)
 
-        return "%s_%X" % (basename, positivehash(frozenset(list(cls.COMPOSE_ENV.items()))))
+        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
 
     @classmethod
     def compose_project(cls):

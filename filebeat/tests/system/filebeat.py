@@ -1,6 +1,3 @@
-from builtins import oct
-from builtins import filter
-from builtins import object
 import json
 import os
 import stat
@@ -75,7 +72,7 @@ class BaseTest(TestCase):
         return oct(stat.S_IMODE(os.lstat(full_path).st_mode))
 
 
-class InputLogs(object):
+class InputLogs:
     """ InputLogs is used to write and append to files which are read by filebeat. """
 
     def __init__(self, home):
@@ -103,7 +100,7 @@ class InputLogs(object):
         return os.path.join(self.home, name)
 
 
-class Registry(object):
+class Registry:
     """ Registry provides access to the registry used by filebeat to store its progress """
 
     def __init__(self, home, name=None):
@@ -119,7 +116,7 @@ class Registry(object):
             entries = json.load(f)
 
         if filter:
-            entries = [x for x in entries if list(filter(x))]
+            entries = [x for x in entries if filter(x)]
         return entries
 
     def count(self, filter=None):
@@ -128,7 +125,7 @@ class Registry(object):
         return len(self.load(filter=filter))
 
 
-class LogState(object):
+class LogState:
     def __init__(self, path):
         self.path = path
         self.off = 0
@@ -141,7 +138,7 @@ class LogState(object):
             def filter(x): return True
         with open(self.path, "r") as f:
             f.seek(self.off)
-            return [l for l in f if list(filter(l))]
+            return [l for l in f if filter(l)]
 
     def contains(self, msg, ignore_case=False, count=1):
         if ignore_case:

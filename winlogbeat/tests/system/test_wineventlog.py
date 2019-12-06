@@ -3,7 +3,6 @@ import sys
 import time
 import unittest
 from winlogbeat import WriteReadTest
-from builtins import str
 
 if sys.platform.startswith("win"):
     import win32evtlog
