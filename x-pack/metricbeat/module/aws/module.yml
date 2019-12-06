@@ -3,3 +3,5 @@ metricsets:
   - elb
   - ebs
   - usage
+  - billing
+  - sns
