@@ -242,6 +242,7 @@ func TestLongOutputFormat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotZero(t, len(path))
 	err = query.AddCounter(path[0], counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
@@ -281,6 +282,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotZero(t, len(path))
 	err = query.AddCounter(path[0], counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
@@ -331,7 +333,7 @@ func TestWildcardQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	assert.NotZero(t, len(values))
 	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
 	if err != nil {
 		t.Fatal(err)
@@ -368,7 +370,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	assert.NotZero(t, len(values))
 	pctKey, err := values[0].MetricSetFields.HasKey("process.private.bytes")
 	if err != nil {
 		t.Fatal(err)
