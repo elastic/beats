@@ -163,6 +163,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-s3_request,s3_request>>
 
+* <<metricbeat-metricset-aws-sns,sns>>
+
 * <<metricbeat-metricset-aws-sqs,sqs>>
 
 include::aws/cloudwatch.asciidoc[]
@@ -178,6 +180,8 @@ include::aws/rds.asciidoc[]
 include::aws/s3_daily_storage.asciidoc[]
 
 include::aws/s3_request.asciidoc[]
+
+include::aws/sns.asciidoc[]
 
 include::aws/sqs.asciidoc[]
 
