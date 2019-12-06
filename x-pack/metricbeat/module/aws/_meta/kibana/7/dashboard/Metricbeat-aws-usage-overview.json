@@ -20,7 +20,7 @@
         "panelsJSON": [
           {
             "embeddableConfig": {
-              "title": "Region Filter"
+              "title": "AWS Region Filter"
             },
             "gridData": {
               "h": 5,
@@ -192,7 +192,7 @@
             }
           }
         },
-        "title": "Region Filter [Metricbeat AWS]",
+        "title": "AWS Region Filter [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -203,7 +203,7 @@
                 "fieldName": "cloud.region",
                 "id": "1549397251041",
                 "indexPatternRefName": "control_0_index_pattern",
-                "label": "region",
+                "label": "region name",
                 "options": {
                   "dynamicOptions": true,
                   "multiselect": true,
@@ -573,7 +573,7 @@
                 "fieldName": "cloud.account.name",
                 "id": "1549397251041",
                 "indexPatternRefName": "control_0_index_pattern",
-                "label": "AWS account",
+                "label": "account name",
                 "options": {
                   "dynamicOptions": true,
                   "multiselect": true,
@@ -631,7 +631,7 @@
                 "fieldName": "aws.cloudwatch.dimensions.Service",
                 "id": "1549397251041",
                 "indexPatternRefName": "control_0_index_pattern",
-                "label": "AWS Services",
+                "label": "service name",
                 "options": {
                   "dynamicOptions": true,
                   "multiselect": true,
