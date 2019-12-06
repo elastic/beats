@@ -2835,6 +2835,12 @@ type: keyword
 
 --
 
+[float]
+=== usage
+
+`usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+
+
 [[exported-fields-azure]]
 == azure fields
 
