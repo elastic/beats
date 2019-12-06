@@ -32,7 +32,7 @@ type ConfigManager interface {
 }
 
 func init() {
-	management.Register("fleet", NewFleetManager, feature.Beta)
+	management.Register("x-pack-fleet", NewFleetManager, feature.Beta)
 }
 
 // Manager handles internal config updates. By retrieving

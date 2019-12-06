@@ -27,7 +27,7 @@ import (
 var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
 
 func init() {
-	management.Register("x-pack", NewConfigManager, feature.Beta)
+	management.Register("x-pack-cm", NewConfigManager, feature.Beta)
 }
 
 // ConfigManager handles internal config updates. By retrieving

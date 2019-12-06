@@ -31,6 +31,8 @@ var Namespace = "libbeat.management"
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
 
+var centralMgmtKey = "x-pack-cm"
+
 // ConfigManager interacts with the beat to update configurations
 // from an external source
 type ConfigManager interface {
@@ -59,19 +61,15 @@ func Register(name string, fn FactoryFunc, stability feature.Stability) {
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
 func Factory(cfg *common.Config) FactoryFunc {
-	type modeConfig struct {
-		Mode string `config:"mode" yaml:"mode"`
-	}
-
-	modeCfg := &modeConfig{}
+	modeCfg := defaultModeConfig()
 	if err := cfg.Unpack(&modeCfg); err != nil {
 		return nilFactory
 	}
 
-	fleetFeat, err := feature.GlobalRegistry().Lookup(Namespace, modeCfg.Mode)
+	specificFeat, err := feature.GlobalRegistry().Lookup(Namespace, modeCfg.Mode)
 	if err == nil {
 		// specific lookup success
-		factory, ok := fleetFeat.Factory().(FactoryFunc)
+		factory, ok := specificFeat.Factory().(FactoryFunc)
 		if !ok {
 			return nilFactory
 		}
@@ -91,6 +89,16 @@ func Factory(cfg *common.Config) FactoryFunc {
 	}
 
 	return nilFactory
+}
+
+type modeConfig struct {
+	Mode string `config:"mode" yaml:"mode"`
+}
+
+func defaultModeConfig() *modeConfig {
+	return &modeConfig{
+		Mode: centralMgmtKey,
+	}
 }
 
 // nilManager, fallback when no manager is present

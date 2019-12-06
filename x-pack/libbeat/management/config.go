@@ -70,10 +70,10 @@ const ManagedConfigTemplate = `
 
 const (
 	// ModeCentralManagement is a default CM mode, using existing processes
-	ModeCentralManagement = "cm"
+	ModeCentralManagement = "x-pack-cm"
 
 	// ModeFleet is a management mode where fleet is used to retrieve configurations
-	ModeFleet = "fleet"
+	ModeFleet = "x-pack-fleet"
 )
 
 // Config for central management
