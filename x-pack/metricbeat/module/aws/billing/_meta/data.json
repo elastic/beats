@@ -1,0 +1,37 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "Currency": "USD",
+                "ServiceName": "AmazonEC2"
+            },
+            "namespace": "AWS/Billing"
+        },
+        "metrics": {
+            "EstimatedCharges": {
+                "max": 8.43
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.billing",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "billing",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}
