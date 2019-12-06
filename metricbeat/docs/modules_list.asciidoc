@@ -16,7 +16,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-appsearch,App Search>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-appsearch-stats,stats>> beta[]  
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.10+| .10+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
+.11+| .11+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-ebs,ebs>>   
 |<<metricbeat-metricset-aws-ec2,ec2>>   
@@ -26,6 +26,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-s3_request,s3_request>>   
 |<<metricbeat-metricset-aws-sns,sns>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>>   
+|<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
