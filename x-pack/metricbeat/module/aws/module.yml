@@ -2,4 +2,5 @@ name: aws
 metricsets:
   - elb
   - ebs
+  - billing
   - sns
