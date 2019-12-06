@@ -1,0 +1,85 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-activemq]]
+:modulename: activemq
+
+:has-dashboards: true
+
+== ActiveMQ module
+
+This module parses Apache ActiveMQ logs. It supports application and audit logs.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The module has been tested with ActiveMQ 5.13.0 and 5.15.9. Other versions are expected to work.
+
+include::../include/running-modules.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for ActiveMQ logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: activemq
+  audit:
+    enabled: true
+    var.paths: ["/path/to/log/activemq/data/audit.log*"]
+  log:
+    enabled: true
+    var.paths: ["/path/to/log/activemq/data/activemq.log*"]
+-----
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "activemq.audit.var.paths=[/path/to/log/activemq/data/audit.log*]"
+-M "activemq.log.var.paths=[/path/to/log/activemq/data/activemq.log*]"
+-----
+
+[float]
+==== `audit` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `log` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Dashboards
+
+The ActiveMQ module comes with several predefined dashboards for application and audit logs. For example:
+
+image::./images/filebeat-activemq-application-events.png[]
+
+image::./images/filebeat-activemq-audit-events.png[]
+
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-activemq,exported fields>> section.
+
