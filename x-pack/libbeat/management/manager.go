@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/feature"
 
 	"github.com/gofrs/uuid"
 
@@ -25,10 +24,6 @@ import (
 )
 
 var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
-
-func init() {
-	management.Register("x-pack-cm", NewConfigManager, feature.Beta)
-}
 
 // ConfigManager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat

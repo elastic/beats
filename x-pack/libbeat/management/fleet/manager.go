@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/plugin/server"
@@ -29,10 +28,6 @@ import (
 // using which manager is informed about config changes.
 type ConfigManager interface {
 	ConfigChan() chan<- map[string]interface{}
-}
-
-func init() {
-	management.Register("x-pack-fleet", NewFleetManager, feature.Beta)
 }
 
 // Manager handles internal config updates. By retrieving

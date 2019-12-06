@@ -49,11 +49,13 @@ type ConfigManager interface {
 	CheckRawConfig(cfg *common.Config) error
 }
 
+type PluginFunc func(*common.Config) FactoryFunc
+
 // FactoryFunc for creating a config manager
 type FactoryFunc func(*common.Config, *reload.Registry, uuid.UUID) (ConfigManager, error)
 
 // Register a config manager
-func Register(name string, fn FactoryFunc, stability feature.Stability) {
+func Register(name string, fn PluginFunc, stability feature.Stability) {
 	f := feature.New(Namespace, name, fn, feature.NewDetails(name, "", stability))
 	feature.MustRegister(f)
 }
@@ -61,30 +63,16 @@ func Register(name string, fn FactoryFunc, stability feature.Stability) {
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
 func Factory(cfg *common.Config) FactoryFunc {
-	modeCfg := defaultModeConfig()
-	if err := cfg.Unpack(&modeCfg); err != nil {
-		return nilFactory
-	}
-
-	specificFeat, err := feature.GlobalRegistry().Lookup(Namespace, modeCfg.Mode)
-	if err == nil {
-		// specific lookup success
-		factory, ok := specificFeat.Factory().(FactoryFunc)
-		if !ok {
-			return nilFactory
-		}
-
-		return factory
-	}
-
 	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
 	if err != nil {
 		return nilFactory
 	}
 
 	for _, f := range factories {
-		if factory, ok := f.Factory().(FactoryFunc); ok {
-			return factory
+		if plugin, ok := f.Factory().(PluginFunc); ok {
+			if factory := plugin(cfg); factory != nil {
+				return factory
+			}
 		}
 	}
 
