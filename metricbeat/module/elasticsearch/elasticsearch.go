@@ -483,7 +483,7 @@ func (l *License) IsOneOf(candidateLicenses ...string) bool {
 func (l *License) ToMapStr() common.MapStr {
 	return common.MapStr{
 		"status":                l.Status,
-		"id":                    l.ID,
+		"uid":                   l.ID,
 		"type":                  l.Type,
 		"issue_date":            l.IssueDate,
 		"issue_date_in_millis":  l.IssueDateInMillis,
