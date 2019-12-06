@@ -17,6 +17,10 @@
 
 package add_id
 
+import (
+	"github.com/elastic/beats/libbeat/processors/add_id/generator"
+)
+
 // configuration for Add ID processor.
 type config struct {
 	TargetField string `config:"target_field"` // Target field for the ID
@@ -28,4 +32,13 @@ func defaultConfig() config {
 		TargetField: "@metadata.id",
 		Type:        "elasticsearch",
 	}
+}
+
+func (c *config) Validate() error {
+	// Validate type of ID generator
+	if !generator.Exists(c.Type) {
+		return makeErrUnknownType(c.Type)
+	}
+
+	return nil
 }

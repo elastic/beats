@@ -17,6 +17,12 @@
 
 package generator
 
+import "strings"
+
+var generators = map[string]IDGenerator{
+	"elasticsearch": ESTimeBasedUUIDGenerator(),
+}
+
 // IDGenerator implementors know how to generate and return a new ID
 type IDGenerator interface {
 	NextID() string
@@ -24,11 +30,19 @@ type IDGenerator interface {
 
 // Factory takes as input the type of ID to generate and returns the
 // generator of that ID type.
-func Factory(typ string) (IDGenerator, error) {
-	switch typ {
-	case "elasticsearch":
-		return ESTimeBasedUUIDGenerator(), nil
-	default:
-		return nil, makeErrUnknownType(typ)
+func Factory(val string) (IDGenerator, error) {
+	typ := strings.ToLower(val)
+	g, found := generators[typ]
+	if !found {
+		return nil, makeErrUnknownType(val)
 	}
+
+	return g, nil
+}
+
+// Exists returns whether the given type of ID generator exists.
+func Exists(val string) bool {
+	typ := strings.ToLower(val)
+	_, found := generators[typ]
+	return found
 }
