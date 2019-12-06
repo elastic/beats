@@ -117,7 +117,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 
 // Enabled returns true if config management is enabled
 func (cm *ConfigManager) Enabled() bool {
-	return cm.config.Enabled && cm.config.Mode == ModeCentralManagement
+	return cm.config.Enabled
 }
 
 // Start the config manager
