@@ -1,6 +1,6 @@
 [role="xpack"]
 [[monitoring-metricbeat-collection]]
-== Collect {beatname_uc} monitoring data with {metricbeat}
+== Use {metricbeat} to send monitoring data
 [subs="attributes"]
 ++++
 <titleabbrev>{metricbeat} collection</titleabbrev>
