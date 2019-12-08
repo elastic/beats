@@ -134,6 +134,8 @@ func parseSockstat(path string) (SockStat, error) {
 	return ss, nil
 }
 
-func allConnections(kind string) ([]net.ConnectionStat, error) {
+// connections gets connection information
+// The linux function doesn't query UIDs for performance
+func connections(kind string) ([]net.ConnectionStat, error) {
 	return net.ConnectionsWithoutUids(kind)
 }
