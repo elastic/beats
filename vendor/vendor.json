@@ -2793,11 +2793,10 @@
 			"revisionTime": "2017-08-19T20:10:35Z"
 		},
 		{
-			"checksumSHA1": "olnb/cAuhzN1SAbez320bjHCSTA=",
+			"checksumSHA1": "GV2wj5dmLfI8SONK/PApiZO0jKs=",
 			"path": "github.com/shirou/gopsutil",
 			"revision": "fc7e5e7af6052e36e83e5539148015ed2c09d8f9",
 			"revisionTime": "2019-11-27T18:28:36Z",
-			"tree": true,
 			"version": "=v2.19.11",
 			"versionExact": "v2.19.11"
 		},
@@ -2824,12 +2823,6 @@
 			"revisionTime": "2018-11-24T14:38:04Z",
 			"version": "v2.18.11",
 			"versionExact": "v2.18.11"
-		},
-		{
-			"checksumSHA1": "Nve7SpDmjsv6+rhkXAkfg/UQx94=",
-			"path": "github.com/shirou/w32",
-			"revision": "bb4de0191aa41b5507caa14b0650cdbddcd9280b",
-			"revisionTime": "2016-09-30T03:27:40Z"
 		},
 		{
 			"checksumSHA1": "1KA6FgHyBKaIqBbOMFYt5wkMap8=",
@@ -3518,12 +3511,6 @@
 			"path": "golang.org/x/sys/windows/svc/eventlog",
 			"revision": "37707fdb30a5b38865cfb95e5aab41707daec7fd",
 			"revisionTime": "2018-02-02T13:35:31Z"
-		},
-		{
-			"checksumSHA1": "kQZJHXdtwN63L4/qOqV2NZVx/RA=",
-			"path": "golang.org/x/sys/windows/svc/mgr",
-			"revision": "ce4227a45e2eb77e5c847278dcc6a626742e2945",
-			"revisionTime": "2019-12-03T10:43:03Z"
 		},
 		{
 			"checksumSHA1": "rEd9Z4B9rbkOzxpwWSu0SN1PtDg=",
