@@ -20,8 +20,9 @@
 package socket_summary
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/shirou/gopsutil/net"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 //a stub function for non-linux systems
