@@ -1,0 +1,6 @@
+*~
+#*
+_obj
+*.tmp
+.idea
+vendor
