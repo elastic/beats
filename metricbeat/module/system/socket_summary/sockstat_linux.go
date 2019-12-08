@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/system"
@@ -131,4 +132,8 @@ func parseSockstat(path string) (SockStat, error) {
 	}
 
 	return ss, nil
+}
+
+func allConnections(kind string) ([]net.ConnectionStat, error) {
+	return net.ConnectionsWithoutUids(kind)
 }
