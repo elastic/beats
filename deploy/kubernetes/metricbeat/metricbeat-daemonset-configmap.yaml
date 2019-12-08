@@ -18,7 +18,7 @@ data:
     #metricbeat.autodiscover:
     #  providers:
     #    - type: kubernetes
-    #      host: ${NODE_NAME}
+    #      node: ${NODE_NAME}
     #      hints.enabled: true
 
     processors:

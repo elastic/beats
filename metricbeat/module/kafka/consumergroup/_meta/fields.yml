@@ -43,6 +43,10 @@
       type: keyword
       description: custom consumer meta data string
 
+    - name: consumer_lag
+      type: long
+      description: consumer lag for partition/topic calculated as the difference between the partition offset and consumer offset
+
     - name: error.code
       type: long
       description: >
