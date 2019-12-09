@@ -2387,6 +2387,36 @@
 			"revisionTime": "2019-12-04T22:49:16Z"
 		},
 		{
+			"checksumSHA1": "kHcHYd3kH2VIBHBRO/GByVlVLwI=",
+			"path": "github.com/hashicorp/nomad/helper",
+			"revision": "cb7ed5fee99a9a156eac250743d2df465ca06b2c",
+			"revisionTime": "2019-12-09T13:37:10Z"
+		},
+		{
+			"checksumSHA1": "//FO9Yqu3+ESiIsza3Pop4iaEJo=",
+			"path": "github.com/hashicorp/nomad/helper/args",
+			"revision": "cb7ed5fee99a9a156eac250743d2df465ca06b2c",
+			"revisionTime": "2019-12-09T13:37:10Z"
+		},
+		{
+			"checksumSHA1": "r6AwkEYzfFQCKIDWm54RcPrFRp0=",
+			"path": "github.com/hashicorp/nomad/helper/constraints/semver",
+			"revision": "cb7ed5fee99a9a156eac250743d2df465ca06b2c",
+			"revisionTime": "2019-12-09T13:37:10Z"
+		},
+		{
+			"checksumSHA1": "KtK2/d4wBHjMqdR/SAa6cSDmxQ0=",
+			"path": "github.com/hashicorp/nomad/helper/flatmap",
+			"revision": "cb7ed5fee99a9a156eac250743d2df465ca06b2c",
+			"revisionTime": "2019-12-09T13:37:10Z"
+		},
+		{
+			"checksumSHA1": "mSCo/iZUEOSpeX5NsGZZzFMJqto=",
+			"path": "github.com/hashicorp/nomad/helper/uuid",
+			"revision": "cb7ed5fee99a9a156eac250743d2df465ca06b2c",
+			"revisionTime": "2019-12-09T13:37:10Z"
+		},
+		{
 			"checksumSHA1": "3LWNcQT7yTaLpEmjhI/3fi8puv0=",
 			"path": "github.com/imdario/mergo",
 			"revision": "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4",
@@ -2614,13 +2644,13 @@
 			"versionExact": "v1.1.15"
 		},
 		{
-			"checksumSHA1": "7zLQC+jG19ndjH24FVh/+ZliHac=",
+			"checksumSHA1": "QCDNcDE+mokVH3qx9kjMP9OZfpc=",
 			"path": "github.com/mitchellh/go-homedir",
 			"revision": "af06845cf3004701891bf4fdb884bfe4920b3727",
 			"revisionTime": "2019-01-27T04:21:35Z"
 		},
 		{
-			"checksumSHA1": "QCDNcDE+mokVH3qx9kjMP9OZfpc=",
+			"checksumSHA1": "7zLQC+jG19ndjH24FVh/+ZliHac=",
 			"path": "github.com/mitchellh/go-homedir",
 			"revision": "af06845cf3004701891bf4fdb884bfe4920b3727",
 			"revisionTime": "2019-01-27T04:21:35Z"
