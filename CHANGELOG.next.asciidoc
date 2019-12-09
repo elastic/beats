@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
+- Fix perfmon expanding counter path/adding counter to query when OS language is not english. {issue}14684[14684] {pull}14800[14800]
 - Add extra check on `ignore_non_existent_counters` flag if the PdhExpandWildCardPathW returns no errors but does not expand the counter path successfully in windows/perfmon metricset. {pull}14797[14797]
 - Fix rds metricset from reporting same values for different instances. {pull}14702[14702]
 - Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]

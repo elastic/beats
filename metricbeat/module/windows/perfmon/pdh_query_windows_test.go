@@ -34,13 +34,15 @@ func TestOpenSuccessful(t *testing.T) {
 // TestAddCounterInvalidArgWhenQueryClosed will check if addcounter func fails when query is closed.
 func TestAddCounterInvalidArgWhenQueryClosed(t *testing.T) {
 	var q Query
-	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	queryPath, err := q.ExpandWildCardPath(validQuery)
-	if err != nil {
-		t.Fatal(err)
+	queryPath, err := q.GetCounterPaths(validQuery)
+	// if windows os language is ENG then err will be nil, else the GetCounterPaths will execute the AddCounter
+	if assert.NoError(t, err) {
+		counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
+		err = q.AddCounter(queryPath[0], counter, false)
+		assert.Error(t, err, PDH_INVALID_HANDLE)
+	} else {
+		assert.Error(t, err, PDH_INVALID_ARGUMENT)
 	}
-	err = q.AddCounter(queryPath[0], counter, false)
-	assert.EqualValues(t, err, PDH_INVALID_ARGUMENT)
 }
 
 // func TestGetFormattedCounterValuesEmptyCounterList will check if getting the counter values will fail when no counter handles are added.
@@ -68,7 +70,7 @@ func TestSuccessfulQuery(t *testing.T) {
 	}
 	defer q.Close()
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	queryPath, err := q.ExpandWildCardPath(validQuery)
+	queryPath, err := q.GetCounterPaths(validQuery)
 	if err != nil {
 		t.Fatal(err)
 	}
