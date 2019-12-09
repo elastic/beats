@@ -233,7 +233,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 			expectedOption: "default",
 		},
 		"mixed module with unregistered and light metricsets": {
-			config:         common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
+			config: common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
 			err:    true,
 		},
 	}
