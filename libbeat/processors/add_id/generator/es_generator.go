@@ -37,28 +37,35 @@ func ESTimeBasedUUIDGenerator() IDGenerator {
 var (
 	sequenceNumber uint32
 	lastTimestamp  time.Time
+	once           sync.Once
 	mac            []byte
 	mu             sync.Mutex
 )
-
-func init() {
-	m, err := getSecureMungedMACAddress()
-	if err != nil {
-		panic(err)
-	}
-	mac = m
-	sequenceNumber = rand.Uint32()
-}
 
 // NextID returns a base64-encoded, randomly-generated, but roughly ordered (over time), unique
 // ID. The algorithm used to generate the ID is the same as used by Elasticsearch.
 // See https://github.com/elastic/elasticsearch/blob/a666fb2266/server/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
 func (*esTimeBasedUUIDGenerator) NextID() string {
+	// Initialize sequence number and mac address. We do this here instead of doing it in a package-level
+	// init function to give the runtime time to generate enough entropy for randomization.
+	initOnce()
+
 	ts, seq := nextIDData()
 	var uuidBytes [15]byte
 
 	packID(uuidBytes[:], ts, seq)
 	return base64.RawURLEncoding.EncodeToString(uuidBytes[:])
+}
+
+func initOnce() {
+	once.Do(func() {
+		sequenceNumber = rand.Uint32()
+		m, err := getSecureMungedMACAddress()
+		if err != nil {
+			panic(err)
+		}
+		mac = m
+	})
 }
 
 func nextIDData() (int64, uint32) {
