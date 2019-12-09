@@ -506,7 +506,7 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 				topLevelDomain := strings.Join(strings.Split(eTLDPlusOne, ".")[1:], ".")
 				qMapStr["top_level_domain"] = topLevelDomain
 
-				subdomain := strings.Trim(strings.TrimRight(q.Name, eTLDPlusOne), ".")
+				subdomain := strings.Trim(strings.TrimSuffix(q.Name, eTLDPlusOne), ".")
 				if subdomain != "" {
 					qMapStr["subdomain"] = subdomain
 				}
