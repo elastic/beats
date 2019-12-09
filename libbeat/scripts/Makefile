@@ -48,6 +48,9 @@ KIBANA_ES_PASS?=testing
 # The beat's Kibana user
 BEAT_KIBANA_USER?=${KIBANA_ES_USER}
 BEAT_KIBANA_PASS?=${KIBANA_ES_PASS}
+# Define a superuser, e.g. for initial setup
+ES_SUPERUSER_USER?=admin
+ES_SUPERUSER_PASS?=changeme
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
@@ -393,6 +396,8 @@ write-environment:
 	echo "ES_PORT=${ES_PORT}" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=${ES_USER}" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=${ES_PASS}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_USER=${ES_SUPERUSER_USER}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_PASS=${ES_SUPERUSER_PASS}" >> ${BUILD_DIR}/test.env
 	echo "KIBANA_HOST=${KIBANA_HOST}" >> ${BUILD_DIR}/test.env
 	echo "KIBANA_PORT=${KIBANA_PORT}" >> ${BUILD_DIR}/test.env
 	echo "KIBANA_USER=${BEAT_KIBANA_USER}" >> ${BUILD_DIR}/test.env
