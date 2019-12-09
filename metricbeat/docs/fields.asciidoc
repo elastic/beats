@@ -1542,6 +1542,12 @@ type: keyword
 --
 
 [float]
+=== billing
+
+`billing` contains the estimated charges for your AWS account in Cloudwatch.
+
+
+[float]
 === cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
@@ -2474,6 +2480,36 @@ type: long
 
 --
 
+*`aws.rds.db_instance.db_cluster_identifier`*::
++
+--
+This identifier is the unique key that identifies a DB cluster specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.role`*::
++
+--
+DB roles like WRITER or READER, specifically for Amazon Aurora DB cluster.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.engine_name`*::
++
+--
+Each DB instance runs a DB engine, like MySQL, MariaDB, PostgreSQL and etc.
+
+
+type: keyword
+
+--
+
 [float]
 === s3_daily_storage
 
@@ -2683,6 +2719,12 @@ format: duration
 --
 
 [float]
+=== sns
+
+`sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+
+
+[float]
 === sqs
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
@@ -2792,6 +2834,12 @@ SQS queue name
 type: keyword
 
 --
+
+[float]
+=== usage
+
+`usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+
 
 [[exported-fields-azure]]
 == azure fields
@@ -15758,6 +15806,15 @@ type: long
 custom consumer meta data string
 
 type: keyword
+
+--
+
+*`kafka.consumergroup.consumer_lag`*::
++
+--
+consumer lag for partition/topic calculated as the difference between the partition offset and consumer offset
+
+type: long
 
 --
 
@@ -30039,7 +30096,7 @@ type: float
 *`system.diskio.iostat.request.avg_size`*::
 +
 --
-The average size (in sectors) of the requests that were issued to the device.
+The average size (in bytes) of the requests that were issued to the device.
 
 
 type: float

@@ -14,6 +14,7 @@ services:
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
     - "xpack.security.enabled=false"
+    - "indices.id_field_data.enabled=true"
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.0.0-SNAPSHOT

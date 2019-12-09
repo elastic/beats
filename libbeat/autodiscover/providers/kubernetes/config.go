@@ -25,15 +25,23 @@ import (
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Config for kubernetes autodiscover provider
 type Config struct {
 	KubeConfig     string        `config:"kube_config"`
-	Host           string        `config:"host"`
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
+
+	// Needed when resource is a pod
+	HostDeprecated string `config:"host"`
+	Node           string `config:"node"`
+	// Scope can be either node or cluster.
+	Scope    string `config:"scope"`
+	Resource string `config:"resource"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`
@@ -45,6 +53,7 @@ type Config struct {
 func defaultConfig() *Config {
 	return &Config{
 		SyncPeriod:     10 * time.Minute,
+		Resource:       "pod",
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
 	}
@@ -59,6 +68,31 @@ func (c *Config) Validate() error {
 
 	if len(c.Templates) == 0 && !c.Hints.Enabled() && len(c.Builders) == 0 {
 		return fmt.Errorf("no configs or hints defined for autodiscover provider")
+	}
+
+	// Check if host is being defined and change it to node instead.
+	if c.Node == "" && c.HostDeprecated != "" {
+		c.Node = c.HostDeprecated
+		cfgwarn.Deprecate("8.0", "`host` will be deprecated, use `node` instead")
+	}
+
+	// Check if resource is either node or pod. If yes then default the scope to "node" if not provided.
+	// Default the scope to "cluster" for everything else.
+	switch c.Resource {
+	case "node", "pod":
+		if c.Scope == "" {
+			c.Scope = "node"
+		}
+
+	default:
+		if c.Scope == "node" {
+			logp.L().Warnf("can not set scope to `node` when using resource %s. resetting scope to `cluster`", c.Resource)
+		}
+		c.Scope = "cluster"
+	}
+
+	if c.Scope != "node" && c.Scope != "cluster" {
+		return fmt.Errorf("invalid `scope` configured. supported values are `node` and `cluster`")
 	}
 
 	return nil
