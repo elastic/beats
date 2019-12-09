@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -130,19 +131,18 @@ func (s *LightModulesSource) MetricSetRegistration(register *Register, moduleNam
 	return ms.Registration(register)
 }
 
-// String returns a string representation of this source, with a list of known metricsets
-func (s *LightModulesSource) String() string {
-	/*var metricSets []string
+// LightModulesInfo returns a string representation of this source, with a list of known metricsets
+func (s *LightModulesSource) LightModulesInfo(r *Register) string {
+	var metricSets []string
 	modules, _ := s.Modules()
 	for _, module := range modules {
-		moduleMetricSets, _ := s.MetricSets(nil, module) // TODO
+		moduleMetricSets, _ := s.MetricSets(r, module)
 		for _, name := range moduleMetricSets {
 			metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 		}
 	}
 
-	return fmt.Sprintf("LightModules:[%s]", strings.Join(metricSets, ", "))*/
-	return "fixme"
+	return fmt.Sprintf("LightModules:[%s]", strings.Join(metricSets, ", "))
 }
 
 type lightModuleConfig struct {
