@@ -11,9 +11,9 @@
 
 [role="xpack"]
 [[monitoring-internal-collection-legacy]]
-== Use legacy collection to send monitoring data
+== Use legacy internal collection to send monitoring data
 ++++
-<titleabbrev>Legacy collection (deprecated)</titleabbrev>
+<titleabbrev>Legacy internal collection (deprecated)</titleabbrev>
 ++++
 
 deprecated[7.2.0]
