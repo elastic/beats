@@ -190,47 +190,51 @@ func TestNewModuleFromConfig(t *testing.T) {
 		expectedQuery  QueryParams
 		expectedPeriod time.Duration
 	}{
-		//"normal module": {
-		//	config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
-		//	expectedOption: "default",
-		//},
-		//"light module": {
-		//	config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
-		//	expectedOption: "test",
-		//},
-		//"light module default metricset": {
-		//	config:         common.MapStr{"module": "service"},
-		//	expectedOption: "test",
-		//},
-		//"light module override option": {
-		//	config:         common.MapStr{"module": "service", "option": "overriden"},
-		//	expectedOption: "overriden",
-		//},
-		//"light module with query": {
-		//	config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
-		//	expectedOption: "test",
-		//	expectedQuery:  QueryParams{"param": "foo"},
-		//},
-		//"light module with custom period": {
-		//	config:         common.MapStr{"module": "service", "period": "42s"},
-		//	expectedOption: "test",
-		//	expectedPeriod: 42 * time.Second,
-		//},
-		//"light module is broken": {
-		//	config: common.MapStr{"module": "broken"},
-		//	err:    true,
-		//},
-		//"light metric set doesn't exist": {
-		//	config: common.MapStr{"module": "service", "metricsets": []string{"notexists"}},
-		//	err:    true,
-		//},
-		//"disabled light module": {
-		//	config: common.MapStr{"module": "service", "enabled": false},
-		//	err:    true,
-		//},
+		"normal module": {
+			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
+			expectedOption: "default",
+		},
+		"light module": {
+			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
+			expectedOption: "test",
+		},
+		"light module default metricset": {
+			config:         common.MapStr{"module": "service"},
+			expectedOption: "test",
+		},
+		"light module override option": {
+			config:         common.MapStr{"module": "service", "option": "overriden"},
+			expectedOption: "overriden",
+		},
+		"light module with query": {
+			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
+			expectedOption: "test",
+			expectedQuery:  QueryParams{"param": "foo"},
+		},
+		"light module with custom period": {
+			config:         common.MapStr{"module": "service", "period": "42s"},
+			expectedOption: "test",
+			expectedPeriod: 42 * time.Second,
+		},
+		"light module is broken": {
+			config: common.MapStr{"module": "broken"},
+			err:    true,
+		},
+		"light metric set doesn't exist": {
+			config: common.MapStr{"module": "service", "metricsets": []string{"notexists"}},
+			err:    true,
+		},
+		"disabled light module": {
+			config: common.MapStr{"module": "service", "enabled": false},
+			err:    true,
+		},
 		"mixed module with standard and light metricsets": {
 			config:         common.MapStr{"module": "mixed", "metricsets": []string{"standard", "light"}},
 			expectedOption: "default",
+		},
+		"mixed module with unregistered and light metricsets": {
+			config:         common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
+			err:    true,
 		},
 	}
 
