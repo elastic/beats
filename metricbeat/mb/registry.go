@@ -116,8 +116,8 @@ type Register struct {
 type ModulesSource interface {
 	Modules() ([]string, error)
 	HasModule(module string) bool
-	MetricSets(module string) ([]string, error)
-	DefaultMetricSets(module string) ([]string, error)
+	MetricSets(r *Register, module string) ([]string, error)
+	DefaultMetricSets(r *Register, module string) ([]string, error)
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 	String() string
@@ -280,7 +280,7 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 	// List also default metrics from secondary sources
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
 		exists = true
-		sourceDefaults, err := source.DefaultMetricSets(module)
+		sourceDefaults, err := source.DefaultMetricSets(r, module)
 		if err != nil {
 			r.log.Errorf("Failed to get default metric sets for module '%s' from secondary source: %s", module, err)
 		} else if len(sourceDefaults) > 0 {
@@ -352,7 +352,7 @@ func (r *Register) MetricSets(module string) []string {
 
 	// List also metric sets from secondary sources
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
-		sourceMetricSets, err := source.MetricSets(module)
+		sourceMetricSets, err := source.MetricSets(r, module)
 		if err != nil {
 			r.log.Errorf("Failed to get metricsets from secondary source: %s", err)
 		}

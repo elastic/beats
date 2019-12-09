@@ -1,6 +1,4 @@
 default: true
 input:
-  module: mixed
+  module: foo
   metricset: light
-  defaults:
-    option: test

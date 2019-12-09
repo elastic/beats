@@ -168,9 +168,10 @@ func TestLoadModule(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		register := NewRegister()
 		r := NewLightModulesSource("testdata/lightmodules")
 		t.Run(c.name, func(t *testing.T) {
-			_, err := r.loadModule(c.name)
+			_, err := r.loadModule(register, c.name)
 			if c.err {
 				assert.Error(t, err)
 			}
@@ -235,6 +236,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 
 	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
+	r.MustAddMetricSet("foo", "light", newMetricSetWithOption)
 	r.MustAddMetricSet("mixed", "standard", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
