@@ -23,7 +23,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -152,12 +152,12 @@ func TestGenerateHints(t *testing.T) {
 
 	cfg := defaultConfig()
 
-	p := Provider{
+	p := pod{
 		config: cfg,
-		logger: logp.NewLogger("kubernetes"),
+		logger: logp.NewLogger("kubernetes.pod"),
 	}
 	for _, test := range tests {
-		assert.Equal(t, p.generateHints(test.event), test.result)
+		assert.Equal(t, p.GenerateHints(test.event), test.result)
 	}
 }
 
@@ -467,15 +467,23 @@ func TestEmitEvent(t *testing.T) {
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New("test"),
-				metagen:   metaGen,
 				templates: mapper,
-				uuid:      UUID,
 				logger:    logp.NewLogger("kubernetes"),
 			}
 
+			pod := &pod{
+				metagen: metaGen,
+				config:  defaultConfig(),
+				publish: p.publish,
+				uuid:    UUID,
+				logger:  logp.NewLogger("kubernetes.pod"),
+			}
+
+			p.eventer = pod
+
 			listener := p.bus.Subscribe()
 
-			p.emit(test.Pod, test.Flag)
+			pod.emit(test.Pod, test.Flag)
 
 			select {
 			case event := <-listener.Events():

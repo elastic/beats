@@ -1543,6 +1543,12 @@ type: keyword
 --
 
 [float]
+=== billing
+
+`billing` contains the estimated charges for your AWS account in Cloudwatch.
+
+
+[float]
 === cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
@@ -2714,6 +2720,12 @@ format: duration
 --
 
 [float]
+=== sns
+
+`sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+
+
+[float]
 === sqs
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
@@ -2823,6 +2835,12 @@ SQS queue name
 type: keyword
 
 --
+
+[float]
+=== usage
+
+`usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+
 
 [[exported-fields-azure]]
 == azure fields
@@ -30334,7 +30352,7 @@ type: float
 *`system.diskio.iostat.request.avg_size`*::
 +
 --
-The average size (in sectors) of the requests that were issued to the device.
+The average size (in bytes) of the requests that were issued to the device.
 
 
 type: float
