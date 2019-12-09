@@ -135,7 +135,7 @@ def main():
 
         # create PR
         request = session.post(base + "/pulls", json=dict(
-            title="Cherry-pick #{} to {}: {}".format(args.pr_number, args.to_branch, original_pr["title"].encode('utf-8')),
+            title="Cherry-pick #{} to {}: {}".format(args.pr_number, args.to_branch, original_pr["title"]),
             head=remote_user + ":" + tmp_branch,
             base=args.to_branch,
             body="Cherry-pick of PR #{} to {} branch. Original message: \n\n{}"
