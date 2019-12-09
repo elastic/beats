@@ -15,6 +15,7 @@ func init() {
 	management.Register("x-pack-fleet", NewFleetManagerPlugin, feature.Beta)
 }
 
+// NewFleetManagerPlugin creates a plugin function returning factory if configuration matches the criteria
 func NewFleetManagerPlugin(config *common.Config) management.FactoryFunc {
 	c := defaultConfig()
 	if config.Enabled() {

@@ -14,6 +14,7 @@ func init() {
 	management.Register("x-pack", NewManagerPlugin, feature.Beta)
 }
 
+// NewManagerPlugin creates a plugin function returning factory if configuration matches the criteria
 func NewManagerPlugin(config *common.Config) management.FactoryFunc {
 	c := defaultConfig()
 	if config.Enabled() {
