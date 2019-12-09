@@ -9,7 +9,7 @@ To build and install, just run `mage Package`. The build process happens entire 
 
 ## Running
 
-`docker run --log-driver=ossifrage/hellologdriver:0.0.1 --log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
+`docker run --log-driver=elastic-logging-plugin:8.0.0 --log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
 
 
 ## How it works
