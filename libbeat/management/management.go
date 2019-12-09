@@ -31,8 +31,6 @@ var Namespace = "libbeat.management"
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
 
-var centralMgmtKey = "x-pack-cm"
-
 // ConfigManager interacts with the beat to update configurations
 // from an external source
 type ConfigManager interface {

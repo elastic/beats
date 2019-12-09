@@ -59,7 +59,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	var cache *Cache
 	var blacklist *ConfigBlacklist
 
-	if c.Enabled && c.Mode == ModeCentralManagement {
+	if c.Enabled {
 		cfgwarn.Deprecate("8.0.0", "Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
 
 		var err error
