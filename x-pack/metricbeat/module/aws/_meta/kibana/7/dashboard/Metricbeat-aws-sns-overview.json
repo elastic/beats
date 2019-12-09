@@ -368,7 +368,7 @@
             }
           }
         },
-        "title": "SNS Messages Published",
+        "title": "SNS Messages Published [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -417,7 +417,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Messages Published",
+          "title": "SNS Messages Published [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -427,8 +427,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:42:45.237Z",
-      "version": "WzUzMywxXQ=="
+      "updated_at": "2019-12-09T09:06:43.252Z",
+      "version": "WzU0NSwxXQ=="
     },
     {
       "attributes": {
@@ -442,7 +442,7 @@
             }
           }
         },
-        "title": "SNS Notifications Delivered",
+        "title": "SNS Notifications Delivered [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -491,7 +491,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Notifications Delivered",
+          "title": "SNS Notifications Delivered [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -501,8 +501,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:43:15.631Z",
-      "version": "WzUzNiwxXQ=="
+      "updated_at": "2019-12-09T09:07:14.722Z",
+      "version": "WzU0OCwxXQ=="
     },
     {
       "attributes": {
@@ -516,7 +516,7 @@
             }
           }
         },
-        "title": "SNS Notifications Failed",
+        "title": "SNS Notifications Failed [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -565,7 +565,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Notifications Failed",
+          "title": "SNS Notifications Failed [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -575,8 +575,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:43:43.576Z",
-      "version": "WzUzOSwxXQ=="
+      "updated_at": "2019-12-09T09:07:55.021Z",
+      "version": "WzU1MSwxXQ=="
     },
     {
       "attributes": {
@@ -648,7 +648,7 @@
             }
           }
         },
-        "title": "SNS Publish Size",
+        "title": "SNS Publish Size [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -697,7 +697,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Publish Size",
+          "title": "SNS Publish Size [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -707,8 +707,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:42:17.307Z",
-      "version": "WzUzMSwxXQ=="
+      "updated_at": "2019-12-09T09:06:19.920Z",
+      "version": "WzU0MywxXQ=="
     },
     {
       "attributes": {
@@ -722,7 +722,7 @@
             }
           }
         },
-        "title": "SNS Notifications Filtered Out",
+        "title": "SNS Notifications Filtered Out [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -771,7 +771,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Notifications Filtered Out",
+          "title": "SNS Notifications Filtered Out [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -781,8 +781,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:42:52.011Z",
-      "version": "WzUzNCwxXQ=="
+      "updated_at": "2019-12-09T09:06:49.279Z",
+      "version": "WzU0NiwxXQ=="
     },
     {
       "attributes": {
@@ -796,7 +796,7 @@
             }
           }
         },
-        "title": "SNS Notifications Filtered Out No Message Attributes",
+        "title": "SNS Notifications Filtered Out No Message Attributes [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -845,7 +845,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Notifications Filtered Out No Message Attributes",
+          "title": "SNS Notifications Filtered Out No Message Attributes [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -855,8 +855,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:43:22.190Z",
-      "version": "WzUzNywxXQ=="
+      "updated_at": "2019-12-09T09:07:34.947Z",
+      "version": "WzU0OSwxXQ=="
     },
     {
       "attributes": {
@@ -870,7 +870,7 @@
             }
           }
         },
-        "title": "SNS Notifications Filtered Out Invalid Attributes",
+        "title": "SNS Notifications Filtered Out Invalid Attributes [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -919,7 +919,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Notifications Filtered Out Invalid Attributes",
+          "title": "SNS Notifications Filtered Out Invalid Attributes [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -929,8 +929,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:43:51.074Z",
-      "version": "WzU0MCwxXQ=="
+      "updated_at": "2019-12-09T09:08:00.463Z",
+      "version": "WzU1MiwxXQ=="
     },
     {
       "attributes": {
@@ -944,7 +944,7 @@
             }
           }
         },
-        "title": "SNS SMS Success Rate",
+        "title": "SNS SMS Success Rate [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -993,7 +993,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS SMS Success Rate",
+          "title": "SNS SMS Success Rate [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -1003,8 +1003,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:42:37.614Z",
-      "version": "WzUzMiwxXQ=="
+      "updated_at": "2019-12-09T09:06:28.900Z",
+      "version": "WzU0NCwxXQ=="
     },
     {
       "attributes": {
@@ -1018,7 +1018,7 @@
             }
           }
         },
-        "title": "SNS Notifications Failed To Redrive To DLQ",
+        "title": "SNS Notifications Failed To Redrive To DLQ [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1067,7 +1067,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Notifications Failed To Redrive To DLQ",
+          "title": "SNS Notifications Failed To Redrive To DLQ [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -1077,8 +1077,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:43:01.104Z",
-      "version": "WzUzNSwxXQ=="
+      "updated_at": "2019-12-09T09:06:57.756Z",
+      "version": "WzU0NywxXQ=="
     },
     {
       "attributes": {
@@ -1092,7 +1092,7 @@
             }
           }
         },
-        "title": "SNS Notifications Redriven To DLQ",
+        "title": "SNS Notifications Redriven To DLQ [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1141,7 +1141,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS Notifications Redriven To DLQ",
+          "title": "SNS Notifications Redriven To DLQ [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -1151,8 +1151,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:43:28.432Z",
-      "version": "WzUzOCwxXQ=="
+      "updated_at": "2019-12-09T09:07:41.740Z",
+      "version": "WzU1MCwxXQ=="
     },
     {
       "attributes": {
@@ -1166,7 +1166,7 @@
             }
           }
         },
-        "title": "SNS SMS Month To Date Spent USD",
+        "title": "SNS SMS Month To Date Spent USD [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1215,7 +1215,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "SNS SMS Month To Date Spent USD",
+          "title": "SNS SMS Month To Date Spent USD [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -1225,8 +1225,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-12-09T08:43:57.500Z",
-      "version": "WzU0MSwxXQ=="
+      "updated_at": "2019-12-09T09:08:06.137Z",
+      "version": "WzU1MywxXQ=="
     }
   ],
   "version": "7.4.0"
