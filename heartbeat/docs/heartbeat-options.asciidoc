@@ -33,7 +33,7 @@ heartbeat.monitors:
   check.receive: "Check"
 - type: http
   schedule: '@every 5s'
-  hosts: ["http://localhost:80/service/status"]
+  urls: ["http://localhost:80/service/status"]
   check.response.status: 200
 heartbeat.scheduler:
   limit: 10
@@ -68,7 +68,7 @@ monitor definitions only, e.g. what is normally under the `heartbeat.monitors` s
 # /path/to/my/monitors.d/localhost_service_check.yml
 - type: http
   schedule: '@every 5s'
-  hosts: ["http://localhost:80/service/status"]
+  urls: ["http://localhost:80/service/status"]
   check.response.status: 200
 ----------------------------------------------------------------------
 
@@ -385,7 +385,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  hosts: ["http://myhost:80"]
+  urls: ["http://myhost:80"]
 -------------------------------------------------------------------------------
 
 
@@ -426,7 +426,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  hosts: ["https://myhost:443"]
+  urls: ["https://myhost:443"]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
@@ -461,7 +461,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  hosts: ["http://myhost:80"]
+  urls: ["http://myhost:80"]
   check.request.method: HEAD
   check.response.status: 200
 -------------------------------------------------------------------------------
@@ -535,7 +535,7 @@ contains JSON:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  hosts: ["https://myhost:80"]
+  urls: ["https://myhost:80"]
   check.request:
     method: GET
     headers:
@@ -556,7 +556,7 @@ patterns:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  hosts: ["https://myhost:80"]
+  urls: ["https://myhost:80"]
   check.request:
     method: GET
     headers:
@@ -575,7 +575,7 @@ regex:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  hosts: ["https://myhost:80"]
+  urls: ["https://myhost:80"]
   check.request:
     method: GET
     headers:
