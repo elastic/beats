@@ -30,7 +30,7 @@ import (
 )
 
 var hubID = "elastic"
-var name = "docker-logging-plugin"
+var name = "elastic-logging-plugin"
 var containerName = name + "_container"
 var dockerPluginName = filepath.Join(hubID, name)
 var packageStagingDir = "build/package/"
