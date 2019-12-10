@@ -237,8 +237,9 @@ func fullName(r *Registry, name string) string {
 
 // Timestamp is a timestamp variable satisfying the Var interface.
 type Timestamp struct {
-	mu sync.RWMutex
-	ts time.Time
+	mu     sync.RWMutex
+	ts     time.Time
+	cached string
 }
 
 // NewTimestamp creates and registeres a new timestamp variable.
@@ -260,6 +261,7 @@ func (v *Timestamp) Set(t time.Time) {
 	defer v.mu.Unlock()
 
 	v.ts = t
+	v.cached = ""
 }
 
 func (v *Timestamp) Get() time.Time {
@@ -277,5 +279,9 @@ func (v *Timestamp) toString() string {
 	if v.ts.IsZero() {
 		return ""
 	}
-	return v.ts.Format(common.TsLayout)
+
+	if v.cached == "" {
+		v.cached = v.ts.Format(common.TsLayout)
+	}
+	return v.cached
 }
