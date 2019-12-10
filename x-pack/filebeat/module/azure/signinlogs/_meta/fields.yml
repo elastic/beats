@@ -37,7 +37,7 @@
           description: >
             ID
         - name: created_at
-          type: keyword
+          type: date
           description: >
             Created date time
         - name: user_display_name

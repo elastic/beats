@@ -1971,7 +1971,7 @@ type: keyword
 Activity timestamp
 
 
-type: keyword
+type: date
 
 --
 
@@ -2270,7 +2270,7 @@ type: keyword
 Created date time
 
 
-type: keyword
+type: date
 
 --
 

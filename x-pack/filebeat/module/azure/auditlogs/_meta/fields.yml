@@ -57,7 +57,7 @@
           description: >
             ID
         - name: activity_datetime
-          type: keyword
+          type: date
           description: >
             Activity timestamp
         - name: category
