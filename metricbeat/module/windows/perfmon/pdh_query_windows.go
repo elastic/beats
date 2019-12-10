@@ -65,6 +65,12 @@ func (q *Query) Open() error {
 	return nil
 }
 
+// AddEnglishCounter adds the specified counter to the query.
+func (q *Query) AddEnglishCounter(counterPath string) (PdhCounterHandle, error) {
+	h, err := PdhAddEnglishCounter(q.handle, counterPath, 0)
+	return h, err
+}
+
 // AddCounter adds the specified counter to the query.
 func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
@@ -92,6 +98,31 @@ func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard b
 		format:       getPDHFormat(counter.Format),
 	}
 	return nil
+}
+
+// GetCounterPaths func will check the computer or log file and return the counter paths that match the given counter path which contains wildcard characters.
+func (q *Query) GetCounterPaths(counterPath string) ([]string, error) {
+	paths, err := q.ExpandWildCardPath(counterPath)
+	if err == nil {
+		return paths, err
+	}
+	//check if Windows installed language is not ENG, the ExpandWildCardPath will return either one of the errors below.
+	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
+		handle, err := q.AddEnglishCounter(counterPath)
+		if err != nil {
+			return nil, err
+		}
+		defer PdhRemoveCounter(handle)
+		info, err := PdhGetCounterInfo(handle)
+		if err != nil {
+			return nil, err
+		}
+		path := UTF16PtrToString(info.SzFullPath)
+		if path != counterPath {
+			return q.ExpandWildCardPath(path)
+		}
+	}
+	return nil, err
 }
 
 // RemoveUnusedCounters will remove all counter handles for the paths that are not found anymore

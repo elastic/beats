@@ -27,3 +27,11 @@ The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jo
 [float]
 === Usage
 The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to those Metricsets' documentation about how to use Jolokia.
+
+
+[float]
+=== Dashboard
+
+The Kafka module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_kafka_dashboard.png[]

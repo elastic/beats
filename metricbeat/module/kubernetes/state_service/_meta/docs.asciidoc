@@ -1,0 +1,2 @@
+The `state_servie` metricset for kubernetes service related metrics from `kube-state-metrics`.
+
