@@ -44,6 +44,7 @@ type kafkaInputConfig struct {
 	ConsumeBackoff           time.Duration     `config:"consume_backoff" validate:"min=0"`
 	WaitClose                time.Duration     `config:"wait_close" validate:"min=0"`
 	MaxWaitTime              time.Duration     `config:"max_wait_time"`
+	MaxProcessingTime        time.Duration     `config:"max_processing_time"`
 	IsolationLevel           isolationLevel    `config:"isolation_level"`
 	Fetch                    kafkaFetch        `config:"fetch"`
 	Rebalance                kafkaRebalance    `config:"rebalance"`
@@ -106,14 +107,15 @@ var (
 // were chosen to match sarama's defaults.
 func defaultConfig() kafkaInputConfig {
 	return kafkaInputConfig{
-		Version:        kafka.Version("1.0.0"),
-		InitialOffset:  initialOffsetOldest,
-		ClientID:       "filebeat",
-		ConnectBackoff: 30 * time.Second,
-		ConsumeBackoff: 2 * time.Second,
-		WaitClose:      2 * time.Second,
-		MaxWaitTime:    250 * time.Millisecond,
-		IsolationLevel: isolationLevelReadUncommitted,
+		Version:           kafka.Version("1.0.0"),
+		InitialOffset:     initialOffsetOldest,
+		ClientID:          "filebeat",
+		ConnectBackoff:    30 * time.Second,
+		ConsumeBackoff:    2 * time.Second,
+		WaitClose:         2 * time.Second,
+		MaxWaitTime:       250 * time.Millisecond,
+		MaxProcessingTime: 20 * time.Microsecond,
+		IsolationLevel:    isolationLevelReadUncommitted,
 		Fetch: kafkaFetch{
 			Min:     1,
 			Default: (1 << 20), // 1 MB
@@ -157,6 +159,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Offsets.Initial = config.InitialOffset.asSaramaOffset()
 	k.Consumer.Retry.Backoff = config.ConsumeBackoff
 	k.Consumer.MaxWaitTime = config.MaxWaitTime
+	k.Consumer.MaxProcessingTime = config.MaxProcessingTime
 	k.Consumer.IsolationLevel = config.IsolationLevel.asSaramaIsolationLevel()
 
 	k.Consumer.Fetch.Min = config.Fetch.Min
