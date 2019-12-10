@@ -16,11 +16,10 @@
       type: long
       description: >
         The number of STAN bytes in the channel
-# If first_seq > min([seq in subscriptions]) data loss has possibly occurred
     - name: first_seq
       type: long
       description: >
-        First sequence number stored in the channel
+        First sequence number stored in the channel. If first_seq > min([seq in subscriptions]) data loss has possibly occurred
     - name: last_seq
       type: long
       description: >

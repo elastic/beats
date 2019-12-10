@@ -65,9 +65,8 @@ func TestFetchEventContent(t *testing.T) {
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	metricSet.Fetch(reporter)
 
-	for idx, evt := range reporter.GetEvents() {
-		e := mbtest.StandardizeEvent(metricSet, evt)
-		t.Logf("[%d] %s/%s event: %+v", idx, metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	for _, evt := range reporter.GetEvents() {
+		mbtest.StandardizeEvent(metricSet, evt)
 	}
 
 }

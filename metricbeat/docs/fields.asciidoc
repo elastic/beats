@@ -29434,7 +29434,7 @@ type: long
 *`stan.channels.first_seq`*::
 +
 --
-First sequence number stored in the channel
+First sequence number stored in the channel. If first_seq > min([seq in subscriptions]) data loss has possibly occurred
 
 
 type: long

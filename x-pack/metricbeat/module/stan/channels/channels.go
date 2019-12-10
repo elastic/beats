@@ -11,8 +11,6 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
-	"github.com/elastic/beats/x-pack/metricbeat/module/stan"
 )
 
 const (
@@ -70,7 +68,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
-	_ = stan.AssetStan()
 	content, err := m.http.FetchContent()
 	if err != nil {
 		return errors.Wrap(err, "error in fetch")

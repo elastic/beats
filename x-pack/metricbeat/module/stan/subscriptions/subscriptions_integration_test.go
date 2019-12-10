@@ -31,7 +31,6 @@ func TestFetch(t *testing.T) {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
 }
 
 func getConfig(host string) map[string]interface{} {
