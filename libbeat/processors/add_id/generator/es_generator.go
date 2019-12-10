@@ -78,36 +78,28 @@ func nextIDData() (uint64, uint32) {
 	// We only use bottom 3 bytes for the sequence number.
 	s := sequenceNumber & 0xffffff
 
-	t := timestamp()
-	return t, s
+	now := uint64(time.Now().UnixNano() / 1000)
+	lastTimestamp = timestamp(now, lastTimestamp)
+	return lastTimestamp, s
 }
 
-// timestamp returns the next timestamp to use, while accounting for system time going
-// backwards (e.g. due to a DST change).
-func timestamp() uint64 {
-	now := uint64(time.Now().UnixNano() / 1000)
-	if lastTimestamp == 0 {
-		// Last timestamp has not been previously initialized
-		lastTimestamp = now
-		return lastTimestamp
+// timestamp returns a monotonically-increasing timestamp (in ms) to use,
+// while accounting for system time going backwards (e.g. due to a DST change).
+func timestamp(now, lastTS uint64) uint64 {
+	// Last timestamp has not been previously initialized.
+	if lastTS == 0 {
+		return now
 	}
 
-	// Normally now should be later than lastTimestamp, but if the system time went backwards
-	// (e.g. due to DST change), we should compute a delta to account for this change, so we always return
-	// a value that's greater than the last call to this function.
-	if now < lastTimestamp {
-		delta = lastTimestamp - now + 1
-		lastTimestamp = now
-		return now + delta
+	// Normally now should be later than lastTimestamp. If that's the case, we can simply
+	// return now as the new timestamp.
+	if now > lastTS {
+		return now
 	}
 
-	// If the system time was reset, reset delta as well
-	if now-lastTimestamp >= delta {
-		delta = 0
-	}
-
-	lastTimestamp = now
-	return lastTimestamp
+	// At this point, we know the system clock has gone backwards. So we increment the
+	// lastTimestamp by 1 (ms) and return it.
+	return lastTS + 1
 }
 
 func packID(buf []byte, ts uint64, seq uint32) {
