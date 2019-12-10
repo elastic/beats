@@ -1542,6 +1542,12 @@ type: keyword
 --
 
 [float]
+=== billing
+
+`billing` contains the estimated charges for your AWS account in Cloudwatch.
+
+
+[float]
 === cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
@@ -2713,6 +2719,12 @@ format: duration
 --
 
 [float]
+=== sns
+
+`sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+
+
+[float]
 === sqs
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
@@ -2822,6 +2834,12 @@ SQS queue name
 type: keyword
 
 --
+
+[float]
+=== usage
+
+`usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+
 
 [[exported-fields-azure]]
 == azure fields
@@ -19453,6 +19471,103 @@ type: keyword
 Resource name the quota applies to
 
 type: keyword
+
+--
+
+[float]
+=== service
+
+kubernetes service metrics
+
+
+
+*`kubernetes.service.name`*::
++
+--
+Service name.
+
+type: keyword
+
+--
+
+*`kubernetes.service.cluster_ip`*::
++
+--
+Internal IP for the service.
+
+type: ip
+
+--
+
+*`kubernetes.service.external_name`*::
++
+--
+Service external DNS name
+
+type: keyword
+
+--
+
+*`kubernetes.service.external_ip`*::
++
+--
+Service external IP
+
+type: keyword
+
+--
+
+*`kubernetes.service.load_balancer_ip`*::
++
+--
+Load Balancer service IP
+
+type: keyword
+
+--
+
+*`kubernetes.service.type`*::
++
+--
+Service type
+
+type: keyword
+
+--
+
+*`kubernetes.service.ingress_ip`*::
++
+--
+Ingress IP
+
+type: keyword
+
+--
+
+*`kubernetes.service.ingress_hostname`*::
++
+--
+Ingress Hostname
+
+type: ip
+
+--
+
+*`kubernetes.service.labels.*`*::
++
+--
+Labels for service
+
+type: object
+
+--
+
+*`kubernetes.service.created`*::
++
+--
+Service creation date
+
+type: date
 
 --
 

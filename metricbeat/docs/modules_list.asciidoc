@@ -16,14 +16,17 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-appsearch,App Search>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-appsearch-stats,stats>> beta[]  
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
+.11+| .11+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
+|<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-ebs,ebs>>   
 |<<metricbeat-metricset-aws-ec2,ec2>>   
 |<<metricbeat-metricset-aws-elb,elb>> beta[]  
 |<<metricbeat-metricset-aws-rds,rds>>   
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>   
 |<<metricbeat-metricset-aws-s3_request,s3_request>>   
+|<<metricbeat-metricset-aws-sns,sns>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>>   
+|<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
@@ -105,7 +108,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.18+| .18+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.19+| .19+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -120,6 +123,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
 |<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>   
 |<<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>>   
+|<<metricbeat-metricset-kubernetes-state_service,state_service>> experimental[]  
 |<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>   
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
