@@ -4698,8 +4698,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.18.11
-Revision: 0f70a4a06f7a1039305ec9b3ba9c2800f8929fba
+Version: v2.19.11
+Revision: fc7e5e7af6052e36e83e5539148015ed2c09d8f9
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------

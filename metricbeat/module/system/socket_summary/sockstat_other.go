@@ -19,10 +19,19 @@
 
 package socket_summary
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/shirou/gopsutil/net"
+
+	"github.com/elastic/beats/libbeat/common"
+)
 
 //a stub function for non-linux systems
 //get a list of platform-specific enhancements and apply them to our mapStr object.
 func applyEnhancements(data common.MapStr, m *MetricSet) (common.MapStr, error) {
 	return data, nil
+}
+
+// connections gets connection information
+func connections(kind string) ([]net.ConnectionStat, error) {
+	return net.Connections(kind)
 }
