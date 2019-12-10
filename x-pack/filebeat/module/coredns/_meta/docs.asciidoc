@@ -29,7 +29,15 @@ Example config:
 
 [source,yaml]
 ----
-- module: corends
+- module: coredns
   log:
     enabled: true
+    var.paths: ["/var/log/coredns.log"]
+    var.tags: ["coredns", "staging"]
 ----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+An array of tags describing the monitored CoreDNS setup.
