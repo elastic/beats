@@ -114,7 +114,7 @@ func defaultConfig() kafkaInputConfig {
 		ConsumeBackoff:    2 * time.Second,
 		WaitClose:         2 * time.Second,
 		MaxWaitTime:       250 * time.Millisecond,
-		MaxProcessingTime: 20 * time.Microsecond,
+		MaxProcessingTime: 20 * time.Second,
 		IsolationLevel:    isolationLevelReadUncommitted,
 		Fetch: kafkaFetch{
 			Min:     1,
