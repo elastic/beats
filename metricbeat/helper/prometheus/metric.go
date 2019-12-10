@@ -46,10 +46,23 @@ type MetricMap interface {
 // Configuration for mappings that needs extended treatment
 type Configuration struct {
 	// StoreNonMappedLables indicates if labels found at the metric that are
-	// not found at the label map should be part of the resulting event
+	// not found at the label map should be part of the resulting event.
+	// This setting should be used when the label name is not known beforehand
 	StoreNonMappedLabels bool
 	// NonMappedLabelsPlacement is used when StoreNonMappedLabels is set to true, and
-	// defines the key at the event to store labels
+	// defines the key path at the event under which to store the dynamically found labels.
+	// This key path will be added to the events that match this metric along with a subset of
+	// key/value pairs will be created under it, one for each non mapped label found.
+	//
+	// Example:
+	//
+	// given a metric family in a prometheus resource in the form:
+	// 		metric1{label1="value1",label2="value2"} 1
+	// and not mapping labels but using this entry on a the MetriMap definition:
+	// 		"metric1": ExtendedInfoMetric(Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "mypath"}),
+	// would output an event that contains a metricset field as follows
+	// 		"mypath": {"label1":"value1","label2":"value2"}
+	//
 	NonMappedLabelsPlacement string
 	// MetricProcessing options are a set of functions that will be
 	// applied to metrics after they are retrieved

@@ -50,7 +50,6 @@ The `setup` phase loads several dependencies, such as:
 
 - Index mapping template in Elasticsearch
 - Kibana dashboards
-- Machine Learning (ML) jobs
 - Ingest pipelines
 - ILM policy
 
@@ -77,7 +76,6 @@ Flags:
       --dashboards         Setup dashboards
   -h, --help               help for setup
       --index-management   Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias
-      --machine-learning   Setup machine learning job configurations
       --pipelines          Setup Ingest pipelines
 ----
 

@@ -1,0 +1,10 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    regions:
+      - us-east-1
+    metrics:
+      - namespace: AWS/Billing
+        statistic: ["Maximum"]
