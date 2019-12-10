@@ -37,7 +37,6 @@ func ESTimeBasedUUIDGenerator() IDGenerator {
 var (
 	sequenceNumber uint64
 	lastTimestamp  uint64
-	delta          uint64
 	once           sync.Once
 	mac            []byte
 	mu             sync.Mutex
