@@ -51,6 +51,7 @@ type kafkaInputConfig struct {
 	Username                 string            `config:"username"`
 	Password                 string            `config:"password"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
+	MaxProcessingTime        time.Duration     `config:"max_processing_time"`
 }
 
 type kafkaFetch struct {
@@ -113,6 +114,7 @@ func defaultConfig() kafkaInputConfig {
 		ConsumeBackoff: 2 * time.Second,
 		WaitClose:      2 * time.Second,
 		MaxWaitTime:    250 * time.Millisecond,
+		MaxProcessingTime: 1 * time.Second,
 		IsolationLevel: isolationLevelReadUncommitted,
 		Fetch: kafkaFetch{
 			Min:     1,
@@ -162,6 +164,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Fetch.Min = config.Fetch.Min
 	k.Consumer.Fetch.Default = config.Fetch.Default
 	k.Consumer.Fetch.Max = config.Fetch.Max
+	k.Consumer.MaxProcessingTime = config.MaxProcessingTime
 
 	k.Consumer.Group.Rebalance.Strategy =
 		config.Rebalance.Strategy.asSaramaStrategy()
