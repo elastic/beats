@@ -83,6 +83,7 @@ func TestCounterWithNoInstanceName(t *testing.T) {
 				"instance_label":    "processor.name",
 				"measurement_label": "processor.time.total.pct",
 				"query":             `\UDPv4\Datagrams Sent/sec`,
+				//"query":             `\UDPv4\Verzonden datagrammen per seconde`,
 			},
 		},
 	}
@@ -112,7 +113,11 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	err = q.AddCounter(processorTimeCounter, counter, false)
+	path, err := q.GetCounterPaths(processorTimeCounter)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = q.AddCounter(path[0], counter, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -131,9 +136,9 @@ func TestQuery(t *testing.T) {
 
 	assert.Len(t, values, 1)
 
-	value, found := values[processorTimeCounter]
+	value, found := values[path[0]]
 	if !found {
-		t.Fatal(processorTimeCounter, "not found")
+		t.Fatal(path[0], "not found")
 	}
 
 	assert.NoError(t, value[0].Err)
@@ -233,7 +238,12 @@ func TestLongOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 	counter := CounterConfig{Format: "long"}
-	err = query.AddCounter(processorTimeCounter, counter, false)
+	path, err := query.GetCounterPaths(processorTimeCounter)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotZero(t, len(path))
+	err = query.AddCounter(path[0], counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -255,7 +265,7 @@ func TestLongOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, okLong := values[processorTimeCounter][0].Measurement.(int32)
+	_, okLong := values[path[0]][0].Measurement.(int32)
 
 	assert.True(t, okLong)
 }
@@ -268,7 +278,12 @@ func TestFloatOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 	counter := CounterConfig{Format: "float"}
-	err = query.AddCounter(processorTimeCounter, counter, false)
+	path, err := query.GetCounterPaths(processorTimeCounter)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotZero(t, len(path))
+	err = query.AddCounter(path[0], counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -290,7 +305,7 @@ func TestFloatOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, okFloat := values[processorTimeCounter][0].Measurement.(float64)
+	_, okFloat := values[path[0]][0].Measurement.(float64)
 
 	assert.True(t, okFloat)
 }
@@ -318,7 +333,7 @@ func TestWildcardQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	assert.NotZero(t, len(values))
 	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
 	if err != nil {
 		t.Fatal(err)
@@ -355,7 +370,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	assert.NotZero(t, len(values))
 	pctKey, err := values[0].MetricSetFields.HasKey("process.private.bytes")
 	if err != nil {
 		t.Fatal(err)
