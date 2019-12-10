@@ -103,7 +103,7 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 				"container": common.MapStr{
 					"labels": cl.containerMeta.ContainerLabels,
 					"id":     cl.containerMeta.ContainerID,
-					"name":   cl.containerMeta.ContainerName,
+					"name":   strings.Trim(cl.containerMeta.ContainerName, "/"),
 					"image": common.MapStr{
 						"name": cl.containerMeta.ContainerImageName,
 					},
