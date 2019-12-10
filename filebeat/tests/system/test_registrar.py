@@ -187,7 +187,7 @@ class Test(BaseTest):
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0600")
+        self.assertEqual(self.file_permissions(registry_file), "0o600")
 
     def test_registry_file_custom_permissions(self):
         """
@@ -222,7 +222,7 @@ class Test(BaseTest):
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0640")
+        self.assertEqual(self.file_permissions(registry_file), "0o640")
 
     def test_registry_file_update_permissions(self):
         """
@@ -256,7 +256,7 @@ class Test(BaseTest):
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0600")
+        self.assertEqual(self.file_permissions(registry_file), "0o600")
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -279,7 +279,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0640")
+        self.assertEqual(self.file_permissions(registry_file), "0o640")
 
     def test_rotating_file(self):
         """

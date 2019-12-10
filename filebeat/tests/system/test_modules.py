@@ -137,7 +137,7 @@ class Test(BaseTest):
 
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
-        output.write(" ".join(cmd) + "\n")
+        output.write(b" ".join(cmd) + b"\n")
 
         # Use a fixed timezone so results don't vary depending on the environment
         # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
