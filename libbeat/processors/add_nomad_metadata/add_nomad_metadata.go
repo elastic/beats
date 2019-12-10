@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	nomadlib "github.com/elastic/beats/libbeat/common/nomad"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
@@ -52,8 +53,10 @@ func init() {
 	jsprocessor.RegisterPlugin("AddNomadMetadata", New)
 }
 
-// New constructs a new add_kubernetes_metadata processor.
+// New constructs a new add_nomad_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
+	cfgwarn.Beta("The processor add_nomad_metadata is beta")
+
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)

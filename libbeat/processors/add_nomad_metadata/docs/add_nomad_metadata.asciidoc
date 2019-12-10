@@ -1,6 +1,8 @@
 [[add-nomad-metadata]]
 === Add Nomad metadata
 
+beta[]
+
 The `add_nomad_metadata` processor annotates each event with relevant metadata
 from Nomad allocations. 
 The events are annotated with Nomad metadata, only if a valid configuration
