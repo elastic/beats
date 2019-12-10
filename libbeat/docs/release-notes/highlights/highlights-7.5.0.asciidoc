@@ -1,0 +1,38 @@
+[[release-highlights-7.5.0]]
+=== 7.5 release highlights
+++++
+<titleabbrev>7.5</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Following are the most notable features and enhancements in 7.5.
+
+For a complete list of highlights, see the 
+https://www.elastic.co/blog/beats-7-5-0-released[{beats} 7.5 release blog].
+
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-7.5, Breaking Changes>> and <<release-notes, Release Notes>>.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+
+[float]
+==== New modules for Azure cloud monitoring
+
+With the addition of {metricbeat-ref}/metricbeat-module-azure.html[{metricbeat}]
+and {filebeat-ref}/filebeat-module-azure.html[{filebeat}] modules for Azure
+monitoring, Azure users can now directly monitor logs and metrics from Azure
+Event Hub and Azure Monitor and use prebuilt {kib} dashboards to speed up the
+analysis.
+
+
+[float]
+==== {heartbeat} enhanced with hint-based autodiscover
+
+In 7.5, we’ve enhanced {heartbeat}, as part of our Uptime solution, to include
+{heartbeat-ref}/[hint-based autodiscover], which is a particularly great fit
+for monitoring the health of Kubernetes services.
+
+// end::notable-highlights[]

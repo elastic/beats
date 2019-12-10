@@ -1,0 +1,191 @@
+// TODO: Create script that generates this file. Conditional coding needs to
+// be preserved.
+
+//# tag::processors-list[]
+ifndef::no_add_cloud_metadata_processor[]
+* <<add-cloud-metadata,`add_cloud_metadata`>>
+endif::[]
+ifndef::no_add_docker_metadata_processor[]
+* <<add-docker-metadata,`add_docker_metadata`>>
+endif::[]
+ifndef::no_add_fields_processor[]
+* <<add-fields, `add_fields`>>
+endif::[]
+ifndef::no_add_host_metadata_processor[]
+* <<add-host-metadata,`add_host_metadata`>>
+endif::[]
+ifndef::no_add_kubernetes_metadata_processor[]
+* <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
+endif::[]
+ifndef::no_add_labels_processor[]
+* <<add-labels, `add_labels`>>
+endif::[]
+ifndef::no_add_locale_processor[]
+* <<add-locale,`add_locale`>>
+endif::[]
+ifndef::no_add_observer_metadata_processor[]
+* <<add-observer-metadata,`add_observer_metadata`>>
+endif::[]
+ifndef::no_add_process_metadata_processor[]
+* <<add-process-metadata,`add_process_metadata`>>
+endif::[]
+ifndef::no_add_tags_processor[]
+* <<add-tags, `add_tags`>>
+endif::[]
+ifndef::no_community_id_processor[]
+* <<community-id,`community_id`>>
+endif::[]
+ifndef::no_convert_processor[]
+* <<convert,`convert`>>
+endif::[]
+ifndef::no_copy_fields_processor[]
+* <<copy-fields, `copy_fields`>>
+endif::[]
+ifndef::no_decode_base64_field_processor[]
+* <<decode-base64-field,`decode_base64_field`>>
+endif::[]
+ifndef::no_decode_cef_processor[]
+* <<processor-decode-cef,`decode_cef`>>
+endif::[]
+ifndef::no_decode_csv_fields_processor[]
+* <<decode-csv-fields,`decode_csv_fields`>>
+endif::[]
+ifndef::no_decode_json_fields_processor[]
+* <<decode-json-fields,`decode_json_fields`>>
+endif::[]
+ifndef::no_decompress_gzip_field_processor[]
+* <<decompress-gzip-field,`decompress_gzip_field`>>
+endif::[]
+ifndef::no_dissect_processor[]
+* <<dissect, `dissect`>>
+endif::[]
+ifndef::no_dns_processor[]
+* <<processor-dns, `dns`>>
+endif::[]
+ifndef::no_drop_event_processor[]
+* <<drop-event,`drop_event`>>
+endif::[]
+ifndef::no_drop_fields_processor[]
+* <<drop-fields,`drop_fields`>>
+endif::[]
+ifndef::no_extract_array_processor[]
+* <<extract-array,`extract_array`>>
+endif::[]
+ifndef::no_fingerprint_processor[]
+* <<fingerprint,`fingerprint`>>
+endif::[]
+ifndef::no_include_fields_processor[]
+* <<include-fields,`include_fields`>>
+endif::[]
+ifndef::no_registered_domain_processor[]
+* <<processor-registered-domain,`registered_domain`>>
+endif::[]
+ifndef::no_rename_processor[]
+* <<rename-fields,`rename`>>
+endif::[]
+ifndef::no_script_processor[]
+* <<processor-script,`script`>>
+endif::[]
+ifndef::no_timestamp_processor[]
+* <<processor-timestamp,`timestamp`>>
+endif::[]
+ifndef::no_truncate_fields_processor[]
+* <<truncate-fields, `truncate_fields`>>
+endif::[]
+//# end::processors-list[]
+
+//# tag::processors-include[]
+ifndef::no_add_cloud_metadata_processor[]
+include::{libbeat-processors-dir}/add_cloud_metadata/docs/add_cloud_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_docker_metadata_processor[]
+include::{libbeat-processors-dir}/add_docker_metadata/docs/add_docker_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_fields_processor[]
+include::{libbeat-processors-dir}/actions/docs/add_fields.asciidoc[]
+endif::[]
+ifndef::no_add_host_metadata_processor[]
+include::{libbeat-processors-dir}/add_host_metadata/docs/add_host_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_kubernetes_metadata_processor[]
+include::{libbeat-processors-dir}/add_kubernetes_metadata/docs/add_kubernetes_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_labels_processor[]
+include::{libbeat-processors-dir}/actions/docs/add_labels.asciidoc[]
+endif::[]
+ifndef::no_add_locale_processor[]
+include::{libbeat-processors-dir}/add_locale/docs/add_locale.asciidoc[]
+endif::[]
+ifndef::no_add_observer_metadata_processor[]
+include::{libbeat-processors-dir}/add_observer_metadata/docs/add_observer_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_process_metadata_processor[]
+include::{libbeat-processors-dir}/add_process_metadata/docs/add_process_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_tags_processor[]
+include::{libbeat-processors-dir}/actions/docs/add_tags.asciidoc[]
+endif::[]
+ifndef::no_community_id_processor[]
+include::{libbeat-processors-dir}/communityid/docs/communityid.asciidoc[]
+endif::[]
+ifndef::no_convert_processor[]
+include::{libbeat-processors-dir}/convert/docs/convert.asciidoc[]
+endif::[]
+ifndef::no_copy_fields_processor[]
+include::{libbeat-processors-dir}/actions/docs/copy_fields.asciidoc[]
+endif::[]
+ifndef::no_decode_base64_field_processor[]
+include::{libbeat-processors-dir}/actions/docs/decode_base64_field.asciidoc[]
+endif::[]
+ifndef::no_decode_cef_processor[]
+include::{x-filebeat-processors-dir}/decode_cef/docs/decode_cef.asciidoc[]
+endif::[]
+ifndef::no_decode_csv_fields_processor[]
+include::{libbeat-processors-dir}/decode_csv_fields/docs/decode_csv_fields.asciidoc[]
+endif::[]
+ifndef::no_decode_json_fields_processor[]
+include::{libbeat-processors-dir}/actions/docs/decode_json_fields.asciidoc[]
+endif::[]
+ifndef::no_decompress_gzip_field_processor[]
+include::{libbeat-processors-dir}/actions/docs/decompress_gzip_field.asciidoc[]
+endif::[]
+ifndef::no_dissect_processor[]
+include::{libbeat-processors-dir}/dissect/docs/dissect.asciidoc[]
+endif::[]
+ifndef::no_dns_processor[]
+include::{libbeat-processors-dir}/dns/docs/dns.asciidoc[]
+endif::[]
+ifndef::no_drop_event_processor[]
+include::{libbeat-processors-dir}/actions/docs/drop_event.asciidoc[]
+endif::[]
+ifndef::no_drop_fields_processor[]
+include::{libbeat-processors-dir}/actions/docs/drop_fields.asciidoc[]
+endif::[]
+ifndef::no_extract_array_processor[]
+include::{libbeat-processors-dir}/extract_array/docs/extract_array.asciidoc[]
+endif::[]
+ifndef::no_fingerprint_processor[]
+include::{libbeat-processors-dir}/fingerprint/docs/fingerprint.asciidoc[]
+endif::[]
+ifndef::no_include_fields_processor[]
+include::{libbeat-processors-dir}/actions/docs/include_fields.asciidoc[]
+endif::[]
+ifndef::no_registered_domain_processor[]
+include::{libbeat-processors-dir}/registered_domain/docs/registered_domain.asciidoc[]
+endif::[]
+ifndef::no_rename_processor[]
+include::{libbeat-processors-dir}/actions/docs/rename.asciidoc[]
+endif::[]
+ifndef::no_script_processor[]
+include::{libbeat-processors-dir}/script/docs/script.asciidoc[]
+endif::[]
+ifndef::no_timestamp_processor[]
+include::{libbeat-processors-dir}/timestamp/docs/timestamp.asciidoc[]
+endif::[]
+ifndef::no_truncate_fields_processor[]
+include::{libbeat-processors-dir}/actions/docs/truncate_fields.asciidoc[]
+endif::[]
+
+//# end::processors-include[]
+
+

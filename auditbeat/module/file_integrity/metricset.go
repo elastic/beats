@@ -41,6 +41,8 @@ const (
 	namespace = "."
 )
 
+var underTest = false
+
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),

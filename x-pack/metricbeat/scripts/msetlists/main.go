@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/metricbeat/mb"
 	_ "github.com/elastic/beats/x-pack/metricbeat/include"
-	xpackmb "github.com/elastic/beats/x-pack/metricbeat/mb"
 )
 
 func main() {
@@ -22,7 +21,7 @@ func main() {
 	os.Setenv("BEAT_STRICT_PERMS", "false")
 
 	path := paths.Resolve(paths.Home, "../x-pack/metricbeat/module")
-	lm := xpackmb.NewLightModulesSource(path)
+	lm := mb.NewLightModulesSource(path)
 	mb.Registry.SetSecondarySource(lm)
 
 	msList := msetlists.DefaultMetricsets()

@@ -29,6 +29,20 @@ kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allo
 
 This module is tested with Kafka 0.10.2.1, 1.1.0 and 2.1.1.
 
+The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for Jolokia's compatibility notes.
+
+[float]
+=== Usage
+The Broker, Producer, Consumer metricsets require <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to those Metricsets' documentation about how to use Jolokia.
+
+
+[float]
+=== Dashboard
+
+The Kafka module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_kafka_dashboard.png[]
+
 
 [float]
 === Example configuration
@@ -39,11 +53,13 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
+# Kafka metrics collected using the Kafka protocol
 - module: kafka
-  metricsets: ["consumergroup", "partition"]
+  #metricsets:
+  #  - partition
+  #  - consumergroup
   period: 10s
   hosts: ["localhost:9092"]
-  enabled: true
 
   #client_id: metricbeat
   #retries: 3
@@ -65,6 +81,27 @@ metricbeat.modules:
   # SASL authentication
   #username: ""
   #password: ""
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]
 ----
 
 [float]
@@ -72,11 +109,23 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kafka-broker,broker>>
+
+* <<metricbeat-metricset-kafka-consumer,consumer>>
+
 * <<metricbeat-metricset-kafka-consumergroup,consumergroup>>
 
 * <<metricbeat-metricset-kafka-partition,partition>>
 
+* <<metricbeat-metricset-kafka-producer,producer>>
+
+include::kafka/broker.asciidoc[]
+
+include::kafka/consumer.asciidoc[]
+
 include::kafka/consumergroup.asciidoc[]
 
 include::kafka/partition.asciidoc[]
+
+include::kafka/producer.asciidoc[]
 

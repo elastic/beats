@@ -1,0 +1,37 @@
+:see-relnotes: See the <<release-notes,release notes>> for a complete list of breaking changes, including changes to beta or experimental functionality.
+
+[[breaking-changes]]
+== Breaking changes
+
+As a general rule, we strive to keep backwards compatibility between minor
+versions (e.g.  7.x to 7.y) so you can upgrade without any configuration file
+changes, but there are breaking changes between major versions (e.g. 6.x to
+7.y). Migrating directly between non consecutive major versions (e.g. 5.x to
+7.x) is not recommended.
+
+See the following topics for a description of breaking changes:
+
+* <<breaking-changes-7.5>>
+
+* <<breaking-changes-7.4>>
+
+* <<breaking-changes-7.3>>
+
+* <<breaking-changes-7.2>>
+
+* <<breaking-changes-7.1>>
+
+* <<breaking-changes-7.0>>
+
+include::breaking-7.5.asciidoc[]
+
+include::breaking-7.4.asciidoc[]
+
+include::breaking-7.3.asciidoc[]
+
+include::breaking-7.2.asciidoc[]
+
+include::breaking-7.1.asciidoc[]
+
+include::breaking-7.0.asciidoc[]
+

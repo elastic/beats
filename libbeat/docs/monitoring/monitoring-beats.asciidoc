@@ -27,8 +27,10 @@ ifndef::serverless[]
 * <<monitoring-metricbeat-collection, {metricbeat} collection>>
 endif::[]
 
-To learn about monitoring in general, see 
-{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
+//Commenting out this link temporarily until the general monitoring docs can be
+//updated. 
+//To learn about monitoring in general, see 
+//{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
 
 --
 

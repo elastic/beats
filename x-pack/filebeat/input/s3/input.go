@@ -521,16 +521,21 @@ func s3ObjectHash(s3Info s3Info) string {
 }
 
 func (c *s3Context) Fail(err error) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	// only care about the last error for now
-	// TODO: add "Typed" error to error for context
-	c.err = err
+	c.setError(err)
 	c.done()
 }
 
+func (c *s3Context) setError(err error) {
+	// only care about the last error for now
+	// TODO: add "Typed" error to error for context
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	c.err = err
+}
+
 func (c *s3Context) done() {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	c.refs--
 	if c.refs == 0 {
 		c.errC <- c.err

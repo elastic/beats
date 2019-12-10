@@ -18,7 +18,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -118,7 +118,7 @@ type User struct {
 
 // Hash creates a hash for User.
 func (user User) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	// Use everything except userInfo
 	h.WriteString(user.Name)
 	binary.Write(h, binary.BigEndian, uint8(user.PasswordType))

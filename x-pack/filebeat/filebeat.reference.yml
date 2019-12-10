@@ -37,6 +37,24 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#------------------------------- Activemq Module -------------------------------
+- module: activemq
+  # Audit logs
+  audit:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Application logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- Apache Module --------------------------------
 #- module: apache
   # Access logs
@@ -88,6 +106,15 @@ filebeat.modules:
     #var.credential_profile_name: fb-aws
 
   elb:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Profile name for aws credential
+    #var.credential_profile_name: fb-aws
+
+  vpcflow:
     enabled: false
 
     # AWS SQS queue url
@@ -259,6 +286,24 @@ filebeat.modules:
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
     var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+  firewall:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: googlecloud-vpc-firewall
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-firewall-sub
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -627,6 +672,8 @@ filebeat.modules:
     enabled: true
   http:
     enabled: true
+  intel:
+    enabled: true    
   irc:
     enabled: true
   kerberos:
@@ -1498,8 +1545,11 @@ output.elasticsearch:
   # Configure escaping HTML symbols in strings.
   #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
@@ -2336,8 +2386,11 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 
