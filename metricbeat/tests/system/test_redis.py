@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import metricbeat
 import redis
@@ -46,11 +45,11 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
 
         fields = REDIS_FIELDS + ["process", "os"]
-        self.assertItemsEqual(self.de_dot(fields), list(evt.keys()))
+        self.assertItemsEqual(self.de_dot(fields), evt.keys())
         redis_info = evt["redis"]["info"]
-        self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), list(redis_info.keys()))
-        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), list(redis_info["clients"].keys()))
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), list(redis_info["cpu"].keys()))
+        self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
+        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -84,9 +83,9 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), list(evt.keys()))
+        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["keyspace"]
-        self.assertItemsEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), list(redis_info.keys()))
+        self.assertItemsEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), redis_info.keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -124,7 +123,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), list(evt.keys()))
+        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -154,12 +153,12 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), list(evt.keys()))
+        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["info"]
         print(redis_info)
-        self.assertItemsEqual(fields, list(redis_info.keys()))
-        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), list(redis_info["clients"].keys()))
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), list(redis_info["cpu"].keys()))
+        self.assertItemsEqual(fields, redis_info.keys())
+        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
 
 
 class TestRedis4(Test):

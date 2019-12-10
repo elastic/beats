@@ -1,4 +1,3 @@
-from __future__ import print_function
 from past.builtins import basestring
 import yaml
 
@@ -39,7 +38,7 @@ def read_migration_fields(beat):
                         continue
                     migration_fields[k["from"]] = k["to"]
 
-    return sorted(list(migration_fields.items()), key=lambda x: x[0])
+    return sorted(migration_fields.items(), key=lambda x: x[0])
 
 
 if __name__ == "__main__":

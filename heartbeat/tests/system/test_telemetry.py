@@ -1,5 +1,3 @@
-from future import standard_library
-standard_library.install_aliases()
 from heartbeat import BaseTest
 import urllib.request
 import urllib.error

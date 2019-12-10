@@ -42,7 +42,7 @@ def main(arguments):
                             assert prev_stmt == stmt
                         lines[position] = (position, stmt, prev_count + count)
 
-    for line in sorted(["%s %d %d\n" % lines[key] for key in list(lines.keys())]):
+    for line in sorted(["%s %d %d\n" % lines[key] for key in lines.keys()]):
         args.outfile.write(line)
 
 

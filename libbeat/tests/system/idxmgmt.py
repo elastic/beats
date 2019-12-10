@@ -1,4 +1,3 @@
-from builtins import object
 from elasticsearch import NotFoundError
 from nose.tools import raises
 import datetime
@@ -20,7 +19,7 @@ class IdxMgmt(object):
         for i in indices:
             self.delete_index_and_alias(i)
             self.delete_template(template=i)
-        for i in list([x for x in policies if x != '']):
+        for i in [x for x in policies if x != '']:
             self.delete_policy(i)
 
     def delete_index_and_alias(self, index=""):
@@ -44,7 +43,7 @@ class IdxMgmt(object):
     def delete_policy(self, policy):
         # Delete any existing policy starting with given policy
         policies = self._client.transport.perform_request('GET', "/_ilm/policy")
-        for p, _ in list(policies.items()):
+        for p, _ in policies.items():
             if not p.startswith(policy):
                 continue
             try:
@@ -73,7 +72,7 @@ class IdxMgmt(object):
 
     def assert_alias_not_created(self, alias):
         resp = self._client.transport.perform_request('GET', '/_alias')
-        for name, entry in list(resp.items()):
+        for name, entry in resp.items():
             if alias not in name:
                 continue
             assert entry["aliases"] == {}, entry["aliases"]

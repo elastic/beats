@@ -1,4 +1,3 @@
-from __future__ import print_function
 import re
 import sys
 import metricbeat
@@ -37,13 +36,13 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot([
             'agent', '@timestamp', 'system', 'metricset.module',
             'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
-        ]), list(evt.keys()))
+        ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(list(cpu.keys()))
         self.assertItemsEqual(self.de_dot([
             "system", "cores", "user", "softirq", "iowait",
             "idle", "irq", "steal", "nice", "total"
-        ]), list(cpu.keys()))
+        ]), cpu.keys())
 
     def test_dropfields_with_condition(self):
         """

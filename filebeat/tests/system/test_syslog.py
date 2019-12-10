@@ -1,4 +1,3 @@
-from builtins import range
 from filebeat import BaseTest
 import socket
 

@@ -26,7 +26,7 @@ class Test(BaseTest):
         assert o["type"] == "http"
         assert o["url.query"] == "pass=xxxxx&user=monica"
         assert o["url.path"] == "/login"
-        for _, val in list(o.items()):
+        for _, val in o.items():
             if isinstance(val, six.string_types):
                 assert "secret" not in val
 
@@ -47,7 +47,7 @@ class Test(BaseTest):
         assert o["type"] == "http"
         assert o["url.query"] == "pass=xxxxx&user=monica"
         assert o["url.path"] == "/login"
-        for _, val in list(o.items()):
+        for _, val in o.items():
             if isinstance(val, six.string_types):
                 assert "secret" not in val
 

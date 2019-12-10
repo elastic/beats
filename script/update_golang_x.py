@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import json
 import os
 import argparse
@@ -19,7 +17,7 @@ def update(pkg_name):
     packages = ['{pkg}{revision}'.format(pkg=pkg, revision=revision) for pkg in packages]
     cmd = ['govendor', 'fetch'] + packages
     if args.verbose:
-        print(' '.join(cmd)))
+        print(' '.join(cmd))
     subprocess.check_call(cmd)
 
 

@@ -1,4 +1,3 @@
-from __future__ import print_function
 from base import BaseTest
 from idxmgmt import IdxMgmt
 import os

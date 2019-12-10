@@ -1,4 +1,3 @@
-from builtins import str
 from base import BaseTest
 import os
 import os.path

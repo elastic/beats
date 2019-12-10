@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import unittest
-from builtins import str
 from winlogbeat import WriteReadTest
 
 if sys.platform.startswith("win"):

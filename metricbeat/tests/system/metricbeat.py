@@ -1,4 +1,3 @@
-from __future__ import print_function
 import re
 import sys
 import os
@@ -105,7 +104,7 @@ class BaseTest(TestCase):
 
         fields = COMMON_FIELDS + fields
         print(fields)
-        self.assertItemsEqual(self.de_dot(fields), list(evt.keys()))
+        self.assertItemsEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)
 

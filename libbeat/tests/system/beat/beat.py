@@ -1,6 +1,3 @@
-from __future__ import print_function
-from builtins import range
-from builtins import object
 import subprocess
 
 import jinja2
@@ -514,7 +511,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         given list of expected fields.
         """
         for o in objs:
-            for key in list(o.keys()):
+            for key in o.keys():
                 known = key in dict_fields or key in expected_fields
                 ismeta = key.startswith('@metadata.')
                 if not(known or ismeta):
@@ -602,7 +599,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}
-        for key, value in list(obj.items()):
+        for key, value in obj.items():
             if isinstance(value, dict) and prefix + key not in dict_fields:
                 new_prefix = prefix + key + "."
                 result.update(self.flatten_object(value, dict_fields,
@@ -684,7 +681,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     return True
             return False
 
-        for key in list(flat.keys()):
+        for key in flat.keys():
             metaKey = key.startswith('@metadata.')
             if not(is_documented(key, expected_fields) or metaKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
