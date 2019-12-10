@@ -20,6 +20,7 @@ package generator
 import (
 	"encoding/base64"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -75,6 +76,32 @@ func TestIDConsecutiveOrdering(t *testing.T) {
 		}
 
 		prevID = currID
+	}
+}
+
+func TestMonotonicTimestamp(t *testing.T) {
+	now := uint64(time.Now().UnixNano() / 1000)
+	tests := map[string]struct {
+		clockTimestamp uint64
+		lastTimestamp  uint64
+	}{
+		"uninitialized": {
+			clockTimestamp: now,
+		},
+		"clock_normal": {
+			clockTimestamp: now,
+			lastTimestamp:  now - 1,
+		},
+		"clock_went_backwards": {
+			clockTimestamp: now - 1,
+			lastTimestamp:  now,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.True(t, timestamp(test.clockTimestamp, test.lastTimestamp) > test.lastTimestamp)
+		})
 	}
 }
 

@@ -84,17 +84,17 @@ func nextIDData() (uint64, uint32) {
 }
 
 // timestamp returns a monotonically-increasing timestamp (in ms) to use,
-// while accounting for system time going backwards (e.g. due to a DST change).
-func timestamp(now, lastTS uint64) uint64 {
+// while accounting for system clock going backwards (e.g. due to a DST change).
+func timestamp(clockTS, lastTS uint64) uint64 {
 	// Last timestamp has not been previously initialized.
 	if lastTS == 0 {
-		return now
+		return clockTS
 	}
 
-	// Normally now should be later than lastTimestamp. If that's the case, we can simply
-	// return now as the new timestamp.
-	if now > lastTS {
-		return now
+	// Normally clockTimestamp should be later than lastTimestamp. If that's the case, we can simply
+	// return clockTimestamp as the new timestamp.
+	if clockTS > lastTS {
+		return clockTS
 	}
 
 	// At this point, we know the system clock has gone backwards. So we increment the
