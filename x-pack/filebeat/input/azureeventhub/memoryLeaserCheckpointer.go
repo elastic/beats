@@ -1,4 +1,4 @@
-package azure
+package azureeventhub
 
 import (
 	"context"
@@ -13,81 +13,80 @@ import (
 	"github.com/devigned/tab"
 
 	"github.com/Azure/azure-event-hubs-go/v2/persist"
-
 )
 
 type (
-	MemoryLeaserCheckpointer struct {
-		store         *SharedStore
+	memoryLeaserCheckpointer struct {
+		store         *sharedStore
 		processor     *eph.EventProcessorHost
 		leaseDuration time.Duration
 		memMu         sync.Mutex
-		leases        map[string]*MemoryLease
+		leases        map[string]*memoryLease
 	}
 
-	MemoryLease struct {
+	memoryLease struct {
 		eph.Lease
 		expirationTime time.Time
 		Token          string
 		Checkpoint     *persist.Checkpoint
-		leaser         *MemoryLeaserCheckpointer
+		leaser         *memoryLeaserCheckpointer
 	}
 
-	SharedStore struct {
-		leases  map[string]*StoreLease
+	sharedStore struct {
+		leases  map[string]*storeLease
 		storeMu sync.Mutex
 	}
 
-	StoreLease struct {
+	storeLease struct {
 		token      string
 		expiration time.Time
-		ml         *MemoryLease
+		ml         *memoryLease
 	}
 )
 
-func newMemoryLease(partitionID string) *MemoryLease {
-	lease := new(MemoryLease)
+func newMemoryLease(partitionID string) *memoryLease {
+	lease := new(memoryLease)
 	lease.PartitionID = partitionID
 	return lease
 }
 
-func (s *SharedStore) exists() bool {
+func (s *sharedStore) exists() bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
 	return s.leases != nil
 }
 
-func (s *SharedStore) ensure() bool {
+func (s *sharedStore) ensure() bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
 	if s.leases == nil {
-		s.leases = make(map[string]*StoreLease)
+		s.leases = make(map[string]*storeLease)
 	}
 	return true
 }
 
-func (s *SharedStore) getLease(partitionID string) MemoryLease {
+func (s *sharedStore) getLease(partitionID string) memoryLease {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
 	return *s.leases[partitionID].ml
 }
 
-func (s *SharedStore) deleteLease(partitionID string) {
+func (s *sharedStore) deleteLease(partitionID string) {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
 	delete(s.leases, partitionID)
 }
 
-func (s *SharedStore) createOrGetLease(partitionID string) MemoryLease {
+func (s *sharedStore) createOrGetLease(partitionID string) memoryLease {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
 	if _, ok := s.leases[partitionID]; !ok {
-		s.leases[partitionID] = new(StoreLease)
+		s.leases[partitionID] = new(storeLease)
 	}
 
 	l := s.leases[partitionID]
@@ -98,7 +97,7 @@ func (s *SharedStore) createOrGetLease(partitionID string) MemoryLease {
 	return *l.ml
 }
 
-func (s *SharedStore) changeLease(partitionID, newToken, oldToken string, duration time.Duration) bool {
+func (s *sharedStore) changeLease(partitionID, newToken, oldToken string, duration time.Duration) bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
@@ -110,7 +109,7 @@ func (s *SharedStore) changeLease(partitionID, newToken, oldToken string, durati
 	return false
 }
 
-func (s *SharedStore) releaseLease(partitionID, token string) bool {
+func (s *sharedStore) releaseLease(partitionID, token string) bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
@@ -122,7 +121,7 @@ func (s *SharedStore) releaseLease(partitionID, token string) bool {
 	return false
 }
 
-func (s *SharedStore) renewLease(partitionID, token string, duration time.Duration) bool {
+func (s *sharedStore) renewLease(partitionID, token string, duration time.Duration) bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
@@ -133,7 +132,7 @@ func (s *SharedStore) renewLease(partitionID, token string, duration time.Durati
 	return false
 }
 
-func (s *SharedStore) acquireLease(partitionID, newToken string, duration time.Duration) bool {
+func (s *sharedStore) acquireLease(partitionID, newToken string, duration time.Duration) bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
@@ -145,7 +144,7 @@ func (s *SharedStore) acquireLease(partitionID, newToken string, duration time.D
 	return false
 }
 
-func (s *SharedStore) storeLease(partitionID, token string, ml MemoryLease) bool {
+func (s *sharedStore) storeLease(partitionID, token string, ml memoryLease) bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
@@ -156,7 +155,7 @@ func (s *SharedStore) storeLease(partitionID, token string, ml MemoryLease) bool
 	return false
 }
 
-func (s *SharedStore) isLeased(partitionID string) bool {
+func (s *sharedStore) isLeased(partitionID string) bool {
 	s.storeMu.Lock()
 	defer s.storeMu.Unlock()
 
@@ -170,44 +169,44 @@ func (s *SharedStore) isLeased(partitionID string) bool {
 }
 
 // IsNotOwnedOrExpired indicates that the lease has expired and does not owned by a processor
-func (l *MemoryLease) isNotOwnedOrExpired(ctx context.Context) bool {
+func (l *memoryLease) isNotOwnedOrExpired(ctx context.Context) bool {
 	return l.IsExpired(ctx) || l.Owner == ""
 }
 
 // IsExpired indicates that the lease has expired and is no longer valid
-func (l *MemoryLease) IsExpired(_ context.Context) bool {
+func (l *memoryLease) IsExpired(_ context.Context) bool {
 	return !l.leaser.store.isLeased(l.PartitionID)
 }
 
-func (l *MemoryLease) expireAfter(d time.Duration) {
+func (l *memoryLease) expireAfter(d time.Duration) {
 	l.expirationTime = time.Now().Add(d)
 }
 
 // GetEpoch returns the value of the epoch
-func (l *MemoryLease) GetEpoch() int64 {
+func (l *memoryLease) GetEpoch() int64 {
 	return l.Epoch
 }
 
-func NewMemoryLeaserCheckpointer(leaseDuration time.Duration, store *SharedStore) *MemoryLeaserCheckpointer {
-	return &MemoryLeaserCheckpointer{
+func NewMemoryLeaserCheckpointer(leaseDuration time.Duration, store *sharedStore) *memoryLeaserCheckpointer {
+	return &memoryLeaserCheckpointer{
 		leaseDuration: leaseDuration,
-		leases:        make(map[string]*MemoryLease),
+		leases:        make(map[string]*memoryLease),
 		store:         store,
 	}
 }
 
-func (ml *MemoryLeaserCheckpointer) SetEventHostProcessor(eph *eph.EventProcessorHost) {
+func (ml *memoryLeaserCheckpointer) SetEventHostProcessor(eph *eph.EventProcessorHost) {
 	ml.processor = eph
 }
 
-func (ml *MemoryLeaserCheckpointer) StoreExists(ctx context.Context) (bool, error) {
+func (ml *memoryLeaserCheckpointer) StoreExists(ctx context.Context) (bool, error) {
 	span, _ := startConsumerSpanFromContext(ctx, "eph.memoryLeaserCheckpointer.StoreExists")
 	defer span.End()
 
 	return ml.store.exists(), nil
 }
 
-func (ml *MemoryLeaserCheckpointer) EnsureStore(ctx context.Context) error {
+func (ml *memoryLeaserCheckpointer) EnsureStore(ctx context.Context) error {
 	span, _ := startConsumerSpanFromContext(ctx, "eph.memoryLeaserCheckpointer.EnsureStore")
 	defer span.End()
 
@@ -215,14 +214,14 @@ func (ml *MemoryLeaserCheckpointer) EnsureStore(ctx context.Context) error {
 	return nil
 }
 
-func (ml *MemoryLeaserCheckpointer) DeleteStore(ctx context.Context) error {
+func (ml *memoryLeaserCheckpointer) DeleteStore(ctx context.Context) error {
 	span, _ := startConsumerSpanFromContext(ctx, "eph.memoryLeaserCheckpointer.DeleteStore")
 	defer span.End()
 
 	return ml.EnsureStore(ctx)
 }
 
-func (ml *MemoryLeaserCheckpointer) GetLeases(ctx context.Context) ([]eph.LeaseMarker, error) {
+func (ml *memoryLeaserCheckpointer) GetLeases(ctx context.Context) ([]eph.LeaseMarker, error) {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -239,7 +238,7 @@ func (ml *MemoryLeaserCheckpointer) GetLeases(ctx context.Context) ([]eph.LeaseM
 	return leases, nil
 }
 
-func (ml *MemoryLeaserCheckpointer) EnsureLease(ctx context.Context, partitionID string) (eph.LeaseMarker, error) {
+func (ml *memoryLeaserCheckpointer) EnsureLease(ctx context.Context, partitionID string) (eph.LeaseMarker, error) {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -251,7 +250,7 @@ func (ml *MemoryLeaserCheckpointer) EnsureLease(ctx context.Context, partitionID
 	return &l, nil
 }
 
-func (ml *MemoryLeaserCheckpointer) DeleteLease(ctx context.Context, partitionID string) error {
+func (ml *memoryLeaserCheckpointer) DeleteLease(ctx context.Context, partitionID string) error {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -262,7 +261,7 @@ func (ml *MemoryLeaserCheckpointer) DeleteLease(ctx context.Context, partitionID
 	return nil
 }
 
-func (ml *MemoryLeaserCheckpointer) AcquireLease(ctx context.Context, partitionID string) (eph.LeaseMarker, bool, error) {
+func (ml *memoryLeaserCheckpointer) AcquireLease(ctx context.Context, partitionID string) (eph.LeaseMarker, bool, error) {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -299,7 +298,7 @@ func (ml *MemoryLeaserCheckpointer) AcquireLease(ctx context.Context, partitionI
 	return &lease, true, nil
 }
 
-func (ml *MemoryLeaserCheckpointer) RenewLease(ctx context.Context, partitionID string) (eph.LeaseMarker, bool, error) {
+func (ml *memoryLeaserCheckpointer) RenewLease(ctx context.Context, partitionID string) (eph.LeaseMarker, bool, error) {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -317,7 +316,7 @@ func (ml *MemoryLeaserCheckpointer) RenewLease(ctx context.Context, partitionID 
 	return lease, true, nil
 }
 
-func (ml *MemoryLeaserCheckpointer) ReleaseLease(ctx context.Context, partitionID string) (bool, error) {
+func (ml *memoryLeaserCheckpointer) ReleaseLease(ctx context.Context, partitionID string) (bool, error) {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -336,7 +335,7 @@ func (ml *MemoryLeaserCheckpointer) ReleaseLease(ctx context.Context, partitionI
 	return true, nil
 }
 
-func (ml *MemoryLeaserCheckpointer) UpdateLease(ctx context.Context, partitionID string) (eph.LeaseMarker, bool, error) {
+func (ml *memoryLeaserCheckpointer) UpdateLease(ctx context.Context, partitionID string) (eph.LeaseMarker, bool, error) {
 	span, _ := startConsumerSpanFromContext(ctx, "eph.memoryLeaserCheckpointer.UpdateLease")
 	defer span.End()
 
@@ -356,7 +355,7 @@ func (ml *MemoryLeaserCheckpointer) UpdateLease(ctx context.Context, partitionID
 	return lease, true, nil
 }
 
-func (ml *MemoryLeaserCheckpointer) GetCheckpoint(ctx context.Context, partitionID string) (persist.Checkpoint, bool) {
+func (ml *memoryLeaserCheckpointer) GetCheckpoint(ctx context.Context, partitionID string) (persist.Checkpoint, bool) {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -370,7 +369,7 @@ func (ml *MemoryLeaserCheckpointer) GetCheckpoint(ctx context.Context, partition
 	return persist.NewCheckpointFromStartOfStream(), ok
 }
 
-func (ml *MemoryLeaserCheckpointer) EnsureCheckpoint(ctx context.Context, partitionID string) (persist.Checkpoint, error) {
+func (ml *memoryLeaserCheckpointer) EnsureCheckpoint(ctx context.Context, partitionID string) (persist.Checkpoint, error) {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -388,7 +387,7 @@ func (ml *MemoryLeaserCheckpointer) EnsureCheckpoint(ctx context.Context, partit
 	return persist.NewCheckpointFromStartOfStream(), nil
 }
 
-func (ml *MemoryLeaserCheckpointer) UpdateCheckpoint(ctx context.Context, partitionID string, checkpoint persist.Checkpoint) error {
+func (ml *memoryLeaserCheckpointer) UpdateCheckpoint(ctx context.Context, partitionID string, checkpoint persist.Checkpoint) error {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -407,7 +406,7 @@ func (ml *MemoryLeaserCheckpointer) UpdateCheckpoint(ctx context.Context, partit
 	return nil
 }
 
-func (ml *MemoryLeaserCheckpointer) DeleteCheckpoint(ctx context.Context, partitionID string) error {
+func (ml *memoryLeaserCheckpointer) DeleteCheckpoint(ctx context.Context, partitionID string) error {
 	ml.memMu.Lock()
 	defer ml.memMu.Unlock()
 
@@ -428,7 +427,7 @@ func (ml *MemoryLeaserCheckpointer) DeleteCheckpoint(ctx context.Context, partit
 	return nil
 }
 
-func (ml *MemoryLeaserCheckpointer) Close() error {
+func (ml *memoryLeaserCheckpointer) Close() error {
 	return nil
 }
 

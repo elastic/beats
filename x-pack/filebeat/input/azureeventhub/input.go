@@ -1,9 +1,10 @@
-package azure
+package azureeventhub
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Azure/azure-event-hubs-go/v2/persist"
 	"sync"
 	"time"
 
@@ -21,7 +22,6 @@ import (
 var eventHubConnector = ";EntityPath="
 var expandEventListFromField = "records"
 
-
 type azureInput struct {
 	config       azureInputConfig
 	context      input.Context
@@ -35,7 +35,7 @@ type azureInput struct {
 }
 
 func init() {
-	err := input.Register("azure", NewInput)
+	err := input.Register("azureeventhub", NewInput)
 	if err != nil {
 		panic(err)
 	}
@@ -47,9 +47,9 @@ func NewInput(
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
-	config := defaultConfig()
+	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading kafka input config")
+		return nil, errors.Wrap(err, "reading azure eventhub input config")
 	}
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
@@ -97,7 +97,13 @@ func (a *azureInput) Run() {
 			defer a.log.Info("azure input worker has stopped.")
 			defer a.workerWg.Done()
 			defer a.workerCancel()
-			if err := a.run(); err != nil {
+			var err error
+			if a.config.EPHEnabled {
+				err = a.runWithEPH()
+			} else {
+				err = a.run()
+			}
+			if err != nil {
 				a.log.Error(err)
 				return
 			}
@@ -107,52 +113,53 @@ func (a *azureInput) Run() {
 
 // run runs the input
 func (a *azureInput) run() error {
-	ctx, cancel := context.WithCancel(a.workerCtx)
-	defer cancel()
-
-	leaserCheckpointer := NewMemoryLeaserCheckpointer(eph.DefaultLeaseDuration, new(SharedStore))
-	if leaserCheckpointer == nil {
+	persister, err := persist.NewFilePersister("C:\\Users\\Mariana\\Downloads\\New folder (2)\\Folder nou")
+	if err != nil {
 		// handle err
 	}
-	var opt eph.EventProcessorHostOption
-    if a.config.ConsumerGroup!= "" {
-    	opt = eph.WithConsumerGroup(a.config.ConsumerGroup)
-	}
-	_= opt
-	processor, err := eph.NewFromConnectionString(ctx, a.config.ConnectionString + eventHubConnector + a.config.EventHubName, leaserCheckpointer, leaserCheckpointer, opt)
+	hub, err := eventhub.NewHubFromConnectionString(a.config.ConnectionString+eventHubConnector+a.config.EventHubName, eventhub.HubWithOffsetPersistence(persister))
+	ctx, cancel := context.WithCancel(a.workerCtx)
+	defer cancel()
 	if err != nil {
 		return err
 	}
 
-	// register a message handler -- many can be registered
-	handlerID, err := processor.RegisterHandler(ctx,
-		func(c context.Context, e *eventhub.Event) error {
-			return a.processEvents(e.Data)
-		})
+	// listen to each partition of the Event Hub
+	runtimeInfo, err := hub.GetRuntimeInformation(ctx)
 	if err != nil {
 		return err
 	}
 
-	a.log.Info("handler id: %q is running\n", handlerID)
-
-	// unregister a handler to stop that handler from receiving events
-	// processor.UnregisterHandler(ctx, handleID)
-
-	// start handling messages from all of the partitions balancing across multiple consumers
-	err = processor.StartNonBlocking(ctx)
-	if err != nil {
-		return err
+	var receiveOption eventhub.ReceiveOption
+	if a.config.ConsumerGroup != "" {
+		receiveOption = eventhub.ReceiveWithConsumerGroup(a.config.ConsumerGroup)
+	}
+	for _, partitionID := range runtimeInfo.PartitionIDs {
+		// Start receiving messages
+		//
+		// Receive blocks while attempting to connect to hub, then runs until listenerHandle.Close() is called
+		// <- listenerHandle.Done() signals listener has stopped
+		// listenerHandle.Err() provides the last error the receiver encountered
+		listenerHandle, err := hub.Receive(
+			ctx,
+			partitionID,
+			func(c context.Context, event *eventhub.Event) error {
+				return a.processEvents(event.Data)
+			},
+			receiveOption)
+		_ = listenerHandle
+		if err != nil {
+			return err
+		}
 	}
 
 	// Wait for a signal to quit:
-	//signalChan := make(chan os.Signal, 1)
-	//signal.Notify(signalChan, os.Interrupt, os.Kill)
-	//<-signalChan
 
-	//err = processor.Close(ctx)
+	//err = hub.Close(context.Background())
 	//if err != nil {
-	//	return err
+	//	fmt.Println(err)
 	//}
+
 	return nil
 }
 
@@ -179,36 +186,44 @@ func (a *azureInput) processEvents(raw []byte) error {
 }
 
 func (a *azureInput) createEvents(message []byte) []beat.Event {
-	timestamp := time.Now()
+	// timestamp temp disabled as the event date is applied for now, will be replaced
+	//timestamp := time.Now()
 	var events []beat.Event
 	messages := a.parseMultipleMessages(message)
 	for _, msg := range messages {
-		event := beat.Event{
-			Timestamp: timestamp,
-			Fields: common.MapStr{
-				"message": msg,
-			},
+		for key, value := range msg {
+			event := beat.Event{
+				Timestamp: key,
+				Fields: common.MapStr{
+					"message": value,
+				},
+			}
+			events = append(events, event)
 		}
-		events = append(events, event)
-
 	}
 	return events
 }
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
+func (a *azureInput) parseMultipleMessages(bMessage []byte) []map[time.Time]string {
 	var obj map[string][]interface{}
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
 		a.log.Errorw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "error", err)
-		return []string{}
+		return []map[time.Time]string{}
 	}
-	var messages []string
+	var messages []map[time.Time]string
+	//var messages []string
 	if len(obj[expandEventListFromField]) > 0 {
 		for _, ms := range obj[expandEventListFromField] {
 			js, err := json.Marshal(ms)
 			if err == nil {
-				messages = append(messages, string(js))
+				// temporary implementation, retrieving the date in order to verify events are matching
+				timeInter := ms.(map[string]interface{})["time"]
+				date, _ := time.Parse(time.RFC3339, timeInter.(string))
+				item := make(map[time.Time]string)
+				item[date] = string(js)
+				messages = append(messages, item)
 			} else {
 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
 			}

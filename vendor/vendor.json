@@ -205,6 +205,15 @@
 			"versionExact": "v2.0.4"
 		},
 		{
+			"checksumSHA1": "R/SoUkPtdxXr3homJLuTqsObVcE=",
+			"origin": "github.com/Azure/azure-event-hubs-go/storage",
+			"path": "github.com/Azure/azure-event-hubs-go/v2/storage",
+			"revision": "4014b0acb37bfb4139fcf4ab12a1a248417843c7",
+			"revisionTime": "2019-10-25T17:10:56Z",
+			"version": "v2.0.4",
+			"versionExact": "v2.0.4"
+		},
+		{
 			"checksumSHA1": "GVp7N0DIODyCsll/xnTh+oCRC+0=",
 			"path": "github.com/Azure/azure-sdk-for-go/services/eventhub/mgmt/2017-04-01/eventhub",
 			"revision": "0820c0553d6c410603056869f7b0e52d61ce5bee",
@@ -221,6 +230,12 @@
 			"path": "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources",
 			"revision": "a629ae7873bf2a86184a8bc1b65e65e1ab532f57",
 			"revisionTime": "2019-08-05T17:15:50Z"
+		},
+		{
+			"checksumSHA1": "Ln7B+8ZONKNLC5ZnC2WzN/tsIiY=",
+			"path": "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2017-10-01/storage",
+			"revision": "e56ec3f142bfbc83f619f7e7eaf72abf03a3ef17",
+			"revisionTime": "2019-12-05T06:28:26Z"
 		},
 		{
 			"checksumSHA1": "jgptrp19Ok9B8BS04S8Xb3Y8Yl8=",
@@ -2732,6 +2747,12 @@
 			"revisionTime": "2017-06-15T03:49:14Z"
 		},
 		{
+			"checksumSHA1": "7ILP3kUOwO/6MV+bAdueAaRwvvY=",
+			"path": "github.com/mattn/go-ieproxy",
+			"revision": "7c0f6868bffe087073376feaab3ace57f2ef90b2",
+			"revisionTime": "2019-11-13T09:00:02Z"
+		},
+		{
 			"checksumSHA1": "U6lX43KDDlNOn+Z0Yyww+ZzHfFo=",
 			"path": "github.com/mattn/go-isatty",
 			"revision": "fc9e8d8ef48496124e79ae0df75490096eccf6fe",
@@ -3471,6 +3492,12 @@
 			"revisionTime": "2017-10-22T17:59:00Z",
 			"version": "release-branch.go1.9",
 			"versionExact": "release-branch.go1.9"
+		},
+		{
+			"checksumSHA1": "yNR4RokwDc+lYbCL/yOB3ENuKH8=",
+			"path": "golang.org/x/net/http/httpproxy",
+			"revision": "c0dbc17a35534bf2e581d7a942408dc936316da4",
+			"revisionTime": "2019-11-08T21:16:37Z"
 		},
 		{
 			"checksumSHA1": "TWcqN2+KUWtdqnu18rruwn14UEQ=",

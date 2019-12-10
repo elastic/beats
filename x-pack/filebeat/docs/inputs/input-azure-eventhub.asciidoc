@@ -1,0 +1,19 @@
+[role="xpack"]
+
+:type: azure-eventhub
+
+[id="{beatname_lc}-input-{type}"]
+=== Azure eventhub input
+
+++++
+<titleabbrev>Azure eventhub</titleabbrev>
+++++
+
+beta[]
+
+Use the `azureeventhub` input to read messages from an Azure event hub.
+
+Example configurations:
+
+==== Configuration options
+
