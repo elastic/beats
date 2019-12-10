@@ -35,7 +35,7 @@ func ESTimeBasedUUIDGenerator() IDGenerator {
 }
 
 var (
-	sequenceNumber uint32
+	sequenceNumber uint64
 	lastTimestamp  uint64
 	delta          uint64
 	once           sync.Once
@@ -60,7 +60,7 @@ func (*esTimeBasedUUIDGenerator) NextID() string {
 
 func initOnce() {
 	once.Do(func() {
-		sequenceNumber = rand.Uint32()
+		sequenceNumber = rand.Uint64()
 		m, err := getSecureMungedMACAddress()
 		if err != nil {
 			panic(err)
@@ -69,7 +69,7 @@ func initOnce() {
 	})
 }
 
-func nextIDData() (uint64, uint32) {
+func nextIDData() (uint64, uint64) {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -78,31 +78,35 @@ func nextIDData() (uint64, uint32) {
 	// We only use bottom 3 bytes for the sequence number.
 	s := sequenceNumber & 0xffffff
 
-	now := uint64(time.Now().UnixNano() / 1000)
-	lastTimestamp = timestamp(now, lastTimestamp)
+	lastTimestamp = timestamp(nowMS(), lastTimestamp, s)
 	return lastTimestamp, s
 }
 
 // timestamp returns a monotonically-increasing timestamp (in ms) to use,
 // while accounting for system clock going backwards (e.g. due to a DST change).
-func timestamp(clockTS, lastTS uint64) uint64 {
-	// Last timestamp has not been previously initialized.
-	if lastTS == 0 {
-		return clockTS
-	}
-
-	// Normally clockTimestamp should be later than lastTimestamp. If that's the case, we can simply
-	// return clockTimestamp as the new timestamp.
+func timestamp(clockTS, lastTS uint64, seq uint64) uint64 {
+	// Don't let timestamp go backwards, at least "on our watch" (while this process is running).  We are still vulnerable if we are
+	// shut down, clock goes backwards, and we restart... for this we randomize the sequenceNumber on init to decrease chance of
+	// collision.
+	newTS := lastTS
 	if clockTS > lastTS {
-		return clockTS
+		newTS = clockTS
 	}
 
-	// At this point, we know the system clock has gone backwards. So we increment the
-	// lastTimestamp by 1 (ms) and return it.
-	return lastTS + 1
+	// Always force the clock to increment whenever sequence number is 0, in case we have a long time-slip backwards.
+	if seq == 0 {
+		newTS++
+	}
+
+	return newTS
 }
 
-func packID(buf []byte, ts uint64, seq uint32) {
+func nowMS() uint64 {
+	now := time.Now()
+	return uint64((now.Unix() * 1000) + (int64(now.Nanosecond()) / 1000000))
+}
+
+func packID(buf []byte, ts uint64, seq uint64) {
 	//// We have auto-generated ids, which are usually used for append-only workloads.
 	//// So we try to optimize the order of bytes for indexing speed (by having quite
 	//// unique bytes close to the beginning of the ids so that sorting is fast) and
