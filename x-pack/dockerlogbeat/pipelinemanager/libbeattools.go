@@ -51,7 +51,7 @@ func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Log
 	}
 
 	info := beat.Info{
-		Beat:     "elastic-log-plugin",
+		Beat:     "elastic-logging-plugin",
 		Version:  "0",
 		Name:     name,
 		Hostname: hostname,
