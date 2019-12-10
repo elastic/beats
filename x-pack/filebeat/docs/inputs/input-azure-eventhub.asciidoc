@@ -11,7 +11,7 @@
 
 beta[]
 
-Use the `azureeventhub` input to read messages from an Azure event hub.
+Use the `azure-eventhub` input to read messages from an Azure event hub.
 
 Example configurations:
 

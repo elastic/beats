@@ -34,10 +34,14 @@ type azureInput struct {
 	processor    *eph.EventProcessorHost
 }
 
+const (
+	inputName = "azure-eventhub"
+)
+
 func init() {
-	err := input.Register("azureeventhub", NewInput)
+	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(err)
+		panic(errors.Wrapf(err, "failed to register %v input", inputName))
 	}
 }
 
@@ -76,14 +80,14 @@ func NewInput(
 
 	input := &azureInput{
 		config:       config,
-		log:          logp.NewLogger("azure input").With("connection string", config.ConnectionString),
+		log:          logp.NewLogger("azure eventhub input").With("connection string", config.ConnectionString),
 		outlet:       out,
 		context:      inputContext,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 	}
 
-	input.log.Info("Initialized azure input.")
+	input.log.Info("Initialized azure eventhub input.")
 	return input, nil
 }
 
@@ -93,8 +97,8 @@ func (a *azureInput) Run() {
 	a.workerOnce.Do(func() {
 		a.workerWg.Add(1)
 		go func() {
-			a.log.Info("azure input worker has started.")
-			defer a.log.Info("azure input worker has stopped.")
+			a.log.Info("azure eventhub input worker has started.")
+			defer a.log.Info("azure eventhub input worker has stopped.")
 			defer a.workerWg.Done()
 			defer a.workerCancel()
 			var err error
