@@ -8,7 +8,7 @@ set -euox pipefail
 if [ ! -d "$beat" ]; then
   echo "$beat does not exist"
   mkdir -p build
-  touch build/TEST-empty.xml && rm build/TEST-empty.xml
+  touch build/TEST-empty.out
   exit
 fi
 
