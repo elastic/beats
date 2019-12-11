@@ -1,27 +1,27 @@
 import os
 import sys
-import unittest
 import time
+import unittest
 from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-
 import metricbeat
 
 
-@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
-    COMPOSE_SERVICES = ['etcd']
+
+    COMPOSE_SERVICES = ['ceph']
+    FIELDS = ["ceph"]
 
     @parameterized.expand([
-        "leader",
-        "self",
-        "store",
-        "metrics",
+        "cluster_disk",
+        "cluster_health",
+        "monitor_health",
+        "pool_disk",
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_metricset(self, metricset):
+    def test_ceph(self, metricset):
         """
-        etcd metricset tests
+        ceph metricsets tests
         """
-        self.check_metricset("etcd", metricset, self.get_hosts(), ['etcd.' + metricset])
+        self.check_metricset("ceph", metricset, self.get_hosts(), self.FIELDS)
