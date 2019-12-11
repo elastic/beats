@@ -21,6 +21,10 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+
+	"github.com/elastic/beats/libbeat/common/fmtstr"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/journalbeat/checkpoint"
@@ -48,7 +52,7 @@ type Input struct {
 // New returns a new Inout
 func New(
 	c *common.Config,
-	pipeline beat.Pipeline,
+	b *beat.Beat,
 	done chan struct{},
 	states map[string]checkpoint.JournalState,
 ) (*Input, error) {
@@ -102,7 +106,7 @@ func New(
 		readers = append(readers, r)
 	}
 
-	inputProcessors, err := processorsForInput(config)
+	inputProcessors, err := processorsForInput(b.Info, config)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +117,7 @@ func New(
 		readers:    readers,
 		done:       done,
 		config:     config,
-		pipeline:   pipeline,
+		pipeline:   b.Publisher,
 		states:     states,
 		id:         id,
 		logger:     logger,
@@ -204,6 +208,39 @@ func (i *Input) Wait() {
 	i.Stop()
 }
 
-func processorsForInput(config Config) (*processors.Processors, error) {
-	return processors.New(config.Processors)
+func processorsForInput(beatInfo beat.Info, config Config) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor ordering is important:
+	// 1. Index configuration
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.List = append(procs.List, indexProcessor)
+	}
+
+	// 2. User processors
+	userProcessors, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	// Subtlety: it is important here that we append the individual elements of
+	// userProcessors, rather than userProcessors itself, even though
+	// userProcessors implements the processors.Processor interface. This is
+	// because the contents of what we return are later pulled out into a
+	// processing.group rather than a processors.Processors, and the two have
+	// different error semantics: processors.Processors aborts processing on
+	// any error, whereas processing.group only aborts on fatal errors. The
+	// latter is the most common behavior, and the one we are preserving here for
+	// backwards compatibility.
+	// We are unhappy about this and have plans to fix this inconsistency at a
+	// higher level, but for now we need to respect the existing semantics.
+	procs.List = append(procs.List, userProcessors.List...)
+
+	return procs, nil
 }

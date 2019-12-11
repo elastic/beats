@@ -123,7 +123,7 @@ func processorsForConfig(
 		if err != nil {
 			return nil, err
 		}
-		indexProcessor := &add_formatted_index.AddFormattedIndex{timestampFormat}
+		indexProcessor := add_formatted_index.New(timestampFormat)
 		procs.List = append(procs.List, indexProcessor)
 	}
 
