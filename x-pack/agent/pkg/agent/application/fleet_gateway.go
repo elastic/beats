@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -67,6 +68,8 @@ func (f *fleetGateway) worker() {
 		case <-f.scheduler.WaitTick():
 			resp, err := f.execute()
 			if err != nil {
+				fmt.Println(err)
+				// record
 				continue
 			}
 

@@ -90,6 +90,9 @@ func withGateway(agentID string, fn withGatewayFunc) func(t *testing.T) {
 			scheduler,
 		)
 
+		go gateway.Start()
+		defer gateway.Stop()
+
 		require.NoError(t, err)
 
 		fn(t, gateway, client, dispatcher, scheduler)
@@ -129,9 +132,6 @@ func TestFleetGateway(t *testing.T) {
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
 	) {
-		go gateway.Start()
-		defer gateway.Stop()
-
 		received := ackSeq(
 			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 				// TODO: assert no events
@@ -149,9 +149,51 @@ func TestFleetGateway(t *testing.T) {
 		<-received
 	}))
 
-	t.Run("Successfully connects and receives a series of actions", skip)
-	t.Run("Successfully connects and sends events back to fleet", skip)
+	t.Run("Successfully connects and receives a series of actions", withGateway(agentID, func(
+		t *testing.T,
+		gateway *fleetGateway,
+		client *testingClient,
+		dispatcher *testingDispatcher,
+		scheduler *scheduler.Stepper,
+	) {
+		received := ackSeq(
+			client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
+				// TODO: assert no events
+				resp := wrapStrToResp(http.StatusOK, `
+{
+    "actions": [
+        {
+            "type": "POLICY_CHANGE",
+            "id": "id1",
+            "data": {
+                "policy": {
+                    "id": "policy-id"
+                }
+            }
+        },
+        {
+            "type": "ANOTHER_ACTION",
+            "id": "id2"
+        }
+    ],
+    "success": true
+}
+`)
+				return resp, nil
+			}),
+			dispatcher.Answer(func(actions ...action) error {
+				require.Equal(t, 2, len(actions))
+				return nil
+			}),
+		)
+
+		scheduler.Next()
+		<-received
+	}))
+
 	t.Run("Periodically communicates with Fleet", skip)
+
+	t.Run("Successfully connects and sends events back to fleet", skip)
 }
 
 func skip(t *testing.T) {

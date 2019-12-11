@@ -9,17 +9,20 @@ import (
 	"net/http"
 	"net/url"
 
+	"time"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
-
 	reporting "github.com/elastic/beats/x-pack/agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
 )
+
+var durationTick = 30 * time.Second
 
 type apiClient interface {
 	Send(
@@ -39,6 +42,7 @@ type Managed struct {
 	api     apiClient
 	log     *logger.Logger
 	agentID string
+	gateway *fleetGateway
 }
 
 func newManaged(
@@ -83,6 +87,8 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
 
+	agentID := "secret"
+
 	emit := emitter(log, router)
 
 	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{})
@@ -99,8 +105,21 @@ func newManaged(
 		&handlerUnknown{},
 	)
 
+	gateway, err := newFleetGateway(
+		log,
+		&fleetGatewaySettings{Duration: durationTick},
+		agentID,
+		client,
+		actionDispatcher,
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Managed{
-		log: log,
+		log:     log,
+		agentID: agentID,
+		gateway: gateway,
 	}, nil
 }
 
@@ -108,6 +127,7 @@ func newManaged(
 func (m *Managed) Start() error {
 	m.log.Info("Agent is starting")
 	defer m.log.Info("Agent is stopped")
+	m.gateway.Start()
 	return nil
 }
 
@@ -131,4 +151,6 @@ func createFleetReporters(
 	}
 
 	return reporting.NewReporter(log, agentID, logR, fleetR), nil
+	m.gateway.Stop()
+	return nil
 }
