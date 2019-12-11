@@ -31,6 +31,8 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle/performance"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle/tablespace"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/sql"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/sql/query"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd/server"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/tomcat"

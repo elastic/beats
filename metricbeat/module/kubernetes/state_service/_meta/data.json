@@ -1,0 +1,50 @@
+{
+    "@timestamp": "2019-11-27T18:13:26.661Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "_doc",
+      "version": "8.0.0"
+    },
+    "metricset": {
+      "period": 10000,
+      "name": "state_service"
+    },
+    "service": {
+      "address": "kube-state-metrics.kube-system:8080",
+      "type": "kubernetes"
+    },
+    "kubernetes": {
+      "namespace": "istio-system",
+      "service": {
+        "name": "prometheus",
+        "created": "2019-11-25T21:00:49.000Z",
+        "cluster_ip": "10.98.33.120",
+        "type": "ClusterIP",
+        "labels": {
+          "label_release": "istio",
+          "label_app": "prometheus",
+          "label_operator_istio_io_component": "Prometheus",
+          "label_operator_istio_io_managed": "Reconcile",
+          "label_operator_istio_io_version": "1.4.0"
+        }
+      }
+    },
+    "ecs": {
+      "version": "1.2.0"
+    },
+    "host": {
+      "name": "minikube"
+    },
+    "agent": {
+      "ephemeral_id": "74d75916-9e2d-4d4c-8b5d-30dfdec1eb34",
+      "hostname": "minikube",
+      "id": "228b79ac-d00f-4272-89ea-867e9b07faa3",
+      "version": "8.0.0",
+      "type": "metricbeat"
+    },
+    "event": {
+      "dataset": "kubernetes.service",
+      "module": "kubernetes",
+      "duration": 45413119
+    }
+ }
