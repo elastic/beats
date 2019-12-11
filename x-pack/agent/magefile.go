@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -261,11 +262,55 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
+	packedBeats := []string{"filebeat", "metricbeat"}
+	requiredPackages := []string{
+		"darwin-amd64.tar.gz",
+		"linux-386.tar.gz",
+		"linux-amd64.tar.gz",
+		"windows-386.zip",
+		"windows-amd64.zip",
+	}
+
+	for _, b := range packedBeats {
+		pwd, err := filepath.Abs(filepath.Join("..", b))
+		if err != nil {
+			panic(err)
+		}
+
+		if requiredPackagesPresent(pwd, b, requiredPackages) {
+			continue
+		}
+
+		cmd := exec.Command("mage", "package")
+		cmd.Dir = pwd
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+
+		if err := cmd.Run(); err != nil {
+			panic(err)
+		}
+	}
+
+	// package agent
 	devtools.UseElasticBeatAgentPackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package)
+}
+
+func requiredPackagesPresent(basePath, beat string, requiredPackages []string) bool {
+	for _, pkg := range requiredPackages {
+		packageName := fmt.Sprintf("%s-%s", beat, pkg)
+		path := filepath.Join(basePath, "build", "package", packageName)
+
+		if _, err := os.Stat(path); err != nil {
+			fmt.Printf("Package '%s' does not exist on path: %s\n", packageName, path)
+			return false
+		}
+	}
+	return true
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
