@@ -19,20 +19,20 @@ const (
 )
 
 // Server is a server for handling communication between
-// beat and Elastic Agent
+// beat and Elastic Agent.
 type Server struct {
 	configChan chan<- map[string]interface{}
 }
 
-// NewConfigServer creates a new grpc configuration server for receiveing
-// configurations from Elastic Agent
+// NewConfigServer creates a new grpc configuration server for receiving
+// configurations from Elastic Agent.
 func NewConfigServer(configChan chan<- map[string]interface{}) *Server {
 	return &Server{
 		configChan: configChan,
 	}
 }
 
-// Config is a handler of a call made by agent pushing latest configuration
+// Config is a handler of a call made by agent pushing latest configuration.
 func (s *Server) Config(ctx context.Context, req *grpc.ConfigRequest) (*grpc.ConfigResponse, error) {
 	cfgString := req.GetConfig()
 

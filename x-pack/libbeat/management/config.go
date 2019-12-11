@@ -69,14 +69,14 @@ const ManagedConfigTemplate = `
 `
 
 const (
-	// ModeCentralManagement is a default CM mode, using existing processes
+	// ModeCentralManagement is a default CM mode, using existing processes.
 	ModeCentralManagement = "x-pack-cm"
 
-	// ModeFleet is a management mode where fleet is used to retrieve configurations
+	// ModeFleet is a management mode where fleet is used to retrieve configurations.
 	ModeFleet = "x-pack-fleet"
 )
 
-// Config for central management
+// Config for central management.
 type Config struct {
 	// true when enrolled
 	Enabled bool `config:"enabled" yaml:"enabled"`
@@ -124,7 +124,7 @@ type templateParams struct {
 	BeatName                  string
 }
 
-// OverwriteConfigFile will overwrite beat settings file with the enrolled template
+// OverwriteConfigFile will overwrite beat settings file with the enrolled template.
 func (c *Config) OverwriteConfigFile(wr io.Writer, beatName string) error {
 	t := template.Must(template.New("beat.management.yml").Parse(ManagedConfigTemplate))
 
