@@ -20,8 +20,9 @@ package cluster_disk
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type StatsCluster struct {
@@ -39,11 +40,11 @@ type DfRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventMapping(content []byte) (common.MapStr, error) {
 	var d DfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: ", err)
+		return nil, errors.Wrap(err, "could not get DFRequest data")
 	}
 
 	return common.MapStr{
@@ -56,5 +57,5 @@ func eventMapping(content []byte) common.MapStr {
 		"available": common.MapStr{
 			"bytes": d.Output.StatsCluster.TotalAvailBytes,
 		},
-	}
+	}, nil
 }

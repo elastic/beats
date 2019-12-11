@@ -2,7 +2,7 @@
   type: group
   description: >
     Cross-cluster replication stats
-  release: beta
+  release: ga
   fields:
     - name: leader
       type: group
@@ -26,11 +26,11 @@
           type: long
           description: >
             Number of the shard within the index
-        - name: operations_indexed
+        - name: operations_written
           type: long
           description: >
             Number of operations indexed (replicated) into the follower shard from the leader shard
-        - name: time_since_last_fetch.ms
+        - name: time_since_last_read.ms
           type: long
           description: >
             Time, in ms, since the follower last fetched from the leader

@@ -89,6 +89,7 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 		InsecureSkipVerify: insecure,
 		CipherSuites:       c.CipherSuites,
 		CurvePreferences:   c.CurvePreferences,
+		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,
 	}
 }

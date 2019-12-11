@@ -1,0 +1,202 @@
+{
+  "test_name": "IPFIX YAF basic with applabel",
+  "events": [
+    {
+      "Timestamp": "2016-12-25T13:03:38Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "bytes": 200,
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "packets": 2,
+          "port": 53
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-25T13:03:38Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "QMH_S2K9KdI",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.100",
+          "destination_transport_port": 53,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-25T13:03:38Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_attributes": 1,
+          "flow_end_milliseconds": "2016-12-25T12:58:35.819Z",
+          "flow_end_reason": 1,
+          "flow_start_milliseconds": "2016-12-25T12:58:35.818Z",
+          "ip_class_of_service": 0,
+          "octet_total_count": 132,
+          "packet_total_count": 2,
+          "protocol_identifier": 17,
+          "reverse_flow_attributes": 0,
+          "reverse_flow_delta_milliseconds": 1,
+          "reverse_ip_class_of_service": 0,
+          "reverse_octet_total_count": 200,
+          "reverse_packet_total_count": 2,
+          "reverse_vlan_id": 0,
+          "silk_app_label": 53,
+          "source_ipv4_address": "172.16.32.201",
+          "source_transport_port": 46086,
+          "type": "netflow_flow",
+          "vlan_id": 0
+        },
+        "network": {
+          "bytes": 332,
+          "community_id": "1:3NQ+f2IICsvUP3F8oQM9Js9FO6Q=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "packets": 4,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 132,
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "packets": 2,
+          "port": 46086
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2016-12-25T12:58:38Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "bytes": 92,
+          "ip": "172.16.32.215",
+          "locality": "private",
+          "packets": 2,
+          "port": 9997
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-25T12:58:38Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "YlvEOsG0NHc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.215",
+          "destination_transport_port": 9997,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-25T12:58:38Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_attributes": 0,
+          "flow_end_milliseconds": "2016-12-25T12:58:34.347Z",
+          "flow_end_reason": 3,
+          "flow_start_milliseconds": "2016-12-25T12:58:33.345Z",
+          "initial_tcp_flags": 194,
+          "ip_class_of_service": 2,
+          "octet_total_count": 172,
+          "packet_total_count": 4,
+          "protocol_identifier": 6,
+          "reverse_flow_attributes": 0,
+          "reverse_flow_delta_milliseconds": 0,
+          "reverse_initial_tcp_flags": 18,
+          "reverse_ip_class_of_service": 0,
+          "reverse_octet_total_count": 92,
+          "reverse_packet_total_count": 2,
+          "reverse_tcp_sequence_number": 3788795034,
+          "reverse_union_tcp_flags": 17,
+          "reverse_vlan_id": 0,
+          "silk_app_label": 0,
+          "source_ipv4_address": "172.16.32.100",
+          "source_transport_port": 63499,
+          "tcp_sequence_number": 340533701,
+          "type": "netflow_flow",
+          "union_tcp_flags": 17,
+          "vlan_id": 0
+        },
+        "network": {
+          "bytes": 264,
+          "community_id": "1:H1pHO7CtjIP7Q5Rljq4l4EH1wf4=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 172,
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "packets": 4,
+          "port": 63499
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2016-12-25T13:03:33Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_options",
+          "category": "network_traffic",
+          "created": "2016-12-25T13:03:33Z",
+          "kind": "event"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-12-25T13:03:33Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "options": {
+            "assembled_fragment_count": 0,
+            "dropped_packet_total_count": 0,
+            "expired_fragment_count": 0,
+            "exporter_ipv4_address": "172.16.32.201",
+            "exporting_process_id": 0,
+            "flow_table_flush_event_count": 39,
+            "flow_table_peak_count": 58,
+            "ignored_packet_total_count": 58,
+            "mean_flow_rate": 0,
+            "mean_packet_rate": 6,
+            "not_sent_packet_total_count": 0,
+            "packet_total_count": 1960
+          },
+          "scope": {
+            "exported_flow_record_total_count": 31,
+            "system_init_time_milliseconds": "2016-12-25T12:58:32Z"
+          },
+          "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

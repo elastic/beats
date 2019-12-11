@@ -8,7 +8,7 @@ Before modifying configuration settings, make sure you've completed the
 <<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.
 
-include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/shared-configuring.asciidoc[]
 
 The following topics describe how to configure {beatname_uc}:
 
@@ -16,9 +16,11 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-general-options>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
 * <<setup-kibana-endpoint>>
 * <<configuration-template>>
 * <<configuration-logging>>
@@ -35,43 +37,62 @@ include::./general-options.asciidoc[]
 
 :allplatforms:
 [role="xpack"]
-include::{libbeat-dir}/docs/queueconfig.asciidoc[]
+include::{libbeat-dir}/queueconfig.asciidoc[]
 :allplatforms!:
 
 [role="xpack"]
-include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+include::{libbeat-dir}/outputconfig.asciidoc[tag=shared-outputconfig]
+
+* <<elasticsearch-output>>
+* <<logstash-output>>
+* <<configure-cloud-id>>
 
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
+include::{libbeat-dir}/outputs/output-elasticsearch.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/outputs/output-logstash.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/outputs/output-cloud.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/shared-ilm.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 include::./filtering.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
+include::{libbeat-dir}/shared-geoip.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/setup-config.asciidoc[]
+include::{libbeat-dir}/shared-kibana-config.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
+include::{libbeat-dir}/setup-config.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 :standalone:
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
+include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :standalone!:
 
 :standalone:
 :allplatforms:
 [role="xpack"]
-include::{libbeat-dir}/docs/yaml.asciidoc[]
+include::{libbeat-dir}/yaml.asciidoc[]
 :standalone!:
 :allplatforms!:
 
 [role="xpack"]
-include::{libbeat-dir}/docs/regexp.asciidoc[]
+include::{libbeat-dir}/regexp.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/reference-yml.asciidoc[]
+include::{libbeat-dir}/reference-yml.asciidoc[]

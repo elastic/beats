@@ -44,23 +44,37 @@ func UseCommunityBeatPackaging() {
 // that is purely OSS under Apache 2.0 and one that is licensed under the
 // Elastic License and may contain additional X-Pack features.
 func UseElasticBeatPackaging() {
-	MustUsePackaging("elastic_beat", packageSpecFile)
+	UseElasticBeatOSSPackaging()
+	MustUsePackaging("elastic_beat_xpack_separate_binaries", packageSpecFile)
 }
 
-// UseElasticBeatWithoutXPackPackaging configures the package target to build packages for
-// an Elastic Beat. This means it will generate two sets of packages -- one
-// that is purely OSS under Apache 2.0 and one that is licensed under the
-// Elastic License and may contain additional X-Pack features.
+// UseElasticBeatOSSPackaging configures the package target to build OSS
+// packages.
+func UseElasticBeatOSSPackaging() {
+	MustUsePackaging("elastic_beat_oss", packageSpecFile)
+}
+
+// UseElasticBeatXPackPackaging configures the package target to build Elastic
+// licensed (X-Pack) packages.
+func UseElasticBeatXPackPackaging() {
+	MustUsePackaging("elastic_beat_xpack", packageSpecFile)
+}
+
+// UseElasticBeatWithoutXPackPackaging configures the package target to build
+// packages for an Elastic Beat. This means it will generate two sets of
+// packages -- one that is purely OSS under Apache 2.0 and one that is licensed
+// under the Elastic License and may contain additional X-Pack features.
 //
 // NOTE: This method doesn't use binaries produced in the x-pack folder, this is
-// a temporary packaging target for projects that depends on beat but do have concrete x-pack
-// binaries.
+// a temporary packaging target for projects that depends on beat but do have
+// concrete x-pack binaries.
 func UseElasticBeatWithoutXPackPackaging() {
-	MustUsePackaging("elastic_beat_without_xpack", packageSpecFile)
+	UseElasticBeatOSSPackaging()
+	UseElasticBeatXPackPackaging()
 }
 
-// MustUsePackaging will load a named spec from a named file, if any errors occurs when loading
-// the specs it will panic.
+// MustUsePackaging will load a named spec from a named file, if any errors
+// occurs when loading the specs it will panic.
 //
 // NOTE: we assume that specFile is relative to the beatsDir.
 func MustUsePackaging(specName, specFile string) {
@@ -103,11 +117,11 @@ func LoadNamedSpec(name string, files ...string) error {
 	}
 
 	log.Printf("%v package spec loaded from %v", name, files)
-	Packages = packages
+	Packages = append(Packages, packages...)
 	return nil
 }
 
-// LoadSpecs loads the packaging specifications from the specified YAML file.
+// LoadSpecs loads the packaging specifications from the specified YAML files.
 func LoadSpecs(files ...string) (map[string][]OSPackageArgs, error) {
 	var data [][]byte
 	for _, file := range files {

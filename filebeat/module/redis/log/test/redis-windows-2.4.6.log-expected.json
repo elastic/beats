@@ -1,0 +1,342 @@
+[
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 0,
+        "message": "Server started, Redis version 2.4.6",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 61,
+        "message": "Open data file dump.rdb: No such file or directory",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 137,
+        "message": "The server is now ready to accept connections on port 6379",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 221,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 299,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 377,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 455,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 533,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 611,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 689,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 767,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 845,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 923,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1001,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1079,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1157,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1235,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1313,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1391,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1469,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1547,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1625,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1703,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1781,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1859,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1937,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2015,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2093,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2171,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2249,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2327,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2405,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2483,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 2561,
+        "message": "0 clients connected (0 slaves), 1179968 bytes in use",
+        "service.type": "redis"
+    }
+]

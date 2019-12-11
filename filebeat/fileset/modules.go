@@ -26,17 +26,16 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
-	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
 var availableMLModules = map[string]string{
-	"apache2": "access",
-	"nginx":   "access",
+	"apache": "access",
+	"nginx":  "access",
 }
 
 type ModuleRegistry struct {
@@ -55,6 +54,12 @@ func newModuleRegistry(modulesPath string,
 	for _, mcfg := range moduleConfigs {
 		if mcfg.Enabled != nil && (*mcfg.Enabled) == false {
 			continue
+		}
+
+		// Look for moved modules
+		if module, moved := getCurrentModuleName(modulesPath, mcfg.Module); moved {
+			logp.Warn("Using old name '%s' for module '%s', please update your configuration", mcfg.Module, module)
+			mcfg.Module = module
 		}
 
 		reg.registry[mcfg.Module] = map[string]*Fileset{}
@@ -127,20 +132,25 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatVersion string, init 
 			return nil, err
 		}
 	}
-	mcfgs := []*ModuleConfig{}
-	for _, moduleConfig := range moduleConfigs {
-		mcfg, err := mcfgFromConfig(moduleConfig)
+	var mcfgs []*ModuleConfig
+	for _, cfg := range moduleConfigs {
+		cfg, err = mergePathDefaults(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("Error unpacking module config: %v", err)
+			return nil, err
 		}
-		mcfgs = append(mcfgs, mcfg)
+
+		moduleConfig, err := mcfgFromConfig(cfg)
+		if err != nil {
+			return nil, errors.Wrap(err, "error unpacking module config")
+		}
+		mcfgs = append(mcfgs, moduleConfig)
 	}
 
 	mcfgs, err = appendWithoutDuplicates(mcfgs, modulesCLIList)
-
 	if err != nil {
 		return nil, err
 	}
+
 	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatVersion)
 }
 
@@ -161,7 +171,7 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
 	for name, filesetConfig := range dict {
-		if name == "module" || name == "enabled" {
+		if name == "module" || name == "enabled" || name == "path" {
 			continue
 		}
 
@@ -180,7 +190,26 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 	return &mcfg, nil
 }
 
+func getCurrentModuleName(modulePath, module string) (string, bool) {
+	moduleConfigPath := filepath.Join(modulePath, module, "module.yml")
+	d, err := ioutil.ReadFile(moduleConfigPath)
+	if err != nil {
+		return module, false
+	}
+
+	var moduleConfig struct {
+		MovedTo string `yaml:"movedTo"`
+	}
+	err = yaml.Unmarshal(d, &moduleConfig)
+	if err == nil && moduleConfig.MovedTo != "" {
+		return moduleConfig.MovedTo, true
+	}
+
+	return module, false
+}
+
 func getModuleFilesets(modulePath, module string) ([]string, error) {
+	module, _ = getCurrentModuleName(modulePath, module)
 	fileInfos, err := ioutil.ReadDir(filepath.Join(modulePath, module))
 	if err != nil {
 		return []string{}, err
@@ -350,63 +379,6 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 		return errors.New(errorMsg)
 	}
 
-	return nil
-}
-
-// LoadML loads the machine-learning configurations into Elasticsearch, if X-Pack is available
-func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
-	haveXpack, err := mlimporter.HaveXpackML(esClient)
-	if err != nil {
-		return errors.Errorf("error checking if xpack is available: %v", err)
-	}
-	if !haveXpack {
-		logp.Warn("X-Pack Machine Learning is not enabled")
-		return nil
-	}
-
-	for module, filesets := range reg.registry {
-		for name, fileset := range filesets {
-			for _, mlConfig := range fileset.GetMLConfigs() {
-				err := mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
-				if err != nil {
-					return errors.Errorf("error loading ML config from %s/%s: %v", module, name, err)
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-// SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if X-Pack is available
-func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana.Client) error {
-	haveXpack, err := mlimporter.HaveXpackML(esClient)
-	if err != nil {
-		return errors.Errorf("Error checking if xpack is available: %v", err)
-	}
-	if !haveXpack {
-		logp.Warn("X-Pack Machine Learning is not enabled")
-		return nil
-	}
-
-	modules := make(map[string]string)
-	if reg.Empty() {
-		modules = availableMLModules
-	} else {
-		for _, module := range reg.ModuleNames() {
-			if fileset, ok := availableMLModules[module]; ok {
-				modules[module] = fileset
-			}
-		}
-	}
-
-	for module, fileset := range modules {
-		prefix := fmt.Sprintf("filebeat-%s-%s-", module, fileset)
-		err := mlimporter.SetupModule(kibanaClient, module, prefix)
-		if err != nil {
-			return errors.Errorf("Error setting up ML for %s: %v", module, err)
-		}
-	}
 	return nil
 }
 

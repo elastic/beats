@@ -1,0 +1,23 @@
+[
+    {
+        "@timestamp": "2018-04-26T18:50:32.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 100000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 0,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 3.3e-05,
+        "mysql.slowlog.query": "SELECT intcol1,charcol1 FROM t1;",
+        "mysql.slowlog.rows_examined": 101,
+        "mysql.slowlog.rows_sent": 101,
+        "mysql.thread_id": 5,
+        "service.type": "mysql",
+        "source.ip": "172.17.0.11",
+        "user.name": "root"
+    }
+]

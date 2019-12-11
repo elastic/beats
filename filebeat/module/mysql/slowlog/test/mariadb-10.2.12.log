@@ -1,0 +1,23 @@
+mysqld, Version: 10.2.12-MariaDB-10.2.12+maria~jessie-log (mariadb.org binary distribution). started with:
+Tcp port: 0  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+mysqld, Version: 10.2.12-MariaDB-10.2.12+maria~jessie-log (mariadb.org binary distribution). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+# Time: 190117 16:04:03
+# User@Host: root[root] @ localhost []
+# Thread_id: 8  Schema:   QC_hit: No
+# Query_time: 2.000227  Lock_time: 0.000000  Rows_sent: 1  Rows_examined: 0
+# Rows_affected: 0
+SET timestamp=1547741043;
+select sleep(2)
+AS foo;
+# Time: 190117 16:04:18
+# User@Host: root[root] @  [192.168.0.10]
+# Thread_id: 25844  Schema: blah  QC_hit: No
+# Query_time: 178.306017  Lock_time: 0.000000  Rows_sent: 0  Rows_examined: 53022772
+# Rows_affected: 3062
+# Full_scan: Yes  Full_join: No  Tmp_table: Yes  Tmp_table_on_disk: No
+# Filesort: Yes  Filesort_on_disk: No  Merge_passes: 0  Priority_queue: No
+SET timestamp=1547741058;
+call PROC('blah');

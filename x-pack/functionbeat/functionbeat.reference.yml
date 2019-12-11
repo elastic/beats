@@ -11,6 +11,8 @@
 # Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #
+# Configure which S3 endpoint should we use.
+functionbeat.provider.aws.endpoint: "s3.amazonaws.com"
 # Configure which S3 bucket we should upload the lambda artifact.
 functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
 
@@ -34,8 +36,23 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -53,13 +70,158 @@ functionbeat.provider.aws.functions:
     #  - dissect:
     #      tokenizer: "%{key1} %{key2}"
 
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
   # Create a function that accepts events from SQS queues.
   - name: sqs
     enabled: false
     type: sqs
 
     # Description of the method to help identify them when you run multiples functions.
-    description: "lambda function for sqs events"
+    description: "lambda function for SQS events"
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # List of SQS queues.
+    triggers:
+        # Arn for the SQS queue.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+    # Define custom processors for this function.
+    #processors:
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+    #
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+  # Create a function that accepts events from Kinesis streams.
+  - name: kinesis
+    enabled: false
+    type: kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Kinesis events"
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  This example extracts the raw data from events.
+    #  - decode_base64_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decompress_gzip_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+  # Create a function that accepts Cloudwatch logs from Kinesis streams.
+  - name: cloudwatch-logs-kinesis
+    enabled: false
+    type: cloudwatch_logs_kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Cloudwatch logs in Kinesis events"
+
+    # Set base64_encoded if your data is base64 encoded.
+    #base64_encoded: false
+
+    # Set compressed if your data is compressed with gzip.
+    #compressed: true
 
     # Concurrency, is the reserved number of instances for that function.
     # Default is 5.
@@ -74,15 +236,26 @@ functionbeat.provider.aws.functions:
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
 
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
     # combination of these.
     #fields:
     #  env: staging
-
-    # List of cloudwatch log group registered to that function.
-    triggers:
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
 
     # Define custom processors for this function.
     #processors:
@@ -92,6 +265,22 @@ functionbeat.provider.aws.functions:
     #      max_depth: 1
     #      target: ""
     #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
 
 #================================ General ======================================
 
@@ -134,7 +323,7 @@ functionbeat.provider.aws.functions:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -177,7 +366,7 @@ functionbeat.provider.aws.functions:
       # Sets the write buffer size.
       #buffer_size: 1MiB
 
-      # Maximum duration after which events are flushed, if the write buffer
+      # Maximum duration after which events are flushed if the write buffer
       # is not full yet. The default value is 1s.
       #flush.timeout: 1s
 
@@ -191,7 +380,7 @@ functionbeat.provider.aws.functions:
       #codec: cbor
     #read:
       # Reader flush timeout, waiting for more events to become available, so
-      # to fill a complete batch, as required by the outputs.
+      # to fill a complete batch as required by the outputs.
       # If flush_timeout is 0, all available events are forwarded to the
       # outputs immediately.
       # The default value is 0s.
@@ -210,7 +399,7 @@ functionbeat.provider.aws.functions:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -273,6 +462,7 @@ functionbeat.provider.aws.functions:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -300,7 +490,7 @@ functionbeat.provider.aws.functions:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -310,10 +500,53 @@ functionbeat.provider.aws.functions:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
+# The following example copies the value of message to message_copied
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: message_copied
+#    fail_on_error: true
+#    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using functionbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Functionbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -342,15 +575,18 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Configure escaping html symbols in strings.
-  #escape_html: true
+  # Configure escaping HTML symbols in strings.
+  #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -361,20 +597,25 @@ output.elasticsearch:
   # Optional index name. The default is "functionbeat" plus date
   # and generates [functionbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "functionbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "functionbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: "/elasticsearch"
 
   # Custom HTTP headers to add to each request
   #headers:
   #  X-My-Header: Contents of the header
 
-  # Proxy server url
+  # Proxy server URL
   #proxy_url: http://proxy:3128
+
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
 
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
@@ -396,45 +637,43 @@ output.elasticsearch:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Configure http request timeout before failing a request to Elasticsearch.
+  # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
+  # and certificates will be accepted. In this mode, SSL-based connections are
   # susceptible to man-in-the-middle attacks. Use only for testing. Default is
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -450,8 +689,8 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
-  # Configure escaping html symbols in strings.
-  #escape_html: true
+  # Configure escaping HTML symbols in strings.
+  #escape_html: false
 
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
@@ -460,7 +699,7 @@ output.elasticsearch:
   # Not yet supported for async connections (i.e. with the "pipelining" option set)
   #ttl: 30s
 
-  # Optional load balance the events between the Logstash hosts. Default is false.
+  # Optionally load-balance events between Logstash hosts. Default is false.
   #loadbalance: false
 
   # Number of batches to be sent asynchronously to Logstash while processing
@@ -493,7 +732,7 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
@@ -502,7 +741,7 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
@@ -513,7 +752,7 @@ output.elasticsearch:
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
   # Optional passphrase for decrypting the Certificate Key.
@@ -522,7 +761,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -544,343 +783,28 @@ output.elasticsearch:
   # timing out. The default is 30s.
   #timeout: 30s
 
-#------------------------------- Kafka output ----------------------------------
-#output.kafka:
-  # Boolean flag to enable or disable the output module.
-  #enabled: true
-
-  # The list of Kafka broker addresses from where to fetch the cluster metadata.
-  # The cluster metadata contain the actual Kafka brokers events are published
-  # to.
-  #hosts: ["localhost:9092"]
-
-  # The Kafka topic used for produced events. The setting can be a format string
-  # using any event field. To set the topic from document type use `%{[type]}`.
-  #topic: beats
-
-  # The Kafka event key setting. Use format string to create unique event key.
-  # By default no event key will be generated.
-  #key: ''
-
-  # The Kafka event partitioning strategy. Default hashing strategy is `hash`
-  # using the `output.kafka.key` setting or randomly distributes events if
-  # `output.kafka.key` is not configured.
-  #partition.hash:
-    # If enabled, events will only be published to partitions with reachable
-    # leaders. Default is false.
-    #reachable_only: false
-
-    # Configure alternative event field names used to compute the hash value.
-    # If empty `output.kafka.key` setting will be used.
-    # Default value is empty list.
-    #hash: []
-
-  # Authentication details. Password is required if username is set.
-  #username: ''
-  #password: ''
-
-  # Kafka version functionbeat is assumed to run against. Defaults to the "1.0.0".
-  #version: '1.0.0'
-
-  # Configure JSON encoding
-  #codec.json:
-    # Pretty print json event
-    #pretty: false
-
-    # Configure escaping html symbols in strings.
-    #escape_html: true
-
-  # Metadata update configuration. Metadata do contain leader information
-  # deciding which broker to use when publishing.
-  #metadata:
-    # Max metadata request retry attempts when cluster is in middle of leader
-    # election. Defaults to 3 retries.
-    #retry.max: 3
-
-    # Waiting time between retries during leader elections. Default is 250ms.
-    #retry.backoff: 250ms
-
-    # Refresh metadata interval. Defaults to every 10 minutes.
-    #refresh_frequency: 10m
-
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
-
-  # The number of times to retry publishing an event after a publishing failure.
-  # After the specified number of retries, the events are typically dropped.
-  # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
-  # all events are published.  Set max_retries to a value less than 0 to retry
-  # until all events are published. The default is 3.
-  #max_retries: 3
-
-  # The maximum number of events to bulk in a single Kafka request. The default
-  # is 2048.
-  #bulk_max_size: 2048
-
-  # The number of seconds to wait for responses from the Kafka brokers before
-  # timing out. The default is 30s.
-  #timeout: 30s
-
-  # The maximum duration a broker will wait for number of required ACKs. The
-  # default is 10s.
-  #broker_timeout: 10s
-
-  # The number of messages buffered for each Kafka broker. The default is 256.
-  #channel_buffer_size: 256
-
-  # The keep-alive period for an active network connection. If 0s, keep-alives
-  # are disabled. The default is 0 seconds.
-  #keep_alive: 0
-
-  # Sets the output compression codec. Must be one of none, snappy and gzip. The
-  # default is gzip.
-  #compression: gzip
-
-  # Set the compression level. Currently only gzip provides a compression level
-  # between 0 and 9. The default value is chosen by the compression algorithm.
-  #compression_level: 4
-
-  # The maximum permitted size of JSON-encoded messages. Bigger messages will be
-  # dropped. The default value is 1000000 (bytes). This value should be equal to
-  # or less than the broker's message.max.bytes.
-  #max_message_bytes: 1000000
-
-  # The ACK reliability level required from broker. 0=no response, 1=wait for
-  # local commit, -1=wait for all replicas to commit. The default is 1.  Note:
-  # If set to 0, no ACKs are returned by Kafka. Messages might be lost silently
-  # on error.
-  #required_acks: 1
-
-  # The configurable ClientID used for logging, debugging, and auditing
-  # purposes.  The default is "beats".
-  #client_id: beats
-
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
-  #ssl.enabled: true
-
-  # Optional SSL configuration options. SSL is off by default.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
-  #ssl.verification_mode: full
-
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
-
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
-
-  # Optional passphrase for decrypting the Certificate Key.
-  #ssl.key_passphrase: ''
-
-  # Configure cipher suites to be used for SSL connections
-  #ssl.cipher_suites: []
-
-  # Configure curve types for ECDHE based cipher suites
-  #ssl.curve_types: []
-
-  # Configure what types of renegotiation are supported. Valid options are
-  # never, once, and freely. Default is never.
-  #ssl.renegotiation: never
-
-#------------------------------- Redis output ----------------------------------
-#output.redis:
-  # Boolean flag to enable or disable the output module.
-  #enabled: true
-
-  # Configure JSON encoding
-  #codec.json:
-    # Pretty print json event
-    #pretty: false
-
-    # Configure escaping html symbols in strings.
-    #escape_html: true
-
-  # The list of Redis servers to connect to. If load balancing is enabled, the
-  # events are distributed to the servers in the list. If one server becomes
-  # unreachable, the events are distributed to the reachable servers only.
-  #hosts: ["localhost:6379"]
-
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
-
-  # The name of the Redis list or channel the events are published to. The
-  # default is functionbeat.
-  #key: functionbeat
-
-  # The password to authenticate with. The default is no authentication.
-  #password:
-
-  # The Redis database number where the events are published. The default is 0.
-  #db: 0
-
-  # The Redis data type to use for publishing events. If the data type is list,
-  # the Redis RPUSH command is used. If the data type is channel, the Redis
-  # PUBLISH command is used. The default value is list.
-  #datatype: list
-
-  # The number of workers to use for each host configured to publish events to
-  # Redis. Use this setting along with the loadbalance option. For example, if
-  # you have 2 hosts and 3 workers, in total 6 workers are started (3 for each
-  # host).
-  #worker: 1
-
-  # If set to true and multiple hosts or workers are configured, the output
-  # plugin load balances published events onto all Redis hosts. If set to false,
-  # the output plugin sends all events to only one host (determined at random)
-  # and will switch to another host if the currently selected one becomes
-  # unreachable. The default value is true.
-  #loadbalance: true
-
-  # The Redis connection timeout in seconds. The default is 5 seconds.
-  #timeout: 5s
-
-  # The number of times to retry publishing an event after a publishing failure.
-  # After the specified number of retries, the events are typically dropped.
-  # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
-  # all events are published. Set max_retries to a value less than 0 to retry
-  # until all events are published. The default is 3.
-  #max_retries: 3
-
-  # The number of seconds to wait before trying to reconnect to Redis
-  # after a network error. After waiting backoff.init seconds, the Beat
-  # tries to reconnect. If the attempt fails, the backoff timer is increased
-  # exponentially up to backoff.max. After a successful connection, the backoff
-  # timer is reset. The default is 1s.
-  #backoff.init: 1s
-
-  # The maximum number of seconds to wait before attempting to connect to
-  # Redis after a network error. The default is 60s.
-  #backoff.max: 60s
-
-  # The maximum number of events to bulk in a single Redis request or pipeline.
-  # The default is 2048.
-  #bulk_max_size: 2048
-
-  # The URL of the SOCKS5 proxy to use when connecting to the Redis servers. The
-  # value must be a URL with a scheme of socks5://.
-  #proxy_url:
-
-  # This option determines whether Redis hostnames are resolved locally when
-  # using a proxy. The default value is false, which means that name resolution
-  # occurs on the proxy server.
-  #proxy_use_local_resolver: false
-
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
-  #ssl.enabled: true
-
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
-  #ssl.verification_mode: full
-
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
-
-  # Optional SSL configuration options. SSL is off by default.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
-
-  # Optional passphrase for decrypting the Certificate Key.
-  #ssl.key_passphrase: ''
-
-  # Configure cipher suites to be used for SSL connections
-  #ssl.cipher_suites: []
-
-  # Configure curve types for ECDHE based cipher suites
-  #ssl.curve_types: []
-
-  # Configure what types of renegotiation are supported. Valid options are
-  # never, once, and freely. Default is never.
-  #ssl.renegotiation: never
-
-#------------------------------- File output -----------------------------------
-#output.file:
-  # Boolean flag to enable or disable the output module.
-  #enabled: true
-
-  # Configure JSON encoding
-  #codec.json:
-    # Pretty print json event
-    #pretty: false
-
-    # Configure escaping html symbols in strings.
-    #escape_html: true
-
-  # Path to the directory where to save the generated files. The option is
-  # mandatory.
-  #path: "/tmp/functionbeat"
-
-  # Name of the generated files. The default is `functionbeat` and it generates
-  # files: `functionbeat`, `functionbeat.1`, `functionbeat.2`, etc.
-  #filename: functionbeat
-
-  # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every functionbeat restart, the files are rotated. The default value is 10240
-  # kB.
-  #rotate_every_kb: 10000
-
-  # Maximum number of files under path. When this number of files is reached,
-  # the oldest file is deleted and the rest are shifted from last to first. The
-  # default is 7 files.
-  #number_of_files: 7
-
-  # Permissions to use for file creation. The default is 0600.
-  #permissions: 0600
-
-
-#----------------------------- Console output ---------------------------------
-#output.console:
-  # Boolean flag to enable or disable the output module.
-  #enabled: true
-
-  # Configure JSON encoding
-  #codec.json:
-    # Pretty print json event
-    #pretty: false
-
-    # Configure escaping html symbols in strings.
-    #escape_html: true
-
 #================================= Paths ======================================
 
-# The home path for the functionbeat installation. This is the default base path
+# The home path for the Functionbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the functionbeat installation. This is the default
+# The configuration path for the Functionbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the functionbeat installation. This is the default base path
-# for all the files in which functionbeat needs to store its data. If not set by a
+# The data path for the Functionbeat installation. This is the default base path
+# for all the files in which Functionbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a functionbeat installation. This is the default location for
+# The logs path for a Functionbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -943,14 +867,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "functionbeat-%{[beat.version]}"
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.name: "functionbeat-%{[beat.version]}"
+# Template name. By default the template name is "functionbeat-%{[agent.version]}"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.name: "functionbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.pattern: "functionbeat-%{[beat.version]}-*"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.pattern: "functionbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -962,10 +886,10 @@ output.elasticsearch:
 #- name: field_name
 #  type: field_type
 
-# Enable json template loading. If this is enabled, the fields.yml is ignored.
+# Enable JSON template loading. If this is enabled, the fields.yml is ignored.
 #setup.template.json.enabled: false
 
-# Path to the json template file
+# Path to the JSON template file
 #setup.template.json.path: "${path.config}/template.json"
 
 # Name under which the template is stored in Elasticsearch
@@ -990,6 +914,41 @@ setup.template.settings:
   #_source:
     #enabled: false
 
+#============================== Setup ILM =====================================
+
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
+
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
+#setup.ilm.enabled: auto
+
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'functionbeat-%{[agent.version]}'.
+#setup.ilm.rollover_alias: "functionbeat"
+
+# Set the rollover index pattern. The default is "%{now/d}-000001".
+#setup.ilm.pattern: "{now/d}-000001"
+
+# Set the lifecycle policy name. The default policy name is
+# 'functionbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -1007,7 +966,7 @@ setup.kibana:
   #username: "elastic"
   #password: "changeme"
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: ""
 
   # Use SSL settings for HTTPS. Default is true.
@@ -1019,27 +978,27 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
 
@@ -1057,13 +1016,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, functionbeat periodically logs its internal metrics that have changed
+# If enabled, Functionbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1098,27 +1060,38 @@ logging.files:
   # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
-  # unix epoch. Defaults to disabled.
+  # Unix epoch. Defaults to disabled.
   #interval: 0
 
-# Set to true to log messages in json format.
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
+
+# Set to true to log messages in JSON format.
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# functionbeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== X-Pack Monitoring ===============================
+# Functionbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Functionbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
@@ -1129,12 +1102,15 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -1166,7 +1142,7 @@ logging.files:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # Configure HTTP request timeout before failing an request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -1178,27 +1154,27 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1217,13 +1193,27 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
 
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
+
 #============================= Process Security ================================
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: false

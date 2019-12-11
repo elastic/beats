@@ -1,0 +1,45 @@
+[
+    {
+        "@timestamp": "1986-04-25T19:23:45.101-02:00",
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "rmbkmonitor04",
+        "input.type": "log",
+        "log.file.path": "tz-offset.log",
+        "log.offset": 0,
+        "message": "shutting down for system halt",
+        "process.name": "shutdown",
+        "process.pid": 2649,
+        "service.type": "system"
+    },
+    {
+        "@timestamp": "1986-04-25T19:23:45.388-02:00",
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "rmbkmonitor04",
+        "input.type": "log",
+        "log.file.path": "tz-offset.log",
+        "log.offset": 89,
+        "message": "constraint_0_power_limit_uw exceeded.",
+        "process.name": "thermald",
+        "service.type": "system"
+    },
+    {
+        "@timestamp": "2019-06-14T08:40:20.912-02:00",
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "localhost",
+        "input.type": "log",
+        "log.file.path": "tz-offset.log",
+        "log.offset": 184,
+        "message": "pam_unix(sudo-i:session): session opened for user root by userauth3(uid=0)",
+        "process.name": "sudo",
+        "service.type": "system"
+    }
+]

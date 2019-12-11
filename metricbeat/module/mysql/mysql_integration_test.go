@@ -29,9 +29,9 @@ import (
 )
 
 func TestNewDB(t *testing.T) {
-	compose.EnsureUp(t, "mysql")
+	service := compose.EnsureUp(t, "mysql")
 
-	db, err := NewDB(GetMySQLEnvDSN())
+	db, err := NewDB(GetMySQLEnvDSN(service.Host()))
 	assert.NoError(t, err)
 
 	err = db.Ping()

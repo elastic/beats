@@ -13,12 +13,13 @@ to the remote system. So, for example, the Redis module provides an `info`
 metricset that collects information and statistics from Redis by running the
 http://redis.io/commands/INFO[`INFO`] command and parsing the returned result.
 
-image:./images/module-overview.png[Modules and metricsets]
+image::./images/module-overview.png[Modules and metricsets]
 
 Likewise, the MySQL module provides a `status` metricset that collects data
 from MySQL by running a http://dev.mysql.com/doc/refman/5.7/en/show-status.html[`SHOW GLOBAL STATUS`]
 SQL query. Metricsets make it easier for you by grouping sets of related metrics together
-in a single request returned by the remote server.
+in a single request returned by the remote server. Most modules have default metricsets
+ that are enabled if there are no user-enabled metricsets.
 
 Metricbeat retrieves metrics by periodically interrogating the host system based
 on the `period` value that you specify when you configure the module. Because multiple
@@ -46,12 +47,10 @@ For more about the benefits of using Metricbeat, see <<key-features>>.
 Every event sent by Metricbeat has the same basic structure. It contains the following fields:
 
 *`@timestamp`*:: Time when the event was captured
-*`beat.hostname`*:: Hostname of the server on which the Beat is running
-*`beat.name`*:: Name given to the Beat
-*`metricset.module`*:: Name of the module that the data is from
-*`metricset.name`*:: Name of the metricset that the data is from
-*`metricset.rtt`*:: Round trip time of the request in microseconds
-*`type`*:: This is always "metricsets"
+*`host.hostname`*:: Hostname of the server on which the Beat is running
+*`agent.type`*:: Name given to the Beat
+*`event.module`*:: Name of the module that the data is from
+*`event.dataset`*:: Name of the module that the data is from
 
 For example:
 
@@ -59,14 +58,15 @@ For example:
 ----
 {
   "@timestamp": "2016-06-22T22:05:53.291Z",
-  "beat": {
-    "hostname": "host.example.com",
-    "name": "host.example.com"
+  "agent": {
+    "type": "metricbeat"
   },
-  "metricset": {
-    "module": "system",
-    "name": "process",
-    "rtt": 7419
+  "host": {
+     "hostname": "host.example.com",
+   },
+  "event": {
+    "dataset": "system.process",
+    "module": process
   },
   .
   .

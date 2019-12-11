@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
 )
 
 func init() {
@@ -59,18 +58,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches disk IO metrics from the OS.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	stats, err := disk.IOCounters(m.includeDevices...)
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	stats, err := IOCounters(m.includeDevices...)
 	if err != nil {
-		return nil, errors.Wrap(err, "disk io counters")
+		return errors.Wrap(err, "disk io counters")
 	}
 
-	// open a sampling means sample the current cpu counter
+	// Sample the current cpu counter
 	m.statistics.OpenSampling()
 
-	events := make([]common.MapStr, 0, len(stats))
-	for _, counters := range stats {
+	// Store the last cpu counter when finished
+	defer m.statistics.CloseSampling()
 
+	for _, counters := range stats {
 		event := common.MapStr{
 			"name": counters.Name,
 			"read": common.MapStr{
@@ -87,8 +87,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				"time": counters.IoTime,
 			},
 		}
-
-		extraMetrics, err := m.statistics.CalIOStatistics(counters)
+		var extraMetrics DiskIOMetric
+		err := m.statistics.CalIOStatistics(&extraMetrics, counters)
 		if err == nil {
 			event["iostat"] = common.MapStr{
 				"read": common.MapStr{
@@ -123,15 +123,17 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			}
 		}
 
-		events = append(events, event)
-
 		if counters.SerialNumber != "" {
 			event["serial_number"] = counters.SerialNumber
 		}
+
+		isOpen := r.Event(mb.Event{
+			MetricSetFields: event,
+		})
+		if !isOpen {
+			return nil
+		}
 	}
 
-	// open a sampling means store the last cpu counter
-	m.statistics.CloseSampling()
-
-	return events, nil
+	return nil
 }

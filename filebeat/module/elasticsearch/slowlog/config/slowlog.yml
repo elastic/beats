@@ -6,10 +6,10 @@ paths:
 exclude_files: [".gz$"]
 
 multiline:
-  pattern: '^\[?[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  pattern: '^(\[?[0-9]{4}-[0-9]{2}-[0-9]{2}|{)'
   negate: true
   match: after
 
-fields:
-  service.name: "elasticsearch"
-fields_under_root: true
+processors:
+# Locale for timezone is only needed in non-json logs
+- add_locale.when.not.regexp.message: "^{"

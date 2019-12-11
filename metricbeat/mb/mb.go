@@ -22,12 +22,15 @@ to implement Modules and their associated MetricSets.
 package mb
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/metricbeat/helper/dialer"
 )
 
 const (
@@ -106,6 +109,7 @@ type MetricSet interface {
 	HostData() HostData                  // HostData returns the parsed host data.
 	Registration() MetricSetRegistration // Params used in registration.
 	Metrics() *monitoring.Registry       // MetricSet specific metrics
+	Logger() *logp.Logger                // MetricSet specific logger
 }
 
 // Closer is an optional interface that a MetricSet can implement in order to
@@ -199,6 +203,20 @@ type ReportingMetricSetV2 interface {
 	Fetch(r ReporterV2)
 }
 
+// ReportingMetricSetV2Error is a MetricSet that reports events or errors through the
+// ReporterV2 interface. Fetch is called periodically to collect events.
+type ReportingMetricSetV2Error interface {
+	MetricSet
+	Fetch(r ReporterV2) error
+}
+
+// ReportingMetricSetV2WithContext is a MetricSet that reports events or errors through the
+// ReporterV2 interface. Fetch is called periodically to collect events.
+type ReportingMetricSetV2WithContext interface {
+	MetricSet
+	Fetch(ctx context.Context, r ReporterV2) error
+}
+
 // PushMetricSetV2 is a MetricSet that pushes events (rather than pulling them
 // periodically via a Fetch callback). Run is invoked to start the event
 // subscription and it should block until the MetricSet is ready to stop or
@@ -208,10 +226,23 @@ type PushMetricSetV2 interface {
 	Run(r PushReporterV2)
 }
 
+// PushMetricSetV2WithContext is a MetricSet that pushes events (rather than pulling them
+// periodically via a Fetch callback). Run is invoked to start the event
+// subscription and it should block until the MetricSet is ready to stop or
+// the context is closed.
+type PushMetricSetV2WithContext interface {
+	MetricSet
+	Run(ctx context.Context, r ReporterV2)
+}
+
 // HostData contains values parsed from the 'host' configuration. Other
 // configuration data like protocols, usernames, and passwords may also be
-// used to construct this HostData data.
+// used to construct this HostData data. HostData also contains information when combined scheme are
+// used, like doing HTTP request over a UNIX socket.
+//
 type HostData struct {
+	Transport dialer.Builder // The transport builder to use when creating the connection.
+
 	URI          string // The full URI that should be used in connections.
 	SanitizedURI string // A sanitized version of the URI without credentials.
 
@@ -241,6 +272,7 @@ type BaseMetricSet struct {
 	hostData     HostData
 	registration MetricSetRegistration
 	metrics      *monitoring.Registry
+	logger       *logp.Logger
 }
 
 func (b *BaseMetricSet) String() string {
@@ -262,6 +294,11 @@ func (b *BaseMetricSet) ID() string {
 // Metrics returns the metrics registry.
 func (b *BaseMetricSet) Metrics() *monitoring.Registry {
 	return b.metrics
+}
+
+// Logger returns the logger.
+func (b *BaseMetricSet) Logger() *logp.Logger {
+	return b.logger
 }
 
 // Name returns the name of the MetricSet. It should not include the name of
@@ -306,14 +343,15 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 // the metricset fetches not only the predefined fields but add alls raw data under
 // the raw namespace to the event.
 type ModuleConfig struct {
-	Hosts      []string      `config:"hosts"`
-	Period     time.Duration `config:"period"     validate:"positive"`
-	Timeout    time.Duration `config:"timeout"    validate:"positive"`
-	Module     string        `config:"module"     validate:"required"`
-	MetricSets []string      `config:"metricsets"`
-	Enabled    bool          `config:"enabled"`
-	Raw        bool          `config:"raw"`
-	Query      QueryParams   `config:"query"`
+	Hosts       []string      `config:"hosts"`
+	Period      time.Duration `config:"period"     validate:"positive"`
+	Timeout     time.Duration `config:"timeout"    validate:"positive"`
+	Module      string        `config:"module"     validate:"required"`
+	MetricSets  []string      `config:"metricsets"`
+	Enabled     bool          `config:"enabled"`
+	Raw         bool          `config:"raw"`
+	Query       QueryParams   `config:"query"`
+	ServiceName string        `config:"service.name"`
 }
 
 func (c ModuleConfig) String() string {

@@ -13,6 +13,20 @@
 ./{beatname_lc} modules enable {modulename}
 ----
 
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} modules enable {modulename}
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} modules enable {modulename}
+----
+
 *win:*
 
 ["source","sh",subs="attributes"]

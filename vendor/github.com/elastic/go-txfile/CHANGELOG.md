@@ -14,6 +14,26 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.0.6]
+
+### Fixed
+- Fix flush callback not being executed on success. PR #34
+
+## [0.0.5]
+
+### Fixed
+- Panic on atomic operation (arm, x86-32) and File lock not released when panic occurs. PR #31
+
+## [0.0.4]
+
+### Added
+- Added `Observer` to txfile for collecting per transaction metrics. PR #23
+- Make file syncing configurable. PR #29
+- Added `Observer` to pq package for collecting operational metrics. PR #26
+
+### Changed
+- Queue reader requires explicit transaction start/stop calls. PR #27 
+
 ## [0.0.3]
 
 ### Fixed
@@ -42,6 +62,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Windows Fix: Max mmaped area must not exceed actual file size on windows. PR #11
 
 
-[Unreleased]: https://github.com/elastic/go-txfile/compare/v0.0.3...HEAD
+[Unreleased]: https://github.com/elastic/go-txfile/compare/v0.0.6...HEAD
+[0.0.6]: https://github.com/elastic/go-txfile/compare/v0.0.5...v0.0.6
+[0.0.5]: https://github.com/elastic/go-txfile/compare/v0.0.4...v0.0.5
+[0.0.4]: https://github.com/elastic/go-txfile/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/elastic/go-txfile/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/elastic/go-txfile/compare/v0.0.1...v0.0.2

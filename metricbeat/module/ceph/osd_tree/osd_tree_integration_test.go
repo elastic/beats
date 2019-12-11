@@ -15,51 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build integration,linux
+
 package osd_tree
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	service := compose.EnsureUpWithTimeout(t, 120, "ceph")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "ceph",
 		"metricsets": []string{"osd_tree"},
-		"hosts":      getTestCephHost(),
+		"hosts":      []string{host},
 	}
-}
-
-const (
-	cephDefaultHost = "127.0.0.1"
-	cephDefaultPort = "5000"
-)
-
-func getTestCephHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("CEPH_HOST", cephDefaultHost),
-		getenv("CEPH_PORT", cephDefaultPort),
-	)
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
 }

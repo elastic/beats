@@ -41,15 +41,14 @@ class Test(metricbeat.BaseTest):
                     break
 
         t = json.loads(template_content)
-
-        properties = t["mappings"]["doc"]["properties"]
+        properties = t["mappings"]["properties"]
 
         # Check libbeat fields
         assert properties["@timestamp"] == {"type": "date"}
         assert properties["host"]["properties"]["name"] == {"type": "keyword", "ignore_above": 1024}
 
         # Check metricbeat generic field
-        assert properties["metricset"]["properties"]["host"] == {"type": "keyword", "ignore_above": 1024}
+        assert properties["service"]["properties"]["address"] == {"type": "keyword", "ignore_above": 1024}
 
         # Check module specific field
         assert properties["system"]["properties"]["cpu"]["properties"]["cores"] == {"type": "long"}

@@ -20,7 +20,7 @@ class HaproxyTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), evt.keys(), evt)
+        self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -32,7 +32,7 @@ class HaproxyTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "haproxy",
             "metricsets": ["info"],
-            "hosts": ["tcp://%s:%d" % (self.compose_hosts()[0], 14567)],
+            "hosts": ["tcp://%s" % (self.compose_host(port="14567/tcp"))],
             "period": "5s"
         }])
         self._test_info()
@@ -48,7 +48,7 @@ class HaproxyTest(metricbeat.BaseTest):
 
         for evt in output:
             print(evt)
-            self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), evt.keys(), evt)
+            self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
             self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -59,7 +59,7 @@ class HaproxyTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "haproxy",
             "metricsets": ["stat"],
-            "hosts": ["tcp://%s:%d" % (self.compose_hosts()[0], 14567)],
+            "hosts": ["tcp://%s" % (self.compose_host(port="14567/tcp"))],
             "period": "5s"
         }])
         self._test_stat()
@@ -72,7 +72,7 @@ class HaproxyTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "haproxy",
             "metricsets": ["stat"],
-            "hosts": ["http://%s:%d/stats" % (self.compose_hosts()[0], 14568)],
+            "hosts": ["http://%s/stats" % (self.compose_host(port="14568/tcp"))],
             "period": "5s"
         }])
         self._test_stat()
@@ -87,15 +87,15 @@ class HaproxyTest(metricbeat.BaseTest):
             "metricsets": ["stat"],
             "username": "admin",
             "password": "admin",
-            "hosts": ["http://%s:%d/stats" % (self.compose_hosts()[0], 14569)],
+            "hosts": ["http://%s/stats" % (self.compose_host(port="14569/tcp"))],
             "period": "5s"
         }])
         self._test_stat()
 
 
 class Haproxy_1_6_Test(HaproxyTest):
-    COMPOSE_SERVICES = ['haproxy_1_6']
+    COMPOSE_ENV = {'HAPROXY_VERSION': '1.6'}
 
 
 class Haproxy_1_7_Test(HaproxyTest):
-    COMPOSE_SERVICES = ['haproxy_1_7']
+    COMPOSE_ENV = {'HAPROXY_VERSION': '1.7'}

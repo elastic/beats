@@ -39,7 +39,7 @@ func (p *pluginList) String() string {
 func (p *pluginList) Set(v string) error {
 	for _, path := range p.paths {
 		if path == v {
-			logp.Warn("%s is already a registered plugin")
+			logp.Warn("%s is already a registered plugin", path)
 			return nil
 		}
 	}

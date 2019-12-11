@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -29,6 +30,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -42,7 +44,7 @@ type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
 
-	index    outil.Selector
+	index    outputs.IndexSelector
 	pipeline *outil.Selector
 	params   map[string]string
 	timeout  time.Duration
@@ -51,7 +53,7 @@ type Client struct {
 	bulkRequ *bulkRequest
 
 	// buffered json response reader
-	json jsonReader
+	json JSONReader
 
 	// additional configs
 	compressionLevel int
@@ -64,32 +66,36 @@ type Client struct {
 type ClientSettings struct {
 	URL                string
 	Proxy              *url.URL
+	ProxyDisable       bool
 	TLS                *transport.TLSConfig
 	Username, Password string
+	APIKey             string
 	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
-	Index              outil.Selector
+	Index              outputs.IndexSelector
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
 	Observer           outputs.Observer
 }
 
-type connectCallback func(client *Client) error
+// ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
+type ConnectCallback func(client *Client) error
 
 // Connection manages the connection for a given client.
 type Connection struct {
 	URL      string
 	Username string
 	Password string
+	APIKey   string
 	Headers  map[string]string
 
 	http              *http.Client
 	onConnectCallback func() error
 
 	encoder bodyEncoder
-	version string
+	version common.Version
 }
 
 type bulkIndexAction struct {
@@ -102,7 +108,7 @@ type bulkCreateAction struct {
 
 type bulkEventMeta struct {
 	Index    string `json:"_index" struct:"_index"`
-	DocType  string `json:"_type" struct:"_type"`
+	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`
 	Pipeline string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
 	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
 }
@@ -122,6 +128,7 @@ var (
 )
 
 var (
+	errExpectedItemsArray    = errors.New("expected items array")
 	errExpectedItemObject    = errors.New("expected item response object")
 	errExpectedStatusCode    = errors.New("expected item status code")
 	errUnexpectedEmptyObject = errors.New("empty object")
@@ -130,7 +137,7 @@ var (
 )
 
 const (
-	eventType = "doc"
+	defaultEventType = "doc"
 )
 
 // NewClient instantiates a new client.
@@ -138,9 +145,12 @@ func NewClient(
 	s ClientSettings,
 	onConnect *callbacksRegistry,
 ) (*Client, error) {
-	proxy := http.ProxyFromEnvironment
-	if s.Proxy != nil {
-		proxy = http.ProxyURL(s.Proxy)
+	var proxy func(*http.Request) (*url.URL, error)
+	if !s.ProxyDisable {
+		proxy = http.ProxyFromEnvironment
+		if s.Proxy != nil {
+			proxy = http.ProxyURL(s.Proxy)
+		}
 	}
 
 	pipeline := s.Pipeline
@@ -199,6 +209,7 @@ func NewClient(
 			URL:      s.URL,
 			Username: s.Username,
 			Password: s.Password,
+			APIKey:   base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
 			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
@@ -224,6 +235,16 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
+		globalCallbackRegistry.mutex.Lock()
+		defer globalCallbackRegistry.mutex.Unlock()
+
+		for _, callback := range globalCallbackRegistry.callbacks {
+			err := callback(client)
+			if err != nil {
+				return err
+			}
+		}
+
 		if onConnect != nil {
 			onConnect.mutex.Lock()
 			defer onConnect.mutex.Unlock()
@@ -250,13 +271,18 @@ func (client *Client) Clone() *Client {
 
 	c, _ := NewClient(
 		ClientSettings{
-			URL:              client.URL,
-			Index:            client.index,
-			Pipeline:         client.pipeline,
-			Proxy:            client.proxyURL,
+			URL:      client.URL,
+			Index:    client.index,
+			Pipeline: client.pipeline,
+			Proxy:    client.proxyURL,
+			// Without the following nil check on proxyURL, a nil Proxy field will try
+			// reloading proxy settings from the environment instead of leaving them
+			// empty.
+			ProxyDisable:     client.proxyURL == nil,
 			TLS:              client.tlsConfig,
 			Username:         client.Username,
 			Password:         client.Password,
+			APIKey:           client.APIKey,
 			Parameters:       nil, // XXX: do not pass params?
 			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
@@ -301,8 +327,13 @@ func (client *Client) publishEvents(
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
 
+	eventType := ""
+	if client.GetVersion().Major < 7 {
+		eventType = defaultEventType
+	}
+
 	origCount := len(data)
-	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
+	data = bulkEncodePublishRequest(client.GetVersion(), body, client.index, client.pipeline, eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -330,7 +361,7 @@ func (client *Client) publishEvents(
 		failedEvents = data
 		stats.fails = len(failedEvents)
 	} else {
-		client.json.init(result.raw)
+		client.json.init(result)
 		failedEvents, stats = bulkCollectPublishFails(&client.json, data)
 	}
 
@@ -359,21 +390,24 @@ func (client *Client) publishEvents(
 // fillBulkRequest encodes all bulk requests and returns slice of events
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
+	version common.Version,
 	body bulkWriter,
-	index outil.Selector,
+	index outputs.IndexSelector,
 	pipeline *outil.Selector,
+	eventType string,
 	data []publisher.Event,
 ) []publisher.Event {
 	okEvents := data[:0]
 	for i := range data {
 		event := &data[i].Content
-		meta, err := createEventBulkMeta(index, pipeline, event)
+		meta, err := createEventBulkMeta(version, index, pipeline, eventType, event)
 		if err != nil {
 			logp.Err("Failed to encode event meta data: %s", err)
 			continue
 		}
 		if err := body.Add(meta, event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
+			logp.Debug("elasticsearch", "Failed event: %v", event)
 			continue
 		}
 		okEvents = append(okEvents, data[i])
@@ -382,8 +416,10 @@ func bulkEncodePublishRequest(
 }
 
 func createEventBulkMeta(
-	indexSel outil.Selector,
+	version common.Version,
+	indexSel outputs.IndexSelector,
 	pipelineSel *outil.Selector,
+	eventType string,
 	event *beat.Event,
 ) (interface{}, error) {
 	pipeline, err := getPipeline(event, pipelineSel)
@@ -392,7 +428,7 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	index, err := getIndex(event, indexSel)
+	index, err := indexSel.Select(event)
 	if err != nil {
 		err := fmt.Errorf("failed to select event index: %v", err)
 		return nil, err
@@ -416,7 +452,7 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
-	if id != "" {
+	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
 		return bulkCreateAction{meta}, nil
 	}
 	return bulkIndexAction{meta}, nil
@@ -438,61 +474,16 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 	return "", nil
 }
 
-// getIndex returns the full index name
-// Index is either defined in the config as part of the output
-// or can be overload by the event through setting index
-func getIndex(event *beat.Event, index outil.Selector) (string, error) {
-	if event.Meta != nil {
-		if str, exists := event.Meta["index"]; exists {
-			idx, ok := str.(string)
-			if ok {
-				ts := event.Timestamp.UTC()
-				return fmt.Sprintf("%s-%d.%02d.%02d",
-					idx, ts.Year(), ts.Month(), ts.Day()), nil
-			}
-		}
-	}
-
-	return index.Select(event)
-}
-
 // bulkCollectPublishFails checks per item errors returning all events
 // to be tried again due to error code returned for that items. If indexing an
 // event failed due to some error in the event itself (e.g. does not respect mapping),
 // the event will be dropped.
 func bulkCollectPublishFails(
-	reader *jsonReader,
+	reader *JSONReader,
 	data []publisher.Event,
 ) ([]publisher.Event, bulkResultStats) {
-	if err := reader.expectDict(); err != nil {
-		logp.Err("Failed to parse bulk response: expected JSON object")
-		return nil, bulkResultStats{}
-	}
-
-	// find 'items' field in response
-	for {
-		kind, name, err := reader.nextFieldName()
-		if err != nil {
-			logp.Err("Failed to parse bulk response")
-			return nil, bulkResultStats{}
-		}
-
-		if kind == dictEnd {
-			logp.Err("Failed to parse bulk response: no 'items' field in response")
-			return nil, bulkResultStats{}
-		}
-
-		// found items array -> continue
-		if bytes.Equal(name, nameItems) {
-			break
-		}
-
-		reader.ignoreNext()
-	}
-
-	// check items field is an array
-	if err := reader.expectArray(); err != nil {
-		logp.Err("Failed to parse bulk response: expected items array")
+	if err := BulkReadToItems(reader); err != nil {
+		logp.Err("failed to parse bulk response: %v", err.Error())
 		return nil, bulkResultStats{}
 	}
 
@@ -500,7 +491,7 @@ func bulkCollectPublishFails(
 	failed := data[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		status, msg, err := itemStatus(reader)
+		status, msg, err := BulkReadItemStatus(reader)
 		if err != nil {
 			return nil, bulkResultStats{}
 		}
@@ -536,9 +527,43 @@ func bulkCollectPublishFails(
 	return failed, stats
 }
 
-func itemStatus(reader *jsonReader) (int, []byte, error) {
+// BulkReadToItems reads the bulk response up to (but not including) items
+func BulkReadToItems(reader *JSONReader) error {
+	if err := reader.ExpectDict(); err != nil {
+		return errExpectedObject
+	}
+
+	// find 'items' field in response
+	for {
+		kind, name, err := reader.nextFieldName()
+		if err != nil {
+			return err
+		}
+
+		if kind == dictEnd {
+			return errExpectedItemsArray
+		}
+
+		// found items array -> continue
+		if bytes.Equal(name, nameItems) {
+			break
+		}
+
+		reader.ignoreNext()
+	}
+
+	// check items field is an array
+	if err := reader.ExpectArray(); err != nil {
+		return errExpectedItemsArray
+	}
+
+	return nil
+}
+
+// BulkReadItemStatus reads the status and error fields from the bulk item
+func BulkReadItemStatus(reader *JSONReader) (int, []byte, error) {
 	// skip outer dictionary
-	if err := reader.expectDict(); err != nil {
+	if err := reader.ExpectDict(); err != nil {
 		return 0, nil, errExpectedItemObject
 	}
 
@@ -576,8 +601,8 @@ func itemStatus(reader *jsonReader) (int, []byte, error) {
 	return status, msg, nil
 }
 
-func itemStatusInner(reader *jsonReader) (int, []byte, error) {
-	if err := reader.expectDict(); err != nil {
+func itemStatusInner(reader *JSONReader) (int, []byte, error) {
+	if err := reader.ExpectDict(); err != nil {
 		return 0, nil, errExpectedItemObject
 	}
 
@@ -633,8 +658,8 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 	return body, nil
 }
 
-// GetVersion returns the elasticsearch version the client is connected to
-func (client *Client) GetVersion() string {
+// GetVersion returns the elasticsearch version the client is connected to.
+func (client *Client) GetVersion() common.Version {
 	return client.Connection.version
 }
 
@@ -666,7 +691,7 @@ func (client *Client) Test(d testing.Driver) {
 
 		err = client.Connect()
 		d.Fatal("talk to server", err)
-		d.Info("version", client.version)
+		d.Info("version", client.version.String())
 	})
 }
 
@@ -674,12 +699,27 @@ func (client *Client) String() string {
 	return "elasticsearch(" + client.Connection.URL + ")"
 }
 
-// Connect connects the client.
+// Connect connects the client. It runs a GET request against the root URL of
+// the configured host, updates the known Elasticsearch version and calls
+// globally configured handlers.
+func (client *Client) Connect() error {
+	return client.Connection.Connect()
+}
+
+// Connect connects the client. It runs a GET request against the root URL of
+// the configured host, updates the known Elasticsearch version and calls
+// globally configured handlers.
 func (conn *Connection) Connect() error {
-	var err error
-	conn.version, err = conn.Ping()
+	versionString, err := conn.Ping()
 	if err != nil {
 		return err
+	}
+
+	if version, err := common.NewVersion(versionString); err != nil {
+		logp.Err("Invalid version from Elasticsearch: %v", versionString)
+		conn.version = common.Version{}
+	} else {
+		conn.version = *version
 	}
 
 	err = conn.onConnectCallback()
@@ -715,7 +755,7 @@ func (conn *Connection) Ping() (string, error) {
 	}
 
 	debugf("Ping status code: %v", status)
-	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	logp.Info("Attempting to connect to Elasticsearch version %s", response.Version.Number)
 	return response.Version.Number, nil
 }
 
@@ -761,7 +801,7 @@ func (conn *Connection) execRequest(
 ) (int, []byte, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		logp.Warn("Failed to create request", err)
+		logp.Warn("Failed to create request %+v", err)
 		return 0, nil, err
 	}
 	if body != nil {
@@ -772,8 +812,13 @@ func (conn *Connection) execRequest(
 
 func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
+
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+
+	if conn.APIKey != "" {
+		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
 	}
 
 	for name, value := range conn.Headers {
@@ -808,7 +853,9 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	return status, obj, err
 }
 
-func (conn *Connection) GetVersion() string {
+// GetVersion returns the elasticsearch version the client is connected to.
+// The version is read and updated on 'Connect'.
+func (conn *Connection) GetVersion() common.Version {
 	return conn.version
 }
 

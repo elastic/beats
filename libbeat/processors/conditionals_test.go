@@ -122,3 +122,111 @@ func TestConditionRuleInitErrorPropagates(t *testing.T) {
 	assert.Equal(t, testErr, err)
 	assert.Nil(t, filter)
 }
+
+type testCase struct {
+	event common.MapStr
+	want  common.MapStr
+	cfg   string
+}
+
+func testProcessors(t *testing.T, cases map[string]testCase) {
+	for name, test := range cases {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			c, err := common.NewConfigWithYAML([]byte(test.cfg), "test "+name)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var pluginConfig PluginConfig
+			if err = c.Unpack(&pluginConfig); err != nil {
+				t.Fatal(err)
+			}
+
+			processor, err := New(pluginConfig)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			result, err := processor.Run(&beat.Event{Fields: test.event.Clone()})
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Equal(t, test.want, result.Fields)
+		})
+	}
+}
+
+func TestIfElseThenProcessor(t *testing.T) {
+	const ifThen = `
+- if:
+    range.uid.lt: 500
+  then:
+    - add_fields: {target: "", fields: {uid_type: reserved}}
+`
+
+	const ifThenElse = `
+- if:
+    range.uid.lt: 500
+  then:
+    - add_fields: {target: "", fields: {uid_type: reserved}}
+  else:
+    - add_fields: {target: "", fields: {uid_type: user}}
+`
+
+	const ifThenElseSingleProcessor = `
+- if:
+    range.uid.lt: 500
+  then:
+    add_fields: {target: "", fields: {uid_type: reserved}}
+  else:
+    add_fields: {target: "", fields: {uid_type: user}}
+`
+
+	const ifThenElseIf = `
+- if:
+    range.uid.lt: 500
+  then:
+    - add_fields: {target: "", fields: {uid_type: reserved}}
+  else:
+    if:
+      equals.uid: 500
+    then:
+      add_fields: {target: "", fields: {uid_type: "eq_500"}}
+    else:
+      add_fields: {target: "", fields: {uid_type: "gt_500"}}
+`
+
+	testProcessors(t, map[string]testCase{
+		"if-then-true": {
+			event: common.MapStr{"uid": 411},
+			want:  common.MapStr{"uid": 411, "uid_type": "reserved"},
+			cfg:   ifThen,
+		},
+		"if-then-false": {
+			event: common.MapStr{"uid": 500},
+			want:  common.MapStr{"uid": 500},
+			cfg:   ifThen,
+		},
+		"if-then-else-true": {
+			event: common.MapStr{"uid": 411},
+			want:  common.MapStr{"uid": 411, "uid_type": "reserved"},
+			cfg:   ifThenElse,
+		},
+		"if-then-else-false": {
+			event: common.MapStr{"uid": 500},
+			want:  common.MapStr{"uid": 500, "uid_type": "user"},
+			cfg:   ifThenElse,
+		},
+		"if-then-else-false-single-processor": {
+			event: common.MapStr{"uid": 500},
+			want:  common.MapStr{"uid": 500, "uid_type": "user"},
+			cfg:   ifThenElseSingleProcessor,
+		},
+		"if-then-else-if": {
+			event: common.MapStr{"uid": 500},
+			want:  common.MapStr{"uid": 500, "uid_type": "eq_500"},
+			cfg:   ifThenElseIf,
+		},
+	})
+}

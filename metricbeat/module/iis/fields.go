@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "iis", Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "iis", asset.ModuleFieldsPri, AssetIis); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetIis returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/iis.
+func AssetIis() string {
 	return "eJzEj7FugzAYhHc/xYmdF/DQrU9RdaD1tfqFjS3bFHj7CpxEgJwsGXLjnfR9uhY9Fw2RpIAs2VKjEUmNAgzTd5SQxQ8abwoAOAdGcRxyZz8+1daJJDhvRksF/AitSXobWgyd4xW+Ji+BGr/Rj+HSVBxHyB408Ssx/jHelhryLrakBjkL91LOnQvbt32Ktucy+WhO2wP5mvcCLNLqR8l89uER8cJ//wEAAP//Ae+cTA=="
 }

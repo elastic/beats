@@ -1,0 +1,3 @@
+# HELP coredns_dns_request_count_total Counter of DNS requests made per zone, protocol and family.
+# TYPE coredns_dns_request_count_total counter
+coredns_dns_request_count_total{family="1",proto="udp",server="dns://:53",zone="."} 440.0

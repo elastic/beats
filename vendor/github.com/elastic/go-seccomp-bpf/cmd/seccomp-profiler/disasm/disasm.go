@@ -180,14 +180,14 @@ func lastInstruction(instructions []string) string {
 
 var (
 	x86_64Parser = &parser{
-		Info: arch.X86_64,
+		Info:                   arch.X86_64,
 		rawSyscallInstructions: []string{"SYSCALL"},
 		callOp:                 "CALL",
 		parse:                  parseX86_64,
 	}
 
 	i386Parser = &parser{
-		Info: arch.I386,
+		Info:                   arch.I386,
 		rawSyscallInstructions: []string{"INT $0x80", "SYSENTER"},
 		callOp:                 "CALL",
 		parse:                  parseX86_64, // i386 is similar to x86_64.

@@ -36,9 +36,9 @@ import (
 	"text/template"
 	"unicode"
 
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/go-seccomp-bpf"
+	seccomp "github.com/elastic/go-seccomp-bpf"
 	"github.com/elastic/go-seccomp-bpf/arch"
 	"github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler/disasm"
 )

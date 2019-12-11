@@ -30,6 +30,8 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
 )
 
 const testFile = "../_meta/test/kube-state-metrics"
@@ -56,27 +58,27 @@ func TestEventMapping(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 
 	assert.Equal(t, 5, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
-		name, err := event.GetValue("name")
+		metricsetFields := event.MetricSetFields
+		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := event.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(eventKey, t, event, k, v)
-					}
-					delete(testCases, eventKey)
+			eventKey := event.ModuleFields["namespace"].(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(eventKey, t, metricsetFields, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -97,8 +99,7 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"kube-system@kube-state-metrics-1303537707": {
-			"_module.namespace": "kube-system",
-			"name":              "kube-state-metrics-1303537707",
+			"name": "kube-state-metrics-1303537707",
 
 			"replicas.labeled":   2,
 			"replicas.observed":  1,
@@ -107,8 +108,7 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.desired":   2,
 		},
 		"test@kube-state-metrics-1303537707": {
-			"_module.namespace": "test",
-			"name":              "kube-state-metrics-1303537707",
+			"name": "kube-state-metrics-1303537707",
 
 			"replicas.labeled":   4,
 			"replicas.observed":  5,
@@ -117,8 +117,7 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.desired":   3,
 		},
 		"kube-system@tiller-deploy-3067024529": {
-			"_module.namespace": "kube-system",
-			"name":              "tiller-deploy-3067024529",
+			"name": "tiller-deploy-3067024529",
 
 			"replicas.labeled":   1,
 			"replicas.observed":  1,
@@ -127,4 +126,8 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.desired":   1,
 		},
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "state_replicaset")
 }

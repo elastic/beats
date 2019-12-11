@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,7 +46,7 @@ func TestIndex(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, resp, err := client.Index(index, "test", "1", params, body)
+	_, resp, err := client.Index(index, "_doc", "1", params, body)
 	if err != nil {
 		t.Fatalf("Index() returns error: %s", err)
 	}
@@ -62,10 +61,10 @@ func TestIndex(t *testing.T) {
 	}
 	_, result, err := client.SearchURIWithBody(index, "", nil, map[string]interface{}{})
 	if err != nil {
-		t.Errorf("SearchUriWithBody() returns an error: %s", err)
+		t.Fatalf("SearchUriWithBody() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+	if result.Hits.Total.Value != 1 {
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
 	params = map[string]string{
@@ -73,13 +72,13 @@ func TestIndex(t *testing.T) {
 	}
 	_, result, err = client.SearchURI(index, "test", params)
 	if err != nil {
-		t.Errorf("SearchUri() returns an error: %s", err)
+		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+	if result.Hits.Total.Value != 1 {
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
-	_, resp, err = client.Delete(index, "test", "1", nil)
+	_, resp, err = client.Delete(index, "_doc", "1", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}
@@ -105,8 +104,8 @@ func TestIngest(t *testing.T) {
 	}
 
 	client := getTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	if client.Connection.version.Major < 5 {
+		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
 	status, _, err := client.DeletePipeline(pipeline, nil)
@@ -139,7 +138,7 @@ func TestIngest(t *testing.T) {
 	}
 
 	params := map[string]string{"refresh": "true"}
-	_, resp, err = client.Ingest(index, "test", pipeline, "1", params, obj{
+	_, resp, err = client.Ingest(index, "_doc", pipeline, "1", params, obj{
 		"testfield": "TEST",
 	})
 	if err != nil {
@@ -150,7 +149,7 @@ func TestIngest(t *testing.T) {
 	}
 
 	// get _source field from indexed document
-	_, docBody, err := client.apiCall("GET", index, "test", "1/_source", "", nil, nil)
+	_, docBody, err := client.apiCall("GET", index, "", "_source/1", "", nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

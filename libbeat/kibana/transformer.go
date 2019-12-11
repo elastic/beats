@@ -50,9 +50,9 @@ func (t *transformer) transform() common.MapStr {
 	return transformed
 }
 
-func loadKibanaEntriesFromYaml(yamlFile string) ([]kibanaEntry, error) {
+func loadKibanaEntriesFromYaml(fields []byte) ([]kibanaEntry, error) {
 	entries := []kibanaEntry{}
-	cfg, err := yaml.NewConfigWithFile(yamlFile)
+	cfg, err := yaml.NewConfig(fields)
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
@@ -249,8 +249,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 				file["uid"] = info.SID
 			}
 		} else {
-			file["uid"] = info.UID
-			file["gid"] = info.GID
+			file["uid"] = strconv.Itoa(int(info.UID))
+			file["gid"] = strconv.Itoa(int(info.GID))
 			file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 		}
 
@@ -396,7 +396,7 @@ func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
 		case SHA512_256:
 			hashes = append(hashes, sha512.New512_256())
 		case XXH64:
-			hashes = append(hashes, xxhash.New64())
+			hashes = append(hashes, xxhash.New())
 		default:
 			return nil, errors.Errorf("unknown hash type '%v'", name)
 		}

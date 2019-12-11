@@ -43,6 +43,12 @@ func Lstat(name string) (FileInfo, error) {
 	return stat(name, os.Lstat)
 }
 
+// Wrap wraps the given os.FileInfo and returns a FileInfo in order to expose
+// the UID and GID in a uniform manner across operating systems.
+func Wrap(info os.FileInfo) (FileInfo, error) {
+	return wrap(info)
+}
+
 type fileInfo struct {
 	os.FileInfo
 	uid *int

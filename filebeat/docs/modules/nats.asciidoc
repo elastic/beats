@@ -1,0 +1,56 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-nats]]
+:modulename: nats
+:has-dashboards: false
+
+== nats module
+
+This is the nats module.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from version v1.4.0.
+
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Dashboard
+
+The Nats module comes with a predefined dashboard. For example:
+
+image::./images/filebeat_nats_dashboard.png[]
+
+
+include::../include/configuring-intro.asciidoc[]
+
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `log` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-nats,exported fields>> section.
+

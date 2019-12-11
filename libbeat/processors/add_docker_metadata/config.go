@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package add_docker_metadata
 
 import (
@@ -33,6 +35,7 @@ type Config struct {
 	SourceIndex  int               `config:"match_source_index"` // Index in the source path split by / to look for container ID.
 	MatchPIDs    []string          `config:"match_pids"`         // A list of fields containing process IDs (PIDs).
 	HostFS       string            `config:"system.hostfs"`      // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
+	DeDot        bool              `config:"labels.dedot"`       // If set to true, replace dots in labels with `_`.
 
 	// Annotations are kept after container is killed, until they haven't been
 	// accessed for a full `cleanup_timeout`:
@@ -45,5 +48,6 @@ func defaultConfig() Config {
 		MatchSource: true,
 		SourceIndex: 4, // Use 4 to match the CID in /var/lib/docker/containers/<container_id>/*.log.
 		MatchPIDs:   []string{"process.pid", "process.ppid"},
+		DeDot:       true,
 	}
 }

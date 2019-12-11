@@ -18,10 +18,6 @@
               type: object
               description: >
                 The HTTP headers sent
-            - name: body
-              type: keyword
-              description: >
-                The HTTP payload sent
         - name: response
           type: group
           description: >

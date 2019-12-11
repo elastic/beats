@@ -20,7 +20,6 @@
 package log
 
 import (
-	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -32,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
 )
 
@@ -82,8 +82,9 @@ func TestReadLine(t *testing.T) {
 				MaxBackoff:    1 * time.Second,
 				BackoffFactor: 2,
 			},
-			BufferSize: 100,
-			MaxBytes:   1000,
+			BufferSize:     100,
+			MaxBytes:       1000,
+			LineTerminator: readfile.LineFeed,
 		},
 		source: source,
 	}
@@ -100,21 +101,21 @@ func TestReadLine(t *testing.T) {
 
 	// Read third line
 	_, text, bytesread, _, err := readLine(r)
-	fmt.Printf("received line: '%s'\n", text)
+	t.Logf("received line: '%s'\n", text)
 	assert.Nil(t, err)
 	assert.Equal(t, text, firstLineString[0:len(firstLineString)-1])
 	assert.Equal(t, bytesread, len(firstLineString))
 
 	// read second line
 	_, text, bytesread, _, err = readLine(r)
-	fmt.Printf("received line: '%s'\n", text)
+	t.Logf("received line: '%s'\n", text)
 	assert.Equal(t, text, secondLineString[0:len(secondLineString)-1])
 	assert.Equal(t, bytesread, len(secondLineString))
 	assert.Nil(t, err)
 
 	// Read third line, which doesn't exist
 	_, text, bytesread, _, err = readLine(r)
-	fmt.Printf("received line: '%s'\n", text)
+	t.Logf("received line: '%s'\n", text)
 	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
 	assert.Equal(t, err, ErrInactive)

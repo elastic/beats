@@ -3,7 +3,7 @@
   description: >
     Memcached module
   short_config: false
-  release: beta
+  release: ga
   fields:
     - name: memcached
       type: group

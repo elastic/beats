@@ -1,0 +1,75 @@
+#------------------------------ NetFlow input --------------------------------
+# Experimental: Config options for the Netflow/IPFIX collector over UDP input
+#- type: netflow
+  #enabled: false
+
+  # Address where the NetFlow Collector will bind
+  #host: ":2055"
+
+  # Maximum size of the message received over UDP
+  #max_message_size: 10KiB
+
+  # List of enabled protocols.
+  # Valid values are 'v1', 'v5', 'v6', 'v7', 'v8', 'v9' and 'ipfix'
+  #protocols: [ v5, v9, ipfix ]
+
+  # Expiration timeout
+  # This is the time before an idle session or unused template is expired.
+  # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
+  #expiration_timeout: 30m
+
+  # Queue size limits the number of netflow packets that are queued awaiting
+  # processing.
+  #queue_size: 8192
+
+  # Custom field definitions for NetFlow V9 / IPFIX.
+  # List of files with YAML fields definition.
+  #custom_definitions:
+  #- path/to/ipfix.yaml
+  #- path/to/netflow.yaml
+
+#---------------------------- Google Cloud Pub/Sub Input -----------------------
+# Input for reading messages from a Google Cloud Pub/Sub topic subscription.
+- type: google-pubsub
+  enabled: false
+
+  # Google Cloud project ID. Required.
+  project_id: my-gcp-project-id
+
+  # Google Cloud Pub/Sub topic name. Required.
+  topic: my-gcp-pubsub-topic-name
+
+  # Google Cloud Pub/Sub topic subscription name. Required.
+  subscription.name: my-gcp-pubsub-subscription-name
+
+  # Create subscription if it does not exist.
+  #subscription.create: true
+
+  # Number of goroutines to create to read from the subscription.
+  #subscription.num_goroutines: 1
+
+  # Maximum number of unprocessed messages to allow at any time.
+  #subscription.max_outstanding_messages: 1000
+
+  # Path to a JSON file containing the credentials and key used to subscribe.
+  credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
+
+#------------------------------ S3 input --------------------------------
+# Beta: Config options for AWS S3 input
+#- type: s3
+  #enabled: false
+
+  # AWS Credentials
+  # If access_key_id and secret_access_key are configured, then use them to make api calls.
+  # If not, s3 input will load default AWS config or load with given profile name.
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-s3-input
+
+  # Queue urls (required) to receive queue messages from
+  #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+
+  # The duration (in seconds) that the received messages are hidden from subsequent
+  # retrieve requests after being retrieved by a ReceiveMessage request.
+  #visibility_timeout: 300

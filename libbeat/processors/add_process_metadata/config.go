@@ -50,7 +50,7 @@ var defaultFields = common.MapStr{
 	"process": common.MapStr{
 		"name":       nil,
 		"title":      nil,
-		"exe":        nil,
+		"executable": nil,
 		"args":       nil,
 		"pid":        nil,
 		"ppid":       nil,

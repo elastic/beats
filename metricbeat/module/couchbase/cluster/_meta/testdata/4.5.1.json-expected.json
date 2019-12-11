@@ -1,0 +1,82 @@
+[
+    {
+        "couchbase": {
+            "cluster": {
+                "hdd": {
+                    "free": {
+                        "bytes": 57080317666
+                    },
+                    "quota": {
+                        "total": {
+                            "bytes": 62725623808
+                        }
+                    },
+                    "total": {
+                        "bytes": 62725623808
+                    },
+                    "used": {
+                        "by_data": {
+                            "bytes": 17923953
+                        },
+                        "value": {
+                            "bytes": 5645306142
+                        }
+                    }
+                },
+                "max_bucket_count": 10,
+                "quota": {
+                    "index_memory": {
+                        "mb": 300
+                    },
+                    "memory": {
+                        "mb": 300
+                    }
+                },
+                "ram": {
+                    "quota": {
+                        "total": {
+                            "per_node": {
+                                "bytes": 314572800
+                            },
+                            "value": {
+                                "bytes": 314572800
+                            }
+                        },
+                        "used": {
+                            "per_node": {
+                                "bytes": 104857600
+                            },
+                            "value": {
+                                "bytes": 104857600
+                            }
+                        }
+                    },
+                    "total": {
+                        "bytes": 6246748160
+                    },
+                    "used": {
+                        "by_data": {
+                            "bytes": 53962032
+                        },
+                        "value": {
+                            "bytes": 3155247104
+                        }
+                    }
+                }
+            }
+        },
+        "event": {
+            "dataset": "couchbase.cluster",
+            "duration": 115000,
+            "module": "couchbase"
+        },
+        "metricset": {
+            "name": "cluster",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "couchbase"
+        }
+    }
+]

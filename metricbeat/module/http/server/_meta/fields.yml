@@ -2,5 +2,5 @@
   type: group
   description: >
     server
-  release: beta
+  release: ga
   fields:

@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
@@ -47,10 +48,10 @@ func testData(t *testing.T) (data []byte) {
 	return
 }
 
-func findItems(mp []common.MapStr, key string) []common.MapStr {
+func findItems(mp []mb.Event, key string) []common.MapStr {
 	result := make([]common.MapStr, 0, 1)
 	for _, v := range mp {
-		if el, ok := v[key]; ok {
+		if el, ok := v.MetricSetFields[key]; ok {
 			result = append(result, el.(common.MapStr))
 		}
 	}
@@ -58,15 +59,15 @@ func findItems(mp []common.MapStr, key string) []common.MapStr {
 	return result
 }
 
-func assertTestData(t *testing.T, mp []common.MapStr) {
-	totals := findItems(mp, "total")
+func assertTestData(t *testing.T, evt []mb.Event) {
+	totals := findItems(evt, "total")
 	assert.Equal(t, 1, len(totals))
 	assert.Equal(t, 2042, totals[0]["requests"])
 	assert.Equal(t, 0, totals[0]["exceptions"])
 	assert.Equal(t, 34, totals[0]["write_errors"])
 	assert.Equal(t, 38, totals[0]["read_errors"])
 
-	workers := findItems(mp, "core")
+	workers := findItems(evt, "core")
 	assert.Equal(t, 4, len(workers))
 }
 
@@ -93,9 +94,11 @@ func TestFetchDataTCP(t *testing.T) {
 		"hosts":      []string{"tcp://" + listener.Addr().String()},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
 
 	assertTestData(t, events)
 	wg.Wait()
@@ -117,9 +120,11 @@ func TestFetchDataHTTP(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
 
 	assertTestData(t, events)
 }
@@ -138,9 +143,9 @@ func TestFetchDataUnmarshalledError(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	_, err := f.Fetch()
-	assert.Error(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	_, errs := mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs)
 }
 
 func TestFetchDataSourceDown(t *testing.T) {
@@ -155,9 +160,9 @@ func TestFetchDataSourceDown(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	_, err := f.Fetch()
-	assert.Error(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	_, errs := mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs)
 }
 
 func TestConfigError(t *testing.T) {
@@ -167,9 +172,9 @@ func TestConfigError(t *testing.T) {
 		"hosts":      []string{"unix://127.0.0.1:8080"},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	_, err := f.Fetch()
-	assert.Error(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	_, errs := mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs)
 
 	config = map[string]interface{}{
 		"module":     "uwsgi",
@@ -177,9 +182,9 @@ func TestConfigError(t *testing.T) {
 		"hosts":      []string{"unknown_url_format"},
 	}
 
-	f = mbtest.NewEventsFetcher(t, config)
-	_, err = f.Fetch()
-	assert.Error(t, err)
+	f = mbtest.NewReportingMetricSetV2Error(t, config)
+	_, errs = mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs)
 
 	config = map[string]interface{}{
 		"module":     "uwsgi",
@@ -187,7 +192,7 @@ func TestConfigError(t *testing.T) {
 		"hosts":      []string{"ftp://127.0.0.1:8080"},
 	}
 
-	f = mbtest.NewEventsFetcher(t, config)
-	_, err = f.Fetch()
-	assert.Error(t, err)
+	f = mbtest.NewReportingMetricSetV2Error(t, config)
+	_, errs = mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs)
 }

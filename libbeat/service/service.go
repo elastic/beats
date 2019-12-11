@@ -42,12 +42,19 @@ import (
 func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	var callback sync.Once
 
-	// On ^C or SIGTERM, gracefully stop the sniffer
+	// On termination signals, gracefully stop the Beat
 	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	go func() {
-		<-sigc
-		logp.Debug("service", "Received sigterm/sigint, stopping")
+		sig := <-sigc
+
+		switch sig {
+		case syscall.SIGINT, syscall.SIGTERM:
+			logp.Debug("service", "Received sigterm/sigint, stopping")
+		case syscall.SIGHUP:
+			logp.Debug("service", "Received sighup, stopping")
+		}
+
 		cancel()
 		callback.Do(stopFunction)
 	}()

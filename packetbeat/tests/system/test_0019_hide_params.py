@@ -24,8 +24,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "http"
-        assert o["http.request.params"] == "pass=xxxxx&user=monica"
-        assert o["path"] == "/login"
+        assert o["url.query"] == "pass=xxxxx&user=monica"
+        assert o["url.path"] == "/login"
         for _, val in o.items():
             if isinstance(val, six.string_types):
                 assert "secret" not in val
@@ -45,8 +45,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "http"
-        assert o["http.request.params"] == "pass=xxxxx&user=monica"
-        assert o["path"] == "/login"
+        assert o["url.query"] == "pass=xxxxx&user=monica"
+        assert o["url.path"] == "/login"
         for _, val in o.items():
             if isinstance(val, six.string_types):
                 assert "secret" not in val
@@ -63,5 +63,5 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "http"
-        assert o["http.request.params"] == "pass=secret&user=monica"
-        assert o["path"] == "/login"
+        assert o["url.query"] == "pass=secret&user=monica"
+        assert o["url.path"] == "/login"

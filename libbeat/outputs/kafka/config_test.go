@@ -39,18 +39,13 @@ func TestConfigAcceptValid(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(test)
+			c := common.MustNewConfigFrom(test)
+			c.SetString("hosts", 0, "localhost")
+			cfg, err := readConfig(c)
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			c.SetString("hosts", 0, "localhost")
-
-			cfg := defaultConfig()
-			if err := c.Unpack(&cfg); err != nil {
-				t.Fatalf("Unpacking configuration failed: %v", err)
-			}
-
-			if _, err := newSaramaConfig(&cfg); err != nil {
+			if _, err := newSaramaConfig(cfg); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
 			}
 		})

@@ -55,24 +55,20 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 
 	var data map[string]map[string][]map[string]interface{}
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
 	}
 
 	var errs multierror.Errors
 	for indexName, d := range data {
 		shards, ok := d["shards"]
 		if !ok {
-			err = elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch)
-			r.Error(err)
-			errs = append(errs, err)
+			errs = append(errs, elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch))
 			continue
 		}
 		for _, data := range shards {
@@ -82,12 +78,14 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 			event.ModuleFields = common.MapStr{}
+			event.ModuleFields.Put("cluster.name", info.ClusterName)
+			event.ModuleFields.Put("cluster.id", info.ClusterID)
 			event.ModuleFields.Put("index.name", indexName)
 
 			event.MetricSetFields, err = schema.Apply(data)
 			if err != nil {
-				event.Error = errors.Wrap(err, "failure applying shard schema")
-				errs = append(errs, event.Error)
+				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
+				continue
 			}
 
 			r.Event(event)

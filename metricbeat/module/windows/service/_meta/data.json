@@ -1,20 +1,24 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "windows.service",
+        "duration": 115000,
+        "module": "windows"
     },
     "metricset": {
-        "module": "windows",
-        "name": "service",
-        "rtt": 115
+        "name": "service"
+    },
+    "service": {
+        "type": "windows"
     },
     "windows": {
         "service": {
-            "display_name": "AllJoyn-Routerdienst",
+            "display_name": "Servicio de enrutador de AllJoyn",
+            "exit_code": "ERROR_SERVICE_NEVER_STARTED",
+            "id": "IOQgaoSLJ7",
             "name": "AJRouter",
-            "start_type": "ServiceDemandStart",
-            "state": "ServiceStopped"
+            "start_type": "Manual (Triggered)",
+            "state": "Stopped"
         }
     }
 }

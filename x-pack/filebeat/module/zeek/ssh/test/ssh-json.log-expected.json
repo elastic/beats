@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": "2019-07-07T19:25:32.904Z",
+        "destination.address": "192.168.1.1",
+        "destination.ip": "192.168.1.1",
+        "destination.port": 22,
+        "event.dataset": "zeek.ssh",
+        "event.id": "CajWfz1b3qnnWT0BU9",
+        "event.module": "zeek",
+        "fileset.name": "ssh",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:42tg9bemt74qgrdvJOy2n5Veg4A=",
+        "network.protocol": "ssh",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "192.168.1.2",
+        "source.ip": "192.168.1.2",
+        "source.port": 48380,
+        "tags": [
+            "zeek.ssh"
+        ],
+        "zeek.session_id": "CajWfz1b3qnnWT0BU9",
+        "zeek.ssh.algorithm.cipher": "chacha20-poly1305@openssh.com",
+        "zeek.ssh.algorithm.compression": "none",
+        "zeek.ssh.algorithm.host_key": "ecdsa-sha2-nistp256",
+        "zeek.ssh.algorithm.key_exchange": "curve25519-sha256@libssh.org",
+        "zeek.ssh.algorithm.mac": "umac-64-etm@openssh.com",
+        "zeek.ssh.auth.attempts": 2,
+        "zeek.ssh.auth.success": false,
+        "zeek.ssh.client": "SSH-2.0-OpenSSH_7.9p1 Ubuntu-10",
+        "zeek.ssh.host_key": "86:71:ac:9c:35:1c:28:29:05:81:48:ec:66:67:de:bd",
+        "zeek.ssh.server": "SSH-2.0-OpenSSH_6.6.1p1 Debian-4~bpo70+1",
+        "zeek.ssh.version": 2
+    }
+]

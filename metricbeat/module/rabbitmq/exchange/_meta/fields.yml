@@ -2,14 +2,16 @@
   type: group
   description: >
     exchange
-  release: beta
+  release: ga
   fields:
     - name: name
       type: keyword
       description: >
         The name of the queue with non-ASCII characters escaped as in C.
     - name: vhost
-      type: keyword
+      type: alias
+      path: rabbitmq.vhost
+      migration: true
       description: >
         Virtual host name with non-ASCII characters escaped as in C.
     - name: durable
@@ -25,7 +27,9 @@
       description: >
         Whether the exchange is internal, i.e. cannot be directly published to by a client.
     - name: user
-      type: keyword
+      type: alias
+      path: user.name
+      migration: true
       description: >
         User who created the exchange.
 

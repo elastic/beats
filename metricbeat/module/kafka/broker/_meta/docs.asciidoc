@@ -1,0 +1,20 @@
+This metricset periodically fetches JMX metrics from Kafka Broker JMX.
+
+[float]
+=== Compatibility
+The module has been tested with Kafka 2.1.1. Other versions are expected to work.
+
+[float]
+=== Usage
+The Broker metricset requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
+
+Note that the Jolokia agent is required to be deployed along with the Kafka JVM application. This can be achieved by
+using the `KAFKA_OPTS` environment variable when starting the Kafka broker application:
+
+[source,shell]
+----
+export KAFKA_OPTS=-javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8779,host=localhost
+./bin/kafka-server-start.sh ./config/server.properties
+----
+
+Then it will be possible to collect the JMX metrics from `localhost:8779`.

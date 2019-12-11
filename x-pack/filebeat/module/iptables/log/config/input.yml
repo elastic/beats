@@ -1,0 +1,53 @@
+{{ if eq .input "syslog" }}
+
+type: syslog
+protocol.udp:
+  host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags}}
+
+processors:
+  - add_locale: ~
+{{ if .community_id }}
+  - dissect:
+      tokenizer: "%{} SRC=%{source.ip} DST=%{destination.ip} "
+      field: "message"
+      target_prefix: ""
+  - dissect:
+      tokenizer: "%{} PROTO=%{network.transport} "
+      field: "message"
+      target_prefix: ""
+  - if:
+      or:
+        - equals.network.transport: TCP
+        - equals.network.transport: UDP
+        - equals.network.transport: SCTP
+    then:
+      dissect:
+        tokenizer: "%{} SPT=%{source.port} DPT=%{destination.port} "
+        field: "message"
+        target_prefix: ""
+    else:
+      dissect:
+        when:or:
+          - equals.network.transport: ICMP
+          - equals.network.transport: ICMPv6
+        tokenizer: "%{} TYPE=%{iptables.icmp.type} CODE=%{iptables.icmp.code} "
+        field: "message"
+        target_prefix: ""
+  - community_id:
+      fields:
+        icmp_type: iptables.icmp.type
+        icmp_code: iptables.icmp.code
+{{ end}}

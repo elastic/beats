@@ -248,7 +248,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 	// File "b/b" is missing because a watch to b couldn't be installed
 
 	expected := map[string]fsnotify.Op{
-		dest: fsnotify.Create,
+		dest:                       fsnotify.Create,
 		filepath.Join(dest, "a"):   fsnotify.Create,
 		filepath.Join(dest, "a/a"): fsnotify.Create,
 		filepath.Join(dest, "b"):   fsnotify.Create,
@@ -299,12 +299,14 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 		ev, err = readTimeout(t, watcher)
 	}
 
-	// Helper to read events ignoring a write to the parent dir, which seems
-	// to trigger sometimes under Windows when moving files around in a dir.
-	readIgnoreParent := func(t *testing.T, w Watcher) (fsnotify.Event, error) {
+	// Helper to read events ignoring writes. These have been observed
+	// under Windows in two cases:
+	// - Writes to the parent dir (metadata updates after update loop above?)
+	// - Delayed writes to "fpath" file, not discarded by above consumer loop.
+	readIgnoreWrites := func(t *testing.T, w Watcher) (fsnotify.Event, error) {
 		for {
 			ev, err := readTimeout(t, w)
-			if err != nil || ev.Name != dir || ev.Op != fsnotify.Write {
+			if err != nil || ev.Op != fsnotify.Write {
 				return ev, err
 			}
 		}
@@ -314,10 +316,10 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	err = os.Rename(fpath, fpath2)
 	assertNoError(t, err)
 
-	evRename, err := readIgnoreParent(t, watcher)
+	evRename, err := readIgnoreWrites(t, watcher)
 	assertNoError(t, err)
 
-	evCreate, err := readIgnoreParent(t, watcher)
+	evCreate, err := readIgnoreWrites(t, watcher)
 	assertNoError(t, err)
 
 	if evRename.Op != fsnotify.Rename {
@@ -334,7 +336,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	err = os.Remove(fpath2)
 	assertNoError(t, err)
 
-	ev, err = readIgnoreParent(t, watcher)
+	ev, err = readIgnoreWrites(t, watcher)
 	assertNoError(t, err)
 
 	assert.Equal(t, fpath2, ev.Name)

@@ -20,7 +20,8 @@ package pool
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/php_fpm"
@@ -42,7 +43,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The php_fpm pool metricset is beta")
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
@@ -55,24 +55,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch gathers data for the pool metricset
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error in http fetch")
 	}
 	var stats map[string]interface{}
 	err = json.Unmarshal(content, &stats)
 	if err != nil {
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error unmarshalling json")
 	}
 	event, err := schema.Apply(stats)
 	if err != nil {
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error in event mapping")
 	}
-	report.Event(mb.Event{
+	reporter.Event(mb.Event{
 		MetricSetFields: event,
 	})
+	return nil
 }

@@ -5,7 +5,7 @@ paths:
 {{ end }}
 exclude_files: ['.gz$']
 multiline:
-  pattern: '^# User@Host: '
+  pattern: '^(# User@Host: |# Time: )'
   negate: true
   match: after
-exclude_lines: ['^[\/\w\.]+, Version: .* started with:.*']   # Exclude the header
+exclude_lines: ['^[\/\w\.]+, Version: .* started with:.*', '^# Time:.*']   # Exclude the header and time

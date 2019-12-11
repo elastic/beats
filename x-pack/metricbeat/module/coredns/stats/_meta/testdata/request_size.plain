@@ -1,0 +1,19 @@
+# HELP coredns_dns_request_size_bytes Size of the EDNS0 UDP buffer in bytes (64K for TCP).
+# TYPE coredns_dns_request_size_bytes histogram
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="0.0"} 0.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="100.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="200.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="300.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="400.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="511.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="1023.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="2047.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="4095.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="8291.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="16000.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="32000.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="48000.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="64000.0"} 440.0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="+Inf"} 440.0
+coredns_dns_request_size_bytes_sum{proto="udp",server="dns://:53",zone="."} 22880.0
+coredns_dns_request_size_bytes_count{proto="udp",server="dns://:53",zone="."} 440.0

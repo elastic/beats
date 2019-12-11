@@ -75,8 +75,8 @@
       fields:
         - name: used.value
           type: long
-          description: >
           format: bytes
+          description: >
             Total number of bytes allocated by Redis.
         - name: used.rss
           type: long
@@ -382,7 +382,9 @@
         Server info
       fields:
         - name: version
-          type: keyword
+          type: alias
+          path: service.version
+          migration: true
           description:
 
         - name: git_sha1
@@ -402,7 +404,9 @@
           description:
 
         - name: os
-          type: keyword
+          type: alias
+          path: os.full
+          migration: true
           description:
 
         - name: arch_bits
@@ -418,7 +422,9 @@
           description:
 
         - name: process_id
-          type: long
+          type: alias
+          path: process.pid
+          migration: true
           description:
 
         - name: run_id

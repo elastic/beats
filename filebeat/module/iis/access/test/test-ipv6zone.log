@@ -1,0 +1,5 @@
+#Software: Microsoft Internet Information Services 10.0
+#Version: 1.0
+#Date: 2018-01-01 10:11:12
+#Fields: date time s-sitename s-computername s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs-version cs(User-Agent) cs(Cookie) cs(Referer) cs-host sc-status sc-substatus sc-win32-status sc-bytes cs-bytes time-taken
+2018-01-01 10:11:12 W3SVC1 MACHINE-NAME ::1%0 GET / - 80 - ::1%0 HTTP/1.1 Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_14_0)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/70.0.3538.102+Safari/537.36 - - example.com 200 0 0 123 456 789

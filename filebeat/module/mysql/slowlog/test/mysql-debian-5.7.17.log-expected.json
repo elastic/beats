@@ -1,0 +1,68 @@
+[
+    {
+        "@timestamp": "2017-04-28T09:07:39.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 4071491000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 0,
+        "mysql.slowlog.current_user": "apphost",
+        "mysql.slowlog.lock_time.sec": 0.000212,
+        "mysql.slowlog.query": "SELECT mcu.mcu_guid, mcu.cus_guid, mcu.mcu_url, mcu.mcu_crawlelements, mcu.mcu_order, GROUP_CONCAT(mca.mca_guid SEPARATOR \";\") as mca_guid\n                    FROM kat_mailcustomerurl mcu, kat_customer cus, kat_mailcampaign mca\n                    WHERE cus.cus_guid = mcu.cus_guid\n                        AND cus.pro_code = 'CYB'\n                        AND cus.cus_offline = 0\n                        AND mca.cus_guid = cus.cus_guid\n                        AND (mcu.mcu_date IS NULL OR mcu.mcu_date < CURDATE())\n                        AND mcu.mcu_crawlelements IS NOT NULL\n                    GROUP BY mcu.mcu_guid\n                    ORDER BY mcu.mcu_order ASC\n                    LIMIT 1000;",
+        "mysql.slowlog.rows_examined": 1489615,
+        "mysql.slowlog.rows_sent": 1000,
+        "mysql.thread_id": 10997316,
+        "service.type": "mysql",
+        "source.domain": "apphost",
+        "source.ip": "1.1.1.1",
+        "user.name": "apphost"
+    },
+    {
+        "@timestamp": "2017-04-28T09:16:30.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 10346539000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 907,
+        "mysql.slowlog.current_user": "apphost",
+        "mysql.slowlog.lock_time.sec": 3.6e-05,
+        "mysql.slowlog.query": "call load_stats(1, '2017-04-28 00:00:00');",
+        "mysql.slowlog.rows_examined": 4751313,
+        "mysql.slowlog.rows_sent": 0,
+        "mysql.thread_id": 10999834,
+        "service.type": "mysql",
+        "source.domain": "apphost",
+        "source.ip": "1.1.1.1",
+        "user.name": "apphost"
+    },
+    {
+        "@timestamp": "2017-04-28T09:31:31.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 10508030000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1158,
+        "mysql.slowlog.current_user": "apphost",
+        "mysql.slowlog.lock_time.sec": 3.4e-05,
+        "mysql.slowlog.query": "call load_stats(1, '2017-04-28 00:00:00');",
+        "mysql.slowlog.rows_examined": 4754675,
+        "mysql.slowlog.rows_sent": 0,
+        "mysql.thread_id": 11004208,
+        "service.type": "mysql",
+        "source.domain": "apphost",
+        "source.ip": "1.1.1.1",
+        "user.name": "apphost"
+    }
+]

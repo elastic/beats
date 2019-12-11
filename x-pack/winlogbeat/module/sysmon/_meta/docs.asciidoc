@@ -1,0 +1,33 @@
+[[winlogbeat-module-sysmon]]
+[role="xpack"]
+== Sysmon Module
+
+The sysmon module processes event log records from the
+https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon[Sysinternals
+System Monitor] (Sysmon) which is a Windows service and device driver that logs
+system activity to the event log. Sysmon is not bundled with Windows or
+Winlogbeat and must be installed independently.
+
+The default configuration file includes configuration for Sysmon. If you do not
+have Sysmon installed Winlogbeat will log a warning that it could not read from
+the `Microsoft-Windows-Sysmon/Operational` channel. It will continue to read
+from the other configured channels. If you do install Sysmon at a later time
+then a restart of Winlogbeat is required to make it begin reading from the
+channel.
+
+This module was built based on Sysmon v10 event manifests. It contains
+transformations for each of the defined event IDs.
+
+[float]
+=== Configuration
+
+[source,yaml]
+----
+winlogbeat.event_logs:
+  - name: Microsoft-Windows-Sysmon/Operational
+    processors:
+      - script:
+          lang: javascript
+          id: sysmon
+          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+----

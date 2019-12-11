@@ -3,7 +3,7 @@
   description: >
     `pool` contains the metrics that were obtained from the PHP-FPM process
     pool.
-  release: beta
+  release: ga
   fields:
     - name: process_manager
       type: keyword
@@ -81,6 +81,5 @@
         Number of seconds since FPM has started.
     - name: start_time
       type: date
-      format: epoch_second
       description: >
         The date and time FPM has started.

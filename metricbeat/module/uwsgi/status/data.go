@@ -20,8 +20,10 @@ package status
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 type uwsgiCore struct {
@@ -75,15 +77,13 @@ type uwsgiStat struct {
 	// Sockets []UwsgiSocket `json:"sockets"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte, reporter mb.ReporterV2) error {
 	var stats uwsgiStat
 	err := json.Unmarshal(content, &stats)
 	if err != nil {
-		logp.Err("uwsgi statistics parsing failed with error: ", err)
-		return nil, err
+		return errors.Wrap(err, "uwsgi statistics parsing failed")
 	}
 
-	events := []common.MapStr{}
 	totalRequests := 0
 	totalExceptions := 0
 	totalWriteErrors := 0
@@ -133,11 +133,11 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 					"read_errors":  core.ReadErrors,
 				},
 			}
-			events = append(events, coreEvent)
+			reporter.Event(mb.Event{MetricSetFields: coreEvent})
 			coreID++
 		}
 
-		events = append(events, workerEvent)
+		reporter.Event(mb.Event{MetricSetFields: workerEvent})
 	}
 
 	// overall
@@ -151,6 +151,6 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		},
 	}
 
-	events = append(events, baseEvent)
-	return events, nil
+	reporter.Event(mb.Event{MetricSetFields: baseEvent})
+	return nil
 }

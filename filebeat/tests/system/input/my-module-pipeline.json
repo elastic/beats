@@ -1,0 +1,27 @@
+{
+  "description": "Pipeline for parsing PostgreSQL logs.",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "ignore_missing": true,
+        "patterns": [
+            "^%{LOCALDATETIME:postgresql.log.timestamp} %{WORD:postgresql.log.timezone} \\[%{NUMBER:postgresql.log.thread_id}\\] ((\\[%{USERNAME:postgresql.log.user}\\]@\\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\\]|%{USERNAME:postgresql.log.user}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?%{WORD:postgresql.log.level}:  (duration: %{NUMBER:postgresql.log.duration} ms  statement: %{GREEDYDATA:postgresql.log.query}|%{GREEDYDATA:postgresql.log.message})"
+        ],
+        "pattern_definitions": {
+          "LOCALDATETIME": "[-0-9]+ %{TIME}",
+          "GREEDYDATA": "(.|\n|\t)*",
+          "POSTGRESQL_DB_NAME": "[a-zA-Z0-9_]+[a-zA-Z0-9_\\$]*"
+        }
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

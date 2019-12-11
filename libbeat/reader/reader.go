@@ -17,6 +17,10 @@
 
 package reader
 
+import (
+	"errors"
+)
+
 // Reader is the interface that wraps the basic Next method for
 // getting a new message.
 // Next returns the message being read or and error. EOF is returned
@@ -24,3 +28,8 @@ package reader
 type Reader interface {
 	Next() (Message, error)
 }
+
+var (
+	//ErrLineUnparsable is error thrown when Next() element from input is corrupted and can not be parsed
+	ErrLineUnparsable = errors.New("line is unparsable")
+)

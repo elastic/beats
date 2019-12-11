@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
 // +build darwin freebsd linux openbsd
 
 package load
@@ -23,19 +22,29 @@ package load
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
+func TestFetch(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	load, err := f.Fetch()
-	if err != nil {
-		t.Fatal(err)
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
 	}
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "load").Fields.StringToPrint())
+}
 
-	event := mbtest.CreateFullEvent(f, load)
-	mbtest.WriteEventToDataJSON(t, event, "")
+func TestData(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func getConfig() map[string]interface{} {

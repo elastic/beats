@@ -1,6 +1,6 @@
 [[filtering-and-enhancing-data]]
 == Filter and Enhance the exported data
 
-include::../../libbeat/docs/processors.asciidoc[]
+include::{libbeat-dir}/processors.asciidoc[]
 
-include::../../libbeat/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/processors-using.asciidoc[]

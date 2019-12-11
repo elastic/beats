@@ -1,0 +1,39 @@
+[
+    {
+        "@timestamp": "2018-08-10T07:45:56.000Z",
+        "apache.access.ssl.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "apache.access.ssl.protocol": "TLSv1.2",
+        "event.dataset": "apache.access",
+        "event.module": "apache",
+        "fileset.name": "access",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 1375,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "apache",
+        "source.address": "172.30.0.119",
+        "source.ip": "172.30.0.119",
+        "url.original": "/nagiosxi/ajaxhelper.php?cmd=getxicoreajax&amp;opts=%7B%22func%22%3A%22get_admin_tasks_html%22%2C%22args%22%3A%22%22%7D&amp;nsp=b5c7d5d4b6f7d0cf0c92f9cbdf737f6a5c838218425e6ae21"
+    },
+    {
+        "@timestamp": "2019-10-16T09:53:47.000Z",
+        "apache.access.ssl.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "apache.access.ssl.protocol": "TLSv1.2",
+        "event.dataset": "apache.access",
+        "event.module": "apache",
+        "fileset.name": "access",
+        "http.request.method": "GET",
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 276,
+        "service.type": "apache",
+        "source.address": "11.19.0.217",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "11.19.0.217",
+        "url.original": "/appl/ajaxhelper.php?cmd=getxicoreajax&opts=%7B%22func%22%3A%22get_pagetop_alert_content_html%22%2C%22args%22%3A%22%22%7D&nsp=c2700eab9797eda8a9f65a3ab17a6adbceccd60a6cca7708650a5923950d"
+    }
+]

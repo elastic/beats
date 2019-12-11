@@ -22,22 +22,44 @@ package info
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/haproxy"
 )
 
+func TestFetch(t *testing.T) {
+	service := compose.EnsureUp(t, "haproxy")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(14567)))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("haproxy", "info").Fields.StringToPrint())
+
+}
+
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
+	service := compose.EnsureUp(t, "haproxy")
+
+	config := getConfig(service.HostForPort(14567))
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}
+
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "haproxy",
 		"metricsets": []string{"info"},
-		"hosts":      []string{"tcp://" + haproxy.GetEnvHost() + ":" + haproxy.GetEnvPort()},
+		"hosts":      []string{"tcp://" + host},
 	}
 }

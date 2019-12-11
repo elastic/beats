@@ -20,31 +20,35 @@ package cluster_health
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Timecheck contains part of the response from a HealthRequest
 type Timecheck struct {
 	RoundStatus string `json:"round_status"`
 	Epoch       int64  `json:"epoch"`
 	Round       int64  `json:"round"`
 }
 
+// Output is the body of the status response
 type Output struct {
 	OverallStatus string    `json:"overall_status"`
 	Timechecks    Timecheck `json:"timechecks"`
 }
 
+// HealthRequest represents the response to a cluster health request
 type HealthRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventMapping(content []byte) (common.MapStr, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: ", err)
+		return nil, errors.Wrap(err, "error getting HealthRequest data")
 	}
 
 	return common.MapStr{
@@ -56,5 +60,5 @@ func eventMapping(content []byte) common.MapStr {
 				"status": d.Output.Timechecks.RoundStatus,
 			},
 		},
-	}
+	}, nil
 }

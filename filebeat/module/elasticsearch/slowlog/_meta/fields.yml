@@ -10,15 +10,15 @@
   - name: took
     description: "Time it took to execute the query"
     example: "300ms"
-    type: text
+    type: keyword
   - name: types
     description: "Types"
     example: ""
     type: keyword
   - name: stats
-    description: "Statistics"
-    example: ""
-    type: text
+    description: "Stats groups"
+    example: "group1"
+    type: keyword
   - name: search_type
     description: "Search type"
     example: "QUERY_THEN_FETCH"
@@ -26,14 +26,10 @@
   - name: source_query
     description: "Slow query"
     example: "{\"query\":{\"match_all\":{\"boost\":1.0}}}"
-    type: text
+    type: keyword
   - name: extra_source
     description: "Extra source information"
     example: ""
-    type: text
-  - name: took_millis
-    description: "Time took in milliseconds"
-    example: 42
     type: keyword
   - name: total_hits
     description: "Total hits"
@@ -54,4 +50,7 @@
   - name: type
     description: "Type"
     example: "doc"
+    type: keyword
+  - name: source
+    description: Source of document that was indexed
     type: keyword

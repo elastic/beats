@@ -23,25 +23,24 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
-	for _, netsStats := range netsStatsList {
-		eventMapping(r, &netsStats)
+	for i := range netsStatsList {
+		eventMapping(r, &netsStatsList[i])
 	}
 }
 
 func eventMapping(r mb.ReporterV2, stats *NetStats) {
-	// Deprecated fields
 	r.Event(mb.Event{
-		ModuleFields: common.MapStr{
-			"container": stats.Container.ToMapStr(),
-		},
+		RootFields: stats.Container.ToMapStr(),
 		MetricSetFields: common.MapStr{
 			"interface": stats.NameInterface,
+			// Deprecated
 			"in": common.MapStr{
 				"bytes":   stats.RxBytes,
 				"dropped": stats.RxDropped,
 				"errors":  stats.RxErrors,
 				"packets": stats.RxPackets,
 			},
+			// Deprecated
 			"out": common.MapStr{
 				"bytes":   stats.TxBytes,
 				"dropped": stats.TxDropped,

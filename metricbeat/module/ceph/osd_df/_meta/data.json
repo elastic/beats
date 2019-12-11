@@ -1,25 +1,30 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "ceph": {
         "osd_df": {
-            "available.byte": 49655580,
+            "available.byte": 0,
             "device_class": "",
             "id": 0,
             "name": "osd.0",
-            "pg_num": 120,
-            "total.byte": 65792556,
-            "used.byte": 12765200,
-            "used.pct": 0.1940219498388237
+            "pg_num": 0,
+            "total.byte": 0,
+            "used.byte": 0
         }
     },
+    "event": {
+        "dataset": "ceph.osd_df",
+        "duration": 115000,
+        "module": "ceph"
+    },
     "metricset": {
-        "host": "ceph:5000",
-        "module": "ceph",
-        "name": "osd_df",
-        "rtt": 115
+        "name": "osd_df"
+    },
+    "service": {
+        "address": "127.0.0.1:5000",
+        "type": "ceph"
     }
 }

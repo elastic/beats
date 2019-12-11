@@ -16,6 +16,7 @@ class Test(metricbeat.BaseTest):
         "leader",
         "self",
         "store",
+        "metrics",
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricset(self, metricset):
@@ -24,10 +25,6 @@ class Test(metricbeat.BaseTest):
         """
         self.check_metricset("etcd", metricset, self.get_hosts(), ['etcd.' + metricset])
 
-    def get_hosts(self):
-        return [self.compose_hosts()[0] + ':' +
-                os.getenv('ETCD_PORT', '2379')]
-
 
 class Test_3_2(Test):
-    COMPOSE_SERVICES = ['etcd_3_2']
+    COMPOSE_ENV = {'ETCD_VERSION': '3.2.25'}

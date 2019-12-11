@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/metricbeat/module/system/raid/blockinfo"
 )
 
 func init() {
@@ -38,7 +39,8 @@ func init() {
 // MetricSet contains proc fs data.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs procfs.FS
+	fs       procfs.FS
+	sysblock string
 }
 
 // New creates a new instance of the raid metricset.
@@ -67,36 +69,68 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	sysMountPoint := filepath.Join(config.MountPoint, "/sys/block")
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
+		sysblock:      sysMountPoint,
 	}, nil
 }
 
-// Fetch fetches one event for each device
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func blockto1024(b int64) int64 {
+	//Annoyingly, different linux subsystems report size size using different blocks
+	// /proc/mdstat /proc/partitions and mdadm (Via the BLKGETSIZE64 ioctl call) count "size" as the number of 1024-byte blocks.
+	// /sys/block/md*/size uses 512-byte blocks. As does /sys/block/md*/md/sync_completed
+	//convert the 512-byte blocks to 1024 byte blocks to maintain how this metricset "used to" report size
+	return b / 2
+}
 
-	stats, err := m.fs.ParseMDStat()
+// Fetch fetches one event for each device
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	devices, err := blockinfo.ListAll(m.sysblock)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "failed to parse sysfs")
 	}
 
-	events := make([]common.MapStr, 0, len(stats))
-	for _, stat := range stats {
+	for _, blockDev := range devices {
+
 		event := common.MapStr{
-			"name":           stat.Name,
-			"activity_state": stat.ActivityState,
+			"name":   blockDev.Name,
+			"status": blockDev.ArrayState,
+			"level":  blockDev.Level,
 			"disks": common.MapStr{
-				"active": stat.DisksActive,
-				"total":  stat.DisksTotal,
-			},
-			"blocks": common.MapStr{
-				"synced": stat.BlocksSynced,
-				"total":  stat.BlocksTotal,
+				"active": blockDev.DiskStates.Active,
+				"total":  blockDev.DiskStates.Total,
+				"spare":  blockDev.DiskStates.Spare,
+				"failed": blockDev.DiskStates.Failed,
+				"states": blockDev.DiskStates.States,
 			},
 		}
-		events = append(events, event)
+		//emulate the behavior of the previous mdstat parser by using the size when no sync data is available
+		if blockDev.SyncStatus.Total == 0 {
+			event["blocks"] = common.MapStr{
+				"synced": blockto1024(blockDev.Size),
+				"total":  blockto1024(blockDev.Size),
+			}
+		} else {
+			event["blocks"] = common.MapStr{
+				"synced": blockto1024(blockDev.SyncStatus.Complete),
+				"total":  blockto1024(blockDev.SyncStatus.Total),
+			}
+		}
+		//sync action is only available on redundant RAID types
+		if blockDev.SyncAction != "" {
+			event["sync_action"] = blockDev.SyncAction
+		}
+
+		isOpen := r.Event(mb.Event{
+			MetricSetFields: event,
+		})
+		if !isOpen {
+			return nil
+		}
 	}
 
-	return events, nil
+	return nil
 }

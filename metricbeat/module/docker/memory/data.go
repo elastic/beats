@@ -22,32 +22,47 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func eventsMapping(memoryDataList []MemoryData) []common.MapStr {
-	events := []common.MapStr{}
+func eventsMapping(r mb.ReporterV2, memoryDataList []MemoryData) {
 	for _, memoryData := range memoryDataList {
-		events = append(events, eventMapping(&memoryData))
+		eventMapping(r, &memoryData)
 	}
-	return events
 }
 
-func eventMapping(memoryData *MemoryData) common.MapStr {
-	event := common.MapStr{
-		mb.ModuleDataKey: common.MapStr{
-			"container": memoryData.Container.ToMapStr(),
-		},
-		"fail": common.MapStr{
-			"count": memoryData.Failcnt,
-		},
-		"limit": memoryData.Limit,
-		"rss": common.MapStr{
-			"total": memoryData.TotalRss,
-			"pct":   memoryData.TotalRssP,
-		},
-		"usage": common.MapStr{
-			"total": memoryData.Usage,
-			"pct":   memoryData.UsageP,
-			"max":   memoryData.MaxUsage,
-		},
+func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
+
+	//if we have windows memory data, just report windows stats
+	var fields common.MapStr
+	if memoryData.Commit+memoryData.CommitPeak+memoryData.PrivateWorkingSet > 0 {
+		fields = common.MapStr{
+			"commit": common.MapStr{
+				"total": memoryData.Commit,
+				"peak":  memoryData.CommitPeak,
+			},
+			"private_working_set": common.MapStr{
+				"total": memoryData.PrivateWorkingSet,
+			},
+		}
+	} else {
+		fields = common.MapStr{
+			"stats": memoryData.Stats,
+			"fail": common.MapStr{
+				"count": memoryData.Failcnt,
+			},
+			"limit": memoryData.Limit,
+			"rss": common.MapStr{
+				"total": memoryData.TotalRss,
+				"pct":   memoryData.TotalRssP,
+			},
+			"usage": common.MapStr{
+				"total": memoryData.Usage,
+				"pct":   memoryData.UsageP,
+				"max":   memoryData.MaxUsage,
+			},
+		}
 	}
-	return event
+
+	r.Event(mb.Event{
+		RootFields:      memoryData.Container.ToMapStr(),
+		MetricSetFields: fields,
+	})
 }

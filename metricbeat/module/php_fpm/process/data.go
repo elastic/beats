@@ -19,6 +19,7 @@ package process
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb"
 
@@ -46,33 +47,51 @@ type phpFpmProcess struct {
 	LastRequestMemory int     `json:"last request memory"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) {
+func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var status phpFpmStatus
 	err := json.Unmarshal(content, &status)
 	if err != nil {
-		r.Error(err)
-		return
+		return err
 	}
 	//remapping process details to match the naming format
 	for _, process := range status.Processes {
-		proc := common.MapStr{
-			"pid":                 process.PID,
-			"state":               process.State,
-			"start_time":          process.StartTime,
-			"start_since":         process.StartSince,
-			"requests":            process.Requests,
-			"request_duration":    process.RequestDuration,
-			"request_method":      process.RequestMethod,
-			"request_uri":         process.RequestURI,
-			"content_length":      process.ContentLength,
-			"user":                process.User,
-			"script":              process.Script,
-			"last_request_cpu":    process.LastRequestCPU,
-			"last_request_memory": process.LastRequestMemory,
+		event := mb.Event{
+			RootFields: common.MapStr{
+				"http": common.MapStr{
+					"request": common.MapStr{
+						"method": strings.ToLower(process.RequestMethod),
+					},
+					"response": common.MapStr{
+						"body": common.MapStr{
+							"bytes": process.ContentLength,
+						},
+					},
+				},
+				"user": common.MapStr{
+					"name": process.User,
+				},
+				"process": common.MapStr{
+					"pid": process.PID,
+				},
+				"url": common.MapStr{
+					"original": process.RequestURI,
+				},
+			},
+			MetricSetFields: common.MapStr{
+				"state":               process.State,
+				"start_time":          process.StartTime,
+				"start_since":         process.StartSince,
+				"requests":            process.Requests,
+				"request_duration":    process.RequestDuration,
+				"script":              process.Script,
+				"last_request_cpu":    process.LastRequestCPU,
+				"last_request_memory": process.LastRequestMemory,
+			},
 		}
-		event := mb.Event{MetricSetFields: proc}
+
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("pool.name", status.Name)
 		r.Event(event)
 	}
+	return nil
 }

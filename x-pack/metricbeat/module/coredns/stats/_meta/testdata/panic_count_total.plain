@@ -1,0 +1,3 @@
+# HELP coredns_panic_count_total A metrics that counts the number of panics.
+# TYPE coredns_panic_count_total counter
+coredns_panic_count_total 42.0

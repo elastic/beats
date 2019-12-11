@@ -18,8 +18,12 @@
 package mage
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -126,11 +130,18 @@ func (b *dockerBuilder) prepareBuild() error {
 }
 
 func (b *dockerBuilder) dockerBuild() (string, error) {
-	tag := fmt.Sprintf("%s:%s", b.Name, b.Version)
+	imageName := b.Name
+	if name, _ := b.ExtraVars["image_name"]; name != "" {
+		var err error
+		imageName, err = b.Expand(name)
+		if err != nil {
+			return "", err
+		}
+	}
+	tag := fmt.Sprintf("%s:%s", imageName, b.Version)
 	if b.Snapshot {
 		tag = tag + "-SNAPSHOT"
 	}
-
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
@@ -141,13 +152,47 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
-		outputTar, err := b.Expand(defaultBinaryName + ".docker.tar")
+		outputTar, err := b.Expand(defaultBinaryName + ".docker.tar.gz")
 		if err != nil {
 			return err
 		}
 		outputFile = filepath.Join(distributionsDir, outputTar)
 	}
-	if err := sh.Run("docker", "save", "-o", outputFile, tag); err != nil {
+	var stderr bytes.Buffer
+	cmd := exec.Command("docker", "save", tag)
+	cmd.Stderr = &stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	if err = cmd.Start(); err != nil {
+		return err
+	}
+
+	err = func() error {
+		f, err := os.Create(outputFile)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		w := gzip.NewWriter(f)
+		defer w.Close()
+
+		_, err = io.Copy(w, stdout)
+		if err != nil {
+			return err
+		}
+		return nil
+	}()
+	if err != nil {
+		return err
+	}
+
+	if err = cmd.Wait(); err != nil {
+		if errmsg := strings.TrimSpace(stderr.String()); errmsg != "" {
+			err = errors.Wrap(errors.New(errmsg), err.Error())
+		}
 		return err
 	}
 	return errors.Wrap(CreateSHA512File(outputFile), "failed to create .sha512 file")

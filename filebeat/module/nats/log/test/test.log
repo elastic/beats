@@ -1,0 +1,18 @@
+[1] 2019/02/06 07:19:40.624334 [INF] Starting nats-server version 1.3.0
+[1] 2019/02/06 07:19:40.624547 [INF] Git commit [eed4fbc]
+[1] 2019/02/06 07:19:40.624674 [INF] Listening for client connections on 0.0.0.0:4222
+[1] 2019/02/06 07:19:40.624690 [INF] Server is ready
+[1] 2019/02/06 07:20:08.508891 [DBG] 172.18.0.1:38630 - cid:1 - Client connection created
+[1] 2019/02/06 07:20:08.510296 [TRC] 172.18.0.1:38630 - cid:1 - ->> [CONNECT {"verbose":false,"pedantic":false,"tls_required":false,"name":"NATS Benchmark","lang":"go","version":"1.7.0","protocol":1,"echo":true}]
+[1] 2019/02/06 07:20:08.512052 [TRC] 172.18.0.1:38630 - cid:1 - ->> [SUB foo  1]
+[1] 2019/02/06 07:20:08.512128 [TRC] 172.18.0.1:38630 - cid:1 - ->> [PING]
+[1] 2019/02/06 07:20:08.512153 [TRC] 172.18.0.1:38630 - cid:1 - <<- [PONG]
+[1] 2019/02/04 15:40:02.717819 [TRC] 50.39.246.116:62388 - cid:3 - ->> [PUB aiuser.platinum1.pingpeer _INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn 20]
+[1] 2019/02/04 15:40:02.717825 [TRC] 50.39.246.116:62388 - cid:3 - ->> MSG_PAYLOAD: [peer, are you alive?]
+[1] 2019/02/04 15:40:02.717832 [TRC] 192.168.176.11:36262 - cid:4 - <<- [MSG aiuser.platinum1.pingpeer 1 _INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn 20]
+[1] 2019/02/04 15:40:02.718007 [TRC] 192.168.176.11:36262 - cid:4 - ->> [PUB _INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn 17]
+[1] 2019/02/04 15:40:02.718023 [TRC] 192.168.176.11:36262 - cid:4 - ->> MSG_PAYLOAD: [I am fine, agent!]
+[1] 2019/02/04 15:40:02.718044 [TRC] 50.39.246.116:62388 - cid:3 - <<- [MSG _INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn 11 17]
+[1] 2019/02/04 15:40:02.717600 [TRC] 50.39.246.116:62388 - cid:3 - ->> [PUB aiuser.platinum1.appstats 1583]
+[1] 2019/02/04 15:40:02.717811 [TRC] 192.168.176.11:36262 - cid:4 - <<- [MSG aiuser.platinum1.appstats 6 1583]
+[1] 2019/02/16 07:20:08.512153 [TRC] 172.18.0.1:38630 - cid:1 - <<- [OK]

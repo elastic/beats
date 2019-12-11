@@ -30,6 +30,8 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
 )
 
 const testFile = "../_meta/test/kube-state-metrics"
@@ -56,27 +58,27 @@ func TestEventMapping(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 
 	assert.Equal(t, 5, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
-		name, err := event.GetValue("name")
+		metricsetFields := event.MetricSetFields
+		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := event.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(eventKey, t, event, k, v)
-					}
-					delete(testCases, eventKey)
+			eventKey := event.ModuleFields["namespace"].(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(eventKey, t, metricsetFields, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -97,9 +99,6 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"default@jumpy-owl-redis": {
-			"_namespace":        "deployment",
-			"_module.namespace": "default",
-
 			"name":   "jumpy-owl-redis",
 			"paused": false,
 
@@ -109,9 +108,6 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.updated":     1,
 		},
 		"test@jumpy-owl-redis": {
-			"_namespace":        "deployment",
-			"_module.namespace": "test",
-
 			"name":   "jumpy-owl-redis",
 			"paused": true,
 
@@ -121,9 +117,6 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.updated":     8,
 		},
 		"kube-system@tiller-deploy": {
-			"_namespace":        "deployment",
-			"_module.namespace": "kube-system",
-
 			"name":   "tiller-deploy",
 			"paused": false,
 
@@ -132,5 +125,27 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.unavailable": 0,
 			"replicas.updated":     1,
 		},
+		"jenkins@wise-lynx-jenkins": {
+			"name":   "wise-lynx-jenkins",
+			"paused": false,
+
+			"replicas.available":   1,
+			"replicas.desired":     1,
+			"replicas.unavailable": 0,
+			"replicas.updated":     1,
+		},
+		"kube-system@kube-state-metrics": {
+			"name":   "kube-state-metrics",
+			"paused": false,
+
+			"replicas.available":   1,
+			"replicas.desired":     2,
+			"replicas.unavailable": 1,
+			"replicas.updated":     2,
+		},
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "state_deployment")
 }

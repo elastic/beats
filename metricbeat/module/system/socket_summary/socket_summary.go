@@ -18,17 +18,13 @@
 package socket_summary
 
 import (
-	"runtime"
 	"syscall"
 
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/shirou/gopsutil/net"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -38,6 +34,7 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet("system", "socket_summary", New,
 		mb.WithNamespace("system.socket.summary"),
+		mb.DefaultMetricSet(),
 	)
 }
 
@@ -47,16 +44,12 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sockstat string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The socket_summary metricset is experimental.")
-	if runtime.GOOS == "windows" {
-		return nil, errors.New("socket_summary metricset is not supported in Windows")
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 	}, nil
@@ -64,11 +57,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 	var (
-		allConns     = len(conns)
-		allListening = 0
-		tcpConns     = 0
-		tcpListening = 0
-		udpConns     = 0
+		allConns       = len(conns)
+		allListening   = 0
+		tcpConns       = 0
+		tcpListening   = 0
+		tcpClosewait   = 0
+		tcpEstablished = 0
+		tcpTimewait    = 0
+		tcpSynsent     = 0
+		tcpSynrecv     = 0
+		tcpFinwait1    = 0
+		tcpFinwait2    = 0
+		tcpLastack     = 0
+		tcpClosing     = 0
+		udpConns       = 0
 	)
 
 	for _, conn := range conns {
@@ -78,9 +80,35 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		switch conn.Type {
 		case syscall.SOCK_STREAM:
 			tcpConns++
-
+			if conn.Status == "ESTABLISHED" {
+				tcpEstablished++
+			}
+			if conn.Status == "CLOSE_WAIT" {
+				tcpClosewait++
+			}
+			if conn.Status == "TIME_WAIT" {
+				tcpTimewait++
+			}
 			if conn.Status == "LISTEN" {
 				tcpListening++
+			}
+			if conn.Status == "SYN_SENT" {
+				tcpSynsent++
+			}
+			if conn.Status == "SYN_RECV" {
+				tcpSynrecv++
+			}
+			if conn.Status == "FIN_WAIT1" {
+				tcpFinwait1++
+			}
+			if conn.Status == "FIN_WAIT2" {
+				tcpFinwait2++
+			}
+			if conn.Status == "LAST_ACK" {
+				tcpLastack++
+			}
+			if conn.Status == "CLOSING" {
+				tcpClosing++
 			}
 		case syscall.SOCK_DGRAM:
 			udpConns++
@@ -94,8 +122,17 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		},
 		"tcp": common.MapStr{
 			"all": common.MapStr{
-				"count":     tcpConns,
-				"listening": tcpListening,
+				"count":       tcpConns,
+				"listening":   tcpListening,
+				"established": tcpEstablished,
+				"close_wait":  tcpClosewait,
+				"time_wait":   tcpTimewait,
+				"syn_sent":    tcpSynsent,
+				"syn_recv":    tcpSynrecv,
+				"fin_wait1":   tcpFinwait1,
+				"fin_wait2":   tcpFinwait2,
+				"last_ack":    tcpLastack,
+				"closing":     tcpClosing,
 			},
 		},
 		"udp": common.MapStr{
@@ -109,17 +146,24 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
-
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// all network connections
-	conns, err := net.Connections("inet")
+	conns, err := connections("inet")
 
 	if err != nil {
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error getting connections")
+	}
+
+	stats := calculateConnStats(conns)
+	newStats, err := applyEnhancements(stats, m)
+	if err != nil {
+		m.Logger().Debugf("error applying enhancements: %s", err)
+		newStats = stats
 	}
 
 	report.Event(mb.Event{
-		MetricSetFields: calculateConnStats(conns),
+		MetricSetFields: newStats,
 	})
+
+	return nil
 }

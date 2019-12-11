@@ -1,6 +1,14 @@
 [[configuration-ssl]]
+ifndef::apm-server[]
 == Specify SSL settings
+endif::apm-server[]
+ifdef::apm-server[]
+== SSL output settings
 
+You can specify SSL options with any output that supports SSL, like {es}, {ls}, or Kafka.
+endif::[]
+
+ifndef::apm-server[]
 You can specify SSL options when you configure:
 
 * <<configuring-output,outputs>> that support SSL
@@ -10,6 +18,7 @@ ifeval::["{beatname_lc}"=="heartbeat"]
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 * <<metricbeat-modules,modules>> that define the host as an HTTP URL
+endif::[]
 endif::[]
 
 Example output config with SSL enabled:
@@ -22,10 +31,11 @@ output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
 output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
 ----
 
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 Also see <<configuring-ssl-logstash>>.
 endif::[]
 
+ifndef::no_kibana[]
 Example Kibana endpoint config with SSL enabled:
 
 [source,yaml]
@@ -36,7 +46,7 @@ setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
 setup.kibana.ssl.key: "/etc/pki/client/cert.key"
 ----
-
+endif::no_kibana[]
 
 ifeval::["{beatname_lc}"=="heartbeat"]
 Example monitor with SSL enabled:
@@ -121,7 +131,7 @@ not configured, the connection will be dropped during or after the handshake. Th
 setting is a list of allowed protocol versions:
 `SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1` and `TLSv1.2`.
 
-The default value is `[TLSv1.0, TLSv1.1, TLSv1.2]`.
+The default value is `[TLSv1.1, TLSv1.2]`.
 
 [float]
 ==== `verification_mode`
@@ -143,21 +153,28 @@ suites are used (recommended).
 
 The following cipher suites are available:
 
-* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* RSA-3DES-CBC3-SHA
-* RSA-AES-128-CBC-SHA
-* RSA-AES-256-CBC-SHA
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * ECDHE-ECDSA-AES-128-CBC-SHA
+* ECDHE-ECDSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
+* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
 * ECDHE-ECDSA-AES-256-CBC-SHA
-* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-CHACHA20-POLY1305 (TLS 1.2 only)
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * ECDHE-RSA-3DES-CBC3-SHA
 * ECDHE-RSA-AES-128-CBC-SHA
-* ECDHE-RSA-AES-256-CBC-SHA
+* ECDHE-RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
 * ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES-256-CBC-SHA
 * ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-RSA-CHACHA20-POLY1205 (TLS 1.2 only)
+* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* RSA-3DES-CBC3-SHA
+* RSA-AES-128-CBC-SHA
+* RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
+* RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* RSA-AES-256-CBC-SHA
+* RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 
 Here is a list of acronyms used in defining the cipher suites:
 
@@ -198,6 +215,7 @@ The following elliptic curve types are available:
 * P-256
 * P-384
 * P-521
+* X25519
 
 [float]
 ==== `renegotiation`
@@ -214,7 +232,8 @@ ifeval::["{beatname_lc}" == "filebeat"]
 ==== `client_authentication`
 
 This configures what types of client authentication are supported. The valid options
-are `none`, `optional`, and `required`. The default value is required.
+are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+default to `required` otherwise it will be set to `none`.
 
 NOTE: This option is only valid with the TCP or the Syslog input.
 

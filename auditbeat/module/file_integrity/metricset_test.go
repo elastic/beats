@@ -29,12 +29,12 @@ import (
 
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/auditbeat/datastore"
-	"github.com/elastic/beats/libbeat/paths"
+	abtest "github.com/elastic/beats/auditbeat/testing"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	defer setup(t)()
+	defer abtest.SetupDataDir(t)()
 
 	dir, err := ioutil.TempDir("", "audit-file")
 	if err != nil {
@@ -61,7 +61,7 @@ func TestData(t *testing.T) {
 }
 
 func TestActions(t *testing.T) {
-	defer setup(t)()
+	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
@@ -170,7 +170,7 @@ func TestActions(t *testing.T) {
 }
 
 func TestExcludedFiles(t *testing.T) {
-	defer setup(t)()
+	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
@@ -206,7 +206,7 @@ func TestExcludedFiles(t *testing.T) {
 	}
 
 	wanted := map[string]bool{
-		dir: true,
+		dir:                              true,
 		filepath.Join(dir, "FILE.TXT"):   true,
 		filepath.Join(dir, ".gitignore"): true,
 	}
@@ -224,7 +224,7 @@ func TestExcludedFiles(t *testing.T) {
 }
 
 func TestIncludedExcludedFiles(t *testing.T) {
-	defer setup(t)()
+	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
@@ -271,7 +271,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 
 	wanted := map[string]bool{
-		dir: true,
+		dir:                                    true,
 		filepath.Join(dir, ".ssh"):             true,
 		filepath.Join(dir, ".ssh/known_hosts"): true,
 	}
@@ -286,16 +286,6 @@ func TestIncludedExcludedFiles(t *testing.T) {
 			assert.True(t, ok)
 		}
 	}
-}
-
-func setup(t testing.TB) func() {
-	// path.data should be set so that the DB is written to a predictable location.
-	var err error
-	paths.Paths.Data, err = ioutil.TempDir("", "beat-data-dir")
-	if err != nil {
-		t.Fatal()
-	}
-	return func() { os.RemoveAll(paths.Paths.Data) }
 }
 
 func getConfig(path ...string) map[string]interface{} {

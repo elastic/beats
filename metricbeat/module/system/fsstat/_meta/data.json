@@ -1,22 +1,28 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "system.fsstat",
+        "duration": 115000,
+        "module": "system"
+    },
     "metricset": {
-        "module": "system",
-        "name": "fsstat",
-        "rtt": 115
+        "name": "fsstat"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "fsstat": {
             "count": 37,
-            "total_files": 4315786607,
+            "total_files": 11762339,
             "total_size": {
-                "free": 58327575072768,
-                "total": 128010997239808,
-                "used": 69683422167040
+                "free": 168018972672,
+                "total": 379794051072,
+                "used": 211775078400
             }
         }
     }

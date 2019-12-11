@@ -44,7 +44,7 @@ config file shipped by default.
 [float]
 ===== docs.asciidoc
 
-The `dosc.asciidoc` file contains the documentation about your module. During generation of the
+The `docs.asciidoc` file contains the documentation about your module. During generation of the
 documentation, the default config file will be appended to the docs. Use this file to describe your
 module in more detail and to document specific configuration options.
 
@@ -76,6 +76,90 @@ It's a common pattern to use a `testing.go` file in the module package to share 
 the metricsets. This file does not have `_test.go` in the name because otherwise it would not be compiled for sub packages.
 
 To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].
+
+[float]
+===== Test a Metricbeat module manually
+
+To test a Metricbeat module manually, follow the steps below.
+
+First we have to build the Docker image which is available for the modules. The Dockerfile is located inside a `_meta` folder within each module folder. As an example let's take MySQL module.
+
+This steps assume you have checked out the Beats repository from Github and are inside `beats` directory. First, we have to enter in the `_meta` folder mentioned above and build the Docker image called `metricbeat-mysql`:
+
+[source,bash]
+----
+$ cd metricbeat/module/mysql/_meta/
+$ docker build -t metricbeat-mysql .
+...
+Removing intermediate container 0e58cfb7b197
+ ---> 9492074840ea
+Step 5/5 : COPY test.cnf /etc/mysql/conf.d/test.cnf
+ ---> 002969e1d810
+Successfully built 002969e1d810
+Successfully tagged metricbeat-mysql:latest
+----
+
+Before we run the container we have just created, we also need to know which port to expose. The port is listed in the `metricbeat/{module}/_meta/env` file:
+
+[source,bash]
+----
+$ cat env
+MYSQL_DSN=root:test@tcp(mysql:3306)/
+MYSQL_HOST=mysql
+MYSQL_PORT=3306
+----
+
+As we see, the port is 3306. We now have all the information to start our MySQL service locally:
+
+[source,bash]
+----
+$ docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=secret metricbeat-mysql
+----
+
+This starts the container and you can now use it for testing the MySQL module.
+
+To run Metricbeat with the module we need to build the binary, enable the module first. The assumption is now that you are back in the `beats` folder path:
+
+[source,bash]
+----
+$ cd metricbeat
+$ mage build
+$ ./metricbeat modules enable mysql
+----
+
+This will enable the module and rename file `metricbeat/modules.d/mysql.yml.disabled` to `metricbeat/modules.d/mysql.yml`. According to our https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mysql.html[documentation] we should specify username and password to user MySQL. It's always a good idea to take a look at the docs to see also that a pre-built dashboard is also available. So tweaking the config a bit, this is how it looks like:
+
+[source,yaml]
+----
+$ cat modules.d/mysql.yml
+
+# Module: mysql
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mysql.html
+
+- module: mysql
+  metricsets:
+    - status
+  #  - galera_status
+  period: 10s
+
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  hosts: ["tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default.
+  username: root
+
+  # Password of hosts. Empty by default.
+  password: secret
+----
+
+It's now sending data to your local Elasticsearch instance. If you need to modify the mysql config, adjust `modules.d/mysql.yml` and restart Metricbeat.
+
+
+
 
 [float]
 ===== Run Environment tests for one module

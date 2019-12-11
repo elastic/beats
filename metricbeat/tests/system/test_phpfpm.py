@@ -32,7 +32,3 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(PHPFPM_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return [os.getenv('PHPFPM_HOST', 'localhost') + ':' +
-                os.getenv('PHPFPM_PORT', '81')]

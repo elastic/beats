@@ -23,45 +23,61 @@ import (
 	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-func eventsMapping(containersList []types.Container, dedot bool) []common.MapStr {
-	myEvents := []common.MapStr{}
+func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool) {
 	for _, container := range containersList {
-		myEvents = append(myEvents, eventMapping(&container, dedot))
+		eventMapping(r, &container, dedot)
 	}
-	return myEvents
 }
 
-func eventMapping(cont *types.Container, dedot bool) common.MapStr {
+func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
 	event := common.MapStr{
-		"created":      common.Time(time.Unix(cont.Created, 0)),
-		"id":           cont.ID,
-		"name":         docker.ExtractContainerName(cont.Names),
-		"command":      cont.Command,
-		"image":        cont.Image,
-		"ip_addresses": extractIPAddresses(cont.NetworkSettings),
-		"size": common.MapStr{
-			"root_fs": cont.SizeRootFs,
-			"rw":      cont.SizeRw,
+		"container": common.MapStr{
+			"id": cont.ID,
+			"image": common.MapStr{
+				"name": cont.Image,
+			},
+			"name":    docker.ExtractContainerName(cont.Names),
+			"runtime": "docker",
 		},
-		"status": cont.Status,
+		"docker": common.MapStr{
+			"container": common.MapStr{
+				"created":      common.Time(time.Unix(cont.Created, 0)),
+				"command":      cont.Command,
+				"ip_addresses": extractIPAddresses(cont.NetworkSettings),
+				"size": common.MapStr{
+					"root_fs": cont.SizeRootFs,
+					"rw":      cont.SizeRw,
+				},
+				"status": cont.Status,
+			},
+		},
 	}
 
 	labels := docker.DeDotLabels(cont.Labels, dedot)
 
 	if len(labels) > 0 {
-		event["labels"] = labels
+		event.Put("docker.container.labels", labels)
 	}
 
-	return event
+	r.Event(mb.Event{
+		RootFields: event,
+	})
 }
 
 func extractIPAddresses(networks *types.SummaryNetworkSettings) []string {
+	// Handle alternate platforms like VMWare's VIC that might not have this data.
+	if networks == nil {
+		return []string{}
+	}
 	ipAddresses := make([]string, 0, len(networks.Networks))
 	for _, network := range networks.Networks {
-		ipAddresses = append(ipAddresses, network.IPAddress)
+		if len(network.IPAddress) > 0 {
+			ipAddresses = append(ipAddresses, network.IPAddress)
+		}
 	}
 	return ipAddresses
 }

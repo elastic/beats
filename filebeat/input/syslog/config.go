@@ -60,7 +60,7 @@ var defaultUDP = udp.Config{
 }
 
 func factory(
-	cb inputsource.NetworkFunc,
+	nf inputsource.NetworkFunc,
 	config common.ConfigNamespace,
 ) (inputsource.Network, error) {
 	n, cfg := config.Name(), config.Config()
@@ -77,13 +77,15 @@ func factory(
 			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
 		}
 
-		return tcp.New(&config.Config, splitFunc, cb)
+		factory := tcp.SplitHandlerFactory(nf, splitFunc)
+
+		return tcp.New(&config.Config, factory)
 	case udp.Name:
 		config := defaultUDP
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
 		}
-		return udp.New(&config, cb), nil
+		return udp.New(&config, nf), nil
 	default:
 		return nil, fmt.Errorf("you must choose between TCP or UDP")
 	}

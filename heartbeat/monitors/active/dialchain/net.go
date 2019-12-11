@@ -23,7 +23,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -64,7 +66,7 @@ func UDPDialer(to time.Duration) NetDialer {
 }
 
 func netDialer(timeout time.Duration) NetDialer {
-	return func(event common.MapStr) (transport.Dialer, error) {
+	return func(event *beat.Event) (transport.Dialer, error) {
 		return makeDialer(func(network, address string) (net.Conn, error) {
 			namespace := ""
 
@@ -86,11 +88,6 @@ func netDialer(timeout time.Duration) NetDialer {
 			if err != nil || portNum < 0 || portNum > (1<<16) {
 				return nil, fmt.Errorf("invalid port number '%v' used", port)
 			}
-			event.DeepUpdate(common.MapStr{
-				namespace: common.MapStr{
-					"port": uint16(portNum),
-				},
-			})
 
 			addresses, err := net.LookupHost(host)
 			if err != nil {
@@ -108,7 +105,7 @@ func netDialer(timeout time.Duration) NetDialer {
 			}
 
 			end := time.Now()
-			event.DeepUpdate(common.MapStr{
+			eventext.MergeEventFields(event, common.MapStr{
 				namespace: common.MapStr{
 					"rtt": common.MapStr{
 						"connect": look.RTT(end.Sub(start)),

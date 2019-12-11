@@ -1,0 +1,276 @@
+[
+    {
+        "@timestamp": "2019-06-11T12:21:08.484Z",
+        "elasticsearch.audit.action": "indices:data/read/search",
+        "elasticsearch.audit.indices": [
+            "*",
+            "-*"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "qxwx-kV9Q9uSwmaeQp1OgQ",
+        "elasticsearch.audit.request.name": "SearchRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:08,484-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53568\", \"request.id\":\"qxwx-kV9Q9uSwmaeQp1OgQ\", \"action\":\"indices:data/read/search\", \"request.name\":\"SearchRequest\", \"indices\":[\"*\",\"-*\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53568",
+        "source.ip": "127.0.0.1",
+        "source.port": 53568,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:08.484Z",
+        "elasticsearch.audit.action": "indices:data/read/search",
+        "elasticsearch.audit.indices": [
+            "*",
+            "-*"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "YhpBByKQTvSJfqCmMyWtXg",
+        "elasticsearch.audit.request.name": "SearchRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 423,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:08,484-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53566\", \"request.id\":\"YhpBByKQTvSJfqCmMyWtXg\", \"action\":\"indices:data/read/search\", \"request.name\":\"SearchRequest\", \"indices\":[\"*\",\"-*\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53566",
+        "source.ip": "127.0.0.1",
+        "source.port": 53566,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:09.084Z",
+        "elasticsearch.audit.action": "indices:data/read/search",
+        "elasticsearch.audit.indices": [
+            "*",
+            "-*"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "h50kZy1fTM6F3uP7MyFPDw",
+        "elasticsearch.audit.request.name": "SearchRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 846,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:09,084-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53562\", \"request.id\":\"h50kZy1fTM6F3uP7MyFPDw\", \"action\":\"indices:data/read/search\", \"request.name\":\"SearchRequest\", \"indices\":[\"*\",\"-*\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53562",
+        "source.ip": "127.0.0.1",
+        "source.port": 53562,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:09.611Z",
+        "elasticsearch.audit.action": "indices:data/read/search",
+        "elasticsearch.audit.indices": [
+            ".kibana_task_manager"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "7KZfVjrYToq8LGLW5tcyDA",
+        "elasticsearch.audit.request.name": "SearchRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 1269,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:09,611-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53570\", \"request.id\":\"7KZfVjrYToq8LGLW5tcyDA\", \"action\":\"indices:data/read/search\", \"request.name\":\"SearchRequest\", \"indices\":[\".kibana_task_manager\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53570",
+        "source.ip": "127.0.0.1",
+        "source.port": 53570,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:09.612Z",
+        "elasticsearch.audit.action": "indices:data/read/search[phase/query]",
+        "elasticsearch.audit.indices": [
+            ".kibana_task_manager"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "7KZfVjrYToq8LGLW5tcyDA",
+        "elasticsearch.audit.request.name": "ShardSearchTransportRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 1706,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:09,612-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53570\", \"request.id\":\"7KZfVjrYToq8LGLW5tcyDA\", \"action\":\"indices:data/read/search[phase/query]\", \"request.name\":\"ShardSearchTransportRequest\", \"indices\":[\".kibana_task_manager\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53570",
+        "source.ip": "127.0.0.1",
+        "source.port": 53570,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:09.758Z",
+        "elasticsearch.audit.action": "cluster:monitor/nodes/info",
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "TAklb9dXRtSg5V9fybe2Kw",
+        "elasticsearch.audit.request.name": "NodesInfoRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 2170,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:09,758-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53572\", \"request.id\":\"TAklb9dXRtSg5V9fybe2Kw\", \"action\":\"cluster:monitor/nodes/info\", \"request.name\":\"NodesInfoRequest\"}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53572",
+        "source.ip": "127.0.0.1",
+        "source.port": 53572,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:09.758Z",
+        "elasticsearch.audit.action": "cluster:monitor/nodes/info[n]",
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "TAklb9dXRtSg5V9fybe2Kw",
+        "elasticsearch.audit.request.name": "NodeInfoRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 2576,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:09,758-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53572\", \"request.id\":\"TAklb9dXRtSg5V9fybe2Kw\", \"action\":\"cluster:monitor/nodes/info[n]\", \"request.name\":\"NodeInfoRequest\"}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53572",
+        "source.ip": "127.0.0.1",
+        "source.port": 53572,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:11.366Z",
+        "elasticsearch.audit.action": "indices:data/read/get",
+        "elasticsearch.audit.indices": [
+            ".kibana"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "7mgKUfdjQhmlrw7ZDG1FjQ",
+        "elasticsearch.audit.request.name": "GetRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 2984,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:11,366-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53571\", \"request.id\":\"7mgKUfdjQhmlrw7ZDG1FjQ\", \"action\":\"indices:data/read/get\", \"request.name\":\"GetRequest\", \"indices\":[\".kibana\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53571",
+        "source.ip": "127.0.0.1",
+        "source.port": 53571,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:11.372Z",
+        "elasticsearch.audit.action": "indices:data/read/get[s]",
+        "elasticsearch.audit.indices": [
+            ".kibana"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "7mgKUfdjQhmlrw7ZDG1FjQ",
+        "elasticsearch.audit.request.name": "GetRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 3402,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:11,372-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53571\", \"request.id\":\"7mgKUfdjQhmlrw7ZDG1FjQ\", \"action\":\"indices:data/read/get[s]\", \"request.name\":\"GetRequest\", \"indices\":[\".kibana\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53571",
+        "source.ip": "127.0.0.1",
+        "source.port": 53571,
+        "user.name": "kibana"
+    },
+    {
+        "@timestamp": "2019-06-11T12:21:11.381Z",
+        "elasticsearch.audit.action": "cluster:admin/xpack/monitoring/bulk",
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "7VcDBbunQnqT2_cGxtURXA",
+        "elasticsearch.audit.request.name": "MonitoringBulkRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "kibana_system"
+        ],
+        "elasticsearch.node.id": "MA2xjPZLSvmif8VZ86OJZw",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 3823,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2019-06-11T05:21:11,381-0700\", \"node.id\":\"MA2xjPZLSvmif8VZ86OJZw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"kibana\", \"user.realm\":\"reserved\", \"user.roles\":[\"kibana_system\"], \"origin.type\":\"rest\", \"origin.address\":\"127.0.0.1:53574\", \"request.id\":\"7VcDBbunQnqT2_cGxtURXA\", \"action\":\"cluster:admin/xpack/monitoring/bulk\", \"request.name\":\"MonitoringBulkRequest\"}",
+        "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:53574",
+        "source.ip": "127.0.0.1",
+        "source.port": 53574,
+        "user.name": "kibana"
+    }
+]

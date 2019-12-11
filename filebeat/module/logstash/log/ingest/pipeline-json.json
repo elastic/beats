@@ -1,5 +1,5 @@
 {
-    "description": "Pipeline for parsing logstash log logs",
+    "description": "Pipeline for parsing logstash logs",
     "on_failure": [
         {
             "set": {
@@ -18,7 +18,7 @@
         {
             "rename": {
                 "field": "@timestamp",
-                "target_field": "read_timestamp"
+                "target_field": "event.created"
             }
         },
         {
@@ -53,13 +53,19 @@
         {
             "rename": {
                 "field": "logstash.log.logEvent.message",
-                "target_field": "logstash.log.message"
+                "target_field": "message"
             }
         },
         {
             "rename": {
                 "field": "logstash.log.logEvent",
                 "target_field": "logstash.log.log_event"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.log.level",
+                "target_field": "log.level"
             }
         }
     ]

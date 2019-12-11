@@ -26,6 +26,11 @@ class Test(BaseTest):
         template = "test-2lines-registry-latest"
         self.run_with_single_registry_format(template)
 
+    def test_upgrade_from_single_file_to_folder_hierarchy(self):
+        template = "test-2lines-registry-latest"
+        self.run_with_single_registry_format(template)
+        self.validate_if_registry_is_moved_under_folder()
+
     def run_with_single_registry_format(self, template):
         # prepare log file
         testfile, file_state = self.prepare_log()
@@ -84,3 +89,9 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 1
         assert output[0]["message"] == "abcdefghi"
+
+    def validate_if_registry_is_moved_under_folder(self):
+        migrated_registry_dir = os.path.abspath(self.working_dir + "/registry")
+        assert os.path.isdir(migrated_registry_dir)
+        assert os.path.isdir(migrated_registry_dir + "/filebeat")
+        assert os.path.isfile(migrated_registry_dir + "/filebeat/data.json")

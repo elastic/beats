@@ -1,5 +1,6 @@
 - name: metrics
   type: group
+  release: ga
   description: >
     Statistics that reflect the current use and state of a running `mongod` instance
     for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
@@ -312,11 +313,11 @@
       description: >
         Reports data from the query execution system.
       fields:
-        - name: scanned_indexes
+        - name: scanned_indexes.count
           type: long
           description: >
             The total number of index items scanned during queries and query-plan evaluation.
-        - name: scanned_documents
+        - name: scanned_documents.count
           type: long
           description: >
             The total number of documents scanned during queries and query-plan evaluation.
@@ -383,7 +384,7 @@
             - name: shutting_down
               type: boolean
             - name: network_interface
-              type: text
+              type: keyword
         - name: apply
           type: group
           description: >
@@ -521,11 +522,11 @@
       description: >
         Reports on the operation of the resource use of the ttl index process.
       fields:
-        - name: deleted_documents
+        - name: deleted_documents.count
           type: long
           description: >
             The total number of documents deleted from collections with a ttl index.
-        - name: passes
+        - name: passes.count
           type: long
           description: >
             The number of times the background process removes documents from collections with a ttl index.

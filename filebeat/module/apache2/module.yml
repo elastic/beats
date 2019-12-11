@@ -1,4 +1,1 @@
-dashboards:
-- id: Filebeat-Apache2-Dashboard
-  file: Filebeat-apache2.json
-
+movedTo: apache

@@ -19,18 +19,14 @@ package processors
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/conditions"
-	"github.com/elastic/beats/libbeat/logp"
 )
-
-// WhenProcessor is a tuple of condition plus a Processor.
-type WhenProcessor struct {
-	condition conditions.Condition
-	p         Processor
-}
 
 // NewConditional returns a constructor suitable for registering when conditionals as a plugin.
 func NewConditional(
@@ -60,6 +56,12 @@ func NewConditionList(config []conditions.Config) ([]conditions.Condition, error
 	return out, nil
 }
 
+// WhenProcessor is a tuple of condition plus a Processor.
+type WhenProcessor struct {
+	condition conditions.Condition
+	p         Processor
+}
+
 // NewConditionRule returns a processor that will execute the provided processor if the condition is true.
 func NewConditionRule(
 	config conditions.Config,
@@ -67,8 +69,7 @@ func NewConditionRule(
 ) (Processor, error) {
 	cond, err := conditions.NewCondition(&config)
 	if err != nil {
-		logp.Err("Failed to initialize lookup condition: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "failed to initialize condition")
 	}
 
 	if cond == nil {
@@ -107,4 +108,80 @@ func addCondition(
 	}
 
 	return NewConditionRule(condConfig, p)
+}
+
+type ifThenElseConfig struct {
+	Cond conditions.Config `config:"if"   validate:"required"`
+	Then *common.Config    `config:"then" validate:"required"`
+	Else *common.Config    `config:"else"`
+}
+
+// IfThenElseProcessor executes one set of processors (then) if the condition is
+// true and another set of processors (else) if the condition is false.
+type IfThenElseProcessor struct {
+	cond conditions.Condition
+	then *Processors
+	els  *Processors
+}
+
+// NewIfElseThenProcessor construct a new IfThenElseProcessor.
+func NewIfElseThenProcessor(cfg *common.Config) (*IfThenElseProcessor, error) {
+	var config ifThenElseConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	cond, err := conditions.NewCondition(&config.Cond)
+	if err != nil {
+		return nil, err
+	}
+
+	newProcessors := func(c *common.Config) (*Processors, error) {
+		if c == nil {
+			return nil, nil
+		}
+		if !c.IsArray() {
+			return New([]*common.Config{c})
+		}
+
+		var pc PluginConfig
+		if err := c.Unpack(&pc); err != nil {
+			return nil, err
+		}
+		return New(pc)
+	}
+
+	var ifProcessors, elseProcessors *Processors
+	if ifProcessors, err = newProcessors(config.Then); err != nil {
+		return nil, err
+	}
+	if elseProcessors, err = newProcessors(config.Else); err != nil {
+		return nil, err
+	}
+
+	return &IfThenElseProcessor{cond, ifProcessors, elseProcessors}, nil
+}
+
+// Run checks the if condition and executes the processors attached to the
+// then statement or the else statement based on the condition.
+func (p *IfThenElseProcessor) Run(event *beat.Event) (*beat.Event, error) {
+	if p.cond.Check(event) {
+		return p.then.Run(event)
+	} else if p.els != nil {
+		return p.els.Run(event)
+	}
+	return event, nil
+}
+
+func (p *IfThenElseProcessor) String() string {
+	var sb strings.Builder
+	sb.WriteString("if ")
+	sb.WriteString(p.cond.String())
+	sb.WriteString(" then ")
+	sb.WriteString(p.then.String())
+	if p.els != nil {
+		sb.WriteString(" else ")
+		sb.WriteString(p.els.String())
+	}
+	return sb.String()
 }

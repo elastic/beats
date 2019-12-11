@@ -21,20 +21,33 @@ package fsstat
 
 import (
 	"testing"
-
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
+func TestFetch(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "fsstat").Fields.StringToPrint())
+}
+
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
 	// Do a first fetch to have percentages
-	f.Fetch()
+	mbtest.ReportingFetchV2Error(f)
 	time.Sleep(1 * time.Second)
 
-	err := mbtest.WriteEvent(f, t)
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}

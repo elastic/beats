@@ -23,19 +23,28 @@ import (
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
-// AWS EC2 Metadata Service
-func newEc2MetadataFetcher(config *common.Config) (*metadataFetcher, error) {
-	ec2InstanceIdentityURI := "/2014-02-25/dynamic/instance-identity/document"
-	ec2Schema := func(m map[string]interface{}) common.MapStr {
-		out, _ := s.Schema{
-			"instance_id":       c.Str("instanceId"),
-			"machine_type":      c.Str("instanceType"),
-			"region":            c.Str("region"),
-			"availability_zone": c.Str("availabilityZone"),
-		}.Apply(m)
-		return out
-	}
+const ec2InstanceIdentityURI = "/2014-02-25/dynamic/instance-identity/document"
 
-	fetcher, err := newMetadataFetcher(config, "ec2", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)
-	return fetcher, err
+// AWS EC2 Metadata Service
+var ec2MetadataFetcher = provider{
+	Name: "aws-ec2",
+
+	Local: true,
+
+	Create: func(_ string, config *common.Config) (metadataFetcher, error) {
+		ec2Schema := func(m map[string]interface{}) common.MapStr {
+			out, _ := s.Schema{
+				"instance":          s.Object{"id": c.Str("instanceId")},
+				"machine":           s.Object{"type": c.Str("instanceType")},
+				"region":            c.Str("region"),
+				"availability_zone": c.Str("availabilityZone"),
+				"account":           s.Object{"id": c.Str("accountId")},
+				"image":             s.Object{"id": c.Str("imageId")},
+			}.Apply(m)
+			return out
+		}
+
+		fetcher, err := newMetadataFetcher(config, "aws", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)
+		return fetcher, err
+	},
 }

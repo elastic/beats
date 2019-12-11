@@ -22,7 +22,7 @@ type fieldSet struct {
 	parent *fieldSet
 }
 
-func NewFieldSet(parent *fieldSet) *fieldSet {
+func newFieldSet(parent *fieldSet) *fieldSet {
 	return &fieldSet{
 		fields: map[string]struct{}{},
 		parent: parent,

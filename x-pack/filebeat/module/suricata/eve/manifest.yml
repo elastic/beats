@@ -10,10 +10,12 @@ var:
       - 'c:/program files/suricata/log/eve.json'
   - name: tags
     default: [suricata]
+  - name: community_id
+    default: true
 
   # - name: nested_ecs
   #   default: false
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/eve.yml
 
 requires.processors:

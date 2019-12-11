@@ -18,6 +18,8 @@
 package pq
 
 import (
+	"time"
+
 	"github.com/elastic/go-txfile"
 	"github.com/elastic/go-txfile/internal/invariant"
 )
@@ -29,22 +31,30 @@ type Reader struct {
 	active   bool
 
 	tx *txfile.Tx
+
+	hdrOff   uintptr
+	observer Observer
+	txStart  time.Time
+	stats    ReadStats
 }
 
 type readState struct {
-	id         uint64
-	endID      uint64 // id of next, yet unwritten event.
-	eventBytes int    // number of unread bytes in current event
+	id            uint64
+	endID         uint64 // id of next, yet unwritten event.
+	totEventBytes int    // number of total bytes in current event
+	eventBytes    int    // number of unread bytes in current event
 
 	cursor cursor
 }
 
-func newReader(accessor *access) *Reader {
+func newReader(observer Observer, accessor *access) *Reader {
 	return &Reader{
 		active:   true,
 		accessor: accessor,
+		observer: observer,
 		state: readState{
-			eventBytes: -1,
+			eventBytes:    -1,
+			totEventBytes: -1,
 			cursor: cursor{
 				pageSize: accessor.PageSize(),
 			},
@@ -64,15 +74,8 @@ func (r *Reader) Available() (uint, error) {
 		return 0, r.errOf(op, err)
 	}
 
-	var err reason
-	func() {
-		var tx *txfile.Tx
-		tx, err = r.beginTx()
-		if err == nil {
-			defer tx.Close()
-			err = r.updateQueueState(tx)
-		}
-	}()
+	tx := r.tx
+	err := r.updateQueueState(tx)
 	if err != nil {
 		return 0, r.errWrap(op, err)
 	}
@@ -89,12 +92,16 @@ func (r *Reader) Available() (uint, error) {
 func (r *Reader) Begin() error {
 	const op = "pq/reader-begin"
 
-	if r.tx != nil {
-		r.tx.Close()
+	var sig ErrKind = NoError
+	switch {
+	case r.isClosed():
+		sig = ReaderClosed
+	case r.isTxActive():
+		sig = UnexpectedActiveTx
 	}
 
-	if err := r.canRead(); err != NoError {
-		return r.errOf(op, err)
+	if sig != NoError {
+		return r.errOf(op, sig)
 	}
 
 	tx, err := r.beginTx()
@@ -103,6 +110,8 @@ func (r *Reader) Begin() error {
 	}
 
 	r.tx = tx
+	r.txStart = time.Now()
+	r.stats = ReadStats{} // zero out last stats on begin
 	return nil
 }
 
@@ -113,6 +122,17 @@ func (r *Reader) Done() {
 	}
 
 	r.tx.Close()
+
+	if r.state.eventBytes < 0 && r.state.totEventBytes > 0 {
+		// did read complete event -> adapt stats
+		r.adoptEventStats()
+	}
+
+	r.stats.Duration = time.Since(r.txStart)
+	if o := r.observer; o != nil {
+		o.OnQueueRead(r.hdrOff, r.stats)
+	}
+
 	r.tx = nil
 }
 
@@ -142,16 +162,6 @@ func (r *Reader) Read(b []byte) (int, error) {
 
 func (r *Reader) readInto(to []byte) ([]byte, reason) {
 	tx := r.tx
-	if tx == nil {
-		t, err := r.beginTx()
-		if err != nil {
-			return nil, err
-		}
-
-		tx = t
-		defer tx.Close()
-	}
-
 	n := r.state.eventBytes
 	if L := len(to); L < n {
 		n = L
@@ -198,17 +208,9 @@ func (r *Reader) Next() (int, error) {
 	}
 
 	tx := r.tx
-	if tx == nil {
-		t, err := r.beginTx()
-		if err != nil {
-			return -1, r.errWrap(op, err)
-		}
-
-		tx = t
-		defer tx.Close()
-	}
-
 	cursor := makeTxCursor(tx, r.accessor, &r.state.cursor)
+
+	r.adoptEventStats()
 
 	// in event? Skip contents
 	if r.state.eventBytes > 0 {
@@ -265,7 +267,40 @@ func (r *Reader) Next() (int, error) {
 	}
 	L := int(hdr.sz.Get())
 	r.state.eventBytes = L
+	r.state.totEventBytes = L
 	return L, nil
+}
+
+func (r *Reader) adoptEventStats() {
+	if r.state.totEventBytes < 0 {
+		// no active event
+		return
+	}
+
+	// update stats:
+	skipping := r.state.eventBytes > 0
+
+	if skipping {
+		r.stats.Skipped++
+		r.stats.BytesSkipped += uint(r.state.eventBytes)
+		r.stats.BytesTotal += uint(r.state.totEventBytes - r.state.eventBytes)
+	} else {
+		bytes := uint(r.state.totEventBytes)
+		r.stats.BytesTotal += bytes
+		if r.stats.Read == 0 {
+			r.stats.BytesMin = bytes
+			r.stats.BytesMax = bytes
+		} else {
+			if r.stats.BytesMin > bytes {
+				r.stats.BytesMin = bytes
+			}
+			if r.stats.BytesMax < bytes {
+				r.stats.BytesMax = bytes
+			}
+		}
+
+		r.stats.Read++
+	}
 }
 
 func (r *Reader) updateQueueState(tx *txfile.Tx) reason {
@@ -308,10 +343,21 @@ func (r *Reader) beginTx() (*txfile.Tx, reason) {
 }
 
 func (r *Reader) canRead() ErrKind {
-	if !r.active {
+	if r.isClosed() {
 		return ReaderClosed
 	}
+	if !r.isTxActive() {
+		return InactiveTx
+	}
 	return NoError
+}
+
+func (r *Reader) isClosed() bool {
+	return !r.active
+}
+
+func (r *Reader) isTxActive() bool {
+	return r.tx != nil
 }
 
 func (r *Reader) err(op string) *Error {

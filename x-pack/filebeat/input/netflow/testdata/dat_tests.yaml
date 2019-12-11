@@ -1,0 +1,182 @@
+---
+
+tests:
+  IPFIX vIPtela with VPN id:
+    files:
+      - ipfix_test_viptela_tpl257.dat
+      - ipfix_test_viptela_data257.dat
+  IPFIX Barracuda firewall:
+    files:
+      - ipfix_test_barracuda_tpl.dat
+      - ipfix_test_barracuda_data256.dat
+  IPFIX YAF basic with applabel:
+    files:
+      - ipfix_test_yaf_tpls_option_tpl.dat
+      - ipfix_test_yaf_tpl45841.dat
+      - ipfix_test_yaf_data45841.dat
+      - ipfix_test_yaf_data45873.dat
+      - ipfix_test_yaf_data53248.dat
+  IPFIX Netscaler with variable length fields, missing templates:
+    files:
+      - ipfix_test_netscaler_data.dat
+  IPFIX configured with include_flowset_id:
+    files:
+      - ipfix_test_netscaler_tpl.dat
+      - ipfix_test_netscaler_data.dat
+  IPFIX:
+    files:
+      - ipfix.dat
+  IPFIX OpenBSD pflow:
+    files:
+      - ipfix_test_openbsd_pflow_tpl.dat
+      - ipfix_test_openbsd_pflow_data.dat
+  IPFIX options template from Juniper MX240 JunOS 15.1 R6 S3:
+    files:
+      - ipfix_test_juniper_mx240_junos151r6s3_opttpl512.dat
+      - ipfix_test_juniper_mx240_junos151r6s3_data512.dat
+  IPFIX Nokia BRAS:
+    files:
+      - ipfix_test_nokia_bras_tpl.dat
+      - ipfix_test_nokia_bras_data256.dat
+  IPFIX Procera:
+    files:
+      - ipfix_test_procera_tpl52935.dat
+      - ipfix_test_procera_data52935.dat
+  IPFIX Barracuda extended uniflow template 256:
+    files:
+      - ipfix_test_barracuda_extended_uniflow_tpl256.dat
+      - ipfix_test_barracuda_extended_uniflow_data256.dat
+  IPFIX Mikrotik RouterOS 6.39.2:
+    files:
+      - ipfix_test_mikrotik_tpl.dat
+      - ipfix_test_mikrotik_data258.dat
+      - ipfix_test_mikrotik_data259.dat
+  IPFIX Netscaler with variable length fields:
+    files:
+      - ipfix_test_netscaler_tpl.dat
+      - ipfix_test_netscaler_data.dat
+  IPFIX VMware virtual distributed switch:
+    files:
+      - ipfix_test_vmware_vds_tpl.dat
+      - ipfix_test_vmware_vds_data264.dat
+      - ipfix_test_vmware_vds_data266.dat
+      - ipfix_test_vmware_vds_data266_267.dat
+
+  Netflow 9 valid 01:
+    files:
+      - netflow9_test_valid01.dat
+  Netflow 9 macaddress:
+    files:
+      - netflow9_test_macaddr_tpl.dat
+      - netflow9_test_macaddr_data.dat
+  Netflow 9 Cisco ASA:
+    files:
+      - netflow9_test_cisco_asa_1_tpl.dat
+      - netflow9_test_cisco_asa_1_data.dat
+    custom_fields:
+      - netflow9_cisco_asa_custom.yaml
+  Netflow 9 multiple netflow exporters:
+    files:
+      - netflow9_test_nprobe_tpl.dat
+      - netflow9_test_softflowd_tpl_data.dat
+      - netflow9_test_nprobe_data.dat
+  Netflow 9 invalid 01:
+    files:
+      - netflow9_test_invalid01.dat
+  Netflow 9 options template with scope fields:
+    files:
+      - netflow9_test_nprobe_tpl.dat
+  Netflow 9 Cisco ASA 2:
+    files:
+      - netflow9_test_cisco_asa_2_tpl_26x.dat
+      - netflow9_test_cisco_asa_2_tpl_27x.dat
+      - netflow9_test_cisco_asa_2_data.dat
+    custom_fields:
+      # This renames some fields to test the loading fields from file feature.
+      - netflow9_cisco_asa_custom.yaml
+  Netflow 9 ipt_netflow reduced size encoding:
+    files:
+      - netflow9_test_iptnetflow_reduced_size_encoding_tpldata260.dat
+  Netflow 9 H3C:
+    files:
+      - netflow9_test_h3c_tpl3281.dat
+      - netflow9_test_h3c_data3281.dat
+  Netflow 9 IE150 IE151:
+    files:
+      - netflow9_test_unknown_tpl266_292_data.dat
+  Netflow 9 Palo Alto 1 flowset in large zero filled packet:
+    files:
+      - netflow9_test_paloalto_81_tpl256-263.dat
+      - netflow9_test_paloalto_81_data257_1flowset_in_large_zerofilled_packet.dat
+  Netflow 9 H3C Netstream with varstring:
+    files:
+      - netflow9_test_h3c_netstream_varstring_tpl3281.dat
+      - netflow9_test_h3c_netstream_varstring_data3281.dat
+  Netflow 9 Fortigate FortiOS 54x appid:
+    files:
+      - netflow9_test_fortigate_fortios_542_appid_tpl258-269.dat
+      - netflow9_test_fortigate_fortios_542_appid_data258_262.dat
+  Netflow 9 Ubiquiti Edgerouter with MPLS labels:
+    files:
+      - netflow9_test_ubnt_edgerouter_tpl.dat
+      - netflow9_test_ubnt_edgerouter_data1024.dat
+      - netflow9_test_ubnt_edgerouter_data1025.dat
+  Netflow 9 nprobe DPI L7:
+    files:
+      - netflow9_test_nprobe_dpi.dat
+  Netflow 9 Fortigate FortiOS 5.2.1:
+    files:
+      - netflow9_test_fortigate_fortios_521_tpl.dat
+      - netflow9_test_fortigate_fortios_521_data256.dat
+      - netflow9_test_fortigate_fortios_521_data257.dat
+  Netflow 9 Streamcore:
+    files:
+      - netflow9_test_streamcore_tpl_data256.dat
+      - netflow9_test_streamcore_tpl_data260.dat
+  Netflow9 Juniper SRX options template with 0 scope field length:
+    files:
+      - netflow9_test_juniper_srx_tplopt.dat
+  Netflow 9 template with 0 length fields:
+    files:
+      - netflow9_test_0length_fields_tpl_data.dat
+  Netflow 9 Cisco ASR 9000 series options template 256:
+    files:
+      - netflow9_test_cisco_asr9k_opttpl256.dat
+      - netflow9_test_cisco_asr9k_data256.dat
+  Netflow 9 Huawei Netstream:
+    files:
+      - netflow9_test_huawei_netstream_tpl.dat
+      - netflow9_test_huawei_netstream_data.dat
+  Netflow 9 field layer2segmentid:
+    files:
+      - netflow9_test_field_layer2segmentid_tpl.dat
+      - netflow9_test_field_layer2segmentid_data.dat
+  Netflow 9 Cisco ASR 9000 series template 260:
+    files:
+      - netflow9_test_cisco_asr9k_tpl260.dat
+      - netflow9_test_cisco_asr9k_data260.dat
+  Netflow 9 Cisco NBAR options template 260:
+    files:
+      - netflow9_test_cisco_nbar_opttpl260.dat
+  Netflow 9 Cisco NBAR flowset 262:
+    files:
+      - netflow9_test_cisco_nbar_tpl262.dat
+      - netflow9_test_cisco_nbar_data262.dat
+  Netflow 9 Cisco WLC:
+    files:
+      - netflow9_test_cisco_wlc_tpl.dat
+      - netflow9_test_cisco_wlc_data261.dat
+  Netflow 9 Cisco WLC 8500 release 8.2:
+    files:
+      - netflow9_test_cisco_wlc_8510_tpl_262.dat
+  Netflow 9 Cisco 1941/K9 release 15.1:
+    files:
+      - netflow9_test_cisco_1941K9.dat
+  Netflow 9 Cisco ASR1001-X:
+    files:
+      - netflow9_cisco_asr1001x_tpl259.dat
+  Netflow 9 Palo Alto PAN-OS with app-id:
+    files:
+      - netflow9_test_paloalto_panos_tpl.dat
+      - netflow9_test_paloalto_panos_data.dat
+

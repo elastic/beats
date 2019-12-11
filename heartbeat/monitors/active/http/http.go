@@ -22,12 +22,13 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-
-	"github.com/elastic/beats/heartbeat/monitors"
 )
 
 func init() {
@@ -36,10 +37,11 @@ func init() {
 
 var debugf = logp.MakeDebug("http")
 
+// Create makes a new HTTP monitor
 func create(
 	name string,
 	cfg *common.Config,
-) (jobs []monitors.Job, endpoints int, err error) {
+) (js []jobs.Job, endpoints int, err error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, 0, err
@@ -75,30 +77,45 @@ func create(
 		return nil, 0, err
 	}
 
-	jobs = make([]monitors.Job, len(config.URLs))
-
-	if config.ProxyURL != "" {
+	// Determine whether we're using a proxy or not and then use that to figure out how to
+	// run the job
+	var makeJob func(string) (jobs.Job, error)
+	// In the event that a ProxyURL is present, or redirect support is enabled
+	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
+	// separate DNS rtt data.
+	if config.ProxyURL != "" || config.MaxRedirects > 0 {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
 			return nil, 0, err
 		}
 
-		for i, url := range config.URLs {
-			jobs[i], err = newHTTPMonitorHostJob(url, &config, transport, enc, body, validator)
-			if err != nil {
-				return nil, 0, err
-			}
+		makeJob = func(urlStr string) (jobs.Job, error) {
+			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
 		}
 	} else {
-		for i, url := range config.URLs {
-			jobs[i], err = newHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
-			if err != nil {
-				return nil, 0, err
-			}
+		makeJob = func(urlStr string) (jobs.Job, error) {
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
 		}
 	}
 
-	return jobs, len(config.URLs), nil
+	js = make([]jobs.Job, len(config.Hosts))
+	for i, urlStr := range config.Hosts {
+		u, _ := url.Parse(urlStr)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		job, err := makeJob(urlStr)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		// Assign any execution errors to the error field and
+		// assign the url field
+		js[i] = wrappers.WithURLField(u, job)
+	}
+
+	return js, len(config.Hosts), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {

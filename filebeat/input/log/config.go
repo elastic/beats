@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
@@ -55,8 +56,9 @@ var (
 		RecursiveGlob:  true,
 
 		// Harvester
-		BufferSize: 16 * humanize.KiByte,
-		MaxBytes:   10 * humanize.MiByte,
+		BufferSize:     16 * humanize.KiByte,
+		MaxBytes:       10 * humanize.MiByte,
+		LineTerminator: readfile.AutoLineTerminator,
 		LogConfig: LogConfig{
 			Backoff:       1 * time.Second,
 			BackoffFactor: 2,
@@ -96,17 +98,18 @@ type config struct {
 	ScanOrder  string `config:"scan.order"`
 	ScanSort   string `config:"scan.sort"`
 
-	ExcludeLines []match.Matcher   `config:"exclude_lines"`
-	IncludeLines []match.Matcher   `config:"include_lines"`
-	MaxBytes     int               `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline    *multiline.Config `config:"multiline"`
-	JSON         *readjson.Config  `config:"json"`
+	LineTerminator readfile.LineTerminator `config:"line_terminator"`
+	ExcludeLines   []match.Matcher         `config:"exclude_lines"`
+	IncludeLines   []match.Matcher         `config:"include_lines"`
+	MaxBytes       int                     `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline      *multiline.Config       `config:"multiline"`
+	JSON           *readjson.Config        `config:"json"`
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {
 		Stream   string `config:"stream"`
 		Partial  bool   `config:"partial"`
-		ForceCRI bool   `config:"force_cri_logs"`
+		Format   string `config:"format"`
 		CRIFlags bool   `config:"cri_flags"`
 	} `config:"docker-json"`
 }

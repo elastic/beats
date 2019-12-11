@@ -1,41 +1,46 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "elasticsearch": {
         "cluster": {
-            "id": "njqU4EQaTROIDlWPeUMQyw"
+            "id": "hyK0oDhoThywCtJd2DV8Bg"
         }
+    },
+    "event": {
+        "dataset": "kibana.stats",
+        "duration": 115000,
+        "module": "kibana"
     },
     "kibana": {
         "stats": {
-            "concurrent_connections": 6,
+            "concurrent_connections": 1,
             "host": {
                 "name": "localhost"
             },
-            "index": "Shaunaks-MBP-2",
-            "name": "Shaunaks-MBP-2",
+            "index": "Shaunaks-MBP-2.attlocal.net",
+            "name": "Shaunaks-MBP-2.attlocal.net",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.23628300055861473
+                    "ms": 0.45250000059604645
                 },
                 "memory": {
                     "heap": {
                         "size_limit": {
-                            "bytes": 1501560832
+                            "bytes": 1526909922
                         },
                         "total": {
-                            "bytes": 215003136
+                            "bytes": 307593216
                         },
                         "used": {
-                            "bytes": 185343400
+                            "bytes": 226887112
                         }
                     }
                 },
                 "uptime": {
-                    "ms": 1343714
+                    "ms": 124098
                 }
             },
             "request": {
@@ -49,22 +54,20 @@
                 }
             },
             "snapshot": false,
-            "status": "green",
-            "transport_address": "localhost:5601",
-            "uuid": "5b2de169-2785-441b-ae8c-186a1936b17d",
-            "version": "7.0.0-alpha1"
+            "status": "green"
         }
     },
     "metricset": {
-        "host": "127.0.0.1:5601",
-        "module": "kibana",
-        "name": "stats",
-        "rtt": 115
+        "name": "stats"
     },
     "process": {
-        "pid": 20173
+        "pid": 93807
     },
     "service": {
-        "name": "kibana"
+        "address": "127.0.0.1:5601",
+        "id": "5b2de169-2785-441b-ae8c-186a1936b17d",
+        "name": "kibana",
+        "type": "kibana",
+        "version": "7.0.0"
     }
 }

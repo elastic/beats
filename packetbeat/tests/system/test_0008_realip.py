@@ -19,7 +19,7 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
 
-        assert o["real_ip"] == "89.247.39.104"
+        assert o["network.forwarded_ip"] == "89.247.39.104"
 
     def test_x_forwarded_for_multiple_ip(self):
         self.render_config_template(
@@ -33,4 +33,4 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
 
-        assert o["real_ip"] == "89.247.39.104"
+        assert o["network.forwarded_ip"] == "89.247.39.104"

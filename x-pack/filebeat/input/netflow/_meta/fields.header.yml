@@ -1,0 +1,44 @@
+- key: netflow
+  title: "NetFlow"
+  description: >
+    Fields from NetFlow and IPFIX flows.
+  fields:
+    - name: netflow
+      type: group
+      description: >
+        Fields from NetFlow and IPFIX.
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            The type of NetFlow record described by this event.
+
+        - name: exporter
+          type: group
+          description: >
+            Metadata related to the exporter device that generated this record.
+          fields:
+            - name: address
+              type: keyword
+              description: >
+                Exporter's network address in IP:port format.
+
+            - name: source_id
+              type: long
+              description: >
+                Observation domain ID to which this record belongs.
+
+            - name: timestamp
+              type: date
+              description: >
+                Time and date of export.
+
+            - name: uptime_millis
+              type: long
+              description: >
+                How long the exporter process has been running, in milliseconds.
+
+            - name: version
+              type: integer
+              description: >
+                NetFlow version used.

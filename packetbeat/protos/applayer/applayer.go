@@ -26,6 +26,8 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+
+	"github.com/elastic/beats/packetbeat/pb"
 )
 
 // A Message its direction indicator
@@ -91,9 +93,8 @@ type Transaction struct {
 	// Ts sets the transaction its initial timestamp
 	Ts TransactionTimestamp
 
-	// ResponseTime is the transaction duration in milliseconds. Should be set
-	// to -1 if duration is unknown
-	ResponseTime int32
+	// EndTime is the time the transaction ended.
+	EndTime time.Time
 
 	// Status of final transaction
 	Status string // see libbeat/common/statuses.go
@@ -122,7 +123,7 @@ type Message struct {
 	Ts           time.Time
 	Tuple        common.IPPortTuple
 	Transport    Transport
-	CmdlineTuple *common.CmdlineTuple
+	CmdlineTuple *common.ProcessTuple
 	Direction    NetDirection
 	IsRequest    bool
 	Size         uint64
@@ -182,7 +183,7 @@ func (t *Transaction) Init(
 	transport Transport,
 	direction NetDirection,
 	time time.Time,
-	cmdline *common.CmdlineTuple,
+	cmdline *common.ProcessTuple,
 	notes []string,
 ) {
 	t.Type = typ
@@ -222,18 +223,22 @@ func (t *Transaction) InitWithMsg(
 func (t *Transaction) Event(event *beat.Event) error {
 	event.Timestamp = t.Ts.Ts
 
+	pbf := pb.NewFields()
+	pbf.SetSource(&t.Src)
+	pbf.SetDestination(&t.Dst)
+	pbf.Source.Bytes = int64(t.BytesIn)
+	pbf.Destination.Bytes = int64(t.BytesOut)
+	pbf.Event.Dataset = t.Type
+	pbf.Event.Start = t.Ts.Ts
+	pbf.Event.End = t.EndTime
+	pbf.Network.Transport = t.Transport.String()
+	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Error.Message = t.Notes
+
 	fields := event.Fields
-	fields["type"] = t.Type
-	fields["responsetime"] = t.ResponseTime
-	fields["src"] = &t.Src
-	fields["dst"] = &t.Dst
-	fields["transport"] = t.Transport.String()
-	fields["bytes_out"] = t.BytesOut
-	fields["bytes_in"] = t.BytesIn
+	fields[pb.FieldsKey] = pbf
+	fields["type"] = pbf.Event.Dataset
 	fields["status"] = t.Status
-	if len(t.Notes) > 0 {
-		fields["notes"] = t.Notes
-	}
 	return nil
 }
 

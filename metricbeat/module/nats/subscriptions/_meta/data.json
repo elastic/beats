@@ -1,0 +1,30 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"nats",
+        "name":"subscriptions",
+        "rtt":44269
+    },
+    "nats":{
+        "subscriptions":{
+            "total": 0,
+            "cache": {
+                "hit_rate": 0.0,
+                "size": 0,
+                "fanout": {
+                    "max": 0,
+                    "avg": 0.0
+                }
+            },
+            "inserts": 0,
+            "removes": 0,
+            "matches": 0
+        }
+    },
+    "type":"metricsets"
+}

@@ -1,0 +1,64 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+This changelog is intended for community Beat developers. It covers the major
+breaking changes to the internal APIs in the official Beats and changes related
+to developing a Beat like code generators or `fields.yml`. Only the major
+changes will be covered in this changelog that are expected to affect community
+developers. Each breaking change added here should have an explanation on how
+other Beats should be migrated.
+
+Note: This changelog documents the current changes which are not yet present in
+an actual release.
+
+=== Beats version HEAD
+https://github.com/elastic/beats/compare/v7.0.0-rc2..master[Check the HEAD diff]
+
+The list below covers the major changes between 7.0.0-rc2 and master only.
+
+==== Breaking changes
+
+- Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
+- For "metricbeat style" generated custom beats, the mage target `GoTestIntegration` has changed to `GoIntegTest` and `GoTestUnit` has changed to `GoUnitTest`. {pull}13341[13341]
+- Build docker and kubernetes features only on supported platforms. {pull}13509[13509]
+- Need to register new processors to be used in the JS processor in their `init` functions. {pull}13509[13509]
+- The custom beat generator now uses mage instead of python, `mage GenerateCustomBeat` can be used to create a new beat, and `mage vendorUpdate` to update the vendored libbeat in a custom beat. {pull}13610[13610]
+- Altered all remaining uses of mapval to use the renamed and enhanced version: https://github.com/elastic/go-lookslike[go-lookslike] instead, which is a separate project. The mapval tree is now gone. {pull}14165[14165]
+- Move light modules to OSS. {pull}14369[14369]
+
+==== Bugfixes
+
+- Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
+
+==== Added
+
+- Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
+- Metricset generator generates beta modules by default now. {pull}10657[10657]
+- The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
+- Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
+- Support for Logger in the Metricset base instance. {pull}11106[11106]
+- Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
+- Prometheus helper for metricbeat contains now `Namespace` field for `prometheus.MetricsMappings` {pull}11424[11424]
+- Update Jinja2 version to 2.10.1. {pull}11817[11817]
+- Reduce idxmgmt.Supporter interface and rework export commands to reuse logic. {pull}11777[11777],{pull}12065[12065],{pull}12067[12067],{pull}12160[12160]
+- Update urllib3 version to 1.24.2 {pull}11930[11930]
+- Add libbeat/common/cleanup package. {pull}12134[12134]
+- New helper to check for leaked goroutines on tests. {pull}12106[12106]
+- Only Load minimal template if no fields are provided. {pull}12103[12103]
+- Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
+- Deprecate setup cmds for `template` and `ilm-policy`. Add new setup cmd for `index-management`. {pull}12132[12132]
+- Use the go-lookslike library for testing in heartbeat. Eventually the mapval package will be replaced with it. {pull}12540[12540]
+- New ReporterV2 interfaces that can receive a context on `Fetch(ctx, reporter)`, or `Run(ctx, reporter)`. {pull}11981[11981]
+- Generate configuration from `mage` for all Beats. {pull}12618[12618]
+- Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
+- Introduce beat.OutputChooses publisher mode. {pull}12996[12996]
+- Ensure that beat.Processor, beat.ProcessorList, and processors.ProcessorList are compatible and can be composed more easily. {pull}12996[12996]
+- Add support to close beat.Client via beat.CloseRef (a subset of context.Context). {pull}13031[13031]
+- Add checks for types and formats used in fields definitions in `fields.yml` files. {pull}13188[13188]
+- Makefile included in generator copies files from beats repository using `git archive` instead of cp. {pull}13193[13193]
+- Strip debug symbols from binaries to reduce binary sizes. {issue}12768[12768]
+- Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
+- Added a `default_field` option to fields in fields.yml to offer a way to exclude fields from the default_field list. {issue}14262[14262] {pull}14341[14341]
+- `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]

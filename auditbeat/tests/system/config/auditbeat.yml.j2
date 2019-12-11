@@ -1,10 +1,10 @@
 auditbeat.modules:
 {% for m in modules -%}
 - module: {{ m.name }}
-  {% if m.metricsets -%}
-  metricsets:
-    {% for ms in m.metricsets -%}
-    - {{ ms }}
+  {% if m.datasets -%}
+  datasets:
+    {% for ds in m.datasets -%}
+    - {{ ds }}
     {% endfor %}
   {% endif -%}
   {% if m.extras -%}
@@ -16,6 +16,8 @@ auditbeat.modules:
   {{ m.additional_content }}
   {% endif -%}
 {%- endfor %}
+
+auditbeat.max_start_delay: 0
 
 queue.mem:
   events: 4

@@ -18,11 +18,15 @@
 package jolokia
 
 import (
+	"fmt"
+
+	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
 func init() {
@@ -42,38 +46,44 @@ type Provider struct {
 	bus       bus.Bus
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
-	templates *template.Mapper
+	templates template.Mapper
 	discovery DiscoveryProber
 }
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
 // there is some problem with the configuration
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("The Jolokia Discovery autodiscover is experimental")
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+	errWrap := func(err error) error {
+		return errors.Wrap(err, "error setting up jolokia autodiscover provider")
+	}
 
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	discovery := &Discovery{
-		Interfaces: config.Interfaces,
+		ProviderUUID: uuid,
+		Interfaces:   config.Interfaces,
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
+	}
+	if len(mapper) == 0 {
+		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, false)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	appenders, err := autodiscover.NewAppenders(config.Appenders)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	return &Provider{

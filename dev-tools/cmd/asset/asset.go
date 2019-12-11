@@ -21,24 +21,22 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
-	"go/format"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/licenses"
 )
 
 var (
-	pkg     string
-	input   string
-	output  string
-	name    string
-	license = "ASL2"
+	pkg      string
+	input    string
+	output   string
+	name     string
+	priority string
+	license  = "ASL2"
 )
 
 func init() {
@@ -47,6 +45,7 @@ func init() {
 	flag.StringVar(&output, "out", "-", "Output path. \"-\" means writing to stdout")
 	flag.StringVar(&license, "license", "ASL2", "License header for generated file.")
 	flag.StringVar(&name, "name", "", "Asset name")
+	flag.StringVar(&priority, "priority", "asset.BeatFieldsPri", "Priority name")
 }
 
 func main() {
@@ -82,32 +81,16 @@ func main() {
 		}
 	}
 
-	// Depending on OS or tools configuration, files can contain carriages (\r),
-	// what leads to different results, remove them before encoding.
-	encData, err := asset.EncodeData(strings.Replace(string(data), "\r", "", -1))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error encoding the data: %s\n", err)
-		os.Exit(1)
-	}
-
 	licenseHeader, err := licenses.Find(license)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Invalid license: %s\n", err)
 		os.Exit(1)
 	}
-	var buf bytes.Buffer
 	if name == "" {
 		name = file
 	}
-	asset.Template.Execute(&buf, asset.Data{
-		Beat:    beatName,
-		Name:    name,
-		Data:    encData,
-		License: licenseHeader,
-		Package: pkg,
-	})
 
-	bs, err := format.Source(buf.Bytes())
+	bs, err := asset.CreateAsset(licenseHeader, beatName, name, pkg, data, priority, file)
 	if err != nil {
 		panic(err)
 	}

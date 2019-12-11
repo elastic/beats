@@ -1,0 +1,21 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/notice.log
+    os.linux:
+      - /var/log/bro/current/notice.log
+    os.darwin:
+      - /usr/local/var/logs/current/notice.log
+  - name: tags
+    default: [zeek.notice]
+  - name: community_id
+    default: true
+
+ingest_pipeline: ingest/pipeline.json
+input: config/notice.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

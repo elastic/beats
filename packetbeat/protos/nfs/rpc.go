@@ -23,12 +23,11 @@ package nfs
 
 import (
 	"encoding/binary"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"fmt"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"

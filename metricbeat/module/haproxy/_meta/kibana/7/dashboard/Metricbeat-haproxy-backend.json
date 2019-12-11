@@ -1,0 +1,114 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "HAProxy backend metrics",
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false, 
+                    "hidePanelTitles": false, 
+                    "useMargins": true
+                }, 
+                "panelsJSON": [
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "1", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 0
+                        }, 
+                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
+                        "panelIndex": "1", 
+                        "type": "visualization", 
+                        "version": "6.2.2"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "2", 
+                            "w": 3, 
+                            "x": 6, 
+                            "y": 0
+                        }, 
+                        "id": "794b6cd0-471d-11e8-bc13-1397384faad3-ecs", 
+                        "panelIndex": "2", 
+                        "type": "visualization", 
+                        "version": "6.2.2"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 4, 
+                            "i": "3", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 2
+                        }, 
+                        "id": "bb0ab500-4735-11e8-bc13-1397384faad3-ecs", 
+                        "panelIndex": "3", 
+                        "type": "visualization", 
+                        "version": "6.2.2"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "4", 
+                            "w": 3, 
+                            "x": 9, 
+                            "y": 0
+                        }, 
+                        "id": "40bed190-473b-11e8-bc13-1397384faad3-ecs", 
+                        "panelIndex": "4", 
+                        "type": "visualization", 
+                        "version": "6.2.2"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "5", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 2
+                        }, 
+                        "id": "0751ed00-479c-11e8-bc13-1397384faad3-ecs", 
+                        "panelIndex": "5", 
+                        "type": "visualization", 
+                        "version": "6.2.2"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 2, 
+                            "i": "6", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 4
+                        }, 
+                        "id": "b3463670-47a1-11e8-bc13-1397384faad3-ecs", 
+                        "panelIndex": "6", 
+                        "type": "visualization", 
+                        "version": "6.2.2"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Metricbeat HAProxy] Backend ECS", 
+                "version": 1
+            }, 
+            "id": "9151c900-471d-11e8-bc13-1397384faad3-ecs", 
+            "type": "dashboard", 
+            "updated_at": "2018-04-24T18:31:25.838Z", 
+            "version": 15
+        }
+    ], 
+    "version": "6.2.2"
+}

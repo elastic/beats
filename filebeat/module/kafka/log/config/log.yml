@@ -8,7 +8,5 @@ multiline:
   pattern: '^\['
   negate: true
   match: after
-{{ if .convert_timezone }}
 processors:
 - add_locale: ~
-{{ end }}

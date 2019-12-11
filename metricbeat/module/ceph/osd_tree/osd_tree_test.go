@@ -49,32 +49,35 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	event := events[0]
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	nodeInfo := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), nodeInfo.StringToPrint())
 
 	//check root bucket info
-	nodeInfo := events[0]
 	assert.EqualValues(t, "default", nodeInfo["name"])
 	assert.EqualValues(t, "root", nodeInfo["type"])
-	assert.EqualValues(t, "-3", nodeInfo["children"])
+	assert.EqualValues(t, []string{"-3"}, nodeInfo["children"])
 	assert.EqualValues(t, -1, nodeInfo["id"])
 	assert.EqualValues(t, 10, nodeInfo["type_id"])
 	assert.EqualValues(t, "", nodeInfo["father"])
 
 	//check host bucket info
-	nodeInfo = events[1]
+	nodeInfo = events[1].MetricSetFields
 	assert.EqualValues(t, "ceph-mon1", nodeInfo["name"])
 	assert.EqualValues(t, "host", nodeInfo["type"])
-	assert.EqualValues(t, "1,0", nodeInfo["children"])
+	assert.EqualValues(t, []string{"1", "0"}, nodeInfo["children"])
 	assert.EqualValues(t, -3, nodeInfo["id"])
 	assert.EqualValues(t, 1, nodeInfo["type_id"])
 	assert.EqualValues(t, "default", nodeInfo["father"])
 
 	//check osd bucket info
-	nodeInfo = events[2]
+	nodeInfo = events[2].MetricSetFields
 	assert.EqualValues(t, "up", nodeInfo["status"])
 	assert.EqualValues(t, "osd.0", nodeInfo["name"])
 	assert.EqualValues(t, "osd", nodeInfo["type"])
@@ -88,7 +91,7 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "ceph-mon1", nodeInfo["father"])
 	assert.EqualValues(t, 2, nodeInfo["depth"])
 
-	nodeInfo = events[3]
+	nodeInfo = events[3].MetricSetFields
 	assert.EqualValues(t, "up", nodeInfo["status"])
 	assert.EqualValues(t, "osd.1", nodeInfo["name"])
 	assert.EqualValues(t, "osd", nodeInfo["type"])

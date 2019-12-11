@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/prometheus/procfs"
@@ -36,7 +37,6 @@ func (s linuxSystem) Processes() ([]types.Process, error) {
 	if err != nil {
 		return nil, err
 	}
-	s.procFS.Path()
 
 	processes := make([]types.Process, 0, len(procs))
 	for _, proc := range procs {
@@ -65,12 +65,30 @@ func (s linuxSystem) Self() (types.Process, error) {
 
 type process struct {
 	procfs.Proc
-	fs   procfs.FS
+	fs   procFS
 	info *types.ProcessInfo
 }
 
+func (p *process) PID() int {
+	return p.Proc.PID
+}
+
+func (p *process) Parent() (types.Process, error) {
+	info, err := p.Info()
+	if err != nil {
+		return nil, err
+	}
+
+	proc, err := p.fs.NewProc(info.PPID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &process{Proc: proc, fs: p.fs}, nil
+}
+
 func (p *process) path(pa ...string) string {
-	return p.fs.Path(append([]string{strconv.Itoa(p.PID)}, pa...)...)
+	return p.fs.path(append([]string{strconv.Itoa(p.PID())}, pa...)...)
 }
 
 func (p *process) CWD() (string, error) {
@@ -108,14 +126,14 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		return types.ProcessInfo{}, err
 	}
 
-	bootTime, err := bootTime(p.fs)
+	bootTime, err := bootTime(p.fs.FS)
 	if err != nil {
 		return types.ProcessInfo{}, err
 	}
 
 	p.info = &types.ProcessInfo{
 		Name:      stat.Comm,
-		PID:       p.PID,
+		PID:       p.PID(),
 		PPID:      stat.PPID,
 		CWD:       cwd,
 		Exe:       exe,
@@ -202,6 +220,37 @@ func (p *process) Capabilities() (*types.CapabilityInfo, error) {
 	}
 
 	return readCapabilities(content)
+}
+
+func (p *process) User() (types.UserInfo, error) {
+	content, err := ioutil.ReadFile(p.path("status"))
+	if err != nil {
+		return types.UserInfo{}, err
+	}
+
+	var user types.UserInfo
+	err = parseKeyValue(content, ":", func(key, value []byte) error {
+		// See proc(5) for the format of /proc/[pid]/status
+		switch string(key) {
+		case "Uid":
+			ids := strings.Split(string(value), "\t")
+			if len(ids) >= 3 {
+				user.UID = ids[0]
+				user.EUID = ids[1]
+				user.SUID = ids[2]
+			}
+		case "Gid":
+			ids := strings.Split(string(value), "\t")
+			if len(ids) >= 3 {
+				user.GID = ids[0]
+				user.EGID = ids[1]
+				user.SGID = ids[2]
+			}
+		}
+		return nil
+	})
+
+	return user, nil
 }
 
 func ticksToDuration(ticks uint64) time.Duration {

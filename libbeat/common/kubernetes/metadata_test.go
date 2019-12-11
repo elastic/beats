@@ -20,54 +20,37 @@ package kubernetes
 import (
 	"testing"
 
-	v1 "github.com/ericchiang/k8s/apis/core/v1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func TestPodMetadataDeDot(t *testing.T) {
-	withUID, _ := common.NewConfigFrom(map[string]interface{}{"include_pod_uid": true})
-
+func TestPodMetadata(t *testing.T) {
 	UID := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	Deployment := "Deployment"
 	test := "test"
 	ReplicaSet := "ReplicaSet"
+	StatefulSet := "StatefulSet"
 	True := true
 	False := false
 	tests := []struct {
-		pod    *Pod
-		meta   common.MapStr
-		config *common.Config
+		name string
+		pod  *Pod
+		meta common.MapStr
 	}{
 		{
+			name: "standalone Pod",
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:    map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:       &UID,
-					Namespace: &test,
+					UID:       types.UID(UID),
+					Namespace: test,
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
-				},
-			},
-			meta: common.MapStr{
-				"pod":       common.MapStr{"name": ""},
-				"node":      common.MapStr{"name": "test"},
-				"namespace": "test",
-				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
-			},
-			config: common.NewConfig(),
-		},
-		{
-			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
-					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:    &UID,
-				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{
@@ -75,45 +58,235 @@ func TestPodMetadataDeDot(t *testing.T) {
 					"name": "",
 					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 				},
-				"node":   common.MapStr{"name": "test"},
-				"labels": common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
+				"node":      common.MapStr{"name": "test"},
+				"namespace": "test",
+				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 			},
-			config: withUID,
 		},
 		{
+			name: "Deployment + Replicaset owned Pod",
 			pod: &Pod{
-				Metadata: &metav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{"a.key": "foo", "a": "bar"},
-					Uid:    &UID,
-					OwnerReferences: []*metav1.OwnerReference{
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
 						{
-							Kind:       &Deployment,
-							Name:       &test,
+							Kind:       Deployment,
+							Name:       test,
 							Controller: &True,
 						},
 						{
-							Kind:       &ReplicaSet,
-							Name:       &ReplicaSet,
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
 							Controller: &False,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &test,
+				Spec: v1.PodSpec{
+					NodeName: test,
 				},
 			},
 			meta: common.MapStr{
-				"pod":        common.MapStr{"name": ""},
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
 				"node":       common.MapStr{"name": "test"},
 				"labels":     common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
 				"deployment": common.MapStr{"name": "test"},
 			},
-			config: common.NewConfig(),
+		},
+		{
+			name: "StatefulSet + Deployment owned Pod",
+			pod: &Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"a.key": "foo", "a": "bar"},
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							Kind:       Deployment,
+							Name:       test,
+							Controller: &False,
+						},
+						{
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
+							Controller: &True,
+						},
+						{
+							Kind:       StatefulSet,
+							Name:       StatefulSet,
+							Controller: &True,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":        common.MapStr{"name": "test"},
+				"labels":      common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
+				"replicaset":  common.MapStr{"name": "ReplicaSet"},
+				"statefulset": common.MapStr{"name": "StatefulSet"},
+			},
+		},
+		{
+			name: "empty owner reference Pod",
+			pod: &Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:          map[string]string{"a.key": "foo", "a": "bar"},
+					UID:             types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{{}},
+					Namespace:       test,
+				},
+				Spec: v1.PodSpec{
+					NodeName: test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":      common.MapStr{"name": "test"},
+				"namespace": "test",
+				"labels":    common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
+			},
 		},
 	}
 
 	for _, test := range tests {
-		metaGen, err := NewMetaGenerator(test.config)
+		config, err := common.NewConfigFrom(map[string]interface{}{
+			"labels.dedot":        false,
+			"annotations.dedot":   false,
+			"include_annotations": []string{"b", "b.key"},
+		})
+
+		metaGen, err := NewMetaGenerator(config)
+		if err != nil {
+			t.Fatalf("case %q failed: %s", test.name, err.Error())
+		}
+		assert.Equal(t, metaGen.PodMetadata(test.pod), test.meta, "test failed for case %q", test.name)
+	}
+}
+
+func TestPodMetadataDeDot(t *testing.T) {
+	UID := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	Deployment := "Deployment"
+	test := "test"
+	ReplicaSet := "ReplicaSet"
+	StatefulSet := "StatefulSet"
+	True := true
+	False := false
+	tests := []struct {
+		pod  *Pod
+		meta common.MapStr
+	}{
+		{
+			pod: &Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      map[string]string{"a.key": "foo", "a": "bar"},
+					UID:         types.UID(UID),
+					Namespace:   test,
+					Annotations: map[string]string{"b.key": "foo", "b": "bar"},
+				},
+				Spec: v1.PodSpec{
+					NodeName: test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":        common.MapStr{"name": "test"},
+				"namespace":   "test",
+				"labels":      common.MapStr{"a": "bar", "a_key": "foo"},
+				"annotations": common.MapStr{"b": "bar", "b_key": "foo"},
+			},
+		},
+		{
+			pod: &Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"a.key": "foo", "a": "bar"},
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							Kind:       Deployment,
+							Name:       test,
+							Controller: &True,
+						},
+						{
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
+							Controller: &False,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":       common.MapStr{"name": "test"},
+				"labels":     common.MapStr{"a": "bar", "a_key": "foo"},
+				"deployment": common.MapStr{"name": "test"},
+			},
+		},
+		{
+			pod: &Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"a.key": "foo", "a": "bar"},
+					UID:    types.UID(UID),
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							Kind:       Deployment,
+							Name:       test,
+							Controller: &False,
+						},
+						{
+							Kind:       ReplicaSet,
+							Name:       ReplicaSet,
+							Controller: &True,
+						},
+						{
+							Kind:       StatefulSet,
+							Name:       StatefulSet,
+							Controller: &True,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":        common.MapStr{"name": "test"},
+				"labels":      common.MapStr{"a": "bar", "a_key": "foo"},
+				"replicaset":  common.MapStr{"name": "ReplicaSet"},
+				"statefulset": common.MapStr{"name": "StatefulSet"},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		config, err := common.NewConfigFrom(map[string]interface{}{
+			"include_annotations": []string{"b", "b.key"},
+		})
+		metaGen, err := NewMetaGenerator(config)
 		if err != nil {
 			t.Fatal(err)
 		}

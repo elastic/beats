@@ -289,7 +289,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Cli
 		t.Fatalf("redis output module not registered")
 	}
 
-	out, err := plugin(beat.Info{Beat: testBeatname, Version: testBeatversion}, outputs.NewNilObserver(), config)
+	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}

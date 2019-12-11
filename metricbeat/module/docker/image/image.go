@@ -23,7 +23,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
@@ -70,11 +69,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	images, err := m.dockerClient.ImageList(context.TODO(), types.ImageListOptions{})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return eventsMapping(images, m.dedot), nil
+	events := eventsMapping(images, m.dedot)
+	for _, event := range events {
+		reporter.Event(mb.Event{MetricSetFields: event})
+	}
+
+	return nil
+}
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
 }

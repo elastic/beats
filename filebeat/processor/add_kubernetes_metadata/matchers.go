@@ -19,6 +19,8 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"os"
+	"runtime"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -38,6 +40,7 @@ func init() {
 }
 
 const LogPathMatcherName = "logs_path"
+const pathSeparator = string(os.PathSeparator)
 
 type LogPathMatcher struct {
 	LogsPath     string
@@ -49,7 +52,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 		LogsPath     string `config:"logs_path"`
 		ResourceType string `config:"resource_type"`
 	}{
-		LogsPath:     "/var/lib/docker/containers/",
+		LogsPath:     defaultLogPath(),
 		ResourceType: "container",
 	}
 
@@ -59,8 +62,8 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 	}
 
 	logPath := config.LogsPath
-	if logPath[len(logPath)-1:] != "/" {
-		logPath = logPath + "/"
+	if logPath[len(logPath)-1:] != pathSeparator {
+		logPath = logPath + pathSeparator
 	}
 	resourceType := config.ResourceType
 
@@ -77,9 +80,10 @@ const containerIdLen = 64
 const podUIDPos = 5
 
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
-	if value, ok := event["source"]; ok {
+	value, err := event.GetValue("log.file.path")
+	if err == nil {
 		source := value.(string)
-		logp.Debug("kubernetes", "Incoming source value: %s", source)
+		logp.Debug("kubernetes", "Incoming log.file.path value: %s", source)
 
 		if !strings.Contains(source, f.LogsPath) {
 			logp.Debug("kubernetes", "Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
@@ -92,10 +96,10 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 		if f.ResourceType == "pod" {
 			// Specify a pod resource type when manually mounting log volumes and they end up under "/var/lib/kubelet/pods/"
 			// This will extract only the pod UID, which offers less granularity of metadata when compared to the container ID
-			if strings.HasPrefix(f.LogsPath, "/var/lib/kubelet/pods/") && strings.HasSuffix(source, ".log") {
-				pathDirs := strings.Split(source, "/")
+			if strings.HasPrefix(f.LogsPath, podLogsPath()) && strings.HasSuffix(source, ".log") {
+				pathDirs := strings.Split(source, pathSeparator)
 				if len(pathDirs) > podUIDPos {
-					podUID := strings.Split(source, "/")[podUIDPos]
+					podUID := strings.Split(source, pathSeparator)[podUIDPos]
 
 					logp.Debug("kubernetes", "Using pod uid: %s", podUID)
 					return podUID
@@ -106,7 +110,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 		} else {
 			// In case of the Kubernetes log path "/var/log/containers/",
 			// the container ID will be located right before the ".log" extension.
-			if strings.HasPrefix(f.LogsPath, "/var/log/containers/") && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
+			if strings.HasPrefix(f.LogsPath, containerLogsPath()) && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
 				containerIDEnd := sourceLen - 4
 				cid := source[containerIDEnd-containerIdLen : containerIDEnd]
 				logp.Debug("kubernetes", "Using container id: %s", cid)
@@ -126,4 +130,25 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	}
 
 	return ""
+}
+
+func defaultLogPath() string {
+	if runtime.GOOS == "windows" {
+		return "C:\\ProgramData\\Docker\\containers"
+	}
+	return "/var/lib/docker/containers/"
+}
+
+func podLogsPath() string {
+	if runtime.GOOS == "windows" {
+		return "C:\\var\\lib\\kubelet\\pods\\"
+	}
+	return "/var/lib/kubelet/pods/"
+}
+
+func containerLogsPath() string {
+	if runtime.GOOS == "windows" {
+		return "C:\\var\\log\\containers\\"
+	}
+	return "/var/log/containers/"
 }

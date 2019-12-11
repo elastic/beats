@@ -20,4 +20,3 @@ In the case of write operations as separate message types, we should parse the f
   - Support option to send documents in response (Send_Response ?)
   - Support option to send update and insert documents in request (Send_Request ?)
   - Support option to ignore non user commands
-  - Fill bytes_in and bytes_out

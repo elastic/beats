@@ -28,8 +28,6 @@ import (
 )
 
 type Config struct {
-	Name string `config:"name"`
-
 	// check all ports if host does not contain port
 	Hosts []string `config:"hosts" validate:"required"`
 	Ports []uint16 `config:"ports"`
@@ -49,7 +47,6 @@ type Config struct {
 }
 
 var DefaultConfig = Config{
-	Name:    "tcp",
 	Timeout: 16 * time.Second,
 	Mode:    monitors.DefaultIPSettings,
 }

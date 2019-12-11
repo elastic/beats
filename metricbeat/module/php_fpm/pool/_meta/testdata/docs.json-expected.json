@@ -1,0 +1,39 @@
+[
+    {
+        "event": {
+            "dataset": "php_fpm.pool",
+            "duration": 115000,
+            "module": "php_fpm"
+        },
+        "metricset": {
+            "name": "pool",
+            "period": 10000
+        },
+        "php_fpm": {
+            "pool": {
+                "connections": {
+                    "accepted": 18,
+                    "listen_queue_len": 0,
+                    "max_listen_queue": 0,
+                    "queued": 0
+                },
+                "name": "www",
+                "process_manager": "dynamic",
+                "processes": {
+                    "active": 1,
+                    "idle": 1,
+                    "max_active": 1,
+                    "max_children_reached": 0,
+                    "total": 2
+                },
+                "slow_requests": 0,
+                "start_since": 3589,
+                "start_time": 1551792028
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "php_fpm"
+        }
+    }
+]

@@ -1,0 +1,277 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Syslog-system-logs-ecs", 
+                "title": "Syslog events by hostname [Filebeat System] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "field": "host.hostname", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "group", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "listeners": {}, 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "defaultYExtents": false, 
+                        "legendPosition": "right", 
+                        "mode": "stacked", 
+                        "scale": "linear", 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "times": [], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Syslog events by hostname ECS", 
+                    "type": "histogram"
+                }
+            }, 
+            "id": "Syslog-events-by-hostname-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Syslog-system-logs-ecs", 
+                "title": "Syslog hostnames and processes [Filebeat System] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "field": "host.hostname", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "field": "process.name", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "listeners": {}, 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "bottom", 
+                        "shareYAxis": true
+                    }, 
+                    "title": "Syslog hostnames and processes ECS", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "Syslog-hostnames-and-processes-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "host.hostname", 
+                    "process.name", 
+                    "message"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlight": {
+                            "fields": {
+                                "*": {}
+                            }, 
+                            "fragment_size": 2147483647, 
+                            "post_tags": [
+                                "@/kibana-highlighted-field@"
+                            ], 
+                            "pre_tags": [
+                                "@kibana-highlighted-field@"
+                            ], 
+                            "require_field_match": false
+                        }, 
+                        "highlightAll": true, 
+                        "index": "filebeat-*", 
+                        "query": {
+                            "language": "kuery",
+                                "query": "event.dataset:system.syslog"
+                            }
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "Syslog logs [Filebeat System] ECS", 
+                "version": 1
+            }, 
+            "id": "Syslog-system-logs-ecs", 
+            "type": "search", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Dashboards [Filebeat System] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "fontSize": 12, 
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
+                    }, 
+                    "title": "Dashboards [Filebeat System] ECS", 
+                    "type": "markdown"
+                }
+            }, 
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Syslog dashboard from the Filebeat System module", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "col": 1, 
+                        "id": "Syslog-events-by-hostname-ecs", 
+                        "panelIndex": 1, 
+                        "row": 2, 
+                        "size_x": 8, 
+                        "size_y": 4, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 9, 
+                        "id": "Syslog-hostnames-and-processes-ecs", 
+                        "panelIndex": 2, 
+                        "row": 2, 
+                        "size_x": 4, 
+                        "size_y": 4, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "columns": [
+                            "host.hostname", 
+                            "process.name", 
+                            "message"
+                        ], 
+                        "id": "Syslog-system-logs-ecs", 
+                        "panelIndex": 3, 
+                        "row": 6, 
+                        "size_x": 12, 
+                        "size_y": 7, 
+                        "sort": [
+                            "@timestamp", 
+                            "desc"
+                        ], 
+                        "type": "search"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
+                        "panelIndex": 4, 
+                        "row": 1, 
+                        "size_x": 12, 
+                        "size_y": 1, 
+                        "type": "visualization"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Filebeat System] Syslog dashboard ECS", 
+                "uiStateJSON": {}, 
+                "version": 1
+            }, 
+            "id": "Filebeat-syslog-dashboard-ecs", 
+            "type": "dashboard", 
+            "version": 6
+        }
+    ], 
+    "version": "6.0.0-beta1-SNAPSHOT"
+}

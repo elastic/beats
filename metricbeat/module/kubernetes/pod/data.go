@@ -33,20 +33,26 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %s", err)
 	}
 
 	node := summary.Node
 	nodeCores := perfMetrics.NodeCoresAllocatable.Get(node.NodeName)
 	nodeMem := perfMetrics.NodeMemAllocatable.Get(node.NodeName)
 	for _, pod := range summary.Pods {
-		var usageNanoCores, usageMem int64
+		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults int64
 		var coresLimit, memLimit float64
 
 		for _, cont := range pod.Containers {
 			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, cont.Name)
 			usageNanoCores += cont.CPU.UsageNanoCores
 			usageMem += cont.Memory.UsageBytes
+			availMem += cont.Memory.AvailableBytes
+			rss += cont.Memory.RssBytes
+			workingSet += cont.Memory.WorkingSetBytes
+			pageFaults += cont.Memory.PageFaults
+			majorPageFaults += cont.Memory.MajorPageFaults
+
 			coresLimit += perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
 			memLimit += perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
 		}
@@ -59,6 +65,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 				},
 			},
 			"name": pod.PodRef.Name,
+			"uid":  pod.PodRef.UID,
 
 			"cpu": common.MapStr{
 				"usage": common.MapStr{
@@ -70,6 +77,17 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 				"usage": common.MapStr{
 					"bytes": usageMem,
 				},
+				"available": common.MapStr{
+					"bytes": availMem,
+				},
+				"working_set": common.MapStr{
+					"bytes": workingSet,
+				},
+				"rss": common.MapStr{
+					"bytes": rss,
+				},
+				"page_faults":       pageFaults,
+				"major_page_faults": majorPageFaults,
 			},
 
 			"network": common.MapStr{

@@ -1,3 +1,1 @@
-=== elasticsearch pending_tasks MetricSet
-
-This is the pending_tasks metricset of the module elasticsearch.
+This is the `pending_tasks` metricset of the Elasticsearch module.

@@ -1,26 +1,32 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "ceph": {
         "cluster_disk": {
             "available": {
-                "bytes": 50847313920
+                "bytes": 0
             },
             "total": {
-                "bytes": 67371577344
+                "bytes": 0
             },
             "used": {
-                "bytes": 13071564800
+                "bytes": 0
             }
         }
     },
+    "event": {
+        "dataset": "ceph.cluster_disk",
+        "duration": 115000,
+        "module": "ceph"
+    },
     "metricset": {
-        "host": "ceph:5000",
-        "module": "ceph",
-        "name": "cluster_disk",
-        "rtt": 115
+        "name": "cluster_disk"
+    },
+    "service": {
+        "address": "127.0.0.1:5000",
+        "type": "ceph"
     }
 }

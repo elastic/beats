@@ -1,0 +1,5 @@
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #ttl: "30s"

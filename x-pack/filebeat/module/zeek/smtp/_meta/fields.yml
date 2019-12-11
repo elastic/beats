@@ -1,0 +1,121 @@
+- name: smtp
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek SMTP log.
+  fields:
+    - name: transaction_depth
+      type: integer
+      description: >
+        A count to represent the depth of this message transaction in a single connection where multiple messages were transferred.
+
+    - name: helo
+      type: keyword
+      description: >
+        Contents of the Helo header.
+
+    - name: mail_from
+      type: keyword
+      description: >
+        Email addresses found in the MAIL FROM header.
+
+    - name: rcpt_to
+      type: keyword
+      description: >
+        Email addresses found in the RCPT TO header.
+
+    - name: date
+      type: date
+      description: >
+        Contents of the Date header.
+
+    - name: from
+      type: keyword
+      description: >
+        Contents of the From header.
+
+    - name: to
+      type: keyword
+      description: >
+        Contents of the To header.
+
+    - name: cc
+      type: keyword
+      description: >
+        Contents of the CC header.
+
+    - name: reply_to
+      type: keyword
+      description: >
+        Contents of the ReplyTo header.
+
+    - name: msg_id
+      type: keyword
+      description: >
+        Contents of the MsgID header.
+
+    - name: in_reply_to
+      type: keyword
+      description: >
+        Contents of the In-Reply-To header.
+
+    - name: subject
+      type: keyword
+      description: >
+        Contents of the Subject header.
+
+    - name: x_originating_ip
+      type: keyword
+      description: >
+        Contents of the X-Originating-IP header.
+
+    - name: first_received
+      type: keyword
+      description: |
+        Contents of the first Received header.
+
+    - name: second_received
+      type: keyword
+      description: |
+        Contents of the second Received header.
+
+    - name: last_reply
+      type: keyword
+      description: |
+        The last message that the server sent to the client.
+
+    - name: path
+      type: ip
+      description: |
+        The message transmission path, as extracted from the headers.
+
+    - name: user_agent
+      type: keyword
+      description: |
+        Value of the User-Agent header from the client.
+
+    - name: tls
+      type: boolean
+      description: |
+        Indicates that the connection has switched to using TLS.
+
+    - name: process_received_from
+      type: boolean
+      description: |
+        Indicates if the "Received: from" headers should still be processed.
+
+    - name: has_client_activity
+      type: boolean
+      description: |
+        Indicates if client activity has been seen, but not yet logged.
+
+    - name: fuids
+      type: keyword
+      description: |
+        (present if base/protocols/smtp/files.bro is loaded)
+        An ordered vector of file unique IDs seen attached to the message.
+
+    - name: is_webmail
+      type: boolean
+      description: |
+        Indicates if the message was sent through a webmail interface.

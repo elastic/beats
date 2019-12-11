@@ -21,7 +21,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type PluginConfig []map[string]*common.Config
+// PluginConfig represents the list of processors.
+type PluginConfig []*common.Config
 
 // fields that should be always exported
 var MandatoryExportedFields = []string{"type"}

@@ -1,0 +1,4 @@
+default: false
+input:
+  module: foo
+  metricset: baz

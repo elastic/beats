@@ -44,7 +44,7 @@ func TestExportTimezone(t *testing.T) {
 	actual := getActualValue(t, testConfig, input)
 
 	expected := common.MapStr{
-		"beat": map[string]string{
+		"event": map[string]string{
 			"timezone": zone,
 		},
 	}
@@ -87,7 +87,7 @@ func TestTimezoneFormat(t *testing.T) {
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	logp.TestingSetup()
 
-	p, err := newAddLocale(config)
+	p, err := New(config)
 	if err != nil {
 		logp.Err("Error initializing add_locale")
 		t.Fatal(err)
@@ -102,7 +102,7 @@ func BenchmarkConstruct(b *testing.B) {
 
 	input := common.MapStr{}
 
-	p, err := newAddLocale(testConfig)
+	p, err := New(testConfig)
 	if err != nil {
 		b.Fatal(err)
 	}

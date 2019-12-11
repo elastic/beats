@@ -20,7 +20,9 @@ package http
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -30,9 +32,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/ecs/code/go/ecs"
 )
 
 var debugf = logp.MakeDebug("http")
@@ -187,9 +190,15 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 		}
 
 		if m.isRequest {
-			m.notes = append(m.notes, "Packet loss while capturing the request")
+			if !m.packetLossReq {
+				m.packetLossReq = true
+				m.notes = append(m.notes, "Packet loss while capturing the request")
+			}
 		} else {
-			m.notes = append(m.notes, "Packet loss while capturing the response")
+			if !m.packetLossResp {
+				m.packetLossResp = true
+				m.notes = append(m.notes, "Packet loss while capturing the response")
+			}
 		}
 		if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 			(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
@@ -495,86 +504,103 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		}
 	}
 
-	httpDetails := common.MapStr{}
-	fields := common.MapStr{
-		"type":   "http",
-		"status": status,
-		"http":   httpDetails,
+	var ts time.Time
+	var src, dst *common.Endpoint
+	for _, m := range []*message{requ, resp} {
+		if m == nil {
+			continue
+		}
+		ts = m.ts
+		src, dst = m.getEndpoints()
+		break
 	}
 
-	var timestamp time.Time
+	evt, pbf := pb.NewBeatEvent(ts)
+	pbf.SetSource(src)
+	pbf.SetDestination(dst)
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = "http"
 
+	fields := evt.Fields
+	fields["type"] = pbf.Network.Protocol
+	fields["status"] = status
+
+	var httpFields ProtocolFields
 	if requ != nil {
-		// Body must be decoded before extractParameters
 		http.decodeBody(requ)
 		path, params, err := http.extractParameters(requ)
 		if err != nil {
 			logp.Warn("Fail to parse HTTP parameters: %v", err)
 		}
-		httpDetails["request"] = common.MapStr{
-			"params":  params,
-			"headers": http.collectHeaders(requ),
+
+		pbf.Source.Bytes = int64(requ.size)
+		host, port := extractHostHeader(string(requ.host))
+		if net.ParseIP(host) == nil {
+			pbf.Destination.Domain = host
 		}
-		fields["method"] = requ.method
-		fields["path"] = path
-		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
-		fields["bytes_in"] = requ.size
-
-		fields["src"], fields["dst"] = requ.getEndpoints()
-
-		http.setBody(httpDetails["request"].(common.MapStr), requ)
-
-		timestamp = requ.ts
-
-		if len(requ.notes) > 0 {
-			fields["notes"] = requ.notes
+		if port == 0 {
+			port = int(pbf.Destination.Port)
+		} else if port != int(pbf.Destination.Port) {
+			requ.notes = append(requ.notes, "Host header port number mismatch")
 		}
+		pbf.Event.Start = requ.ts
+		pbf.Network.ForwardedIP = string(requ.realIP)
+		pbf.Error.Message = requ.notes
 
-		if len(requ.realIP) > 0 {
-			fields["real_ip"] = requ.realIP
+		// http
+		httpFields.Version = requ.version.String()
+		httpFields.RequestBytes = int64(requ.size)
+		httpFields.RequestBodyBytes = int64(requ.contentLength)
+		httpFields.RequestMethod = bytes.ToLower(requ.method)
+		httpFields.RequestReferrer = requ.referer
+		if requ.sendBody && len(requ.body) > 0 {
+			httpFields.RequestBodyBytes = int64(len(requ.body))
+			httpFields.RequestBodyContent = common.NetString(requ.body)
 		}
+		httpFields.RequestHeaders = http.collectHeaders(requ)
 
+		// url
+		u := newURL(host, int64(port), path, params)
+		pb.MarshalStruct(evt.Fields, "url", u)
+
+		// user-agent
+		userAgent := ecs.UserAgent{Original: string(requ.userAgent)}
+		pb.MarshalStruct(evt.Fields, "user_agent", userAgent)
+
+		// packetbeat root fields
 		if http.sendRequest {
 			fields["request"] = string(http.makeRawMessage(requ))
 		}
+		fields["method"] = httpFields.RequestMethod
+		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
 	}
 
 	if resp != nil {
 		http.decodeBody(resp)
-		httpDetails["response"] = common.MapStr{
-			"code":    resp.statusCode,
-			"phrase":  resp.statusPhrase,
-			"headers": http.collectHeaders(resp),
-		}
-		http.setBody(httpDetails["response"].(common.MapStr), resp)
-		fields["bytes_out"] = resp.size
 
+		pbf.Destination.Bytes = int64(resp.size)
+		pbf.Event.End = resp.ts
+		pbf.Error.Message = append(pbf.Error.Message, resp.notes...)
+
+		// http
+		httpFields.ResponseStatusCode = int64(resp.statusCode)
+		httpFields.ResponseStatusPhrase = bytes.ToLower(resp.statusPhrase)
+		httpFields.ResponseBytes = int64(resp.size)
+		httpFields.ResponseBodyBytes = int64(resp.contentLength)
+		if resp.sendBody && len(resp.body) > 0 {
+			httpFields.ResponseBodyBytes = int64(len(resp.body))
+			httpFields.ResponseBodyContent = common.NetString(resp.body)
+		}
+		httpFields.ResponseHeaders = http.collectHeaders(resp)
+
+		// packetbeat root fields
 		if http.sendResponse {
 			fields["response"] = string(http.makeRawMessage(resp))
 		}
-
-		if len(resp.notes) > 0 {
-			if fields["notes"] != nil {
-				fields["notes"] = append(fields["notes"].([]string), resp.notes...)
-			} else {
-				fields["notes"] = resp.notes
-			}
-		}
-		if requ == nil {
-			timestamp = resp.ts
-			fields["src"], fields["dst"] = resp.getEndpoints()
-		}
 	}
 
-	// resp_time in milliseconds
-	if requ != nil && resp != nil {
-		fields["responsetime"] = int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
-	}
-
-	return beat.Event{
-		Timestamp: timestamp,
-		Fields:    fields,
-	}
+	pb.MarshalStruct(evt.Fields, "http", httpFields)
+	return evt
 }
 
 func (http *httpPlugin) makeRawMessage(m *message) string {
@@ -595,7 +621,7 @@ func (http *httpPlugin) publishTransaction(event beat.Event) {
 	http.results(event)
 }
 
-func (http *httpPlugin) collectHeaders(m *message) interface{} {
+func (http *httpPlugin) collectHeaders(m *message) common.MapStr {
 	hdrs := map[string]interface{}{}
 
 	hdrs["content-length"] = m.contentLength
@@ -604,19 +630,18 @@ func (http *httpPlugin) collectHeaders(m *message) interface{} {
 	}
 
 	if http.parserConfig.sendHeaders {
-
 		cookie := "cookie"
 		if !m.isRequest {
 			cookie = "set-cookie"
 		}
 
 		for name, value := range m.headers {
-			if strings.ToLower(name) == "content-type" {
+			switch {
+			case bytes.Equal([]byte(name), nameContentLength),
+				bytes.Equal([]byte(name), nameContentType):
 				continue
 			}
-			if strings.ToLower(name) == "content-length" {
-				continue
-			}
+
 			if http.splitCookie && name == cookie {
 				hdrs[name] = splitCookiesHeader(string(value))
 			} else {
@@ -625,12 +650,6 @@ func (http *httpPlugin) collectHeaders(m *message) interface{} {
 		}
 	}
 	return hdrs
-}
-
-func (http *httpPlugin) setBody(result common.MapStr, m *message) {
-	if m.sendBody && len(m.body) > 0 {
-		result["body"] = string(m.body)
-	}
 }
 
 func (http *httpPlugin) decodeBody(m *message) {
@@ -686,6 +705,23 @@ func parseCookieValue(raw string) string {
 		raw = raw[1 : len(raw)-1]
 	}
 	return raw
+}
+
+func extractHostHeader(header string) (host string, port int) {
+	if len(header) == 0 || net.ParseIP(header) != nil {
+		return header, port
+	}
+	// Split :port trailer
+	if pos := strings.LastIndexByte(header, ':'); pos != -1 {
+		if num, err := strconv.Atoi(header[pos+1:]); err == nil && num > 0 && num < 65536 {
+			header, port = header[:pos], num
+		}
+	}
+	// Remove square bracket boxing of IPv6 address.
+	if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
+		header = header[1:last]
+	}
+	return header, port
 }
 
 func (http *httpPlugin) hideHeaders(m *message) {

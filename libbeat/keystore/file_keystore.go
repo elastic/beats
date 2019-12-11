@@ -234,41 +234,53 @@ func (k *FileKeystore) doSave(override bool) error {
 	return nil
 }
 
-func (k *FileKeystore) load() error {
-	k.Lock()
-	defer k.Unlock()
-
+func (k *FileKeystore) loadRaw() ([]byte, error) {
 	f, err := os.OpenFile(k.Path, os.O_RDONLY, filePermission)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil
+			return nil, nil
 		}
-		return err
+		return nil, err
 	}
 	defer f.Close()
 
 	if common.IsStrictPerms() {
 		if err := k.checkPermissions(k.Path); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	raw, err := ioutil.ReadAll(f)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	v := raw[0:len(version)]
 	if !bytes.Equal(v, version) {
-		return fmt.Errorf("keystore format doesn't match expected version: '%s' got '%s'", version, v)
+		return nil, fmt.Errorf("keystore format doesn't match expected version: '%s' got '%s'", version, v)
 	}
 
-	base64Content := raw[len(version):]
-	if len(base64Content) == 0 {
-		return fmt.Errorf("corrupt or empty keystore")
+	if len(raw) <= len(version) {
+		return nil, fmt.Errorf("corrupt or empty keystore")
 	}
 
-	base64Decoder := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(base64Content))
+	return raw, nil
+}
+
+func (k *FileKeystore) load() error {
+	k.Lock()
+	defer k.Unlock()
+
+	raw, err := k.loadRaw()
+	if err != nil {
+		return err
+	}
+
+	if len(raw) == 0 {
+		return nil
+	}
+
+	base64Decoder := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(raw[len(version):]))
 	plaintext, err := k.decrypt(base64Decoder)
 	if err != nil {
 		return fmt.Errorf("could not decrypt the keystore: %v", err)
@@ -377,7 +389,7 @@ func (k *FileKeystore) checkPermissions(f string) error {
 	perm := info.Mode().Perm()
 
 	if fileUID != 0 && euid != fileUID {
-		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
+		return fmt.Errorf(`config file ("%v") must be owned by the user identifier `+
 			`(uid=%v) or root`, f, euid)
 	}
 
@@ -394,6 +406,18 @@ func (k *FileKeystore) checkPermissions(f string) error {
 	}
 
 	return nil
+}
+
+// Package returns the bytes of the encrypted keystore.
+func (k *FileKeystore) Package() ([]byte, error) {
+	k.Lock()
+	defer k.Unlock()
+	return k.loadRaw()
+}
+
+// ConfiguredPath returns the path to the keystore.
+func (k *FileKeystore) ConfiguredPath() string {
+	return k.Path
 }
 
 func (k *FileKeystore) hashPassword(password, salt []byte) []byte {

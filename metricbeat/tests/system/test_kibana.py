@@ -47,9 +47,30 @@ class Test(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_xpack(self):
+        """
+        kibana-xpack module tests
+        """
+        self.render_config_template(modules=[{
+            "name": "kibana",
+            "metricsets": [
+                "stats"
+            ],
+            "hosts": self.get_hosts(),
+            "period": "1s",
+            "extras": {
+                "xpack.enabled": "true"
+            }
+        }])
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
     def get_hosts(self):
-        return [os.getenv('KIBANA_HOST', 'localhost') + ':' +
-                os.getenv('KIBANA_PORT', '5601')]
+        return [self.compose_host("kibana")]
 
     def get_version(self):
         host = self.get_hosts()[0]

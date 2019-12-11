@@ -8,8 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class Test(metricbeat.BaseTest):
-
-    COMPOSE_SERVICES = ['uwsgi_tcp', "uwsgi_http"]
+    COMPOSE_SERVICES = ['uwsgi_tcp']
 
     def common_checks(self, output):
         # Ensure no errors or warnings exist in the log.
@@ -51,15 +50,14 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_status_tcp(self):
+    def test_status(self):
         """
         uWSGI module outputs an event.
         """
-        hosts = [os.getenv("UWSGI_STAT_TCP_SERVER")]
         self.render_config_template(modules=[{
             "name": "uwsgi",
             "metricsets": ["status"],
-            "hosts": hosts,
+            "hosts": [self.get_host()],
             "period": "5s"
         }])
         proc = self.start_beat()
@@ -69,22 +67,12 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.common_checks(output)
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
-    def test_status_http(self):
-        """
-        uWSGI module outputs an event.
-        """
-        hosts = [os.getenv("UWSGI_STAT_HTTP_SERVER")]
-        self.render_config_template(modules=[{
-            "name": "uwsgi",
-            "metricsets": ["status"],
-            "hosts": hosts,
-            "period": "5s"
-        }])
-        proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
-        proc.check_kill_and_wait()
+    def get_host(self):
+        return "tcp://" + self.compose_host()
 
-        output = self.read_output_json()
-        self.common_checks(output)
+
+class TestHTTP(Test):
+    COMPOSE_SERVICES = ['uwsgi_http']
+
+    def get_host(self):
+        return "http://" + self.compose_host()

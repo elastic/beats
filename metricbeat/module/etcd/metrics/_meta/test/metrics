@@ -1,0 +1,1256 @@
+# HELP etcd_debugging_mvcc_db_compaction_keys_total Total number of db keys compacted.
+# TYPE etcd_debugging_mvcc_db_compaction_keys_total counter
+etcd_debugging_mvcc_db_compaction_keys_total 0
+# HELP etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds Bucketed histogram of db compaction pause duration.
+# TYPE etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds histogram
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="1"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="2"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="4"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="8"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="16"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="32"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="64"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="128"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="256"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="512"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="1024"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="2048"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="4096"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_bucket{le="+Inf"} 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_sum 0
+etcd_debugging_mvcc_db_compaction_pause_duration_milliseconds_count 0
+# HELP etcd_debugging_mvcc_db_compaction_total_duration_milliseconds Bucketed histogram of db compaction total duration.
+# TYPE etcd_debugging_mvcc_db_compaction_total_duration_milliseconds histogram
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="100"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="200"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="400"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="800"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="1600"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="3200"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="6400"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="12800"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="25600"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="51200"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="102400"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="204800"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="409600"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="819200"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_bucket{le="+Inf"} 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_sum 0
+etcd_debugging_mvcc_db_compaction_total_duration_milliseconds_count 0
+# HELP etcd_debugging_mvcc_db_total_size_in_bytes Total size of the underlying database physically allocated in bytes. Use etcd_mvcc_db_total_size_in_bytes
+# TYPE etcd_debugging_mvcc_db_total_size_in_bytes gauge
+etcd_debugging_mvcc_db_total_size_in_bytes 24576
+# HELP etcd_debugging_mvcc_delete_total Total number of deletes seen by this member.
+# TYPE etcd_debugging_mvcc_delete_total counter
+etcd_debugging_mvcc_delete_total 0
+# HELP etcd_debugging_mvcc_events_total Total number of events sent by this member.
+# TYPE etcd_debugging_mvcc_events_total counter
+etcd_debugging_mvcc_events_total 0
+# HELP etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds Bucketed histogram of index compaction pause duration.
+# TYPE etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds histogram
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="0.5"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="1"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="2"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="4"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="8"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="16"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="32"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="64"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="128"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="256"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="512"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="1024"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="+Inf"} 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_sum 0
+etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_count 0
+# HELP etcd_debugging_mvcc_keys_total Total number of keys.
+# TYPE etcd_debugging_mvcc_keys_total gauge
+etcd_debugging_mvcc_keys_total 0
+# HELP etcd_debugging_mvcc_pending_events_total Total number of pending events to be sent.
+# TYPE etcd_debugging_mvcc_pending_events_total gauge
+etcd_debugging_mvcc_pending_events_total 0
+# HELP etcd_debugging_mvcc_put_total Total number of puts seen by this member.
+# TYPE etcd_debugging_mvcc_put_total counter
+etcd_debugging_mvcc_put_total 0
+# HELP etcd_debugging_mvcc_range_total Total number of ranges seen by this member.
+# TYPE etcd_debugging_mvcc_range_total counter
+etcd_debugging_mvcc_range_total 0
+# HELP etcd_debugging_mvcc_slow_watcher_total Total number of unsynced slow watchers.
+# TYPE etcd_debugging_mvcc_slow_watcher_total gauge
+etcd_debugging_mvcc_slow_watcher_total 0
+# HELP etcd_debugging_mvcc_txn_total Total number of txns seen by this member.
+# TYPE etcd_debugging_mvcc_txn_total counter
+etcd_debugging_mvcc_txn_total 0
+# HELP etcd_debugging_mvcc_watch_stream_total Total number of watch streams.
+# TYPE etcd_debugging_mvcc_watch_stream_total gauge
+etcd_debugging_mvcc_watch_stream_total 0
+# HELP etcd_debugging_mvcc_watcher_total Total number of watchers.
+# TYPE etcd_debugging_mvcc_watcher_total gauge
+etcd_debugging_mvcc_watcher_total 0
+# HELP etcd_debugging_server_lease_expired_total The total number of expired leases.
+# TYPE etcd_debugging_server_lease_expired_total counter
+etcd_debugging_server_lease_expired_total 0
+# HELP etcd_debugging_snap_save_marshalling_duration_seconds The marshalling cost distributions of save called by snapshot.
+# TYPE etcd_debugging_snap_save_marshalling_duration_seconds histogram
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.001"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.002"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.004"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.008"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.016"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.032"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.064"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.128"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.256"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="0.512"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="1.024"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="2.048"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="4.096"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="8.192"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_bucket{le="+Inf"} 0
+etcd_debugging_snap_save_marshalling_duration_seconds_sum 0
+etcd_debugging_snap_save_marshalling_duration_seconds_count 0
+# HELP etcd_debugging_snap_save_total_duration_seconds The total latency distributions of save called by snapshot.
+# TYPE etcd_debugging_snap_save_total_duration_seconds histogram
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.001"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.002"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.004"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.008"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.016"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.032"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.064"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.128"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.256"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="0.512"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="1.024"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="2.048"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="4.096"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="8.192"} 0
+etcd_debugging_snap_save_total_duration_seconds_bucket{le="+Inf"} 0
+etcd_debugging_snap_save_total_duration_seconds_sum 0
+etcd_debugging_snap_save_total_duration_seconds_count 0
+# HELP etcd_debugging_store_expires_total Total number of expired keys.
+# TYPE etcd_debugging_store_expires_total counter
+etcd_debugging_store_expires_total 0
+# HELP etcd_debugging_store_reads_total Total number of reads action by (get/getRecursive), local to this member.
+# TYPE etcd_debugging_store_reads_total counter
+etcd_debugging_store_reads_total{action="get"} 1
+etcd_debugging_store_reads_total{action="getRecursive"} 2
+# HELP etcd_debugging_store_watch_requests_total Total number of incoming watch requests (new or reestablished).
+# TYPE etcd_debugging_store_watch_requests_total counter
+etcd_debugging_store_watch_requests_total 0
+# HELP etcd_debugging_store_watchers Count of currently active watchers.
+# TYPE etcd_debugging_store_watchers gauge
+etcd_debugging_store_watchers 0
+# HELP etcd_debugging_store_writes_total Total number of writes (e.g. set/compareAndDelete) seen by this member.
+# TYPE etcd_debugging_store_writes_total counter
+etcd_debugging_store_writes_total{action="create"} 1
+etcd_debugging_store_writes_total{action="set"} 4
+# HELP etcd_disk_backend_commit_duration_seconds The latency distributions of commit called by backend.
+# TYPE etcd_disk_backend_commit_duration_seconds histogram
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.001"} 4
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.002"} 4
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.004"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.008"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.016"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.032"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.064"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.128"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.256"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="0.512"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="1.024"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="2.048"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="4.096"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="8.192"} 6
+etcd_disk_backend_commit_duration_seconds_bucket{le="+Inf"} 6
+etcd_disk_backend_commit_duration_seconds_sum 0.005161901
+etcd_disk_backend_commit_duration_seconds_count 6
+# HELP etcd_disk_backend_defrag_duration_seconds The latency distribution of backend defragmentation.
+# TYPE etcd_disk_backend_defrag_duration_seconds histogram
+etcd_disk_backend_defrag_duration_seconds_bucket{le="0.1"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="0.2"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="0.4"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="0.8"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="1.6"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="3.2"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="6.4"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="12.8"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="25.6"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="51.2"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="102.4"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="204.8"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="409.6"} 0
+etcd_disk_backend_defrag_duration_seconds_bucket{le="+Inf"} 0
+etcd_disk_backend_defrag_duration_seconds_sum 0
+etcd_disk_backend_defrag_duration_seconds_count 0
+# HELP etcd_disk_backend_snapshot_duration_seconds The latency distribution of backend snapshots.
+# TYPE etcd_disk_backend_snapshot_duration_seconds histogram
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="0.01"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="0.02"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="0.04"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="0.08"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="0.16"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="0.32"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="0.64"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="1.28"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="2.56"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="5.12"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="10.24"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="20.48"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="40.96"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="81.92"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="163.84"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="327.68"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="655.36"} 0
+etcd_disk_backend_snapshot_duration_seconds_bucket{le="+Inf"} 0
+etcd_disk_backend_snapshot_duration_seconds_sum 0
+etcd_disk_backend_snapshot_duration_seconds_count 0
+# HELP etcd_disk_wal_fsync_duration_seconds The latency distributions of fsync called by wal.
+# TYPE etcd_disk_wal_fsync_duration_seconds histogram
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.001"} 0
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.002"} 0
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.004"} 0
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.008"} 2
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.016"} 2
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.032"} 2
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.064"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.128"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.256"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.512"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="1.024"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="2.048"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="4.096"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="8.192"} 3
+etcd_disk_wal_fsync_duration_seconds_bucket{le="+Inf"} 3
+etcd_disk_wal_fsync_duration_seconds_sum 0.071772434
+etcd_disk_wal_fsync_duration_seconds_count 3
+# HELP etcd_grpc_proxy_cache_hits_total Total number of cache hits
+# TYPE etcd_grpc_proxy_cache_hits_total gauge
+etcd_grpc_proxy_cache_hits_total 0
+# HELP etcd_grpc_proxy_cache_keys_total Total number of keys/ranges cached
+# TYPE etcd_grpc_proxy_cache_keys_total gauge
+etcd_grpc_proxy_cache_keys_total 0
+# HELP etcd_grpc_proxy_cache_misses_total Total number of cache misses
+# TYPE etcd_grpc_proxy_cache_misses_total gauge
+etcd_grpc_proxy_cache_misses_total 0
+# HELP etcd_grpc_proxy_events_coalescing_total Total number of events coalescing
+# TYPE etcd_grpc_proxy_events_coalescing_total counter
+etcd_grpc_proxy_events_coalescing_total 0
+# HELP etcd_grpc_proxy_watchers_coalescing_total Total number of current watchers coalescing
+# TYPE etcd_grpc_proxy_watchers_coalescing_total gauge
+etcd_grpc_proxy_watchers_coalescing_total 0
+# HELP etcd_mvcc_db_total_size_in_bytes Total size of the underlying database physically allocated in bytes.
+# TYPE etcd_mvcc_db_total_size_in_bytes gauge
+etcd_mvcc_db_total_size_in_bytes 24576
+# HELP etcd_mvcc_db_total_size_in_use_in_bytes Total size of the underlying database logically in use in bytes.
+# TYPE etcd_mvcc_db_total_size_in_use_in_bytes gauge
+etcd_mvcc_db_total_size_in_use_in_bytes 24576
+# HELP etcd_mvcc_hash_duration_seconds The latency distribution of storage hash operation.
+# TYPE etcd_mvcc_hash_duration_seconds histogram
+etcd_mvcc_hash_duration_seconds_bucket{le="0.01"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="0.02"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="0.04"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="0.08"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="0.16"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="0.32"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="0.64"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="1.28"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="2.56"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="5.12"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="10.24"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="20.48"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="40.96"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="81.92"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="163.84"} 0
+etcd_mvcc_hash_duration_seconds_bucket{le="+Inf"} 0
+etcd_mvcc_hash_duration_seconds_sum 0
+etcd_mvcc_hash_duration_seconds_count 0
+# HELP etcd_mvcc_hash_rev_duration_seconds The latency distribution of storage hash by revision operation.
+# TYPE etcd_mvcc_hash_rev_duration_seconds histogram
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="0.01"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="0.02"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="0.04"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="0.08"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="0.16"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="0.32"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="0.64"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="1.28"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="2.56"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="5.12"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="10.24"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="20.48"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="40.96"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="81.92"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="163.84"} 0
+etcd_mvcc_hash_rev_duration_seconds_bucket{le="+Inf"} 0
+etcd_mvcc_hash_rev_duration_seconds_sum 0
+etcd_mvcc_hash_rev_duration_seconds_count 0
+# HELP etcd_network_client_grpc_received_bytes_total The total number of bytes received from grpc clients.
+# TYPE etcd_network_client_grpc_received_bytes_total counter
+etcd_network_client_grpc_received_bytes_total 0
+# HELP etcd_network_client_grpc_sent_bytes_total The total number of bytes sent to grpc clients.
+# TYPE etcd_network_client_grpc_sent_bytes_total counter
+etcd_network_client_grpc_sent_bytes_total 0
+# HELP etcd_server_go_version Which Go version server is running with. 1 for 'server_go_version' label with current version.
+# TYPE etcd_server_go_version gauge
+etcd_server_go_version{server_go_version="go1.10.8"} 1
+# HELP etcd_server_has_leader Whether or not a leader exists. 1 is existence, 0 is not.
+# TYPE etcd_server_has_leader gauge
+etcd_server_has_leader 1
+# HELP etcd_server_health_failures The total number of failed health checks
+# TYPE etcd_server_health_failures counter
+etcd_server_health_failures 0
+# HELP etcd_server_health_success The total number of successful health checks
+# TYPE etcd_server_health_success counter
+etcd_server_health_success 0
+# HELP etcd_server_heartbeat_send_failures_total The total number of leader heartbeat send failures (likely overloaded from slow disk).
+# TYPE etcd_server_heartbeat_send_failures_total counter
+etcd_server_heartbeat_send_failures_total 0
+# HELP etcd_server_id Server or member ID in hexadecimal format. 1 for 'server_id' label with current ID.
+# TYPE etcd_server_id gauge
+etcd_server_id{server_id="8e9e05c52164694d"} 1
+# HELP etcd_server_is_leader Whether or not this member is a leader. 1 if is, 0 otherwise.
+# TYPE etcd_server_is_leader gauge
+etcd_server_is_leader 1
+# HELP etcd_server_leader_changes_seen_total The number of leader changes seen.
+# TYPE etcd_server_leader_changes_seen_total counter
+etcd_server_leader_changes_seen_total 1
+# HELP etcd_server_proposals_applied_total The total number of consensus proposals applied.
+# TYPE etcd_server_proposals_applied_total gauge
+etcd_server_proposals_applied_total 8
+# HELP etcd_server_proposals_committed_total The total number of consensus proposals committed.
+# TYPE etcd_server_proposals_committed_total gauge
+etcd_server_proposals_committed_total 8
+# HELP etcd_server_proposals_failed_total The total number of failed proposals seen.
+# TYPE etcd_server_proposals_failed_total counter
+etcd_server_proposals_failed_total 0
+# HELP etcd_server_proposals_pending The current number of pending proposals to commit.
+# TYPE etcd_server_proposals_pending gauge
+etcd_server_proposals_pending 0
+# HELP etcd_server_quota_backend_bytes Current backend storage quota size in bytes.
+# TYPE etcd_server_quota_backend_bytes gauge
+etcd_server_quota_backend_bytes 2.147483648e+09
+# HELP etcd_server_read_indexes_failed_total The total number of failed read indexes seen.
+# TYPE etcd_server_read_indexes_failed_total counter
+etcd_server_read_indexes_failed_total 0
+# HELP etcd_server_slow_apply_total The total number of slow apply requests (likely overloaded from slow disk).
+# TYPE etcd_server_slow_apply_total counter
+etcd_server_slow_apply_total 0
+# HELP etcd_server_slow_read_indexes_total The total number of pending read indexes not in sync with leader's or timed out read index requests.
+# TYPE etcd_server_slow_read_indexes_total counter
+etcd_server_slow_read_indexes_total 0
+# HELP etcd_server_version Which version is running. 1 for 'server_version' label with current version.
+# TYPE etcd_server_version gauge
+etcd_server_version{server_version="3.3.12"} 1
+# HELP etcd_snap_db_fsync_duration_seconds The latency distributions of fsyncing .snap.db file
+# TYPE etcd_snap_db_fsync_duration_seconds histogram
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.001"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.002"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.004"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.008"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.016"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.032"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.064"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.128"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.256"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="0.512"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="1.024"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="2.048"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="4.096"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="8.192"} 0
+etcd_snap_db_fsync_duration_seconds_bucket{le="+Inf"} 0
+etcd_snap_db_fsync_duration_seconds_sum 0
+etcd_snap_db_fsync_duration_seconds_count 0
+# HELP etcd_snap_db_save_total_duration_seconds The total latency distributions of v3 snapshot save
+# TYPE etcd_snap_db_save_total_duration_seconds histogram
+etcd_snap_db_save_total_duration_seconds_bucket{le="0.1"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="0.2"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="0.4"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="0.8"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="1.6"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="3.2"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="6.4"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="12.8"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="25.6"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="51.2"} 0
+etcd_snap_db_save_total_duration_seconds_bucket{le="+Inf"} 0
+etcd_snap_db_save_total_duration_seconds_sum 0
+etcd_snap_db_save_total_duration_seconds_count 0
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 7.0458e-05
+go_gc_duration_seconds{quantile="0.25"} 7.0458e-05
+go_gc_duration_seconds{quantile="0.5"} 0.000145406
+go_gc_duration_seconds{quantile="0.75"} 0.000145406
+go_gc_duration_seconds{quantile="1"} 0.000145406
+go_gc_duration_seconds_sum 0.000215864
+go_gc_duration_seconds_count 2
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 67
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.10.8"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 3.13024e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 5.769024e+06
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.445851e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 9522
+# HELP go_memstats_gc_cpu_fraction The fraction of this program's available CPU time used by the GC since the program started.
+# TYPE go_memstats_gc_cpu_fraction gauge
+go_memstats_gc_cpu_fraction -6.017098463381069e-08
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 479232
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 3.13024e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 2.33472e+06
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 4.841472e+06
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 24205
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 0
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 7.176192e+06
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.5523196603041317e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 60
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 33727
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 20832
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 32768
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 63840
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 81920
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 6.109984e+06
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 2.304285e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.409024e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.409024e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 1.2929272e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 22
+# HELP grpc_server_handled_total Total number of RPCs completed on the server, regardless of success or failure.
+# TYPE grpc_server_handled_total counter
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Aborted",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="AlreadyExists",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Canceled",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DataLoss",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="DeadlineExceeded",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="FailedPrecondition",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Internal",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="InvalidArgument",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="NotFound",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OK",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="OutOfRange",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="PermissionDenied",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="ResourceExhausted",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unauthenticated",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unavailable",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unimplemented",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_handled_total{grpc_code="Unknown",grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+# HELP grpc_server_msg_received_total Total number of RPC stream messages received on the server.
+# TYPE grpc_server_msg_received_total counter
+grpc_server_msg_received_total{grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_msg_received_total{grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_msg_received_total{grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_received_total{grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+# HELP grpc_server_msg_sent_total Total number of gRPC stream messages sent by the server.
+# TYPE grpc_server_msg_sent_total counter
+grpc_server_msg_sent_total{grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_msg_sent_total{grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_msg_sent_total{grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_msg_sent_total{grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0
+# HELP grpc_server_started_total Total number of RPCs started on the server.
+# TYPE grpc_server_started_total counter
+grpc_server_started_total{grpc_method="Alarm",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="AuthDisable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="AuthEnable",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Authenticate",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Check",grpc_service="grpc.health.v1.Health",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Compact",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Defragment",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="DeleteRange",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Hash",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="HashKV",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="LeaseGrant",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="LeaseKeepAlive",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"} 0
+grpc_server_started_total{grpc_method="LeaseLeases",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="LeaseRevoke",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="LeaseTimeToLive",grpc_service="etcdserverpb.Lease",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="MemberAdd",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="MemberList",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="MemberRemove",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="MemberUpdate",grpc_service="etcdserverpb.Cluster",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="MoveLeader",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Put",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Range",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="RoleAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="RoleDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="RoleGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="RoleGrantPermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="RoleList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="RoleRevokePermission",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Snapshot",grpc_service="etcdserverpb.Maintenance",grpc_type="server_stream"} 0
+grpc_server_started_total{grpc_method="Status",grpc_service="etcdserverpb.Maintenance",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Txn",grpc_service="etcdserverpb.KV",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="UserAdd",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="UserChangePassword",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="UserDelete",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="UserGet",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="UserGrantRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="UserList",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="UserRevokeRole",grpc_service="etcdserverpb.Auth",grpc_type="unary"} 0
+grpc_server_started_total{grpc_method="Watch",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"} 0

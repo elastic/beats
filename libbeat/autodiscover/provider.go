@@ -21,10 +21,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Provider for autodiscover
@@ -33,7 +34,7 @@ type Provider interface {
 }
 
 // ProviderBuilder creates a new provider based on the given config and returns it
-type ProviderBuilder func(bus.Bus, *common.Config) (Provider, error)
+type ProviderBuilder func(bus.Bus, uuid.UUID, *common.Config) (Provider, error)
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
@@ -54,7 +55,7 @@ func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
 	}
 
 	r.providers[name] = provider
-	logp.Debug(debugK, "Provider registered: %s", name)
+	r.logger.Debugf("Provider registered: %s", name)
 	return nil
 }
 
@@ -77,8 +78,13 @@ func (r *registry) BuildProvider(bus bus.Bus, c *common.Config) (Provider, error
 
 	builder := r.GetProvider(config.Type)
 	if builder == nil {
-		return nil, fmt.Errorf("Unknown autodiscover provider %s", config.Type)
+		return nil, fmt.Errorf("unknown autodiscover provider %s", config.Type)
 	}
 
-	return builder(bus, c)
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
+	return builder(bus, uuid, c)
 }

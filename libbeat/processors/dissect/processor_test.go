@@ -84,7 +84,7 @@ func TestProcessor(t *testing.T) {
 				return
 			}
 
-			processor, err := newProcessor(c)
+			processor, err := NewProcessor(c)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -113,7 +113,7 @@ func TestFieldDoesntExist(t *testing.T) {
 		return
 	}
 
-	processor, err := newProcessor(c)
+	processor, err := NewProcessor(c)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -163,7 +163,7 @@ func TestFieldAlreadyExist(t *testing.T) {
 				return
 			}
 
-			processor, err := newProcessor(c)
+			processor, err := NewProcessor(c)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -187,7 +187,7 @@ func TestErrorFlagging(t *testing.T) {
 			return
 		}
 
-		processor, err := newProcessor(c)
+		processor, err := NewProcessor(c)
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -216,7 +216,7 @@ func TestErrorFlagging(t *testing.T) {
 			return
 		}
 
-		processor, err := newProcessor(c)
+		processor, err := NewProcessor(c)
 		if !assert.NoError(t, err) {
 			return
 		}

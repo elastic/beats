@@ -1,0 +1,36 @@
+# Time: 2019-01-21T06:36:03.868128Z
+# User@Host: exporter[exporter] @ localhost []  Id: 14367293
+# Schema:   Last_errno: 1370  Killed: 0
+# Query_time: 0.050365  Lock_time: 0.010733  Rows_sent: 16  Rows_examined: 3146  Rows_affected: 0
+# Bytes_sent: 1362  Tmp_tables: 376  Tmp_disk_tables: 71  Tmp_table_sizes: 606208
+# QC_Hit: No  Full_scan: Yes  Full_join: Yes  Tmp_table: Yes  Tmp_table_on_disk: Yes
+# Filesort: No  Filesort_on_disk: No  Merge_passes: 0
+# No InnoDB statistics available for this query
+# Log_slow_rate_type: query  Log_slow_rate_limit: 100
+SET timestamp=1548052563;
+SELECT t.table_schema, t.table_name, column_name, `auto_increment`,
+                  pow(2, case data_type
+                    when 'tinyint'   then 7
+                    when 'smallint'  then 15
+                    when 'mediumint' then 23
+                    when 'int'       then 31
+                    when 'bigint'    then 63
+                    end+(column_type like '% unsigned'))-1 as max_int
+                  FROM information_schema.tables t
+                  JOIN information_schema.columns c
+                    ON BINARY t.table_schema = c.table_schema AND BINARY t.table_name = c.table_name
+                  WHERE c.extra = 'auto_increment' AND t.auto_increment IS NOT NULL;
+# Time: 2019-01-21T09:15:36.487710Z
+# User@Host: test[test] @  [192.168.123.123]  Id: 14370752
+# Schema: test  Last_errno: 3170  Killed: 0
+# Query_time: 153.883481  Lock_time: 0.024022  Rows_sent: 0  Rows_examined: 120309968  Rows_affected: 19198
+# Bytes_sent: 62  Tmp_tables: 0  Tmp_disk_tables: 0  Tmp_table_sizes: 0
+# InnoDB_trx_id: 69BB9C7F9
+# QC_Hit: No  Full_scan: No  Full_join: No  Tmp_table: No  Tmp_table_on_disk: No
+# Filesort: No  Filesort_on_disk: No  Merge_passes: 0
+#   InnoDB_IO_r_ops: 9744  InnoDB_IO_r_bytes: 79822848  InnoDB_IO_r_wait: 0.883446
+#   InnoDB_rec_lock_wait: 0.003038  InnoDB_queue_wait: 0.000000
+#   InnoDB_pages_distinct: 64872
+# Log_slow_rate_type: query  Log_slow_rate_limit: 100
+SET timestamp=1548062136;
+UPDATE test    SET test.state = 'NOT_RELEVANT', modified = now()  WHERE test.id IN (26328833, 390, 149386, 152268, 160997, 165304, 168524, 184105, 193022, 194533, 194862, 196469, 196487, 246398, 256594, 260566, 261862, 262342, 263701, 264166, 264607, 267671, 274879, 276704, 280964, 284366, 289323, 289843, 290004, 298999, 301213, 303494, 307920, 311905, 316311, 318404, 330846, 340751, 341433, 357191, 369184, 376876, 378360, 378492, 379470, 382131, 384077, 388368, 396815, 396881, 398272, 398950, 399589, 401299, 408787, 411293, 419109, 425953, 427659, 433183, 437030, 438332, 438386, 447037, 454231, 455257, 455344, 456385, 460420, 460425, 461252, 462338, 462531, 462684, 463104, 463395, 471073, 480069, 480078, 482399, 485205, 487971, 497191, 500261, 501855, 517585, 519310, 519654, 522575, 538425, 543560, 562315, 573934, 583466, 583490, 583502, 597605, 600875, 601546, 603879, 604467, 604619, 757786, 797285, 799155, 802905, 806268, 806798, 811974, 819684, 822629, 826406, 837733, 840128, 840131, 840251, 840277, 840302, 842966, 844294, 844300, 847837, 852503, 854272, 854299, 862983, 881405, 881461, 881467, 881560, 881908, 882435, 882453, 882651, 882711, 882811, 888265, 888286, 914091, 916288, 916316, 917708, 918238, 918887, 919222, 926607, 976977, 977010, 977067, 977131, 977185, 988249, 988276, 988336, 988360, 988504, 990994);

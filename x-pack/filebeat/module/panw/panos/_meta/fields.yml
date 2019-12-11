@@ -1,0 +1,129 @@
+ - name: panos
+   type: group
+   description: >
+     Fields for the Palo Alto Networks PAN-OS logs.
+   fields:
+    - name: ruleset
+      type: keyword
+      description: >
+        Name of the rule that matched this session.
+    - name: source
+      type: group
+      description: >
+        Fields to extend the top-level source object.
+      fields:
+        - name: zone
+          type: keyword
+          description: >
+            Source zone for this session.
+        - name: interface
+          type: keyword
+          description: >
+            Source interface for this session.
+        - name: nat
+          type: group
+          description: >
+            Post-NAT source address, if source NAT is performed.
+          fields:
+          - name: ip
+            type: ip
+            description: >
+              Post-NAT source IP.
+          - name: port
+            type: long
+            description: >
+              Post-NAT source port.
+
+    - name: destination
+      type: group
+      description: >
+        Fields to extend the top-level destination object.
+      fields:
+        - name: zone
+          type: keyword
+          description: >
+            Destination zone for this session.
+        - name: interface
+          type: keyword
+          description: >
+            Destination interface for this session.
+        - name: nat
+          type: group
+          description: >
+            Post-NAT destination address, if destination NAT is performed.
+          fields:
+            - name: ip
+              type: ip
+              description: >
+                Post-NAT destination IP.
+            - name: port
+              type: long
+              description: >
+                Post-NAT destination port.
+
+    - name: network
+      type: group
+      description: >
+        Fields to extend the top-level network object.
+      fields:
+        - name: pcap_id
+          type: keyword
+          description: >
+            Packet capture ID for a threat.
+
+        - name: nat
+          type: group
+          fields:
+            - name: community_id
+              type: keyword
+              description: >
+                Community ID flow-hash for the NAT 5-tuple.
+
+    - name: file
+      type: group
+      description: >
+        Fields to extend the top-level file object.
+      fields:
+        - name: hash
+          description: >
+            Binary hash for a threat file sent to be analyzed
+            by the WildFire service.
+          type: keyword
+
+    - name: url
+      type: group
+      description: >
+        Fields to extend the top-level url object.
+      fields:
+        - name: category
+          type: keyword
+          description: >
+            For threat URLs, it's the URL category.
+            For WildFire, the verdict on the file and is
+            either 'malicious', 'grayware', or 'benign'.
+
+    - name: flow_id
+      type: keyword
+      description: >
+        Internal numeric identifier for each session.
+
+    - name: sequence_number
+      type: long
+      description: >
+        Log entry identifier that is incremented sequentially.
+        Unique for each log type.
+
+    - name: threat.resource
+      type: keyword
+      description: >
+        URL or file name for a threat.
+
+    - name: threat.id
+      type: keyword
+      description: >
+        Palo Alto Networks identifier for the threat.
+
+    - name: threat.name
+      type: keyword
+      description: >
+        Palo Alto Networks name for the threat.

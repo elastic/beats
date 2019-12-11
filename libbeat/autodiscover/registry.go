@@ -17,7 +17,11 @@
 
 package autodiscover
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/elastic/beats/libbeat/logp"
+)
 
 // Register of autodiscover providers
 type registry struct {
@@ -29,6 +33,8 @@ type registry struct {
 	builders map[string]BuilderConstructor
 	// A map of appender name to AppenderBuilder.
 	appenders map[string]AppenderBuilder
+
+	logger *logp.Logger
 }
 
 // Registry holds all known autodiscover providers, they must be added to it to enable them for use
@@ -40,5 +46,6 @@ func NewRegistry() *registry {
 		providers: make(map[string]ProviderBuilder, 0),
 		builders:  make(map[string]BuilderConstructor, 0),
 		appenders: make(map[string]AppenderBuilder, 0),
+		logger:    logp.NewLogger("autodiscover"),
 	}
 }

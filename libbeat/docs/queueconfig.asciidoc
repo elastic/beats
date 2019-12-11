@@ -29,7 +29,7 @@ If no flush interval and no number of events to flush is configured,
 all events published to this queue will be directly consumed by the outputs.
 To enforce spooling in the queue, set the `flush.min_events` and `flush.timeout` options.
 
-By default `flush.min.events` is set to 2048 and `flush.timeout` is set to 1s.
+By default `flush.min_events` is set to 2048 and `flush.timeout` is set to 1s.
 
 The output's `bulk_max_size` setting limits the number of events being processed at once.
 

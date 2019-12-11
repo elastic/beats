@@ -39,8 +39,8 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
-var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older",
-	"read_buffer_size", "format_buffer_size")
+var eventLoggingConfigKeys = common.MakeStringSet(append(commonConfigKeys,
+	"ignore_older", "read_buffer_size", "format_buffer_size")...)
 
 type eventLoggingConfig struct {
 	ConfigCommon     `config:",inline"`

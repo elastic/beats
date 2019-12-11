@@ -28,12 +28,13 @@ import (
 func MapHostInfo(info types.HostInfo) common.MapStr {
 	data := common.MapStr{
 		"host": common.MapStr{
-			"name":         info.Hostname,
+			"hostname":     info.Hostname,
 			"architecture": info.Architecture,
 			"os": common.MapStr{
 				"platform": info.OS.Platform,
 				"version":  info.OS.Version,
 				"family":   info.OS.Family,
+				"name":     info.OS.Name,
 				"kernel":   info.KernelVersion,
 			},
 		},
@@ -67,12 +68,13 @@ func ReportInfo(_ monitoring.Mode, V monitoring.Visitor) {
 	}
 	info := h.Info()
 
-	monitoring.ReportString(V, "name", info.Hostname)
+	monitoring.ReportString(V, "hostname", info.Hostname)
 	monitoring.ReportString(V, "architecture", info.Architecture)
 	monitoring.ReportNamespace(V, "os", func() {
 		monitoring.ReportString(V, "platform", info.OS.Platform)
 		monitoring.ReportString(V, "version", info.OS.Version)
 		monitoring.ReportString(V, "family", info.OS.Family)
+		monitoring.ReportString(V, "name", info.OS.Name)
 		monitoring.ReportString(V, "kernel", info.KernelVersion)
 
 		if info.OS.Codename != "" {

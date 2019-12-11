@@ -51,10 +51,6 @@ var (
 			"replicaset": p.KeyLabel("name"),
 			"namespace":  p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 		},
-
-		ExtraFields: map[string]string{
-			mb.NamespaceKey: "replicaset",
-		},
 	}
 )
 
@@ -91,18 +87,43 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
 	events, err := m.prometheus.GetProcessedMetrics(mapping)
-	if err == nil {
-		m.enricher.Enrich(events)
+	if err != nil {
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 
-	return events, err
+	m.enricher.Enrich(events)
+	for _, event := range events {
+
+		var moduleFieldsMapStr common.MapStr
+		moduleFields, ok := event[mb.ModuleDataKey]
+		if ok {
+			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+			}
+		}
+		delete(event, mb.ModuleDataKey)
+
+		if reported := reporter.Event(mb.Event{
+			MetricSetFields: event,
+			ModuleFields:    moduleFieldsMapStr,
+			Namespace:       "kubernetes.replicaset",
+		}); !reported {
+			m.Logger().Debug("error trying to emit event")
+			return
+		}
+	}
+
+	return
 }
 
 // Close stops this metricset

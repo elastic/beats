@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "prometheus", Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "prometheus", asset.ModuleFieldsPri, AssetPrometheus); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
-	return "eJy0krGum0AQRXu+4oo6jw+gSJP+KVLKKEJruMDKyw7ZGZ7kv48INsYEy03elMPsPYfZfcOZlxJjkoHWc9IMMG+BJfLvazPPgIZaJz+al1jiawYAP8yZopYQWBsbtEkG3E8VGaC9JKtqia3vSrQuKDMgMdApS3RunqGZj52W+JmrhvwL8t5szH9lQOsZGi3/4t4Q3cCd7Fx2GeesJNN47RzIPmYteY8et+5C0fnn1u4R5CloqWU77iSTwXpuFgNl+mAqNuOryYnmNv2989YwivnW126G68PEM9sXxnO9b0KXHRS7mSOlrdbviROrwNhZ/8/QzSxI7A4+vpCb69uUEqMtGCyYveJdpkkyjmw+weN9Gk5MkPbGuBrxg3G/tM3LralKLWRkrNrm+NoOpF7d2iozB6P1gesRSU9s1CS5jkXdT/GslUk1MqlX++9SAwdJFywgWO8MLnF+wLjQcMWygQkar+ci+xMAAP//EEQ9qA=="
+// AssetPrometheus returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/prometheus.
+func AssetPrometheus() string {
+	return "eJyUkc1qwzAQhO9+ikG9hSQPoENfoYUeSwmKtba30R+7G0LeviQ2aQIttLppv9FoNNrgQGePJjWTTXTUDjC2RB7u9TZ0HRBJe+FmXIvHcwcAbxZMob2ERhGD1IyA71OgElvlYtsO0KmK7fpaBh49hpCUOkAoUVDyGMNFQ2ZcRvV4d6rJreEms+Y+OmBgSlH99d4nvEgkASs4tyoWimEioTVS2FNSnDgl5GD9hIFFbQ2bCEJqCEKI9bhPdPXaoIRM9w1sZ4/t6soBOzfyqPtP6m0ZzZvdTA50PlWJC/qhpsu6ayWTCfdL0t8yzKK/h7h70QPZ5dAal3GRuZX7Z84b2Tx81lcAAAD//3hXtDU="
 }

@@ -18,9 +18,11 @@
 package elasticsearch
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/libbeat/monitoring/report"
 )
 
 // config is subset of libbeat/outputs/elasticsearch config tailored
@@ -32,6 +34,7 @@ type config struct {
 	Headers          map[string]string `config:"headers"`
 	Username         string            `config:"username"`
 	Password         string            `config:"password"`
+	APIKey           string            `config:"api_key"`
 	ProxyURL         string            `config:"proxy_url"`
 	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
 	TLS              *tlscommon.Config `config:"ssl"`
@@ -43,9 +46,19 @@ type config struct {
 	BufferSize       int               `config:"buffer_size"`
 	Tags             []string          `config:"tags"`
 	Backoff          backoff           `config:"backoff"`
+	Format           report.Format     `config:"_format"`
+	ClusterUUID      string            `config:"cluster_uuid"`
 }
 
 type backoff struct {
 	Init time.Duration
 	Max  time.Duration
+}
+
+func (c *config) Validate() error {
+	if c.APIKey != "" && (c.Username != "" && c.Password != "") {
+		return fmt.Errorf("cannot set both api_key and username/password for monitoring client")
+	}
+
+	return nil
 }

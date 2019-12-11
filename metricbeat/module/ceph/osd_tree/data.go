@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Node represents a node object
 type Node struct {
 	ID       int64   `json:"id"`
 	Name     string  `json:"name"`
@@ -42,10 +43,12 @@ type Node struct {
 	DeviceClass     string  `json:"device_class"`
 }
 
+// Output contains a node list from the df response
 type Output struct {
 	Nodes []Node `json:"nodes"`
 }
 
+// OsdTreeRequest is a OSD response object
 type OsdTreeRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`
@@ -55,7 +58,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var d OsdTreeRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: ", err)
+		logp.Err("Error: %+v", err)
 		return nil, err
 	}
 
@@ -86,7 +89,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		nodeInfo := common.MapStr{}
 		if node.ID < 0 {
 			//bucket node
-			nodeInfo["children"] = childrenMap[node.Name]
+			nodeInfo["children"] = strings.Split(childrenMap[node.Name], ",")
 		} else {
 			//osd node
 			nodeInfo["crush_weight"] = node.CrushWeight

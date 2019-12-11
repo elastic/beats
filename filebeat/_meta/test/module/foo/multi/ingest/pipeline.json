@@ -1,0 +1,27 @@
+{
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "^%{CHAR:first_char}"
+                ],
+                "pattern_definitions": {
+                    "CHAR": "."
+                }
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char == '{'",
+                "name": "{< IngestPipeline "json_logs" >}"
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char != '{'",
+                "name": "{< IngestPipeline "plain_logs" >}"
+            }
+        }
+    ]
+}

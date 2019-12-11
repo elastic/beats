@@ -1,0 +1,3 @@
+# HELP coredns_dns_request_type_count_total Counter of DNS requests per type, per zone.
+# TYPE coredns_dns_request_type_count_total counter
+coredns_dns_request_type_count_total{server="dns://:53",type="A",zone="."} 440.0

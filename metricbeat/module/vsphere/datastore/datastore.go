@@ -21,6 +21,8 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -36,12 +38,14 @@ func init() {
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	HostURL  *url.URL
 	Insecure bool
 }
 
+// New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The vsphere datastore metricset is beta")
 
@@ -69,19 +73,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
-	ctx, cancel := context.WithCancel(context.Background())
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
-	var events []common.MapStr
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in NewClient")
 	}
 
-	defer client.Logout(ctx)
+	defer func() {
+		if err := client.Logout(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to logout from vshphere"))
+		}
+	}()
 
 	c := client.Client
 
@@ -90,16 +98,19 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"Datastore"}, true)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in CreateContainerView")
 	}
 
-	defer v.Destroy(ctx)
+	defer func() {
+		if err := v.Destroy(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
+		}
+	}()
 
 	// Retrieve summary property for all datastores
 	var dst []mo.Datastore
-	err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary"}, &dst)
-	if err != nil {
-		return nil, err
+	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary"}, &dst); err != nil {
+		return errors.Wrap(err, "error in Retrieve")
 	}
 
 	for _, ds := range dst {
@@ -126,8 +137,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			},
 		}
 
-		events = append(events, event)
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+		})
 	}
 
-	return events, nil
+	return nil
 }

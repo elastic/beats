@@ -17,8 +17,9 @@
 
 package template
 
-import "github.com/elastic/beats/libbeat/common"
+import "github.com/elastic/beats/libbeat/mapping"
 
+// TemplateConfig holds config information about the Elasticsearch template
 type TemplateConfig struct {
 	Enabled bool   `config:"enabled"`
 	Name    string `config:"name"`
@@ -29,20 +30,23 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields common.Fields    `config:"append_fields"`
+	AppendFields mapping.Fields   `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`
 	Settings     TemplateSettings `config:"settings"`
+	Order        int              `config:"order"`
 }
 
+// TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
 type TemplateSettings struct {
 	Index  map[string]interface{} `config:"index"`
 	Source map[string]interface{} `config:"_source"`
 }
 
-var (
-	// DefaultConfig for index template
-	DefaultConfig = TemplateConfig{
+// DefaultConfig for index template
+func DefaultConfig() TemplateConfig {
+	return TemplateConfig{
 		Enabled: true,
 		Fields:  "",
+		Order:   1,
 	}
-)
+}

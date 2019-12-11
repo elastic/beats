@@ -1,0 +1,223 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "3",
+              "w": 48,
+              "x": 0,
+              "y": 15
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "version": "7.0.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Journalbeat] Overview ECS",
+        "version": 1
+      },
+      "id": "effdfcd0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "dashboard": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+          "name": "panel_0",
+          "type": "search"
+        },
+        {
+          "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+          "name": "panel_1",
+          "type": "search"
+        },
+        {
+          "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+          "name": "panel_2",
+          "type": "search"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-02-04T12:25:20.413Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.hostname",
+          "journald.kernel.subsystem",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "syslog.facility:0 AND syslog.priority<4"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "[Journalbeat] Kernel errors ECS",
+        "version": 1
+      },
+      "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "33c018b0-2876-11e9-bc7e-af96a8fe0ddd",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-02-04T12:19:40.092Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.hostname",
+          "process.name",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": "syslog.facility:4"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "[Journalbeat] Authorization ECS",
+        "version": 1
+      },
+      "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "33c018b0-2876-11e9-bc7e-af96a8fe0ddd",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-02-04T12:20:56.412Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.hostname",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "[Journalbeat] Systemd messages ECS",
+        "version": 1
+      },
+      "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "33c018b0-2876-11e9-bc7e-af96a8fe0ddd",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-02-04T12:22:19.508Z",
+      "version": 1
+    }
+  ],
+  "version": "7.0.0"
+}

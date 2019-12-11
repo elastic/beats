@@ -22,261 +22,200 @@ package main
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
-	mage.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
+	common.RegisterCheckDeps(Update)
+
+	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
-}
-
-// CrossBuildXPack cross-builds the beat with XPack for all target platforms.
-func CrossBuildXPack() error {
-	return mage.CrossBuildXPack()
+	return devtools.CrossBuild()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return mage.Clean()
+	return devtools.CrossBuildGoDaemon()
 }
 
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
-// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseElasticBeatPackaging()
-	customizePackaging()
+	devtools.UseElasticBeatOSSPackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
+	filebeat.CustomizePackaging()
 
-	mg.Deps(Update, prepareModulePackagingOSS, prepareModulePackagingXPack)
-	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
+	mg.Deps(Update)
+	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages(mage.WithModules(), mage.WithModulesD())
+	return devtools.TestPackages(devtools.WithModules(), devtools.WithModulesD())
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	if err := sh.Run("make", "update"); err != nil {
-		return err
-	}
-
-	// XXX (andrewkroh on 2018-10-14): This is a temporary solution for enabling
-	// X-Pack modules for Filebeat. Packaging for X-Pack will be fully migrated
-	// to a magefile.go in the x-pack/filebeat directory and this will be
-	// removed.
-	return mage.Mage("../x-pack/filebeat", "update")
+// Update is an alias for executing fields, dashboards, config, includes.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config, includeList, fieldDocs,
+		filebeat.CollectDocs,
+		filebeat.PrepareModulePackagingOSS)
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	return mage.GenerateFieldsYAML("module")
-}
-
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
-}
-
-// -----------------------------------------------------------------------------
-// Customizations specific to Filebeat.
-// - Include modules directory in packages (minus _meta and test files).
-// - Include modules.d directory in packages.
-
-var (
-	dirModuleGeneratedOSS     = filepath.Clean("build/package/modules-oss")
-	dirModuleGeneratedXPack   = filepath.Clean("build/package/modules-x-pack")
-	dirModulesDGeneratedXPack = filepath.Clean("build/packaging/modules.d-x-pack")
-)
-
-func replacePackageFileSource(args mage.OSPackageArgs, replacements map[string]string) {
-	missing := make(map[string]struct{})
-	for key := range replacements {
-		missing[key] = struct{}{}
-	}
-	for key, contents := range args.Spec.Files {
-		oldSource := args.Spec.Files[key].Source
-		if newSource, found := replacements[oldSource]; found {
-			contents.Source = newSource
-			args.Spec.Files[key] = contents
-			delete(missing, oldSource)
-		}
-	}
-	if len(missing) > 0 {
-		asList := make([]string, 0, len(missing))
-		for path := range missing {
-			asList = append(asList, path)
-		}
-		panic(errors.Errorf("the following file sources were not found for replacement: %v", asList))
-	}
-}
-
-// customizePackaging modifies the package specs to add the modules and
+// Config generates both the short/reference/docker configs and populates the
 // modules.d directory.
-func customizePackaging() {
-	var (
-		moduleTarget = "module"
-		module       = mage.PackageFile{
-			Mode:   0644,
-			Source: dirModuleGeneratedOSS,
-		}
-		moduleXPack = mage.PackageFile{
-			Mode:   0644,
-			Source: dirModuleGeneratedXPack,
-		}
-
-		modulesDTarget = "modules.d"
-		modulesD       = mage.PackageFile{
-			Mode:    0644,
-			Source:  "modules.d",
-			Config:  true,
-			Modules: true,
-		}
-		modulesDXPack = mage.PackageFile{
-			Mode:    0644,
-			Source:  dirModulesDGeneratedXPack,
-			Config:  true,
-			Modules: true,
-		}
-	)
-
-	for _, args := range mage.Packages {
-		mods := module
-		modsD := modulesD
-		pkgType := args.Types[0]
-		if args.Spec.License == "Elastic License" {
-			mods = moduleXPack
-			modsD = modulesDXPack
-			replacePackageFileSource(args, map[string]string{
-				"fields.yml":                  "../x-pack/{{.BeatName}}/fields.yml",
-				"{{.BeatName}}.reference.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.reference.yml",
-				"_meta/kibana.generated":      "../x-pack/{{.BeatName}}/build/kibana",
-			})
-			if pkgType != mage.Docker {
-				replacePackageFileSource(args, map[string]string{
-					"{{.BeatName}}.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.yml",
-				})
-			}
-		}
-
-		switch pkgType {
-		case mage.TarGz, mage.Zip, mage.Docker:
-			args.Spec.Files[moduleTarget] = mods
-			args.Spec.Files[modulesDTarget] = modsD
-		case mage.Deb, mage.RPM:
-			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = mods
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modsD
-		case mage.DMG:
-			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}"+moduleTarget] = mods
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modsD
-		default:
-			panic(errors.Errorf("unhandled package type: %v", pkgType))
-		}
-	}
+func Config() {
+	mg.Deps(devtools.GenerateDirModulesD, configYML)
 }
 
-// prepareModulePackagingOSS copies the module dir to the build dir and excludes
-// _meta and test files so that they are not included in packages.
-func prepareModulePackagingOSS() error {
-	if err := sh.Rm(dirModuleGeneratedOSS); err != nil {
+func configYML() error {
+	return devtools.Config(devtools.AllConfigTypes, filebeat.OSSConfigFileParams(), ".")
+}
+
+// includeList generates include/list.go with imports for inputs.
+func includeList() error {
+	options := devtools.DefaultIncludeListOptions()
+	options.ImportDirs = []string{"input/*"}
+	return devtools.GenerateIncludeListGo(options)
+}
+
+// Fields generates fields.yml and fields.go files for the Beat.
+func Fields() {
+	mg.Deps(libbeatAndFilebeatCommonFieldsGo, moduleFieldsGo)
+	mg.Deps(fieldsYML)
+}
+
+// libbeatAndFilebeatCommonFieldsGo generates a fields.go containing both
+// libbeat and filebeat's common fields.
+func libbeatAndFilebeatCommonFieldsGo() error {
+	if err := devtools.GenerateFieldsYAML(); err != nil {
 		return err
 	}
-
-	copy := &mage.CopyTask{
-		Source:  "module",
-		Dest:    dirModuleGeneratedOSS,
-		Mode:    0644,
-		DirMode: 0755,
-		Exclude: []string{
-			"/_meta",
-			"/test",
-			"fields.go",
-		},
-	}
-	return copy.Execute()
+	return devtools.GenerateAllInOneFieldsGo()
 }
 
-// prepareModulePackagingXPack generates modules and modules.d directories
-// for an x-pack distribution, excluding _meta and test files so that they are
-// not included in packages.
-func prepareModulePackagingXPack() error {
-	err := mage.Clean([]string{
-		dirModuleGeneratedXPack,
-		dirModulesDGeneratedXPack,
+// moduleFieldsGo generates a fields.go for each module.
+func moduleFieldsGo() error {
+	return devtools.GenerateModuleFieldsGo("module")
+}
+
+// fieldsYML generates the fields.yml file containing all fields.
+func fieldsYML() error {
+	return devtools.GenerateFieldsYAML("module")
+}
+
+// fieldDocs generates docs/fields.asciidoc containing all fields
+// (including x-pack).
+func fieldDocs() error {
+	inputs := []string{
+		devtools.OSSBeatDir("module"),
+		devtools.XPackBeatDir("module"),
+		devtools.OSSBeatDir("input"),
+		devtools.XPackBeatDir("input"),
+		devtools.XPackBeatDir("processors"),
+	}
+	output := devtools.CreateDir("build/fields/fields.all.yml")
+	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+		return err
+	}
+	return devtools.Docs.FieldDocs(output)
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return devtools.KibanaDashboards("module")
+}
+
+// ExportDashboard exports a dashboard and writes it into the correct directory.
+//
+// Required environment variables:
+// - MODULE: Name of the module
+// - ID:     Dashboard id
+func ExportDashboard() error {
+	return devtools.ExportDashboard()
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	devtools.AddIntegTestUsage()
+	defer devtools.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest, PythonUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.RunIntegTest("goIntegTest", func() error {
+		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 	})
-	if err != nil {
-		return err
-	}
+}
 
-	for _, copyAction := range []struct {
-		src, dst string
-	}{
-		{"module", dirModuleGeneratedXPack},
-		{"../x-pack/filebeat/module", dirModuleGeneratedXPack},
-		{"modules.d", dirModulesDGeneratedXPack},
-		{"../x-pack/filebeat/modules.d", dirModulesDGeneratedXPack},
-	} {
-		err := (&mage.CopyTask{
-			Source:  copyAction.src,
-			Dest:    copyAction.dst,
-			Mode:    0644,
-			DirMode: 0755,
-			Exclude: []string{
-				"/_meta",
-				"/test",
-				"fields.go",
-			},
-		}).Execute()
-		if err != nil {
-			return err
-		}
+// PythonUnitTest executes the python system tests.
+func PythonUnitTest() error {
+	mg.Deps(devtools.BuildSystemTestBinary)
+	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+}
+
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
+func PythonIntegTest(ctx context.Context) error {
+	if !devtools.IsInIntegTestEnv() {
+		mg.Deps(Fields)
 	}
-	return nil
+	return devtools.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(devtools.BuildSystemTestBinary)
+		args := devtools.DefaultPythonTestIntegrationArgs()
+		args.Env["MODULES_PATH"] = devtools.CWD("module")
+		return devtools.PythonNoseTest(args)
+	}, "GENERATE")
 }

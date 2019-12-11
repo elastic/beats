@@ -23,22 +23,36 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
 func TestFetch(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	require.Empty(t, errs)
+	require.NotEmpty(t, events)
+	event := events[0].BeatEvent("system", "process_summary").Fields
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		event.StringToPrint())
+
+	summary, err := event.GetValue("system.process.summary")
+	require.NoError(t, err)
+
+	event, ok := summary.(common.MapStr)
+	require.True(t, ok)
+
 	assert.Contains(t, event, "total")
 	assert.Contains(t, event, "sleeping")
 	assert.Contains(t, event, "running")

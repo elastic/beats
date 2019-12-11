@@ -1,0 +1,213 @@
+{
+    "description": "Pipeline for parsing elasticsearch audit logs in JSON format",
+    "processors": [
+        {
+            "json": {
+                "field": "message",
+                "target_field": "elasticsearch.audit"
+            }
+        },
+        {
+            "drop": {
+                "if": "ctx.elasticsearch.audit?.type != null && ctx.elasticsearch.audit.type != 'audit'"
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.audit.type",
+                "ignore_missing": true
+
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.timestamp",
+                "target_field": "elasticsearch.audit.@timestamp",
+                "ignore_missing": true
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "event.action",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.event.action",
+                "target_field": "event.action",
+                "ignore_missing": true
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "event.type",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.event.type",
+                "target_field": "elasticsearch.audit.layer",
+                "ignore_missing": true
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "origin.address",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "grok": {
+                "field": "elasticsearch.audit.origin.address",
+                "patterns": [
+                    "\\[%{IPORHOST:source.ip}\\]:%{INT:source.port:int}",
+                    "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.origin.address",
+                "target_field": "source.address",
+                "ignore_missing": true
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "url.path",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "url.query",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query == null",
+                "field": "url.original",
+                "value": "{{elasticsearch.audit.url.path}}"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null",
+                "field": "url.original",
+                "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.elasticsearch.audit?.url?.path != null",
+                "field": "elasticsearch.audit.url.path"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.elasticsearch.audit?.url?.query != null",
+                "field": "elasticsearch.audit.url.query"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "node.id",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "node.name",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.node",
+                "target_field": "elasticsearch.node"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "user.name",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.user.name",
+                "target_field": "user.name",
+                "ignore_missing": true
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "request.method",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.request.method",
+                "target_field": "http.request.method",
+                "ignore_missing": true
+            }
+
+        },
+        {
+            "dot_expander": {
+                "field": "request.body",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.request.body",
+                "target_field": "http.request.body.content",
+                "ignore_missing": true
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "cluster.name",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.cluster.name",
+                "target_field": "elasticsearch.cluster.name",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.level",
+                "target_field": "log.level",
+                "ignore_missing": true
+            }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.audit.@timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                "ignore_failure": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

@@ -1,0 +1,67 @@
+{
+  "test_name": "Netflow 9 nprobe DPI L7",
+  "events": [
+    {
+      "Timestamp": "1970-01-01T00:08:22Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "port": 0
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "1970-01-01T00:08:22Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "oFN7CMNpOLQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AAAAUg==",
+          "application_name": "\u0000\u0000\u0000\u0000\u0000\"\u0000\u0000\u0000\u0000\u0004",
+          "destination_ipv4_address": "0.0.0.0",
+          "destination_transport_port": 0,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "1970-01-01T00:08:22Z",
+            "uptime_millis": 91000,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 104000,
+          "flow_start_sys_up_time": 101000,
+          "octet_delta_count": 82,
+          "packet_delta_count": 1,
+          "protocol_identifier": 0,
+          "source_ipv4_address": "0.0.0.0",
+          "source_transport_port": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 82,
+          "community_id": "1:LFE/FJ5zfsQGP8HTeu6b6rxLS78=",
+          "direction": "unknown",
+          "iana_number": 0,
+          "packets": 1,
+          "transport": "unknown (0)"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "bytes": 82,
+          "ip": "0.0.0.0",
+          "locality": "private",
+          "packets": 1,
+          "port": 0
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

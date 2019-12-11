@@ -1,3 +1,5 @@
 type: syslog
 protocol.udp:
-  host: "localhost:{{.syslog_port}}"
+  host: "{{.syslog_host}}:{{.syslog_port}}"
+processors:
+- add_locale: ~

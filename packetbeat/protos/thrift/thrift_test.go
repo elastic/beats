@@ -729,7 +729,7 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.request.method != "zip" ||
 		trans.request.params != "()" ||
-		trans.reply != nil || trans.responseTime != 0 {
+		trans.reply != nil {
 
 		t.Error("Bad result:", trans)
 	}
@@ -759,7 +759,7 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.request.method != "zip" ||
 		trans.request.params != "()" ||
-		trans.reply != nil || trans.responseTime != 0 {
+		trans.reply != nil {
 
 		t.Error("Bad result:", trans)
 	}

@@ -1,0 +1,27 @@
+[
+    {
+        "@timestamp": "2016-12-26T16:22:14.000Z",
+        "destination.domain": "vhost1.domaine.fr",
+        "event.dataset": "apache.access",
+        "event.module": "apache",
+        "fileset.name": "access",
+        "http.request.method": "GET",
+        "http.request.referrer": "-",
+        "http.response.body.bytes": 499,
+        "http.response.status_code": 404,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "apache",
+        "source.ip": "192.168.33.2",
+        "url.original": "/hello",
+        "user.name": "-",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:50.0) Gecko/20100101 Firefox/50.0",
+        "user_agent.os.full": "Mac OS X 10.12",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.12",
+        "user_agent.version": "50.0."
+    }
+]

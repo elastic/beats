@@ -37,6 +37,8 @@ type writer struct {
 	fsync      []syncMsg
 	fsync0     [8]syncMsg
 
+	syncMode SyncMode
+
 	pending   int // number of scheduled writes since last sync
 	published int // number of writes executed since last sync
 }
@@ -90,8 +92,13 @@ const (
 	syncDataOnly
 )
 
-func (w *writer) Init(target writable, pageSize uint) {
+func (w *writer) Init(target writable, pageSize uint, syncMode SyncMode) {
+	if syncMode == SyncDefault {
+		syncMode = SyncData
+	}
+
 	w.target = target
+	w.syncMode = syncMode
 	w.pageSize = pageSize
 	w.cond = sync.NewCond(&w.mux)
 	w.scheduled = w.scheduled0[:0]
@@ -175,29 +182,41 @@ func (w *writer) Run() (bool, reason) {
 
 		// execute pending fsync:
 		if fsync := cmd.fsync; fsync != nil {
-			const op = "txfile/write-sync"
-
-			resetErr := cmd.syncFlags.Test(syncResetErr)
 			if err == nil {
-				syncFlag := vfs.SyncAll
-				if cmd.syncFlags.Test(syncDataOnly) {
-					syncFlag = vfs.SyncDataOnly
-				}
-
-				if syncErr := w.target.Sync(syncFlag); syncErr != nil {
-					err = errOp(op).causedBy(syncErr)
-				}
+				err = w.execSync(cmd)
 			}
 			fsync.err = err
 
 			traceln("done fsync")
 			fsync.Release()
 
+			resetErr := cmd.syncFlags.Test(syncResetErr)
 			if resetErr {
 				err = nil
 			}
 		}
 	}
+}
+
+func (w *writer) execSync(cmd command) reason {
+	const op = "txfile/write-sync"
+
+	syncFlag := vfs.SyncAll
+	switch w.syncMode {
+	case SyncNone:
+		return nil
+
+	case SyncData:
+		if cmd.syncFlags.Test(syncDataOnly) {
+			syncFlag = vfs.SyncDataOnly
+		}
+	}
+
+	if err := w.target.Sync(syncFlag); err != nil {
+		return errOp(op).causedBy(err)
+	}
+
+	return nil
 }
 
 func (w *writer) nextCommand(buf []writeMsg) (command, bool) {

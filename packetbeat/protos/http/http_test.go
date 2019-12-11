@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type testParser struct {
@@ -49,6 +50,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	publish.MarshalPacketbeatFields(&event, nil)
 	e.events = append(e.events, event)
 }
 
@@ -720,7 +722,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		t.Error("Unexpected state", st.parseState)
 	}
 
-	logp.Debug("http", "parseOffset", st.parseOffset)
+	logp.Debug("http", "parseOffset: %d", st.parseOffset)
 
 	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != false {
@@ -1196,16 +1198,16 @@ func TestHttpParser_includeBodyFor(t *testing.T) {
 
 	trans := expectTransaction(t, &store)
 	assert.NotNil(t, trans)
-	hasKey, err := trans.HasKey("http.request.body")
+	hasKey, err := trans.HasKey("http.request.body.content")
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.True(t, hasKey)
-	contents, err := trans.GetValue("http.response.body")
+	contents, err := trans.GetValue("http.response.body.content")
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, "done.", contents)
+	assert.Equal(t, common.NetString("done."), contents)
 }
 
 func TestHttpParser_sendRequestResponse(t *testing.T) {
@@ -1307,8 +1309,10 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	http.ReceivedFin(tcptuple, 1, private)
 
 	trans := expectTransaction(t, &store)
-	assert.NotNil(t, trans)
-	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+	if assert.NotNil(t, trans) {
+		notes, _ := trans.GetValue("error.message")
+		assert.Equal(t, notes, "Packet loss while capturing the response")
+	}
 }
 
 func TestHttp_configsSettingAll(t *testing.T) {
@@ -1416,9 +1420,9 @@ func TestHttp_includeBodies(t *testing.T) {
 
 		trans := expectTransaction(t, &store)
 		assert.NotNil(t, trans)
-		hasKey, _ := trans.HasKey("http.request.body")
+		hasKey, _ := trans.HasKey("http.request.body.content")
 		assert.Equal(t, testCase.hasRequest, hasKey, msg)
-		hasKey, _ = trans.HasKey("http.response.body")
+		hasKey, _ = trans.HasKey("http.response.body.content")
 		assert.Equal(t, testCase.hasResponse, hasKey, msg)
 	}
 }
@@ -1596,16 +1600,16 @@ func TestHTTP_Encodings(t *testing.T) {
 
 		trans := expectTransaction(t, &store)
 		assert.NotNil(t, trans, msg)
-		body, err := trans.GetValue("http.response.body")
+		body, err := trans.GetValue("http.response.body.content")
 		if err == nil {
-			assert.Equal(t, testData.expectedBody, body, msg)
+			assert.Equal(t, common.NetString(testData.expectedBody), body, msg)
 		} else {
 			if len(testData.expectedBody) == 0 && len(testData.note) > 0 {
-				note, err := trans.GetValue("notes")
+				note, err := trans.GetValue("error.message")
 				if !assert.Nil(t, err, msg) {
-					t.Fatal(err)
+					return
 				}
-				assert.Equal(t, []string{testData.note}, note)
+				assert.Equal(t, testData.note, note)
 			} else {
 				t.Fatal(err)
 			}
@@ -1618,7 +1622,7 @@ func TestHTTP_Decoding_disabled(t *testing.T) {
 		"Host: server\r\n" +
 		"\r\n"
 
-	deflateBody := string([]byte{0xcb, 0xc8, 0xcf, 0x49, 0xe4, 0x02, 0x00})
+	deflateBody := common.NetString{0xcb, 0xc8, 0xcf, 0x49, 0xe4, 0x02, 0x00}
 
 	var store eventStore
 	http := httpModForTests(&store)
@@ -1647,12 +1651,130 @@ func TestHTTP_Decoding_disabled(t *testing.T) {
 
 	trans := expectTransaction(t, &store)
 	assert.NotNil(t, trans)
-	body, err := trans.GetValue("http.response.body")
+	body, err := trans.GetValue("http.response.body.content")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.Equal(t, deflateBody, body)
+}
+
+func TestHttpParser_hostHeader(t *testing.T) {
+	template := "HEAD /_cat/shards HTTP/1.1\r\n" +
+		"Host: %s\r\n" +
+		"\r\n"
+	var store eventStore
+	http := httpModForTests(&store)
+	for _, test := range []struct {
+		title, host string
+		port        uint16
+		expected    common.MapStr
+	}{
+		{
+			title: "domain alone",
+			host:  "elasticsearch",
+			expected: common.MapStr{
+				"destination.domain": "elasticsearch",
+				"url.full":           "http://elasticsearch/_cat/shards",
+			},
+		},
+		{
+			title: "domain with port",
+			port:  9200,
+			host:  "elasticsearch:9200",
+			expected: common.MapStr{
+				"destination.domain": "elasticsearch",
+				"url.full":           "http://elasticsearch:9200/_cat/shards",
+			},
+		},
+		{
+			title: "ipv4",
+			host:  "127.0.0.1",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://127.0.0.1/_cat/shards",
+			},
+		},
+		{
+			title: "ipv4 with port",
+			port:  9200,
+			host:  "127.0.0.1:9200",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://127.0.0.1:9200/_cat/shards",
+			},
+		},
+		{
+			title: "ipv6 unboxed",
+			host:  "fd00::42",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[fd00::42]/_cat/shards",
+			},
+		},
+		{
+			title: "ipv6 boxed",
+			host:  "[fd00::42]",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[fd00::42]/_cat/shards",
+			},
+		},
+		{
+			title: "ipv6 boxed with port",
+			port:  9200,
+			host:  "[::1]:9200",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[::1]:9200/_cat/shards",
+			},
+		},
+		{
+			title: "non boxed ipv6",
+			// This one is now illegal but it seems at some point the RFC
+			// didn't enforce the brackets when the port was omitted.
+			host: "fd00::1234",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[fd00::1234]/_cat/shards",
+			},
+		},
+		{
+			title: "non-matching port",
+			port:  80,
+			host:  "myhost:9200",
+			expected: common.MapStr{
+				"destination.domain": "myhost",
+				"url.full":           "http://myhost:9200/_cat/shards",
+				"error.message":      []string{"Unmatched request", "Host header port number mismatch"},
+			},
+		},
+	} {
+		t.Run(test.title, func(t *testing.T) {
+			request := fmt.Sprintf(template, test.host)
+			tcptuple := testCreateTCPTuple()
+			if test.port != 0 {
+				tcptuple.DstPort = test.port
+			}
+			packet := protos.Packet{Payload: []byte(request)}
+			private := protos.ProtocolData(&httpConnectionData{})
+			private = http.Parse(&packet, tcptuple, 1, private)
+			http.Expired(tcptuple, private)
+			trans := expectTransaction(t, &store)
+			if !assert.NotNil(t, trans) {
+				t.Fatal("nil transaction")
+			}
+			for field, expected := range test.expected {
+				actual, err := trans.GetValue(field)
+				assert.Equal(t, expected, actual, field)
+				if expected != nil {
+					assert.Nil(t, err, field)
+				} else {
+					assert.Equal(t, common.ErrKeyNotFound, err, field)
+				}
+			}
+		})
+	}
 }
 
 func benchmarkHTTPMessage(b *testing.B, data []byte) {

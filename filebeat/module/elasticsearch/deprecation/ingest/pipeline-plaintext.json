@@ -1,0 +1,47 @@
+{
+    "description": "Pipeline for parsing the Elasticsearch deprecation log file in plaintext format.",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "pattern_definitions": {
+                    "GREEDYMULTILINE": "(.|\n)*"
+                },
+                "patterns": [
+                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.deprecation.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}*\\]\\[%{DATA:elasticsearch.component}%{SPACE}*\\] %{GREEDYMULTILINE:message}"
+                ]
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.event.timezone == null",
+                "field": "elasticsearch.deprecation.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "yyyy-MM-dd'T'HH:mm:ss,SSS"
+                ],
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.event.timezone != null",
+                "field": "elasticsearch.deprecation.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "yyyy-MM-dd'T'HH:mm:ss,SSS"
+                ],
+                "timezone": "{{ event.timezone }}",
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
+        }
+    ]
+}

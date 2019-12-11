@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
@@ -42,7 +43,11 @@ type client struct {
 	canDrop      bool
 	reportEvents bool
 
-	isOpen atomic.Bool
+	// Open state, signaling, and sync primitives for coordinating client Close.
+	isOpen    atomic.Bool   // set to false during shutdown, such that no new events will be accepted anymore.
+	closeOnce sync.Once     // closeOnce ensure that the client shutdown sequence is only executed once
+	closeRef  beat.CloseRef // extern closeRef for sending a signal that the client should be closed.
+	done      chan struct{} // the done channel will be closed if the closeReg gets closed, or Close is run.
 
 	eventer beat.ClientEventer
 }
@@ -67,7 +72,7 @@ func (c *client) publish(e beat.Event) {
 	var (
 		event   = &e
 		publish = true
-		log     = c.pipeline.logger
+		log     = c.pipeline.monitors.Logger
 	)
 
 	c.onNewEvent()
@@ -134,23 +139,40 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	// first stop ack handling. ACK handler might block (with timeout), waiting
+	log := c.logger()
+
+	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
 	// for pending events to be ACKed.
+	c.doClose()
+	log.Debug("client: wait for acker to finish")
+	c.acker.wait()
+	log.Debug("client: acker shut down")
+	return nil
+}
 
-	log := c.pipeline.logger
+func (c *client) doClose() {
+	c.closeOnce.Do(func() {
+		close(c.done)
 
-	if !c.isOpen.Swap(false) {
-		return nil // closed or already closing
-	}
+		log := c.logger()
 
-	c.onClosing()
+		c.isOpen.Store(false)
+		c.onClosing()
 
-	log.Debug("client: closing acker")
-	c.acker.close()
+		log.Debug("client: closing acker")
+		c.acker.close() // this must trigger a direct/indirect call to 'unlink'
+	})
+}
+
+// unlink is the final step of closing a client. It must be executed only after
+// it is guaranteed that the underlying acker has been closed and will not
+// accept any new publish or ACK events.
+// This method is normally registered with the ACKer and triggered by it.
+func (c *client) unlink() {
+	log := c.logger()
 	log.Debug("client: done closing acker")
 
-	// finally disconnect client from broker
-	n := c.producer.Cancel()
+	n := c.producer.Cancel() // close connection to queue
 	log.Debugf("client: cancelled %v events", n)
 
 	if c.reportEvents {
@@ -161,7 +183,10 @@ func (c *client) Close() error {
 	}
 
 	c.onClosed()
-	return nil
+}
+
+func (c *client) logger() *logp.Logger {
+	return c.pipeline.monitors.Logger
 }
 
 func (c *client) onClosing() {
@@ -190,6 +215,9 @@ func (c *client) onPublished() {
 }
 
 func (c *client) onFilteredOut(e beat.Event) {
+	log := c.logger()
+
+	log.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
 	c.pipeline.observer.filteredEvent()
 	if c.eventer != nil {
 		c.eventer.FilteredOut(e)
@@ -197,6 +225,9 @@ func (c *client) onFilteredOut(e beat.Event) {
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
+	log := c.logger()
+
+	log.Debugf("Pipeline client receives callback 'onDroppedOnPublish' for event: %+v", e)
 	c.pipeline.observer.failedPublishEvent()
 	if c.eventer != nil {
 		c.eventer.DroppedOnPublish(e)

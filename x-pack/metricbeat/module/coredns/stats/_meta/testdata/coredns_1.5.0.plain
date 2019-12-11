@@ -1,0 +1,395 @@
+# HELP coredns_build_info A metric with a constant '1' value labeled by version, revision, and goversion from which CoreDNS was built.
+# TYPE coredns_build_info gauge
+coredns_build_info{goversion="go1.12.2",revision="e3f9a80",version="1.5.0"} 1
+# HELP coredns_cache_hits_total The count of cache hits.
+# TYPE coredns_cache_hits_total counter
+coredns_cache_hits_total{server="dns://:53",type="success"} 323
+# HELP coredns_cache_misses_total The count of cache misses.
+# TYPE coredns_cache_misses_total counter
+coredns_cache_misses_total{server="dns://:53"} 1686
+# HELP coredns_cache_size The number of elements in the cache.
+# TYPE coredns_cache_size gauge
+coredns_cache_size{server="dns://:53",type="denial"} 0
+coredns_cache_size{server="dns://:53",type="success"} 1
+# HELP coredns_dns_request_count_total Counter of DNS requests made per zone, protocol and family.
+# TYPE coredns_dns_request_count_total counter
+coredns_dns_request_count_total{family="1",proto="tcp",server="dns://:53",zone="."} 83
+coredns_dns_request_count_total{family="1",proto="tcp",server="dns://:53",zone="my.domain.elastic."} 37
+coredns_dns_request_count_total{family="1",proto="udp",server="dns://:53",zone="."} 129
+coredns_dns_request_count_total{family="1",proto="udp",server="dns://:53",zone="my.domain.elastic."} 1972
+# HELP coredns_dns_request_do_count_total Counter of DNS requests with DO bit set per zone.
+# TYPE coredns_dns_request_do_count_total counter
+coredns_dns_request_do_count_total{server="dns://:53",zone="my.domain.elastic."} 1525
+# HELP coredns_dns_request_duration_seconds Histogram of the time (in seconds) each request took.
+# TYPE coredns_dns_request_duration_seconds histogram
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.00025"} 0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.0005"} 0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.001"} 0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.002"} 0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.004"} 0
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.008"} 47
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.016"} 152
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.032"} 168
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.064"} 194
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.128"} 203
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.256"} 212
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.512"} 212
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="1.024"} 212
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="2.048"} 212
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="4.096"} 212
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="8.192"} 212
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="+Inf"} 212
+coredns_dns_request_duration_seconds_sum{server="dns://:53",zone="."} 5.474046607000003
+coredns_dns_request_duration_seconds_count{server="dns://:53",zone="."} 212
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.00025"} 1740
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.0005"} 2006
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.001"} 2007
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.002"} 2008
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.004"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.008"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.016"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.032"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.064"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.128"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.256"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="0.512"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="1.024"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="2.048"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="4.096"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="8.192"} 2009
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone="my.domain.elastic.",le="+Inf"} 2009
+coredns_dns_request_duration_seconds_sum{server="dns://:53",zone="my.domain.elastic."} 0.2889330520000002
+coredns_dns_request_duration_seconds_count{server="dns://:53",zone="my.domain.elastic."} 2009
+# HELP coredns_dns_request_size_bytes Size of the EDNS0 UDP buffer in bytes (64K for TCP).
+# TYPE coredns_dns_request_size_bytes histogram
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="0"} 0
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="100"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="200"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="300"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="400"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="511"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="1023"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="2047"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="4095"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="8291"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="16000"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="32000"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="48000"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="64000"} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="+Inf"} 83
+coredns_dns_request_size_bytes_sum{proto="tcp",server="dns://:53",zone="."} 4551
+coredns_dns_request_size_bytes_count{proto="tcp",server="dns://:53",zone="."} 83
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="0"} 0
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="100"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="200"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="300"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="400"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="511"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="1023"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="2047"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="4095"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="8291"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="16000"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="32000"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="48000"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="64000"} 37
+coredns_dns_request_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="+Inf"} 37
+coredns_dns_request_size_bytes_sum{proto="tcp",server="dns://:53",zone="my.domain.elastic."} 2180
+coredns_dns_request_size_bytes_count{proto="tcp",server="dns://:53",zone="my.domain.elastic."} 37
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="0"} 0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="100"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="200"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="300"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="400"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="511"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="1023"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="2047"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="4095"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="8291"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="16000"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="32000"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="48000"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="64000"} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="+Inf"} 129
+coredns_dns_request_size_bytes_sum{proto="udp",server="dns://:53",zone="."} 6574
+coredns_dns_request_size_bytes_count{proto="udp",server="dns://:53",zone="."} 129
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="0"} 0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="100"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="200"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="300"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="400"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="511"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="1023"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="2047"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="4095"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="8291"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="16000"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="32000"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="48000"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="64000"} 1972
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="+Inf"} 1972
+coredns_dns_request_size_bytes_sum{proto="udp",server="dns://:53",zone="my.domain.elastic."} 114442
+coredns_dns_request_size_bytes_count{proto="udp",server="dns://:53",zone="my.domain.elastic."} 1972
+# HELP coredns_dns_request_type_count_total Counter of DNS requests per type, per zone.
+# TYPE coredns_dns_request_type_count_total counter
+coredns_dns_request_type_count_total{server="dns://:53",type="A",zone="."} 89
+coredns_dns_request_type_count_total{server="dns://:53",type="A",zone="my.domain.elastic."} 1912
+coredns_dns_request_type_count_total{server="dns://:53",type="MX",zone="."} 104
+coredns_dns_request_type_count_total{server="dns://:53",type="MX",zone="my.domain.elastic."} 85
+coredns_dns_request_type_count_total{server="dns://:53",type="SOA",zone="."} 19
+coredns_dns_request_type_count_total{server="dns://:53",type="SOA",zone="my.domain.elastic."} 12
+# HELP coredns_dns_response_rcode_count_total Counter of response status codes.
+# TYPE coredns_dns_response_rcode_count_total counter
+coredns_dns_response_rcode_count_total{rcode="NOERROR",server="dns://:53",zone="."} 170
+coredns_dns_response_rcode_count_total{rcode="NOERROR",server="dns://:53",zone="my.domain.elastic."} 2009
+coredns_dns_response_rcode_count_total{rcode="NXDOMAIN",server="dns://:53",zone="."} 42
+# HELP coredns_dns_response_size_bytes Size of the returned response in bytes.
+# TYPE coredns_dns_response_size_bytes histogram
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="0"} 0
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="100"} 27
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="200"} 63
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="300"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="400"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="511"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="1023"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="2047"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="4095"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="8291"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="16000"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="32000"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="48000"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="64000"} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone=".",le="+Inf"} 83
+coredns_dns_response_size_bytes_sum{proto="tcp",server="dns://:53",zone="."} 12437
+coredns_dns_response_size_bytes_count{proto="tcp",server="dns://:53",zone="."} 83
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="0"} 27
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="100"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="200"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="300"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="400"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="511"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="1023"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="2047"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="4095"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="8291"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="16000"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="32000"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="48000"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="64000"} 37
+coredns_dns_response_size_bytes_bucket{proto="tcp",server="dns://:53",zone="my.domain.elastic.",le="+Inf"} 37
+coredns_dns_response_size_bytes_sum{proto="tcp",server="dns://:53",zone="my.domain.elastic."} 680
+coredns_dns_response_size_bytes_count{proto="tcp",server="dns://:53",zone="my.domain.elastic."} 37
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="0"} 0
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="100"} 49
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="200"} 73
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="300"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="400"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="511"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="1023"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="2047"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="4095"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="8291"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="16000"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="32000"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="48000"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="64000"} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="+Inf"} 129
+coredns_dns_response_size_bytes_sum{proto="udp",server="dns://:53",zone="."} 22227
+coredns_dns_response_size_bytes_count{proto="udp",server="dns://:53",zone="."} 129
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="0"} 98
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="100"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="200"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="300"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="400"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="511"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="1023"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="2047"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="4095"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="8291"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="16000"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="32000"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="48000"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="64000"} 1972
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone="my.domain.elastic.",le="+Inf"} 1972
+coredns_dns_response_size_bytes_sum{proto="udp",server="dns://:53",zone="my.domain.elastic."} 127432
+coredns_dns_response_size_bytes_count{proto="udp",server="dns://:53",zone="my.domain.elastic."} 1972
+# HELP coredns_forward_request_count_total Counter of requests made per upstream.
+# TYPE coredns_forward_request_count_total counter
+coredns_forward_request_count_total{to="8.8.4.4:53"} 97
+coredns_forward_request_count_total{to="8.8.8.8:53"} 115
+# HELP coredns_forward_request_duration_seconds Histogram of the time each request took.
+# TYPE coredns_forward_request_duration_seconds histogram
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.00025"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.0005"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.001"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.002"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.004"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.008"} 21
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.016"} 66
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.032"} 75
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.064"} 88
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.128"} 93
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.256"} 97
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="0.512"} 97
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="1.024"} 97
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="2.048"} 97
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="4.096"} 97
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="8.192"} 97
+coredns_forward_request_duration_seconds_bucket{to="8.8.4.4:53",le="+Inf"} 97
+coredns_forward_request_duration_seconds_sum{to="8.8.4.4:53"} 2.6742174700000008
+coredns_forward_request_duration_seconds_count{to="8.8.4.4:53"} 97
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.00025"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.0005"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.001"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.002"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.004"} 0
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.008"} 36
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.016"} 86
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.032"} 93
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.064"} 107
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.128"} 110
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.256"} 115
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="0.512"} 115
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="1.024"} 115
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="2.048"} 115
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="4.096"} 115
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="8.192"} 115
+coredns_forward_request_duration_seconds_bucket{to="8.8.8.8:53",le="+Inf"} 115
+coredns_forward_request_duration_seconds_sum{to="8.8.8.8:53"} 2.737295418999999
+coredns_forward_request_duration_seconds_count{to="8.8.8.8:53"} 115
+# HELP coredns_forward_response_rcode_count_total Counter of requests made per upstream.
+# TYPE coredns_forward_response_rcode_count_total counter
+coredns_forward_response_rcode_count_total{rcode="NOERROR",to="8.8.4.4:53"} 77
+coredns_forward_response_rcode_count_total{rcode="NOERROR",to="8.8.8.8:53"} 93
+coredns_forward_response_rcode_count_total{rcode="NXDOMAIN",to="8.8.4.4:53"} 20
+coredns_forward_response_rcode_count_total{rcode="NXDOMAIN",to="8.8.8.8:53"} 22
+# HELP coredns_forward_sockets_open Gauge of open sockets per upstream.
+# TYPE coredns_forward_sockets_open gauge
+coredns_forward_sockets_open{to="8.8.4.4:53"} 1
+coredns_forward_sockets_open{to="8.8.8.8:53"} 1
+# HELP coredns_panic_count_total A metrics that counts the number of panics.
+# TYPE coredns_panic_count_total counter
+coredns_panic_count_total 0
+# HELP coredns_plugin_enabled A metric that indicates whether a plugin is enabled on per server and zone basis.
+# TYPE coredns_plugin_enabled gauge
+coredns_plugin_enabled{name="auto",server="dns://:53",zone="my.domain.elastic."} 1
+coredns_plugin_enabled{name="cache",server="dns://:53",zone="my.domain.elastic."} 1
+coredns_plugin_enabled{name="errors",server="dns://:53",zone="."} 1
+coredns_plugin_enabled{name="errors",server="dns://:53",zone="my.domain.elastic."} 1
+coredns_plugin_enabled{name="forward",server="dns://:53",zone="."} 1
+coredns_plugin_enabled{name="hosts",server="dns://:53",zone="my.domain.elastic."} 1
+coredns_plugin_enabled{name="log",server="dns://:53",zone="."} 1
+coredns_plugin_enabled{name="log",server="dns://:53",zone="my.domain.elastic."} 1
+coredns_plugin_enabled{name="prometheus",server="dns://:53",zone="."} 1
+coredns_plugin_enabled{name="prometheus",server="dns://:53",zone="my.domain.elastic."} 1
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 1.068e-05
+go_gc_duration_seconds{quantile="0.25"} 3.0948e-05
+go_gc_duration_seconds{quantile="0.5"} 6.4787e-05
+go_gc_duration_seconds{quantile="0.75"} 8.9763e-05
+go_gc_duration_seconds{quantile="1"} 0.000655576
+go_gc_duration_seconds_sum 0.005003119
+go_gc_duration_seconds_count 70
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 21
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.12.2"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 1.843744e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 2.240164e+07
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.45134e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 306871
+# HELP go_memstats_gc_cpu_fraction The fraction of this program's available CPU time used by the GC since the program started.
+# TYPE go_memstats_gc_cpu_fraction gauge
+go_memstats_gc_cpu_fraction 3.282059007676328e-06
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 2.38592e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 1.843744e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 6.2267392e+07
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 3.760128e+06
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 10738
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 6.0637184e+07
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 6.602752e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.5550919381656787e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 317609
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 13888
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 16384
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 61920
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 98304
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 4.194304e+06
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.749932e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.081344e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.081344e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 7.2810744e+07
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 18
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 4.75
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 11
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 2.7693056e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.55508368301e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.48942848e+08
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes -1

@@ -3,8 +3,7 @@
 *You know, for windows event logs*
 
 Winlogbeat is an open-source log collector that ships Windows Event Logs to
-Elasticsearch or Logstash. It installs as a Windows service on all versions
-since Windows XP.
+Elasticsearch or Logstash. It installs and runs as a Windows service.
 
 ## Contributions
 

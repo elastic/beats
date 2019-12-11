@@ -1,6 +1,7 @@
 from filebeat import BaseTest
 import socket
 import ssl
+import unittest
 from os import path
 from nose.tools import raises, assert_raises
 
@@ -127,7 +128,7 @@ class Test(BaseTest):
     @raises(ssl.SSLError)
     def test_tcp_over_tls_mutual_auth_fails(self):
         """
-        Test filebeat TCP with TLS when enforcing client auth with bad client certificates.
+        Test filebeat TCP with TLS with default setting to enforce client auth, with bad client certificates
         """
         input_raw = """
 - type: tcp
@@ -136,7 +137,6 @@ class Test(BaseTest):
   ssl.certificate_authorities: {cacert}
   ssl.certificate: {certificate}
   ssl.key: {key}
-  ssl.client_authentication: required
 """
         config = {
             "host": "127.0.0.1",

@@ -1,0 +1,10 @@
+# Module: consul
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-consul.html
+
+- module: consul
+  metricsets:
+  - agent
+  enabled: true
+  period: 10s
+  hosts: ["localhost:8500"]
+

@@ -55,12 +55,92 @@ func getMockedConns() []net.ConnectionStat {
 		net.ConnectionStat{
 			Family: syscall.AF_INET,
 			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSE_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "TIME_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSE_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSE_WAIT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
 			Status: "CLOSE",
 		},
 		net.ConnectionStat{
 			Family: syscall.AF_INET,
 			Type:   syscall.SOCK_STREAM,
 			Status: "LISTEN",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "SYN_SENT",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "SYN_RECV",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "SYN_RECV",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "LAST_ACK",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "FIN_WAIT1",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "FIN_WAIT2",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "FIN_WAIT2",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "LAST_ACK",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSING",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "CLOSING",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "FIN_WAIT2",
+		},
+		net.ConnectionStat{
+			Family: syscall.AF_INET,
+			Type:   syscall.SOCK_STREAM,
+			Status: "LAST_ACK",
 		},
 	}
 }
@@ -99,9 +179,72 @@ func TestCalculateConnStats(t *testing.T) {
 		t.Fail()
 	}
 
-	assert.Equal(t, allConns, 7)
+	tcpEstablisheds, err := metrics.GetValue("tcp.all.established")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpClosewaits, err := metrics.GetValue("tcp.all.close_wait")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpTimewaits, err := metrics.GetValue("tcp.all.time_wait")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpSynsents, err := metrics.GetValue("tcp.all.syn_sent")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpSynrecvs, err := metrics.GetValue("tcp.all.syn_recv")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpFinwait1s, err := metrics.GetValue("tcp.all.fin_wait1")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpFinwait2s, err := metrics.GetValue("tcp.all.fin_wait2")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpLastacks, err := metrics.GetValue("tcp.all.last_ack")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	tcpClosings, err := metrics.GetValue("tcp.all.closing")
+
+	if err != nil {
+		t.Fail()
+	}
+
+	assert.Equal(t, allConns, 23)
 	assert.Equal(t, allListens, 2)
 	assert.Equal(t, udpConns, 2)
-	assert.Equal(t, tcpConns, 5)
+	assert.Equal(t, tcpConns, 21)
 	assert.Equal(t, tcpListens, 2)
+	assert.Equal(t, tcpEstablisheds, 2)
+	assert.Equal(t, tcpClosewaits, 3)
+	assert.Equal(t, tcpTimewaits, 1)
+	assert.Equal(t, tcpSynsents, 1)
+	assert.Equal(t, tcpSynrecvs, 2)
+	assert.Equal(t, tcpFinwait1s, 1)
+	assert.Equal(t, tcpFinwait2s, 3)
+	assert.Equal(t, tcpLastacks, 3)
+	assert.Equal(t, tcpClosings, 2)
 }

@@ -61,7 +61,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -69,13 +69,11 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &nodesStruct)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
 	var errs multierror.Errors
-	for name, node := range nodesStruct.Nodes {
+	for id, node := range nodesStruct.Nodes {
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}
@@ -83,17 +81,15 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", nodesStruct.ClusterName)
+		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			event.Error = errors.Wrap(err, "failure applying node schema")
-			r.Event(event)
-			errs = append(errs, event.Error)
+			errs = append(errs, errors.Wrap(err, "failure applying node schema"))
 			continue
 		}
 
-		// Write name here as full name only available as key
-		event.MetricSetFields["name"] = name
+		event.MetricSetFields["id"] = id
 
 		r.Event(event)
 	}

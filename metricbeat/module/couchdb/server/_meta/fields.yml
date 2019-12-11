@@ -1,0 +1,180 @@
+- name: server
+  type: group
+  description: >
+    Contains CouchDB server stats
+  release: ga
+  fields:
+    - name: httpd
+      type: group
+      description: >
+        HTTP statistics
+      fields:
+        - name: view_reads
+          type: long
+          description: >
+             Number of view reads
+
+        - name: bulk_requests
+          type: long
+          description: >
+            Number of bulk requests
+
+        - name: clients_requesting_changes
+          type: long
+          description: >
+            Number of clients for continuous _changes
+
+        - name: temporary_view_reads
+          type: long
+          description: >
+            Number of temporary view reads
+
+        - name: requests
+          type: long 
+          description: >
+            Number of HTTP requests
+
+    - name: httpd_request_methods
+      type: group
+      description: >
+        HTTP request methods
+      fields:
+        - name: COPY
+          type: long
+          description: >
+            Number of HTTP COPY requests
+
+        - name: HEAD
+          type: long
+          description: >
+            Number of HTTP HEAD requests
+
+        - name: POST
+          type: long
+          description: >
+            Number of HTTP POST requests
+
+        - name: DELETE
+          type: long
+          description: >
+            Number of HTTP DELETE requests
+
+        - name: GET
+          type: long
+          description: >
+            Number of HTTP GET requests
+
+        - name: PUT
+          type: long
+          description: >
+            Number of HTTP PUT requests
+
+    - name: httpd_status_codes
+      type: group
+      description: >
+        HTTP status codes statistics
+      fields:
+        - name: "200"
+          type: long
+          description: >
+            Number of HTTP 200 OK responses
+
+        - name: "201"
+          type: long
+          description: >
+            Number of HTTP 201 Created responses
+
+        - name: "202"
+          type: long
+          description: >
+            Number of HTTP 202 Accepted responses
+
+        - name: "301"
+          type: long
+          description: >
+            Number of HTTP 301 Moved Permanently responses
+
+        - name: "304"
+          type: long
+          description: >
+            Number of HTTP 304 Not Modified responses
+
+        - name: "400"
+          type: long
+          description: >
+            Number of HTTP 400 Bad Request responses
+
+        - name: "401"
+          type: long
+          description: >
+            Number of HTTP 401 Unauthorized responses
+
+        - name: "403"
+          type: long
+          description: >
+            Number of HTTP 403 Forbidden responses
+
+        - name: "404"
+          type: long
+          description: >
+             Number of HTTP 404 Not Found responses
+
+        - name: "405"
+          type: long
+          description: >
+            Number of HTTP 405 Method Not Allowed responses
+
+        - name: "409"
+          type: long
+          description: >
+            Number of HTTP 409 Conflict responses
+
+        - name: "412"
+          type: long
+          description: >
+            Number of HTTP 412 Precondition Failed responses
+
+        - name: "500"
+          type: long
+          description: >
+            Number of HTTP 500 Internal Server Error responses
+
+    - name: couchdb 
+      type: group
+      description: >
+        couchdb statistics
+      fields:
+        - name: database_writes
+          type: long
+          description: >
+            Number of times a database was changed
+
+        - name: open_databases
+          type: long
+          description: >
+            Number of open databases
+
+        - name: auth_cache_misses
+          type: long
+          description: >
+            Number of authentication cache misses
+
+        - name: request_time
+          type: long
+          description: >
+            Length of a request inside CouchDB without MochiWeb
+
+        - name: database_reads
+          type: long
+          description: >
+            Number of times a document was read from a database
+
+        - name: auth_cache_hits
+          type: long
+          description: >
+            Number of authentication cache hits
+
+        - name: open_os_files
+          type: long 
+          description: >
+            Number of file descriptors CouchDB has open

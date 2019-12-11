@@ -28,10 +28,13 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/ceph"
 )
 
 func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/testdata/")
+	assert.NoError(t, err)
 
 	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -47,12 +50,13 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	if err != nil {
-		t.Fatal(err)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	event := events[0]
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
@@ -85,4 +89,8 @@ func TestFetchEventContents(t *testing.T) {
 
 	total = store_stats["total"].(common.MapStr)
 	assert.EqualValues(t, 8488943, total["bytes"])
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "ceph", "monitor_health")
 }

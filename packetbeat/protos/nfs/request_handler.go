@@ -23,9 +23,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
+
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
@@ -76,18 +77,30 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		src, dst = dst, src
 	}
 
-	fields := common.MapStr{}
-	fields["status"] = common.OK_STATUS // all packages are OK for now
-	fields["src"] = &src
-	fields["dst"] = &dst
+	evt, pbf := pb.NewBeatEvent(ts)
+	pbf.SetSource(&src)
+	pbf.SetDestination(&dst)
+	pbf.Source.Bytes = int64(xdr.size())
+	pbf.Event.Dataset = "nfs"
+	pbf.Event.Start = ts
+	pbf.Network.Transport = "tcp"
 
 	nfsVers := xdr.getUInt()
 	nfsProc := xdr.getUInt()
 
+	switch nfsVers {
+	case 3:
+		pbf.Network.Protocol = "nfsv3"
+	case 4:
+		pbf.Network.Protocol = "nfsv4"
+	default:
+		pbf.Network.Protocol = "nfs"
+	}
+
 	// build event only if it's a nfs packet
-	rpcInfo := common.MapStr{}
-	rpcInfo["xid"] = xid
-	rpcInfo["call_size"] = xdr.size()
+	rpcInfo := common.MapStr{
+		"xid": xid,
+	}
 
 	authFlavor := xdr.getUInt()
 	authOpaque := xdr.getDynamicOpaque()
@@ -102,6 +115,8 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		machine := credXdr.getString()
 		if machine == "" {
 			machine = src.IP
+		} else {
+			pbf.Source.Domain = machine
 		}
 		cred["machinename"] = machine
 		cred["uid"] = credXdr.getUInt()
@@ -118,15 +133,15 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 	xdr.getUInt()
 	xdr.getDynamicOpaque()
 
-	fields["type"] = "nfs"
+	fields := evt.Fields
+	fields["status"] = common.OK_STATUS // all packages are OK for now
+	fields["type"] = pbf.Event.Dataset
 	fields["rpc"] = rpcInfo
 	nfs := nfs{
-		vers: nfsVers,
-		proc: nfsProc,
-		event: beat.Event{
-			Timestamp: ts,
-			Fields:    fields,
-		},
+		vers:  nfsVers,
+		proc:  nfsProc,
+		pbf:   pbf,
+		event: evt,
 	}
 	fields["nfs"] = nfs.getRequestInfo(xdr)
 
@@ -163,14 +178,11 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 	v := r.callsSeen.Delete(reqID)
 	if v != nil {
 		nfs := v.(*nfs)
-		event := nfs.event
-		fields := event.Fields
+		nfs.pbf.Event.End = ts
+		nfs.pbf.Destination.Bytes = int64(xdr.size())
+
+		fields := nfs.event.Fields
 		rpcInfo := fields["rpc"].(common.MapStr)
-		rpcInfo["reply_size"] = xdr.size()
-		rpcTime := ts.Sub(event.Timestamp)
-		rpcInfo["time"] = rpcTime
-		// the same in human readable form
-		rpcInfo["time_str"] = fmt.Sprintf("%v", rpcTime)
 		status := int(xdr.getUInt())
 		rpcInfo["status"] = acceptStatus[status]
 
@@ -179,6 +191,6 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 			nfsInfo := fields["nfs"].(common.MapStr)
 			nfsInfo["status"] = nfs.getNFSReplyStatus(xdr)
 		}
-		r.results(event)
+		r.results(nfs.event)
 	}
 }

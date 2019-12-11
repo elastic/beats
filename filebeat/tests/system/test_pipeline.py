@@ -45,6 +45,14 @@ class Test(BaseTest):
             pass
         self.wait_until(lambda: not self.es.indices.exists(index_name))
 
+        body = {
+            "transient": {
+                "script.max_compilations_rate": "100/1m"
+            }
+        }
+
+        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             elasticsearch=dict(
@@ -54,6 +62,7 @@ class Test(BaseTest):
             pipeline="test",
             setup_template_name=index_name,
             setup_template_pattern=index_name + "*",
+            ilm={"enabled": False},
         )
 
         os.mkdir(self.working_dir + "/log/")

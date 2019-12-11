@@ -1,0 +1,1948 @@
+{
+  "test_name": "ipfix_cisco",
+  "events": [
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184158,
+          "flow_start_sys_up_time": 564184140,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 719,
+          "initiator_packets": 5,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 49,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184154,
+          "flow_start_sys_up_time": 564184140,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1477,
+          "initiator_packets": 6,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 49,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACCA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 1,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 89,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184144,
+          "flow_start_sys_up_time": 564184142,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1,
+          "initiator_packets": 1,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 1,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 2,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184216,
+          "flow_start_sys_up_time": 564184131,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 108580,
+          "initiator_packets": 79,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 49,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184208,
+          "flow_start_sys_up_time": 564184176,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 342,
+          "initiator_packets": 5,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 49,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 2,
+          "art_count_late_responses": 0,
+          "art_count_responses": 3,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 2,
+          "art_network_time_sum": 97,
+          "art_response_time_sum": 153,
+          "art_server_network_time_sum": 95,
+          "art_server_response_time_maximum": 8,
+          "art_server_response_time_sum": 13,
+          "art_total_response_time_sum": 156,
+          "art_total_transaction_time_sum": 100,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 24,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564197394,
+          "flow_start_sys_up_time": 564184067,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1851,
+          "initiator_packets": 17,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 2,
+          "protocol_identifier": 6,
+          "responder_octets": 9437,
+          "responder_packets": 18,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184216,
+          "flow_start_sys_up_time": 564184182,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 51480,
+          "initiator_packets": 39,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 49,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 10,
+          "art_count_late_responses": 0,
+          "art_count_responses": 15,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 14,
+          "art_network_time_sum": 374,
+          "art_response_time_sum": 516,
+          "art_server_network_time_sum": 364,
+          "art_server_response_time_maximum": 27,
+          "art_server_response_time_sum": 117,
+          "art_total_response_time_sum": 541,
+          "art_total_transaction_time_sum": 512,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 35,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564203810,
+          "flow_start_sys_up_time": 564184040,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 5135,
+          "initiator_packets": 55,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 126,
+          "new_connection_delta_count": 6,
+          "protocol_identifier": 6,
+          "responder_octets": 36894,
+          "responder_packets": 47,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACYw==",
+          "art_client_network_time_sum": 5,
+          "art_count_late_responses": 0,
+          "art_count_responses": 6,
+          "art_count_retransmissions": 1,
+          "art_count_transactions": 6,
+          "art_network_time_sum": 23,
+          "art_response_time_sum": 123,
+          "art_server_network_time_sum": 18,
+          "art_server_response_time_maximum": 31,
+          "art_server_response_time_sum": 78,
+          "art_total_response_time_sum": 138,
+          "art_total_transaction_time_sum": 123,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 64,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564200378,
+          "flow_start_sys_up_time": 564184163,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 6400,
+          "initiator_packets": 20,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 61,
+          "new_connection_delta_count": 2,
+          "protocol_identifier": 6,
+          "responder_octets": 6533,
+          "responder_packets": 14,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQAAMQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 109,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564185840,
+          "flow_start_sys_up_time": 564184196,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 5684,
+          "initiator_packets": 491,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184254,
+          "flow_start_sys_up_time": 564184154,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 4965,
+          "initiator_packets": 13,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACYw==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 2,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 119878,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 239,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184362,
+          "flow_start_sys_up_time": 564184214,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 0,
+          "initiator_packets": 2,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 61,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 138,
+          "responder_packets": 4,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACCA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 1,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 44,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184220,
+          "flow_start_sys_up_time": 564184220,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1,
+          "initiator_packets": 1,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 3,
+          "art_count_late_responses": 0,
+          "art_count_responses": 3,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 2,
+          "art_network_time_sum": 149,
+          "art_response_time_sum": 444,
+          "art_server_network_time_sum": 146,
+          "art_server_response_time_maximum": 3,
+          "art_server_response_time_sum": 6,
+          "art_total_response_time_sum": 453,
+          "art_total_transaction_time_sum": 296,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 62,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564215068,
+          "flow_start_sys_up_time": 564184067,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1571,
+          "initiator_packets": 13,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 220,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 6079,
+          "responder_packets": 10,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184252,
+          "flow_start_sys_up_time": 564183878,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 2807,
+          "initiator_packets": 6,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 61,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQAAAQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 59,
+          "egress_interface": 4,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184248,
+          "flow_start_sys_up_time": 564184248,
+          "ingress_interface": 1,
+          "ingress_vrfid": 0,
+          "initiator_octets": 0,
+          "initiator_packets": 1,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 124,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 2,
+          "art_count_late_responses": 0,
+          "art_count_responses": 4,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 4,
+          "art_network_time_sum": 6,
+          "art_response_time_sum": 23,
+          "art_server_network_time_sum": 4,
+          "art_server_response_time_maximum": 3,
+          "art_server_response_time_sum": 7,
+          "art_total_response_time_sum": 31,
+          "art_total_transaction_time_sum": 23,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 32,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564200378,
+          "flow_start_sys_up_time": 564184251,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1877,
+          "initiator_packets": 11,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 3409,
+          "responder_packets": 7,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184286,
+          "flow_start_sys_up_time": 564184040,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 2255,
+          "initiator_packets": 7,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 61,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184314,
+          "flow_start_sys_up_time": 564184284,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 538,
+          "initiator_packets": 5,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 49,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 0,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACZg==",
+          "art_client_network_time_sum": 2,
+          "art_count_late_responses": 0,
+          "art_count_responses": 5,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 5,
+          "art_network_time_sum": 9,
+          "art_response_time_sum": 72,
+          "art_server_network_time_sum": 7,
+          "art_server_response_time_maximum": 25,
+          "art_server_response_time_sum": 55,
+          "art_total_response_time_sum": 77,
+          "art_total_transaction_time_sum": 59870,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 181,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564214304,
+          "flow_start_sys_up_time": 564184296,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1487,
+          "initiator_packets": 21,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 2,
+          "protocol_identifier": 6,
+          "responder_octets": 6305,
+          "responder_packets": 15,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACYw==",
+          "art_client_network_time_sum": 2,
+          "art_count_late_responses": 0,
+          "art_count_responses": 3,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 3,
+          "art_network_time_sum": 12,
+          "art_response_time_sum": 39,
+          "art_server_network_time_sum": 10,
+          "art_server_response_time_maximum": 14,
+          "art_server_response_time_sum": 15,
+          "art_total_response_time_sum": 45,
+          "art_total_transaction_time_sum": 39,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 32,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564200376,
+          "flow_start_sys_up_time": 564184268,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1973,
+          "initiator_packets": 10,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 61,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 3110,
+          "responder_packets": 7,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAFmQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 2,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 119,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564214242,
+          "flow_start_sys_up_time": 564184300,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 2,
+          "initiator_packets": 4,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 124,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 2,
+          "responder_packets": 4,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 2,
+          "art_count_transactions": 0,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 0,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 179,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184580,
+          "flow_start_sys_up_time": 564184306,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 2,
+          "initiator_packets": 2,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 2,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 2,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 18,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 119,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184326,
+          "flow_start_sys_up_time": 564184326,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 0,
+          "initiator_packets": 4,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "responder_packets": 2,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAFmQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 1,
+          "art_count_retransmissions": 1,
+          "art_count_transactions": 1,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 5,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 5,
+          "art_server_response_time_sum": 5,
+          "art_total_response_time_sum": 8,
+          "art_total_transaction_time_sum": 12,
+          "biflow_direction": 1,
+          "connection_sum_duration_seconds": 119,
+          "egress_interface": 10,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564214476,
+          "flow_start_sys_up_time": 564184326,
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "initiator_octets": 1005,
+          "initiator_packets": 4,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 125,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 174,
+          "responder_packets": 3,
+          "type": "netflow_flow",
+          "vlan_id": 290,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 2,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 119644,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 238,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184490,
+          "flow_start_sys_up_time": 564184336,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 0,
+          "initiator_packets": 2,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 61,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 138,
+          "responder_packets": 4,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 0,
+          "art_count_late_responses": 0,
+          "art_count_responses": 0,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 1,
+          "art_network_time_sum": 0,
+          "art_response_time_sum": 0,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 0,
+          "art_server_response_time_sum": 0,
+          "art_total_response_time_sum": 0,
+          "art_total_transaction_time_sum": 59790,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 119,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184350,
+          "flow_start_sys_up_time": 564184348,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 0,
+          "initiator_packets": 1,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 43,
+          "new_connection_delta_count": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 31,
+          "responder_packets": 2,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "art_client_network_time_sum": 3,
+          "art_count_late_responses": 0,
+          "art_count_responses": 6,
+          "art_count_retransmissions": 0,
+          "art_count_transactions": 6,
+          "art_network_time_sum": 3,
+          "art_response_time_sum": 33,
+          "art_server_network_time_sum": 0,
+          "art_server_response_time_maximum": 28,
+          "art_server_response_time_sum": 33,
+          "art_total_response_time_sum": 51,
+          "art_total_transaction_time_sum": 43,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 0,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564184586,
+          "flow_start_sys_up_time": 564184356,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 8989,
+          "initiator_packets": 19,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 124,
+          "new_connection_delta_count": 1,
+          "protocol_identifier": 6,
+          "responder_octets": 13482,
+          "responder_packets": 17,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    },
+    {
+      "Timestamp": "2018-07-03T10:47:00Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Vhs9T5k296w",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACYw==",
+          "art_client_network_time_sum": 20,
+          "art_count_late_responses": 0,
+          "art_count_responses": 25,
+          "art_count_retransmissions": 4,
+          "art_count_transactions": 25,
+          "art_network_time_sum": 58,
+          "art_response_time_sum": 301,
+          "art_server_network_time_sum": 38,
+          "art_server_response_time_maximum": 31,
+          "art_server_response_time_sum": 168,
+          "art_total_response_time_sum": 363,
+          "art_total_transaction_time_sum": 332,
+          "biflow_direction": 2,
+          "connection_sum_duration_seconds": 116,
+          "egress_interface": 13,
+          "exporter": {
+            "address": "10.101.255.2:52788",
+            "source_id": 512,
+            "timestamp": "2018-07-03T10:47:00Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_sys_up_time": 564215336,
+          "flow_start_sys_up_time": 564184380,
+          "ingress_interface": 10,
+          "ingress_vrfid": 0,
+          "initiator_octets": 233345,
+          "initiator_packets": 236,
+          "ip_diff_serv_code_point": 0,
+          "ip_ttl": 61,
+          "new_connection_delta_count": 8,
+          "protocol_identifier": 6,
+          "responder_octets": 28373,
+          "responder_packets": 133,
+          "type": "netflow_flow",
+          "vlan_id": 0,
+          "waasoptimization_segment": 16
+        },
+        "network": {
+          "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

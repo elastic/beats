@@ -19,7 +19,7 @@
       description: Set if the file has the `setgid` bit set. Omitted otherwise.
 
     - name: origin
-      type: text
+      type: keyword
       description: >
           An array of strings describing a possible external origin for
           this file. For example, the URL it was downloaded from. Only
@@ -49,3 +49,82 @@
         type: keyword
         example: s0
         description: The object's SELinux level.
+
+  - name: user
+    type: group
+    description: User information.
+    fields:
+
+    - name: audit
+      type: group
+      description: Audit user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Audit user ID.
+      - name: name
+        type: keyword
+        description: Audit user name.
+
+    - name: effective
+      type: group
+      description: Effective user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Effective user ID.
+      - name: name
+        type: keyword
+        description: Effective user name.
+      - name: group
+        type: group
+        description: Effective group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Effective group ID.
+        - name: name
+          type: keyword
+          description: Effective group name.
+
+    - name: filesystem
+      type: group
+      description: Filesystem user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Filesystem user ID.
+      - name: name
+        type: keyword
+        description: Filesystem user name.
+      - name: group
+        type: group
+        description: Filesystem group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Filesystem group ID.
+        - name: name
+          type: keyword
+          description: Filesystem group name.
+
+    - name: saved
+      type: group
+      description: Saved user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Saved user ID.
+      - name: name
+        type: keyword
+        description: Saved user name.
+      - name: group
+        type: group
+        description: Saved group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Saved group ID.
+        - name: name
+          type: keyword
+          description: Saved group name.

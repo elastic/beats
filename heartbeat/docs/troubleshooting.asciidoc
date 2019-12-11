@@ -17,14 +17,14 @@ following tips:
 [[getting-help]]
 == Get help
 
-include::../../libbeat/docs/getting-help.asciidoc[]
+include::{libbeat-dir}/getting-help.asciidoc[]
 
 //sets block macro for debugging.asciidoc included in next section
 
 [[enable-heartbeat-debugging]]
 == Debug
 
-include::../../libbeat/docs/debugging.asciidoc[]
+include::{libbeat-dir}/debugging.asciidoc[]
 
 
 

@@ -35,7 +35,7 @@ var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
 // options.
 type ConfigCommon struct {
 	API  string `config:"api"`  // Name of the API to use. Optional.
-	Name string `config:"name"` // Name of the event log or channel.
+	Name string `config:"name"` // Name of the event log or channel or file.
 }
 
 type validator interface {
@@ -45,23 +45,19 @@ type validator interface {
 func readConfig(
 	c *common.Config,
 	config interface{},
-	validKeys []string,
+	validKeys common.StringSet,
 ) error {
 	if err := c.Unpack(config); err != nil {
-		return fmt.Errorf("Failed unpacking config. %v", err)
+		return fmt.Errorf("failed unpacking config. %v", err)
 	}
 
 	var errs multierror.Errors
 	if len(validKeys) > 0 {
-		sort.Strings(validKeys)
-
 		// Check for invalid keys.
 		for _, k := range c.GetFields() {
-			k = strings.ToLower(k)
-			i := sort.SearchStrings(validKeys, k)
-			if i >= len(validKeys) || validKeys[i] != k {
-				errs = append(errs, fmt.Errorf("Invalid event log key '%s' "+
-					"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
+			if !validKeys.Has(k) {
+				errs = append(errs, fmt.Errorf("invalid event log key '%s' "+
+					"found. Valid keys are %s", k, strings.Join(validKeys.ToSlice(), ", ")))
 			}
 		}
 	}

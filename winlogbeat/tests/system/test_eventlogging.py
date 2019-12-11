@@ -61,7 +61,7 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], eventID=event_id)
-        self.assertEqual(evts[0]["message_error"].lower(),
+        self.assertEqual(evts[0]["error.message"].lower(),
                          ("The system cannot find message text for message "
                           "number 1111 in the message file for "
                           "C:\\Windows\\system32\\EventCreate.exe.").lower())
@@ -88,7 +88,7 @@ class Test(WriteReadTest):
         self.write_event_log(msg)
         evts = self.read_events(config={
             "tags": ["global"],
-            "fields": {"global": "field", "env": "prod", "level": "overwrite"},
+            "fields": {"global": "field", "env": "prod", "log.level": "overwrite"},
             "fields_under_root": True,
             "event_logs": [
                 {
@@ -126,6 +126,7 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
+            "log.level": "information",
             "fields.global": "field",
             "fields.env": "dev",
             "fields.level": "overwrite",
@@ -151,7 +152,8 @@ class Test(WriteReadTest):
             ]
         }, expected_events=1)
         self.assertTrue(len(evts), 1)
-        self.assertEqual(evts[0]["event_id"], 10)
+        self.assertEqual(evts[0]["winlog.event_id"], 10)
+        self.assertEqual(evts[0]["event.code"], 10)
 
     def test_unknown_eventlog_config(self):
         """
@@ -169,8 +171,8 @@ class Test(WriteReadTest):
                 }
             ]
         )
-        self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
-        assert self.log_contains("4 errors: Invalid event log key")
+        self.start_beat().check_wait(exit_code=1)
+        assert self.log_contains("4 errors: invalid event log key")
 
     def test_utf16_characters(self):
         """
@@ -232,3 +234,27 @@ class Test(WriteReadTest):
         evts = self.read_events(config)
         self.assertTrue(len(evts), 1)
         self.assertNotIn("message", evts[0])
+
+    def test_multiline_events(self):
+        """
+        eventlogging - Event with newlines and control characters
+        """
+        msg = """
+A trusted logon process has been registered with the Local Security Authority.
+This logon process will be trusted to submit logon requests.
+
+Subject:
+
+Security ID:  SYSTEM
+Account Name:  MS4\x1e$
+Account Domain:  WORKGROUP
+Logon ID:  0x3e7
+Logon Process Name:  IKE"""
+        self.write_event_log(msg)
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+        self.assertEqual(unicode(self.api), evts[0]["winlog.api"], evts[0])
+        self.assertNotIn("event.original", evts[0], msg=evts[0])
+        self.assertIn("message", evts[0], msg=evts[0])
+        self.assertNotIn("\\u000a", evts[0]["message"], msg=evts[0])
+        self.assertEqual(unicode(msg), evts[0]["message"].decode('unicode-escape'), msg=evts[0])

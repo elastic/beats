@@ -1,12 +1,16 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "elasticsearch": {
+        "cluster": {
+            "id": "3LbUkLkURz--FR-YO0wLNA",
+            "name": "es1"
+        },
         "index": {
-            "name": "test-index",
+            "name": ".monitoring-es-6-2018.11.20",
             "recovery": {
                 "id": 0,
                 "primary": true,
@@ -14,8 +18,8 @@
                 "stage": "DONE",
                 "target": {
                     "host": "127.0.0.1",
-                    "id": "ODWb5m6zT9q0lf8YTPyWWg",
-                    "name": "ODWb5m6"
+                    "id": "FMRmkE3HTU6xxxoFK-06Ww",
+                    "name": "es1_1"
                 },
                 "type": "EMPTY_STORE"
             }

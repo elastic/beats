@@ -133,12 +133,16 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	}
 
 	var r reader.Reader
-	r, err = readfile.NewEncodeReader(f, enc, 4096)
+	r, err = readfile.NewEncodeReader(f, readfile.Config{
+		Codec:      enc,
+		BufferSize: 4096,
+		Terminator: readfile.LineFeed,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	r = readfile.NewStripNewline(r)
+	r = readfile.NewStripNewline(r, readfile.LineFeed)
 
 	if conf.multiPattern != "" {
 		p, err := match.Compile(conf.multiPattern)
@@ -264,7 +268,7 @@ func runSimulate(url string, pipeline map[string]interface{}, logs []string, ver
 	for _, s := range sources {
 		d := common.MapStr{
 			"_index":  "index",
-			"_type":   "doc",
+			"_type":   "_doc",
 			"_id":     "id",
 			"_source": s,
 		}

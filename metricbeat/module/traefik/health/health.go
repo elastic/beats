@@ -21,7 +21,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -51,7 +50,6 @@ type MetricSet struct {
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The traefik health metricset is beta.")
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
@@ -65,11 +63,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods gather data, convert it to the right format, and publish it.
 // If there are errors, those are published instead.
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	data, err := m.http.FetchJSON()
 	if err != nil {
-		report.Error(errors.Wrap(err, "failed to sample health"))
-		return
+		return errors.Wrap(err, "failed to sample health")
 	}
 
 	metricSetFields, _ := eventMapping(data)
@@ -79,5 +76,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 	event.RootFields.Put("service.name", "traefik")
 
-	report.Event(event)
+	reporter.Event(event)
+	return nil
 }

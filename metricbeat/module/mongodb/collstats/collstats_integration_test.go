@@ -26,44 +26,44 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/mongodb"
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "mongodb")
+	service := compose.EnsureUp(t, "mongodb")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 
 	for _, event := range events {
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		metricsetFields := event.MetricSetFields
 
 		// Check a few event Fields
-		db := event["db"].(string)
+		db := metricsetFields["db"].(string)
 		assert.NotEqual(t, db, "")
 
-		collection := event["collection"].(string)
+		collection := metricsetFields["collection"].(string)
 		assert.NotEqual(t, collection, "")
 	}
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "mongodb")
+	service := compose.EnsureUp(t, "mongodb")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mongodb",
 		"metricsets": []string{"collstats"},
-		"hosts":      []string{mongodb.GetEnvHost() + ":" + mongodb.GetEnvPort()},
+		"hosts":      []string{host},
 	}
 }

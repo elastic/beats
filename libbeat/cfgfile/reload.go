@@ -35,6 +35,7 @@ import (
 )
 
 var (
+	// DefaultDynamicConfig provides default behavior for a Runner.
 	DefaultDynamicConfig = DynamicConfig{
 		Reload: Reload{
 			Period:  10 * time.Second,
@@ -58,16 +59,31 @@ type DynamicConfig struct {
 	Reload Reload `config:"reload"`
 }
 
+// Reload defines reload behavior and frequency
 type Reload struct {
 	Period  time.Duration `config:"period"`
 	Enabled bool          `config:"enabled"`
 }
 
+// RunnerFactory is used for creating of new Runners
 type RunnerFactory interface {
 	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+}
+
+// ConfigChecker is usually combined with a RunnerFactory for implementations that can check a config
+// without a pipeline and metadata.
+type ConfigChecker interface {
 	CheckConfig(config *common.Config) error
 }
 
+// CheckableRunnerFactory is the union of RunnerFactory and ConfigChecker.
+type CheckableRunnerFactory interface {
+	RunnerFactory
+	ConfigChecker
+}
+
+// Runner is a simple interface providing a simple way to
+// Start and Stop Reloader
 type Runner interface {
 	// We include fmt.Stringer here because we do log debug messages that must print
 	// something for the given Runner. We need Runner implementers to consciously implement a
@@ -82,12 +98,11 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	pipeline      beat.Pipeline
-	runnerFactory RunnerFactory
-	config        DynamicConfig
-	path          string
-	done          chan struct{}
-	wg            sync.WaitGroup
+	pipeline beat.Pipeline
+	config   DynamicConfig
+	path     string
+	done     chan struct{}
+	wg       sync.WaitGroup
 }
 
 // NewReloader creates new Reloader instance for the given config
@@ -137,7 +152,13 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 		if !c.Config.Enabled() {
 			continue
 		}
-		_, err := runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
+
+		if checker, ok := runnerFactory.(ConfigChecker); ok {
+			err = checker.CheckConfig(c.Config)
+		} else {
+			_, err = runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
+		}
+
 		if err != nil {
 			return err
 		}
@@ -212,6 +233,37 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	}
 }
 
+// Load loads configuration files once.
+func (rl *Reloader) Load(runnerFactory RunnerFactory) {
+	list := NewRunnerList("load", runnerFactory, rl.pipeline)
+
+	rl.wg.Add(1)
+	defer rl.wg.Done()
+
+	// Stop all running modules when method finishes
+	defer list.Stop()
+
+	gw := NewGlobWatcher(rl.path)
+
+	debugf("Scan for config files")
+	files, _, err := gw.Scan()
+	if err != nil {
+		logp.Err("Error fetching new config files: %v", err)
+	}
+
+	// Load all config objects
+	configs, _ := rl.loadConfigs(files)
+
+	debugf("Number of module configs found: %v", len(configs))
+
+	if err := list.Reload(configs); err != nil {
+		logp.Err("Error loading configuration files: %+v", err)
+		return
+	}
+
+	logp.Info("Loading of config files completed.")
+}
+
 func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error) {
 	// Load all config objects
 	result := []*reload.ConfigWithMeta{}
@@ -220,7 +272,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 		configs, err := LoadList(file)
 		if err != nil {
 			errs = append(errs, err)
-			logp.Err("Error loading config: %s", err)
+			logp.Err("Error loading config from file '%s', error %v", file, err)
 			continue
 		}
 

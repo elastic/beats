@@ -4,7 +4,7 @@
     One document per query per user per database, showing information related
     invocation of that query, such as cpu usage and total time. Collected by
     querying pg_stat_statements.
-  release: beta
+  release: ga
   fields:
     - name: user.id
       type: long
@@ -29,63 +29,63 @@
       type: long
       description: >
         Total number of rows returned by query.
-    - name: time.total
-      type: long
+    - name: query.time.total.ms
+      type: float
       description: >
         Total number of milliseconds spent running query.
-    - name: time.min
-      type: long
+    - name: query.time.min.ms
+      type: float
       description: >
         Minimum number of milliseconds spent running query.
-    - name: time.max
-      type: long
+    - name: query.time.max.ms
+      type: float
       description: >
         Maximum number of milliseconds spent running query.
-    - name: time.mean
+    - name: query.time.mean.ms
       type: long
       description: >
         Mean number of milliseconds spent running query.
-    - name: time.stddev
+    - name: query.time.stddev.ms
       type: long
       description: >
         Population standard deviation of time spent running query, in milliseconds.
-    - name: memory.shared.hit
+    - name: query.memory.shared.hit
       type: long
       description: >
         Total number of shared block cache hits by the query.
-    - name: memory.shared.read
+    - name: query.memory.shared.read
       type: long
       description: >
         Total number of shared block cache read by the query.
-    - name: memory.shared.dirtied
+    - name: query.memory.shared.dirtied
       type: long
       description: >
         Total number of shared block cache dirtied by the query.
-    - name: memory.shared.written
+    - name: query.memory.shared.written
       type: long
       description: >
         Total number of shared block cache written by the query.
-    - name: memory.local.hit
+    - name: query.memory.local.hit
       type: long
       description: >
         Total number of local block cache hits by the query.
-    - name: memory.local.read
+    - name: query.memory.local.read
       type: long
       description: >
         Total number of local block cache read by the query.
-    - name: memory.local.dirtied
+    - name: query.memory.local.dirtied
       type: long
       description: >
         Total number of local block cache dirtied by the query.
-    - name: memory.local.written
+    - name: query.memory.local.written
       type: long
       description: >
         Total number of local block cache written by the query.
-    - name: memory.temp.read
+    - name: query.memory.temp.read
       type: long
       description: >
         Total number of temp block cache read by the query.
-    - name: memory.temp.written
+    - name: query.memory.temp.written
       type: long
       description: >
         Total number of temp block cache written by the query.

@@ -1,0 +1,37 @@
+{
+  "test_name": "Netflow9 Juniper SRX options template with 0 scope field length",
+  "events": [
+    {
+      "Timestamp": "2016-11-29T00:21:56Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_options",
+          "category": "network_traffic",
+          "created": "2016-11-29T00:21:56Z",
+          "kind": "event"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 142,
+            "timestamp": "2016-11-29T00:21:56Z",
+            "uptime_millis": 3566690934,
+            "version": 9
+          },
+          "options": {
+            "sampling_algorithm": 2,
+            "sampling_interval": 1
+          },
+          "scope": {},
+          "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        }
+      },
+      "Private": null,
+      "TimeSeries": false
+    }
+  ]
+}

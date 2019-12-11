@@ -1,0 +1,76 @@
+- name: s3_request
+  type: group
+  description: >
+    `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+  release: ga
+  fields:
+    - name: requests.total
+      type: long
+      description: >
+        The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
+    - name: requests.get
+      type: long
+      description: >
+        The number of HTTP GET requests made for objects in an Amazon S3 bucket.
+    - name: requests.put
+      type: long
+      description: >
+        The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
+    - name: requests.delete
+      type: long
+      description: >
+        The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
+    - name: requests.head
+      type: long
+      description: >
+        The number of HTTP HEAD requests made to an Amazon S3 bucket.
+    - name: requests.post
+      type: long
+      description: >
+        The number of HTTP POST requests made to an Amazon S3 bucket.
+    - name: requests.select
+      type: long
+      description: >
+        The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
+    - name: requests.select_scanned.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
+    - name: requests.select_returned.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
+    - name: requests.list
+      type: long
+      description: >
+        The number of HTTP requests that list the contents of a bucket.
+    - name: downloaded.bytes
+      type: long
+      format: bytes
+      description: >
+        The number bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.
+    - name: uploaded.bytes
+      type: long
+      format: bytes
+      description: >
+        The number bytes uploaded that contain a request body, made to an Amazon S3 bucket.
+    - name: errors.4xx
+      type: long
+      description: >
+        The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
+    - name: errors.5xx
+      type: long
+      description: >
+        The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
+    - name: latency.first_byte.ms
+      type: long
+      format: duration
+      description: >
+        The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
+    - name: latency.total_request.ms
+      type: long
+      format: duration
+      description: >
+        The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.

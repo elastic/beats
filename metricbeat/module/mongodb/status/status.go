@@ -18,20 +18,14 @@
 package status
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 
 	"gopkg.in/mgo.v2/bson"
 )
-
-/*
-TODOs:
-	* add a metricset for "metrics" data
-*/
-
-var debugf = logp.MakeDebug("mongodb.status")
 
 func init() {
 	mb.Registry.MustAddMetricSet("mongodb", "status", New,
@@ -62,20 +56,34 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error creating new Session")
 	}
 	defer mongoSession.Close()
 
 	result := map[string]interface{}{}
 	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
-		return nil, err
+		return errors.Wrap(err, "failed to retrieve serverStatus")
 	}
 
-	data, _ := schema.Apply(result)
-	return data, nil
+	event := mb.Event{
+		RootFields: common.MapStr{},
+	}
+	event.MetricSetFields, _ = schema.Apply(result)
+
+	if v, err := event.MetricSetFields.GetValue("version"); err == nil {
+		event.RootFields.Put("service.version", v)
+		event.MetricSetFields.Delete("version")
+	}
+	if v, err := event.MetricSetFields.GetValue("process"); err == nil {
+		event.RootFields.Put("process.name", v)
+		event.MetricSetFields.Delete("process")
+	}
+	r.Event(event)
+
+	return nil
 }

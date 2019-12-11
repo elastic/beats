@@ -22,36 +22,46 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func eventsMapping(cpuStatsList []CPUStats) []common.MapStr {
-	events := []common.MapStr{}
+func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
 	for _, cpuStats := range cpuStatsList {
-		events = append(events, eventMapping(&cpuStats))
+		eventMapping(r, &cpuStats)
 	}
-	return events
 }
 
-func eventMapping(stats *CPUStats) common.MapStr {
-	event := common.MapStr{
-		mb.ModuleDataKey: common.MapStr{
-			"container": stats.Container.ToMapStr(),
-		},
-		"core": stats.PerCpuUsage,
+func eventMapping(r mb.ReporterV2, stats *CPUStats) {
+	fields := common.MapStr{
+		"core": stats.PerCPUUsage,
 		"total": common.MapStr{
 			"pct": stats.TotalUsage,
+			"norm": common.MapStr{
+				"pct": stats.TotalUsageNormalized,
+			},
 		},
 		"kernel": common.MapStr{
 			"ticks": stats.UsageInKernelmode,
 			"pct":   stats.UsageInKernelmodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInKernelmodePercentageNormalized,
+			},
 		},
 		"user": common.MapStr{
 			"ticks": stats.UsageInUsermode,
 			"pct":   stats.UsageInUsermodePercentage,
+			"norm": common.MapStr{
+				"pct": stats.UsageInUsermodePercentageNormalized,
+			},
 		},
 		"system": common.MapStr{
 			"ticks": stats.SystemUsage,
 			"pct":   stats.SystemUsagePercentage,
+			"norm": common.MapStr{
+				"pct": stats.SystemUsagePercentageNormalized,
+			},
 		},
 	}
 
-	return event
+	r.Event(mb.Event{
+		RootFields:      stats.Container.ToMapStr(),
+		MetricSetFields: fields,
+	})
 }

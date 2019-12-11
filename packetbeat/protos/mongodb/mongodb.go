@@ -22,10 +22,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -293,6 +294,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		trans.params = requ.params
 		trans.resource = requ.resource
 		trans.bytesIn = requ.messageLength
+		trans.documents = requ.documents
 	}
 
 	// fill response
@@ -304,7 +306,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		trans.error = resp.error
 		trans.documents = resp.documents
 
-		trans.responseTime = int32(resp.ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+		trans.endTime = resp.ts
 		trans.bytesOut = resp.messageLength
 
 	}
@@ -375,9 +377,19 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 		return
 	}
 
-	timestamp := t.ts
-	fields := common.MapStr{}
-	fields["type"] = "mongodb"
+	evt, pbf := pb.NewBeatEvent(t.ts)
+	pbf.SetSource(&t.src)
+	pbf.SetDestination(&t.dst)
+	pbf.Source.Bytes = int64(t.bytesIn)
+	pbf.Destination.Bytes = int64(t.bytesOut)
+	pbf.Event.Dataset = "mongodb"
+	pbf.Event.Start = t.ts
+	pbf.Event.End = t.endTime
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
 	if t.error == "" {
 		fields["status"] = common.OK_STATUS
 	} else {
@@ -388,11 +400,6 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 	fields["method"] = t.method
 	fields["resource"] = t.resource
 	fields["query"] = reconstructQuery(t, false)
-	fields["responsetime"] = t.responseTime
-	fields["bytes_in"] = uint64(t.bytesIn)
-	fields["bytes_out"] = uint64(t.bytesOut)
-	fields["src"] = &t.src
-	fields["dst"] = &t.dst
 
 	if mongodb.sendRequest {
 		fields["request"] = reconstructQuery(t, true)
@@ -420,8 +427,5 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 		}
 	}
 
-	mongodb.results(beat.Event{
-		Timestamp: timestamp,
-		Fields:    fields,
-	})
+	mongodb.results(evt)
 }

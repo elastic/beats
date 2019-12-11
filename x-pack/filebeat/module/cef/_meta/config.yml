@@ -1,0 +1,6 @@
+- module: cef
+  log:
+    enabled: true
+    var:
+      syslog_host: localhost
+      syslog_port: 9003

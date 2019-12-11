@@ -18,6 +18,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -25,31 +26,47 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	"github.com/pkg/errors"
+
+	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/licenses"
 )
 
 var usageText = `
-Usage: module_include_list [flags] [module-dir]
+Usage: module_include_list [flags]
   module_include_list generates a list.go file containing import statements for
-  the module and its dataset packages. The file is usually written to the 
-  include/list.go in the Beat's root directory.
+  the specified imports and module directories. An import is a directory or
+  directory glob containing .go files. A moduleDir is a directory to search
+  for modules and datasets.
+
+  Packages without .go files or without an init() method are omitted from the
+  generated file. The output file is written to the include/list.go in the
+  Beat's root directory by default.
 Options:
 `[1:]
 
 var (
-	license string
-	pkg     string
-	outFile string
+	license           string
+	pkg               string
+	outFile           string
+	buildTags         string
+	moduleDirs        stringSliceFlag
+	moduleExcludeDirs stringSliceFlag
+	importDirs        stringSliceFlag
 )
 
 func init() {
 	flag.StringVar(&license, "license", "ASL2", "License header for generated file (ASL2 or Elastic).")
 	flag.StringVar(&pkg, "pkg", "include", "Package name.")
 	flag.StringVar(&outFile, "out", "include/list.go", "Output file.")
+	flag.StringVar(&buildTags, "buildTags", "", "Build Tags.")
+	flag.Var(&moduleDirs, "moduleDir", "Directory to search for modules to include")
+	flag.Var(&moduleExcludeDirs, "moduleExcludeDirs", "Directory to exclude from the list")
+	flag.Var(&importDirs, "import", "Directory to include")
 	flag.Usage = usageFlag
 }
 
@@ -62,69 +79,86 @@ func main() {
 		log.Fatalf("Invalid license specifier: %v", err)
 	}
 
-	args := flag.Args()
-	if len(args) != 1 {
-		log.Fatal("module-dir must be passed as an argument.")
+	if len(moduleDirs) == 0 && len(importDirs) == 0 {
+		log.Fatal("At least one -import or -moduleDir must be specified.")
 	}
-	dir := args[0]
 
-	// Find modules and datasets.
-	metaDirs, err := mage.FindFiles(
-		filepath.Join(dir, "*/_meta"),
-		filepath.Join(dir, "*/*/_meta"),
-	)
+	dirs, err := findModuleAndDatasets()
 	if err != nil {
-		log.Fatalf("Failed finding modules and datasets: %v", err)
+		log.Fatal(err)
+	}
+
+	if imports, err := findImports(); err != nil {
+		log.Fatal(err)
+	} else {
+		dirs = append(dirs, imports...)
 	}
 
 	// Get the current directories Go import path.
-	repo, err := mage.GetProjectRepoInfo()
+	repo, err := devtools.GetProjectRepoInfo()
 	if err != nil {
 		log.Fatalf("Failed to determine import path: %v", err)
 	}
 
 	// Build import paths.
 	var imports []string
-	for _, metaDir := range metaDirs {
-		importDir := filepath.Dir(metaDir)
-
-		// Skip dirs that have no .go files.
-		goFiles, err := filepath.Glob(filepath.Join(importDir, "*.go"))
+	for _, dir := range dirs {
+		// Skip packages without an init() function because that cannot register
+		// anything as a side-effect of being imported (e.g. filebeat/input/file).
+		var foundInitMethod bool
+		goFiles, err := filepath.Glob(filepath.Join(dir, "*.go"))
 		if err != nil {
-			log.Fatal("Failed checking for .go files in package dir: %v", err)
+			log.Fatalf("Failed checking for .go files in package dir: %v", err)
 		}
-		if len(goFiles) == 0 {
+		for _, f := range goFiles {
+			// Skip test files
+			if strings.HasSuffix(f, "_test.go") {
+				continue
+			}
+			if hasInitMethod(f) {
+				foundInitMethod = true
+				break
+			}
+		}
+		if !foundInitMethod {
 			continue
 		}
 
-		importDir, err = filepath.Rel(mage.CWD(), filepath.Dir(metaDir))
-		if err != nil {
-			log.Fatal(err)
+		importDir := dir
+		if filepath.IsAbs(dir) {
+			// Make it relative to the current package if it's absolute.
+			importDir, err = filepath.Rel(devtools.CWD(), dir)
+			if err != nil {
+				log.Fatalf("Failure creating import for dir=%v: %v", dir, err)
+			}
 		}
 
 		imports = append(imports, filepath.ToSlash(
 			filepath.Join(repo.ImportPath, importDir)))
 	}
 
+	sort.Strings(imports)
+
 	// Populate the template.
 	var buf bytes.Buffer
 	err = Template.Execute(&buf, Data{
-		License: license,
-		Package: pkg,
-		Imports: imports,
+		License:   license,
+		Package:   pkg,
+		BuildTags: buildTags,
+		Imports:   imports,
 	})
 	if err != nil {
-		log.Fatal("Failed executing template: %v", err)
+		log.Fatalf("Failed executing template: %v", err)
 	}
 
 	// Create the output directory.
 	if err = os.MkdirAll(filepath.Dir(outFile), 0755); err != nil {
-		log.Fatal("Failed to create output directory: %v", err)
+		log.Fatalf("Failed to create output directory: %v", err)
 	}
 
 	// Write the output file.
 	if err = ioutil.WriteFile(outFile, buf.Bytes(), 0644); err != nil {
-		log.Fatal("Failed writing output file: %v", err)
+		log.Fatalf("Failed writing output file: %v", err)
 	}
 }
 
@@ -138,12 +172,12 @@ var Template = template.Must(template.New("normalizations").Funcs(map[string]int
 }).Parse(`
 {{ .License | trim }}
 
-// Code generated by beats/dev-tools/module_include_list/module_include_list.go - DO NOT EDIT.
-
+// Code generated by beats/dev-tools/cmd/module_include_list/module_include_list.go - DO NOT EDIT.
+{{ .BuildTags }}
 package {{ .Package }}
 
 import (
-	// Import modules.
+	// Import packages that need to register themselves.
 {{- range $import := .Imports }}
 	_ "{{ $import }}"
 {{- end }}
@@ -151,7 +185,76 @@ import (
 `[1:]))
 
 type Data struct {
-	License string
-	Package string
-	Imports []string
+	License   string
+	Package   string
+	BuildTags string
+	Imports   []string
+}
+
+//stringSliceFlag is a flag type that allows more than one value to be specified.
+type stringSliceFlag []string
+
+func (f *stringSliceFlag) String() string { return strings.Join(*f, ", ") }
+
+func (f *stringSliceFlag) Set(value string) error {
+	*f = append(*f, value)
+	return nil
+}
+
+// findModuleAndDatasets searches the specified moduleDirs for packages that
+// should be imported. They are designated by the presence of a _meta dir.
+func findModuleAndDatasets() ([]string, error) {
+	var dirs []string
+	for _, moduleDir := range moduleDirs {
+		// Find modules and datasets as indicated by the _meta dir.
+		metaDirs, err := devtools.FindFiles(
+			filepath.Join(moduleDir, "*/_meta"),
+			filepath.Join(moduleDir, "*/*/_meta"),
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed finding modules and datasets")
+		}
+
+		for _, metaDir := range metaDirs {
+			// Strip off _meta.
+			skipDir := false
+			for _, excludeModule := range moduleExcludeDirs {
+				if strings.Contains(metaDir, excludeModule) {
+					skipDir = true
+					break
+				}
+			}
+			if skipDir {
+				continue
+			}
+			dirs = append(dirs, filepath.Dir(metaDir))
+		}
+	}
+	return dirs, nil
+}
+
+// findImports expands the given import values in case they contain globs.
+func findImports() ([]string, error) {
+	return devtools.FindFiles(importDirs...)
+}
+
+// hasInitMethod returns true if the file contains 'func init()'.
+func hasInitMethod(file string) bool {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatalf("Failed to read from %v: %v", file, err)
+	}
+	defer f.Close()
+
+	var initSignature = []byte("func init()")
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if bytes.Contains(scanner.Bytes(), initSignature) {
+			return true
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("Failed scanning %v: %v", file, err)
+	}
+	return false
 }
