@@ -100,6 +100,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 			evt, err = eventMapping(sub)
 			if err != nil {
 				r.Error(errors.Wrap(err, "error mapping subscription event"))
+				continue
 			}
 
 			if !r.Event(evt) {

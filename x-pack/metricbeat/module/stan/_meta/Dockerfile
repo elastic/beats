@@ -5,7 +5,7 @@ FROM nats-streaming:$STAN_VERSION
 FROM golang:1.13-alpine AS build-env
 RUN apk --no-cache add build-base git bzr mercurial gcc
 RUN cd src && go get github.com/nats-io/stan.go/
-RUN cd src/github.com/nats-io/stan.go/examples/stan-bench && go build .
+RUN cd src/github.com/nats-io/stan.go/examples/stan-bench && git checkout tags/v0.5.2 && go build .
 
 # create an enhanced container with nc command available since nats is based
 # on scratch image making healthcheck impossible

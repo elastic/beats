@@ -110,6 +110,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 
 		if evt, err = eventMapping(chWrapper); err != nil {
 			r.Error(errors.Wrap(err, "error mapping channel to its schema"))
+			continue
 		}
 		if !r.Event(evt) {
 			return nil
