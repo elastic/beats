@@ -4,7 +4,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/iis"
-	"github.com/elastic/beats/metricbeat/module/windows/perfmon"
 	"github.com/pkg/errors"
 )
 
@@ -22,23 +21,23 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	reader *perfmon.PerfmonReader
+	reader *iis.Reader
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The iis webserver metricset is experimental.")
-	config := iis.InitConfig("webserver")
+	counters := iis.GetPerfCounters("webserver")
 
-	reader, err := perfmon.NewPerfmonReader(config)
+	reader, err := iis.NewReader(counters)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization of reader failed")
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		reader : reader,
+		reader:        reader,
 	}, nil
 }
 
