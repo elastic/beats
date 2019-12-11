@@ -18,6 +18,7 @@ type fleetGateway struct {
 	client     clienter
 	scheduler  scheduler.Scheduler
 	agentID    string
+	done       chan struct{}
 }
 
 type fleetGatewaySettings struct {
@@ -56,6 +57,7 @@ func newFleetGatewayWithScheduler(
 		client:     client,
 		agentID:    agentID, //TODO(ph): this need to be a struct.
 		scheduler:  scheduler,
+		done:       make(chan struct{}),
 	}, nil
 }
 
@@ -71,6 +73,8 @@ func (f *fleetGateway) worker() {
 			if err := f.dispatcher.Dispatch(resp.Actions); err != nil {
 				// record
 			}
+		case <-f.done:
+			return
 		}
 	}
 }
@@ -87,11 +91,10 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 	return resp, nil
 }
 
-func (f *fleetGateway) Start() error {
-	return nil
+func (f *fleetGateway) Start() {
+	go f.worker()
 }
 
-func (f *fleetGateway) Stop() error {
-	// TODO lets try to flush events before shutting down.
-	return nil
+func (f *fleetGateway) Stop() {
+	close(f.done)
 }

@@ -58,7 +58,7 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 			ad.log.Debugf("Failed to dispatch action %+v error %+v", action, err)
 			return err
 		}
-		ad.log.Debugf("Succesfully dispatch action %+v", action)
+		ad.log.Debugf("Succesfully dispatch action")
 	}
 	return nil
 }

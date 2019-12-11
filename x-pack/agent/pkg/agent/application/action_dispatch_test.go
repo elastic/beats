@@ -29,19 +29,19 @@ type mockActionOther struct{}
 func TestActionDispatcher(t *testing.T) {
 	t.Run("Success to dispatch multiples events", func(t *testing.T) {
 		def := &mockHandler{}
-		dispatcher, err := newActionDispatcher(nil, def)
+		d, err := newActionDispatcher(nil, def)
 		require.NoError(t, err)
 
 		success1 := &mockHandler{}
 		success2 := &mockHandler{}
 
-		dispatcher.Register(&mockAction{}, success1)
-		dispatcher.Register(&mockActionOther{}, success2)
+		d.Register(&mockAction{}, success1)
+		d.Register(&mockActionOther{}, success2)
 
 		action1 := &mockAction{}
 		action2 := &mockActionOther{}
 
-		err = dispatcher.Dispatch(action1, action2)
+		err = d.Dispatch(action1, action2)
 
 		require.NoError(t, err)
 
@@ -57,14 +57,14 @@ func TestActionDispatcher(t *testing.T) {
 
 	t.Run("Unknown action are catched by the unknown handler", func(t *testing.T) {
 		def := &mockHandler{}
-		dispatcher, err := newActionDispatcher(nil, def)
+		d, err := newActionDispatcher(nil, def)
 		require.NoError(t, err)
 
 		success := &mockHandler{}
-		dispatcher.Register(mockAction{}, success)
+		d.Dispatch(mockAction{}, success)
 
 		action := &mockActionUnknown{}
-		err = dispatcher.Dispatch(action)
+		err = d.Dispatch(action)
 
 		require.NoError(t, err)
 		require.False(t, success.called)

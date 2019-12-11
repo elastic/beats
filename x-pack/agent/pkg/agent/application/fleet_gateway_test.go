@@ -103,7 +103,7 @@ func ackSeq(channels ...<-chan struct{}) <-chan struct{} {
 		for _, c := range channels {
 			<-c
 		}
-		close(comm)
+		comm <- struct{}{}
 	}(comm)
 	return comm
 }
@@ -123,8 +123,7 @@ func wrapStrToResp(code int, body string) *http.Response {
 
 func TestFleetGateway(t *testing.T) {
 	agentID := "agent-secret"
-
-	t.Run("Successfully connects send no event and receives no action", withGateway(agentID, func(
+	t.Run("send no event and receive no action", withGateway(agentID, func(
 		t *testing.T,
 		gateway *fleetGateway,
 		client *testingClient,
@@ -147,6 +146,7 @@ func TestFleetGateway(t *testing.T) {
 			}),
 		)
 
+		fmt.Println("after received")
 		// Synchronize scheduler and acking of calls from the worker go routine.
 		scheduler.Next()
 		<-received
