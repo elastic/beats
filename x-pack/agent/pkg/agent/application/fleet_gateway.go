@@ -67,10 +67,15 @@ func (f *fleetGateway) worker() {
 		case <-f.scheduler.WaitTick():
 			resp, err := f.execute()
 			if err != nil {
-				// record
+				continue
 			}
 
-			if err := f.dispatcher.Dispatch(resp.Actions); err != nil {
+			actions := make([]action, len(resp.Actions))
+			for idx, a := range actions {
+				actions[idx] = a
+			}
+
+			if err := f.dispatcher.Dispatch(actions...); err != nil {
 				// record
 			}
 		case <-f.done:
