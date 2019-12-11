@@ -17,7 +17,7 @@
 
 package docker
 
-// Config contains the config needed for the docker module
+// Config contains the config needed for the docker
 type Config struct {
 	TLS   *TLSConfig `config:"ssl"`
 	DeDot bool       `config:"labels.dedot"`
@@ -30,7 +30,7 @@ func DefaultConfig() Config {
 	}
 }
 
-// TLSConfig contains TLS config
+// TLSConfig contains TLS settings required to connect to the docker daemon via TCP
 type TLSConfig struct {
 	Enabled     *bool  `config:"enabled"`
 	CA          string `config:"certificate_authority"`
