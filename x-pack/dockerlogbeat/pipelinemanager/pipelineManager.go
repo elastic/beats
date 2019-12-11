@@ -140,10 +140,11 @@ func (pm *PipelineManager) removePipelineIfNeeded(hash string) {
 		delete(pm.pipelines, hash)
 		//pipelines must be closed after clients
 		//Just do this here, since the caller doesn't know if we need to close the libbeat pipeline
-		go func() {
-			pm.Logger.Debugf("Pipeline closing from removePipelineIfNeeded")
-			pipeline.Close()
-		}()
+		pm.Logger.Debugf("Pipeline closing from removePipelineIfNeeded")
+		err := pipeline.Close()
+		if err != nil {
+			pm.Logger.Errorf("Error closing pipeline: %s", err)
+		}
 	}
 }
 

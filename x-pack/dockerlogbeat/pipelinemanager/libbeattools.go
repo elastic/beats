@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"time"
 
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
@@ -88,20 +89,28 @@ func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Log
 		return nil, errors.Wrap(err, "error making index manager")
 	}
 
-	pipeline, err := pipeline.Load(info,
+	settings := pipeline.Settings{
+		WaitClose:     time.Duration(time.Second * 10),
+		WaitCloseMode: pipeline.WaitOnPipelineClose,
+		Processors:    processing,
+	}
+
+	pipeline, err := pipeline.LoadWithSettings(
+		info,
 		pipeline.Monitors{
 			Metrics:   nil,
 			Telemetry: nil,
 			Logger:    log,
 		},
 		pipelineCfg,
-		processing,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
 			out, err := outputs.Load(idx, info, stat, cfg.Name(), cfg.Config())
 			return cfg.Name(), out, err
 		},
+		settings,
 	)
+
 	if err != nil {
 		return nil, errors.Wrap(err, "error in pipeline.Load")
 	}
