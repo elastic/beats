@@ -68,9 +68,7 @@ func TestService_Generate(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 			},
 		},
 		{
@@ -107,9 +105,7 @@ func TestService_Generate(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 				"deployment": common.MapStr{
 					"name": "owner",
 				},
@@ -161,9 +157,7 @@ func TestService_GenerateFromName(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 			},
 		},
 		{
@@ -200,9 +194,7 @@ func TestService_GenerateFromName(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 				"deployment": common.MapStr{
 					"name": "owner",
 				},
@@ -274,12 +266,10 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-					"uid":  uid,
-					"labels": common.MapStr{
-						"nskey": "nsvalue",
-					},
+				"namespace":     "default",
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"nskey": "nsvalue",
 				},
 			},
 		},

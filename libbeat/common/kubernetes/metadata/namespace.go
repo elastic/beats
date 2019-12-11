@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
+const resource = "namespace"
+
 type namespace struct {
 	store    cache.Store
 	resource *Resource
@@ -31,12 +33,10 @@ type namespace struct {
 
 // NewNamespaceMetadataGenerator creates a metagen for namespace resources
 func NewNamespaceMetadataGenerator(cfg *common.Config, namespaces cache.Store) MetaGen {
-	no := &namespace{
+	return &namespace{
 		resource: NewResourceMetadataGenerator(cfg),
 		store:    namespaces,
 	}
-
-	return no
 }
 
 // Generate generates namespace metadata from a resource object
@@ -46,7 +46,10 @@ func (n *namespace) Generate(obj kubernetes.Resource, opts ...FieldOptions) comm
 		return nil
 	}
 
-	meta := n.resource.Generate("namespace", obj, opts...)
+	meta := n.resource.Generate(resource, obj, opts...)
+	// TODO: remove this call when moving to 8.0
+	meta = flattenMetadata(meta)
+
 	// TODO: Add extra fields in here if need be
 	return meta
 }
@@ -67,4 +70,27 @@ func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.M
 	} else {
 		return nil
 	}
+}
+
+func flattenMetadata(in common.MapStr) common.MapStr {
+	out := common.MapStr{}
+	rawFields, err := in.GetValue(resource)
+	if err != nil {
+		return nil
+	}
+
+	fields, ok := rawFields.(common.MapStr)
+	if !ok {
+		return nil
+	}
+
+	for k, v := range fields {
+		if k == "name" {
+			out[resource] = v
+		} else {
+			out[resource+"_"+k] = v
+		}
+	}
+
+	return out
 }

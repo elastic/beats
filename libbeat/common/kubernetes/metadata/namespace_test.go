@@ -57,13 +57,21 @@ func TestNamespace_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
+			// Use this for 8.0
+			/*output: common.MapStr{
 				"namespace": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
 					"labels": common.MapStr{
 						"foo": "bar",
 					},
+				},
+			},*/
+			output: common.MapStr{
+				"namespace":     "obj",
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},
@@ -102,13 +110,22 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"namespace": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
+			// Use this for 8.0
+			/*
+				output: common.MapStr{
+					"namespace": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"labels": common.MapStr{
+							"foo": "bar",
+						},
 					},
+				},*/
+			output: common.MapStr{
+				"namespace":     "obj",
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"foo": "bar",
 				},
 			},
 		},

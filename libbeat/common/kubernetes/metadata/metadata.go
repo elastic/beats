@@ -25,7 +25,9 @@ import (
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
 type MetaGen interface {
+	// Generate generates metadata for a given resource
 	Generate(kubernetes.Resource, ...FieldOptions) common.MapStr
+	// GenerateFromName generates metadata for a given resource based on it's name
 	GenerateFromName(string, ...FieldOptions) common.MapStr
 }
 

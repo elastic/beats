@@ -71,9 +71,7 @@ func TestPod_Generate(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 				"node": common.MapStr{
 					"name": "testnode",
 				},
@@ -116,9 +114,7 @@ func TestPod_Generate(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 				"deployment": common.MapStr{
 					"name": "owner",
 				},
@@ -176,9 +172,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 				"node": common.MapStr{
 					"name": "testnode",
 				},
@@ -221,9 +215,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-				},
+				"namespace": "default",
 				"deployment": common.MapStr{
 					"name": "owner",
 				},
@@ -316,12 +308,10 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 						"foo": "bar",
 					},
 				},
-				"namespace": common.MapStr{
-					"name": "default",
-					"uid":  uid,
-					"labels": common.MapStr{
-						"nskey": "nsvalue",
-					},
+				"namespace":     "default",
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"nskey": "nsvalue",
 				},
 				"node": common.MapStr{
 					"name": "testnode",

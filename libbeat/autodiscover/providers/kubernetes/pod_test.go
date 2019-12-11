@@ -241,16 +241,12 @@ func TestEmitEvent(t *testing.T) {
 					"node": common.MapStr{
 						"name": "node",
 					},
-					"namespace": common.MapStr{
-						"name": "default",
-					},
+					"namespace":   "default",
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace": "default",
 						"container": common.MapStr{
 							"name":  "filebeat",
 							"image": "elastic/filebeat:6.3.0",
@@ -377,16 +373,12 @@ func TestEmitEvent(t *testing.T) {
 					"node": common.MapStr{
 						"name": "node",
 					},
-					"namespace": common.MapStr{
-						"name": "default",
-					},
+					"namespace":   "default",
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace": "default",
 						"container": common.MapStr{
 							"name":  "filebeat",
 							"image": "elastic/filebeat:6.3.0",
@@ -450,16 +442,12 @@ func TestEmitEvent(t *testing.T) {
 					"node": common.MapStr{
 						"name": "node",
 					},
-					"namespace": common.MapStr{
-						"name": "default",
-					},
+					"namespace":   "default",
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace": "default",
 						"container": common.MapStr{
 							"name":  "filebeat",
 							"image": "elastic/filebeat:6.3.0",

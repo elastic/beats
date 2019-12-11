@@ -165,16 +165,12 @@ func TestEmitEvent_Service(t *testing.T) {
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
-					"namespace": common.MapStr{
-						"name": "default",
-					},
+					"namespace":   "default",
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace": "default",
 						"service": common.MapStr{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -257,16 +253,12 @@ func TestEmitEvent_Service(t *testing.T) {
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
-					"namespace": common.MapStr{
-						"name": "default",
-					},
+					"namespace":   "default",
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace": "default",
 						"service": common.MapStr{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",

@@ -33,14 +33,12 @@ type pod struct {
 
 // NewPodMetadataGenerator creates a metagen for pod resources
 func NewPodMetadataGenerator(cfg *common.Config, pods cache.Store, node MetaGen, namespace MetaGen) MetaGen {
-	po := &pod{
+	return &pod{
 		resource:  NewResourceMetadataGenerator(cfg),
 		store:     pods,
 		node:      node,
 		namespace: namespace,
 	}
-
-	return po
 }
 
 // Generate generates pod metadata from a resource object
@@ -66,7 +64,9 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 	if p.namespace != nil {
 		meta := p.namespace.GenerateFromName(po.GetNamespace())
 		if meta != nil {
-			out.Put("namespace", meta["namespace"])
+			// Use this in 8.0
+			//out.Put("namespace", meta["namespace"])
+			out.DeepUpdate(meta)
 		}
 	}
 	return out

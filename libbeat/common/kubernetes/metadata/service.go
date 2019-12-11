@@ -32,13 +32,11 @@ type service struct {
 
 // NewServiceMetadataGenerator creates a metagen for service resources
 func NewServiceMetadataGenerator(cfg *common.Config, services cache.Store, namespace MetaGen) MetaGen {
-	po := &service{
+	return &service{
 		resource:  NewResourceMetadataGenerator(cfg),
 		store:     services,
 		namespace: namespace,
 	}
-
-	return po
 }
 
 // Generate generates service metadata from a resource object
@@ -53,7 +51,9 @@ func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common
 	if s.namespace != nil {
 		meta := s.namespace.GenerateFromName(svc.GetNamespace())
 		if meta != nil {
-			out.Put("namespace", meta["namespace"])
+			// Use this in 8.0
+			//out.Put("namespace", meta["namespace"])
+			out.DeepUpdate(meta)
 		}
 	}
 

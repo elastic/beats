@@ -31,12 +31,10 @@ type node struct {
 
 // NewNodeMetadataGenerator creates a metagen for service resources
 func NewNodeMetadataGenerator(cfg *common.Config, nodes cache.Store) MetaGen {
-	no := &node{
+	return &node{
 		resource: NewResourceMetadataGenerator(cfg),
 		store:    nodes,
 	}
-
-	return no
 }
 
 // Generate generates service metadata from a resource object
