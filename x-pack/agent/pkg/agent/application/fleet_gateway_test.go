@@ -32,13 +32,13 @@ func (t *testingClient) Send(
 ) (*http.Response, error) {
 	t.Lock()
 	defer t.Unlock()
+	defer func() { t.received <- struct{}{} }()
 	return t.callback(headers, body)
 }
 
 func (t *testingClient) Answer(fn clientCallbackFunc) <-chan struct{} {
 	t.Lock()
 	defer t.Unlock()
-	defer func() { t.received <- struct{}{} }()
 	t.callback = fn
 	return t.received
 }
@@ -65,7 +65,6 @@ func (t *testingDispatcher) Dispatch(actions ...action) error {
 func (t *testingDispatcher) Answer(fn testingDispatcherFunc) <-chan struct{} {
 	t.Lock()
 	defer t.Unlock()
-	defer func() { t.received <- struct{}{} }()
 	t.callback = fn
 	return t.received
 }
@@ -139,14 +138,12 @@ func TestFleetGateway(t *testing.T) {
 				resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true, }`)
 				return resp, nil
 			}),
-
 			dispatcher.Answer(func(actions ...action) error {
 				require.Equal(t, 0, len(actions))
 				return nil
 			}),
 		)
 
-		fmt.Println("after received")
 		// Synchronize scheduler and acking of calls from the worker go routine.
 		scheduler.Next()
 		<-received
