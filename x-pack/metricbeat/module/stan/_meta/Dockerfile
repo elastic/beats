@@ -19,5 +19,3 @@ HEALTHCHECK --interval=1s --retries=10 CMD nc -w 1 0.0.0.0 8222 </dev/null
 ADD run.sh /run.sh
 # Run with default memory based store
 ENTRYPOINT ["/run.sh"]
-#ENTRYPOINT ["/nats-streaming-server"]
-#CMD ["-m", "8222"]
