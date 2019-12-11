@@ -9,17 +9,13 @@ import (
 	"net/url"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
 )
 
-type clientCallbackFunc func(method string,
-	headers http.Header,
-	body io.Reader,
-) (*http.Response, error)
+type clientCallbackFunc func(headers http.Header, body io.Reader) (*http.Response, error)
 
 type testingClient struct {
 	sync.Mutex
@@ -34,16 +30,17 @@ func (t *testingClient) Send(
 	headers http.Header,
 	body io.Reader,
 ) (*http.Response, error) {
-	m.Lock()
-	defer m.Unlock()
-	return m.callback(headers, body)
+	t.Lock()
+	defer t.Unlock()
+	return t.callback(headers, body)
 }
 
 func (t *testingClient) Answer(fn clientCallbackFunc) <-chan struct{} {
-	m.Lock()
-	defer m.Unlock()
+	t.Lock()
+	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
-	m.callback = fn
+	t.callback = fn
+	return t.received
 }
 
 func newTestingClient() *testingClient {
@@ -58,51 +55,53 @@ type testingDispatcher struct {
 	received chan struct{}
 }
 
-func (t *testingDispatcher) Dispatch(actions ...Action) error {
+func (t *testingDispatcher) Dispatch(actions ...action) error {
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
 	return t.callback(actions...)
 }
 
-func (t *testingDispatcher) Answer(fn testingDispatcher) <-chan struct{} {
+func (t *testingDispatcher) Answer(fn testingDispatcherFunc) <-chan struct{} {
 	t.Lock()
 	defer t.Unlock()
+	defer func() { t.received <- struct{}{} }()
 	t.callback = fn
+	return t.received
 }
 
 func newTestingDispatcher() *testingDispatcher {
 	return &testingDispatcher{received: make(chan struct{})}
 }
 
-type withGatewayFunc func(*fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper)
+type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper)
 
-func withGateway(fn withGatewayFunc) func(t *testing.T) {
-	scheduler := scheduler.NewStepper()
-	client := newTestingClient()
-	dispatcher := newTestingDispatcher()
+func withGateway(agentID string, fn withGatewayFunc) func(t *testing.T) {
+	return func(t *testing.T) {
+		scheduler := scheduler.NewStepper()
+		client := newTestingClient()
+		dispatcher := newTestingDispatcher()
 
-	gateway, err := newFleetGatewayWithScheduler(
-		nil,
-		Settings{period: 5 * time.Second},
-		agentID,
-		client,
-		dispatcher,
-		scheduler,
-	)
+		gateway, err := newFleetGatewayWithScheduler(
+			nil,
+			&fleetGatewaySettings{},
+			agentID,
+			client,
+			dispatcher,
+			scheduler,
+		)
 
-	require.NoError(t)
+		require.NoError(t, err)
 
-	fn(gateway, client, dispatcher, scheduler)
+		fn(t, gateway, client, dispatcher, scheduler)
+	}
 }
 
-func ackSeq(channels ...chan struct{}) chan struct{} {
+func ackSeq(channels ...<-chan struct{}) <-chan struct{} {
 	comm := make(chan struct{})
 	go func(comm chan struct{}) {
-		var c int
 		for _, c := range channels {
 			<-c
-			c++
 		}
 		close(comm)
 	}(comm)
@@ -110,7 +109,7 @@ func ackSeq(channels ...chan struct{}) chan struct{} {
 }
 
 func wrapStrToResp(code int, body string) *http.Response {
-	t := &http.Response{
+	return &http.Response{
 		Status:        fmt.Sprintf("%d %s", code, http.StatusText(code)),
 		StatusCode:    code,
 		Proto:         "HTTP/1.1",
@@ -123,13 +122,14 @@ func wrapStrToResp(code int, body string) *http.Response {
 }
 
 func TestFleetGateway(t *testing.T) {
-	agentID = "agent-secret"
+	agentID := "agent-secret"
 
-	t.Run("Successfully connects send no event and receives no action", withGateway(func(
+	t.Run("Successfully connects send no event and receives no action", withGateway(agentID, func(
+		t *testing.T,
 		gateway *fleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
-		scheduler *scheduler.Scheduler,
+		scheduler *scheduler.Stepper,
 	) {
 		go gateway.Start()
 		defer gateway.Stop()
@@ -142,10 +142,12 @@ func TestFleetGateway(t *testing.T) {
 			}),
 
 			dispatcher.Answer(func(actions ...action) error {
-				return require.Equal(t, 0, len(actions))
+				require.Equal(t, 0, len(actions))
+				return nil
 			}),
 		)
 
+		// Synchronize scheduler and acking of calls from the worker go routine.
 		scheduler.Next()
 		<-received
 	}))

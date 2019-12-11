@@ -17,6 +17,7 @@ type fleetGateway struct {
 	dispatcher dispatcher
 	client     clienter
 	scheduler  scheduler.Scheduler
+	agentID    string
 }
 
 type fleetGatewaySettings struct {
@@ -30,13 +31,13 @@ func newFleetGateway(
 	client clienter,
 	d dispatcher,
 ) (*fleetGateway, error) {
-	scheduler := scheduler.NewPeriodic(settings)
+	scheduler := scheduler.NewPeriodic(settings.Duration)
 	return newFleetGatewayWithScheduler(
 		log,
 		settings,
 		agentID,
 		client,
-		dispatcher,
+		d,
 		scheduler,
 	)
 }
@@ -51,7 +52,6 @@ func newFleetGatewayWithScheduler(
 ) (*fleetGateway, error) {
 	return &fleetGateway{
 		log:        log,
-		settings:   settings,
 		dispatcher: d,
 		client:     client,
 		agentID:    agentID, //TODO(ph): this need to be a struct.
@@ -78,17 +78,13 @@ func (f *fleetGateway) worker() {
 func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 	cmd := fleetapi.NewCheckinCmd(f.agentID, f.client)
 
-	req := fleetapi.CheckinRequest{}
-	resp, err := cmd.Execute(cmd)
+	req := &fleetapi.CheckinRequest{}
+	resp, err := cmd.Execute(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	return resp, nil
-}
-
-func (f *fleetGateway) Report(event interface{}) error {
-	return nil
 }
 
 func (f *fleetGateway) Start() error {
