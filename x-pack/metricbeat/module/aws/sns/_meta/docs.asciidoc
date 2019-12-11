@@ -1,4 +1,4 @@
-The sns metricset of aws module allows you to monitor your AWS SNS topic. `sns` metricset fetches a set of values from
+The `sns` metricset of aws module allows you to monitor your AWS SNS topic. `sns` metricset fetches a set of values from
 https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html#SNS_ViewMetrics[Amazon SNS Metrics].
 CloudWatch metrics for Amazon SNS topics are automatically collected and pushed to CloudWatch every five minutes.
 
@@ -13,6 +13,13 @@ sns:ListTopics
 sts:GetCallerIdentity
 iam:ListAccountAliases
 ----
+
+[float]
+=== Dashboard
+
+The `aws sns` metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-sns-overview.png[]
 
 [float]
 === Configuration example
