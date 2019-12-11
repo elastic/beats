@@ -62,6 +62,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-sql>>
 * <<exported-fields-statsd>>
 * <<exported-fields-system>>
 * <<exported-fields-tomcat>>
@@ -29453,6 +29454,67 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-sql]]
+== sql fields
+
+sql module
+
+
+
+[float]
+=== sql
+
+`sql` fetches metrics from a SQL database 
+
+
+
+[float]
+=== query
+
+query
+
+
+
+*`sql.query.driver`*::
++
+--
+Driver used to execute the query.
+
+
+type: keyword
+
+--
+
+*`sql.query.query`*::
++
+--
+Query executed to collect metrics.
+
+
+type: keyword
+
+--
+
+*`sql.query.metrics.numeric.*`*::
++
+--
+Numeric metrics collected.
+
+
+type: object
+
+--
+
+*`sql.query.metrics.string.*`*::
++
+--
+Non-numeric values collected.
+
+
+type: object
 
 --
 
