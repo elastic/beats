@@ -34,13 +34,15 @@ func TestOpenSuccessful(t *testing.T) {
 // TestAddCounterInvalidArgWhenQueryClosed will check if addcounter func fails when query is closed.
 func TestAddCounterInvalidArgWhenQueryClosed(t *testing.T) {
 	var q Query
-	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	queryPath, err := q.ExpandWildCardPath(validQuery)
-	if err != nil {
-		t.Fatal(err)
+	queryPath, err := q.GetCounterPaths(validQuery)
+	// if windows os language is ENG then err will be nil, else the GetCounterPaths will execute the AddCounter
+	if assert.NoError(t, err) {
+		counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
+		err = q.AddCounter(queryPath[0], counter, false)
+		assert.Error(t, err, PDH_INVALID_HANDLE)
+	} else {
+		assert.Error(t, err, PDH_INVALID_ARGUMENT)
 	}
-	err = q.AddCounter(queryPath[0], counter, false)
-	assert.EqualValues(t, err, PDH_INVALID_ARGUMENT)
 }
 
 // func TestGetFormattedCounterValuesEmptyCounterList will check if getting the counter values will fail when no counter handles are added.
@@ -68,7 +70,7 @@ func TestSuccessfulQuery(t *testing.T) {
 	}
 	defer q.Close()
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	queryPath, err := q.ExpandWildCardPath(validQuery)
+	queryPath, err := q.GetCounterPaths(validQuery)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,4 +88,29 @@ func TestSuccessfulQuery(t *testing.T) {
 	list, err := q.GetFormattedCounterValues()
 	assert.Nil(t, err)
 	assert.NotNil(t, list)
+}
+
+// TestInstanceNameRegexp tests regular expression for instance.
+func TestInstanceNameRegexp(t *testing.T) {
+	queryPaths := []string{`\SQLServer:Databases(*)\Log File(s) Used Size (KB)`, `\Search Indexer(*)\L0 Indexes (Wordlists)`,
+		`\Search Indexer(*)\L0 Merges (flushes) Now.`, `\NUMA Node Memory(*)\Free & Zero Page List MBytes`}
+	for _, path := range queryPaths {
+		matches := instanceNameRegexp.FindStringSubmatch(path)
+		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
+			assert.Equal(t, matches[1], "*")
+		}
+	}
+}
+
+// TestObjectNameRegexp tests regular expression for object.
+func TestObjectNameRegexp(t *testing.T) {
+	queryPaths := []string{`\Web Service Cache\Output Cache Current Flushed Items`,
+		`\Web Service Cache\Output Cache Total Flushed Items`, `\Web Service Cache\Total Flushed Metadata`,
+		`\Web Service Cache\Kernel: Current URIs Cached`}
+	for _, path := range queryPaths {
+		matches := objectNameRegexp.FindStringSubmatch(path)
+		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
+			assert.Equal(t, matches[1], "Web Service Cache")
+		}
+	}
 }

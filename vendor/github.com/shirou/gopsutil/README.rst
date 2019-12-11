@@ -207,7 +207,7 @@ pid                 x     x      x       x       x
 ppid                x     x      x       x       x
 name                x     x      x       x       x
 cmdline             x     x              x       x
-create_time         x                    x
+create_time         x                    x       x
 status              x     x      x       x
 cwd                 x
 exe                 x     x      x               x
@@ -241,6 +241,7 @@ parent              x            x       x       x
 children            x     x      x       x       x
 connections         x            x       x
 is_running
+page_faults         x
 ================ ===== ======= ======= ====== =======
 
 Original Metrics

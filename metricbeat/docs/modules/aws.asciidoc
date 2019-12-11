@@ -149,6 +149,8 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-aws-billing,billing>>
+
 * <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
 
 * <<metricbeat-metricset-aws-ebs,ebs>>
@@ -163,7 +165,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-s3_request,s3_request>>
 
+* <<metricbeat-metricset-aws-sns,sns>>
+
 * <<metricbeat-metricset-aws-sqs,sqs>>
+
+* <<metricbeat-metricset-aws-usage,usage>>
+
+include::aws/billing.asciidoc[]
 
 include::aws/cloudwatch.asciidoc[]
 
@@ -179,5 +187,9 @@ include::aws/s3_daily_storage.asciidoc[]
 
 include::aws/s3_request.asciidoc[]
 
+include::aws/sns.asciidoc[]
+
 include::aws/sqs.asciidoc[]
+
+include::aws/usage.asciidoc[]
 
