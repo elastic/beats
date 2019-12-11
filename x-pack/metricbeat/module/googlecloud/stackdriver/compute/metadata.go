@@ -38,9 +38,10 @@ func NewMetadataService(ctx context.Context, projectID, zone string, opt option.
 }
 
 type computeMetadata struct {
-	projectID  string
-	zone       string
-	instanceID string
+	projectID   string
+	zone        string
+	instanceID  string
+	machineType string
 
 	ts *monitoringpb.TimeSeries
 
@@ -64,21 +65,19 @@ type metadataCollector struct {
 }
 
 // Metadata implements googlecloud.MetadataCollecter to the known set of labels from a Compute TimeSeries single point of data.
-func (s *metadataCollector) Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (common.MapStr, common.MapStr, error) {
+func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.TimeSeries) (common.MapStr, common.MapStr, error) {
 	if s.computeMetadata == nil {
-		_, err := s.instanceMetadata(ctx, s.instanceID(in), s.zone)
+		_, err := s.instanceMetadata(ctx, s.instanceID(resp), s.zone)
 		if err != nil {
 			return nil, nil, err
 		}
 	}
 
-	stackdriverLabels := googlecloud.NewStackdriverMetadataServiceForTimeSeries(in)
-	output, ecs, err := stackdriverLabels.Metadata(ctx, in)
+	stackdriverLabels := googlecloud.NewStackdriverMetadataServiceForTimeSeries(resp)
+	output, ecs, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	resp := in
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
 		ecs.Put(googlecloud.ECS_CLOUD+"."+googlecloud.ECS_CLOUD_INSTANCE+"."+googlecloud.ECS_CLOUD_INSTANCE_ID,
@@ -88,6 +87,10 @@ func (s *metadataCollector) Metadata(ctx context.Context, in *monitoringpb.TimeS
 	if resp.Metric.Labels != nil {
 		ecs.Put(googlecloud.ECS_CLOUD+"."+googlecloud.ECS_CLOUD_INSTANCE+"."+googlecloud.ECS_CLOUD_INSTANCE_NAME,
 			resp.Metric.Labels[googlecloud.JSON_PATH_ECS_INSTANCE_NAME])
+	}
+
+	if s.computeMetadata.machineType != "" {
+		ecs.Put(googlecloud.ECS_CLOUD+"."+googlecloud.ECS_CLOUD_MACHINE+"."+googlecloud.ECS_CLOUD_MACHINE_TYPE, s.computeMetadata.machineType)
 	}
 
 	s.computeMetadata.Metrics = output[googlecloud.LABEL_METRICS]
@@ -118,6 +121,10 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 
 	if i.Labels != nil {
 		s.computeMetadata.User = i.Labels
+	}
+
+	if i.MachineType != "" {
+		s.computeMetadata.machineType = i.MachineType
 	}
 
 	if i.Metadata != nil && i.Metadata.Items != nil {
