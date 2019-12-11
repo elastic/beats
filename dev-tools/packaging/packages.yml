@@ -131,6 +131,12 @@ shared:
     <<: *common
     files:
       <<: *agent_binary_files
+      'beats/filebeat-{{.GOOS}}-{{.Platform.Arch}}.zip':
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/package/filebeat-{{.GOOS}}-{{.Platform.Arch}}.tar.gz'
+        mode: 0644
+      'beats/metricbeat-{{.GOOS}}-{{.Platform.Arch}}.zip':
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/package/metricbeat-{{.GOOS}}-{{.Platform.Arch}}.tar.gz'
+        mode: 0644
 
   # Binary package spec (zip for windows) for community beats.
   - &agent_windows_binary_spec
