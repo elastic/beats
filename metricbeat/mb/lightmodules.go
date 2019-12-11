@@ -131,8 +131,8 @@ func (s *LightModulesSource) MetricSetRegistration(register *Register, moduleNam
 	return ms.Registration(register)
 }
 
-// LightModulesInfo returns a string representation of this source, with a list of known metricsets
-func (s *LightModulesSource) LightModulesInfo(r *Register) string {
+// ModulesInfo returns a string representation of this source, with a list of known metricsets
+func (s *LightModulesSource) ModulesInfo(r *Register) string {
 	var metricSets []string
 	modules, _ := s.Modules()
 	for _, module := range modules {

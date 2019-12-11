@@ -120,7 +120,7 @@ type ModulesSource interface {
 	DefaultMetricSets(r *Register, module string) ([]string, error)
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
-	LightModulesInfo(r *Register) string
+	ModulesInfo(r *Register) string
 }
 
 // NewRegister creates and returns a new Register.
@@ -390,7 +390,7 @@ func (r *Register) String() string {
 
 	var secondarySource string
 	if source := r.secondarySource; source != nil {
-		secondarySource = fmt.Sprintf(", LightModules:[%s]", source.LightModulesInfo(r))
+		secondarySource = fmt.Sprintf(", LightModules:[%s]", source.ModulesInfo(r))
 	}
 
 	sort.Strings(modules)
