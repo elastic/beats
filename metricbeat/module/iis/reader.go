@@ -22,7 +22,6 @@ package iis
 import (
 	"github.com/elastic/beats/metricbeat/module/windows/perfmon"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -41,7 +40,7 @@ type Reader struct {
 	query         perfmon.Query     // PDH Query
 	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
 	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed      bool              // Indicates if the query has been executed.
+	Executed      bool              // Indicates if the query has been executed.
 	log           *logp.Logger      //
 	counters      []PerformanceCounter
 }
@@ -125,7 +124,7 @@ func (r *Reader) RefreshCounterPaths() error {
 }
 
 // Read executes a query and returns those values in an event.
-func (r *Reader) Read() ([]mb.Event, error) {
+func (r *Reader) Read(metricsetName string) ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := r.query.CollectData(); err != nil {
@@ -140,46 +139,47 @@ func (r *Reader) Read() ([]mb.Event, error) {
 
 	eventMap := make(map[string]*mb.Event)
 
-	for counterPath, values := range values {
-		for ind, val := range values {
-			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
-			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-			if val.Err != nil && !r.executed {
+	for path, counterValues := range values {
+		for _, counterValue := range counterValues {
+			if counterValue.Err != nil && !r.Executed {
 				r.log.Debugw("Ignoring the first measurement because the data isn't ready",
-					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
+					"error", counterValue.Err, logp.Namespace("iis"), "query", path)
 				continue
 			}
-
+			if counterValue.Err != nil {
+				r.log.Errorw("Error while retrieving counter values",
+					"error", counterValue.Err, logp.Namespace("perfmon"), "query", path)
+				continue
+			}
 			var eventKey string
-			if false && val.Err == nil {
+			if metricsetName == "webserver" {
 				// Send measurements with the same instance label as part of the same event
-				eventKey = val.Instance
+				eventKey = metricsetName
 			} else {
 				// Send every measurement as an individual event
 				// If a counter contains an error, it will always be sent as an individual event
-				eventKey = counterPath + strconv.Itoa(ind)
+				eventKey = counterValue.Instance
 			}
 
 			// Create a new event if the key doesn't exist in the map
 			if _, ok := eventMap[eventKey]; !ok {
 				eventMap[eventKey] = &mb.Event{
 					MetricSetFields: common.MapStr{},
-					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
 				}
-				if val.Instance != "" {
+				if metricsetName != "webserver" {
 					//will ignore instance counter
-					if ok, match := matchesParentProcess(val.Instance); ok {
-						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], match)
+					if ok, match := matchesParentProcess(counterValue.Instance); ok {
+						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[path], match)
 					} else {
-						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
+						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[path], counterValue.Instance)
 					}
 				}
 			}
 			event := eventMap[eventKey]
-			if val.Measurement != nil {
-				event.MetricSetFields.Put(r.measurement[counterPath], val.Measurement)
+			if counterValue.Measurement != nil {
+				event.MetricSetFields.Put(r.measurement[path], counterValue.Measurement)
 			} else {
-				event.MetricSetFields.Put(r.measurement[counterPath], 0)
+				event.MetricSetFields.Put(r.measurement[path], 0)
 			}
 		}
 	}
@@ -190,7 +190,7 @@ func (r *Reader) Read() ([]mb.Event, error) {
 		events = append(events, *val)
 	}
 
-	r.executed = true
+	r.Executed = true
 	return events, nil
 }
 

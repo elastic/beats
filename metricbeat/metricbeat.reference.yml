@@ -60,7 +60,7 @@ metricbeat.modules:
 - module: system
   metricsets:
     - cpu             # CPU usage
-    - load            # CPU load averages
+    #- load            # CPU load averages
     - memory          # Memory usage
     - network         # Network IO
     - process         # Per process metrics
@@ -341,6 +341,15 @@ metricbeat.modules:
   #    namespace: "foo"
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
+
+#--------------------------------- Iis Module ---------------------------------
+- module: iis
+  metricsets:
+    - webserver
+    - website
+  enabled: true
+  period: 10s
+
 
 #------------------------------- Jolokia Module -------------------------------
 - module: jolokia

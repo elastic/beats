@@ -2,10 +2,10 @@ package iis
 
 var (
 	website_counters = map[string]string{
-		"website.bytes_sent_per_sec":       "\\Web Service(*)\\Bytes Sent/sec",
-		"website.total_bytes_sent_per_sec": "\\Web Service(*)\\Total Bytes Sent",
-		"website.bytes_recv_per_sec":       "\\Web Service(*)\\Bytes Received/sec",
-		"website.total_bytes_recv_per_sec": "\\Web Service(*)\\Total Bytes Received",
+		"bytes_sent_per_sec":       "\\Web Service(*)\\Bytes Sent/sec",
+		"total_bytes_sent_per_sec": "\\Web Service(*)\\Total Bytes Sent",
+		"bytes_recv_per_sec":       "\\Web Service(*)\\Bytes Received/sec",
+		"total_bytes_recv_per_sec": "\\Web Service(*)\\Total Bytes Received",
 
 		//\Web Service(*)\Total Files Sent
 		//\Web Service(*)\Files Sent/sec
@@ -20,8 +20,8 @@ var (
 		//\Web Service(*)\Post Requests/sec
 	}
 	webserver_counters = map[string]string{
-		"webserver.total_bytes_sent_per_sec": "\\Web Service(_Total)\\Total Bytes Sent",
-		"webserver.total_bytes_recv_per_sec": "\\Web Service(_Total)\\Total Bytes Received",
+		"total_bytes_sent_per_sec": "\\Web Service(_Total)\\Total Bytes Sent",
+		"total_bytes_recv_per_sec": "\\Web Service(_Total)\\Total Bytes Received",
 		//\Web Service(*)\Total Files Sent
 		//\Web Service(*)\Files Sent/sec
 		//\Web Service(*)\Total Files Received
@@ -67,7 +67,7 @@ func GetPerfCounters(metricset string) []PerformanceCounter {
 	case "website":
 		for k, v := range website_counters {
 			counter := PerformanceCounter{
-				InstanceLabel:    "website.name",
+				InstanceLabel:    "name",
 				MeasurementLabel: k,
 				Path:             v,
 				Format:           "float",
@@ -77,7 +77,7 @@ func GetPerfCounters(metricset string) []PerformanceCounter {
 	case "webserver":
 		for k, v := range webserver_counters {
 			counter := PerformanceCounter{
-				InstanceLabel:    "webserver.name",
+				InstanceLabel:    "",
 				MeasurementLabel: k,
 				Path:             v,
 				Format:           "float",

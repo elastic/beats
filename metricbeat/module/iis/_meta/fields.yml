@@ -1,9 +1,9 @@
 - key: iis
   title: "iis"
   description: >
-    experimental[]
-
     iis module
+  release: beta
+
   fields:
     - name: iis
       type: group

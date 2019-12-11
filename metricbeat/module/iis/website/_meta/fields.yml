@@ -2,6 +2,7 @@
   type: group
   description: >
     website
+  release: beta
   fields:
     - name: example
       type: keyword

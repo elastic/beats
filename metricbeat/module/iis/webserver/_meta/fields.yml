@@ -2,6 +2,8 @@
   type: group
   description: >
     webserver
+  release: beta
+
   fields:
     - name: example
       type: keyword
