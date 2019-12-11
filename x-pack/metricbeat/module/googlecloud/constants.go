@@ -28,16 +28,22 @@ const (
 const (
 	//Cloud fields https://www.elastic.co/guide/en/ecs/master/ecs-cloud.html
 	ECS_CLOUD                   = "cloud"
+
 	ECS_CLOUD_AVAILABILITY_ZONE = "availability_zone"
+
+	ECS_CLOUD_PROVIDER          = "provider"
+
+	ECS_CLOUD_REGION            = "region"
+
 	ECS_CLOUD_ACCOUNT           = "account"
 	ECS_CLOUD_ACCOUNT_ID        = "id"
+
 	ECS_CLOUD_INSTANCE          = "instance"
 	ECS_CLOUD_INSTANCE_ID       = "id"
 	ECS_CLOUD_INSTANCE_NAME     = "name"
+
 	ECS_CLOUD_MACHINE           = "machine"
 	ECS_CLOUD_MACHINE_TYPE      = "type"
-	ECS_CLOUD_PROVIDER          = "provider"
-	ECS_CLOUD_REGION            = "region"
 )
 
 // Metadata keys used for events. They follow GCP structure.
