@@ -62,16 +62,16 @@ type Channels struct {
 	Channels  []Channel `json:"channels,omitempty"`
 }
 
-// eventMapping map a channel to a Metricbeat event
+// eventMapping maps a channel to a Metricbeat event
 func eventMapping(content map[string]interface{}) (mb.Event, error) {
 	fields, err := channelSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure applying channels schema")
+		return mb.Event{}, errors.Wrap(err, "error applying channels schema")
 	}
 
 	moduleFields, err := moduleSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure applying module schema")
+		return mb.Event{}, errors.Wrap(err, "error applying module schema")
 	}
 
 	event := mb.Event{
@@ -85,7 +85,7 @@ func eventMapping(content map[string]interface{}) (mb.Event, error) {
 func eventsMapping(content []byte, r mb.ReporterV2) error {
 	channelsIn := Channels{}
 	if err := json.Unmarshal(content, &channelsIn); err != nil {
-		return errors.Wrap(err, "failure unmarshaling Nats streaming channels response to JSON")
+		return errors.Wrap(err, "error unmarshaling Nats streaming channels response to JSON")
 	}
 
 	for _, ch := range channelsIn.Channels {
@@ -109,7 +109,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 		}
 
 		if evt, err = eventMapping(chWrapper); err != nil {
-			r.Error(errors.Wrap(err, "failure to map channel to its schema"))
+			r.Error(errors.Wrap(err, "error mapping channel to its schema"))
 		}
 		if !r.Event(evt) {
 			return nil

@@ -42,12 +42,12 @@ func eventMapping(content []byte, r mb.ReporterV2) error {
 
 	fields, err := clientsSchema.Apply(streaming)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Nats streaming server API response")
+		return errors.Wrap(err, "error parsing Nats streaming server API response")
 	}
 
 	moduleFields, err := moduleSchema.Apply(streaming)
 	if err != nil {
-		return errors.Wrap(err, "failure applying module schema")
+		return errors.Wrap(err, "error applying module schema")
 	}
 	event := mb.Event{
 		MetricSetFields: fields,

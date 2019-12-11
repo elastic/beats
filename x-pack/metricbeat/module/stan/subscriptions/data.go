@@ -34,17 +34,17 @@ var (
 	}
 )
 
-// subscriptionsSchema used to parse through each subscription
-// under a presumed channel
+// eventMapping maps a subscription to a Metricbeat event using subscriptionsSchema
+// to parse through each subscription under a presumed channel
 func eventMapping(content map[string]interface{}) (mb.Event, error) {
 	fields, err := subscriptionsSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure applying subscription schema")
+		return mb.Event{}, errors.Wrap(err, "error applying subscription schema")
 	}
 
 	moduleFields, err := moduleSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure applying module schema")
+		return mb.Event{}, errors.Wrap(err, "error applying module schema")
 	}
 
 	event := mb.Event{
@@ -88,7 +88,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var err error
 	channels := Channels{}
 	if err = json.Unmarshal(content, &channels); err != nil {
-		return errors.Wrap(err, "failure unmarshaling Nats streaming channels detailed response to JSON")
+		return errors.Wrap(err, "error unmarshaling Nats streaming channels detailed response to JSON")
 	}
 
 	for _, ch := range channels.Channels {
