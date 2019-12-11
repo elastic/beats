@@ -20,8 +20,6 @@ func (o *Operator) initHandlerMap() {
 
 	hm[configrequest.StepRun] = o.handleRun
 	hm[configrequest.StepRemove] = o.handleRemove
-	hm[configrequest.StepStartSidecar] = o.handleStartSidecar
-	hm[configrequest.StepStopSidecar] = o.handleStopSidecar
 
 	o.handlers = hm
 }
@@ -46,7 +44,7 @@ func (o *Operator) handleRemove(step configrequest.Step) error {
 
 	p, _, err := getProgramFromStep(step)
 	if err != nil {
-		return errors.Wrap(err, "operator.handleStart failed to create program")
+		return errors.Wrap(err, "operator.handleRemove failed to stop program")
 	}
 
 	return o.stop(p)
@@ -67,15 +65,24 @@ func getProgramFromStepWithTags(step configrequest.Step, tags map[app.Tag]string
 }
 
 func getConfigFromStep(step configrequest.Step) (map[string]interface{}, error) {
-	metConfig, ok := step.Meta[configrequest.MetaConfigKey]
-	if !ok {
+	metConfig, hasConfig := step.Meta[configrequest.MetaConfigKey]
+
+	if !hasConfig && needsMetaConfig(step) {
 		return nil, fmt.Errorf("step: %s, no config in metadata", step.ID)
 	}
 
-	config, ok := metConfig.(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("step: %s, program config is in invalid format", step.ID)
+	var config map[string]interface{}
+	if hasConfig {
+		var ok bool
+		config, ok = metConfig.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("step: %s, program config is in invalid format", step.ID)
+		}
 	}
 
 	return config, nil
+}
+
+func needsMetaConfig(step configrequest.Step) bool {
+	return step.ID == configrequest.StepRun
 }
