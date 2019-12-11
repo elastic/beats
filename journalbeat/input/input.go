@@ -102,7 +102,7 @@ func New(
 		readers = append(readers, r)
 	}
 
-	processors, err := processors.New(config.Processors)
+	inputProcessors, err := processors.New(config.Processors)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func New(
 		id:         id,
 		logger:     logger,
 		eventMeta:  config.EventMetadata,
-		processors: processors,
+		processors: inputProcessors,
 	}, nil
 }
 
