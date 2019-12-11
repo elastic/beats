@@ -102,7 +102,7 @@ func New(
 		readers = append(readers, r)
 	}
 
-	inputProcessors, err := processors.New(config.Processors)
+	inputProcessors, err := processorsForInput(config)
 	if err != nil {
 		return nil, err
 	}
@@ -202,4 +202,8 @@ func (i *Input) Stop() {
 // Wait waits until all readers are done.
 func (i *Input) Wait() {
 	i.Stop()
+}
+
+func processorsForInput(config Config) (*processors.Processors, error) {
+	return processors.New(config.Processors)
 }
