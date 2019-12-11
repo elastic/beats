@@ -62,13 +62,15 @@ func newFleetGatewayWithScheduler(
 func (f *fleetGateway) worker() {
 	for {
 		select {
-		case time.After(f.settings.Period):
+		case <-f.scheduler.WaitTick():
 			resp, err := f.execute()
 			if err != nil {
-				// todo log?
+				// record
 			}
-			err := f.dispatcher.Dispatch(resp.Actions...)
-			// TODO err
+
+			if err := f.dispatcher.Dispatch(resp.Actions); err != nil {
+				// record
+			}
 		}
 	}
 }
@@ -76,7 +78,6 @@ func (f *fleetGateway) worker() {
 func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 	cmd := fleetapi.NewCheckinCmd(f.agentID, f.client)
 
-	// TODO: batch events.
 	req := fleetapi.CheckinRequest{}
 	resp, err := cmd.Execute(cmd)
 	if err != nil {
@@ -87,18 +88,14 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 }
 
 func (f *fleetGateway) Report(event interface{}) error {
-	// TODO, make sure we accumulate
-
+	return nil
 }
 
 func (f *fleetGateway) Start() error {
+	return nil
 }
 
 func (f *fleetGateway) Stop() error {
 	// TODO lets try to flush events before shutting down.
+	return nil
 }
-
-// TODO:
-// Questions(ph) Block or not on the stop.
-// - [ ] refactor the application.go
-// - [ ] Use a Scheduler interface to make synchronous testing working.
