@@ -9,10 +9,6 @@ const (
 	StepRun = "sc-run"
 	// StepRemove is a name of Remove program event causing beat in version to be uninstalled
 	StepRemove = "sc-remove"
-	// StepStartSidecar is a name of start program monitoring event
-	StepStartSidecar = "sc-sidecar-start"
-	// StepStopSidecar is a name of stop program monitoring event
-	StepStopSidecar = "sc-sidecar-stop"
 
 	// MetaConfigKey is key used to store configuration in metadata
 	MetaConfigKey = "config"

@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common/reload"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -31,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/monitoring"
