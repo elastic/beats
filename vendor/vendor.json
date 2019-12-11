@@ -3759,8 +3759,10 @@
 		{
 			"checksumSHA1": "nN+zggDyWr8HPYzwltMkzJJr1Jc=",
 			"path": "google.golang.org/api/internal/third_party/uritemplates",
-			"revision": "006ab4afe25e899e4ec545ce1cbfdaed675d15d8",
-			"revisionTime": "2019-11-17T00:08:09Z"
+			"revision": "8a410c21381766a810817fd6200fce8838ecb277",
+			"revisionTime": "2019-11-15T18:09:15Z",
+			"version": "v0.14.0",
+			"versionExact": "v0.14.0"
 		},
 		{
 			"checksumSHA1": "zh9AcT6oNvhnOqb7w7njY48TkvI=",
