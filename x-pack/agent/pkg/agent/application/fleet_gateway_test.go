@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -191,7 +192,47 @@ func TestFleetGateway(t *testing.T) {
 		<-received
 	}))
 
-	t.Run("Periodically communicates with Fleet", skip)
+	// Test the normal time based execution.
+	t.Run("Periodically communicates with Fleet", func(t *testing.T) {
+		scheduler := scheduler.NewPeriodic(1 * time.Second)
+		client := newTestingClient()
+		dispatcher := newTestingDispatcher()
+
+		gateway, err := newFleetGatewayWithScheduler(
+			nil,
+			&fleetGatewaySettings{},
+			agentID,
+			client,
+			dispatcher,
+			scheduler,
+		)
+
+		go gateway.Start()
+		defer gateway.Stop()
+
+		require.NoError(t, err)
+
+		var count int
+		for {
+			received := ackSeq(
+				client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
+					// TODO: assert no events
+					resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+					return resp, nil
+				}),
+				dispatcher.Answer(func(actions ...action) error {
+					require.Equal(t, 0, len(actions))
+					return nil
+				}),
+			)
+
+			<-received
+			count++
+			if count == 5 {
+				return
+			}
+		}
+	})
 
 	t.Run("Successfully connects and sends events back to fleet", skip)
 }
