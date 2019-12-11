@@ -354,6 +354,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add consumer_lag in Kafka consumergroup metricset {pull}14822[14822]
 - Make use of consumer_lag in Kafka dashboard {pull}14863[14863]
 - Refactor kubernetes autodiscover to enable different resource based discovery {pull}14738[14738]
+- Add `add_id` processor. {pull}14524[14524]
 
 *Auditbeat*
 
