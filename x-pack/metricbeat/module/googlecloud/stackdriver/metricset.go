@@ -72,15 +72,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
-	err := validatePeriodForGCP(m.Module().Config().Period)
-	if err != nil {
-		return errors.Wrap(err, "invalid time period for GCP")
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
+	if err = validatePeriodForGCP(m.Module().Config().Period); err != nil {
+		return err
 	}
 
-	//TODO Add credentials check?
+	//TODO Add credentials file check (path and structure)
+	//TODO Add correct zone check
 
-	reqs, err := newStackdriverMetricsRequester(m.config, m.Module().Config().Period, m.Logger())
+	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
 	if err != nil {
 		return errors.Wrapf(err, "error trying to do create a request client to GCP project '%s' in zone '%s'", m.config.ProjectID, m.config.Zone)
 	}
@@ -140,7 +140,11 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 	return events, nil
 }
 
-// TODO Validate time period?
+// validatePeriodForGCP returns nil if the Period in the module config is in the accepted threshold
 func validatePeriodForGCP(d time.Duration) (err error) {
+	if d.Seconds() < 300 {
+		return errors.New("period in Google Cloud config file cannot be set to less than 300 seconds")
+	}
+
 	return nil
 }

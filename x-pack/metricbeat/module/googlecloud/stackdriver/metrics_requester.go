@@ -21,13 +21,13 @@ import (
 	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
 )
 
-func newStackdriverMetricsRequester(c config, window time.Duration, logger *logp.Logger) (*stackdriverMetricsRequester, error) {
+func newStackdriverMetricsRequester(ctx context.Context, c config, window time.Duration, logger *logp.Logger) (*stackdriverMetricsRequester, error) {
 	interval, err := getTimeInterval(window)
 	if err != nil {
 		return nil, errors.Wrap(err, "error trying to get time window")
 	}
 
-	client, err := monitoring.NewMetricClient(context.Background(), c.opt)
+	client, err := monitoring.NewMetricClient(ctx, c.opt)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating Stackdriver client")
 	}
@@ -56,7 +56,7 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: r.interval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   fmt.Sprintf(`metric.type="%s"`, m),
+		Filter:   fmt.Sprintf(`metric.type="%s" AND resource.labels.zone = "%s"`, m, r.config.Zone),
 	}
 
 	it := r.client.ListTimeSeries(ctx, req)
