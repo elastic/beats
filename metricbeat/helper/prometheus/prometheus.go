@@ -205,7 +205,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			event[k] = v
 		}
 		events = append(events, event)
-
 	}
 
 	// fill info from infoMetrics
@@ -226,7 +225,7 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 		}
 	}
-	
+
 	return events, nil
 }
 
