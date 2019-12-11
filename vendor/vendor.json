@@ -51,8 +51,10 @@
 		{
 			"checksumSHA1": "fkIr/Nq8prntyXUg8LvtIJp8EjI=",
 			"path": "cloud.google.com/go/monitoring/apiv3",
-			"revision": "7ad705f3932a730d492d20009b5ab5556d57e790",
-			"revisionTime": "2019-11-20T18:38:35Z"
+			"revision": "d1ee711ee996fa74abaffbdb572963f368f215a9",
+			"revisionTime": "2019-11-18T21:33:38Z",
+			"version": "v0.49.0",
+			"versionExact": "v0.49.0"
 		},
 		{
 			"checksumSHA1": "jRv9Aa00+thzDjjgM9Sjzw9bcvE=",
