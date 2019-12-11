@@ -48,9 +48,7 @@ func testStepScheduler(t *testing.T) {
 		defer scheduler.Stop()
 
 		recorder := newTickRecorder(scheduler)
-		go func() {
-			recorder.Start()
-		}()
+		go recorder.Start()
 		defer recorder.Stop()
 
 		scheduler.Next()
@@ -68,9 +66,7 @@ func testPeriodic(t *testing.T) {
 	defer scheduler.Stop()
 
 	recorder := newTickRecorder(scheduler)
-	go func() {
-		recorder.Start()
-	}()
+	go recorder.Start()
 	defer recorder.Stop()
 
 	require.Equal(t, 1, <-recorder.recorder)
