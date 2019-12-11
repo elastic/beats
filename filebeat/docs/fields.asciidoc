@@ -1589,6 +1589,16 @@ type: keyword
 
 --
 
+*`azure.resource.authorization_rule`*::
++
+--
+Authorization rule
+
+
+type: keyword
+
+--
+
 [float]
 === activitylogs
 
@@ -1660,12 +1670,42 @@ type: keyword
 
 --
 
+*`azure.activitylogs.identity.claims.*`*::
++
+--
+Claims
+
+
+type: object
+
+--
+
 [float]
 === authorization
 
 Authorization
 
 
+
+*`azure.activitylogs.identity.authorization.scope`*::
++
+--
+Scope
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.identity.authorization.action`*::
++
+--
+Action
+
+
+type: keyword
+
+--
 
 [float]
 === evidence
@@ -1734,26 +1774,6 @@ type: keyword
 
 --
 
-*`azure.activitylogs.identity.scope`*::
-+
---
-Scope
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.identity.action`*::
-+
---
-Action
-
-
-type: keyword
-
---
-
 *`azure.activitylogs.operation_name`*::
 +
 --
@@ -1768,6 +1788,16 @@ type: keyword
 +
 --
 Result signature
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.category`*::
++
+--
+Category
 
 
 type: keyword
@@ -1822,6 +1852,16 @@ type: keyword
 +
 --
 The operation version
+
+
+type: keyword
+
+--
+
+*`azure.auditlogs.identity`*::
++
+--
+Identity
 
 
 type: keyword
@@ -1925,13 +1965,13 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.activityDateTime`*::
+*`azure.auditlogs.properties.activity_datetime`*::
 +
 --
 Activity timestamp
 
 
-type: keyword
+type: date
 
 --
 
@@ -1946,13 +1986,13 @@ type: keyword
 --
 
 [float]
-=== target_resources
+=== target_resources.*
 
 Target resources
 
 
 
-*`azure.auditlogs.properties.target_resources.display_name`*::
+*`azure.auditlogs.properties.target_resources.*.display_name`*::
 +
 --
 Display name
@@ -1962,7 +2002,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.target_resources.id`*::
+*`azure.auditlogs.properties.target_resources.*.id`*::
 +
 --
 ID
@@ -1972,7 +2012,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.target_resources.type`*::
+*`azure.auditlogs.properties.target_resources.*.type`*::
 +
 --
 Type
@@ -1982,7 +2022,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.target_resources.ip_address`*::
+*`azure.auditlogs.properties.target_resources.*.ip_address`*::
 +
 --
 ip Address
@@ -1992,7 +2032,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.target_resources.user_principal_name`*::
+*`azure.auditlogs.properties.target_resources.*.user_principal_name`*::
 +
 --
 User principal name
@@ -2003,13 +2043,13 @@ type: keyword
 --
 
 [float]
-=== modified_properties
+=== modified_properties.*
 
 Modified properties
 
 
 
-*`azure.auditlogs.properties.target_resources.modified_properties.newValue`*::
+*`azure.auditlogs.properties.target_resources.*.modified_properties.*.new_value`*::
 +
 --
 New value
@@ -2019,7 +2059,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.target_resources.modified_properties.displayName`*::
+*`azure.auditlogs.properties.target_resources.*.modified_properties.*.display_name`*::
 +
 --
 Display value
@@ -2029,7 +2069,7 @@ type: keyword
 
 --
 
-*`azure.auditlogs.properties.target_resources.modified_properties.oldValue`*::
+*`azure.auditlogs.properties.target_resources.*.modified_properties.*.old_value`*::
 +
 --
 Old value
@@ -2187,6 +2227,16 @@ type: keyword
 
 --
 
+*`azure.signinlogs.result_description`*::
++
+--
+Result description
+
+
+type: keyword
+
+--
+
 *`azure.signinlogs.identity`*::
 +
 --
@@ -2220,7 +2270,7 @@ type: keyword
 Created date time
 
 
-type: keyword
+type: date
 
 --
 
@@ -2425,16 +2475,6 @@ Status
 +
 --
 Error code
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.properties.status.additional_details`*::
-+
---
-Additional details
 
 
 type: keyword
