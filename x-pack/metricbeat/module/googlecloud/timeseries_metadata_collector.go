@@ -38,7 +38,7 @@ type StackdriverTimeSeriesMetadataCollector struct {
 	timeSeries *monitoringpb.TimeSeries
 }
 
-// Metadata parses a Timeseries object to return its metadata divided into "unkonwn" (first object) and ECS (second
+// Metadata parses a Timeseries object to return its metadata divided into "unknown" (first object) and ECS (second
 // object https://www.elastic.co/guide/en/ecs/master/index.html)
 func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (common.MapStr, common.MapStr, error) {
 	m := common.MapStr{}
@@ -62,7 +62,11 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 	//Remove keys from resource that refers to ECS fields
 
-	if s.timeSeries != nil || s.timeSeries.Metric != nil {
+	if s.timeSeries == nil {
+		return m, ecs, nil
+	}
+
+	if s.timeSeries.Metric != nil {
 		metrics := make(map[string]interface{})
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
@@ -74,7 +78,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 			metrics[k] = v
 		}
 
-		//Do not write metrics labels if it's finally empty
+		//Do not write metrics labels if it's content is empty
 		for k, v := range metrics {
 			m.Put(LABEL_METRICS+"."+k, v)
 		}
@@ -92,7 +96,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 			resources[k] = v
 		}
 
-		//Do not write resources labels if it's finally empty
+		//Do not write resources labels if it's content is empty
 		for k, v := range resources {
 			m.Put(LABEL_RESOURCE+"."+k, v)
 		}
