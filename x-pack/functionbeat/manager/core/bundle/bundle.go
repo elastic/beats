@@ -54,7 +54,7 @@ type Resource interface {
 }
 
 // Folder returns a list of files in a folder.
-func Folder(folder string, filemode os.FileMode) []Resource {
+func Folder(folder, root string, filemode os.FileMode) []Resource {
 	resources := make([]Resource, 0)
 	err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -65,7 +65,7 @@ func Folder(folder string, filemode os.FileMode) []Resource {
 			return nil
 		}
 
-		resources = append(resources, &LocalFile{Path: path, FileMode: filemode})
+		resources = append(resources, &RelativeFile{LocalFile{Path: path, FileMode: filemode}, root})
 
 		return nil
 	})
@@ -102,6 +102,21 @@ func (l *LocalFile) Name() string {
 // Mode return the permissions of the file in the zip.
 func (l *LocalFile) Mode() os.FileMode {
 	return l.FileMode
+}
+
+// RelativeFile is a Localfile which needs to be placed relatively in the
+// root of the bundle.
+type RelativeFile struct {
+	LocalFile
+	root string
+}
+
+// Name returns the name of the file.
+func (r *RelativeFile) Name() string {
+	if r.root == "" {
+		return r.LocalFile.Path
+	}
+	return r.LocalFile.Path[len(r.root)+1:]
 }
 
 // MemoryFile an in-memory representation of a physical file.

@@ -186,6 +186,7 @@ func ZipResources() map[string][]bundle.Resource {
 }
 
 func zipResources(typeName string) []bundle.Resource {
-	vendor := bundle.Folder(filepath.Join("pkg", typeName, "vendor"), 0655)
+	root := filepath.Join("pkg", typeName)
+	vendor := bundle.Folder(filepath.Join(root, "vendor"), root, 0655)
 	return append(vendor, &bundle.LocalFile{Path: filepath.Join("pkg", typeName, typeName+".go"), FileMode: 0755})
 }
