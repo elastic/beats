@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 - Add statistic option into cloudwatch metricset. If there is no statistic method specified, default is to collect Average, Sum, Maximum, Minimum and SampleCount. {issue}12370[12370] {pull}12840[12840]
+- Add sql module that fetches metrics from a SQL database {pull}13257[13257]
 
 *Packetbeat*
 
@@ -135,6 +136,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix memory leak in kubernetes autodiscover provider and add_kubernetes_metadata processor happening when pods are terminated without sending a delete event. {pull}14259[14259]
 - Fix kubernetes `metaGenerator.ResourceMetadata` when parent reference controller is nil {issue}14320[14320] {pull}14329[14329]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
+- Fix `proxy_url` option in Elasticsearch output. {pull}14950[14950]
 - Fix bug with potential concurrent reads and writes from event.Meta map by Kafka output. {issue}14542[14542] {pull}14568[14568]
 
 *Auditbeat*
@@ -199,6 +201,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix calculation of `network.bytes` and `network.packets` for bi-directional netflow events. {pull}14111[14111]
 - Accept '-' as http.response.body.bytes in apache module. {pull}14137[14137]
 - Fix timezone parsing of MySQL module ingest pipelines. {pull}14130[14130]
+- Fix azure filesets test files. {issue}14185[14185] {pull}14235[14235]
 - Improve error message in s3 input when handleSQSMessage failed. {pull}14113[14113]
 - Close chan of Closer first before calling callback {pull}14231[14231]
 - Fix race condition in S3 input plugin. {pull}14359[14359]
@@ -287,6 +290,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
 - Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
 - Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
+- Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
+- Fix mixed modules loading standard and light metricsets {pull}15011[15011]
 
 *Packetbeat*
 
@@ -364,6 +369,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add consumer_lag in Kafka consumergroup metricset {pull}14822[14822]
 - Make use of consumer_lag in Kafka dashboard {pull}14863[14863]
 - Refactor kubernetes autodiscover to enable different resource based discovery {pull}14738[14738]
+- Add `add_id` processor. {pull}14524[14524]
 
 *Auditbeat*
 
@@ -543,6 +549,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add usage metricset in aws modules. {pull}14925[14925] {issue}14935[14935]
 - Add billing metricset in aws modules. {pull}14801[14801] {issue}14934[14934]
 - Add AWS SNS metricset. {pull}14946[14946]
+- Add overview dashboard for AWS SNS module {pull}14977[14977]
 
 *Packetbeat*
 
