@@ -1863,6 +1863,18 @@ type: date
 
 --
 
+*`file.attributes`*::
++
+--
+Array of file attributes.
+Attributes names will vary by platform. Here's a non-exhaustive list of values that are expected in this field: archive, compressed, directory, encrypted, execute, hidden, read, readonly, system, write.
+
+type: keyword
+
+example: ["readonly", "system"]
+
+--
+
 *`file.created`*::
 +
 --
@@ -5397,11 +5409,18 @@ example: Safari
 *`user_agent.original`*::
 +
 --
-Unparsed version of the user_agent.
+Unparsed user_agent string.
 
 type: keyword
 
 example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
+
+--
+
+*`user_agent.original.text`*::
++
+--
+type: text
 
 --
 
