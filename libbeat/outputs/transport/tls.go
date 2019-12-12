@@ -37,10 +37,9 @@ type TLSVersion = tlscommon.TLSVersion
 
 // Define all the possible TLS version.
 const (
-	TLSVersionSSL30 = tlscommon.TLSVersionSSL30
-	TLSVersion10    = tlscommon.TLSVersion10
-	TLSVersion11    = tlscommon.TLSVersion11
-	TLSVersion12    = tlscommon.TLSVersion12
+	TLSVersion10 = tlscommon.TLSVersion10
+	TLSVersion11 = tlscommon.TLSVersion11
+	TLSVersion12 = tlscommon.TLSVersion12
 )
 
 // Constants of the supported verification mode.

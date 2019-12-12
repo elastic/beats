@@ -104,10 +104,9 @@ type TLSVersion uint16
 
 // Define all the possible TLS version.
 const (
-	TLSVersionSSL30 TLSVersion = tls.VersionSSL30
-	TLSVersion10    TLSVersion = tls.VersionTLS10
-	TLSVersion11    TLSVersion = tls.VersionTLS11
-	TLSVersion12    TLSVersion = tls.VersionTLS12
+	TLSVersion10 TLSVersion = tls.VersionTLS10
+	TLSVersion11 TLSVersion = tls.VersionTLS11
+	TLSVersion12 TLSVersion = tls.VersionTLS12
 )
 
 // TLSDefaultVersions list of versions of TLS we should support.
@@ -131,8 +130,6 @@ var tlsClientAuthTypes = map[string]tlsClientAuth{
 }
 
 var tlsProtocolVersions = map[string]TLSVersion{
-	"SSLv3":   TLSVersionSSL30,
-	"SSLv3.0": TLSVersionSSL30,
 	"TLSv1":   TLSVersion10,
 	"TLSv1.0": TLSVersion10,
 	"TLSv1.1": TLSVersion11,
@@ -140,10 +137,9 @@ var tlsProtocolVersions = map[string]TLSVersion{
 }
 
 var tlsProtocolVersionsInverse = map[TLSVersion]string{
-	TLSVersionSSL30: "SSLv3",
-	TLSVersion10:    "TLSv1.0",
-	TLSVersion11:    "TLSv1.1",
-	TLSVersion12:    "TLSv1.2",
+	TLSVersion10: "TLSv1.0",
+	TLSVersion11: "TLSv1.1",
+	TLSVersion12: "TLSv1.2",
 }
 
 // TLSVerificationMode represents the type of verification to do on the remote host,
