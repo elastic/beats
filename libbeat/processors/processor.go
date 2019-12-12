@@ -103,10 +103,12 @@ func New(config PluginConfig) (*Processors, error) {
 	return procs, nil
 }
 
+// AddProcessor adds a single Processor to Processors
 func (procs *Processors) AddProcessor(p Processor) {
 	procs.List = append(procs.List, p)
 }
 
+// AddProcessors adds more Processors to Processors
 func (procs *Processors) AddProcessors(p Processors) {
 	// Subtlety: it is important here that we append the individual elements of
 	// p, rather than p itself, even though
