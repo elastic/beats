@@ -674,7 +674,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
             return True
 
         def is_documented(key, docs):
-            #print("docs {}".format(docs))
             if key in docs:
                 return True
             for pattern in (f for f in docs if "*" in f):
