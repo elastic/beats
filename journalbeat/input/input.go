@@ -221,7 +221,7 @@ func processorsForInput(beatInfo beat.Info, config Config) (*processors.Processo
 			return nil, err
 		}
 		indexProcessor := add_formatted_index.New(timestampFormat)
-		procs.List = append(procs.List, indexProcessor)
+		procs.AddProcessor(indexProcessor)
 	}
 
 	// 2. User processors
@@ -229,18 +229,7 @@ func processorsForInput(beatInfo beat.Info, config Config) (*processors.Processo
 	if err != nil {
 		return nil, err
 	}
-	// Subtlety: it is important here that we append the individual elements of
-	// userProcessors, rather than userProcessors itself, even though
-	// userProcessors implements the processors.Processor interface. This is
-	// because the contents of what we return are later pulled out into a
-	// processing.group rather than a processors.Processors, and the two have
-	// different error semantics: processors.Processors aborts processing on
-	// any error, whereas processing.group only aborts on fatal errors. The
-	// latter is the most common behavior, and the one we are preserving here for
-	// backwards compatibility.
-	// We are unhappy about this and have plans to fix this inconsistency at a
-	// higher level, but for now we need to respect the existing semantics.
-	procs.List = append(procs.List, userProcessors.List...)
+	procs.AddProcessors(*userProcessors)
 
 	return procs, nil
 }
