@@ -38,6 +38,7 @@ func New(formatString *fmtstr.TimestampFormatString) *AddFormattedIndex {
 	return &AddFormattedIndex{formatString}
 }
 
+// Run runs the processor.
 func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 	index, err := p.formatString.Run(event.Timestamp)
 	if err != nil {
