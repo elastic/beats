@@ -8,7 +8,6 @@ import (
 	"archive/zip"
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -52,6 +51,30 @@ type Resource interface {
 
 	// Mode returns the permission of the file.
 	Mode() os.FileMode
+}
+
+// Folder returns a list of files in a folder.
+func Folder(folder string, filemode os.FileMode) []Resource {
+	resources := make([]Resource, 0)
+	err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		resources = append(resources, &LocalFile{Path: path, FileMode: filemode})
+
+		return nil
+	})
+
+	if err != nil {
+		return nil
+	}
+
+	return resources
 }
 
 // LocalFile represents a local file on disk.
@@ -140,7 +163,6 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		defer r.Close()
 
 		header := &zip.FileHeader{
 			Name:   file.Name(),
@@ -150,13 +172,16 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 		header.SetMode(file.Mode())
 		w, err := zipWriter.CreateHeader(header)
 		if err != nil {
+			r.Close()
 			return nil, err
 		}
 
 		l, err := io.Copy(w, r)
 		if err != nil {
+			r.Close()
 			return nil, err
 		}
+		r.Close()
 
 		uncompressed = uncompressed + l
 		if p.maxSizeUncompressed != -1 && uncompressed > p.maxSizeUncompressed {
@@ -170,7 +195,7 @@ func (p *ZipBundle) Bytes() ([]byte, error) {
 		}
 
 		if l == 0 {
-			return nil, errors.New("no bytes written to the zip file")
+			continue
 		}
 
 		// Force a flush to accurately check for the size of the bytes.Buffer and see if

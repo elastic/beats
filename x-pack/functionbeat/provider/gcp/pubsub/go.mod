@@ -2,7 +2,7 @@ module github.com/elastic/beats/x-pack/functionbeat/provider/gcp/pubsub
 
 go 1.11
 
-require github.com/elastic/beats v0.0.0-20191121195850-34554d735fde
+require github.com/elastic/beats v0.0.0-20191212105324-3a052b4b184e
 
 replace (
 	4d63.com/tz => 4d63.com/tz v0.0.0-20191124060701-6d37baae851b
