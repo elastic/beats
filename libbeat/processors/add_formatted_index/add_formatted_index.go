@@ -25,19 +25,19 @@ import (
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
-// addFormattedIndex is a Processor to set an event's "raw_index" metadata field
+// AddFormattedIndex is a Processor to set an event's "raw_index" metadata field
 // with a given TimestampFormatString. The elasticsearch output interprets
 // that field as specifying the (raw string) index the event should be sent to;
 // in other outputs it is just included in the metadata.
-type addFormattedIndex struct {
+type AddFormattedIndex struct {
 	formatString *fmtstr.TimestampFormatString
 }
 
-func New(formatString *fmtstr.TimestampFormatString) *addFormattedIndex {
-	return &addFormattedIndex{formatString}
+func New(formatString *fmtstr.TimestampFormatString) *AddFormattedIndex {
+	return &AddFormattedIndex{formatString}
 }
 
-func (p *addFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
+func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 	index, err := p.formatString.Run(event.Timestamp)
 	if err != nil {
 		return nil, err
@@ -50,6 +50,6 @@ func (p *addFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *addFormattedIndex) String() string {
+func (p *AddFormattedIndex) String() string {
 	return fmt.Sprintf("add_index_pattern=%v", p.formatString)
 }
