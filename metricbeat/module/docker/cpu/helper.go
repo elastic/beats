@@ -54,15 +54,15 @@ func NewCpuService() *CPUService {
 func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUStats {
 	formattedStats := []CPUStats{}
 
-	for _, stats := range rawStats {
-		formattedStats = append(formattedStats, c.getCPUStats(stats, dedot))
+	for i := range rawStats {
+		formattedStats = append(formattedStats, c.getCPUStats(&rawStats[i], dedot))
 	}
 
 	return formattedStats
 }
 
-func (c *CPUService) getCPUStats(myRawStat docker.Stat, dedot bool) CPUStats {
-	usage := cpuUsage{Stat: myRawStat}
+func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
+	usage := cpuUsage{Stat: *myRawStat}
 
 	stats := CPUStats{
 		Time:                                  common.Time(myRawStat.Stats.Read),

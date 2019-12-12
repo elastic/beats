@@ -28,12 +28,12 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool) {
-	for _, container := range containersList {
-		eventMapping(r, container, dedot)
+	for i := range containersList {
+		eventMapping(r, &containersList[i], dedot)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont types.Container, dedot bool) {
+func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
 	event := common.MapStr{
 		"container": common.MapStr{
 			"id": cont.ID,
@@ -74,9 +74,9 @@ func extractIPAddresses(networks *types.SummaryNetworkSettings) []string {
 		return []string{}
 	}
 	ipAddresses := make([]string, 0, len(networks.Networks))
-	for _, network := range networks.Networks {
-		if len(network.IPAddress) > 0 {
-			ipAddresses = append(ipAddresses, network.IPAddress)
+	for i := range networks.Networks {
+		if len(networks.Networks[i].IPAddress) > 0 {
+			ipAddresses = append(ipAddresses, networks.Networks[i].IPAddress)
 		}
 	}
 	return ipAddresses

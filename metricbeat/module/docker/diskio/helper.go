@@ -76,9 +76,9 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 	formattedStats := []BlkioStats{}
 
 	statsPerContainer := make(map[string]BlkioRaw)
-	for _, myRawStats := range rawStats {
-		stats := io.getBlkioStats(myRawStats, dedot)
-		storageStats := io.getStorageStats(myRawStats, dedot)
+	for i := range rawStats {
+		stats := io.getBlkioStats(&rawStats[i], dedot)
+		storageStats := io.getStorageStats(&rawStats[i], dedot)
 		stats.Add(&storageStats)
 
 		oldStats, exist := io.lastStatsPerContainer[stats.Container.ID]
@@ -98,7 +98,7 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 
 // getStorageStats collects diskio metrics from StorageStats structure, that
 // is populated in Windows systems only
-func (io *BlkioService) getStorageStats(myRawStats docker.Stat, dedot bool) BlkioStats {
+func (io *BlkioService) getStorageStats(myRawStats *docker.Stat, dedot bool) BlkioStats {
 	return BlkioStats{
 		Time:      myRawStats.Stats.Read,
 		Container: docker.NewContainer(myRawStats.Container, dedot),
@@ -119,7 +119,7 @@ func (io *BlkioService) getStorageStats(myRawStats docker.Stat, dedot bool) Blki
 
 // getBlkioStats collects diskio metrics from BlkioStats structures, that
 // are not populated in Windows
-func (io *BlkioService) getBlkioStats(myRawStat docker.Stat, dedot bool) BlkioStats {
+func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
 	return BlkioStats{
 		Time:      myRawStat.Stats.Read,
 		Container: docker.NewContainer(myRawStat.Container, dedot),
@@ -141,14 +141,14 @@ func (io *BlkioService) getNewStats(time time.Time, blkioEntry []types.BlkioStat
 		totals: 0,
 	}
 
-	for _, myEntry := range blkioEntry {
-		switch myEntry.Op {
+	for i := range blkioEntry {
+		switch blkioEntry[i].Op {
 		case "Write":
-			stats.writes += myEntry.Value
+			stats.writes += blkioEntry[i].Value
 		case "Read":
-			stats.reads += myEntry.Value
+			stats.reads += blkioEntry[i].Value
 		case "Total":
-			stats.totals += myEntry.Value
+			stats.totals += blkioEntry[i].Value
 		}
 	}
 	return stats

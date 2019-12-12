@@ -30,12 +30,12 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, containers []types.Container, m *MetricSet) {
-	for _, container := range containers {
-		eventMapping(r, container, m)
+	for i := range containers {
+		eventMapping(r, &containers[i], m)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont types.Container, m *MetricSet) {
+func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
 	if !hasHealthCheck(cont.Status) {
 		return
 	}
@@ -70,7 +70,7 @@ func eventMapping(r mb.ReporterV2, cont types.Container, m *MetricSet) {
 	}
 
 	r.Event(mb.Event{
-		RootFields:      docker.NewContainer(&cont, m.dedot).ToMapStr(),
+		RootFields:      docker.NewContainer(cont, m.dedot).ToMapStr(),
 		MetricSetFields: fields,
 	})
 }
