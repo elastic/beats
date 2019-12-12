@@ -165,8 +165,8 @@ class Test(BaseTest):
         tls.connect((config.get('host'), config.get('port')))
         # In TLS 1.3 authentication failures are not detected by the initial
         # connection and handshake. For the client to detect that authentication
-        # has failed it must send data _and_ wait for the response.
-        tls.sendall("Hello World\n")
+        # has failed (at least in python) it must wait for a server response
+        # so that the failure can be reported as an exception when it arrives.
         tls.recv(1)
 
     def test_tcp_over_tls_mutual_auth_succeed(self):
