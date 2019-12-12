@@ -31,10 +31,15 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle/performance"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle/tablespace"
+<<<<<<< HEAD
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/stan"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/stan/channels"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/stan/stats"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/stan/subscriptions"
+=======
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/sql"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/sql/query"
+>>>>>>> upstream/master
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/statsd/server"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/tomcat"
