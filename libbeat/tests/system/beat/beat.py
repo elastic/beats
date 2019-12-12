@@ -674,6 +674,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             return True
 
         def is_documented(key, docs):
+            #print("docs {}".format(docs))
             if key in docs:
                 return True
             for pattern in (f for f in docs if "*" in f):
@@ -683,7 +684,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         for key in flat.keys():
             metaKey = key.startswith('@metadata.')
-            if not(is_documented(key, expected_fields) or metaKey):
+            # Range keys as used in 'date_range' etc will not have docs of course
+            isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt'];
+            if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
             if is_documented(key, aliases):
                 raise Exception("Key '{}' found in event is documented as an alias!".format(key))
