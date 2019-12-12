@@ -169,6 +169,11 @@ type EncryptedDiskStore struct {
 	password []byte
 }
 
+// NewEncryptedDiskStore creates an encrypted disk store.
+func NewEncryptedDiskStore(target string, password []byte) *EncryptedDiskStore {
+	return &EncryptedDiskStore{target: target, password: password}
+}
+
 // Save accepts a persistedConfig, encrypt it and saved it to a target file, to do so we will
 // make a temporary files if the write is successful we are replacing the target file with the
 // original content.
