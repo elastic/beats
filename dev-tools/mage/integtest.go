@@ -27,7 +27,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -219,14 +218,6 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	// Only allow one usage at a time.
 	integTestLock.Lock()
 	defer integTestLock.Unlock()
-
-	// keep output active so as to prevent Travis timeout
-	go func() {
-		for {
-			fmt.Print(".")
-			time.Sleep(60 * time.Second)
-		}
-	}()
 
 	_, err = sh.Exec(
 		composeEnv,

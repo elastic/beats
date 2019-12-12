@@ -108,7 +108,7 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C x-pack/metricbeat testsuite"
+      env: TARGETS="-C x-pack/metricbeat travis_wait 40 testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
