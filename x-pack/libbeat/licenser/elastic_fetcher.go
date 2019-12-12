@@ -14,7 +14,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
@@ -190,21 +189,4 @@ func newESClientMux(clients []elasticsearch.Client) *esClientMux {
 	})
 
 	return &esClientMux{idx: idx, clients: tmp}
-}
-
-// Create takes a raw configuration and will create a a license manager based on the elasticsearch
-// output configuration, if no output is found we return an error.
-func Create(cfg *common.ConfigNamespace, refreshDelay, graceDelay time.Duration) (*Manager, error) {
-	if !cfg.IsSet() || cfg.Name() != "elasticsearch" {
-		return nil, ErrNoElasticsearchConfig
-	}
-
-	clients, err := elasticsearch.NewElasticsearchClients(cfg.Config())
-	if err != nil {
-		return nil, err
-	}
-	clientsMux := newESClientMux(clients)
-
-	manager := New(clientsMux, refreshDelay, graceDelay)
-	return manager, nil
 }
