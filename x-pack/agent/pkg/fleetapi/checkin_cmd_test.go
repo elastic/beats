@@ -72,7 +72,6 @@ func TestCheckin(t *testing.T) {
 				},
 			}
 
-			fmt.Println(ActionPolicyChange)
 			cmd := NewCheckinCmd(agentID, client)
 
 			request := CheckinRequest{
