@@ -33,7 +33,7 @@ class ActiveMqTest(XPackTest):
 
         output = self.read_output_json()
         for evt in output:
-            if destination_type in evt['activemq'] and destination_name == evt['activemq'][destination_type]['name']:
+            if self.all_messages_enqueued(evt, destination_type, destination_name):
                 return True
         return False
 
@@ -59,16 +59,19 @@ class ActiveMqTest(XPackTest):
 
         passed = False
         for evt in output:
-            if destination_name == evt['activemq'][destination_type]['name']:
-                assert 2 == evt['activemq'][destination_type]['messages']['enqueue']['count']
+            if self.all_messages_enqueued(evt, destination_type, destination_name):
                 assert 0 < evt['activemq'][destination_type]['messages']['size']['avg']
                 if 'queue' == destination_type:
-                    assert 0 < evt['activemq'][destination_type]['size']
+                    assert 2 == evt['activemq'][destination_type]['size']
                 self.assert_fields_are_documented(evt)
                 passed = True
 
         conn.disconnect()
         assert passed
+
+    def all_messages_enqueued(self, evt, destination_type, destination_name):
+        return destination_type in evt['activemq'] and destination_name == evt['activemq'][destination_type]['name'] \
+            and 2 == evt['activemq'][destination_type]['messages']['enqueue']['count']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_broker_metrics_collected(self):
