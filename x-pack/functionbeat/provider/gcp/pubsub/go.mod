@@ -2,47 +2,7 @@ module github.com/elastic/beats/x-pack/functionbeat/provider/gcp/pubsub
 
 go 1.11
 
-require (
-	cloud.google.com/go v0.38.0
-	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
-	github.com/Microsoft/go-winio v0.0.0-00010101000000-000000000000 // indirect
-	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000 // indirect
-	github.com/armon/go-socks5 v0.0.0-00010101000000-000000000000 // indirect
-	github.com/dlclark/regexp2 v1.2.0 // indirect
-	github.com/docker/distribution v0.0.0-00010101000000-000000000000 // indirect
-	github.com/docker/docker v0.0.0-00010101000000-000000000000 // indirect
-	github.com/docker/go-connections v0.0.0-00010101000000-000000000000 // indirect
-	github.com/docker/go-units v0.0.0-00010101000000-000000000000 // indirect
-	github.com/dop251/goja v0.0.0-00010101000000-000000000000 // indirect
-	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6 // indirect
-	github.com/dustin/go-humanize v0.0.0-00010101000000-000000000000 // indirect
-	github.com/elastic/beats v0.0.0-20191121195850-34554d735fde
-	github.com/elastic/ecs v0.0.0-00010101000000-000000000000 // indirect
-	github.com/elastic/go-lumber v0.1.0 // indirect
-	github.com/elastic/go-seccomp-bpf v0.0.0-00010101000000-000000000000 // indirect
-	github.com/elastic/go-structform v0.0.6 // indirect
-	github.com/elastic/go-sysinfo v0.0.0-00010101000000-000000000000 // indirect
-	github.com/elastic/go-txfile v0.0.6 // indirect
-	github.com/elastic/gosigar v0.10.5 // indirect
-	github.com/fatih/color v0.0.0-00010101000000-000000000000 // indirect
-	github.com/garyburd/redigo v1.6.0 // indirect
-	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
-	github.com/gofrs/uuid v0.0.0-00010101000000-000000000000 // indirect
-	github.com/klauspost/cpuid v0.0.0-00010101000000-000000000000 // indirect
-	github.com/magefile/mage v0.0.0-00010101000000-000000000000 // indirect
-	github.com/mattn/go-colorable v0.0.0-00010101000000-000000000000 // indirect
-	github.com/mattn/go-isatty v0.0.0-00010101000000-000000000000 // indirect
-	github.com/miekg/dns v0.0.0-00010101000000-000000000000 // indirect
-	github.com/mitchellh/hashstructure v0.0.0-00010101000000-000000000000 // indirect
-	github.com/morikuni/aec v1.0.0 // indirect
-	github.com/pierrec/xxHash v0.0.0-00010101000000-000000000000 // indirect
-	github.com/tsg/gopacket v0.0.0-00010101000000-000000000000 // indirect
-	go.uber.org/atomic v0.0.0-00010101000000-000000000000 // indirect
-	go.uber.org/multierr v0.0.0-00010101000000-000000000000 // indirect
-	go.uber.org/zap v0.0.0-00010101000000-000000000000 // indirect
-	gotest.tools v2.2.0+incompatible // indirect
-	k8s.io/client-go v0.0.0-00010101000000-000000000000 // indirect
-)
+require github.com/elastic/beats v0.0.0-20191121195850-34554d735fde
 
 replace (
 	4d63.com/tz => 4d63.com/tz v0.0.0-20191124060701-6d37baae851b
