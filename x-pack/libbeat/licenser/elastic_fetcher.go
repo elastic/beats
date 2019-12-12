@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
-const xPackURL = "/_xpack"
+const xPackURL = "/_license"
 
 // params defaults query parameters to send to the '_xpack' endpoint by default we only need
 // machine parseable data.
@@ -129,8 +129,7 @@ func (f *ElasticFetcher) Fetch() (*License, error) {
 
 // Xpack Response, temporary struct to merge the features into the license struct.
 type xpackResponse struct {
-	License  License  `json:"license"`
-	Features features `json:"features"`
+	License License `json:"license"`
 }
 
 func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
@@ -141,7 +140,6 @@ func (f *ElasticFetcher) parseJSON(b []byte) (*License, error) {
 	}
 
 	license := info.License
-	license.Features = info.Features
 
 	return &license, nil
 }

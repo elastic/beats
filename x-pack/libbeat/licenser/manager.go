@@ -31,17 +31,7 @@ var (
 	OSSLicense = &License{
 		UUID:   mustUUIDV4().String(),
 		Type:   OSS,
-		Mode:   OSS,
 		Status: Active,
-		Features: features{
-			Graph:      graph{},
-			Logstash:   logstash{},
-			ML:         ml{},
-			Monitoring: monitoring{},
-			Rollup:     rollup{},
-			Security:   security{},
-			Watcher:    watcher{},
-		},
 	}
 )
 

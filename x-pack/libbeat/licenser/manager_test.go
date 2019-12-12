@@ -63,7 +63,6 @@ func TestRetrieveLicense(t *testing.T) {
 	i := &License{
 		UUID:   mustUUIDV4().String(),
 		Type:   Basic,
-		Mode:   Basic,
 		Status: Active,
 	}
 	mock := newMockFetcher()
@@ -126,7 +125,6 @@ func TestRetrieveLicense(t *testing.T) {
 		i := &License{
 			UUID:   mustUUIDV4().String(),
 			Type:   Platinum,
-			Mode:   Platinum,
 			Status: Active,
 		}
 		mock.Insert(i, nil)
@@ -146,7 +144,6 @@ func TestWatcher(t *testing.T) {
 	i := &License{
 		UUID:   mustUUIDV4().String(),
 		Type:   Basic,
-		Mode:   Basic,
 		Status: Active,
 	}
 
@@ -248,7 +245,6 @@ func TestWatcher(t *testing.T) {
 					mock.Insert(&License{
 						UUID:   mustUUIDV4().String(),
 						Type:   Platinum,
-						Mode:   Platinum,
 						Status: Active,
 					}, nil)
 					c++
@@ -290,7 +286,6 @@ func TestWaitForLicense(t *testing.T) {
 	i := &License{
 		UUID:   mustUUIDV4().String(),
 		Type:   Basic,
-		Mode:   Basic,
 		Status: Active,
 	}
 
