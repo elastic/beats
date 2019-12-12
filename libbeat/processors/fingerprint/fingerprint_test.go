@@ -18,6 +18,7 @@
 package fingerprint
 
 import (
+	"math/rand"
 	"strconv"
 	"testing"
 	"time"
@@ -376,4 +377,46 @@ func TestIgnoreMissing(t *testing.T) {
 			}
 		})
 	}
+}
+
+func BenchmarkHashMethods(b *testing.B) {
+	events := nRandomEvents(100000)
+
+	for method := range hashes {
+		testConfig, _ := common.NewConfigFrom(common.MapStr{
+			"fields": []string{"message"},
+			"method": method,
+		})
+
+		p, _ := New(testConfig)
+
+		b.Run(method, func(b *testing.B) {
+			b.ResetTimer()
+			for _, e := range events {
+				p.Run(&e)
+			}
+		})
+	}
+}
+
+func nRandomEvents(num int) []beat.Event {
+	const charset = "abcdefghijklmnopqrstuvwxyz" +
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+		"0123456789"
+	charsetLen := len(charset)
+	b := make([]byte, 200)
+
+	var events []beat.Event
+	for i := 0; i < num; i++ {
+		for j := range b {
+			b[j] = charset[rand.Intn(charsetLen)]
+		}
+		events = append(events, beat.Event{
+			Fields: common.MapStr{
+				"message": string(b),
+			},
+		})
+	}
+
+	return events
 }
