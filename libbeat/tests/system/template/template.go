@@ -30,7 +30,7 @@ import (
 // MaxDefaultFieldLength is the limit on the number of default_field values
 // allowed by the test. This is less that the 1024 limit of Elasticsearch to
 // give a little room for custom fields and the expansion of `fields.*`.
-const MaxDefaultFieldLength = 1010
+const MaxDefaultFieldLength = 1000
 
 // TestTemplate executes tests on the Beat's index template.
 func TestTemplate(t *testing.T, beatName string) {
