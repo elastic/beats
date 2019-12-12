@@ -4,7 +4,7 @@ services:
   stan:
     image: docker.elastic.co/observability-ci/beats-integration-stan:${STAN_VERSION:-0.15.1}-1
     build:
-      context: ./module/stan/_meta
+      context: ./_meta
       args:
         STAN_VERSION: ${STAN_VERSION:-0.15.1}
     ports:
