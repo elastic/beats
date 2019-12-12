@@ -23,12 +23,12 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, memoryDataList []MemoryData) {
-	for _, memoryData := range memoryDataList {
-		eventMapping(r, memoryData)
+	for i := range memoryDataList {
+		eventMapping(r, &memoryDataList[i])
 	}
 }
 
-func eventMapping(r mb.ReporterV2, memoryData MemoryData) {
+func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 
 	//if we have windows memory data, just report windows stats
 	var fields common.MapStr

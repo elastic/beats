@@ -46,21 +46,21 @@ type MemoryService struct{}
 
 func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool) []MemoryData {
 	formattedStats := []MemoryData{}
-	for _, containerStats := range containers {
+	for i := range containers {
 		//There appears to be a race where a container will report with a stat object before it actually starts
 		//during this time, there doesn't appear to be any meaningful data,
 		// and Limit will never be 0 unless the container is not running
 		//and there's no cgroup data, and CPU usage should be greater than 0 for any running container.
-		if containerStats.Stats.MemoryStats.Limit == 0 && containerStats.Stats.PreCPUStats.CPUUsage.TotalUsage == 0 {
+		if containers[i].Stats.MemoryStats.Limit == 0 && containers[i].Stats.PreCPUStats.CPUUsage.TotalUsage == 0 {
 			continue
 		}
-		formattedStats = append(formattedStats, s.getMemoryStats(containerStats, dedot))
+		formattedStats = append(formattedStats, s.getMemoryStats(&containers[i], dedot))
 	}
 
 	return formattedStats
 }
 
-func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) MemoryData {
+func (s *MemoryService) getMemoryStats(myRawStat *docker.Stat, dedot bool) MemoryData {
 	totalRSS := myRawStat.Stats.MemoryStats.Stats["total_rss"]
 	return MemoryData{
 		Time:      common.Time(myRawStat.Stats.Read),
