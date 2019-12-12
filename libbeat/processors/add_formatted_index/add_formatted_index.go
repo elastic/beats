@@ -33,6 +33,7 @@ type AddFormattedIndex struct {
 	formatString *fmtstr.TimestampFormatString
 }
 
+// New returns a new AddFormattedIndex processor.
 func New(formatString *fmtstr.TimestampFormatString) *AddFormattedIndex {
 	return &AddFormattedIndex{formatString}
 }
