@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	helper "github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/dockerlogbeat/pipereader"
 )
@@ -101,9 +102,9 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 			Fields: common.MapStr{
 				"message": line,
 				"container": common.MapStr{
-					"labels": cl.containerMeta.ContainerLabels,
+					"labels": helper.DeDotLabels(cl.containerMeta.ContainerLabels, true),
 					"id":     cl.containerMeta.ContainerID,
-					"name":   strings.Trim(cl.containerMeta.ContainerName, "/"),
+					"name":   helper.ExtractContainerName([]string{cl.containerMeta.ContainerName}),
 					"image": common.MapStr{
 						"name": cl.containerMeta.ContainerImageName,
 					},
