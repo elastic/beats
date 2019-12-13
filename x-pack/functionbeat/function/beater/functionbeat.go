@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -104,7 +106,7 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	bt.log.Info("Functionbeat is running")
 	defer bt.log.Info("Functionbeat stopped running")
 
-	clientFactory := makeClientFactory(bt.log, b.Publisher)
+	clientFactory := makeClientFactory(bt.log, b.Publisher, b.Info)
 
 	enabledFunctions := bt.enabledFunctions()
 	bt.log.Infof("Functionbeat is configuring enabled functions: %s", strings.Join(enabledFunctions, ", "))
@@ -163,7 +165,7 @@ type fnExtraConfig struct {
 	Index fmtstr.EventFormatString `config:"index"`
 }
 
-func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
+func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline, beatInfo beat.Info) func(*common.Config) (core.Client, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
@@ -174,8 +176,7 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Co
 			return nil, err
 		}
 
-		// TODO: pass beat.Info as first arg
-		funcProcessors, err := processorsForFunction(c)
+		funcProcessors, err := processorsForFunction(beatInfo, c)
 		if err != nil {
 			return nil, err
 		}
@@ -193,12 +194,21 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Co
 	}
 }
 
-func processorsForFunction(config fnExtraConfig) (*processors.Processors, error) {
+func processorsForFunction(beatInfo beat.Info, config fnExtraConfig) (*processors.Processors, error) {
 	procs := processors.NewList(nil)
 
 	// Processor ordering is important:
 	// 1. Index configuration
-	// TODO
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(indexProcessor)
+	}
 
 	// 2. User processors
 	userProcessors, err := processors.New(config.Processors)
