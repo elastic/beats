@@ -1587,6 +1587,12 @@ type: object
 --
 
 [float]
+=== dynamodb
+
+`dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
+
+
+[float]
 === ebs
 
 `ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.

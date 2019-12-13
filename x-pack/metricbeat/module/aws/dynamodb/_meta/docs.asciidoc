@@ -1,0 +1,38 @@
+The `dynamodb` metricset of aws module allows you to monitor your AWS SNS topic. `dynamodb` metricset fetches a set of values from
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html[Amazon DynamoDB Metrics].
+For all other DynamoDB metrics, the aggregation granularity is five minutes.
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - sns
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+----
+
+[float]
+=== Metrics
+Please see more details for each metric in
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html[Amazon DynamoDB Metrics].
+
+|===
+|Metric Name|Statistic Method
+|ConditionalCheckFailedRequests | Maximum
+|ConsumedReadCapacityUnits | Maximum
+|ConsumedWriteCapacityUnits | Maximum
+|ReadThrottleEvents | Sum
+|ReturnedBytes | Sum
+|ReturnedItemCount | Sum
+|ReturnedRecordsCount | Sum
+|SuccessfulRequestLatency | Sum
+|SystemErrors | Average
+|TimeToLiveDeletedItemCount | Sum
+|ThrottledRequests | Average
+|TransactionConflict | Average
+|UserErrors | Average
+|WriteThrottleEvents | Average
+|===

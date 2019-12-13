@@ -1,0 +1,20 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/DynamoDB
+        statistic: ["Average"]
+        name:
+          - OnlineIndexPercentageProgress
+          - ProvisionedWriteCapacityUnits
+          - ProvisionedReadCapacityUnits
+          - ConsumedReadCapacityUnits
+          - ConsumedWriteCapacityUnits
+      - namespace: AWS/DynamoDB
+        statistic: ["Sum"]
+        name:
+          - ConsumedReadCapacityUnits
+          - ConsumedWriteCapacityUnits
+          - ConditionalCheckFailedRequests
