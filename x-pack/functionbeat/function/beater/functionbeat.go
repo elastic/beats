@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
-
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -192,30 +190,4 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline, beatInfo beat.I
 
 		return client, err
 	}
-}
-
-func processorsForFunction(beatInfo beat.Info, config fnExtraConfig) (*processors.Processors, error) {
-	procs := processors.NewList(nil)
-
-	// Processor ordering is important:
-	// 1. Index configuration
-	if !config.Index.IsEmpty() {
-		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
-		if err != nil {
-			return nil, err
-		}
-		indexProcessor := add_formatted_index.New(timestampFormat)
-		procs.AddProcessor(indexProcessor)
-	}
-
-	// 2. User processors
-	userProcessors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, err
-	}
-	procs.AddProcessors(*userProcessors)
-
-	return procs, nil
 }
