@@ -1000,6 +1000,7 @@
         In normal conditions, assuming no tampering, the timestamps should chronologically
         look like this: `@timestamp` < `event.created` < `event.ingested`.'
       example: 2016-05-23 08:05:35.101000
+      default_field: false
     - name: kind
       level: extended
       type: keyword
@@ -1401,6 +1402,7 @@
         \ on Windows this could be the host's Active Directory domain or NetBIOS domain\
         \ name.  For Linux this could be the domain of the host's LDAP provider."
       example: CONTOSO
+      default_field: false
     - name: geo.city_name
       level: core
       type: keyword
@@ -2136,6 +2138,7 @@
 
         For example use the commit SHA of a non-released package.'
       example: 36f4f7e89dd61b0988b12ee000b98966867710cd
+      default_field: false
     - name: checksum
       level: extended
       type: keyword
@@ -2187,6 +2190,7 @@
       description: Home page or reference URL of the software in this package, if
         available.
       example: https://golang.org
+      default_field: false
     - name: size
       level: extended
       type: long
@@ -2202,6 +2206,7 @@
         This should contain the package file type, rather than the package manager
         name. Examples: rpm, dpkg, brew, npm, gem, nupkg, jar.'
       example: rpm
+      default_field: false
     - name: version
       level: extended
       type: keyword
@@ -2342,6 +2347,7 @@
         The field should be absent if there is no exit code for the event (e.g. process
         start).'
       example: 137
+      default_field: false
     - name: parent.name
       level: extended
       type: keyword
@@ -2363,6 +2369,7 @@
       format: string
       description: Process id.
       example: 4242
+      default_field: false
     - name: parent.ppid
       level: extended
       type: long
