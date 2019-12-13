@@ -75,7 +75,7 @@ class BaseTest(TestCase):
             for r in replace:
                 pattern = self.build_log_regex(r)
                 log = pattern.sub("", log)
-        self.assertNotRegexp(log, "\tERROR\t|\tWARN\t")
+        self.assertNotRegex(log, "\tERROR\t|\tWARN\t")
 
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
