@@ -11,3 +11,8 @@
       description: >
         Information and statistics of pods managed by kubernetes.
       fields:
+        - name: labels.*
+          type: object
+          object_type: keyword
+          description: Labels for kubernetes object
+

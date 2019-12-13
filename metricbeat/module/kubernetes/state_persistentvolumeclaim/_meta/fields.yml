@@ -22,7 +22,4 @@
     - name: storage_class
       type: keyword
       description: Storage class for the PVC.
-    - name: labels.*
-      type: object
-      object_type: keyword
-      description: Labels for PVC
+      

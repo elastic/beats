@@ -49,9 +49,14 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 
-				"kube_persistentvolumeclaim_access_mode":                     p.LabelMetric("access_mode", "access_mode"),
-				"kube_persistentvolumeclaim_info":                            p.InfoMetric(),
-				"kube_persistentvolumeclaim_labels":                          p.ExtendedInfoMetric(p.Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "labels"}),
+				"kube_persistentvolumeclaim_access_mode": p.LabelMetric("access_mode", "access_mode"),
+				"kube_persistentvolumeclaim_info":        p.InfoMetric(),
+				"kube_persistentvolumeclaim_labels": p.ExtendedInfoMetric(
+					p.Configuration{
+						StoreNonMappedLabels:     true,
+						NonMappedLabelsPlacement: mb.ModuleDataKey + ".labels",
+						MetricProcessingOptions:  []p.MetricOption{p.OpLabelKeyPrefixRemover("label_")},
+					}),
 				"kube_persistentvolumeclaim_resource_requests_storage_bytes": p.Metric("request_storage.bytes"),
 				"kube_persistentvolumeclaim_status_phase":                    p.LabelMetric("phase", "phase"),
 			},

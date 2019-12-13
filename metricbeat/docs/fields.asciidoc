@@ -16637,6 +16637,15 @@ Information and statistics of pods managed by kubernetes.
 
 
 
+*`kubernetes.labels.*`*::
++
+--
+Labels for kubernetes object
+
+type: object
+
+--
+
 [float]
 === apiserver
 
@@ -19353,15 +19362,6 @@ type: keyword
 Storage class for the PVC.
 
 type: keyword
-
---
-
-*`kubernetes.persistentvolumeclaim.labels.*`*::
-+
---
-Labels for PVC
-
-type: object
 
 --
 

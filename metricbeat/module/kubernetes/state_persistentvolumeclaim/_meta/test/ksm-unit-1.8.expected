@@ -2,13 +2,13 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
+			"labels": {
+				"app": "mysql-server"
+			},
 			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
-			"labels": {
-				"label_app": "mysql-server"
-			},
 			"name": "mysql-data",
 			"phase": "Bound",
 			"request_storage": {
