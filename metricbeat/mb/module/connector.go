@@ -86,6 +86,9 @@ func processorsForConfig(
 	beatInfo beat.Info, config connectorConfig,
 ) (*processors.Processors, error) {
 	procs := processors.NewList(nil)
+
+	// Processor order is important! The index processor, if present, must be
+	// added before the user processors.
 	if !config.Index.IsEmpty() {
 		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
 		timestampFormat, err :=
