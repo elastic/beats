@@ -210,7 +210,7 @@ class TCP4TestCase:
         server.listen(8)
         client.connect(self.server_addr)
         acc, _ = server.accept()
-        acc.send('Hello there\n')
+        acc.send(b'Hello there\n')
         msg = client.recv(64)
         client.send('"{}" what\n'.format(msg))
         msg = acc.recv(64)
@@ -249,7 +249,7 @@ class UDP4TestCase:
         client, self.client_addr = socket_ipv4(socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         server, self.server_addr = socket_ipv4(socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         for i in range(3):
-            client.sendto('Hello there {}'.format(i), self.server_addr)
+            client.sendto(bytes('Hello there {}'.format(i), "utf-8"), self.server_addr)
             msg, _ = server.recvfrom(64)
         server.sendto('howdy', self.client_addr)
         msg, _ = client.recvfrom(64)
@@ -290,7 +290,7 @@ class ConnectedUDP4TestCase:
         client.connect(self.server_addr)
         server.connect(self.client_addr)
         for i in range(5):
-            server.send('Hello there {}'.format(i))
+            server.send(bytes('Hello there {}'.format(i), "utf-8"))
             msg = client.recv(64)
         client.send('howdy')
         msg = server.recv(64)
@@ -334,7 +334,7 @@ class ConnectedUDP6TestCase:
             client.connect(self.server_addr)
             server.connect(self.client_addr)
             for i in range(5):
-                server.send('Hello there {}'.format(i))
+                server.send(bytes('Hello there {}'.format(i), "utf-8"))
                 msg = client.recv(64)
             client.send('howdy')
             msg = server.recv(64)
@@ -422,9 +422,9 @@ class MultiUDP4TestCase:
         client, self.client_addr = socket_ipv4(socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         for i in range(3):
             server, self.server_addr[i] = socket_ipv4(socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-            client.sendto('ping', self.server_addr[i])
+            client.sendto(b'ping', self.server_addr[i])
             msg, _ = server.recvfrom(64)
-            server.sendto('pong', self.client_addr)
+            server.sendto(b'pong', self.client_addr)
             msg, _ = client.recvfrom(64)
             server.close()
         client.close()
@@ -568,11 +568,11 @@ class DNSTestCase:
         server, self.server_addr = self.socket_factory()
 
         raw_addr = ip_str_to_raw(self.server_addr[0])
-        req = "\x74\xba\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07elastic" \
-              "\x02co\x00" + q + "\x00\x01"
-        resp = "\x74\xba\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00\x07elastic" \
-               "\x02co\x00" + q + "\x00\x01\xc0\x0c" + q + "\x00\x01\x00\x00" \
-               "\x00\x9c" + struct.pack(">H", len(raw_addr)) + raw_addr
+        req = b"\x74\xba\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07elastic" \
+              b"\x02co\x00" + q + "\x00\x01"
+        resp = b"\x74\xba\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00\x07elastic" \
+               b"\x02co\x00" + q + "\x00\x01\xc0\x0c" + q + "\x00\x01\x00\x00" \
+               b"\x00\x9c" + bytes(struct.pack(">H", len(raw_addr)) + raw_addr, "utf-8")
 
         transaction_udp(dns_cli, self.dns_client_addr,
                         dns_srv, self.dns_server_addr,
