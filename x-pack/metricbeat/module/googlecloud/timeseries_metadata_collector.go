@@ -46,17 +46,17 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	var availabilityZone, accountID string
 
 	if in.Resource != nil && in.Resource.Labels != nil {
-		availabilityZone = in.Resource.Labels[JSON_PATH_ECS_AVAILABILITY_ZONE]
-		accountID = in.Resource.Labels[JSON_PATH_ECS_ACCOUNT_ID]
+		availabilityZone = in.Resource.Labels[TimeSeriesResponsePathForECSAvailabilityZone]
+		accountID = in.Resource.Labels[TimeSeriesResponsePathForECSAccountId]
 	}
 
 	ecs := common.MapStr{
-		ECS_CLOUD: common.MapStr{
-			ECS_CLOUD_AVAILABILITY_ZONE: availabilityZone,
-			ECS_CLOUD_ACCOUNT: common.MapStr{
-				ECS_CLOUD_ACCOUNT_ID: accountID,
+		ECSCloud: common.MapStr{
+			ECSCloudAvailabilityZone: availabilityZone,
+			ECSCloudAccount: common.MapStr{
+				ECSCloudAccountId: accountID,
 			},
-			ECS_CLOUD_PROVIDER: "googlecloud",
+			ECSCloudProvider: "googlecloud",
 		},
 	}
 
@@ -71,7 +71,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Metric.Labels {
-			if k == JSON_PATH_ECS_INSTANCE_NAME {
+			if k == TimeSeriesResponsePathForECSInstanceName {
 				continue
 			}
 
@@ -80,7 +80,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 		//Do not write metrics labels if it's content is empty
 		for k, v := range metrics {
-			m.Put(LABEL_METRICS+"."+k, v)
+			m.Put(LabelMetrics+"."+k, v)
 		}
 	}
 
@@ -89,7 +89,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {
-			if k == JSON_PATH_ECS_AVAILABILITY_ZONE || k == JSON_PATH_ECS_INSTANCE_ID || k == JSON_PATH_ECS_ACCOUNT_ID {
+			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceId || k == TimeSeriesResponsePathForECSAccountId {
 				continue
 			}
 
@@ -98,13 +98,13 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 		//Do not write resources labels if it's content is empty
 		for k, v := range resources {
-			m.Put(LABEL_RESOURCE+"."+k, v)
+			m.Put(LabelResource+"."+k, v)
 		}
 	}
 
 	if s.timeSeries.Metadata != nil {
-		m.Put(LABEL_SYSTEM, s.timeSeries.Metadata.SystemLabels)
-		m.Put(LABEL_USER_METADATA, s.timeSeries.Metadata.UserLabels)
+		m.Put(LabelSystem, s.timeSeries.Metadata.SystemLabels)
+		m.Put(LabelUserMetadata, s.timeSeries.Metadata.UserLabels)
 	}
 
 	return m, ecs, nil
@@ -113,7 +113,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 // ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.`El trickerionEl trickerion
 func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *MetadataCollectorInputData) (string, error) {
 	m := common.MapStr{
-		KEY_TIMESTAMP: in.Timestamp.UnixNano(),
+		KeyTimestamp: in.Timestamp.UnixNano(),
 	}
 
 	if s.timeSeries == nil {

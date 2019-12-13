@@ -17,13 +17,13 @@ import (
 // abstraction to fetch metadata, the pubsub abstraction, etc.
 func NewMetadataServiceForConfig(ctx context.Context, c config) (googlecloud.MetadataService, error) {
 	switch c.ServiceName {
-	case googlecloud.SERVICE_COMPUTE:
+	case googlecloud.ServiceCompute:
 		return compute.NewMetadataService(ctx, c.ProjectID, c.Zone, c.opt)
-	case googlecloud.SERVICE_PUBSUB:
+	case googlecloud.ServicePubsub:
 		return nil, nil
-	case googlecloud.SERVICE_FIRESTORE:
+	case googlecloud.ServiceFirestore:
 		return nil, nil
-	case googlecloud.SERVICE_STORAGE:
+	case googlecloud.ServiceStorage:
 		return nil, nil
 	default:
 		return nil, errors.Errorf("service '%s' not found", c.ServiceName)

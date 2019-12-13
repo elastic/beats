@@ -30,7 +30,7 @@ const (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(googlecloud.MODULE_NAME, METRICSET_NAME, New)
+	mb.Registry.MustAddMetricSet(googlecloud.ModuleName, METRICSET_NAME, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement

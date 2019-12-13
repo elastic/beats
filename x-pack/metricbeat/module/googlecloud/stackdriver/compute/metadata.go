@@ -80,28 +80,26 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
-		ecs.Put(googlecloud.ECS_CLOUD+"."+googlecloud.ECS_CLOUD_INSTANCE+"."+googlecloud.ECS_CLOUD_INSTANCE_ID,
-			resp.Resource.Labels[googlecloud.JSON_PATH_ECS_INSTANCE_ID])
+		ecs.Put(googlecloud.ECSCloudInstanceIdKey, resp.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceId])
 	}
 
 	if resp.Metric.Labels != nil {
-		ecs.Put(googlecloud.ECS_CLOUD+"."+googlecloud.ECS_CLOUD_INSTANCE+"."+googlecloud.ECS_CLOUD_INSTANCE_NAME,
-			resp.Metric.Labels[googlecloud.JSON_PATH_ECS_INSTANCE_NAME])
+		ecs.Put(googlecloud.ECSCloudInstanceNameKey, resp.Metric.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceName])
 	}
 
 	if s.computeMetadata.machineType != "" {
-		ecs.Put(googlecloud.ECS_CLOUD+"."+googlecloud.ECS_CLOUD_MACHINE+"."+googlecloud.ECS_CLOUD_MACHINE_TYPE, s.computeMetadata.machineType)
+		ecs.Put(googlecloud.ECSCloudMachineTypeKey, s.computeMetadata.machineType)
 	}
 
-	s.computeMetadata.Metrics = output[googlecloud.LABEL_METRICS]
-	s.computeMetadata.System = output[googlecloud.LABEL_SYSTEM]
+	s.computeMetadata.Metrics = output[googlecloud.LabelMetrics]
+	s.computeMetadata.System = output[googlecloud.LabelSystem]
 
 	if s.computeMetadata.User != nil {
-		output[googlecloud.LABEL_USER] = s.computeMetadata.User
+		output[googlecloud.LabelUser] = s.computeMetadata.User
 	}
 
 	if s.computeMetadata.Metadata != nil {
-		output[googlecloud.LABEL_METADATA] = s.computeMetadata.Metadata
+		output[googlecloud.LabelMetadata] = s.computeMetadata.Metadata
 	}
 
 	return output, ecs, nil
@@ -162,7 +160,7 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID, zone strin
 
 func (s *metadataCollector) instanceID(ts *monitoringpb.TimeSeries) string {
 	if ts.Resource != nil && ts.Resource.Labels != nil {
-		return ts.Resource.Labels[googlecloud.JSON_PATH_ECS_INSTANCE_ID]
+		return ts.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceId]
 	}
 
 	return ""
