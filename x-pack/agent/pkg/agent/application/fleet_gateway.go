@@ -78,7 +78,7 @@ func (f *fleetGateway) worker() {
 			}
 
 			actions := make([]action, len(resp.Actions))
-			for idx, a := range actions {
+			for idx, a := range resp.Actions {
 				actions[idx] = a
 			}
 

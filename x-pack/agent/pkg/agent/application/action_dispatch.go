@@ -5,12 +5,21 @@
 package application
 
 import (
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"reflect"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
+
+func init() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+}
 
 type action interface{}
 
@@ -47,8 +56,11 @@ func newActionDispatcher(log *logger.Logger, def actionHandler) (*actionDispatch
 }
 
 func (ad *actionDispatcher) Register(a action, handler actionHandler) {
-	t := reflect.TypeOf(a).String()
-	ad.handlers[t] = handler
+	ad.handlers[ad.key(a)] = handler
+}
+
+func (ad *actionDispatcher) key(a action) string {
+	return reflect.TypeOf(a).String()
 }
 
 func (ad *actionDispatcher) Dispatch(actions ...action) error {
@@ -64,8 +76,7 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 }
 
 func (ad *actionDispatcher) dispatchAction(a action) error {
-	t := reflect.TypeOf(a).String()
-	handler, found := ad.handlers[t]
+	handler, found := ad.handlers[(ad.key(a))]
 	if !found {
 		return ad.def.Handle(a)
 	}

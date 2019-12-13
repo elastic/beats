@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"time"
 
@@ -40,9 +41,9 @@ type Managed struct {
 	log     *logger.Logger
 	Config  FleetAgentConfig
 	api     apiClient
-	log     *logger.Logger
 	agentID string
 	gateway *fleetGateway
+	wg      sync.WaitGroup
 }
 
 func newManaged(
@@ -81,13 +82,10 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to create reporters")
 	}
 
-	// TODO(michal, ph) Link router with configuration
-	_, err = newRouter(log, streamFactory(config, client, reporter))
+	router, err := newRouter(log, streamFactory(config, client, reporter))
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
-
-	agentID := "secret"
 
 	emit := emitter(log, router)
 
@@ -126,13 +124,21 @@ func newManaged(
 // Start starts a managed agent.
 func (m *Managed) Start() error {
 	m.log.Info("Agent is starting")
-	defer m.log.Info("Agent is stopped")
-	m.gateway.Start()
+	m.wg.Add(1)
+
+	go func(wg *sync.WaitGroup) {
+		defer m.log.Info("Agent is stopped")
+		defer wg.Done()
+		m.gateway.Start()
+	}(&m.wg)
+
 	return nil
 }
 
 // Stop stops a managed agent.
 func (m *Managed) Stop() error {
+	m.gateway.Stop()
+	m.wg.Wait()
 	return nil
 }
 
@@ -151,6 +157,4 @@ func createFleetReporters(
 	}
 
 	return reporting.NewReporter(log, agentID, logR, fleetR), nil
-	m.gateway.Stop()
-	return nil
 }
