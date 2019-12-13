@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "prometheus.query",
+        "duration": 115000,
+        "module": "prometheus"
+    },
+    "metricset": {
+        "name": "query",
+        "period": 10000
+    },
+    "prometheus": {
+        "query": {
+            "cpu_usage": {
+                "status": "success",
+                "data": {
+                    "resultType": "vector",
+                    "result": [
+                    {
+                        "metric": {},
+                        "value": [
+                            "1576583842.761000",
+                            "2880242405376"
+                        ]
+                    }
+                    ]
+                }
+            }
+        }
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "prometheus"
+    }
+}

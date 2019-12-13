@@ -3,6 +3,7 @@
   period: 10s
   metricsets: ["collector"]
   hosts: ["localhost:9090"]
+  metricsets: ["collect"]
   metrics_path: /metrics
   #metrics_filters:
   #  include: []
@@ -24,3 +25,13 @@
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
+
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metricsets: ["query"]
+  paths:
+  - name: 'http_request'
+    path: '/api/v1/query'
+    fields:
+      'query': sum(rate(prometheus_http_requests_total[1m]))
