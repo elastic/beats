@@ -72,12 +72,10 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
-func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
 	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
+		return err
 	}
 
 	for _, event := range events {
@@ -85,8 +83,7 @@ func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) {
 		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
 		if !reported {
 			m.Logger().Debug("error trying to emit event")
-			return
 		}
 	}
-	return
+	return nil
 }
