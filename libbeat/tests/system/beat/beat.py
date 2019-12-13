@@ -684,7 +684,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         for key in flat.keys():
             metaKey = key.startswith('@metadata.')
             # Range keys as used in 'date_range' etc will not have docs of course
-            isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt'];
+            isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
             if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
             if is_documented(key, aliases):
