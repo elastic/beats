@@ -38,7 +38,7 @@ def is_platform_supported():
 
 def enable_ipv6_loopback():
     f = open('/proc/sys/net/ipv6/conf/lo/disable_ipv6', 'wb')
-    f.write('0\n')
+    f.write(b'0\n')
     f.close()
 
 
