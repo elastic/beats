@@ -7,10 +7,14 @@
 package pkg
 
 import (
+	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
 	abtest "github.com/elastic/beats/auditbeat/testing"
+	"github.com/elastic/beats/libbeat/logp"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
@@ -18,6 +22,8 @@ func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	defer f.(*MetricSet).bucket.DeleteBucket()
+
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("received error: %+v", errs[0])
@@ -29,6 +35,46 @@ func TestData(t *testing.T) {
 
 	fullEvent := mbtest.StandardizeEvent(f, events[len(events)-1], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
+}
+
+func TestDpkg(t *testing.T) {
+	logp.TestingSetup()
+
+	defer abtest.SetupDataDir(t)()
+
+	// Disable all except dpkg
+	rpmPathOld := rpmPath
+	dpkgPathOld := dpkgPath
+	brewPathOld := homebrewCellarPath
+	defer func() {
+		rpmPath = rpmPathOld
+		dpkgPath = dpkgPathOld
+		homebrewCellarPath = brewPathOld
+	}()
+	rpmPath = "/does/not/exist"
+	homebrewCellarPath = "/does/not/exist"
+
+	var err error
+	dpkgPath, err = filepath.Abs("testdata/dpkg/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	defer f.(*MetricSet).bucket.DeleteBucket()
+
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("received error: %+v", errs[0])
+	}
+
+	if assert.Len(t, events, 1) {
+		event := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+		checkFieldValue(t, event, "system.audit.package.name", "test")
+		checkFieldValue(t, event, "system.audit.package.summary", "Test Package")
+		checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
+		checkFieldValue(t, event, "system.audit.package.version", "8.2.0-1ubuntu2~18.04")
+	}
 }
 
 func getConfig() map[string]interface{} {

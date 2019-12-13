@@ -7,7 +7,7 @@ metadata). {beatname_uc} provides a couple of options for filtering and
 enhancing exported data.
 
 You can configure {beatname_uc} to include events that match specific filtering
-criteria. To do this, use the <<{beatname_lc}-include-matches,`include_matches`>>
+criteria. To do this, use the <<include-matches,`include_matches`>>
 option. The advantage of this approach is that you can reduce the number of
 fields that {beatname_uc} needs to process.
 
@@ -19,7 +19,7 @@ global processing across all data exported by {beatname_uc}.
 [[using-processors]]
 === Processors
 
-include::{libbeat-dir}/docs/processors.asciidoc[]
+include::{libbeat-dir}/processors.asciidoc[]
 
 // You must set the processor-scope attribute to resolve the attribute reference
 // defined in processors-using.asciidoc. The attribute is used to indicate where
@@ -28,5 +28,5 @@ include::{libbeat-dir}/docs/processors.asciidoc[]
 // to processors-using.asciidoc.
 
 :processor-scope: input
-include::{libbeat-dir}/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/processors-using.asciidoc[]
 :processor-scope!:

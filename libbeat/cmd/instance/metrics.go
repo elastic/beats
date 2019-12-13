@@ -57,6 +57,7 @@ func setupMetrics(name string) error {
 
 	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
 	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
+	monitoring.NewFunc(beatMetrics, "runtime", reportRuntime, monitoring.Report)
 
 	setupPlatformSpecificMetrics()
 
@@ -245,4 +246,11 @@ func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	defer V.OnRegistryFinished()
 
 	monitoring.ReportInt(V, "cores", int64(process.NumCPU))
+}
+
+func reportRuntime(_ monitoring.Mode, V monitoring.Visitor) {
+	V.OnRegistryStart()
+	defer V.OnRegistryFinished()
+
+	monitoring.ReportInt(V, "goroutines", int64(runtime.NumGoroutine()))
 }

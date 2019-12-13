@@ -19,7 +19,8 @@
             "capabilities": {
                 "consumer_cancel_notify": true,
                 "connection.blocked": true
-            }
+            },
+            "connection_name": "Connection1"
         },
         "channel_max": 65535,
         "frame_max": 131072,
@@ -76,7 +77,8 @@
             "capabilities": {
                 "connection.blocked": true,
                 "consumer_cancel_notify": true
-            }
+            },
+            "connection_name": "Connection2"
         },
         "channel_max": 65535,
         "frame_max": 131072,

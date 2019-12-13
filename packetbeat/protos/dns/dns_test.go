@@ -264,6 +264,7 @@ func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	assert.Equal(t, q.qType, mapValue(t, m, "dns.question.type"))
 	assert.Equal(t, q.qName, mapValue(t, m, "dns.question.name"))
 	assert.Equal(t, q.qEtld, mapValue(t, m, "dns.question.etld_plus_one"))
+	assert.Equal(t, q.qEtld, mapValue(t, m, "dns.question.registered_domain"))
 }
 
 // Assert that the specified flags are set.
@@ -310,7 +311,7 @@ func TestRRsToMapStrsWithOPTRecord(t *testing.T) {
 
 	// The OPT record is a pseudo-record so it doesn't become a real record
 	// in our conversion, and there will be 1 entry instead of 2.
-	mapStrs := rrsToMapStrs([]mkdns.RR{o, r})
+	mapStrs, _ := rrsToMapStrs([]mkdns.RR{o, r}, false)
 	assert.Len(t, mapStrs, 1)
 
 	mapStr := mapStrs[0]

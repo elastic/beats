@@ -22,6 +22,8 @@ package service
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/StackExchange/wmi"
 	"github.com/stretchr/testify/assert"
 
@@ -33,6 +35,8 @@ type Win32Service struct {
 	ProcessId   uint32
 	DisplayName string
 	State       string
+	StartName   string
+	PathName    string
 }
 
 func TestData(t *testing.T) {
@@ -56,7 +60,8 @@ func TestReadService(t *testing.T) {
 
 	var wmiSrc []Win32Service
 
-	// Get services from WMI.
+	// Get services from WMI, set NonePtrZero so nil fields are turned to empty strings
+	wmi.DefaultClient.NonePtrZero = true
 	err = wmi.Query("SELECT * FROM Win32_Service ", &wmiSrc)
 	if err != nil {
 		t.Fatal(err)
@@ -68,6 +73,8 @@ func TestReadService(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	var stateChangedServices []common.MapStr
+
 	// Compare our module's data against WMI.
 	for _, s := range services {
 		// Look if the service is in the WMI data.
@@ -78,13 +85,25 @@ func TestReadService(t *testing.T) {
 					assert.Equal(t, w.ProcessId, s["pid"],
 						"PID of service %v does not match", w.DisplayName)
 				}
-				assert.Equal(t, w.State, s["state"],
-					"State of service %v does not match", w.DisplayName)
-
 				// For some services DisplayName and Name are the same. It seems to be a bug from the wmi query.
 				if w.DisplayName != w.Name {
 					assert.Equal(t, w.DisplayName, s["display_name"],
 						"Display name of service %v does not match", w.Name)
+				}
+				// some services come back without PathName or StartName from WMI, just skip them
+				if s["path_name"] != nil && w.PathName != "" {
+					assert.Equal(t, w.PathName, s["path_name"],
+						"Path name of service %v does not match", w.Name)
+				}
+				if s["start_name"] != nil && w.StartName != "" {
+					assert.Equal(t, w.StartName, s["start_name"],
+						"Start name of service %v does not match", w.Name)
+				}
+				// Some services have changed state before the second retrieval.
+				if w.State != s["state"] {
+					changed := s
+					changed["initial_state"] = w.State
+					stateChangedServices = append(stateChangedServices, changed)
 				}
 				found = true
 				break
@@ -96,4 +115,14 @@ func TestReadService(t *testing.T) {
 			t.Errorf("Service %s can not be found by wmi query", s["name"])
 		}
 	}
+	// If more than 90% of the services have the same state then we have enough confidence the state check works while being resilient to race conditions,
+	// else it will require further investigation on which services are failing
+	if stateChangedServices != nil {
+		failing := float64(len(stateChangedServices)) / float64(len(services)) * 100
+		if failing > 90 {
+			// print entire information on the services failing
+			t.Errorf("%.2f%% of the services have a different state than initial one \n : %s", failing, stateChangedServices)
+		}
+	}
+
 }

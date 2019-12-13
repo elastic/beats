@@ -32,7 +32,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -87,7 +88,8 @@
           "port": 65058
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -142,7 +144,8 @@
           "port": 123
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -197,7 +200,8 @@
           "port": 123
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -252,7 +256,8 @@
           "port": 59157
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -307,7 +312,8 @@
           "port": 80
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -362,7 +368,8 @@
           "port": 59158
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -417,7 +424,8 @@
           "port": 443
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -472,7 +480,8 @@
           "port": 59159
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -527,7 +536,8 @@
           "port": 139
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -582,7 +592,8 @@
           "port": 59160
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -637,7 +648,8 @@
           "port": 23
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -692,7 +704,8 @@
           "port": 59161
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -747,7 +760,8 @@
           "port": 995
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -802,7 +816,8 @@
           "port": 59162
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -857,7 +872,8 @@
           "port": 443
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -912,7 +928,8 @@
           "port": 59163
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -967,7 +984,8 @@
           "port": 135
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1022,7 +1040,8 @@
           "port": 59164
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1077,7 +1096,8 @@
           "port": 110
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1132,7 +1152,8 @@
           "port": 59165
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1187,7 +1208,8 @@
           "port": 111
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1242,7 +1264,8 @@
           "port": 59166
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1297,7 +1320,8 @@
           "port": 143
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1352,7 +1376,8 @@
           "port": 59167
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1407,7 +1432,8 @@
           "port": 3389
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1462,7 +1488,8 @@
           "port": 59168
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1517,7 +1544,8 @@
           "port": 80
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1572,7 +1600,8 @@
           "port": 59169
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2015-10-10T08:47:01Z",
@@ -1627,7 +1656,8 @@
           "port": 25
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

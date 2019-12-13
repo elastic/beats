@@ -26,33 +26,29 @@ import (
 )
 
 func TestIsLine(t *testing.T) {
-	notLine := []byte("This is not a line")
-	assert.False(t, isLine(notLine))
+	for terminator, nl := range lineTerminatorCharacters {
+		reader := NewStripNewline(nil, terminator)
 
-	notLine = []byte("This is not a line\n\r")
-	assert.False(t, isLine(notLine))
+		notLine := []byte("This is not a line")
+		assert.False(t, reader.isLine(notLine))
 
-	notLine = []byte("This is \n not a line")
-	assert.False(t, isLine(notLine))
-
-	line := []byte("This is a line \n")
-	assert.True(t, isLine(line))
-
-	line = []byte("This is a line\r\n")
-	assert.True(t, isLine(line))
+		line := append([]byte("This is a line"), nl...)
+		assert.True(t, reader.isLine(line))
+	}
 }
 
 func TestLineEndingChars(t *testing.T) {
-	line := []byte("Not ending line")
-	assert.Equal(t, 0, lineEndingChars(line))
+	for terminator, nl := range lineTerminatorCharacters {
+		reader := NewStripNewline(nil, terminator)
 
-	line = []byte("N ending \n")
-	assert.Equal(t, 1, lineEndingChars(line))
+		line := append([]byte("This is a line"), nl...)
+		assert.Equal(t, reader.lineEndingFunc(reader, line), len(nl))
+	}
+}
 
-	line = []byte("RN ending \r\n")
-	assert.Equal(t, 2, lineEndingChars(line))
+func TestAutoLineEndingChars(t *testing.T) {
+	reader := NewStripNewline(nil, AutoLineTerminator)
 
-	// This is an invalid option
-	line = []byte("NR ending \n\r")
-	assert.Equal(t, 0, lineEndingChars(line))
+	assert.Equal(t, reader.lineEndingFunc(reader, []byte("this is a windows line\r\n")), 2)
+	assert.Equal(t, reader.lineEndingFunc(reader, []byte("this is a not windows line\n")), 1)
 }

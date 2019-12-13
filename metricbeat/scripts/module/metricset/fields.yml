@@ -1,5 +1,6 @@
 - name: {metricset}
   type: group
+  release: beta
   description: >
     {metricset}
   fields:

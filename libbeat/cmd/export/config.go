@@ -18,7 +18,6 @@
 package export
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -40,26 +39,20 @@ func GenExportConfigCmd(settings instance.Settings) *cobra.Command {
 }
 
 func exportConfig(settings instance.Settings) error {
-	b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
-	if err != nil {
-		return fmt.Errorf("error initializing beat: %s", err)
-	}
-
 	settings.DisableConfigResolver = true
-
-	err = b.InitWithSettings(settings)
+	b, err := instance.NewInitializedBeat(settings)
 	if err != nil {
-		return fmt.Errorf("error initializing beat: %s", err)
+		fatalfInitCmd(err)
 	}
 
 	var config map[string]interface{}
 	err = b.RawConfig.Unpack(&config)
 	if err != nil {
-		return fmt.Errorf("error unpacking config, error: %s", err)
+		fatalf("Error unpacking config: %+v.", err)
 	}
 	res, err := yaml.Marshal(config)
 	if err != nil {
-		return fmt.Errorf("Error converting config to YAML format, error: %s", err)
+		fatalf("Error converting config to YAML format: %+v.", err)
 	}
 
 	os.Stdout.Write(res)

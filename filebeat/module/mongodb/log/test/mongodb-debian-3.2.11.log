@@ -32,3 +32,4 @@
 2018-02-05T14:49:45.605+0100 I CONTROL  [signalProcessingThread] got signal 15 (Terminated), will terminate after current cmd ends
 2018-02-05T14:49:45.605+0100 I FTDC     [signalProcessingThread] Shutting down full-time diagnostic data capture
 2018-02-05T14:49:45.606+0100 I NETWORK  [signalProcessingThread] closing listening socket: 6
+2019-03-07T15:10:26.960+0000 I ASIO [NetworkInterfaceASIO-Replication-0] Successfully connected to dbbox7:27017, took 10ms (1 connections now open to dbbox7:27017)

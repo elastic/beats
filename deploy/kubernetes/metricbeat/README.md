@@ -14,7 +14,7 @@ updating YAML manifests under this folder.
 
 We use official [Beats Docker images](https://github.com/elastic/beats-docker),
 as they allow external files configuration, a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/)
-is used for kubernetes specific settings. Check [metricbeat-configmap.yaml](metricbeat-configmap.yaml)
+is used for kubernetes specific settings. Check [metricbeat-daemonset-configmap.yaml](metricbeat-daemonset-configmap.yaml)
 for details.
 
 Also, [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) uses a set of environment

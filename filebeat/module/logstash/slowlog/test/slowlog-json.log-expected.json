@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2019-01-08T14:58:35.605Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "logstash.slowlog",
         "event.duration": 5026401704,
         "event.module": "logstash",

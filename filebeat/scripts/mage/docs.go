@@ -20,24 +20,24 @@ package mage
 import (
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 // CollectDocs executes the Filebeat docs_collector script to collect/generate
 // documentation from each module.
 func CollectDocs() error {
-	ve, err := mage.PythonVirtualenv()
+	ve, err := devtools.PythonVirtualenv()
 	if err != nil {
 		return err
 	}
 
-	python, err := mage.LookVirtualenvPath(ve, "python")
+	python, err := devtools.LookVirtualenvPath(ve, "python")
 	if err != nil {
 		return err
 	}
 
 	// TODO: Port this script to Go.
 	return sh.Run(python,
-		mage.OSSBeatDir("scripts/docs_collector.py"),
-		"--beat", mage.BeatName)
+		devtools.OSSBeatDir("scripts/docs_collector.py"),
+		"--beat", devtools.BeatName)
 }

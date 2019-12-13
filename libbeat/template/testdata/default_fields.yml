@@ -1,0 +1,7 @@
+- key: test
+  title: Test default fieldds
+  fields:
+    - name: foo
+      type: keyword
+    - name: bar
+      type: keyword

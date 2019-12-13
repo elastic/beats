@@ -27,7 +27,7 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {repo} has not yet been released.
+Version {version} of {repo} has not yet been released.
 
 endif::[]
 
@@ -56,6 +56,7 @@ ifeval::["{release-state}"=="prerelease"]
 --------------------------------------------------
 echo "deb https://artifacts.elastic.co/packages/{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
 --------------------------------------------------
++
 endif::[]
 ifeval::["{release-state}"=="released"]
 . Save the repository definition to  +/etc/apt/sources.list.d/elastic-{major-version}.list+:
@@ -64,7 +65,34 @@ ifeval::["{release-state}"=="released"]
 --------------------------------------------------
 echo "deb https://artifacts.elastic.co/packages/{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
 --------------------------------------------------
++
 endif::[]
+[NOTE]
+==================================================
+
+The package is free to use under the Elastic license. An alternative package
+which contains only features that are available under the Apache 2.0 license is
+also available. To install it, use the following sources list:
+
+ifeval::["{release-state}"=="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
+--------------------------------------------------
+
+endif::[]
+
+ifeval::["{release-state}"!="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/oss-{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
+--------------------------------------------------
+
+endif::[]
+
+==================================================
 +
 [WARNING]
 ==================================================
@@ -92,6 +120,13 @@ sudo apt-get update && sudo apt-get install {beatname_pkg}
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
+sudo systemctl enable {beatname_pkg}
+--------------------------------------------------
+
+If your system does not use `systemd` then run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
 sudo update-rc.d {beatname_pkg} defaults 95 10
 --------------------------------------------------
 
@@ -102,7 +137,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {repo} has not yet been released.
+Version {version} of {repo} has not yet been released.
 
 endif::[]
 
@@ -147,6 +182,34 @@ type=rpm-md
 --------------------------------------------------
 endif::[]
 +
+[NOTE]
+==================================================
+
+The package is free to use under the Elastic license. An alternative package
+which contains only features that are available under the Apache 2.0 license is
+also available. To install it, use the following `baseurl` in your
+`.repo` file:
+
+ifeval::["{release-state}"=="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+baseurl=https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/yum
+--------------------------------------------------
+
+endif::[]
+
+ifeval::["{release-state}"!="prerelease"]
+
+["source","sh",subs="attributes"]
+--------------------------------------------------
+baseurl=https://artifacts.elastic.co/packages/oss-{major-version}/yum
+--------------------------------------------------
+
+endif::[]
+
+==================================================
++
 Your repository is ready to use. For example, you can install {beatname_uc} by
 running:
 +
@@ -156,6 +219,13 @@ sudo yum install {beatname_pkg}
 --------------------------------------------------
 
 . To configure {beatname_uc} to start automatically during boot, run:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+sudo systemctl enable {beatname_pkg}
+--------------------------------------------------
+
+If your system does not use `systemd` then run:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------

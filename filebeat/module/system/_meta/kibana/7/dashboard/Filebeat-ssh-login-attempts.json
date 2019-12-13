@@ -10,7 +10,7 @@
                         "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                "query": "event.action:Accepted"
+                                "query": "system.auth.ssh.event:Accepted"
                             }
                     }
                 },
@@ -129,7 +129,7 @@
                             "enabled": true,
                             "id": "3",
                             "params": {
-                                "field": "event.action",
+                                "field": "system.auth.ssh.event",
                                 "order": "desc",
                                 "orderBy": "1",
                                 "size": 5
@@ -168,7 +168,7 @@
                         "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                "query": "event.action:Failed OR event.action:Invalid"
+                                "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
                             }
                     }
                 },
@@ -222,7 +222,7 @@
                         "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                "query": "event.action:Failed OR event.action:Invalid"
+                                "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
                             }
                     }
                 },
@@ -296,7 +296,7 @@
         {
             "attributes": {
                 "columns": [
-                    "event.action",
+                    "system.auth.ssh.event",
                     "system.auth.ssh.method",
                     "user.name",
                     "source.ip",
@@ -311,7 +311,7 @@
                         "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                            "query": "event.dataset:system.auth AND event.action:*"
+                            "query": "event.dataset:system.auth AND system.auth.ssh.event:*"
                         }
                     }
                 },
@@ -407,7 +407,7 @@
                     {
                         "col": 1,
                         "columns": [
-                            "event.action",
+                            "system.auth.ssh.event",
                             "system.auth.ssh.method",
                             "user.name",
                             "source.ip",

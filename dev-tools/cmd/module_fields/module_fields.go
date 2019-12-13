@@ -23,7 +23,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/generator/fields"
@@ -73,6 +73,11 @@ func main() {
 		log.Fatalf("Error fetching modules: %v", err)
 	}
 
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Failed to determine working directory: %v", err)
+	}
+
 	for _, module := range modules {
 		files, err := fields.CollectFiles(module, dir)
 		if err != nil {
@@ -89,12 +94,17 @@ func main() {
 			log.Fatalf("error fetching files for package %v: %v", module, err)
 		}
 
-		bs, err := asset.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", dir+"/"+module)
+		p, err := filepath.Rel(wd, filepath.Join(dir, module))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		bs, err := asset.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", filepath.ToSlash(p))
 		if err != nil {
 			log.Fatalf("Error creating golang file from template: %v", err)
 		}
 
-		err = ioutil.WriteFile(path.Join(dir, module, "fields.go"), bs, 0644)
+		err = ioutil.WriteFile(filepath.Join(dir, module, "fields.go"), bs, 0644)
 		if err != nil {
 			log.Fatalf("Error writing fields.go: %v", err)
 		}

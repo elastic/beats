@@ -37,31 +37,36 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "logstash")
+	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {
-		f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig(metricSet))
-		events, errs := mbtest.ReportingFetchV2(f)
+		t.Run(metricSet, func(t *testing.T) {
+			config := logstash.GetConfig(metricSet, service.Host())
+			f := mbtest.NewReportingMetricSetV2Error(t, config)
+			events, errs := mbtest.ReportingFetchV2Error(f)
 
-		assert.Empty(t, errs)
-		if !assert.NotEmpty(t, events) {
-			t.FailNow()
-		}
+			assert.Empty(t, errs)
+			if !assert.NotEmpty(t, events) {
+				t.FailNow()
+			}
 
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-			events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
+		})
 	}
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "logstash")
+	service := compose.EnsureUp(t, "logstash")
 
 	for _, metricSet := range metricSets {
-		config := logstash.GetConfig(metricSet)
-		f := mbtest.NewReportingMetricSetV2(t, config)
-		err := mbtest.WriteEventsReporterV2(f, t, metricSet)
-		if err != nil {
-			t.Fatal("write", err)
-		}
+		t.Run(metricSet, func(t *testing.T) {
+			config := logstash.GetConfig(metricSet, service.Host())
+			f := mbtest.NewReportingMetricSetV2Error(t, config)
+			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		})
 	}
 }

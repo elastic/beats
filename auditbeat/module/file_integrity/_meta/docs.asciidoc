@@ -116,3 +116,6 @@ The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`,
 of this directories are watched. If `recursive` is set to `true`, the
 `file_integrity` module will watch for changes on this directories and all
 their subdirectories.
+
+*`keep_null`*:: If this option is set to true, fields with `null` values will be
+published in the output document. By default, `keep_null` is set to `false`.

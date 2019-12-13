@@ -18,9 +18,10 @@
 package readfile
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 
-	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/libbeat/common/streambuf"
@@ -32,9 +33,9 @@ import (
 // from raw input stream for every decoded line.
 type LineReader struct {
 	reader     io.Reader
-	codec      encoding.Encoding
 	bufferSize int
 	nl         []byte
+	decodedNl  []byte
 	inBuffer   *streambuf.Buffer
 	outBuffer  *streambuf.Buffer
 	inOffset   int // input buffer read offset
@@ -43,21 +44,26 @@ type LineReader struct {
 }
 
 // New creates a new reader object
-func NewLineReader(input io.Reader, codec encoding.Encoding, bufferSize int) (*LineReader, error) {
-	encoder := codec.NewEncoder()
+func NewLineReader(input io.Reader, config Config) (*LineReader, error) {
+	encoder := config.Codec.NewEncoder()
 
 	// Create newline char based on encoding
-	nl, _, err := transform.Bytes(encoder, []byte{'\n'})
+	terminator, ok := lineTerminatorCharacters[config.Terminator]
+	if !ok {
+		return nil, fmt.Errorf("unknown line terminator: %+v", config.Terminator)
+	}
+
+	nl, _, err := transform.Bytes(encoder, terminator)
 	if err != nil {
 		return nil, err
 	}
 
 	return &LineReader{
 		reader:     input,
-		codec:      codec,
-		bufferSize: bufferSize,
+		bufferSize: config.BufferSize,
+		decoder:    config.Codec.NewDecoder(),
 		nl:         nl,
-		decoder:    codec.NewDecoder(),
+		decodedNl:  terminator,
 		inBuffer:   streambuf.New(nil),
 		outBuffer:  streambuf.New(nil),
 	}, nil
@@ -74,7 +80,7 @@ func (r *LineReader) Next() ([]byte, int, error) {
 			return nil, 0, err
 		}
 
-		// Check last decoded byte really being '\n' also unencoded
+		// Check last decoded byte really being newline also unencoded
 		// if not, continue reading
 		buf := r.outBuffer.Bytes()
 
@@ -84,14 +90,15 @@ func (r *LineReader) Next() ([]byte, int, error) {
 			continue
 		}
 
-		if buf[len(buf)-1] == '\n' {
+		if bytes.HasSuffix(buf, r.decodedNl) {
 			break
 		} else {
 			logp.Debug("line", "Line ending char found which wasn't one: %c", buf[len(buf)-1])
+			logp.Debug("line", "In %s", string(buf))
 		}
 	}
 
-	// output buffer contains complete line ending with '\n'. Extract
+	// output buffer contains complete line ending with newline. Extract
 	// byte slice from buffer and reset output buffer.
 	bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
 	r.outBuffer.Reset()
@@ -112,7 +119,7 @@ func (r *LineReader) advance() error {
 	// Initial check if buffer has already a newLine character
 	idx := r.inBuffer.IndexFrom(r.inOffset, r.nl)
 
-	// fill inBuffer until '\n' sequence has been found in input buffer
+	// fill inBuffer until newline sequence has been found in input buffer
 	for idx == -1 {
 		// increase search offset to reduce iterations on buffer when looping
 		newOffset := r.inBuffer.Len() - len(r.nl)
@@ -140,7 +147,7 @@ func (r *LineReader) advance() error {
 		idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
 	}
 
-	// found encoded byte sequence for '\n' in buffer
+	// found encoded byte sequence for newline in buffer
 	// -> decode input sequence into outBuffer
 	sz, err := r.decode(idx + len(r.nl))
 	if err != nil {
@@ -156,7 +163,7 @@ func (r *LineReader) advance() error {
 	// continue scanning input buffer from last position + 1
 	r.inOffset = idx + 1 - sz
 	if r.inOffset < 0 {
-		// fix inOffset if '\n' has encoding > 8bits + firl line has been decoded
+		// fix inOffset if newline has encoding > 8bits + firl line has been decoded
 		r.inOffset = 0
 	}
 

@@ -24,6 +24,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common/useragent"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -132,7 +136,7 @@ func makeTestHTTPRequest(t *testing.T) *http.Request {
 }
 
 func TestZeroMaxRedirectShouldError(t *testing.T) {
-	checker := makeCheckRedirect(0)
+	checker := makeCheckRedirect(0, nil)
 	req := makeTestHTTPRequest(t)
 
 	res := checker(req, nil)
@@ -141,7 +145,7 @@ func TestZeroMaxRedirectShouldError(t *testing.T) {
 
 func TestNonZeroRedirect(t *testing.T) {
 	limit := 5
-	checker := makeCheckRedirect(limit)
+	checker := makeCheckRedirect(limit, nil)
 
 	var via []*http.Request
 	// Test requests within the limit
@@ -168,4 +172,30 @@ func TestRequestBuildingWithCustomHost(t *testing.T) {
 		assert.Equal(t, "custom-host", request.Host)
 		assert.Equal(t, "custom-host", request.Header.Get("Host"))
 	}
+}
+
+func TestRequestBuildingWithNoUserAgent(t *testing.T) {
+	request, err := buildRequest("localhost", &Config{}, nilEncoder{})
+
+	require.Nil(t, err)
+	assert.Equal(t, useragent.UserAgent("Heartbeat"), request.Header.Get("User-Agent"))
+}
+
+func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {
+	expectedUserAgent := "some-user-agent"
+
+	var config = Config{
+		Check: checkConfig{
+			Request: requestParameters{
+				SendHeaders: map[string]string{
+					"User-Agent": expectedUserAgent,
+				},
+			},
+		},
+	}
+
+	request, err := buildRequest("localhost", &config, nilEncoder{})
+
+	require.Nil(t, err)
+	assert.Equal(t, expectedUserAgent, request.Header.Get("User-Agent"))
 }

@@ -44,8 +44,6 @@ type containers struct {
 	IDs  []string `config:"ids"`
 	Path string   `config:"path"`
 
-	Paths []string `config:"paths"`
-
 	// Stream can be all, stdout or stderr
 	Stream string `config:"stream"`
 }

@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-php_fpm-pool]]
@@ -7,6 +7,7 @@ This file is generated! See scripts/docs_collector.py
 
 include::../../../module/php_fpm/pool/_meta/docs.asciidoc[]
 
+This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
 ==== Fields
 

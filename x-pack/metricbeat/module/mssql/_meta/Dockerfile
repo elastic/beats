@@ -1,4 +1,5 @@
-FROM microsoft/mssql-server-linux:2017-GA
+ARG MSSQL_VERSION
+FROM microsoft/mssql-server-linux:${MSSQL_VERSION}
 
 ENV ACCEPT_EULA='Y'
 ENV SA_PASSWORD='1234_asdf'

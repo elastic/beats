@@ -35,8 +35,7 @@ func TestCreateEvent(t *testing.T) {
 	message := []byte(hello)
 	mt := inputsource.NetworkMetadata{RemoteAddr: addr}
 
-	data := createEvent(message, mt)
-	event := data.GetEvent()
+	event := createEvent(message, mt)
 
 	m, err := event.GetValue("message")
 	assert.NoError(t, err)

@@ -6,7 +6,7 @@ check files integrity.
 
 ifeval::["{release-state}"=="unreleased"]
 
-However, version {stack-version} of {beatname_uc} has not yet been
+However, version {version} of {beatname_uc} has not yet been
 released, so no Docker image is currently available for this version.
 
 endif::[]
@@ -52,6 +52,21 @@ may want to change that behavior, so just edit the YAML file and modify them:
   value: elastic
 - name: ELASTICSEARCH_PASSWORD
   value: changeme
+------------------------------------------------
+
+[float]
+===== Running {beatname_uc} on master nodes
+
+Kubernetes master nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
+to limit the workloads that can run on them. To run {beatname_uc} on master nodes you may need to
+update the Daemonset spec to include proper tolerations:
+
+[source,yaml]
+------------------------------------------------
+spec:
+ tolerations:
+ - key: node-role.kubernetes.io/master
+   effect: NoSchedule
 ------------------------------------------------
 
 [float]

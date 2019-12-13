@@ -19,7 +19,6 @@ package gotype
 
 import (
 	"reflect"
-	"sync"
 	"unsafe"
 
 	structform "github.com/elastic/go-structform"
@@ -33,6 +32,9 @@ type unfoldCtx struct {
 	opts options
 
 	// buf buffer
+
+	userReg map[reflect.Type]reflUnfolder
+	reg     *typeUnfoldRegistry
 
 	unfolder unfolderStack
 	value    reflectValueStack
@@ -94,13 +96,15 @@ type unfolder interface {
 }
 
 type typeUnfoldRegistry struct {
-	mu sync.RWMutex
-	m  map[reflect.Type]reflUnfolder
+	m map[reflect.Type]reflUnfolder
 }
 
-var unfoldRegistry = newTypeUnfoldRegistry()
+func NewUnfolder(to interface{}, opts ...UnfoldOption) (*Unfolder, error) {
+	O, err := applyUnfoldOpts(opts)
+	if err != nil {
+		return nil, err
+	}
 
-func NewUnfolder(to interface{}) (*Unfolder, error) {
 	u := &Unfolder{}
 	u.opts = options{tag: "struct"}
 
@@ -111,6 +115,15 @@ func NewUnfolder(to interface{}) (*Unfolder, error) {
 	u.idx.init()
 	u.baseType.init()
 	u.valueBuffer.init()
+
+	u.reg = newTypeUnfoldRegistry()
+	if O.unfoldFns != nil {
+		u.userReg = map[reflect.Type]reflUnfolder{}
+		for typ, unfolder := range O.unfoldFns {
+			u.userReg[typ] = unfolder
+			u.userReg[typ.Elem()] = unfolder // add non-pointer value for arrays/maps and other structs
+		}
+	}
 
 	// TODO: make allocation buffer size configurable
 	// u.buf.init(1024)
@@ -164,7 +177,7 @@ func (u *Unfolder) SetTarget(to interface{}) error {
 		return errRequiresPointer
 	}
 
-	ru, err := lookupReflUnfolder(&u.unfoldCtx, t)
+	ru, err := lookupReflUnfolder(&u.unfoldCtx, t, true)
 	if err != nil {
 		return err
 	}
@@ -188,7 +201,7 @@ func (u *unfoldCtx) OnObjectFinished() error {
 	}
 
 	lAfter := len(u.unfolder.stack) + 1
-	if old := u.unfolder.current; lAfter > 1 && lBefore != lAfter {
+	if old := u.unfolder.current; lAfter > 1 && lBefore > lAfter {
 		return old.OnChildObjectDone(u)
 	}
 
@@ -215,7 +228,7 @@ func (u *unfoldCtx) OnArrayFinished() error {
 	}
 
 	lAfter := len(u.unfolder.stack) + 1
-	if old := u.unfolder.current; lAfter > 1 && lBefore != lAfter {
+	if old := u.unfolder.current; lAfter > 1 && lBefore > lAfter {
 		return old.OnChildArrayDone(u)
 	}
 
@@ -295,14 +308,10 @@ func newTypeUnfoldRegistry() *typeUnfoldRegistry {
 }
 
 func (r *typeUnfoldRegistry) find(t reflect.Type) reflUnfolder {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
 	return r.m[t]
 }
 
 func (r *typeUnfoldRegistry) set(t reflect.Type, f reflUnfolder) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	r.m[t] = f
 }
 

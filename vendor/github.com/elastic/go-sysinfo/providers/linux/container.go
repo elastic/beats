@@ -46,14 +46,13 @@ func isContainerizedCgroup(data []byte) (bool, error) {
 	s := bufio.NewScanner(bytes.NewReader(data))
 	for n := 0; s.Scan(); n++ {
 		line := s.Bytes()
-		if len(line) == 0 || line[len(line)-1] == '/' {
-			continue
-		}
 
-		if bytes.HasSuffix(line, []byte("init.scope")) {
-			return false, nil
+		// Following a suggestion on Stack Overflow on how to detect
+		// being inside a container: https://stackoverflow.com/a/20012536/235203
+		if bytes.Contains(line, []byte("docker")) || bytes.Contains(line, []byte("lxc")) {
+			return true, nil
 		}
 	}
 
-	return true, s.Err()
+	return false, s.Err()
 }

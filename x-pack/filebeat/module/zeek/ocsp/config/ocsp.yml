@@ -1,0 +1,58 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.ocsp"
+
+        - from: "zeek.ocsp.id"
+          to: "zeek.ocsp.file_id"
+
+        - from: "zeek.ocsp.hashAlgorithm"
+          to: "zeek.ocsp.hash.algorithm"
+
+        - from: "zeek.ocsp.issuerNameHash"
+          to: "zeek.ocsp.hash.issuer.name"
+
+        - from: "zeek.ocsp.issuerKeyHash"
+          to: "zeek.ocsp.hash.issuer.key"
+
+        - from: "zeek.ocsp.serialNumber"
+          to: "zeek.ocsp.serial_number"
+
+        - from: "zeek.ocsp.serialNumber"
+          to: "zeek.ocsp.serial_number"
+
+        - from: "zeek.ocsp.certStatus"
+          to: "zeek.ocsp.status"
+
+        - from: "zeek.ocsp.certStatus"
+          to: "zeek.ocsp.status"
+
+        - from: "zeek.ocsp.revoketime"
+          to: "zeek.ocsp.revoke.date"
+
+        - from: "zeek.ocsp.revokereason"
+          to: "zeek.ocsp.revoke.reason"
+
+        - from: "zeek.ocsp.thisUpdate"
+          to: "zeek.ocsp.update.this"
+
+        - from: "zeek.ocsp.nextUpdate"
+          to: "zeek.ocsp.update.next"
+
+      ignore_missing: true
+      fail_on_error: false

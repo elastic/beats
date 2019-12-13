@@ -1,0 +1,81 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-oracle]]
+[role="xpack"]
+== Oracle module
+
+beta[]
+
+This is the https://www.oracle.com[Oracle] module for Metricbeat. It is under active development with feedback from the community. A single Metricset for Tablespace monitoring is added so the community can start gathering metrics from their nodes and contributing to the module.
+
+[float]
+== Compatibility
+Oracle Metricbeat module is being tested version 12c R2 by using the store/oracle/database-enterprise:12.2.0.1 Docker image downloaded directly from the https://hub.docker.com/_/oracle-database-enterprise-edition[Oracle Docker Hub repository]
+which is based on 5.0.13-arch1-1-ARCH Arch Linux. This is important, the module has only been tested with the mentioned image in Linux environments.
+
+OCI Instant Client is also required and the module has been tested by using version 18.5. See below for more information.
+
+[float]
+== Dashboard
+An overview dashboard for Kibana is already included:
+
+image::./images/metricbeat-oracle-overview.png[]
+
+[float]
+
+== Requirements
+Oracle database requires a special OCI connector to get connected to the database. You can find more information about it in the https://www.oracle.com/database/technologies/instant-client.html[official link of Oracle's webpage]. Oracle's webpage contains a comprehensive manual about installation methods and troubleshooting. A small description is included here but follow Oracle's official documentation if you find some issue. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found https://www.oracle.com/database/technologies/instant-client/downloads.html[here]. The Oracle Technology Network License Agreement with Oracle must be accepted to download the library.
+
+The OCI library install few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. The environment variable `LD_LIBRARY_PATH` is used to set the reference required by the Metricbeat library. For example, let's say you have downloaded the library into your `Downloads` folder, you can follow the steps below to install the ZIP library on `/usr/lib` (assuming you have `wget` and a zip unpacker):
+
+	unzip $HOME/Downloads/instantclient-basic-linux.x64-18.5.0.0.0dbru.zip -d /usr/lib
+	export LD_LIBRARY_PATH=/usr/lib/instantclient_18_5:$LD_LIBRARY_PATH`
+
+Then, Metricbeat can be launched normally if the environment variable is set.
+
+[float]
+== Metricsets
+
+The following Metricset is included in the module:
+
+[float]
+=== `tablespaces`
+
+Includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc.
+
+
+[float]
+=== Example configuration
+
+The Oracle module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: oracle
+  metricsets: ["tablespace", "performance"]
+  enabled: true
+  period: 10s
+  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+
+  # username: ""
+  # password: ""
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-oracle-performance,performance>>
+
+* <<metricbeat-metricset-oracle-tablespace,tablespace>>
+
+include::oracle/performance.asciidoc[]
+
+include::oracle/tablespace.asciidoc[]
+

@@ -28,7 +28,8 @@ import (
 	"github.com/elastic/beats/libbeat/version"
 )
 
-func genVersionCmd(settings instance.Settings) *cobra.Command {
+// GenVersionCmd generates the command version for a Beat.
+func GenVersionCmd(settings instance.Settings) *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
 		Short: "Show current version info",

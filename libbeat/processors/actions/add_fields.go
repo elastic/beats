@@ -24,11 +24,14 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type addFields struct {
-	fields common.MapStr
-	shared bool
+	fields    common.MapStr
+	shared    bool
+	overwrite bool
 }
 
 // FieldsKey is the default target key for the add_fields processor.
@@ -36,9 +39,11 @@ const FieldsKey = "fields"
 
 func init() {
 	processors.RegisterPlugin("add_fields",
-		configChecked(CreateAddFields,
-			requireFields(FieldsKey),
-			allowedFields(FieldsKey, "target", "when")))
+		checks.ConfigChecked(CreateAddFields,
+			checks.RequireFields(FieldsKey),
+			checks.AllowedFields(FieldsKey, "target", "when")))
+
+	jsprocessor.RegisterPlugin("AddFields", CreateAddFields)
 }
 
 // CreateAddFields constructs an add_fields processor from config.
@@ -62,8 +67,8 @@ func CreateAddFields(c *common.Config) (processors.Processor, error) {
 // NewAddFields creates a new processor adding the given fields to events.
 // Set `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
-func NewAddFields(fields common.MapStr, shared bool) processors.Processor {
-	return &addFields{fields: fields, shared: shared}
+func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.Processor {
+	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
 }
 
 func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
@@ -72,7 +77,12 @@ func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 		fields = fields.Clone()
 	}
 
-	event.Fields.DeepUpdate(fields)
+	if af.overwrite {
+		event.Fields.DeepUpdate(fields)
+	} else {
+		event.Fields.DeepUpdateNoOverwrite(fields)
+	}
+
 	return event, nil
 }
 
@@ -95,5 +105,5 @@ func makeFieldsProcessor(target string, fields common.MapStr, shared bool) proce
 		}
 	}
 
-	return NewAddFields(fields, shared)
+	return NewAddFields(fields, shared, true)
 }

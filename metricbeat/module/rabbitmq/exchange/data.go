@@ -20,12 +20,11 @@ package exchange
 import (
 	"encoding/json"
 
-	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -56,33 +55,31 @@ var (
 	}
 )
 
-func eventsMapping(content []byte, r mb.ReporterV2) {
+func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 	var exchanges []map[string]interface{}
 	err := json.Unmarshal(content, &exchanges)
 	if err != nil {
-		logp.Err("Error: %+v", err)
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error in unmarshal")
 	}
-
-	var errors multierror.Errors
 
 	for _, exchange := range exchanges {
-		err := eventMapping(exchange, r)
+		evt, err := eventMapping(exchange)
 		if err != nil {
-			errors = append(errors, err)
+			m.Logger().Errorf("error in mapping: %s", err)
+			r.Error(err)
+			continue
+		}
+		if !r.Event(evt) {
+			return nil
 		}
 	}
-
-	if len(errors) > 0 {
-		r.Error(errors.Err())
-	}
+	return nil
 }
 
-func eventMapping(exchange map[string]interface{}, r mb.ReporterV2) error {
+func eventMapping(exchange map[string]interface{}) (mb.Event, error) {
 	fields, err := schema.Apply(exchange)
 	if err != nil {
-		return err
+		return mb.Event{}, err
 	}
 
 	rootFields := common.MapStr{}
@@ -102,6 +99,6 @@ func eventMapping(exchange map[string]interface{}, r mb.ReporterV2) error {
 		RootFields:      rootFields,
 		ModuleFields:    moduleFields,
 	}
-	r.Event(event)
-	return nil
+	return event, nil
+
 }

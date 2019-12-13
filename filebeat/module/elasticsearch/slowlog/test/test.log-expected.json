@@ -1,7 +1,6 @@
 [
     {
-        "@timestamp": "2018-06-29T10:06:14.933Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2018-06-29T10:06:14.933-02:00",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26",
         "elasticsearch.node.name": "v_VJhjV",
         "elasticsearch.shard.id": "0",
@@ -19,6 +18,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 4000000,
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -27,8 +27,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-29T10:06:14.943Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2018-06-29T10:06:14.943-02:00",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26",
         "elasticsearch.node.name": "v_VJhjV",
         "elasticsearch.shard.id": "0",
@@ -43,6 +42,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 10000000,
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -51,8 +51,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-29T09:01:01.821Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2018-06-29T09:01:01.821-02:00",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26",
         "elasticsearch.node.name": "v_VJhjV",
         "elasticsearch.shard.id": "0",
@@ -67,6 +66,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 124000000,
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -75,8 +75,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-29T09:01:01.827Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2018-06-29T09:01:01.827-02:00",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26",
         "elasticsearch.node.name": "v_VJhjV",
         "elasticsearch.shard.id": "0",
@@ -91,6 +90,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 7000000,
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -99,8 +99,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-04T13:48:07.452Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2018-07-04T13:48:07.452-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -113,6 +112,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 1000000,
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
@@ -121,8 +121,7 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2018-07-04T21:51:30.411Z",
-        "ecs.version": "1.0.0",
+        "@timestamp": "2018-07-04T21:51:30.411-02:00",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -134,11 +133,35 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 1000000,
         "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "INFO",
         "log.offset": 4766,
         "message": "[2018-07-04T21:51:30,411][INFO ][index.indexing.slowlog.index] [v_VJhjV] [metricbeat-6.3.0-2018.07.04/VLKxBLvUSYuIMKzpacGjRg] took[1.7ms], took_millis[1], type[doc], id[s01HZ2QBk9jw4gtgaFtn], routing[], source[",
+        "service.type": "elasticsearch"
+    },
+    {
+        "@timestamp": "2019-11-14T21:18:40.269-02:00",
+        "elasticsearch.index.name": "exp_v3_1_current",
+        "elasticsearch.node.name": "exp-data-elasticsearc-2",
+        "elasticsearch.shard.id": "3",
+        "elasticsearch.slowlog.logger": "index.search.slowlog.query",
+        "elasticsearch.slowlog.search_type": "QUERY_THEN_FETCH",
+        "elasticsearch.slowlog.source_query": "{\"size\":1000,\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"bool\":{\"should\":[{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"diagnosis.dx_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"diagnosis\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}},{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"procedure.px_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"procedure\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}}],\"must_not\":[{\"exists\":{\"field\":\"primary_px_key\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"version\":true,\"sort\":[{\"_doc\":{\"order\":\"asc\"}}]}",
+        "elasticsearch.slowlog.stats": "",
+        "elasticsearch.slowlog.took": "516.4ms",
+        "elasticsearch.slowlog.total_shards": 10,
+        "elasticsearch.slowlog.types": "encounter",
+        "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 516000000,
+        "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.level": "TRACE",
+        "log.offset": 5638,
+        "message": "[2019-11-14T21:18:40,269][TRACE][index.search.slowlog.query] [exp-data-elasticsearc-2] [exp_v3_1_current][3] took[516.4ms], took_millis[516], types[encounter], stats[], search_type[QUERY_THEN_FETCH], total_shards[10], source[{\"size\":1000,\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"bool\":{\"should\":[{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"diagnosis.dx_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"diagnosis\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}},{\"nested\":{\"query\":{\"constant_score\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"procedure.px_rank\":{\"value\":1,\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"path\":\"procedure\",\"ignore_unmapped\":true,\"score_mode\":\"avg\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}}],\"must_not\":[{\"exists\":{\"field\":\"primary_px_key\",\"boost\":1.0}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"boost\":1.0}},\"version\":true,\"sort\":[{\"_doc\":{\"order\":\"asc\"}}]}]",
         "service.type": "elasticsearch"
     }
 ]

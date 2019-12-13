@@ -5,6 +5,7 @@
 package scripts
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -19,8 +20,8 @@ func getCredentialsUsingMFA() {
 	serialNumber := "arn:aws:iam::654321:mfa/test@test.com"
 
 	// access key id and secret access key of your IAM user.
-	accessKeyID := "AKIAIFX3D"
-	secretAccessKey := "jyVKiT"
+	accessKeyID := "FAKE-ACCESS-KEY-ID"
+	secretAccessKey := "FAKE-SECRET-ACCESS-KEY"
 
 	os.Setenv("AWS_ACCESS_KEY_ID", accessKeyID)
 	os.Setenv("AWS_SECRET_ACCESS_KEY", secretAccessKey)
@@ -38,7 +39,7 @@ func getCredentialsUsingMFA() {
 	}
 
 	req := stsSvc.GetSessionTokenRequest(&getSessionTokenInput)
-	tempToken, err := req.Send()
+	tempToken, err := req.Send(context.TODO())
 	if err != nil {
 		fmt.Println("GetSessionToken failed: ", err)
 	}

@@ -145,7 +145,8 @@ called once for each host. The frequency of calling `Fetch` is based on the `per
 defined in the configuration file.
 
 `Fetch` must publish the event using the `mb.ReporterV2.Event` method. If an error
-happens, the error must be published using the `mb.ReporterV2.Error` method. This means
+happens, `Fetch` can return an error, or if `Event` is being called in a loop,
+published using the `mb.ReporterV2.Error` method. This means
 that Metricbeat always sends an event, even on failure. You must make sure that the
 error message helps to identify the actual error.
 
@@ -154,7 +155,7 @@ incremented for each `Fetch` call:
 
 [source,go]
 ----
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	report.Event(mb.Event{
 		MetricSetFields: common.MapStr{
@@ -162,6 +163,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 	})
 	m.counter++
+
+	return nil
 }
 ----
 
@@ -172,19 +175,11 @@ https://godoc.org/github.com/elastic/beats/libbeat/common#MapStr[MapStr API docs
 
 [float]
 ===== Multi Fetching
-Metricbeat has two different `Fetch` interfaces. One of the interfaces, which you saw in the
-previous example, fetches a single event. In some cases, every fetch returns a list of events.
-Instead of using an array inside a JSON document, we recommend that you create a list of events.
 
-For this kind of data, you can use the following `Fetch` interface:
-
-[source,go]
-----
-(m *MetricSet) Fetch() ([]common.MapStr, error)
-----
-
-The only difference between this and the previous example is that the second example returns `[]common.MapStr`.
-Metricbeat will add the same timestamp to all the events in the list to make it possible to correlate the events.
+`Event` can be called multiple times inside of the `Fetch` method for metricsets that might expose multiple events.
+`Event` returns a bool that indicates if the metricset is already closed and no further events can be processed,
+in which case `Fetch` should return immediately. If there is an error while processing one of many events,
+it can be published using the `mb.ReporterV2.Error` method, as opposed to returning an error value.
 
 [float]
 ===== Parsing and Normalizing Fields
@@ -225,7 +220,7 @@ common.MapStr{
 }
 ----
 
-You can use the following code to make the transformations:
+You can use the schema package to transform the data, and optionally mark some fields in a schema as required or not. For example:
 
 [source,go]
 ----
@@ -233,6 +228,36 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
+
+var (
+	schema = s.Schema{
+		"test_string": c.Str("testString", s.Required), <1>
+		"test_int":    c.Int("testInt"), <2>
+		"test_bool":   c.Bool("testBool", s.Optional), <3>
+		"test_float":  c.Float("testFloat"),
+		"test_obj": s.Object{
+			"test_obj_string": c.Str("testObjString", s.IgnoreAllErrors), <4>
+		},
+	}
+)
+
+func eventMapping(input map[string]interface{}) common.MapStr {
+	return schema.Apply(input) <5>
+}
+----
+<1> Marks a field as required.
+<2> If a field has no schema option set, it is equivalent to `Required`.
+<3> Marks the field as optional.
+<4> Ignore any value conversion error
+<5> By default, `Apply` will fail and return an error if any required field is missing. Using the optional second argument, you can specify how `Apply` handles different fields of the  schema. The possible values are:
+- `AllRequired` is the default behavior. Returns an error if any required field is missing, including fields that are required because no schema option is set.
+- `FailOnRequired`  will fail if a field explicitly marked as `required` is missing.
+- `NotFoundKeys(cb func([]string))` takes a callback function that will be called with a list of missing keys, allowing for finer-grained error handling.
+
+In the above example, note that it is possible to create the schema object once
+and apply it to all events. You can also use `ApplyTo` to add additional data to an existing `MapStr` object:
+[source,go]
+----
 
 var (
 	schema = s.Schema{
@@ -244,15 +269,28 @@ var (
 			"test_obj_string": c.Str("testObjString"),
 		},
 	}
+
+	additionalSchema = s.Schema{
+		"second_string": c.Str("secondString"),
+		"second_int": c.Int("secondInt"),
+	}
 )
 
-func eventMapping(input map[string]interface{}) common.MapStr {
-	return schema.Apply(input)
-}
-----
+	data, err := schema.Apply(input)
+	if err != nil {
+		return err
+	}
 
-In the above example, note that it is possible to create the schema object once
-and apply it to all events.
+	if m.parseMoreData{
+		_, err := additionalSchema.ApplyTo(data, input)
+		if len(err) > 0 { <1>
+			return err.Err()
+		}
+	}
+
+----
+<1> `ApplyTo` returns a raw MultiError object, making it suitable for finer-grained error handling.
+
 
 [float]
 ==== Configuration File

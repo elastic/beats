@@ -21,13 +21,14 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type dropEvent struct{}
 
 func init() {
 	processors.RegisterPlugin("drop_event",
-		configChecked(newDropEvent, allowedFields("when")))
+		checks.ConfigChecked(newDropEvent, checks.AllowedFields("when")))
 }
 
 var dropEventsSingleton = (*dropEvent)(nil)

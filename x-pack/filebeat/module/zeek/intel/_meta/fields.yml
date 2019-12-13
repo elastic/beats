@@ -1,0 +1,80 @@
+- name: intel
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek Intel log.
+  fields:
+
+    - name: seen
+      type: group
+      fields:
+        - name: indicator
+          type: keyword
+          description: >
+            The intelligence indicator.
+
+        - name: indicator_type
+          type: keyword
+          description: >
+            The type of data the indicator represents.
+
+        - name: host
+          type: keyword
+          description: >
+            If the indicator type was Intel::ADDR, then this field will be present.
+
+        - name: conn
+          type: keyword
+          description: >
+            If the data was discovered within a connection, the connection record should go here to give context to the data.
+
+        - name: where
+          type: keyword
+          description: >
+            Where the data was discovered.
+
+        - name: node
+          type: keyword
+          description: >
+            The name of the node where the match was discovered.
+
+        - name: uid
+          type: keyword
+          description: >
+            If the data was discovered within a connection, the connection uid should go here to give context to the data. If the conn field is provided, this will be automatically filled out.
+
+        - name: f
+          type: object
+          description: >
+            If the data was discovered within a file, the file record should go here to provide context to the data.
+
+        - name: fuid
+          type: keyword
+          description: >
+            If the data was discovered within a file, the file uid should go here to provide context to the data. If the file record f is provided, this will be automatically filled out.
+
+
+    - name: matched
+      type: keyword
+      description: >
+        Event to represent a match in the intelligence data from data that was seen.
+
+    - name: sources
+      type: keyword
+      description: >
+        Sources which supplied data for this match.
+
+    - name: fuid
+      type: keyword
+      description: >
+        If a file was associated with this intelligence hit, this is the uid for the file.
+
+    - name: file_mime_type
+      type: keyword
+      description: >
+        A mime type if the intelligence hit is related to a file. If the $f field is provided this will be automatically filled out.
+
+    - name: file_desc
+      type: keyword
+      description: >
+        Frequently files can be described to give a bit more context. If the $f field is provided this field will be automatically filled out.

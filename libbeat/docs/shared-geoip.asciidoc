@@ -16,11 +16,13 @@ IP addresses, based on data from the Maxmind GeoLite2 City Database. Because the
 processor uses a geoIP database that's installed on {es}, you don't need
 to install a geoIP database on the machines running {beatname_uc}.
 
+ifndef::no-output-logstash[]
 NOTE: If your use case involves using {ls}, you can use the
 {logstash-ref}/plugins-filters-geoip.html[GeoIP filter] available in {ls}
 instead of using the `geoip` processor. However, using the `geoip` processor is
 the simplest approach when you don't require the additional processing power of
 {ls}.
+endif::no-output-logstash[]
 
 [float]
 [id="{beatname_lc}-configuring-geoip"]
@@ -139,4 +141,4 @@ location field, for example `client.geo.location` or `host.geo.location`, as
 the Geohash.
 
 [role="screenshot"]
-image:./images/coordinate-map.png[Coordinate map in {kib}]
+image::./images/coordinate-map.png[Coordinate map in {kib}]

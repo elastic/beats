@@ -25,7 +25,8 @@ import (
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
 )
 
 func TestWrapAll(t *testing.T) {
@@ -63,7 +64,7 @@ func TestWrapAll(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         args
-		resultFields []mapval.Map
+		resultFields []map[string]interface{}
 	}{
 		{
 			"simple",
@@ -71,7 +72,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{basicJob},
 				[]JobWrapper{addFoo},
 			},
-			[]mapval.Map{{"basic": "job", "foo": "bar"}},
+			[]map[string]interface{}{{"basic": "job", "foo": "bar"}},
 		},
 		{
 			"multijob",
@@ -79,7 +80,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{basicJob, basicJob},
 				[]JobWrapper{addFoo},
 			},
-			[]mapval.Map{
+			[]map[string]interface{}{
 				{"basic": "job", "foo": "bar"},
 				{"basic": "job", "foo": "bar"},
 			},
@@ -90,7 +91,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{contJob},
 				[]JobWrapper{addFoo},
 			},
-			[]mapval.Map{
+			[]map[string]interface{}{
 				{"cont": "job", "foo": "bar"},
 				{"basic": "job", "foo": "bar"},
 			},
@@ -101,7 +102,7 @@ func TestWrapAll(t *testing.T) {
 				[]Job{contJob},
 				[]JobWrapper{addFoo, addBaz},
 			},
-			[]mapval.Map{
+			[]map[string]interface{}{
 				{"cont": "job", "foo": "bar", "baz": "bot"},
 				{"basic": "job", "foo": "bar", "baz": "bot"},
 			},
@@ -115,8 +116,8 @@ func TestWrapAll(t *testing.T) {
 			for idx, rf := range tt.resultFields {
 				fr := results[idx].Fields
 
-				validator := mapval.Strict(mapval.MustCompile(rf))
-				mapval.Test(t, validator, fr)
+				validator := lookslike.Strict(lookslike.MustCompile(rf))
+				testslike.Test(t, validator, fr)
 			}
 		})
 	}

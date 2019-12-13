@@ -78,7 +78,6 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 2
 
-    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/9214')
     def test_close_removed(self):
         """
         Checks that a file is closed if removed

@@ -22,11 +22,14 @@ package collector
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/golang/protobuf/proto"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	_ "github.com/elastic/beats/metricbeat/module/prometheus"
 )
 
 func TestGetPromEventsFromMetricFamily(t *testing.T) {
@@ -195,4 +198,8 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 		event := getPromEventsFromMetricFamily(test.Family)
 		assert.Equal(t, test.Event, event)
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "prometheus", "collector")
 }

@@ -1,0 +1,8 @@
+This is the Beat module.
+
+The default metricsets are `state` and `stats`.
+
+[float]
+=== Compatibility
+
+The beat module is tested with metricbeat 7.3.0.

@@ -52,6 +52,19 @@ func TestDefaultSupport_Init(t *testing.T) {
 		}
 	})
 
+	t.Run("with an empty rollover_alias", func(t *testing.T) {
+		_, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":        true,
+				"rollover_alias": "",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
+			},
+		))
+		require.Error(t, err)
+	})
+
 	t.Run("with custom config", func(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
@@ -65,7 +78,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		))
 		require.NoError(t, err)
 
-		s := tmp.(*ilmSupport)
+		s := tmp.(*stdSupport)
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
@@ -74,56 +87,95 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(Alias{Name: "alias", Pattern: "01"}, s.Alias())
 	})
 
-	t.Run("load external policy", func(t *testing.T) {
-		s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+	t.Run("with custom alias config with fieldref", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
-				"policy_file": "testfiles/custom.json",
+				"enabled":        true,
+				"rollover_alias": "alias-%{[agent.version]}",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
 			},
 		))
 		require.NoError(t, err)
-		assert.Equal(t, map[string]interface{}{"hello": "world"}, s.Policy().Body)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "alias-9.9.9", Pattern: "01"}, s.Alias())
+	})
+
+	t.Run("with default alias", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":      true,
+				"pattern":      "01",
+				"check_exists": false,
+				"overwrite":    true,
+			},
+		))
+		require.NoError(t, err)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "test-9.9.9", Pattern: "01"}, s.Alias())
+	})
+
+	t.Run("load external policy", func(t *testing.T) {
+		s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			common.MapStr{"policy_file": "testfiles/custom.json"},
+		))
+		require.NoError(t, err)
+		assert.Equal(t, common.MapStr{"hello": "world"}, s.Policy().Body)
 	})
 }
 
 func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 	cases := map[string]struct {
-		calls []onCall
-		cfg   map[string]interface{}
-		b     bool
-		fail  error
-		err   bool
+		calls   []onCall
+		cfg     map[string]interface{}
+		enabled bool
+		fail    error
+		err     bool
 	}{
 		"disabled via config": {
 			cfg: map[string]interface{}{"enabled": false},
 		},
 		"disabled via handler": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(false, nil),
+				onCheckILMEnabled(ModeAuto).Return(false, nil),
 			},
 		},
 		"enabled via handler": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(true, nil),
+				onCheckILMEnabled(ModeAuto).Return(true, nil),
 			},
-			b: true,
+			enabled: true,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
-				onILMEnabled(ModeEnabled).Return(true, nil),
+				onCheckILMEnabled(ModeEnabled).Return(true, nil),
 			},
-			cfg: map[string]interface{}{"enabled": true},
-			b:   true,
+			cfg:     map[string]interface{}{"enabled": true},
+			enabled: true,
 		},
 		"fail enabled": {
 			calls: []onCall{
-				onILMEnabled(ModeEnabled).Return(false, nil),
+				onCheckILMEnabled(ModeEnabled).Return(false, nil),
 			},
 			cfg:  map[string]interface{}{"enabled": true},
 			fail: ErrESILMDisabled,
 		},
 		"io error": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(false, errors.New("ups")),
+				onCheckILMEnabled(ModeAuto).Return(false, errors.New("ups")),
 			},
 			cfg: map[string]interface{}{},
 			err: true,
@@ -139,7 +191,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
-			b, err := m.Enabled()
+			enabled, err := m.CheckEnabled()
 
 			if test.fail == nil && !test.err {
 				require.NoError(t, err)
@@ -151,7 +203,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 				assert.Equal(t, test.fail, ErrReason(err))
 			}
 
-			assert.Equal(t, test.b, b)
+			assert.Equal(t, test.enabled, enabled)
 			h.AssertExpectations(t)
 		})
 	}
@@ -212,7 +264,7 @@ func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
 
 func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	testPolicy := Policy{
-		Name: "test-9.9.9",
+		Name: "test",
 		Body: DefaultPolicy,
 	}
 
@@ -253,11 +305,6 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := test.cfg
-			if cfg == nil {
-				cfg = map[string]interface{}{"name": "test"}
-			}
-
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
 			created, err := m.EnsurePolicy(test.overwrite)
@@ -275,7 +322,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	}
 }
 
-func createManager(t *testing.T, h APIHandler, cfg map[string]interface{}) Manager {
+func createManager(t *testing.T, h ClientHandler, cfg map[string]interface{}) Manager {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 	s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(cfg))
 	require.NoError(t, err)

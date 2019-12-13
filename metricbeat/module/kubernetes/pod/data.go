@@ -65,6 +65,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 				},
 			},
 			"name": pod.PodRef.Name,
+			"uid":  pod.PodRef.UID,
 
 			"cpu": common.MapStr{
 				"usage": common.MapStr{

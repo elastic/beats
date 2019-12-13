@@ -30,12 +30,15 @@ import (
 	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
 )
 
 type decodeJSONFields struct {
 	fields        []string
 	maxDepth      int
 	overwriteKeys bool
+	addErrorKey   bool
 	processArray  bool
 	target        *string
 }
@@ -44,6 +47,7 @@ type config struct {
 	Fields        []string `config:"fields"`
 	MaxDepth      int      `config:"max_depth" validate:"min=1"`
 	OverwriteKeys bool     `config:"overwrite_keys"`
+	AddErrorKey   bool     `config:"add_error_key"`
 	ProcessArray  bool     `config:"process_array"`
 	Target        *string  `config:"target"`
 }
@@ -60,9 +64,11 @@ var debug = logp.MakeDebug("filters")
 
 func init() {
 	processors.RegisterPlugin("decode_json_fields",
-		configChecked(NewDecodeJSONFields,
-			requireFields("fields"),
-			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")))
+		checks.ConfigChecked(NewDecodeJSONFields,
+			checks.RequireFields("fields"),
+			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when")))
+
+	jsprocessor.RegisterPlugin("DecodeJSONFields", NewDecodeJSONFields)
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
@@ -75,7 +81,7 @@ func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := &decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, processArray: config.ProcessArray, target: config.Target}
+	f := &decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, addErrorKey: config.AddErrorKey, processArray: config.ProcessArray, target: config.Target}
 	return f, nil
 }
 
@@ -114,7 +120,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		} else {
 			switch t := output.(type) {
 			case map[string]interface{}:
-				jsontransform.WriteJSONKeys(event, t, f.overwriteKeys)
+				jsontransform.WriteJSONKeys(event, t, f.overwriteKeys, f.addErrorKey)
 			default:
 				errs = append(errs, "failed to add target to root")
 			}

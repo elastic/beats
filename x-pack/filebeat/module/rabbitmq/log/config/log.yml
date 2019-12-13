@@ -1,0 +1,17 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+# If the line doesn't start with a timestamp, consider it a continuation of the previous line
+# From https://www.elastic.co/guide/en/beats/filebeat/current/_examples_of_multiline_configuration.html#_timestamps
+# ideally, this would be the same pattern (`DATESTAMP`) used in `processors.grok.patterns`
+multiline:
+  pattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  negate: true
+  match: after
+
+processors:
+  - add_locale: ~

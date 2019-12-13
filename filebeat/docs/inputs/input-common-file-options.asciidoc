@@ -77,7 +77,11 @@ certain criteria or time. Closing the harvester means closing the file handler.
 If a file is updated after the harvester is closed, the file will be picked up
 again after `scan_frequency` has elapsed. However, if the file is moved or
 deleted while the harvester is closed, {beatname_uc} will not be able to pick up
-the file again, and any data that the harvester hasn't read will be lost.
+the file again, and any data that the harvester hasn't read will be lost. 
+The `close_*` settings are applied synchronously when {beatname_uc} attempts 
+to read from a file, meaning that if {beatname_uc} is in a blocked state
+due to blocked output, full queue or other issue, a file that would 
+otherwise be closed remains open until {beatname_uc} once again attempts to read from the file.
 
 
 [float]
@@ -226,6 +230,13 @@ from inode reuse on Linux. For more information, see <<inode-reuse-issue>>.
 
 NOTE: Every time a file is renamed, the file state is updated and the counter
 for `clean_inactive` starts at 0 again.
+
+TIP: During testing, you might notice that the registry contains state entries
+that should be removed based on the `clean_inactive` setting. This happens
+because {beatname_uc} doesn't remove the entries until it opens the registry
+again to read a different file. If you are testing the `clean_inactive` setting,
+make sure {beatname_uc} is configured to read from more than one file, or the
+file state will never be removed from the registry. 
 
 [float]
 [id="{beatname_lc}-input-{type}-clean-removed"]

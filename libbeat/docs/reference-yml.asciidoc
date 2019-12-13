@@ -12,14 +12,14 @@ The contents of the file are included here for your convenience.
 
 ifndef::has_xpack[]
 [source,yaml]
---
+----
 include::../../{beatname_lc}/{beatname_lc}.reference.yml[]
---
+----
 endif::has_xpack[]
 
 ifdef::has_xpack[]
 [source,yaml]
---
+----
 include::../../x-pack/{beatname_lc}/{beatname_lc}.reference.yml[]
---
+----
 endif::has_xpack[]

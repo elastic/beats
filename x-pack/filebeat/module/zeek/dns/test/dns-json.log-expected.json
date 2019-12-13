@@ -1,13 +1,42 @@
 [
     {
-        "@timestamp": 1547188415000,
+        "@timestamp": "2019-01-11T06:33:35.857Z",
         "destination.address": "192.168.86.1",
         "destination.ip": "192.168.86.1",
         "destination.port": 53,
-        "ecs.version": "1.0.0",
+        "dns.answers": [
+            {
+                "data": "proxy-production-us-west1.gcp.cloud.es.io",
+                "ttl": 119
+            },
+            {
+                "data": "proxy-production-us-west1-v1-009.gcp.cloud.es.io",
+                "ttl": 119
+            },
+            {
+                "data": "35.199.178.4",
+                "ttl": 59
+            }
+        ],
+        "dns.header_flags": [
+            "RD",
+            "RA"
+        ],
+        "dns.id": 15209,
+        "dns.question.class": "IN",
+        "dns.question.name": "dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io",
+        "dns.question.registered_domain": "es.io",
+        "dns.question.type": "A",
+        "dns.resolved_ip": [
+            "35.199.178.4"
+        ],
+        "dns.response_code": "NOERROR",
+        "dns.type": "answer",
         "event.dataset": "zeek.dns",
+        "event.duration": 76967000,
         "event.id": "CAcJw21BbVedgFnYH3",
         "event.module": "zeek",
+        "event.original": "{\"ts\":1547188415.857497,\"uid\":\"CAcJw21BbVedgFnYH3\",\"id.orig_h\":\"192.168.86.167\",\"id.orig_p\":38339,\"id.resp_h\":\"192.168.86.1\",\"id.resp_p\":53,\"proto\":\"udp\",\"trans_id\":15209,\"rtt\":0.076967,\"query\":\"dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io\",\"qclass\":1,\"qclass_name\":\"C_INTERNET\",\"qtype\":1,\"qtype_name\":\"A\",\"rcode\":0,\"rcode_name\":\"NOERROR\",\"AA\":false,\"TC\":false,\"RD\":true,\"RA\":true,\"Z\":0,\"answers\":[\"proxy-production-us-west1.gcp.cloud.es.io\",\"proxy-production-us-west1-v1-009.gcp.cloud.es.io\",\"35.199.178.4\"],\"TTLs\":[119.0,119.0,59.0],\"rejected\":false}",
         "fileset.name": "dns",
         "input.type": "log",
         "log.offset": 0,
@@ -45,5 +74,95 @@
         "zeek.dns.rtt": 0.076967,
         "zeek.dns.trans_id": 15209,
         "zeek.session_id": "CAcJw21BbVedgFnYH3"
+    },
+    {
+        "@timestamp": "2019-08-29T16:23:50.680Z",
+        "destination.address": "ff02::fb",
+        "destination.ip": "ff02::fb",
+        "destination.port": 5353,
+        "dns.id": 0,
+        "dns.question.class": "IN",
+        "dns.question.name": "_googlecast._tcp.local",
+        "dns.question.registered_domain": "_tcp.local",
+        "dns.question.type": "PTR",
+        "dns.type": "query",
+        "event.dataset": "zeek.dns",
+        "event.id": "C19a1k4lTv46YMbeOk",
+        "event.module": "zeek",
+        "event.original": "{\"ts\":1567095830.680046,\"uid\":\"C19a1k4lTv46YMbeOk\",\"id.orig_h\":\"fe80::4ef:15cf:769f:ff21\",\"id.orig_p\":5353,\"id.resp_h\":\"ff02::fb\",\"id.resp_p\":5353,\"proto\":\"udp\",\"trans_id\":0,\"query\":\"_googlecast._tcp.local\",\"qclass\":1,\"qclass_name\":\"C_INTERNET\",\"qtype\":12,\"qtype_name\":\"PTR\",\"AA\":false,\"TC\":false,\"RD\":false,\"RA\":false,\"Z\":0,\"rejected\":false}",
+        "fileset.name": "dns",
+        "input.type": "log",
+        "log.offset": 566,
+        "network.community_id": "1:Jq0sRtlGSMjsvMBE1ZYybbR2tI0=",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "fe80::4ef:15cf:769f:ff21",
+        "source.ip": "fe80::4ef:15cf:769f:ff21",
+        "source.port": 5353,
+        "tags": [
+            "zeek.dns"
+        ],
+        "zeek.dns.AA": false,
+        "zeek.dns.RA": false,
+        "zeek.dns.RD": false,
+        "zeek.dns.TC": false,
+        "zeek.dns.qclass": 1,
+        "zeek.dns.qclass_name": "C_INTERNET",
+        "zeek.dns.qtype": 12,
+        "zeek.dns.qtype_name": "PTR",
+        "zeek.dns.query": "_googlecast._tcp.local",
+        "zeek.dns.rejected": false,
+        "zeek.dns.trans_id": 0,
+        "zeek.session_id": "C19a1k4lTv46YMbeOk"
+    },
+    {
+        "@timestamp": "2019-08-29T16:23:50.734Z",
+        "destination.address": "224.0.0.251",
+        "destination.ip": "224.0.0.251",
+        "destination.port": 5353,
+        "dns.answers": [
+            {
+                "data": "bravia-4k-gb-5c89f865c9d569ab338815b35e3acc56._googlecast._tcp.local",
+                "ttl": 120
+            }
+        ],
+        "dns.header_flags": "AA",
+        "dns.id": 0,
+        "dns.question.name": "_googlecast._tcp.local",
+        "dns.question.registered_domain": "_tcp.local",
+        "dns.response_code": "NOERROR",
+        "dns.type": "answer",
+        "event.dataset": "zeek.dns",
+        "event.id": "CdiVAw7jJw6gsX5H",
+        "event.module": "zeek",
+        "event.original": "{\"ts\":1567095830.734329,\"uid\":\"CdiVAw7jJw6gsX5H\",\"id.orig_h\":\"192.168.86.237\",\"id.orig_p\":5353,\"id.resp_h\":\"224.0.0.251\",\"id.resp_p\":5353,\"proto\":\"udp\",\"trans_id\":0,\"query\":\"_googlecast._tcp.local\",\"rcode\":0,\"rcode_name\":\"NOERROR\",\"AA\":true,\"TC\":false,\"RD\":false,\"RA\":false,\"Z\":0,\"answers\":[\"bravia-4k-gb-5c89f865c9d569ab338815b35e3acc56._googlecast._tcp.local\"],\"TTLs\":[120.0],\"rejected\":false}",
+        "fileset.name": "dns",
+        "input.type": "log",
+        "log.offset": 909,
+        "network.community_id": "1:QIR5YXlirWwWA18ZyY/RnvQoaic=",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "192.168.86.237",
+        "source.ip": "192.168.86.237",
+        "source.port": 5353,
+        "tags": [
+            "zeek.dns"
+        ],
+        "zeek.dns.AA": true,
+        "zeek.dns.RA": false,
+        "zeek.dns.RD": false,
+        "zeek.dns.TC": false,
+        "zeek.dns.TTLs": [
+            120
+        ],
+        "zeek.dns.answers": [
+            "bravia-4k-gb-5c89f865c9d569ab338815b35e3acc56._googlecast._tcp.local"
+        ],
+        "zeek.dns.query": "_googlecast._tcp.local",
+        "zeek.dns.rcode": 0,
+        "zeek.dns.rcode_name": "NOERROR",
+        "zeek.dns.rejected": false,
+        "zeek.dns.trans_id": 0,
+        "zeek.session_id": "CdiVAw7jJw6gsX5H"
     }
 ]

@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type ilmSupport struct {
+type stdSupport struct {
 	log *logp.Logger
 
 	mode        Mode
@@ -34,9 +34,9 @@ type ilmSupport struct {
 	policy Policy
 }
 
-type singlePolicyManager struct {
-	*ilmSupport
-	client APIHandler
+type stdManager struct {
+	*stdSupport
+	client ClientHandler
 
 	// cached info
 	cache infoCache
@@ -49,15 +49,15 @@ type infoCache struct {
 
 var defaultCacheDuration = 5 * time.Minute
 
-// NewDefaultSupport creates an instance of default ILM support implementation.
-func NewDefaultSupport(
+// NewStdSupport creates an instance of default ILM support implementation.
+func NewStdSupport(
 	log *logp.Logger,
 	mode Mode,
 	alias Alias,
 	policy Policy,
 	overwrite, checkExists bool,
 ) Supporter {
-	return &ilmSupport{
+	return &stdSupport{
 		log:         log,
 		mode:        mode,
 		overwrite:   overwrite,
@@ -67,18 +67,19 @@ func NewDefaultSupport(
 	}
 }
 
-func (s *ilmSupport) Mode() Mode     { return s.mode }
-func (s *ilmSupport) Alias() Alias   { return s.alias }
-func (s *ilmSupport) Policy() Policy { return s.policy }
+func (s *stdSupport) Mode() Mode      { return s.mode }
+func (s *stdSupport) Alias() Alias    { return s.alias }
+func (s *stdSupport) Policy() Policy  { return s.policy }
+func (s *stdSupport) Overwrite() bool { return s.overwrite }
 
-func (s *ilmSupport) Manager(h APIHandler) Manager {
-	return &singlePolicyManager{
+func (s *stdSupport) Manager(h ClientHandler) Manager {
+	return &stdManager{
 		client:     h,
-		ilmSupport: s,
+		stdSupport: s,
 	}
 }
 
-func (m *singlePolicyManager) Enabled() (bool, error) {
+func (m *stdManager) CheckEnabled() (bool, error) {
 	if m.mode == ModeDisabled {
 		return false, nil
 	}
@@ -87,7 +88,7 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 		return m.cache.Enabled, nil
 	}
 
-	enabled, err := m.client.ILMEnabled(m.mode)
+	enabled, err := m.client.CheckILMEnabled(m.mode)
 	if err != nil {
 		return enabled, err
 	}
@@ -101,7 +102,11 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 	return enabled, nil
 }
 
-func (m *singlePolicyManager) EnsureAlias() error {
+func (m *stdManager) EnsureAlias() error {
+	if !m.checkExists {
+		return nil
+	}
+
 	b, err := m.client.HasAlias(m.alias.Name)
 	if err != nil {
 		return err
@@ -114,9 +119,9 @@ func (m *singlePolicyManager) EnsureAlias() error {
 	return m.client.CreateAlias(m.alias)
 }
 
-func (m *singlePolicyManager) EnsurePolicy(overwrite bool) (bool, error) {
+func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
-	overwrite = overwrite || m.overwrite
+	overwrite = overwrite || m.Overwrite()
 
 	exists := true
 	if m.checkExists && !overwrite {

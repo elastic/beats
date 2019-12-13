@@ -20,19 +20,16 @@ package keyspace
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/redis"
 )
 
-var (
-	debugf = logp.MakeDebug("redis-keyspace")
-)
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()
 
 func init() {
 	mb.Registry.MustAddMetricSet("redis", "keyspace", New,
-		mb.WithHostParser(parse.PassThruHostParser),
+		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
 }
@@ -52,14 +49,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	conn := m.Connection()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+		}
+	}()
+
 	// Fetch default INFO.
-	info, err := redis.FetchRedisInfo("keyspace", m.Connection())
+	info, err := redis.FetchRedisInfo("keyspace", conn)
 	if err != nil {
-		logp.Err("Failed to fetch redis info for keyspaces: %s", err)
-		return
+		return errors.Wrap(err, "Failed to fetch redis info for keyspaces")
 	}
 
-	debugf("Redis INFO from %s: %+v", m.Host(), info)
+	m.Logger().Debugf("Redis INFO from %s: %+v", m.Host(), info)
 	eventsMapping(r, info)
+	return nil
 }

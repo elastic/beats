@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 const (
@@ -31,8 +31,8 @@ const (
 )
 
 // OSSConfigFileParams returns the parameters for generating OSS config.
-func OSSConfigFileParams() mage.ConfigFileParams {
-	params, err := configFileParams(mage.OSSBeatDir())
+func OSSConfigFileParams() devtools.ConfigFileParams {
+	params, err := configFileParams(devtools.OSSBeatDir())
 	if err != nil {
 		panic(err)
 	}
@@ -40,43 +40,43 @@ func OSSConfigFileParams() mage.ConfigFileParams {
 }
 
 // XPackConfigFileParams returns the parameters for generating X-Pack config.
-func XPackConfigFileParams() mage.ConfigFileParams {
-	params, err := configFileParams(mage.OSSBeatDir(), mage.XPackBeatDir())
+func XPackConfigFileParams() devtools.ConfigFileParams {
+	params, err := configFileParams(devtools.OSSBeatDir(), devtools.XPackBeatDir())
 	if err != nil {
 		panic(err)
 	}
 	return params
 }
 
-func configFileParams(dirs ...string) (mage.ConfigFileParams, error) {
+func configFileParams(dirs ...string) (devtools.ConfigFileParams, error) {
 	var globs []string
 	for _, dir := range dirs {
 		globs = append(globs, filepath.Join(dir, configTemplateGlob))
 	}
 
-	configFiles, err := mage.FindFiles(globs...)
+	configFiles, err := devtools.FindFiles(globs...)
 	if err != nil {
-		return mage.ConfigFileParams{}, errors.Wrap(err, "failed to find config templates")
+		return devtools.ConfigFileParams{}, errors.Wrap(err, "failed to find config templates")
 	}
 	if len(configFiles) == 0 {
-		return mage.ConfigFileParams{}, errors.Errorf("no config files found in %v", globs)
+		return devtools.ConfigFileParams{}, errors.Errorf("no config files found in %v", globs)
 	}
 
-	return mage.ConfigFileParams{
+	return devtools.ConfigFileParams{
 		ShortParts: join(
-			mage.OSSBeatDir("_meta/common.p1.yml"),
+			devtools.OSSBeatDir("_meta/common.p1.yml"),
 			configFiles,
-			mage.OSSBeatDir("_meta/common.p2.yml"),
-			mage.LibbeatDir("_meta/config.yml"),
+			devtools.OSSBeatDir("_meta/common.p2.yml"),
+			devtools.LibbeatDir("_meta/config.yml.tmpl"),
 		),
 		ReferenceParts: join(
-			mage.OSSBeatDir("_meta/common.reference.yml"),
+			devtools.OSSBeatDir("_meta/common.reference.yml"),
 			configFiles,
-			mage.LibbeatDir("_meta/config.reference.yml"),
+			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		),
 		DockerParts: []string{
-			mage.OSSBeatDir("_meta/beat.docker.yml"),
-			mage.LibbeatDir("_meta/config.docker.yml"),
+			devtools.OSSBeatDir("_meta/beat.docker.yml"),
+			devtools.LibbeatDir("_meta/config.docker.yml"),
 		},
 		ExtraVars: map[string]interface{}{
 			"ArchBits": archBits,

@@ -23,6 +23,8 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // QueryResult contains the result of a query.
@@ -235,6 +237,9 @@ func (es *Connection) SearchURIWithBody(
 	params map[string]string,
 	body interface{},
 ) (int, *SearchResults, error) {
+	if !es.version.LessThan(&common.Version{Major: 8}) {
+		docType = ""
+	}
 	status, resp, err := es.apiCall("GET", index, docType, "_search", "", params, body)
 	if err != nil {
 		return status, nil, err

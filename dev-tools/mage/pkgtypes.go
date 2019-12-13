@@ -253,6 +253,22 @@ func (typ PackageType) AddFileExtension(file string) string {
 	return file
 }
 
+// PackagingDir returns the path that should be used for building and packaging.
+// The path returned guarantees that packaging operations can run in isolation.
+func (typ PackageType) PackagingDir(home string, target BuildPlatform, spec PackageSpec) (string, error) {
+	root := home
+	if typ == Docker {
+		imageName, err := spec.ImageName()
+		if err != nil {
+			return "", err
+		}
+		root = filepath.Join(root, imageName)
+	}
+
+	targetPath := typ.AddFileExtension(spec.Name + "-" + target.GOOS() + "-" + target.Arch())
+	return filepath.Join(root, targetPath), nil
+}
+
 // Build builds a package based on the provided spec.
 func (typ PackageType) Build(spec PackageSpec) error {
 	switch typ {
@@ -279,6 +295,10 @@ func (s PackageSpec) Clone() PackageSpec {
 	clone.Files = make(map[string]PackageFile, len(s.Files))
 	for k, v := range s.Files {
 		clone.Files[k] = v
+	}
+	clone.ExtraVars = make(map[string]string, len(s.ExtraVars))
+	for k, v := range s.ExtraVars {
+		clone.ExtraVars[k] = v
 	}
 	return clone
 }
@@ -343,6 +363,10 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 		return MustExpand(in, args...)
 	}
 
+	if s.evalContext == nil {
+		s.evalContext = map[string]interface{}{}
+	}
+
 	for k, v := range s.ExtraVars {
 		s.evalContext[k] = mustExpand(v)
 	}
@@ -374,9 +398,6 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 		}
 	} else {
 		s.packageDir = filepath.Clean(mustExpand(s.packageDir))
-	}
-	if s.evalContext == nil {
-		s.evalContext = map[string]interface{}{}
 	}
 	s.evalContext["PackageDir"] = s.packageDir
 
@@ -429,6 +450,19 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 	}
 
 	return s
+}
+
+// ImageName computes the image name from the spec. A template for the image
+// name can be configured by adding image_name to extra_vars.
+func (s PackageSpec) ImageName() (string, error) {
+	if name, _ := s.ExtraVars["image_name"]; name != "" {
+		imageName, err := s.Expand(name)
+		if err != nil {
+			return "", errors.Wrapf(err, "failed to expand image_name")
+		}
+		return imageName, nil
+	}
+	return s.Name, nil
 }
 
 func copyInstallScript(spec PackageSpec, script string, local *string) error {
@@ -651,6 +685,9 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		"--name", spec.ServiceName,
 		"--architecture", spec.Arch,
 	)
+	if packageType == RPM {
+		args = append(args, "--rpm-rpmbuild-define", "_build_id_links none")
+	}
 	if spec.Version != "" {
 		args = append(args, "--version", spec.Version)
 	}

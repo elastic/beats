@@ -25,8 +25,30 @@ import (
 // MergeEventFields merges the given common.MapStr into the given Event's Fields.
 func MergeEventFields(e *beat.Event, merge common.MapStr) {
 	if e.Fields != nil {
-		e.Fields.DeepUpdate(merge)
+		e.Fields.DeepUpdate(merge.Clone())
 	} else {
-		e.Fields = merge
+		e.Fields = merge.Clone()
 	}
+}
+
+// EventCancelledMetaKey is the path to the @metadata key marking an event as cancelled.
+const EventCancelledMetaKey = "__hb_evt_cancel__"
+
+// CancelEvent marks the event as cancelled. Downstream consumers of it should not emit nor output this event.
+func CancelEvent(event *beat.Event) {
+	if event != nil {
+		if event.Meta == nil {
+			event.Meta = common.MapStr{}
+		}
+		event.Meta.Put(EventCancelledMetaKey, true)
+	}
+}
+
+// IsEventCancelled checks for the marker left by CancelEvent.
+func IsEventCancelled(event *beat.Event) bool {
+	if event == nil || event.Meta == nil {
+		return false
+	}
+	v, err := event.Meta.GetValue(EventCancelledMetaKey)
+	return err == nil && v == true
 }

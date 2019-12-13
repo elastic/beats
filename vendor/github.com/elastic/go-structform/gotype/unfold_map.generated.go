@@ -21,7 +21,7 @@ package gotype
 import (
 	"unsafe"
 
-	"github.com/elastic/go-structform"
+	structform "github.com/elastic/go-structform"
 )
 
 var (
@@ -2336,6 +2336,5 @@ func makeMapPtr(ctx *unfoldCtx, l int, bt structform.BaseType) (interface{}, uns
 
 	default:
 		panic("invalid type code")
-		return nil, nil, nil
 	}
 }

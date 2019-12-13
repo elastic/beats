@@ -22,6 +22,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 
@@ -37,7 +38,7 @@ type Prometheus interface {
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
 
-	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2)
+	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
 
 type prometheus struct {
@@ -83,6 +84,7 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 			if err == io.EOF {
 				break
 			}
+			return nil, errors.Wrap(err, "decoding of metric family failed")
 		} else {
 			families = append(families, mf)
 		}
@@ -117,9 +119,8 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
 			m, ok := mapping.Metrics[family.GetName()]
-
-			// Ignore unknown metrics
-			if !ok {
+			if m == nil || !ok {
+				// Ignore unknown metrics
 				continue
 			}
 
@@ -129,6 +130,16 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			// Ignore retrieval errors (bad conf)
 			if value == nil {
 				continue
+			}
+
+			storeAllLabels := false
+			labelsLocation := ""
+			var extraFields common.MapStr
+			if m != nil {
+				c := m.GetConfiguration()
+				storeAllLabels = c.StoreNonMappedLabels
+				labelsLocation = c.NonMappedLabelsPlacement
+				extraFields = c.ExtraFields
 			}
 
 			// Apply extra options
@@ -147,7 +158,21 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 					} else {
 						labels.Put(l.GetField(), v)
 					}
+				} else if storeAllLabels {
+					// if label for this metric is not found at the label mappings but
+					// it is configured to store any labels found, make it so
+					// TODO dedot
+					labels.Put(labelsLocation+"."+k, v)
 				}
+			}
+
+			// if extra fields have been added through metric configuration
+			// add them to labels.
+			//
+			// not considering these extra fields to be keylabels as that case
+			// have not appeared yet
+			for k, v := range extraFields {
+				labels.Put(k, v)
 			}
 
 			// Keep a info document if it's an infoMetric
@@ -161,9 +186,12 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
-				// Put it in the event if it's a common metric
 				event := getEvent(eventsMap, keyLabels)
-				event.Put(field, value)
+				update := common.MapStr{}
+				update.Put(field, value)
+				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
+				event.DeepUpdate(update)
+
 				event.DeepUpdate(labels)
 			}
 		}
@@ -209,11 +237,10 @@ type infoMetricData struct {
 	Meta   common.MapStr
 }
 
-func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) {
+func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error {
 	events, err := p.GetProcessedMetrics(mapping)
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error getting processed metrics")
 	}
 	for _, event := range events {
 		r.Event(mb.Event{
@@ -221,6 +248,8 @@ func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.Report
 			Namespace:       mapping.Namespace,
 		})
 	}
+
+	return nil
 }
 
 func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {

@@ -71,6 +71,21 @@ include::../include/var-paths.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Virtual Host
+
+See customlog documentation  https://httpd.apache.org/docs/2.4/en/mod/mod_log_config.html
+Add %v config in httpd.conf in log section
+["source","sh",subs="attributes"]
+-----
+    # Replace
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    # By
+    LogFormat "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+-----
+
 :has-dashboards!:
 
 :fileset_ex!:

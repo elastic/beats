@@ -57,9 +57,7 @@ class Test(BaseTest):
         """
         Test that the dashboards can be loaded with `setup --dashboards`
         """
-
-        kibana_dir = os.path.join(self.beat_path, "_meta", "kibana.generated")
-        shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
+        shutil.copytree(self.kibana_dir(), os.path.join(self.working_dir, "kibana"))
 
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
@@ -97,3 +95,15 @@ class Test(BaseTest):
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
         assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
+
+    def get_elasticsearch_url(self):
+        return "http://" + self.compose_host("elasticsearch")
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://" + self.compose_host("kibana")
+
+    def kibana_dir(self):
+        return os.path.join(self.beat_path, "_meta", "kibana.generated")

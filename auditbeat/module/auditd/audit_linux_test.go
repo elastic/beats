@@ -146,18 +146,23 @@ func TestLoginType(t *testing.T) {
 			"event.outcome":  "failure",
 			"user.name":      "(invalid user)",
 			"user.id":        nil,
+			"session":        nil,
 		},
 		{
 			"event.category": "authentication",
 			"event.type":     "authentication_success",
 			"event.outcome":  "success",
 			"user.name":      "adrian",
+			"user.audit.id":  nil,
+			"auditd.session": nil,
 		},
 		{
 			"event.category": "user-login",
 			"event.outcome":  "success",
 			"user.name":      "root",
 			"user.id":        "0",
+			"user.audit.id":  "0",
+			"auditd.session": "62",
 		},
 	} {
 		beatEvent := mbtest.StandardizeEvent(ms, events[idx], core.AddDatasetToEvent)
@@ -169,7 +174,8 @@ func TestLoginType(t *testing.T) {
 				assert.NoError(t, err, msg)
 				assert.Equal(t, v, cur, msg)
 			} else {
-				assert.Error(t, err, msg)
+				_, err := beatEvent.GetValue(k)
+				assert.Equal(t, common.ErrKeyNotFound, err, msg)
 			}
 		}
 	}

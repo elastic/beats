@@ -22,7 +22,7 @@ import "reflect"
 
 var _reflPrimitivesMapping = map[reflect.Type]reFoldFn{
 
-	tBool: reFoldBool,
+	tBool:                         reFoldBool,
 	reflect.SliceOf(tBool):        reFoldArrBool,
 	reflect.MapOf(tString, tBool): reFoldMapBool,
 
@@ -30,7 +30,7 @@ var _reflPrimitivesMapping = map[reflect.Type]reFoldFn{
 	reflect.SliceOf(tString):        reFoldArrString,
 	reflect.MapOf(tString, tString): reFoldMapString,
 
-	tUint: reFoldUint,
+	tUint:                         reFoldUint,
 	reflect.SliceOf(tUint):        reFoldArrUint,
 	reflect.MapOf(tString, tUint): reFoldMapUint,
 
@@ -50,11 +50,11 @@ var _reflPrimitivesMapping = map[reflect.Type]reFoldFn{
 	reflect.SliceOf(tUint64):        reFoldArrUint64,
 	reflect.MapOf(tString, tUint64): reFoldMapUint64,
 
-	tInt: reFoldInt,
+	tInt:                         reFoldInt,
 	reflect.SliceOf(tInt):        reFoldArrInt,
 	reflect.MapOf(tString, tInt): reFoldMapInt,
 
-	tInt8: reFoldInt8,
+	tInt8:                         reFoldInt8,
 	reflect.SliceOf(tInt8):        reFoldArrInt8,
 	reflect.MapOf(tString, tInt8): reFoldMapInt8,
 

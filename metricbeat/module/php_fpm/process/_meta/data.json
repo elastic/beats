@@ -16,7 +16,8 @@
         }
     },
     "metricset": {
-        "name": "process"
+        "name": "process",
+        "period": 10000
     },
     "php_fpm": {
         "pool": {
