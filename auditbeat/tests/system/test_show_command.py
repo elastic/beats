@@ -107,7 +107,7 @@ class Test(BaseTest):
         self.run_beat(extra_args=['show', 'auditd-status'],
                       exit_code=0,
                       output=output_file)
-        fhandle = os.fdopen(fd, 'rb')
+        fhandle = os.fdopen(fd, 'r')
         lines = fhandle.readlines()
         fhandle.close()
         os.unlink(output_file)
