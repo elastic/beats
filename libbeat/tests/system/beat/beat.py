@@ -578,7 +578,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
             content += f.read()
 
-            hash = hashlib.md5(content).hexdigest()
+            hash = hashlib.md5(content.encode("utf-8")).hexdigest()
             doc = ""
             if hash in yaml_cache:
                 doc = yaml_cache[hash]
