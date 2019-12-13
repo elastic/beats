@@ -438,6 +438,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix timezone parsing in haproxy pipeline. {pull}14755[14755]
 - Add module for ActiveMQ. {pull}14840[14840]
 - Add dashboards for the ActiveMQ Filebeat module. {pull}14880[14880]
+- Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]

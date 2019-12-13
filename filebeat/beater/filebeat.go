@@ -326,7 +326,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	crawler, err := crawler.New(
-		channel.NewOutletFactory(outDone, wgEvents).Create,
+		channel.NewOutletFactory(outDone, wgEvents, b.Info).Create,
 		config.Inputs,
 		b.Info.Version,
 		fb.done,
