@@ -227,6 +227,19 @@ running configuration for a container, 60s by default.
   either take `node` or `cluster` as values. `node` scope allows discovery of resources in
   the specified node. `cluster` scope allows cluster wide discovery. Only `pod` and `node` resources
   can be discovered at node scope.
+`add_resource_metadata`:: (Optional) Specify resources against which additional enrichment needs to be done one.
+`add_resource_metadata` can be done for `node` or `namespace`. Example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      add_resource_metadata:
+        namespace:
+          enabled: true
+          include_labels: ["namespacelabel1"]
+        node:
+          enabled: true
+          include_labels: ["nodelabel2"]
+-------------------------------------------------------------------------------------
 
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
