@@ -32,5 +32,5 @@ func init() {
 // AssetPrometheus returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/prometheus.
 func AssetPrometheus() string {
-	return "eJyUkc1qwzAQhO9+ikG9hSQPoENfoYUeSwmKtba30R+7G0LeviQ2aQIttLppv9FoNNrgQGePJjWTTXTUDjC2RB7u9TZ0HRBJe+FmXIvHcwcAbxZMob2ERhGD1IyA71OgElvlYtsO0KmK7fpaBh49hpCUOkAoUVDyGMNFQ2ZcRvV4d6rJreEms+Y+OmBgSlH99d4nvEgkASs4tyoWimEioTVS2FNSnDgl5GD9hIFFbQ2bCEJqCEKI9bhPdPXaoIRM9w1sZ4/t6soBOzfyqPtP6m0ZzZvdTA50PlWJC/qhpsu6ayWTCfdL0t8yzKK/h7h70QPZ5dAal3GRuZX7Z84b2Tx81lcAAAD//3hXtDU="
+	return "eJyUkk1u4zAMhfc+xYNmFyQ5gBZzhRmgy6IIFJu21eivJI3Aty9iO4lbJEDLnd+j+T5R2uFEo0XhHEl7GqQC1GsgC/P/JpoKaEhq9kV9ThZ/KwB4UacCqdkVatByjnC4/wVKTck+6b4CpM+shzqn1ncWrQtCFcAUyAlZdO7SQ6o+dWLxakSC2cL0qsW8VUDrKTRip9w/+McNMbzAx5JZXVL0xLRFcEcKgrMPAdFp3aP1LLqF9gQmUTgmNHk4Bppm7ZBcpPUG9vOM/WbyAR0LWeTjO9W6SPPHYXZONJ4zN4v1YE2XWm0lkrKvF9JnDHPTzyFWJ/riHKIrxaduaTMb80vOm7P7dllXdUb/GIjHm3rl7TgPZaU+Cb3UNGDJFNKV9yj2/h4+AwAA//8bo9bO"
 }

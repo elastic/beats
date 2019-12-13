@@ -1,0 +1,21 @@
+This is the `query` metricset to query from https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries.
+
+
+[float]
+=== Configuration
+
+This module can query using HTTP API provided by Prometheus.
+https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  metricsets: ["query"]
+  hosts: ["node:9100"]
+  paths:
+  - name: 'http_request'
+    path: '/api/v1/query'
+    fields:
+      'query': sum(rate(prometheus_http_requests_total[1m]))
+-------------------------------------------------------------------------------------
