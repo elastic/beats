@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/fmtstr"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -149,25 +151,31 @@ func isOutputSupported(name string) bool {
 	return false
 }
 
+type fnExtraConfig struct {
+	Processors processors.PluginConfig `config:"processors"`
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool `config:"keep_null"`
+
+	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+
+	// ES output index pattern
+	Index fmtstr.EventFormatString `config:"index"`
+}
+
 func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Config) (core.Client, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
 	return func(cfg *common.Config) (core.Client, error) {
-		c := struct {
-			Processors processors.PluginConfig `config:"processors"`
-
-			// KeepNull determines whether published events will keep null values or omit them.
-			KeepNull bool `config:"keep_null"`
-
-			common.EventMetadata `config:",inline"` // Fields and tags to add to events.
-		}{}
+		c := fnExtraConfig{}
 
 		if err := cfg.Unpack(&c); err != nil {
 			return nil, err
 		}
 
-		processors, err := processors.New(c.Processors)
+		// TODO: pass beat.Info as first arg
+		funcProcessors, err := processorsForFunction(c)
 		if err != nil {
 			return nil, err
 		}
@@ -175,7 +183,7 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Co
 		client, err := core.NewSyncClient(log, pipeline, beat.ClientConfig{
 			PublishMode: beat.GuaranteedSend,
 			Processing: beat.ProcessingConfig{
-				Processor:     processors,
+				Processor:     funcProcessors,
 				EventMetadata: c.EventMetadata,
 				KeepNull:      c.KeepNull,
 			},
@@ -183,4 +191,21 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline) func(*common.Co
 
 		return client, err
 	}
+}
+
+func processorsForFunction(config fnExtraConfig) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor ordering is important:
+	// 1. Index configuration
+	// TODO
+
+	// 2. User processors
+	userProcessors, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	procs.AddProcessors(*userProcessors)
+
+	return procs, nil
 }
