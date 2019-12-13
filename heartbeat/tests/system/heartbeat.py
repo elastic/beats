@@ -29,7 +29,7 @@ class BaseTest(TestCase):
                 if "write_delay" in kwargs:
                     sleep(float(kwargs["write_delay"]))
 
-                self.wfile.write(content)
+                self.wfile.write(bytes(content, "utf-8"))
 
         server = http.server.HTTPServer(('localhost', 0), HTTPHandler)
 
