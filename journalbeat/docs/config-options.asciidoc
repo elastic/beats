@@ -215,3 +215,16 @@ available:
 `CONTAINER_NAME`::            `container.name`
 `CONTAINER_PARTIAL_MESSAGE`:: `container.partial`
 `CONTAINER_TAG`::             `container.image.tag`
+
+[float]
+[id="index"]
+==== `index`
+
+If present, this formatted string overrides the index for events from this input
+(for elasticsearch outputs), or sets the `raw_index` field of the event's
+metadata (for other outputs). This string can only refer to the agent name and
+version and the event timestamp; for access to dynamic fields, use
+`output.elasticsearch.index` or a processor.
+
+Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
+expand to `"journalbeat-myindex-2019.12.13"`.

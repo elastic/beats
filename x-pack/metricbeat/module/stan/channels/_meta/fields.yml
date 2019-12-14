@@ -1,0 +1,30 @@
+- name: channels
+  type: group
+  description: >
+    Contains stan / nats streaming/serverz endpoint metrics
+  release: beta
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the STAN streaming channel
+    - name: messages
+      type: long
+      description: >
+        The number of STAN streaming messages
+    - name: bytes
+      type: long
+      description: >
+        The number of STAN bytes in the channel
+    - name: first_seq
+      type: long
+      description: >
+        First sequence number stored in the channel. If first_seq > min([seq in subscriptions]) data loss has possibly occurred
+    - name: last_seq
+      type: long
+      description: >
+        Last sequence number stored in the channel
+    - name: depth
+      type: long
+      description: >
+        Queue depth based upon current sequence number and highest reported subscriber sequence number

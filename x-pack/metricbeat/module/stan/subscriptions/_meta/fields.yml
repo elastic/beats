@@ -1,0 +1,36 @@
+- name: subscriptions
+  type: group
+  description: >
+    Contains stan / nats streaming/serverz endpoint subscription metrics
+  release: beta
+  fields:
+    - name: id
+      type: keyword
+      description: >
+        The name of the STAN channel subscription (client_id)
+    - name: channel
+      type: keyword
+      description: >
+        The name of the STAN channel the subscription is associated with
+    - name: queue
+      type: keyword
+      description: >
+        The name of the NATS queue that the STAN channel subscription is associated with, if any
+# If first_seq > min([seq in subscriptions]) data loss has possibly occurred
+    - name: last_sent
+      type: long
+      description: >
+        Last known sequence number of the subscription that was acked
+    - name: pending
+      type: long
+      description: >
+        Number of pending messages from / to the subscriber
+    - name: offline
+      type: boolean
+      description: >
+        Is the subscriber marked as offline?
+    - name: stalled
+      type: boolean
+      description: >
+        Is the subscriber known to be stalled?
+    
