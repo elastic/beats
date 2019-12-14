@@ -2793,36 +2793,36 @@
 			"revisionTime": "2017-08-19T20:10:35Z"
 		},
 		{
-			"checksumSHA1": "KUrV5Esg6Wdcrv+hDc6/p0Q3/qw=",
+			"checksumSHA1": "GV2wj5dmLfI8SONK/PApiZO0jKs=",
 			"path": "github.com/shirou/gopsutil",
-			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
-			"revisionTime": "2018-11-24T14:38:04Z",
-			"version": "v2.18.11",
-			"versionExact": "v2.18.11"
+			"revision": "fc7e5e7af6052e36e83e5539148015ed2c09d8f9",
+			"revisionTime": "2019-11-27T18:28:36Z",
+			"version": "v2.19.11",
+			"versionExact": "v2.19.11"
 		},
 		{
-			"checksumSHA1": "Qr93LUVvC2g/aTZSXEIrw4OhuXQ=",
+			"checksumSHA1": "h9IgMsg5hwNg5cYMLIx3Ssm+iFg=",
 			"path": "github.com/shirou/gopsutil/disk",
-			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
-			"revisionTime": "2018-11-24T14:38:04Z",
-			"version": "v2.18.11",
-			"versionExact": "v2.18.11"
+			"revision": "fc7e5e7af6052e36e83e5539148015ed2c09d8f9",
+			"revisionTime": "2019-11-27T18:28:36Z",
+			"version": "v2.19.11",
+			"versionExact": "v2.19.11"
 		},
 		{
-			"checksumSHA1": "GR7l7Ez4ppxIfonl7aJayYRVPWc=",
+			"checksumSHA1": "+iFA/hHmdWehBFBa3uAetswSoug=",
 			"path": "github.com/shirou/gopsutil/internal/common",
-			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
-			"revisionTime": "2018-11-24T14:38:04Z",
-			"version": "v2.18.11",
-			"versionExact": "v2.18.11"
+			"revision": "fc7e5e7af6052e36e83e5539148015ed2c09d8f9",
+			"revisionTime": "2019-11-27T18:28:36Z",
+			"version": "v2.19.11",
+			"versionExact": "v2.19.11"
 		},
 		{
-			"checksumSHA1": "wAc1Qo6T9MTYdSog78uJfCYZPtc=",
+			"checksumSHA1": "I0kTdVfvfbrboyXnaTeZNmXtT0o=",
 			"path": "github.com/shirou/gopsutil/net",
-			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
-			"revisionTime": "2018-11-24T14:38:04Z",
-			"version": "v2.18.11",
-			"versionExact": "v2.18.11"
+			"revision": "fc7e5e7af6052e36e83e5539148015ed2c09d8f9",
+			"revisionTime": "2019-11-27T18:28:36Z",
+			"version": "v2.19.11",
+			"versionExact": "v2.19.11"
 		},
 		{
 			"checksumSHA1": "1KA6FgHyBKaIqBbOMFYt5wkMap8=",
@@ -4527,6 +4527,11 @@
 			"path": "howett.net/plist",
 			"revision": "233df3c4f07b0c562da0e8a6fb850681ac49bb90",
 			"revisionTime": "2017-11-05T00:43:39Z"
+		},
+		{
+			"path": "https://github.com/shirou/gopsutil",
+			"revision": "v2.19.11",
+			"version": "v2.19.11"
 		},
 		{
 			"checksumSHA1": "qt2NIBMPd2LABq8WO+l5rFaUPx0=",

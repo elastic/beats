@@ -265,6 +265,34 @@ This product includes software developed at
 the Microsoft Corporation (https://www.microsoft.com).
 
 --------------------------------------------------------------------
+Dependency: github.com/Azure/go-ansiterm
+Revision: d6e3b3328b783f23731bc4d058875b0371ff8109
+License type (autodetected): MIT
+./x-pack/dockerlogbeat/vendor/github.com/Azure/go-ansiterm/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2015 Microsoft Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/Azure/go-autorest
 Revision: ba1147dc57f993013ef255c128ca1cac8a557409
 License type (autodetected): Apache-2.0
@@ -399,10 +427,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/containerd/containerd
+Revision: 36cf5b690dcc00ff0f34ff7799209050c3d0c59a
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/containerd/containerd/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Docker
+Copyright 2012-2015 Docker, Inc.
+
+This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+The following is courtesy of our legal counsel:
+
+
+Use and transfer of Docker may be subject to certain restrictions by the
+United States and other governments.
+It is your responsibility to ensure that your use and/or transfer does not
+violate applicable laws.
+
+For more information, please see https://www.bis.doc.gov
+
+See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
+
+--------------------------------------------------------------------
 Dependency: github.com/containerd/continuity
 Revision: 75bee3e2ccb6402e3a986ab8bd3b17003fc0fdec
 License type (autodetected): Apache-2.0
 ./vendor/github.com/containerd/continuity/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/containerd/fifo
+Revision: bda0ff6ed73c67bfb5e62bc9c697f146b7fd7f13
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/containerd/fifo/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -455,6 +518,21 @@ Version: v20
 Revision: fd7a80b32e1fc73e890fde45604ed5009dc817a3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+CoreOS Project
+Copyright 2018 CoreOS, Inc
+
+This product includes software developed at CoreOS, Inc.
+(http://www.coreos.com/).
+
+--------------------------------------------------------------------
+Dependency: github.com/coreos/go-systemd
+Revision: fd7a80b32e1fc73e890fde45604ed5009dc817a3
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -657,6 +735,35 @@ For more information, please see https://www.bis.doc.gov
 See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
+Dependency: github.com/docker/docker
+Revision: 5b57f41241cb0d8df5886a1db3d7920494a9e432
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/docker/docker/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Docker
+Copyright 2012-2017 Docker, Inc.
+
+This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+This product contains software (https://github.com/creack/pty) developed
+by Keith Rarick, licensed under the MIT License.
+
+The following is courtesy of our legal counsel:
+
+
+Use and transfer of Docker may be subject to certain restrictions by the
+United States and other governments.
+It is your responsibility to ensure that your use and/or transfer does not
+violate applicable laws.
+
+For more information, please see https://www.bis.doc.gov
+
+See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
+
+--------------------------------------------------------------------
 Dependency: github.com/docker/go-connections
 Version: v0.3.0
 Revision: 3ede32e2033de7505e6500d6c868c2b9ed9f169d
@@ -688,6 +795,60 @@ Docker
 Copyright 2012-2015 Docker, Inc.
 
 This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+The following is courtesy of our legal counsel:
+
+
+Use and transfer of Docker may be subject to certain restrictions by the
+United States and other governments.
+It is your responsibility to ensure that your use and/or transfer does not
+violate applicable laws.
+
+For more information, please see https://www.bis.doc.gov
+
+See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
+
+--------------------------------------------------------------------
+Dependency: github.com/docker/go-metrics
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/docker/go-metrics/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Docker
+Copyright 2012-2015 Docker, Inc.
+
+This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+The following is courtesy of our legal counsel:
+
+
+Use and transfer of Docker may be subject to certain restrictions by the
+United States and other governments.
+It is your responsibility to ensure that your use and/or transfer does not
+violate applicable laws.
+
+For more information, please see https://www.bis.doc.gov
+
+See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
+
+--------------------------------------------------------------------
+Dependency: github.com/docker/go-plugins-helpers
+Revision: 1e6269c305b8c75cfda1c8aa91349c38d7335814
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/docker/go-plugins-helpers/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Docker
+Copyright 2012-2015 Docker, Inc.
+
+This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+This product contains software (https://github.com/kr/pty) developed
+by Keith Rarick, licensed under the MIT License.
 
 The following is courtesy of our legal counsel:
 
@@ -1787,6 +1948,48 @@ Dependency: github.com/gogo/protobuf
 Revision: 4c00d2f19fb91be5fecd8681fa83450a2a979e69
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/gogo/protobuf/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013, The GoGo Authors. All rights reserved.
+
+Protocol Buffers for Go with Gadgets
+
+Go support for Protocol Buffers - Google's data interchange format
+
+Copyright 2010 The Go Authors.  All rights reserved.
+https://github.com/golang/protobuf
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--------------------------------------------------------------------
+Dependency: github.com/gogo/protobuf
+Revision: 8a5ed79f688836cf007ca23aefe0299791e7bea5
+License type (autodetected): BSD-3-Clause
+./x-pack/dockerlogbeat/vendor/github.com/gogo/protobuf/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013, The GoGo Authors. All rights reserved.
 
@@ -3741,6 +3944,36 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/jmoiron/sqlx
+Revision: d7d95172beb5a538ff08c50a6e98aee6e7c41f40
+License type (autodetected): MIT
+./x-pack/metricbeat/module/sql/vendor/github.com/jmoiron/sqlx/LICENSE:
+--------------------------------------------------------------------
+ Copyright (c) 2013, Jason Moiron
+
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------
 Dependency: github.com/joeshaw/multierror
 Revision: 69b34d4ec901851247ae7e77d33909caf9df99ed
 License type (autodetected): MIT
@@ -4082,6 +4315,17 @@ Apache License 2.0
 Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
 
 --------------------------------------------------------------------
+Dependency: github.com/matttproud/golang_protobuf_extensions
+Revision: c182affec369e30f25d3eb8cd8a478dee585ae7d
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/matttproud/golang_protobuf_extensions/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
+
+--------------------------------------------------------------------
 Dependency: github.com/Microsoft/go-winio
 Version: v0.4.14
 Revision: 6c72808b55902eae4c5943626030429ff20f3b63
@@ -4281,6 +4525,34 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/morikuni/aec
+Revision: 39771216ff4c63d11f5e604076f9c45e8be1067b
+License type (autodetected): MIT
+./x-pack/dockerlogbeat/vendor/github.com/morikuni/aec/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2016 Taihei Morikuni
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/opencontainers/go-digest
 Revision: eaa60544f31ccf3b0653b1a118b76d33418ff41b
 License type (autodetected): Apache-2.0
@@ -4290,10 +4562,28 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/opencontainers/go-digest
+Revision: ac19fd6e7483ff933754af248d80be865e543d22
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/opencontainers/go-digest/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/opencontainers/image-spec
 Revision: 4038d4391fe912af1031db5a1f511cf07c07cbc8
 License type (autodetected): Apache-2.0
 ./vendor/github.com/opencontainers/image-spec/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/opencontainers/image-spec
+Revision: 775207bd45b6cb8153ce218cc59351799217451f
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/opencontainers/image-spec/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -4507,9 +4797,57 @@ Copyright 2013 Matt T. Proud
 Licensed under the Apache License, Version 2.0
 
 --------------------------------------------------------------------
+Dependency: github.com/prometheus/client_golang
+Revision: 20428fa0bffcb4ee7a7941545ae0df9acdc9d8a7
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/prometheus/client_golang/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Prometheus instrumentation library for Go applications
+Copyright 2012-2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+
+The following components are included in this product:
+
+perks - a fork of https://github.com/bmizerany/perks
+https://github.com/beorn7/perks
+Copyright 2013-2015 Blake Mizerany, Björn Rabenstein
+See https://github.com/beorn7/perks/blob/master/README.md for license details.
+
+Go support for Protocol Buffers - Google's data interchange format
+http://github.com/golang/protobuf/
+Copyright 2010 The Go Authors
+See source code for license details.
+
+Support for streaming Protocol Buffer messages for the Go language (golang).
+https://github.com/matttproud/golang_protobuf_extensions
+Copyright 2013 Matt T. Proud
+Licensed under the Apache License, Version 2.0
+
+--------------------------------------------------------------------
 Dependency: github.com/prometheus/client_model
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/client_model/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Data model artifacts for Prometheus.
+Copyright 2012-2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+--------------------------------------------------------------------
+Dependency: github.com/prometheus/client_model
+Revision: 14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/prometheus/client_model/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -4536,10 +4874,42 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
+Dependency: github.com/prometheus/common
+Revision: 287d3e634a1e550c9e463dd7e5a75a422c614505
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/prometheus/common/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+Common libraries shared by Prometheus Go components.
+Copyright 2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+--------------------------------------------------------------------
 Dependency: github.com/prometheus/procfs
 Revision: 54d17b57dd7d4a3aa092476596b3f8a933bde349
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/procfs/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+procfs provides functions to retrieve system, kernel and process
+metrics from the pseudo-filesystem proc.
+
+Copyright 2014-2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+--------------------------------------------------------------------
+Dependency: github.com/prometheus/procfs
+Revision: de25ac347ef9305868b04dc42425c973b863b18c
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/github.com/prometheus/procfs/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -4760,8 +5130,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.18.11
-Revision: 0f70a4a06f7a1039305ec9b3ba9c2800f8929fba
+Version: v2.19.11
+Revision: fc7e5e7af6052e36e83e5539148015ed2c09d8f9
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------
@@ -5656,6 +6026,15 @@ Dependency: google.golang.org/genproto
 Revision: a7e196e89fd3a3c4d103ca540bd5dac3a736e375
 License type (autodetected): Apache-2.0
 ./vendor/google.golang.org/genproto/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/genproto
+Revision: 20e1ac93f88cf06d2b1defb90b9e9e126c7dfff6
+License type (autodetected): Apache-2.0
+./x-pack/dockerlogbeat/vendor/google.golang.org/genproto/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 

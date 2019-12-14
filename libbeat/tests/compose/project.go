@@ -90,6 +90,7 @@ const (
 type Driver interface {
 	Up(ctx context.Context, opts UpOptions, service string) error
 	Kill(ctx context.Context, signal string, service string) error
+	KillOld(ctx context.Context, except []string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
 
 	LockFile() string
@@ -221,28 +222,9 @@ func (c *Project) KillOld(except []string) error {
 	// it can happen that an other package tries to start them at the same time
 	// which leads to a conflict. We need a better solution long term but that should
 	// solve the problem for now.
-	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes")
+	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes", "kafka")
 
-	servicesStatus, err := c.getServices()
-	if err != nil {
-		return err
-	}
-
-	for _, s := range servicesStatus {
-		// Ignore the ones we want
-		if contains(except, s.Name()) {
-			continue
-		}
-
-		if s.Running() && s.Old() {
-			err = c.Kill(s.Name())
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return c.Driver.KillOld(context.TODO(), except)
 }
 
 // Lock acquires the lock (300s) timeout
