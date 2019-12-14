@@ -73,7 +73,7 @@ class Test(BaseTest):
         os.unlink(output_file)
         assert len(lines) >= len(rules)
         # get rid of automatic rule
-        if '-F key=rule' not in lines[0]:
+        if b'-F key=rule' not in lines[0]:
             del lines[0]
 
         for i in range(len(rules)):
