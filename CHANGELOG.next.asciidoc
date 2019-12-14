@@ -524,6 +524,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kafka JMX metricsets. {pull}14330[14330]
 - Add metrics to envoyproxy server metricset and support for envoy proxy 1.12. {pull}14416[14416] {issue}13642[13642]
 - Add module for ActiveMQ. {pull}14788[14788]
+- Add usage metricset in aws modules. {pull}14925[14925] {issue}14935[14935]
 - Add billing metricset in aws modules. {pull}14801[14801] {issue}14934[14934]
 - Add AWS SNS metricset. {pull}14946[14946]
 - Add overview dashboard for AWS SNS module {pull}14977[14977]
