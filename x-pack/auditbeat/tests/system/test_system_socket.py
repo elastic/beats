@@ -569,9 +569,9 @@ class DNSTestCase:
 
         raw_addr = ip_str_to_raw(self.server_addr[0])
         req = b"\x74\xba\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07elastic" \
-              b"\x02co\x00" + q + "\x00\x01"
+              b"\x02co\x00" + q + b"\x00\x01"
         resp = b"\x74\xba\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00\x07elastic" \
-               b"\x02co\x00" + q + "\x00\x01\xc0\x0c" + q + "\x00\x01\x00\x00" \
+               b"\x02co\x00" + q + b"\x00\x01\xc0\x0c" + q + b"\x00\x01\x00\x00" \
                b"\x00\x9c" + bytes(struct.pack(">H", len(raw_addr)) + raw_addr, "utf-8")
 
         transaction_udp(dns_cli, self.dns_client_addr,
