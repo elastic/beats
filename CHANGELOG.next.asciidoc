@@ -546,6 +546,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release kubernetes modules `controllermanager`, `scheduler`, `proxy`, `state_cronjob` and `state_resourcequota` as GA. {pull}14584[14584]
 - Add module for ActiveMQ. {pull}14580[14580]
 - Enable script processor. {pull}14711[14711]
+- Enable wildcard for cloudwatch metricset namespace. {pull}14971[14971] {issue}14965[14965]
 - Add `kube-state-metrics` `state_service` metrics for kubernetes module. {pull}14794[14794]
 - Add usage metricset in aws modules. {pull}14925[14925] {issue}14935[14935]
 - Add billing metricset in aws modules. {pull}14801[14801] {issue}14934[14934]
