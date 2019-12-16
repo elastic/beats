@@ -8,6 +8,7 @@
                     "id": "policy-id",
                     "outputs": {
                         "default": {
+                            "type": "elasticsearch",
                             "hosts": "https://localhost:9200"
                         }
                     },
