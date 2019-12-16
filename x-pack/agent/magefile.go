@@ -315,7 +315,7 @@ func flags() string {
 
 // Update is an alias for executing fields, dashboards, config, includes.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec)
+	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -404,4 +404,14 @@ func UnitTest() {
 // TODO: call integtest mage package when python tests are available
 func IntegTest() {
 	os.Create(filepath.Join("build", "TEST-go-integration.out"))
+}
+
+// BuildFleetCfg embed the default fleet configuration as part of the binary.
+func BuildFleetCfg() error {
+	goF := filepath.Join("dev-tools", "cmd", "buildfleetcfg", "buildfleetcfg.go")
+	in := filepath.Join("_meta", "agent.fleet.yml")
+	out := filepath.Join("pkg", "agent", "application", "configuration_embed.go")
+
+	fmt.Printf(">> BuildFleetCfg %s to %s\n", in, out)
+	return RunGo("run", goF, "--in", in, "--out", out)
 }
