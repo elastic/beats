@@ -316,6 +316,16 @@ type: date_range
 
 --
 
+*`monitor.timespan`*::
++
+--
+Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
+
+
+type: date_range
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 
