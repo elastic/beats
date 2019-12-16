@@ -5,7 +5,6 @@
 package application
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
@@ -67,28 +66,13 @@ func newFleetGatewayWithScheduler(
 }
 
 func (f *fleetGateway) worker() {
-	resp, err := f.execute()
-	if err != nil {
-		fmt.Println(err)
-		// record
-	}
-
-	actions := make([]action, len(resp.Actions))
-	for idx, a := range resp.Actions {
-		actions[idx] = a
-	}
-
-	if err := f.dispatcher.Dispatch(actions...); err != nil {
-		// record
-	}
-
 	for {
 		select {
 		case <-f.scheduler.WaitTick():
+			f.log.Debug("FleetGateway calling Checkin API")
 			resp, err := f.execute()
 			if err != nil {
-				fmt.Println(err)
-				// record
+				f.log.Error(err)
 				continue
 			}
 
@@ -98,8 +82,9 @@ func (f *fleetGateway) worker() {
 			}
 
 			if err := f.dispatcher.Dispatch(actions...); err != nil {
-				// record
+				f.log.Error(err)
 			}
+			f.log.Debug("FleetGateway sleeping")
 		case <-f.done:
 			return
 		}
