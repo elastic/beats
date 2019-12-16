@@ -42,16 +42,30 @@ func NewStepper() *Stepper {
 // Periodic wraps a time.Timer as the scheduler.
 type Periodic struct {
 	Ticker *time.Ticker
+	ran    bool
 }
 
 // NewPeriodic returns a Periodic scheduler that will unblock the WaitTick based on a duration.
+// The timer will do an initial tick, sleep for the defined period and tick again.
 func NewPeriodic(d time.Duration) *Periodic {
 	return &Periodic{Ticker: time.NewTicker(d)}
 }
 
 // WaitTick wait on the duration to be experied to unblock the channel.
+// Note: you should not keep a reference to the channel.
 func (p *Periodic) WaitTick() <-chan time.Time {
-	return p.Ticker.C
+	if p.ran {
+		return p.Ticker.C
+	}
+
+	rC := make(chan time.Time)
+	go func(c chan time.Time) {
+		c <- time.Now()
+	}(rC)
+
+	p.ran = true
+
+	return rC
 }
 
 // Stop stops the internal Ticker.

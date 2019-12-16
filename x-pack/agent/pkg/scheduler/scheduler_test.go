@@ -11,19 +11,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type e struct {
+	count int
+	at    time.Time
+}
+
 type tickRecorder struct {
 	scheduler Scheduler
 	count     int
 	done      chan struct{}
-	recorder  chan int
+	recorder  chan e
 }
 
 func (m *tickRecorder) Start() {
 	for {
 		select {
-		case <-m.scheduler.WaitTick():
+		case t := <-m.scheduler.WaitTick():
 			m.count = m.count + 1
-			m.recorder <- m.count
+			m.recorder <- e{count: m.count, at: t}
 		case <-m.done:
 			return
 		}
@@ -42,7 +47,7 @@ func newTickRecorder(scheduler Scheduler) *tickRecorder {
 	return &tickRecorder{
 		scheduler: scheduler,
 		done:      make(chan struct{}),
-		recorder:  make(chan int),
+		recorder:  make(chan e),
 	}
 }
 
@@ -56,24 +61,47 @@ func testStepScheduler(t *testing.T) {
 		defer recorder.Stop()
 
 		scheduler.Next()
-		require.Equal(t, 1, <-recorder.recorder)
+		nE := <-recorder.recorder
+		require.Equal(t, 1, nE.count)
 		scheduler.Next()
-		require.Equal(t, 2, <-recorder.recorder)
+		nE = <-recorder.recorder
+		require.Equal(t, 2, nE.count)
 		scheduler.Next()
-		require.Equal(t, 3, <-recorder.recorder)
+		nE = <-recorder.recorder
+		require.Equal(t, 3, nE.count)
 	})
 }
 
 func testPeriodic(t *testing.T) {
-	duration := 1 * time.Millisecond
-	scheduler := NewPeriodic(duration)
-	defer scheduler.Stop()
+	t.Run("tick than wait", func(t *testing.T) {
+		duration := 1 * time.Minute
+		scheduler := NewPeriodic(duration)
+		defer scheduler.Stop()
 
-	recorder := newTickRecorder(scheduler)
-	go recorder.Start()
-	defer recorder.Stop()
+		startedAt := time.Now()
+		recorder := newTickRecorder(scheduler)
+		go recorder.Start()
+		defer recorder.Stop()
 
-	require.Equal(t, 1, <-recorder.recorder)
-	require.Equal(t, 2, <-recorder.recorder)
-	require.Equal(t, 3, <-recorder.recorder)
+		nE := <-recorder.recorder
+
+		require.True(t, nE.at.Sub(startedAt) < duration)
+	})
+
+	t.Run("multiple tick", func(t *testing.T) {
+		duration := 1 * time.Millisecond
+		scheduler := NewPeriodic(duration)
+		defer scheduler.Stop()
+
+		recorder := newTickRecorder(scheduler)
+		go recorder.Start()
+		defer recorder.Stop()
+
+		nE := <-recorder.recorder
+		require.Equal(t, 1, nE.count)
+		nE = <-recorder.recorder
+		require.Equal(t, 2, nE.count)
+		nE = <-recorder.recorder
+		require.Equal(t, 3, nE.count)
+	})
 }
