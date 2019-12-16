@@ -126,7 +126,7 @@ These are the available fields during within config templating. The `kubernetes.
   * kubernetes.labels
   * kubernetes.annotations
 
-====== Pod spesific:
+====== Pod specific:
   * kubernetes.container.id
   * kubernetes.container.image
   * kubernetes.container.name
@@ -135,11 +135,11 @@ These are the available fields during within config templating. The `kubernetes.
   * kubernetes.pod.name
   * kubernetes.pod.uid
 
-====== Node spesific:
+====== Node specific:
   * kubernetes.node.name
   * kubernetes.node.uid
 
-====== Service spesific:
+====== Service specific:
   * kubernetes.namespace
   * kubernetes.service.name
   * kubernetes.service.uid
