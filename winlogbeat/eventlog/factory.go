@@ -34,8 +34,11 @@ var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
 // EventLog. Each implementation is free to support additional configuration
 // options.
 type ConfigCommon struct {
-	API  string `config:"api"`  // Name of the API to use. Optional.
-	Name string `config:"name"` // Name of the event log or channel or file.
+	// Name of the event log or channel or file.
+	Name string `config:"name"`
+	// Name of the API to use. Optional.
+	API string `config:"api"`
+	// Index name for events from this event log. Optional.
 }
 
 type validator interface {
