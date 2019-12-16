@@ -4,54 +4,46 @@
         "rds": {
             "cpu": {
                 "total": {
-                    "pct": 3
+                    "pct": 0.999999999997575
                 }
             },
             "database_connections": 0,
             "db_instance": {
-                "arn": "arn:aws:rds:us-east-2:627959692251:db:test1",
-                "class": "db.r5.large",
-                "identifier": "test1",
+                "arn": "arn:aws:rds:ap-southeast-1:627959692251:db:database-1",
+                "class": "db.t2.micro",
+                "identifier": "database-1",
                 "status": "available"
             },
-            "deadlocks": 0,
+            "disk_queue_depth": 0.00006666888896296543,
             "disk_usage": {
-                "bin_log.bytes": 0
+                "bin_log.bytes": 2752
             },
-            "free_local_storage.bytes": 32025966592,
-            "freeable_memory.bytes": 4716777472,
+            "free_storage.bytes": 20402475008,
+            "freeable_memory.bytes": 441335808,
             "latency": {
-                "commit": 2.810083333333333,
-                "ddl": 0,
-                "dml": 0.08358333333333333,
-                "insert": 0.08358333333333333,
-                "select": 0.24081333333333332,
-                "update": 0
+                "read": 0,
+                "write": 0.0002909090909090909
             },
-            "login_failures": 0,
-            "queries": 8.966517224712922,
+            "read_io.ops_per_sec": 0,
+            "swap_usage.bytes": 1167360,
             "throughput": {
-                "commit": 0,
-                "ddl": 0,
-                "delete": 0,
-                "dml": 0,
-                "insert": 0.4999333422210372,
-                "network": 1.4,
-                "network_receive": 0.6999825008749563,
-                "network_transmit": 0.6999650017499125,
-                "select": 2.498168010125908,
-                "update": 0
+                "network_receive": 570.7618714269047,
+                "network_transmit": 3228.0614030701536,
+                "read": 0,
+                "write": 3754.7918263942133
             },
-            "transactions": {
-                "active": 0,
-                "blocked": 0
-            }
+            "transactions": {},
+            "write_io.ops_per_sec": 0.40002000100005003
         }
     },
     "cloud": {
-        "availability_zone": "us-east-2a",
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
+        "availability_zone": "ap-southeast-1a",
         "provider": "aws",
-        "region": "us-east-2"
+        "region": "ap-southeast-1"
     },
     "event": {
         "dataset": "aws.rds",
@@ -59,7 +51,8 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "rds"
+        "name": "rds",
+        "period": 10000
     },
     "service": {
         "type": "aws"

@@ -2,7 +2,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -15,7 +15,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -31,7 +31,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -44,7 +44,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -57,7 +57,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -73,7 +73,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -86,7 +86,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -99,7 +99,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -115,7 +115,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -128,7 +128,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -141,7 +141,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -154,7 +154,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -167,7 +167,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -180,7 +180,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -193,7 +193,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -206,7 +206,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -219,7 +219,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -232,7 +232,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -245,7 +245,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -258,7 +258,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -271,7 +271,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -284,7 +284,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -297,7 +297,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -313,7 +313,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -326,7 +326,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -342,7 +342,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -355,7 +355,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -368,7 +368,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -381,7 +381,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -394,7 +394,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -407,7 +407,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -420,7 +420,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -433,7 +433,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -449,7 +449,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -462,7 +462,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -478,7 +478,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -491,7 +491,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -504,7 +504,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -517,7 +517,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -530,7 +530,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -542,7 +542,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -555,7 +555,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -568,7 +568,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -581,7 +581,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -593,7 +593,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -605,7 +605,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -618,7 +618,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -630,7 +630,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -643,7 +643,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -656,7 +656,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -668,7 +668,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -681,7 +681,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -694,7 +694,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -707,7 +707,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -719,7 +719,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -732,7 +732,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -744,7 +744,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -757,7 +757,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -769,7 +769,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -782,7 +782,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -795,7 +795,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -808,7 +808,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -820,7 +820,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -833,7 +833,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -845,7 +845,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -858,7 +858,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -871,7 +871,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -884,7 +884,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -896,7 +896,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -909,7 +909,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -922,7 +922,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -934,7 +934,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -947,7 +947,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -960,7 +960,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -972,7 +972,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -985,7 +985,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -998,7 +998,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1010,7 +1010,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1023,7 +1023,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1035,7 +1035,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1048,7 +1048,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1060,7 +1060,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1073,7 +1073,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1086,7 +1086,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1099,7 +1099,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1112,7 +1112,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1124,7 +1124,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1137,7 +1137,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1150,7 +1150,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1162,7 +1162,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1175,7 +1175,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1188,7 +1188,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1200,7 +1200,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1213,7 +1213,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1225,7 +1225,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1238,7 +1238,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1251,7 +1251,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1264,7 +1264,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1276,7 +1276,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",
@@ -1289,7 +1289,7 @@
     {
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "a-mac-with-esc-key",
         "input.type": "log",

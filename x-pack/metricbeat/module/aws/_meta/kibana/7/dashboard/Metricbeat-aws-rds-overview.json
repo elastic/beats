@@ -19,7 +19,9 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Database Connections"
+            },
             "gridData": {
               "h": 6,
               "i": "1",
@@ -30,10 +32,12 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Database Connections",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Insert Latency in Milliseconds"
+            },
             "gridData": {
               "h": 10,
               "i": "3",
@@ -44,10 +48,12 @@
             "panelIndex": "3",
             "panelRefName": "panel_1",
             "title": "Insert Latency in Milliseconds",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Select Latency in Milliseconds"
+            },
             "gridData": {
               "h": 10,
               "i": "4",
@@ -58,10 +64,12 @@
             "panelIndex": "4",
             "panelRefName": "panel_2",
             "title": "Select Latency in Milliseconds",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Transaction Blocked"
+            },
             "gridData": {
               "h": 6,
               "i": "5",
@@ -72,7 +80,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_3",
             "title": "Transaction Blocked",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
             "embeddableConfig": {},
@@ -85,10 +93,12 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_4",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Insert Throughput in Count/Second"
+            },
             "gridData": {
               "h": 11,
               "i": "7",
@@ -99,10 +109,12 @@
             "panelIndex": "7",
             "panelRefName": "panel_5",
             "title": "Insert Throughput in Count/Second",
-            "version": "7.2.0"
+            "version": "7.4.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Select Throughput in Count/Second"
+            },
             "gridData": {
               "h": 11,
               "i": "8",
@@ -113,7 +125,23 @@
             "panelIndex": "8",
             "panelRefName": "panel_6",
             "title": "Select Throughput in Count/Second",
-            "version": "7.2.0"
+            "version": "7.4.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Disk Queue Depth"
+            },
+            "gridData": {
+              "h": 12,
+              "i": "132653bc-2669-4e8c-b536-06c680e9acf0",
+              "w": 48,
+              "x": 0,
+              "y": 27
+            },
+            "panelIndex": "132653bc-2669-4e8c-b536-06c680e9acf0",
+            "panelRefName": "panel_7",
+            "title": "Disk Queue Depth",
+            "version": "7.4.0"
           }
         ],
         "timeRestore": false,
@@ -122,7 +150,7 @@
       },
       "id": "3367c170-921f-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "dashboard": "7.0.0"
+        "dashboard": "7.3.0"
       },
       "references": [
         {
@@ -159,11 +187,16 @@
           "id": "e06e4cf0-921e-11e9-aa19-159bf182e06f",
           "name": "panel_6",
           "type": "visualization"
+        },
+        {
+          "id": "966ae990-d979-11e9-9458-bbef63ad717b",
+          "name": "panel_7",
+          "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-06-24T15:58:45.695Z",
-      "version": "WzMyNTIsOV0="
+      "updated_at": "2019-09-17T18:35:03.575Z",
+      "version": "WzExNTk3LDhd"
     },
     {
       "attributes": {
@@ -186,6 +219,11 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "10bc2760-d978-11e9-aff2-99c15d8b7da1"
+              }
+            ],
             "bar_color_rules": [
               {
                 "id": "f8196690-921a-11e9-badf-4b42bd1ef543"
@@ -195,7 +233,8 @@
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
-            "interval": "",
+            "interval": "1m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -225,9 +264,9 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "",
-            "type": "timeseries"
+            "type": "metric"
           },
-          "title": "AWS RDS Database Connections",
+          "title": "RDS Database Connections [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -237,8 +276,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-24T18:48:07.479Z",
-      "version": "WzM1MDksOV0="
+      "updated_at": "2019-09-17T18:22:36.018Z",
+      "version": "WzExNTc3LDhd"
     },
     {
       "attributes": {
@@ -259,6 +298,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -276,16 +316,17 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "1m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": "0",
-                "formatter": "number",
+                "formatter": "ms,ms,",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Insert Latency in Milliseconds",
-                "line_width": 1,
+                "line_width": "2",
                 "metrics": [
                   {
                     "field": "aws.rds.latency.insert",
@@ -293,8 +334,9 @@
                     "type": "avg"
                   }
                 ],
-                "point_size": 1,
+                "point_size": "5",
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_field": "aws.rds.db_instance.identifier",
@@ -306,7 +348,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "AWS RDS Insert Latency in Milliseconds",
+          "title": "RDS Insert Latency in Milliseconds [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -316,8 +358,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-24T15:58:45.695Z",
-      "version": "WzMyNTQsOV0="
+      "updated_at": "2019-09-17T18:27:15.143Z",
+      "version": "WzExNTg1LDhd"
     },
     {
       "attributes": {
@@ -355,16 +397,17 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "1m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": "0",
-                "formatter": "number",
+                "formatter": "ms,ms,",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Select Latency in Milliseconds",
-                "line_width": 1,
+                "line_width": "2",
                 "metrics": [
                   {
                     "field": "aws.rds.latency.select",
@@ -372,8 +415,9 @@
                     "type": "avg"
                   }
                 ],
-                "point_size": 1,
+                "point_size": "5",
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_field": "aws.rds.db_instance.identifier",
@@ -385,7 +429,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "AWS RDS Select Latency in Milliseconds",
+          "title": "RDS Select Latency in Milliseconds [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -395,8 +439,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-24T15:58:45.695Z",
-      "version": "WzMyNTUsOV0="
+      "updated_at": "2019-09-17T18:26:36.223Z",
+      "version": "WzExNTgzLDhd"
     },
     {
       "attributes": {
@@ -419,6 +463,20 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "background_color": "rgba(164,221,0,1)",
+                "id": "27aaf910-d978-11e9-aff2-99c15d8b7da1",
+                "operator": "lte",
+                "value": 0
+              },
+              {
+                "color": "rgba(244,78,59,1)",
+                "id": "3526a9e0-d978-11e9-aff2-99c15d8b7da1",
+                "operator": "gt",
+                "value": 0
+              }
+            ],
             "bar_color_rules": [
               {
                 "bar_color": "rgba(211,49,21,1)",
@@ -433,7 +491,8 @@
             "filter": "",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
-            "interval": "",
+            "interval": "1m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -463,9 +522,9 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "",
-            "type": "timeseries"
+            "type": "metric"
           },
-          "title": "AWS RDS Transaction Blocked",
+          "title": "RDS Transaction Blocked [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -475,8 +534,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-24T18:48:19.859Z",
-      "version": "WzM1MTAsOV0="
+      "updated_at": "2019-09-17T18:23:33.361Z",
+      "version": "WzExNTc5LDhd"
     },
     {
       "attributes": {
@@ -533,8 +592,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-06-21T22:16:27.194Z",
-      "version": "WzI5OTAsOF0="
+      "updated_at": "2019-09-17T18:20:56.488Z",
+      "version": "WzExMjUzLDhd"
     },
     {
       "attributes": {
@@ -555,6 +614,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -572,16 +632,17 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "1m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": "0",
-                "formatter": "number",
+                "formatter": "'0.0'",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Insert Throughput Count/Second",
-                "line_width": 1,
+                "line_width": "2",
                 "metrics": [
                   {
                     "field": "aws.rds.throughput.insert",
@@ -589,8 +650,9 @@
                     "type": "avg"
                   }
                 ],
-                "point_size": 1,
+                "point_size": "5",
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_field": "aws.rds.db_instance.identifier",
@@ -602,7 +664,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "AWS RDS Insert Throughput in Count/Second",
+          "title": "RDS Insert Throughput in Count/Second [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -612,8 +674,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-24T15:58:45.695Z",
-      "version": "WzMyNTgsOV0="
+      "updated_at": "2019-09-17T18:31:36.123Z",
+      "version": "WzExNTkzLDhd"
     },
     {
       "attributes": {
@@ -634,6 +696,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "",
             "axis_position": "left",
             "axis_scale": "normal",
             "background_color_rules": [
@@ -651,16 +714,17 @@
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "1m",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": "0",
-                "formatter": "number",
+                "formatter": "'0.0'",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Select Throughput Count/Second",
-                "line_width": 1,
+                "line_width": "2",
                 "metrics": [
                   {
                     "field": "aws.rds.throughput.select",
@@ -668,8 +732,9 @@
                     "type": "avg"
                   }
                 ],
-                "point_size": 1,
+                "point_size": "5",
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_field": "aws.rds.db_instance.identifier",
@@ -681,7 +746,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "AWS RDS Select Throughput in Count/Second",
+          "title": "RDS Select Throughput in Count/Second [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -691,9 +756,92 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-24T15:58:45.695Z",
-      "version": "WzMyNTksOV0="
+      "updated_at": "2019-09-17T18:31:01.587Z",
+      "version": "WzExNTkyLDhd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "RDS Disk Queue Depth [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "28cacdf0-921c-11e9-badf-4b42bd1ef543"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "f8196690-921a-11e9-badf-4b42bd1ef543"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "1m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "'0.000'",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Select Throughput Count/Second",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "aws.rds.disk_queue_depth",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "5",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.rds.db_instance.identifier",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "RDS Disk Queue Depth [Metricbeat AWS]",
+          "type": "metrics"
+        }
+      },
+      "id": "966ae990-d979-11e9-9458-bbef63ad717b",
+      "migrationVersion": {
+        "visualization": "7.2.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-09-17T18:33:04.936Z",
+      "version": "WzExNTk1LDhd"
     }
   ],
-  "version": "7.2.0"
+  "version": "7.4.0"
 }

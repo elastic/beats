@@ -29,11 +29,15 @@ import (
 var (
 	schema = s.Schema{
 		"cluster_manager": s.Object{
-			"active_clusters":  c.Int("active_clusters"),
-			"cluster_added":    c.Int("cluster_added"),
-			"cluster_modified": c.Int("cluster_modified"),
-			"cluster_removed":  c.Int("cluster_removed"),
-			"warming_clusters": c.Int("warming_clusters"),
+			"active_clusters":            c.Int("active_clusters"),
+			"cluster_added":              c.Int("cluster_added"),
+			"cluster_modified":           c.Int("cluster_modified"),
+			"cluster_removed":            c.Int("cluster_removed"),
+			"warming_clusters":           c.Int("warming_clusters"),
+			"cluster_updated":            c.Int("cluster_updated", s.Optional),
+			"cluster_updated_via_merge":  c.Int("cluster_updated_via_merge", s.Optional),
+			"update_merge_cancelled":     c.Int("update_merge_cancelled", s.Optional),
+			"update_out_of_merge_window": c.Int("update_out_of_merge_window", s.Optional),
 		},
 		"filesystem": s.Object{
 			"flushed_by_timer":     c.Int("flushed_by_timer"),
@@ -41,6 +45,7 @@ var (
 			"write_buffered":       c.Int("write_buffered"),
 			"write_completed":      c.Int("write_completed"),
 			"write_total_buffered": c.Int("write_total_buffered"),
+			"write_failed":         c.Int("write_failed", s.Optional),
 		},
 		"runtime": s.Object{
 			"load_error":              c.Int("load_error"),
@@ -49,6 +54,8 @@ var (
 			"override_dir_exists":     c.Int("override_dir_exists"),
 			"override_dir_not_exists": c.Int("override_dir_not_exists"),
 			"admin_overrides_active":  c.Int("admin_overrides_active", s.Optional),
+			"deprecated_feature_use":  c.Int("deprecated_feature_use", s.Optional),
+			"num_layers":              c.Int("num_layers", s.Optional),
 		},
 		"listener_manager": s.Object{
 			"listener_added":           c.Int("listener_added"),
@@ -56,12 +63,13 @@ var (
 			"listener_create_success":  c.Int("listener_create_success"),
 			"listener_modified":        c.Int("listener_modified"),
 			"listener_removed":         c.Int("listener_removed"),
+			"listener_stopped":         c.Int("listener_stopped", s.Optional),
 			"total_listeners_active":   c.Int("total_listeners_active"),
 			"total_listeners_draining": c.Int("total_listeners_draining"),
 			"total_listeners_warming":  c.Int("total_listeners_warming"),
 		},
 		"stats": s.Object{
-			"overflow": c.Int("overflow"),
+			"overflow": c.Int("overflow", s.Optional),
 		},
 		"server": s.Object{
 			"days_until_first_cert_expiring": c.Int("days_until_first_cert_expiring"),
@@ -75,6 +83,12 @@ var (
 			"watchdog_mega_miss":             c.Int("watchdog_mega_miss", s.Optional),
 			"watchdog_miss":                  c.Int("watchdog_miss", s.Optional),
 			"hot_restart_epoch":              c.Int("hot_restart_epoch", s.Optional),
+			"concurrency":                    c.Int("concurrency", s.Optional),
+			"debug_assertion_failures":       c.Int("debug_assertion_failures", s.Optional),
+			"dynamic_unknown_fields":         c.Int("dynamic_unknown_fields", s.Optional),
+			"state":                          c.Int("state", s.Optional),
+			"static_unknown_fields":          c.Int("static_unknown_fields", s.Optional),
+			"stats_recent_lookups":           c.Int("stats_recent_lookups", s.Optional),
 		},
 		"http2": s.Object{
 			"header_overflow":        c.Int("header_overflow", s.Optional),
@@ -87,7 +101,7 @@ var (
 		},
 	}
 )
-var reStats *regexp.Regexp = regexp.MustCompile(`cluster_manager.*|filesystem.*|runtime.*|listener_manager.*|stats.*|server.*|http2\..*`)
+var reStats *regexp.Regexp = regexp.MustCompile(`cluster_manager.*|filesystem.*|access_log_file.*|runtime.*|listener_manager.*|stats.*|server.*|http2\..*`)
 
 func eventMapping(response []byte) (common.MapStr, error) {
 	data := map[string]interface{}{}

@@ -126,7 +126,7 @@ curl: (51) SSL: certificate verification failed (result: 5)
 See the <<ssl-client-fails,troubleshooting docs>> for info about resolving this issue.
 
 [float]
-=== Test the Beats to Logstash connection
+=== Test the {beatname_uc} to Logstash connection
 
 If you have {beatname_uc} running as a service, first stop the service. Then test your setup by running {beatname_uc} in
 the foreground so you can quickly see any errors that occur:

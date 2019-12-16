@@ -23,13 +23,16 @@ import (
 	"strconv"
 	"syscall"
 	"unicode/utf16"
+	"unsafe"
 
 	"golang.org/x/sys/windows"
 )
 
 // Windows API calls
 //sys _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhOpenQueryW
-//sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhAddEnglishCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
+//sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddCounterW
+//sys _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhRemoveCounter
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValueDouble(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueDouble) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
 //sys _PdhGetFormattedCounterValueLarge(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLarge) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
@@ -37,6 +40,7 @@ import (
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 //sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
+//sys _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetCounterInfoW
 
 type PdhQueryHandle uintptr
 
@@ -45,6 +49,28 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
+
+// PdhCounterInfo struct contains the performance counter details
+type PdhCounterInfo struct {
+	DwLength         uint32
+	DwType           uint32
+	CVersion         uint32
+	CStatus          uint32
+	LScale           int32
+	LDefaultScale    int32
+	DwUserData       *uint32
+	DwQueryUserData  *uint32
+	SzFullPath       *uint16 // pointer to a string
+	SzMachineName    *uint16 // pointer to a string
+	SzObjectName     *uint16 // pointer to a string
+	SzInstanceName   *uint16 // pointer to a string
+	SzParentInstance *uint16 // pointer to a string
+	DwInstanceIndex  uint32  // pointer to a string
+	SzCounterName    *uint16 // pointer to a string
+	Padding          [4]byte
+	SzExplainText    *uint16   // pointer to a string
+	DataBuffer       [1]uint32 // pointer to an extra space
+}
 
 // PdhCounterValueDouble  for double values
 type PdhCounterValueDouble struct {
@@ -88,6 +114,16 @@ func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	return handle, nil
 }
 
+// PdhAddEnglishCounter adds the specified counter to the query.
+func PdhAddEnglishCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
+	var handle PdhCounterHandle
+	if err := _PdhAddEnglishCounter(query, counterPath, userData, &handle); err != nil {
+		return InvalidCounterHandle, PdhErrno(err.(syscall.Errno))
+	}
+
+	return handle, nil
+}
+
 // PdhAddCounter adds the specified counter to the query.
 func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
 	var handle PdhCounterHandle
@@ -96,6 +132,15 @@ func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (
 	}
 
 	return handle, nil
+}
+
+// PdhRemoveCounter removes the specified counter to the query.
+func PdhRemoveCounter(counter PdhCounterHandle) error {
+	if err := _PdhRemoveCounter(counter); err != nil {
+		return PdhErrno(err.(syscall.Errno))
+	}
+
+	return nil
 }
 
 // PdhCollectQueryData collects the current raw data value for all counters in the specified query.
@@ -168,6 +213,27 @@ func PdhExpandCounterPath(utfPath *uint16) ([]uint16, error) {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 		return expandPaths, nil
+	}
+	return nil, nil
+}
+
+// PdhGetCounterInfo returns the counter information for given handle
+func PdhGetCounterInfo(handle PdhCounterHandle) (*PdhCounterInfo, error) {
+	var bufSize uint32
+	var buff []byte
+	if err := _PdhGetCounterInfo(handle, 0, &bufSize, nil); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		buff = make([]byte, bufSize)
+		bufSize = uint32(len(buff))
+
+		if err = _PdhGetCounterInfo(handle, 0, &bufSize, &buff[0]); err == nil {
+			counterInfo := (*PdhCounterInfo)(unsafe.Pointer(&buff[0]))
+			if counterInfo != nil {
+				return counterInfo, nil
+			}
+		}
 	}
 	return nil, nil
 }

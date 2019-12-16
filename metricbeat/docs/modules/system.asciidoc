@@ -8,10 +8,17 @@ This file is generated! See scripts/mage/docs_collector.go
 The System module allows you to monitor your servers. Because the System module
 always applies to the local server, the `hosts` config option is not needed.
 
-The default metricsets are `cpu`, `load`, `memory`, `network`, `process` and
-`process_summary`.
+The default metricsets are `cpu`, `load`, `memory`, `network`, `process`, and
+`process_summary`. To disable a default metricset, comment it out in the
+`modules.d/system.yml` configuration file. If _all_ metricsets are commented out
+and the System module is enabled, {beatname_uc} uses the default metricsets.
 
-Note that certain metricsets may access `/proc` to gather process information, and the resulting `ptrace_may_access()` call by the kernel to check for permissions can be blocked by https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor and other LSM software], even though the system module doesn't use `ptrace` directly.
+Note that certain metricsets may access `/proc` to gather process information,
+and the resulting `ptrace_may_access()` call by the kernel to check for
+permissions can be blocked by
+https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor
+and other LSM software], even though the System module doesn't use `ptrace`
+directly.
 
 [float]
 === Dashboard
@@ -134,6 +141,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-raid,raid>>
 
+* <<metricbeat-metricset-system-service,service>>
+
 * <<metricbeat-metricset-system-socket,socket>>
 
 * <<metricbeat-metricset-system-socket_summary,socket_summary>>
@@ -163,6 +172,8 @@ include::system/process.asciidoc[]
 include::system/process_summary.asciidoc[]
 
 include::system/raid.asciidoc[]
+
+include::system/service.asciidoc[]
 
 include::system/socket.asciidoc[]
 

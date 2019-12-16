@@ -10,8 +10,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Cisco module
 
-beta[]
-
 This is a module for Cisco network device's logs. It includes the following
 filesets for receiving logs over syslog or read from a file:
 
@@ -22,6 +20,17 @@ filesets for receiving logs over syslog or read from a file:
 Cisco ASA devices also support exporting flow records using NetFlow, which is
 supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
 {beatname_uc}.
+
+[WARNING]
+=======================================
+Some filesets in this module make extensive use of ingest pipeline scripts.
+This can cause their ingest pipelines to fail loading due to exceeding the
+default compilation limits:
+
+`[script] Too many dynamic script compilations within, max: [75/5m]`
+
+Check the <<dynamic-script-compilations>> section for more information.
+=======================================
 
 include::../include/what-happens.asciidoc[]
 
@@ -124,7 +133,7 @@ Mappings for Intrusion events fields:
 |====================================
 | FTD Field | Mapped fields
 | ApplicationProtocol | network.protocol
-| DstIP | destination.ip
+| DstIP | destination.address
 | DstPort | destination.port
 | EgressInterface | cisco.ftd.destination_interface
 | GID | service.id
@@ -134,7 +143,7 @@ Mappings for Intrusion events fields:
 | IntrusionPolicy | cisco.ftd.rule_name
 | Message | message
 | Protocol | network.transport
-| SrcIP | source.ip
+| SrcIP | source.address
 | SrcPort | source.port
 | User | user.id, user.name
 | WebApplication | network.application
@@ -152,7 +161,7 @@ Mappings for Connection and Security Intelligence events fields:
 | DNSQuery | dns.question.name
 | DNSRecordType | dns.question.type
 | DNSResponseType | dns.response_code
-| DstIP | destination.ip
+| DstIP | destination.address
 | DstPort | destination.port
 | EgressInterface | cisco.ftd.destination_interface
 | HTTPReferer | http.request.referrer
@@ -167,13 +176,13 @@ Mappings for Connection and Security Intelligence events fields:
 | ResponderPackets | destination.packets
 | SSLActualAction | event.outcome
 | SSLServerName | server.domain
-| SrcIP | source.ip
+| SrcIP | source.address
 | SrcPort | source.port
 | URL | url.original
 | User | user.name
 | UserAgent | user_agent.original
 | WebApplication | network.application
-| originalClientSrcIP | client.ip
+| originalClientSrcIP | client.address
 |====================================
 
 Mappings for File and Malware events fields:
@@ -184,7 +193,7 @@ Mappings for File and Malware events fields:
 | ArchiveFileName | file.name
 | ArchiveSHA256 | file.hash.sha256
 | Client | network.application
-| DstIP | destination.ip
+| DstIP | destination.address
 | DstPort | destination.port
 | FileName | file.name
 | FilePolicy | cisco.ftd.rule_name
@@ -192,7 +201,7 @@ Mappings for File and Malware events fields:
 | FileSize | file.size
 | FirstPacketSecond | event.start
 | Protocol | network.transport
-| SrcIP | source.ip
+| SrcIP | source.address
 | SrcPort | source.port
 | URI | url.original
 | User | user.name
@@ -279,6 +288,22 @@ include::../include/timezone-support.asciidoc[]
 :has-dashboards!:
 
 :fileset_ex!:
+
+[float]
+[[dynamic-script-compilations]]
+=== Dynamic Script Compilations
+
+The `asa` and `ftd` filesets are based on ingest pipelines and make extensive
+use of script processors and painless conditions. This can cause the pipelines
+to fail loading the first time the module is used, due to exceeding the maximum
+script compilation limits. It is recommended to tune the following parameters
+on your cluster:
+
+- {ref}/circuit-breaker.html#script-compilation-circuit-breaker[script.max_compilations_rate]:
+  Increase to at least `100/5m`.
+
+- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache_max_size]:
+  Increase to at least `200` if using both filesets or other script-heavy modules.
 
 :modulename!:
 

@@ -58,15 +58,35 @@ var (
 
 	procPdhOpenQueryW               = modpdh.NewProc("PdhOpenQueryW")
 	procPdhAddEnglishCounterW       = modpdh.NewProc("PdhAddEnglishCounterW")
+	procPdhAddCounterW              = modpdh.NewProc("PdhAddCounterW")
+	procPdhRemoveCounter            = modpdh.NewProc("PdhRemoveCounter")
 	procPdhCollectQueryData         = modpdh.NewProc("PdhCollectQueryData")
 	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
 	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
 	procPdhExpandWildCardPathW      = modpdh.NewProc("PdhExpandWildCardPathW")
 	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
+	procPdhGetCounterInfoW          = modpdh.NewProc("PdhGetCounterInfoW")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
 	r0, _, _ := syscall.Syscall(procPdhOpenQueryW.Addr(), 3, uintptr(unsafe.Pointer(dataSource)), uintptr(userData), uintptr(unsafe.Pointer(query)))
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhAddEnglishCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) {
+	var _p0 *uint16
+	_p0, errcode = syscall.UTF16PtrFromString(counterPath)
+	if errcode != nil {
+		return
+	}
+	return __PdhAddEnglishCounter(query, _p0, userData, counter)
+}
+
+func __PdhAddEnglishCounter(query PdhQueryHandle, counterPath *uint16, userData uintptr, counter *PdhCounterHandle) (errcode error) {
+	r0, _, _ := syscall.Syscall6(procPdhAddEnglishCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}
@@ -83,7 +103,15 @@ func _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, 
 }
 
 func __PdhAddCounter(query PdhQueryHandle, counterPath *uint16, userData uintptr, counter *PdhCounterHandle) (errcode error) {
-	r0, _, _ := syscall.Syscall6(procPdhAddEnglishCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
+	r0, _, _ := syscall.Syscall6(procPdhAddCounterW.Addr(), 4, uintptr(query), uintptr(unsafe.Pointer(counterPath)), uintptr(userData), uintptr(unsafe.Pointer(counter)), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) {
+	r0, _, _ := syscall.Syscall(procPdhRemoveCounter.Addr(), 1, uintptr(counter), 0, 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}
@@ -140,6 +168,14 @@ func _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPa
 
 func _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) {
 	r0, _, _ := syscall.Syscall(procPdhExpandCounterPathW.Addr(), 3, uintptr(unsafe.Pointer(wildcardPath)), uintptr(unsafe.Pointer(expandedPathList)), uintptr(unsafe.Pointer(pathListLength)))
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) {
+	r0, _, _ := syscall.Syscall6(procPdhGetCounterInfoW.Addr(), 4, uintptr(counter), uintptr(text), uintptr(unsafe.Pointer(size)), uintptr(unsafe.Pointer(lpBuffer)), 0, 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

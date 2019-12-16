@@ -34,16 +34,23 @@ import (
 type dockerBuilder struct {
 	PackageSpec
 
-	buildDir string
-	beatDir  string
+	imageName string
+	buildDir  string
+	beatDir   string
 }
 
 func newDockerBuilder(spec PackageSpec) (*dockerBuilder, error) {
+	imageName, err := spec.ImageName()
+	if err != nil {
+		return nil, err
+	}
+
 	buildDir := filepath.Join(spec.packageDir, "docker-build")
 	beatDir := filepath.Join(buildDir, "beat")
 
 	return &dockerBuilder{
 		PackageSpec: spec,
+		imageName:   imageName,
 		buildDir:    buildDir,
 		beatDir:     beatDir,
 	}, nil
@@ -130,11 +137,10 @@ func (b *dockerBuilder) prepareBuild() error {
 }
 
 func (b *dockerBuilder) dockerBuild() (string, error) {
-	tag := fmt.Sprintf("%s:%s", b.Name, b.Version)
+	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
 	if b.Snapshot {
 		tag = tag + "-SNAPSHOT"
 	}
-
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
@@ -145,7 +151,9 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
-		outputTar, err := b.Expand(defaultBinaryName + ".docker.tar.gz")
+		outputTar, err := b.Expand(defaultBinaryName+".docker.tar.gz", map[string]interface{}{
+			"Name": b.imageName,
+		})
 		if err != nil {
 			return err
 		}

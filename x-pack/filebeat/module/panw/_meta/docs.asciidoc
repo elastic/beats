@@ -5,8 +5,6 @@
 
 == Palo Alto Networks module
 
-beta[]
-
 This is a module for Palo Alto Networks PAN-OS firewall monitoring logs received
 over Syslog or read from a file. It currently supports messages of Traffic and
 Threat types.
@@ -104,8 +102,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Category |  | panw.panos.url.category
 | Severity | log.level |
 | Direction | network.direction |
-| Source Location | source.geo.country_iso_code |
-| Destination Location | destination.geo.country_iso_code |
+| Source Location | source.geo.name |
+| Destination Location | destination.geo.name |
 | PCAP_id |  | panw.panos.network.pcap_id
 | Filedigest |  | panw.panos.file.hash
 | User Agent | user_agent.original |

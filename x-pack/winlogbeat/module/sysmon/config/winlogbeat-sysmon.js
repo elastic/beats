@@ -394,7 +394,7 @@ var sysmon = (function () {
         .AddFields({
             "fields": {
                 "event.category": "process",
-                "event.type:": "process_start",
+                "event.type": "process_start",
             },
             "target": "",
         })
@@ -489,7 +489,7 @@ var sysmon = (function () {
         .AddFields({
             "fields": {
                 "event.category": "process",
-                "event.type:": "process_end",
+                "event.type": "process_end",
             },
             "target": "",
         })

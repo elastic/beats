@@ -54,6 +54,10 @@ type Config struct {
 	// DevelopmentMode is an undocumented flag to ignore SSH traffic so that the
 	// dataset can be run with debug output without creating a feedback loop.
 	DevelopmentMode bool `config:"socket.development_mode"`
+
+	// EnableIPv6 allows to control IPv6 support. When unset (default) IPv6
+	// will be automatically detected on runtime.
+	EnableIPv6 *bool `config:"socket.enable_ipv6"`
 }
 
 // Validate validates the host metricset config.

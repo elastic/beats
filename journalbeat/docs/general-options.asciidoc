@@ -29,32 +29,32 @@ data path. See the <<directory-layout>> section for details. The default is `${p
 ----
 
 [float]
-==== `backoff` deprecated[5.6.1,Use the option under `paths` instead.]
+==== `backoff` deprecated:[5.6.1,Use the option under `paths` instead.]
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
 <<{beatname_lc}-backoff,`backoff`>>.
 
 [float]
-==== `max_backoff` deprecated[5.6.1,Use the option under `paths` instead.]
+==== `max_backoff` deprecated:[5.6.1,Use the option under `paths` instead.]
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
 <<{beatname_lc}-max-backoff,`max_backoff`>>.
 
 [float]
-==== `seek` deprecated[5.6.1,Use the option under `paths` instead.]
+==== `seek` deprecated:[5.6.1,Use the option under `paths` instead.]
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
 <<seek,`seek`>>. 
 
 [float]
-==== `include_matches` deprecated[5.6.1,Use the option under `paths` instead.]
+==== `include_matches` deprecated:[5.6.1,Use the option under `paths` instead.]
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
 <<include-matches,`include_matches`>>. 
 
-include::{libbeat-dir}/docs/generalconfig.asciidoc[]
+include::{libbeat-dir}/generalconfig.asciidoc[]
 

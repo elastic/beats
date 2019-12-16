@@ -41,7 +41,6 @@ const (
 
 // Adapter must be implemented by the beat in order to provide Autodiscover
 type Adapter interface {
-
 	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
 	CreateConfig(bus.Event) ([]*common.Config, error)
 
@@ -202,7 +201,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 		err = a.adapter.CheckConfig(config)
 		if err != nil {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config %v, won't start runner", config)))
+			a.logger.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config '%s', won't start runner", common.DebugString(config, true))))
 			continue
 		}
 

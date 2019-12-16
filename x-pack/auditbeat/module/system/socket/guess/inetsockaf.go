@@ -51,9 +51,10 @@ func init() {
 }
 
 type guessInetSockFamily struct {
-	ctx    Context
-	family int
-	limit  int
+	ctx     Context
+	family  int
+	limit   int
+	canIPv6 bool
 }
 
 // Name of this guess.
@@ -103,6 +104,12 @@ func (g *guessInetSockFamily) Prepare(ctx Context) error {
 	if g.limit, ok = g.ctx.Vars["INET_SOCK_V6_LIMIT"].(int); !ok {
 		return errors.New("required variable INET_SOCK_V6_LIMIT not found")
 	}
+	// check that this system can create AF_INET6 sockets. Otherwise revert to
+	// using AF_INET only.
+	fd, err := unix.Socket(unix.AF_INET6, unix.SOCK_DGRAM, 0)
+	if g.canIPv6 = err == nil; g.canIPv6 {
+		unix.Close(fd)
+	}
 	return nil
 }
 
@@ -114,7 +121,7 @@ func (g *guessInetSockFamily) Terminate() error {
 // Trigger creates and then closes a socket alternating between AF_INET/AF_INET6
 // on each run.
 func (g *guessInetSockFamily) Trigger() error {
-	if g.family == unix.AF_INET {
+	if g.canIPv6 && g.family == unix.AF_INET {
 		g.family = unix.AF_INET6
 	} else {
 		g.family = unix.AF_INET

@@ -1,0 +1,26 @@
+- name: resourcequota
+  type: group
+  description: >
+    kubernetes resourcequota metrics
+  release: ga
+  fields:
+    - name: created.sec
+      type: double
+      description: Epoch seconds since the ResourceQuota was created
+    - name: quota
+      type: double
+      description: Quota informed (hard or used) for the resource
+    - name: name
+      type: keyword
+      description: ResourceQuota name
+    - name: type
+      type: keyword
+      description: Quota information type, `hard` or `used`
+    - name: resource
+      type: keyword
+      description: Resource name the quota applies to
+
+      
+      
+
+

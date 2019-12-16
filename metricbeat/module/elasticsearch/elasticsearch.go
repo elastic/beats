@@ -67,6 +67,7 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 
 	expectedXPackMetricsets := []string{
 		"ccr",
+		"enrich",
 		"cluster_stats",
 		"index",
 		"index_recovery",
@@ -85,6 +86,9 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
 var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+
+// EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
+var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -474,6 +478,33 @@ func (l *License) IsOneOf(candidateLicenses ...string) bool {
 	}
 
 	return false
+}
+
+// ToMapStr converts the license to a common.MapStr. This is necessary
+// for proper marshaling of the data before it's sent over the wire. In
+// particular it ensures that ms-since-epoch values are marshaled as longs
+// and not floats in scientific notation as Elasticsearch does not like that.
+func (l *License) ToMapStr() common.MapStr {
+	m := common.MapStr{
+		"status":               l.Status,
+		"uid":                  l.ID,
+		"type":                 l.Type,
+		"issue_date":           l.IssueDate,
+		"issue_date_in_millis": l.IssueDateInMillis,
+		"expiry_date":          l.ExpiryDate,
+		"max_nodes":            l.MaxNodes,
+		"issued_to":            l.IssuedTo,
+		"issuer":               l.Issuer,
+		"start_date_in_millis": l.StartDateInMillis,
+	}
+
+	if l.ExpiryDateInMillis != 0 {
+		// We don't want to record a 0 expiry date as this means the license has expired
+		// in the Stack Monitoring UI
+		m["expiry_date_in_millis"] = l.ExpiryDateInMillis
+	}
+
+	return m
 }
 
 func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr, error) {

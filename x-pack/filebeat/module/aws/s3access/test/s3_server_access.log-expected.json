@@ -131,5 +131,29 @@
         "input.type": "log",
         "log.offset": 2875,
         "service.type": "aws"
+    },
+    {
+        "@timestamp": "2019-09-19T17:06:39.000Z",
+        "aws.s3access.authentication_type": "AuthHeader",
+        "aws.s3access.bucket": "test-s3-ks",
+        "aws.s3access.bucket_owner": "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2",
+        "aws.s3access.cipher_suite": "ECDHE-RSA-AES128-SHA",
+        "aws.s3access.host_header": "s3-ap-southeast-1.amazonaws.com",
+        "aws.s3access.host_id": "LwRa4w6DbuU48GKQiH3jDbjfTyLCbwasFBsdttugRQ+9lH4jK8lT91+HhGZKMYI3sPyKuQ9LvU0=",
+        "aws.s3access.http_status": 204,
+        "aws.s3access.key": "Screen+Shot+2019-09-09+at+9.08.44+AM.png",
+        "aws.s3access.object_size": 57138,
+        "aws.s3access.operation": "BATCH.DELETE.OBJECT",
+        "aws.s3access.remote_ip": "174.29.206.152",
+        "aws.s3access.request_id": "6CE38F1312D32BDD",
+        "aws.s3access.requester": "arn:aws:iam::123456:user/test@elastic.co",
+        "aws.s3access.signature_version": "SigV4",
+        "aws.s3access.tls_version": "TLSv1.2",
+        "event.dataset": "aws.s3access",
+        "event.module": "aws",
+        "fileset.name": "s3access",
+        "input.type": "log",
+        "log.offset": 3280,
+        "service.type": "aws"
     }
 ]

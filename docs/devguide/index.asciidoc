@@ -1,9 +1,11 @@
 [[beats-reference]]
 = Beats Developer Guide
 
-:libbeat-dir: ../../libbeat
+:libbeat-dir: {docdir}/../../libbeat/docs
 
-include::{libbeat-dir}/docs/version.asciidoc[]
+include::{libbeat-dir}/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/versions/stack/{source_branch}.asciidoc[]
 
 :dev-guide: true
 :beatname_lc: beatname
@@ -11,13 +13,13 @@ include::{libbeat-dir}/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./pull-request-guidelines.asciidoc[]
 
 include::./contributing.asciidoc[]
 
-include::{libbeat-dir}/docs/communitybeats.asciidoc[]
+include::{libbeat-dir}/communitybeats.asciidoc[]
 
 include::./newbeat.asciidoc[]
 

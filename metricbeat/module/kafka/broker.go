@@ -43,6 +43,7 @@ func Version(version string) kafka.Version {
 type Broker struct {
 	broker *sarama.Broker
 	cfg    *sarama.Config
+	client sarama.Client
 
 	advertisedAddr string
 	id             int32
@@ -96,6 +97,7 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 	return &Broker{
 		broker:  sarama.NewBroker(host),
 		cfg:     cfg,
+		client:  nil,
 		id:      noID,
 		matchID: settings.MatchID,
 	}
@@ -104,6 +106,7 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 // Close the broker connection
 func (b *Broker) Close() error {
 	closeBroker(b.broker)
+	b.client.Close()
 	return nil
 }
 
@@ -112,6 +115,13 @@ func (b *Broker) Connect() error {
 	if err := b.broker.Open(b.cfg); err != nil {
 		return errors.Wrap(err, "broker.Open failed")
 	}
+
+	c, err := getClusterWideClient(b.Addr(), b.cfg)
+	if err != nil {
+		closeBroker(b.broker)
+		return fmt.Errorf("Could not get cluster client for advertised broker with address %v", b.Addr())
+	}
+	b.client = c
 
 	if b.id != noID || !b.matchID {
 		return nil
@@ -134,6 +144,7 @@ func (b *Broker) Connect() error {
 	debugf("found matching broker %v with id %v", other.Addr(), other.ID())
 	b.id = other.ID()
 	b.advertisedAddr = other.Addr()
+
 	return nil
 }
 
@@ -270,7 +281,16 @@ func (b *Broker) FetchGroupOffsets(group string, partitions map[string][]int32) 
 	return b.broker.FetchOffset(requ)
 }
 
-// ID returns the broker or -1 if the broker id is unknown.
+// FetchPartitionOffsetFromTheLeader fetches the OffsetNewest from the leader.
+func (b *Broker) FetchPartitionOffsetFromTheLeader(topic string, partitionID int32) (int64, error) {
+	offset, err := b.client.GetOffset(topic, partitionID, sarama.OffsetNewest)
+	if err != nil {
+		return -1, err
+	}
+	return offset, nil
+}
+
+// ID returns the broker ID or -1 if the broker id is unknown.
 func (b *Broker) ID() int32 {
 	if b.id == noID {
 		return b.broker.ID()
@@ -522,6 +542,14 @@ func anyIPsMatch(as, bs []net.IP) bool {
 		}
 	}
 	return false
+}
+
+func getClusterWideClient(addr string, cfg *sarama.Config) (sarama.Client, error) {
+	client, err := sarama.NewClient([]string{addr}, cfg)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 func brokerAddresses(brokers []*sarama.Broker) []string {

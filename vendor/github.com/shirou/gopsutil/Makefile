@@ -18,6 +18,7 @@ build_test:  ## test only buildable
 	GOOS=linux GOARCH=arm go test ./... | $(BUILD_FAIL_PATTERN)
 	GOOS=linux GOARCH=arm64 go test ./... | $(BUILD_FAIL_PATTERN)
 	GOOS=freebsd go test ./... | $(BUILD_FAIL_PATTERN)
+	GOOS=freebsd GOARCH=arm go test ./... | $(BUILD_FAIL_PATTERN)
 	CGO_ENABLED=0 GOOS=darwin go test ./... | $(BUILD_FAIL_PATTERN)
 	GOOS=windows go test ./... | $(BUILD_FAIL_PATTERN)
 	# Operating systems supported for building only (not implemented error if used)

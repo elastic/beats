@@ -18,6 +18,8 @@
 package apiserver
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -29,7 +31,7 @@ type metricset struct {
 	prometheusMappings *prometheus.MetricsMapping
 }
 
-var _ mb.ReportingMetricSetV2 = (*metricset)(nil)
+var _ mb.ReportingMetricSetV2Error = (*metricset)(nil)
 
 // getMetricsetFactory as required by` mb.Registry.MustAddMetricSet`
 func getMetricsetFactory(prometheusMappings *prometheus.MetricsMapping) mb.MetricSetFactory {
@@ -47,11 +49,10 @@ func getMetricsetFactory(prometheusMappings *prometheus.MetricsMapping) mb.Metri
 }
 
 // Fetch as expected by `mb.EventFetcher`
-func (m *metricset) Fetch(reporter mb.ReporterV2) {
+func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
 	if err != nil {
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error getting metrics")
 	}
 
 	rcPost14 := false
@@ -88,4 +89,6 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) {
 			Namespace:       m.prometheusMappings.Namespace,
 		})
 	}
+
+	return nil
 }

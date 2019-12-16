@@ -83,9 +83,15 @@ type watcher struct {
 	logger   *logp.Logger
 }
 
-func tweakOptions(options *metav1.ListOptions, opt WatchOptions) {
+func nodeSelector(options *metav1.ListOptions, opt WatchOptions) {
 	if opt.Node != "" {
 		options.FieldSelector = "spec.nodeName=" + opt.Node
+	}
+}
+
+func nameSelector(options *metav1.ListOptions, opt WatchOptions) {
+	if opt.Node != "" {
+		options.FieldSelector = "metadata.name=" + opt.Node
 	}
 }
 
@@ -103,11 +109,11 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		p := client.CoreV1().Pods(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				tweakOptions(&options, opts)
+				nodeSelector(&options, opts)
 				return p.List(options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				tweakOptions(&options, opts)
+				nodeSelector(&options, opts)
 				return p.Watch(options)
 			},
 		}
@@ -129,9 +135,11 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		n := client.CoreV1().Nodes()
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				nameSelector(&options, opts)
 				return n.List(options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				nameSelector(&options, opts)
 				return n.Watch(options)
 			},
 		}
@@ -162,7 +170,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 
 		objType = "replicaset"
 	case *StatefulSet:
-		ss := client.AppsV1().ReplicaSets(opts.Namespace)
+		ss := client.AppsV1().StatefulSets(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				return ss.List(options)
@@ -173,6 +181,18 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		}
 
 		objType = "statefulset"
+	case *Service:
+		svc := client.CoreV1().Services(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return svc.List(options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return svc.Watch(options)
+			},
+		}
+
+		objType = "service"
 	default:
 		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
 	}

@@ -65,7 +65,6 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	upOptions := UpOptions{
 		Timeout: 60 * time.Second,
 		Create: CreateOptions{
-			Build:         true,
 			ForceRecreate: true,
 		},
 	}

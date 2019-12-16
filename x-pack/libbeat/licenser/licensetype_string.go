@@ -8,9 +8,22 @@ package licenser
 
 import "strconv"
 
-const _LicenseType_name = "Open sourceTrialBasicStandardGoldPlatinum"
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[OSS-0]
+	_ = x[Trial-1]
+	_ = x[Basic-2]
+	_ = x[Standard-3]
+	_ = x[Gold-4]
+	_ = x[Platinum-5]
+	_ = x[Enterprise-6]
+}
 
-var _LicenseType_index = [...]uint8{0, 11, 16, 21, 29, 33, 41}
+const _LicenseType_name = "Open sourceTrialBasicStandardGoldPlatinumEnterprise"
+
+var _LicenseType_index = [...]uint8{0, 11, 16, 21, 29, 33, 41, 51}
 
 func (i LicenseType) String() string {
 	if i < 0 || i >= LicenseType(len(_LicenseType_index)-1) {

@@ -1,11 +1,11 @@
 [
     {
-        "@timestamp": "2018-06-19T05:16:15.549Z",
+        "@timestamp": "2018-06-19T05:16:15.549-02:00",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
@@ -16,13 +16,13 @@
         "user.name": "i030648"
     },
     {
-        "@timestamp": "2018-06-19T05:07:52.304Z",
+        "@timestamp": "2018-06-19T05:07:52.304-02:00",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.node.name": "v_VJhjV",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 155,
@@ -33,7 +33,7 @@
         "user.name": "rado"
     },
     {
-        "@timestamp": "2018-06-19T05:00:15.778Z",
+        "@timestamp": "2018-06-19T05:00:15.778-02:00",
         "elasticsearch.audit.action": "indices:data/read/scroll/clear",
         "elasticsearch.audit.event_type": "access_granted",
         "elasticsearch.audit.layer": "transport",
@@ -41,7 +41,7 @@
         "elasticsearch.audit.request.name": "ClearScrollRequest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 306,
@@ -51,13 +51,13 @@
         "user.name": "_xpack_security"
     },
     {
-        "@timestamp": "2018-06-19T05:07:45.544Z",
+        "@timestamp": "2018-06-19T05:07:45.544-02:00",
         "elasticsearch.audit.event_type": "anonymous_access_denied",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.node.name": "v_VJhjV",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 519,
@@ -67,12 +67,12 @@
         "url.original": "/_xpack/security/_authenticate"
     },
     {
-        "@timestamp": "2018-06-19T05:26:27.268Z",
+        "@timestamp": "2018-06-19T05:26:27.268-02:00",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 654,
@@ -83,7 +83,7 @@
         "user.name": "N078801"
     },
     {
-        "@timestamp": "2018-06-19T05:55:26.898Z",
+        "@timestamp": "2018-06-19T05:55:26.898-02:00",
         "elasticsearch.audit.action": "cluster:monitor/main",
         "elasticsearch.audit.event_type": "access_denied",
         "elasticsearch.audit.layer": "transport",
@@ -91,7 +91,7 @@
         "elasticsearch.audit.request.name": "MainRequest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 802,
@@ -101,13 +101,13 @@
         "user.name": "_anonymous"
     },
     {
-        "@timestamp": "2018-06-19T05:24:15.190Z",
+        "@timestamp": "2018-06-19T05:24:15.190-02:00",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.node.name": "v_VJhjV",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "http.request.body.content": "body",
         "input.type": "log",
@@ -119,7 +119,7 @@
         "user.name": "elastic"
     },
     {
-        "@timestamp": "2019-01-08T14:15:02.011Z",
+        "@timestamp": "2019-01-08T14:15:02.011-02:00",
         "elasticsearch.audit.action": "indices:data/read/search[free_context]",
         "elasticsearch.audit.event_type": "access_granted",
         "elasticsearch.audit.indices": [
@@ -142,7 +142,7 @@
         "elasticsearch.node.name": "NodeName-0",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1210,
@@ -152,7 +152,7 @@
         "user.name": "username"
     },
     {
-        "@timestamp": "2019-01-27T20:04:27.244Z",
+        "@timestamp": "2019-01-27T20:04:27.244-02:00",
         "elasticsearch.audit.event_type": "authentication_success",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.realm": "default_file",
@@ -160,7 +160,7 @@
         "elasticsearch.node.name": "node-0",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "audit",
         "http.request.body.content": "{\"metadata\":{\"intelligence\":7},\"full_name\":\"Jack Nicholson\",\"roles\":[\"admin\",\"other_role1\"",
         "input.type": "log",

@@ -2,10 +2,14 @@
   {
     "@timestamp": "2018-05-18T23:09:03.2086661Z",
     "event": {
-      "action": "Special Logon",
+      "action": "logged-in-special",
       "code": 4672,
       "kind": "event",
-      "module": "security"
+      "module": "security",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"

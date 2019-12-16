@@ -9,13 +9,13 @@ quickly, see {stack-gs}/get-started-elastic-stack.html[Getting started with the
 [TIP]
 ==============
 You can skip having to install {es} and {kib} by using our
-https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service] on
-Elastic Cloud. The {es} Service is available on AWS, GCP, and Azure.
-https://www.elastic.co/cloud/elasticsearch-service/signup[Try out the {es}
-Service for free].
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
+{ecloud}. The {ess} is available on AWS, GCP, and Azure.
+https://www.elastic.co/cloud/elasticsearch-service/signup[Try out the {ess}
+for free].
 ==============
 
-After installing the {stack}, see the {beats} getting started guides: 
+After installing the {stack}, see the {beats} getting started guides:
 
 * {auditbeat-ref}/auditbeat-getting-started.html[Auditbeat]
 * {filebeat-ref}/filebeat-getting-started.html[Filebeat]
@@ -26,7 +26,6 @@ After installing the {stack}, see the {beats} getting started guides:
 * {packetbeat-ref}/packetbeat-getting-started.html[Packetbeat]
 * {winlogbeat-ref}/winlogbeat-getting-started.html[Winlogbeat]
 
-If you're planning to use the
-{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
-{infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}, also see the
-{infra-guide}/index.html[Infrastructure Monitoring Guide].
+If you're planning to use the Metrics app or the Logs app in {kib},
+also see the {metrics-guide}[Metrics Monitoring Guide]
+and the {logs-guide}[Logs Monitoring Guide].

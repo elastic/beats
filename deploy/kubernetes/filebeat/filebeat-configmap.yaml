@@ -14,7 +14,6 @@ data:
         - /var/log/containers/*.log
       processors:
         - add_kubernetes_metadata:
-            in_cluster: true
             host: ${NODE_NAME}
             matchers:
             - logs_path:
@@ -24,7 +23,7 @@ data:
     #filebeat.autodiscover:
     #  providers:
     #    - type: kubernetes
-    #      host: ${NODE_NAME}
+    #      node: ${NODE_NAME}
     #      hints.enabled: true
     #      hints.default_config:
     #        type: container

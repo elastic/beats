@@ -39,3 +39,8 @@ func Check() {
 	deps = append(deps, devtools.Check)
 	mg.SerialDeps(deps...)
 }
+
+// CheckLicenseHeaders checks license headers
+func CheckLicenseHeaders() {
+	mg.Deps(devtools.CheckLicenseHeaders)
+}

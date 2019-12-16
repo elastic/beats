@@ -22,6 +22,7 @@ package perfmon
 import (
 	"regexp"
 	"runtime"
+	"strings"
 	"syscall"
 	"unsafe"
 
@@ -29,7 +30,7 @@ import (
 )
 
 var (
-	instanceNameRegexp = regexp.MustCompile(`.*\((.*)\).*`)
+	instanceNameRegexp = regexp.MustCompile(`.*?\((.*?)\).*`)
 	objectNameRegexp   = regexp.MustCompile(`(?:^\\\\[^\\]+\\|^\\)([^\\]+)`)
 )
 
@@ -64,10 +65,16 @@ func (q *Query) Open() error {
 	return nil
 }
 
+// AddEnglishCounter adds the specified counter to the query.
+func (q *Query) AddEnglishCounter(counterPath string) (PdhCounterHandle, error) {
+	h, err := PdhAddEnglishCounter(q.handle, counterPath, 0)
+	return h, err
+}
+
 // AddCounter adds the specified counter to the query.
 func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
-		return errors.Errorf("counter %s has been already added", counterPath)
+		return nil
 	}
 	var err error
 	var instanceName string
@@ -91,6 +98,67 @@ func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard b
 		format:       getPDHFormat(counter.Format),
 	}
 	return nil
+}
+
+// GetCounterPaths func will check the computer or log file and return the counter paths that match the given counter path which contains wildcard characters.
+func (q *Query) GetCounterPaths(counterPath string) ([]string, error) {
+	paths, err := q.ExpandWildCardPath(counterPath)
+	if err == nil {
+		return paths, err
+	}
+	//check if Windows installed language is not ENG, the ExpandWildCardPath will return either one of the errors below.
+	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
+		handle, err := q.AddEnglishCounter(counterPath)
+		if err != nil {
+			return nil, err
+		}
+		defer PdhRemoveCounter(handle)
+		info, err := PdhGetCounterInfo(handle)
+		if err != nil {
+			return nil, err
+		}
+		path := UTF16PtrToString(info.SzFullPath)
+		if path != counterPath {
+			return q.ExpandWildCardPath(path)
+		}
+	}
+	return nil, err
+}
+
+// RemoveUnusedCounters will remove all counter handles for the paths that are not found anymore
+func (q *Query) RemoveUnusedCounters(counters []string) error {
+	// check if the expandwildcard func did expand th wildcard queries, if not, no counters will be removed
+	for _, counter := range counters {
+		if strings.Contains(counter, "*") {
+			return nil
+		}
+	}
+	unused := make(map[string]*Counter)
+	for counterPath, counter := range q.counters {
+		if !matchCounter(counterPath, counters) {
+			unused[counterPath] = counter
+		}
+	}
+	if len(unused) == 0 {
+		return nil
+	}
+	for counterPath, cnt := range unused {
+		err := PdhRemoveCounter(cnt.handle)
+		if err != nil {
+			return err
+		}
+		delete(q.counters, counterPath)
+	}
+	return nil
+}
+
+func matchCounter(counterPath string, counterList []string) bool {
+	for _, cn := range counterList {
+		if cn == counterPath {
+			return true
+		}
+	}
+	return false
 }
 
 // CollectData collects the value for all counters in the query.
@@ -129,6 +197,9 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	}
 	if err != nil {
 		return nil, err
+	}
+	if expdPaths == nil {
+		return nil, errors.New("no counter paths found")
 	}
 	return UTF16ToStringArray(expdPaths), nil
 }

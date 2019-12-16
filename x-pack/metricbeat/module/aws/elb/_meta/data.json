@@ -3,21 +3,34 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "AvailabilityZone": "us-east-1b",
-                "LoadBalancerName": "DockerReg-EcsElast-1UFCSV3UVE46A"
+                "LoadBalancerName": "tf-lb-20171218185946539900000004"
             },
             "namespace": "AWS/ELB"
         },
         "metrics": {
-            "HealthyHostCount": {
-                "avg": 2
+            "EstimatedALBActiveConnectionCount": {
+                "avg": 2.6
             },
-            "UnHealthyHostCount": {
+            "EstimatedALBConsumedLCUs": {
+                "avg": 0.000015000000000000002
+            },
+            "EstimatedALBNewConnectionCount": {
                 "avg": 0
+            },
+            "EstimatedProcessedBytes": {
+                "avg": 237.6
             }
+        },
+        "tags": {
+            "Name": "logstash",
+            "owner": "logstash"
         }
     },
     "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
         "provider": "aws",
         "region": "us-east-1"
     },
@@ -27,7 +40,8 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "elb"
+        "name": "elb",
+        "period": 10000
     },
     "service": {
         "type": "aws"

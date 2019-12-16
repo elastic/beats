@@ -69,6 +69,232 @@
             `param2`, and so on, because event log parameters are unnamed in
             earlier versions of Windows.
 
+        - name: event_data
+          type: group
+          description: >
+            This is a non-exhaustive list of parameters that are used in
+            Windows events. By having these fields defined in the template they
+            can be used in dashboards and machine-learning jobs.
+          fields:
+            - name: AuthenticationPackageName
+              type: keyword
+            - name: Binary
+              type: keyword
+            - name: BitlockerUserInputTime
+              type: keyword
+            - name: BootMode
+              type: keyword
+            - name: BootType
+              type: keyword
+            - name: BuildVersion
+              type: keyword
+            - name: Company
+              type: keyword
+            - name: CorruptionActionState
+              type: keyword
+            - name: CreationUtcTime
+              type: keyword
+            - name: Description
+              type: keyword
+            - name: Detail
+              type: keyword
+            - name: DeviceName
+              type: keyword
+            - name: DeviceNameLength
+              type: keyword
+            - name: DeviceTime
+              type: keyword
+            - name: DeviceVersionMajor
+              type: keyword
+            - name: DeviceVersionMinor
+              type: keyword
+            - name: DriveName
+              type: keyword
+            - name: DriverName
+              type: keyword
+            - name: DriverNameLength
+              type: keyword
+            - name: DwordVal
+              type: keyword
+            - name: EntryCount
+              type: keyword
+            - name: ExtraInfo
+              type: keyword
+            - name: FailureName
+              type: keyword
+            - name: FailureNameLength
+              type: keyword
+            - name: FileVersion
+              type: keyword
+            - name: FinalStatus
+              type: keyword
+            - name: Group
+              type: keyword
+            - name: IdleImplementation
+              type: keyword
+            - name: IdleStateCount
+              type: keyword
+            - name: ImpersonationLevel
+              type: keyword
+            - name: IntegrityLevel
+              type: keyword
+            - name: IpAddress
+              type: keyword
+            - name: IpPort
+              type: keyword
+            - name: KeyLength
+              type: keyword
+            - name: LastBootGood
+              type: keyword
+            - name: LastShutdownGood
+              type: keyword
+            - name: LmPackageName
+              type: keyword
+            - name: LogonGuid
+              type: keyword
+            - name: LogonId
+              type: keyword
+            - name: LogonProcessName
+              type: keyword
+            - name: LogonType
+              type: keyword
+            - name: MajorVersion
+              type: keyword
+            - name: MaximumPerformancePercent
+              type: keyword
+            - name: MinimumPerformancePercent
+              type: keyword
+            - name: MinimumThrottlePercent
+              type: keyword
+            - name: MinorVersion
+              type: keyword
+            - name: NewProcessId
+              type: keyword
+            - name: NewProcessName
+              type: keyword
+            - name: NewSchemeGuid
+              type: keyword
+            - name: NewTime
+              type: keyword
+            - name: NominalFrequency
+              type: keyword
+            - name: Number
+              type: keyword
+            - name: OldSchemeGuid
+              type: keyword
+            - name: OldTime
+              type: keyword
+            - name: OriginalFileName
+              type: keyword
+            - name: Path
+              type: keyword
+            - name: PerformanceImplementation
+              type: keyword
+            - name: PreviousCreationUtcTime
+              type: keyword
+            - name: PreviousTime
+              type: keyword
+            - name: PrivilegeList
+              type: keyword
+            - name: ProcessId
+              type: keyword
+            - name: ProcessName
+              type: keyword
+            - name: ProcessPath
+              type: keyword
+            - name: ProcessPid
+              type: keyword
+            - name: Product
+              type: keyword
+            - name: PuaCount
+              type: keyword
+            - name: PuaPolicyId
+              type: keyword
+            - name: QfeVersion
+              type: keyword
+            - name: Reason
+              type: keyword
+            - name: SchemaVersion
+              type: keyword
+            - name: ScriptBlockText
+              type: keyword
+            - name: ServiceName
+              type: keyword
+            - name: ServiceVersion
+              type: keyword
+            - name: ShutdownActionType
+              type: keyword
+            - name: ShutdownEventCode
+              type: keyword
+            - name: ShutdownReason
+              type: keyword
+            - name: Signature
+              type: keyword
+            - name: SignatureStatus
+              type: keyword
+            - name: Signed
+              type: keyword
+            - name: StartTime
+              type: keyword
+            - name: State
+              type: keyword
+            - name: Status
+              type: keyword
+            - name: StopTime
+              type: keyword
+            - name: SubjectDomainName
+              type: keyword
+            - name: SubjectLogonId
+              type: keyword
+            - name: SubjectUserName
+              type: keyword
+            - name: SubjectUserSid
+              type: keyword
+            - name: TSId
+              type: keyword
+            - name: TargetDomainName
+              type: keyword
+            - name: TargetInfo
+              type: keyword
+            - name: TargetLogonGuid
+              type: keyword
+            - name: TargetLogonId
+              type: keyword
+            - name: TargetServerName
+              type: keyword
+            - name: TargetUserName
+              type: keyword
+            - name: TargetUserSid
+              type: keyword
+            - name: TerminalSessionId
+              type: keyword
+            - name: TokenElevationType
+              type: keyword
+            - name: TransmittedServices
+              type: keyword
+            - name: UserSid
+              type: keyword
+            - name: Version
+              type: keyword
+            - name: Workstation
+              type: keyword
+            - name: param1
+              type: keyword
+            - name: param2
+              type: keyword
+            - name: param3
+              type: keyword
+            - name: param4
+              type: keyword
+            - name: param5
+              type: keyword
+            - name: param6
+              type: keyword
+            - name: param7
+              type: keyword
+            - name: param8
+              type: keyword
+
         - name: event_id
           type: keyword
           required: true

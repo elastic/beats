@@ -37,9 +37,11 @@ const (
 	// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does
 	// not return ErrTempBulkFailure
 	defaultMaxWaitRetry = 60 * time.Second
+
+	debugSelector = "kafka"
 )
 
-var debugf = logp.MakeDebug("kafka")
+var debugf = logp.MakeDebug(debugSelector)
 
 var (
 	errNoTopicSet = errors.New("No topic configured")

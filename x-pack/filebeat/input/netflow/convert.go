@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -262,26 +262,23 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		revPkts, hasRevPkts = getKeyUint64(flow.Fields, "reversePacketTotalCount")
 	}
 
-	if hasRevBytes || hasRevPkts {
-		if hasBytes {
-			ecsSource["bytes"] = countBytes
-			ecsDest["bytes"] = revBytes
-		}
-		if hasPkts {
-			ecsSource["packets"] = revBytes
-			ecsDest["packets"] = revPkts
-		}
-		countBytes += revBytes
-		countPkts += revPkts
+	if hasRevBytes {
+		ecsDest["bytes"] = revBytes
+	}
+
+	if hasRevPkts {
+		ecsDest["packets"] = revPkts
 	}
 
 	if hasBytes {
+		ecsSource["bytes"] = countBytes
 		if hasRevBytes {
 			countBytes += revBytes
 		}
 		ecsNetwork["bytes"] = countBytes
 	}
 	if hasPkts {
+		ecsSource["packets"] = countPkts
 		if hasRevPkts {
 			countPkts += revPkts
 		}
@@ -445,7 +442,7 @@ func (p IPProtocol) String() string {
 }
 
 func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {
-	h := xxhash.New64()
+	h := xxhash.New()
 	// Both flows will have the same ID.
 	if srcPort >= dstPort {
 		h.Write(srcIP)

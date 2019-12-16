@@ -98,16 +98,12 @@ check: python-env
 	@git diff-index --exit-code HEAD --
 
 .PHONY: check-headers
-check-headers:
-	@go get -u github.com/elastic/go-licenser
-	@go-licenser -d -exclude x-pack -exclude generator/beat/\{beat\} -exclude generator/metricbeat/\{beat\}
-	@go-licenser -d -license Elastic x-pack
+check-headers: mage
+	@mage checkLicenseHeaders
 
 .PHONY: add-headers
-add-headers:
-	@go get github.com/elastic/go-licenser
-	@go-licenser -exclude x-pack
-	@go-licenser -license Elastic x-pack
+add-headers: mage
+	@mage addLicenseHeaders
 
 # Corrects spelling errors
 .PHONY: misspell
