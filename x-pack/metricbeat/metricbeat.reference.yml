@@ -917,6 +917,15 @@ metricbeat.modules:
   sql_query: "select now()"
 
 
+#--------------------------------- Stan Module ---------------------------------
+- module: stan
+  metricsets: ["stats", "channels", "subscriptions"]
+  period: 60s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/streaming/serverz"
+  #channels.metrics_path: "/streaming/channelsz"
+  #subscriptions.metrics_path: "/streaming/channelsz" # we retrieve streaming subscriptions with a detailed query param to the channelsz endpoint
+
 #-------------------------------- Statsd Module --------------------------------
 - module: statsd
   host: "localhost"

@@ -178,6 +178,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
 |<<metricbeat-module-sql,sql>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-sql-query,query>> beta[]  
+|<<metricbeat-module-stan,Stan>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-stan-channels,channels>> beta[]  
+|<<metricbeat-metricset-stan-stats,stats>> beta[]  
+|<<metricbeat-metricset-stan-subscriptions,subscriptions>> beta[]  
 |<<metricbeat-module-statsd,Statsd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-statsd-server,server>> beta[]  
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -262,6 +266,7 @@ include::modules/prometheus.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/sql.asciidoc[]
+include::modules/stan.asciidoc[]
 include::modules/statsd.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/tomcat.asciidoc[]
