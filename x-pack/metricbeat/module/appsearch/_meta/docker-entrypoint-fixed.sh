@@ -24,7 +24,7 @@ if [[ ! -f /usr/share/app-search/config/app-search.yml ]] || ! grep -q -v '^\s*#
   printf '%s\n' "${as_opts[@]}" | sort > /usr/share/app-search/config/app-search.yml
 fi
 
-until curl -f "http://elasticsearch:9200/_license"; do
+until curl -f -s "http://elasticsearch:9200/_license"; do
   echo "Elasticsearch not available yet".
   sleep 1
 done
