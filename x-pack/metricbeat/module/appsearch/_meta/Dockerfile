@@ -1,4 +1,4 @@
-FROM docker.elastic.co/app-search/app-search:7.4.0
+FROM docker.elastic.co/app-search/app-search:7.5.0
 
 COPY docker-entrypoint-dependencies.sh /usr/local/bin/
 ENTRYPOINT /usr/local/bin/docker-entrypoint-dependencies.sh
