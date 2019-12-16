@@ -41,7 +41,9 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 		init = false
 		listMetricsInput := &cloudwatch.ListMetricsInput{
 			NextToken: nextToken,
-			Namespace: &namespace,
+		}
+		if namespace != "*" {
+			listMetricsInput.Namespace = &namespace
 		}
 		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
 
