@@ -57,16 +57,19 @@
           type: keyword
           description: >
             Indicator if monitor could validate the service to be available.
-
         - name: check_group
           type: keyword
           description: >
             A token unique to a simultaneously invoked group of checks as in the case where multiple IPs are checked for a single DNS entry.
-
-        - name: continuous_status_segment
+        - name: status_block
           type: date
           description: >
-            A date representing the start time of a logically contiguous segment of statuses
+            A date representing the start time of a logically contiguous segment of statuses typically either all up
+            or all down. In the case of a rapidly flapping endpoint this may be a mix.
+        - name: timespan
+          type: date_range
+          description: >
+            Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
 
 - key: summary
   title: "Monitor summary"

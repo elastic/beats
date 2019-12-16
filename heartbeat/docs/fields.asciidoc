@@ -296,13 +296,23 @@ type: keyword
 
 --
 
-*`monitor.continuous_status_segment`*::
+*`monitor.status_block`*::
 +
 --
-A date representing the start time of a logically contiguous segment of statuses
+A date representing the start time of a logically contiguous segment of statuses typically either all up or all down. In the case of a rapidly flapping endpoint this may be a mix.
 
 
 type: date
+
+--
+
+*`monitor.timespan`*::
++
+--
+Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
+
+
+type: date_range
 
 --
 
