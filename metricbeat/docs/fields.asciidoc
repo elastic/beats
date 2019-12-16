@@ -16635,7 +16635,6 @@ Kubernetes metrics
 === kubernetes
 
 Information and statistics of pods managed by kubernetes.
-
 - name: apiserver
   type: group
   description: >
