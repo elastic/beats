@@ -81,7 +81,7 @@ class Test(BaseTest):
             got = lines[i].strip()
             assert expected == got, \
                 "rule {0} doesn't match. expected='{1}' got='{2}'".format(
-                    i, expected, got.encode("utf-8")
+                    i, expected, got.decode("utf-8")
                 )
 
     @unittest.skipUnless(is_root(), "Requires root")
