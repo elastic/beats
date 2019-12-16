@@ -327,14 +327,9 @@ func dockerComposeBuildImages() error {
 		args = append(args, "--no-cache")
 	}
 
-	out := ioutil.Discard
-	if mg.Verbose() {
-		out = os.Stderr
-	}
-
 	_, err = sh.Exec(
 		composeEnv,
-		out,
+		os.Stdout,
 		os.Stderr,
 		"docker-compose", args...,
 	)
