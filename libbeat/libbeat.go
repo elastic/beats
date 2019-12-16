@@ -18,6 +18,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/elastic/beats/libbeat/cmd"
@@ -27,6 +28,7 @@ import (
 var RootCmd = cmd.GenRootCmdWithSettings(mock.New, mock.Settings)
 
 func main() {
+	fmt.Printf("This is a spurious change to trigger the CI on everything.\n")
 	if err := RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
