@@ -21,18 +21,32 @@ https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensi
 
 |===
 |Metric Name|Statistic Method
-|ConditionalCheckFailedRequests | Maximum
-|ConsumedReadCapacityUnits | Maximum
-|ConsumedWriteCapacityUnits | Maximum
-|ReadThrottleEvents | Sum
-|ReturnedBytes | Sum
-|ReturnedItemCount | Sum
-|ReturnedRecordsCount | Sum
-|SuccessfulRequestLatency | Sum
-|SystemErrors | Average
-|TimeToLiveDeletedItemCount | Sum
-|ThrottledRequests | Average
+|SuccessfulRequestLatency | Average
+|OnlineIndexPercentageProgress | Average
+|ProvisionedWriteCapacityUnits | Average
+|ProvisionedReadCapacityUnits | Average
+|ConsumedReadCapacityUnits | Average
+|ConsumedWriteCapacityUnits | Average
+|ReplicationLatency | Average
 |TransactionConflict | Average
-|UserErrors | Average
-|WriteThrottleEvents | Average
+|AccountProvisionedReadCapacityUtilization | Average
+|AccountProvisionedWriteCapacityUtilization | Average
+|SystemErrors | Sum
+|ConsumedReadCapacityUnits | Sum
+|ConsumedWriteCapacityUnits | Sum
+|ConditionalCheckFailedRequests | Sum
+|PendingReplicationCount | Sum
+|TransactionConflict | Sum
+|ReadThrottleEvents | Sum
+|ThrottledRequests | Sum
+|WriteThrottleEvents | Sum
+|SuccessfulRequestLatency | Maximum
+|ReplicationLatency | Maximum
+|AccountMaxReads | Maximum
+|AccountMaxTableLevelReads | Maximum
+|AccountMaxTableLevelWrites | Maximum
+|AccountMaxWrites | Maximum
+|MaxProvisionedTableReadCapacityUtilization | Maximum
+|MaxProvisionedTableWriteCapacityUtilization | Maximum
 |===
+

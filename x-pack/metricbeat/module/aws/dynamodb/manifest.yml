@@ -7,14 +7,36 @@ input:
       - namespace: AWS/DynamoDB
         statistic: ["Average"]
         name:
+          - SuccessfulRequestLatency
           - OnlineIndexPercentageProgress
           - ProvisionedWriteCapacityUnits
           - ProvisionedReadCapacityUnits
           - ConsumedReadCapacityUnits
           - ConsumedWriteCapacityUnits
+          - ReplicationLatency
+          - TransactionConflict
+          - AccountProvisionedReadCapacityUtilization
+          - AccountProvisionedWriteCapacityUtilization
       - namespace: AWS/DynamoDB
         statistic: ["Sum"]
         name:
+          - SystemErrors
           - ConsumedReadCapacityUnits
           - ConsumedWriteCapacityUnits
           - ConditionalCheckFailedRequests
+          - PendingReplicationCount
+          - TransactionConflict
+          - ReadThrottleEvents
+          - ThrottledRequests
+          - WriteThrottleEvents
+      - namespace: AWS/DynamoDB
+        statistic: ["Maximum"]
+        name:
+          - SuccessfulRequestLatency
+          - ReplicationLatency
+          - AccountMaxReads
+          - AccountMaxTableLevelReads
+          - AccountMaxTableLevelWrites
+          - AccountMaxWrites
+          - MaxProvisionedTableReadCapacityUtilization
+          - MaxProvisionedTableWriteCapacityUtilization
