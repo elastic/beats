@@ -511,6 +511,13 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 					qMapStr["subdomain"] = subdomain
 				}
 			}
+		} else if strings.Contains(err.Error(), "cannot derive eTLD+1 for domain") && strings.Count(q.Name, ".") == 1 {
+			// Handle publicsuffix.EffectiveTLDPlusOne eTLD+1 error with 1 dot in the domain.
+			s := strings.Split(q.Name, ".")
+			if len(s) == 2 && s[1] != "" {
+				qMapStr["top_level_domain"] = s[1]
+			}
+			qMapStr["registered_domain"] = q.Name
 		}
 	}
 
