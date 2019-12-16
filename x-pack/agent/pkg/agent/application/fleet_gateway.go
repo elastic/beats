@@ -67,6 +67,21 @@ func newFleetGatewayWithScheduler(
 }
 
 func (f *fleetGateway) worker() {
+	resp, err := f.execute()
+	if err != nil {
+		fmt.Println(err)
+		// record
+	}
+
+	actions := make([]action, len(resp.Actions))
+	for idx, a := range resp.Actions {
+		actions[idx] = a
+	}
+
+	if err := f.dispatcher.Dispatch(actions...); err != nil {
+		// record
+	}
+
 	for {
 		select {
 		case <-f.scheduler.WaitTick():

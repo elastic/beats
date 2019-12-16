@@ -23,7 +23,7 @@ import (
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
 )
 
-var durationTick = 30 * time.Second
+var durationTick = 10 * time.Second
 
 type apiClient interface {
 	Send(
@@ -94,12 +94,13 @@ func newManaged(
 		return nil, err
 	}
 
-	actionDispatcher.Register(
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		&handlerPolicyChange{emitter: emit},
 	)
 
-	actionDispatcher.Register(&fleetapi.ActionPolicyChange{},
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionUnknown{},
 		&handlerUnknown{},
 	)
 
