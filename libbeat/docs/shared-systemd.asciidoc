@@ -5,6 +5,11 @@ The DEB and RPM packages include a service unit for Linux systems with
 systemd. On these systems, you can manage {beatname_uc} by using the usual
 systemd commands.
 
+ifdef::apm-server[]
+We recommend that the {beatname_lc} process is run as a non-root user.
+Therefore, that is the default setup for {beatname_uc}'s DEB package and RPM installation.
+endif::apm-server[]
+
 ==== Start and stop {beatname_uc}
 
 Use `systemctl` to start or stop {beatname_uc}:
@@ -101,3 +106,7 @@ systemctl restart {beatname_lc}
 NOTE: It is recommended that you use a configuration management tool to
 include drop-in unit files. If you need to add a drop-in manually, use
 +systemctl edit {beatname_lc}.service+.
+
+ifdef::apm-server[]
+include::./../config-ownership.asciidoc[]
+endif::apm-server[]
