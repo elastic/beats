@@ -29,6 +29,7 @@ type Schedule struct {
 	scheduler.Schedule
 }
 
+// intervalScheduler defines a schedule that runs at fixed intervals.
 type intervalScheduler struct {
 	interval time.Duration
 }
