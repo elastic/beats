@@ -24,9 +24,9 @@ if [[ ! -f /usr/share/app-search/config/app-search.yml ]] || ! grep -q -v '^\s*#
   printf '%s\n' "${as_opts[@]}" | sort > /usr/share/app-search/config/app-search.yml
 fi
 
-set +e
-set -x
+until curl -f "http://elasticsearch:9200/_license"; do
+  echo "Elasticsearch not available yet".
+  sleep 1
+done
 
-for I in {1..10}; do /usr/share/app-search/bin/app-search "$@" && break || sleep 10; done
-
-echo "Quitting"
+/usr/share/app-search/bin/app-search "$@"
