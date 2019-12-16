@@ -381,7 +381,7 @@ class UDP6TestCase:
             for i in range(3):
                 client.sendto(bytes('Hello there {}'.format(i), "utf-8"), self.server_addr)
                 msg, _ = server.recvfrom(64)
-            server.sendto('howdy', self.client_addr)
+            server.sendto(b'howdy', self.client_addr)
             msg, _ = client.recvfrom(64)
             client.close()
             server.close()
@@ -568,7 +568,7 @@ class DNSTestCase:
         server, self.server_addr = self.socket_factory()
 
         raw_addr = ip_str_to_raw(self.server_addr[0])
-        q_bytes = q.decode("utf-8")
+        q_bytes = q.encode("utf-8")
         req = b"\x74\xba\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07elastic" \
               b"\x02co\x00" + q_bytes + b"\x00\x01"
         resp = b"\x74\xba\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00\x07elastic" \
