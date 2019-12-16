@@ -76,9 +76,9 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 	formattedStats := []BlkioStats{}
 
 	statsPerContainer := make(map[string]BlkioRaw)
-	for i := range rawStats {
-		stats := io.getBlkioStats(&rawStats[i], dedot)
-		storageStats := io.getStorageStats(&rawStats[i], dedot)
+	for _, myRawStat := range rawStats {
+		stats := io.getBlkioStats(&myRawStat, dedot)
+		storageStats := io.getStorageStats(&myRawStat, dedot)
 		stats.Add(&storageStats)
 
 		oldStats, exist := io.lastStatsPerContainer[stats.Container.ID]
@@ -141,14 +141,14 @@ func (io *BlkioService) getNewStats(time time.Time, blkioEntry []types.BlkioStat
 		totals: 0,
 	}
 
-	for i := range blkioEntry {
-		switch blkioEntry[i].Op {
+	for _, myEntry := range blkioEntry {
+		switch myEntry.Op {
 		case "Write":
-			stats.writes += blkioEntry[i].Value
+			stats.writes += myEntry.Value
 		case "Read":
-			stats.reads += blkioEntry[i].Value
+			stats.reads += myEntry.Value
 		case "Total":
-			stats.totals += blkioEntry[i].Value
+			stats.totals += myEntry.Value
 		}
 	}
 	return stats

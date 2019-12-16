@@ -54,15 +54,15 @@ func NewCpuService() *CPUService {
 func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUStats {
 	formattedStats := []CPUStats{}
 
-	for i := range rawStats {
-		formattedStats = append(formattedStats, c.getCPUStats(&rawStats[i], dedot))
+	for _, stats := range rawStats {
+		formattedStats = append(formattedStats, c.getCPUStats(&stats, dedot))
 	}
 
 	return formattedStats
 }
 
 func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
-	usage := cpuUsage{Stat: *myRawStat}
+	usage := cpuUsage{Stat: myRawStat}
 
 	stats := CPUStats{
 		Time:                                  common.Time(myRawStat.Stats.Read),
@@ -90,7 +90,7 @@ func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 // TODO: These helper should be merged with the cpu helper in system/cpu
 
 type cpuUsage struct {
-	docker.Stat
+	*docker.Stat
 
 	cpus        uint32
 	systemDelta uint64

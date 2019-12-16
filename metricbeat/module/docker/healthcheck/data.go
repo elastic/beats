@@ -30,8 +30,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, containers []types.Container, m *MetricSet) {
-	for i := range containers {
-		eventMapping(r, &containers[i], m)
+	for _, container := range containers {
+		eventMapping(r, &container, m)
 	}
 }
 

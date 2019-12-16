@@ -31,7 +31,7 @@ var cpuService CPUService
 
 func cpuUsageFor(stats types.StatsJSON) *cpuUsage {
 	u := cpuUsage{
-		Stat:        docker.Stat{Stats: stats},
+		Stat:        &docker.Stat{Stats: stats},
 		systemDelta: 1000000000, // Nanoseconds in a second
 	}
 	return &u

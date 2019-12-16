@@ -23,8 +23,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
-	for i := range blkioStatsList {
-		eventMapping(r, &blkioStatsList[i])
+	for _, blkioStats := range blkioStatsList {
+		eventMapping(r, &blkioStats)
 	}
 }
 

@@ -97,7 +97,7 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 		},
 	}
 	//WHEN
-	rawStats := memoryService.getMemoryStats(&memoryRawStats, false)
+	rawStats := memoryService.getMemoryStats(memoryRawStats, false)
 	r := &mbtest.CapturingReporterV2{}
 	eventMapping(r, &rawStats)
 	events := r.GetEvents()

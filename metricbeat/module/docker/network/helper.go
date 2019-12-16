@@ -69,16 +69,16 @@ type NetStats struct {
 
 func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, dedot bool) []NetStats {
 	formattedStats := []NetStats{}
-	for i := range rawStats {
-		for nameInterface, rawnNetStats := range rawStats[i].Stats.Networks {
-			formattedStats = append(formattedStats, n.getNetworkStats(nameInterface, rawnNetStats, &rawStats[i], dedot))
+	for _, myStats := range rawStats {
+		for nameInterface, rawnNetStats := range myStats.Stats.Networks {
+			formattedStats = append(formattedStats, n.getNetworkStats(nameInterface, rawnNetStats, myStats, dedot))
 		}
 	}
 
 	return formattedStats
 }
 
-func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.NetworkStats, myRawstats *docker.Stat, dedot bool) NetStats {
+func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.NetworkStats, myRawstats docker.Stat, dedot bool) NetStats {
 	newNetworkStats := createNetRaw(myRawstats.Stats.Read, &rawNetStats)
 	oldNetworkStat, exist := n.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface]
 

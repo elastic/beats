@@ -23,8 +23,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
-	for i := range cpuStatsList {
-		eventMapping(r, &cpuStatsList[i])
+	for _, cpuStats := range cpuStatsList {
+		eventMapping(r, &cpuStats)
 	}
 }
 

@@ -23,8 +23,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, memoryDataList []MemoryData) {
-	for i := range memoryDataList {
-		eventMapping(r, &memoryDataList[i])
+	for _, memoryData := range memoryDataList {
+		eventMapping(r, &memoryData)
 	}
 }
 

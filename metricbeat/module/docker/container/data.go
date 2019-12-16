@@ -28,8 +28,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool) {
-	for i := range containersList {
-		eventMapping(r, &containersList[i], dedot)
+	for _, container := range containersList {
+		eventMapping(r, &container, dedot)
 	}
 }
 
@@ -74,9 +74,9 @@ func extractIPAddresses(networks *types.SummaryNetworkSettings) []string {
 		return []string{}
 	}
 	ipAddresses := make([]string, 0, len(networks.Networks))
-	for i := range networks.Networks {
-		if len(networks.Networks[i].IPAddress) > 0 {
-			ipAddresses = append(ipAddresses, networks.Networks[i].IPAddress)
+	for _, network := range networks.Networks {
+		if len(network.IPAddress) > 0 {
+			ipAddresses = append(ipAddresses, network.IPAddress)
 		}
 	}
 	return ipAddresses
