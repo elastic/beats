@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
-
 	"github.com/gofrs/uuid"
 	v1 "k8s.io/api/core/v1"
 	k8s "k8s.io/client-go/kubernetes"
@@ -31,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )

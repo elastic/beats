@@ -78,10 +78,14 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	metaConf := config.AddResourceMetadata
 	if metaConf != nil {
 		if metaConf.Node != nil && metaConf.Node.Enabled() {
-			nodeWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
+			options := kubernetes.WatchOptions{
 				SyncTimeout: config.SyncPeriod,
 				Node:        config.Node,
-			}, nil)
+			}
+			if config.Namespace != "" {
+				options.Namespace = config.Namespace
+			}
+			nodeWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
 			if err != nil {
 				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 			}
@@ -97,7 +101,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 			}
 
-			nodeMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
+			namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
 		}
 	}
 
