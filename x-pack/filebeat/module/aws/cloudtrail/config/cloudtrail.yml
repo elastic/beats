@@ -1,0 +1,17 @@
+{{ if eq .input "s3" }}
+
+type: s3
+queue_url: {{ .queue_url }}
+credential_profile_name: {{ .credential_profile_name }}
+expand_event_list_from_field: Records
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
