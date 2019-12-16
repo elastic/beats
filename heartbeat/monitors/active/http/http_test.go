@@ -35,6 +35,7 @@ import (
 
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
+	schedule "github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -74,7 +75,8 @@ func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "tls", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "tls", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -301,7 +303,8 @@ func TestLargeResponse(t *testing.T) {
 	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -472,7 +475,8 @@ func TestRedirect(t *testing.T) {
 	jobs, _, err := create("redirect", config)
 	require.NoError(t, err)
 
-	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
