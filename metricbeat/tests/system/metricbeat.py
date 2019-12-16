@@ -104,7 +104,7 @@ class BaseTest(TestCase):
 
         fields = COMMON_FIELDS + fields
         print(fields)
-        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+        self.assertCountEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)
 

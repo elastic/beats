@@ -113,9 +113,9 @@ class ComposeMixin(object):
         info.mode = 0o100644
         info.size = len(content)
 
-        data = io.StringIO()
+        data = io.BytesIO()
         tar = tarfile.TarFile(fileobj=data, mode='w')
-        tar.addfile(info, io.StringIO(content))
+        tar.addfile(info, fileobj=io.BytesIO(content.encode("utf-8")))
         tar.close()
 
         containers = project.containers(service_names=[service])
@@ -228,6 +228,6 @@ class ComposeMixin(object):
         log = cls.get_service_log(service)
         counter = 0
         for line in log.splitlines():
-            if line.find(msg) >= 0:
+            if line.find(msg.encode("utf-8")) >= 0:
                 counter += 1
         return counter > 0

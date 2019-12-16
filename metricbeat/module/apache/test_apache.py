@@ -76,15 +76,15 @@ class ApacheStatusTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def verify_fields(self, evt):
-        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(APACHE_FIELDS), evt.keys())
         apache_status = evt["apache"]["status"]
         if self.old_apache_version():
-            self.assertItemsEqual(
+            self.assertCountEqual(
                 self.de_dot(APACHE_OLD_STATUS_FIELDS), apache_status.keys())
         else:
-            self.assertItemsEqual(
+            self.assertCountEqual(
                 self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
-            self.assertItemsEqual(
+            self.assertCountEqual(
                 self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
             # There are more fields that could be checked.
 
