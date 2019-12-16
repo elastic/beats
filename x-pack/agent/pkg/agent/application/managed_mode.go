@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"sync"
 
 	"time"
 
@@ -43,7 +42,6 @@ type Managed struct {
 	api     apiClient
 	agentID string
 	gateway *fleetGateway
-	wg      sync.WaitGroup
 }
 
 func newManaged(
@@ -125,21 +123,14 @@ func newManaged(
 // Start starts a managed agent.
 func (m *Managed) Start() error {
 	m.log.Info("Agent is starting")
-	m.wg.Add(1)
-
-	go func(wg *sync.WaitGroup) {
-		defer m.log.Info("Agent is stopped")
-		defer wg.Done()
-		m.gateway.Start()
-	}(&m.wg)
-
+	m.gateway.Start()
 	return nil
 }
 
 // Stop stops a managed agent.
 func (m *Managed) Stop() error {
+	defer m.log.Info("Agent is stopped")
 	m.gateway.Stop()
-	m.wg.Wait()
 	return nil
 }
 
