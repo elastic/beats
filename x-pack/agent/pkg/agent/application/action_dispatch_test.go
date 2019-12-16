@@ -75,4 +75,19 @@ func TestActionDispatcher(t *testing.T) {
 		require.False(t, success.called)
 		require.Nil(t, success.received)
 	})
+
+	t.Run("Could not register two handlers on the same action", func(t *testing.T) {
+		success1 := &mockHandler{}
+		success2 := &mockHandler{}
+
+		def := &mockHandler{}
+		d, err := newActionDispatcher(nil, def)
+		require.NoError(t, err)
+
+		err = d.Register(&mockAction{}, success1)
+		require.NoError(t, err)
+
+		err = d.Register(&mockAction{}, success2)
+		require.Error(t, err)
+	})
 }

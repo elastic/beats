@@ -5,6 +5,7 @@
 package application
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -55,8 +56,21 @@ func newActionDispatcher(log *logger.Logger, def actionHandler) (*actionDispatch
 	}, nil
 }
 
-func (ad *actionDispatcher) Register(a action, handler actionHandler) {
-	ad.handlers[ad.key(a)] = handler
+func (ad *actionDispatcher) Register(a action, handler actionHandler) error {
+	k := ad.key(a)
+	_, ok := ad.handlers[k]
+	if ok {
+		return fmt.Errorf("action with type %T is already registered", a)
+	}
+	ad.handlers[k] = handler
+	return nil
+}
+
+func (ad *actionDispatcher) MustRegister(a action, handler actionHandler) {
+	err := ad.Register(a, handler)
+	if err != nil {
+		panic("could not register action, error: " + err.Error())
+	}
 }
 
 func (ad *actionDispatcher) key(a action) string {
@@ -68,6 +82,7 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 	for _, action := range actions {
 		if err := ad.dispatchAction(action); err != nil {
 			ad.log.Debugf("Failed to dispatch action %+v error %+v", action, err)
+			// fmt.Println(err)
 			return err
 		}
 		ad.log.Debugf("Succesfully dispatch action")
