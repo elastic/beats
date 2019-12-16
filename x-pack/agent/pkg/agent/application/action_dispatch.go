@@ -10,6 +10,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"reflect"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -78,11 +79,15 @@ func (ad *actionDispatcher) key(a action) string {
 }
 
 func (ad *actionDispatcher) Dispatch(actions ...action) error {
-	ad.log.Debugf("Dispatch %d actions", len(actions))
+	ad.log.Debugf(
+		"Dispatch %d actions of types: %s",
+		len(actions),
+		strings.Join(detectTypes(actions), ", "),
+	)
+
 	for _, action := range actions {
 		if err := ad.dispatchAction(action); err != nil {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
-			// fmt.Println(err)
 			return err
 		}
 		ad.log.Debugf("Succesfully dispatched action: '%+v'", action)
@@ -97,4 +102,12 @@ func (ad *actionDispatcher) dispatchAction(a action) error {
 	}
 
 	return handler.Handle(a)
+}
+
+func detectTypes(actions []action) []string {
+	str := make([]string, len(actions))
+	for idx, action := range actions {
+		str[idx] = reflect.TypeOf(action).String()
+	}
+	return str
 }

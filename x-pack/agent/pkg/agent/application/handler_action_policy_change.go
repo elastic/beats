@@ -6,16 +6,16 @@ package application
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
 
 type handlerPolicyChange struct {
-	log     *log.Logger
+	log     *logger.Logger
 	emitter emitterFunc
 }
 
