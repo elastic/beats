@@ -5,6 +5,8 @@
   metricsets:
     - "transaction_log"
     - "performance"
-  hosts: ["sqlserver://sa@localhost"]
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
   period: 10s
 
