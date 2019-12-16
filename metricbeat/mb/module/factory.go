@@ -29,13 +29,15 @@ import (
 // Factory creates new Runner instances from configuration objects.
 // It is used to register and reload modules.
 type Factory struct {
-	options []Option
+	beatInfo beat.Info
+	options  []Option
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(options ...Option) *Factory {
+func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
 	return &Factory{
-		options: options,
+		beatInfo: beatInfo,
+		options:  options,
 	}
 }
 
@@ -43,7 +45,7 @@ func NewFactory(options ...Option) *Factory {
 func (r *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	var errs multierror.Errors
 
-	connector, err := NewConnector(p, c, meta)
+	connector, err := NewConnector(r.beatInfo, p, c, meta)
 	if err != nil {
 		errs = append(errs, err)
 	}
