@@ -32,7 +32,7 @@ func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries) Met
 	}
 }
 
-// StackdriverTimeSeriesMetadataCollector is the implementation of MetadataCollecter to collect metrics from Stackdriver
+// StackdriverTimeSeriesMetadataCollector is the implementation of MetadataCollector to collect metrics from Stackdriver
 // common TimeSeries objects
 type StackdriverTimeSeriesMetadataCollector struct {
 	timeSeries *monitoringpb.TimeSeries
@@ -40,7 +40,7 @@ type StackdriverTimeSeriesMetadataCollector struct {
 
 // Metadata parses a Timeseries object to return its metadata divided into "unknown" (first object) and ECS (second
 // object https://www.elastic.co/guide/en/ecs/master/index.html)
-func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (common.MapStr, common.MapStr, error) {
+func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (MetadataCollectorData, error) {
 	m := common.MapStr{}
 
 	var availabilityZone, accountID string
@@ -63,7 +63,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	//Remove keys from resource that refers to ECS fields
 
 	if s.timeSeries == nil {
-		return m, ecs, nil
+		return MetadataCollectorData{}, errors.New("no time series data found in google found response")
 	}
 
 	if s.timeSeries.Metric != nil {
@@ -107,7 +107,10 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		m.Put(LabelUserMetadata, s.timeSeries.Metadata.UserLabels)
 	}
 
-	return m, ecs, nil
+	return MetadataCollectorData{
+		Labels: m,
+		ECS:    ecs,
+	}, nil
 }
 
 // ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.`El trickerionEl trickerion

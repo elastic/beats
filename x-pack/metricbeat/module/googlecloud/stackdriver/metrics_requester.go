@@ -27,7 +27,7 @@ func newStackdriverMetricsRequester(ctx context.Context, c config, window time.D
 		return nil, errors.Wrap(err, "error trying to get time window")
 	}
 
-	client, err := monitoring.NewMetricClient(ctx, c.opt)
+	client, err := monitoring.NewMetricClient(ctx, c.opt...)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating Stackdriver client")
 	}
@@ -67,7 +67,7 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out
 		}
 
 		if err != nil {
-			r.logger.Error(errors.Wrapf(err, "could not read time series value: %v", m))
+			r.logger.Errorf("Could not read time series value: %s: %v", m, err)
 			break
 		}
 
@@ -78,7 +78,7 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out
 }
 
 func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) ([]*monitoringpb.TimeSeries, error) {
-	lock := sync.Mutex{}
+	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]*monitoringpb.TimeSeries, 0)
 
@@ -90,13 +90,9 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) 
 
 			ts := r.Metric(ctx, m)
 
-			for _, timeSeries := range ts {
-				func(ts *monitoringpb.TimeSeries) {
-					defer lock.Unlock()
-					lock.Lock()
-					results = append(results, timeSeries)
-				}(timeSeries)
-			}
+			lock.Lock()
+			defer lock.Unlock()
+			results = append(results, ts...)
 		}(metric)
 	}
 
@@ -120,8 +116,6 @@ func getTimeInterval(windowTime time.Duration) (*monitoringpb.TimeInterval, erro
 		return nil, errors.New("a window time or start and end time must be provided to create a time window to fetch metrics from")
 	} else if windowTime.Minutes() > googlecloud.MaxTimeIntervalDataWindowMinutes {
 		return nil, errors.Errorf("the provided window time is too big. No more than %d minutes can be fetched", googlecloud.MaxTimeIntervalDataWindowMinutes)
-	} else if startTime.Unix()-endTime.Unix() >= 0 {
-		return nil, errors.New("start time cannot be later than or equal than end time")
 	}
 
 	interval := &monitoringpb.TimeInterval{

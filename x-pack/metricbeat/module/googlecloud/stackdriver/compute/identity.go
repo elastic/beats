@@ -7,26 +7,25 @@ package compute
 import (
 	"context"
 	"errors"
-
 	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
 )
 
 // ID returns a generated ID for a Compute resource based on its labels, projectID, zone, timestamp and instance ID
 // It's purpose is to group metrics that share that ID (the ones on the same instance, basically)
 func (s *metadataCollector) ID(ctx context.Context, in *googlecloud.MetadataCollectorInputData) (string, error) {
-	computeLabels, ecs, err := s.Metadata(ctx, in.TimeSeries)
+	metadata, err := s.Metadata(ctx, in.TimeSeries)
 	if err != nil {
 		return "", err
 	}
 
-	ecs.Update(computeLabels)
+	metadata.ECS.Update(metadata.Labels)
 	if in.Timestamp != nil {
-		ecs.Put("timestamp", in.Timestamp)
+		metadata.ECS.Put("timestamp", in.Timestamp)
 	} else if in.Point != nil {
-		ecs.Put("timestamp", in.Point.Interval.StartTime)
+		metadata.ECS.Put("timestamp", in.Point.Interval.StartTime)
 	} else {
 		return "", errors.New("no timestamp information found")
 	}
 
-	return ecs.String(), nil
+	return metadata.ECS.String(), nil
 }

@@ -5,8 +5,6 @@
 package stackdriver
 
 import (
-	"context"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
@@ -15,10 +13,10 @@ import (
 
 // NewMetadataServiceForConfig returns a service to fetch metadata from a config struct. It must return the Compute
 // abstraction to fetch metadata, the pubsub abstraction, etc.
-func NewMetadataServiceForConfig(ctx context.Context, c config) (googlecloud.MetadataService, error) {
+func NewMetadataServiceForConfig(c config) (googlecloud.MetadataService, error) {
 	switch c.ServiceName {
 	case googlecloud.ServiceCompute:
-		return compute.NewMetadataService(ctx, c.ProjectID, c.Zone, c.opt)
+		return compute.NewMetadataService(c.ProjectID, c.Zone, c.opt...)
 	case googlecloud.ServicePubsub:
 		return nil, nil
 	case googlecloud.ServiceFirestore:

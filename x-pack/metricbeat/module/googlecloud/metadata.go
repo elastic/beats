@@ -6,6 +6,7 @@ package googlecloud
 
 import (
 	"context"
+	"time"
 
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
@@ -15,17 +16,22 @@ import (
 // MetadataService must be implemented by GCP services that requires non out-of-the box code that is not fulfil by the Stackdriver
 // metricset. For example, Compute instance labels.
 type MetadataService interface {
-	MetadataCollecter
+	MetadataCollector
 	Identity
 }
 
-// MetadataCollecter must be implemented by services that has special code needs that aren't fulfilled by the Stackdriver
-// metricset to collect their labels (most of them)
-type MetadataCollecter interface {
+type MetadataCollectorData struct {
+	Labels common.MapStr
+	ECS    common.MapStr
+}
 
-	// Metadata returns a perfectly formatted common.Mapstr object ready to attach to an output event in its "labels" key.
-	// For example, Compute labels looks like this. Other services may have a slightly different structure. Check constants.go
-	// file for reference:
+// MetadataCollector must be implemented by services that has special code needs that aren't fulfilled by the Stackdriver
+// metricset to collect their labels (most of them)
+type MetadataCollector interface {
+
+	// Metadata returns an object with perfectly formatted labels and ECS fields ready to attach to an output event in
+	//its "labels" key. For example, Compute labels looks like this. Other services may have a slightly different
+	//structure. Check constants.go file for reference:
 	//
 	// {
 	//    "metadata":{
@@ -45,7 +51,16 @@ type MetadataCollecter interface {
 	//    },
 	// }
 	// Because some of them will be ECS fields, the second returned MapStr are those ECS fields.
-	Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (common.MapStr, common.MapStr, error)
+	Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (MetadataCollectorData, error)
+}
+
+// MetadataCollectorInputData is a "container" of input data commonly needed for the GCP service's metadata collectors
+type MetadataCollectorInputData struct {
+	TimeSeries *monitoringpb.TimeSeries
+	ProjectID  string
+	Zone       string
+	Point      *monitoringpb.Point
+	Timestamp  *time.Time
 }
 
 // Identity must be implemented by GCP services that can add some short of data to group their metrics (like instance

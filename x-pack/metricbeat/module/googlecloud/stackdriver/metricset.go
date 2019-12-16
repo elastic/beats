@@ -6,19 +6,19 @@ package stackdriver
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/pkg/errors"
+
+	"google.golang.org/api/option"
+	httpGoogle "google.golang.org/api/transport/http"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"google.golang.org/api/option"
-
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
-
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
 )
 
 const (
@@ -50,7 +50,7 @@ type config struct {
 	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 
-	opt option.ClientOption
+	opt []option.ClientOption
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -64,7 +64,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	m.config.opt = option.WithCredentialsFile(m.config.CredentialsFilePath)
+	m.config.opt = []option.ClientOption{
+		option.WithCredentialsFile(m.config.CredentialsFilePath),
+	}
 
 	return m, nil
 }
@@ -73,12 +75,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
+	httpClient, err := createHTTPClient(ctx, m.config.opt...)
+	if err != nil {
+		return errors.Wrapf(err, "could not create HTTP client to connect to Google Services")
+	}
+
+	httpClientOption := option.WithHTTPClient(httpClient)
+	m.config.opt = append(m.config.opt, httpClientOption)
+
 	if err = validatePeriodForGCP(m.Module().Config().Period); err != nil {
 		return err
 	}
-
-	//TODO Add credentials file check (path and structure)
-	//TODO Add correct zone check
 
 	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
 	if err != nil {
@@ -102,6 +109,18 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
+//createHTTPClient to use with share around every request to GCP services. It's recreated in every Fetch call.
+func createHTTPClient(ctx context.Context, opts ...option.ClientOption) (*http.Client, error) {
+	transport, err := httpGoogle.NewTransport(ctx, http.DefaultTransport, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &http.Client{
+		Transport: transport,
+		Timeout:   30 * time.Second,
+	}, nil
+}
+
 func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSeries) ([]mb.Event, error) {
 	e := newIncomingFieldExtractor(m.Logger())
 
@@ -109,7 +128,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 	var err error
 	// Override default metadata service labels are ON and service is known
 	if m.config.IncludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(ctx, m.config); err != nil {
+		if gcpService, err = NewMetadataServiceForConfig(m.config); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}
 	}
@@ -125,7 +144,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 		event := mb.Event{
 			Timestamp:  groupedEvents[0].Timestamp,
 			RootFields: groupedEvents[0].ECS,
-			MetricSetFields: common.MapStr{
+			ModuleFields: common.MapStr{
 				"labels": groupedEvents[0].Labels,
 			},
 		}

@@ -38,7 +38,7 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googleclou
 				continue
 			}
 
-			labels, ecs, err := gcpService.Metadata(ctx, sdCollectorInputData.TimeSeries)
+			metadataCollectorData, err := gcpService.Metadata(ctx, sdCollectorInputData.TimeSeries)
 			if err != nil {
 				m.Logger().Error("error trying to retrieve labels from metric event")
 				continue
@@ -48,8 +48,8 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googleclou
 				eventGroups[id] = make([]KeyValuePoint, 0)
 			}
 
-			keyValues[i].ECS = ecs
-			keyValues[i].Labels = labels
+			keyValues[i].ECS = metadataCollectorData.ECS
+			keyValues[i].Labels = metadataCollectorData.Labels
 
 			// Group the data into common events
 			eventGroups[id] = append(eventGroups[id], keyValues[i])
