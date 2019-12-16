@@ -25,5 +25,8 @@ if [[ ! -f /usr/share/app-search/config/app-search.yml ]] || ! grep -q -v '^\s*#
 fi
 
 set +e
+set -x
 
 for I in {1..10}; do /usr/share/app-search/bin/app-search "$@" && break || sleep 10; done
+
+echo "Quitting"
