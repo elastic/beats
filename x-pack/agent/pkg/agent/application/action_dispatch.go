@@ -81,11 +81,11 @@ func (ad *actionDispatcher) Dispatch(actions ...action) error {
 	ad.log.Debugf("Dispatch %d actions", len(actions))
 	for _, action := range actions {
 		if err := ad.dispatchAction(action); err != nil {
-			ad.log.Debugf("Failed to dispatch action %+v error %+v", action, err)
+			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			// fmt.Println(err)
 			return err
 		}
-		ad.log.Debugf("Succesfully dispatch action")
+		ad.log.Debugf("Succesfully dispatched action: '%+v'", action)
 	}
 	return nil
 }

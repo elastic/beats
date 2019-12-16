@@ -4,10 +4,13 @@
 
 package application
 
-import "fmt"
+import "github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 
-type handlerDefault struct{}
+type handlerDefault struct {
+	log *logger.Logger
+}
 
 func (h *handlerDefault) Handle(a action) error {
-	return fmt.Errorf("unhandled action of type %T", a)
+	h.log.Errorf("HandlerDefault: action '%+v' received", a)
+	return nil
 }

@@ -6,6 +6,7 @@ package application
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/pkg/errors"
 
@@ -14,10 +15,12 @@ import (
 )
 
 type handlerPolicyChange struct {
+	log     *log.Logger
 	emitter emitterFunc
 }
 
 func (h *handlerPolicyChange) Handle(a action) error {
+	h.log.Debugf("HandlerPolicyChange: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionPolicyChange)
 	if !ok {
 		return fmt.Errorf("invalid type, expected ActionPolicyChange and received %T", a)
@@ -27,6 +30,8 @@ func (h *handlerPolicyChange) Handle(a action) error {
 	if err != nil {
 		return errors.Wrap(err, "could not parse the configuration from the policy")
 	}
+
+	h.log.Debug("HandlerPolicyChange: emit configuration")
 
 	return h.emitter(c)
 }

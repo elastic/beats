@@ -4,10 +4,15 @@
 
 package application
 
-import "fmt"
+import (
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
+)
 
-type handlerUnknown struct{}
+type handlerUnknown struct {
+	log *logger.Logger
+}
 
 func (h *handlerUnknown) Handle(a action) error {
-	return fmt.Errorf("unknown action reveived of type %T", a)
+	h.log.Errorf("HandlerUnknown: action '%+v' received", a)
+	return nil
 }

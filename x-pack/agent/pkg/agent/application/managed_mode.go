@@ -89,19 +89,19 @@ func newManaged(
 
 	emit := emitter(log, router)
 
-	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{})
+	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
 	if err != nil {
 		return nil, err
 	}
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
-		&handlerPolicyChange{emitter: emit},
+		&handlerPolicyChange{log: log, emitter: emit},
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
-		&handlerUnknown{},
+		&handlerUnknown{log: log},
 	)
 
 	gateway, err := newFleetGateway(
