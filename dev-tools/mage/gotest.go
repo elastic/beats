@@ -74,6 +74,22 @@ func makeGoTestArgs(name string) GoTestArgs {
 	return params
 }
 
+func makeGoTestArgsForModule(name, module string) GoTestArgs {
+	fileName := fmt.Sprintf("build/TEST-go-%s-%s", strings.Replace(strings.ToLower(name), " ", "_", -1),
+		strings.Replace(strings.ToLower(module), " ", "_", -1))
+	params := GoTestArgs{
+		TestName:        fmt.Sprintf("%s-%s", name, module),
+		Race:            RaceDetector,
+		Packages:        []string{fmt.Sprintf("./module/%s/...", module)},
+		OutputFile:      fileName + ".out",
+		JUnitReportFile: fileName + ".xml",
+	}
+	if TestCoverage {
+		params.CoverageProfileFile = fileName + ".cov"
+	}
+	return params
+}
+
 // DefaultGoTestUnitArgs returns a default set of arguments for running
 // all unit tests. We tag unit test files with '!integration'.
 func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
@@ -82,6 +98,14 @@ func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 // all integration tests. We tag integration test files with 'integration'.
 func DefaultGoTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Integration")
+	args.Tags = append(args.Tags, "integration")
+	return args
+}
+
+// GoTestIntegrationArgsForModule returns a default set of arguments for running
+// module integration tests. We tag integration test files with 'integration'.
+func GoTestIntegrationArgsForModule(module string) GoTestArgs {
+	args := makeGoTestArgsForModule("Integration", module)
 	args.Tags = append(args.Tags, "integration")
 	return args
 }
