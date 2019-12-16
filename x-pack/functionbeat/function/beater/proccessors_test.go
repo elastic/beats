@@ -9,11 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 	_ "github.com/elastic/beats/libbeat/processors/actions"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestProcessorsForFunction(t *testing.T) {
