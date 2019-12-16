@@ -16,12 +16,12 @@ Use `systemctl` to start or stop {beatname_uc}:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl start {beatname_lc}
+sudo systemctl start {beatname_lc}
 ------------------------------------------------
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl stop {beatname_lc}
+sudo systemctl stop {beatname_lc}
 ------------------------------------------------
 
 By default, the {beatname_uc} service starts automatically when the system
@@ -29,12 +29,12 @@ boots. To enable or disable auto start use:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl enable {beatname_lc}
+sudo systemctl enable {beatname_lc}
 ------------------------------------------------
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl disable {beatname_lc}
+sudo systemctl disable {beatname_lc}
 ------------------------------------------------
 
 
