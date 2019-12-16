@@ -290,6 +290,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
 - Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
 - Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
+- Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
+- Fix mixed modules loading standard and light metricsets {pull}15011[15011]
 
 *Packetbeat*
 
@@ -368,6 +370,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make use of consumer_lag in Kafka dashboard {pull}14863[14863]
 - Refactor kubernetes autodiscover to enable different resource based discovery {pull}14738[14738]
 - Add `add_id` processor. {pull}14524[14524]
+- Enable TLS 1.3 in all beats. {pull}12973[12973]
 
 *Auditbeat*
 
@@ -452,6 +455,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix timezone parsing in haproxy pipeline. {pull}14755[14755]
 - Add module for ActiveMQ. {pull}14840[14840]
 - Add dashboards for the ActiveMQ Filebeat module. {pull}14880[14880]
+- Add STAN Metricbeat module. {pull}14839[14839]
 
 *Heartbeat*
 - Add non-privileged icmp on linux and darwin(mac). {pull}13795[13795] {issue}11498[11498]
@@ -543,6 +547,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release kubernetes modules `controllermanager`, `scheduler`, `proxy`, `state_cronjob` and `state_resourcequota` as GA. {pull}14584[14584]
 - Add module for ActiveMQ. {pull}14580[14580]
 - Enable script processor. {pull}14711[14711]
+- Enable wildcard for cloudwatch metricset namespace. {pull}14971[14971] {issue}14965[14965]
 - Add `kube-state-metrics` `state_service` metrics for kubernetes module. {pull}14794[14794]
 - Add `kube-state-metrics` `state_persistentvolumeclaim` metrics for kubernetes module. {pull}15066[15066]
 - Add usage metricset in aws modules. {pull}14925[14925] {issue}14935[14935]

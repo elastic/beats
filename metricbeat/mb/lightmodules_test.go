@@ -168,9 +168,10 @@ func TestLoadModule(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		register := NewRegister()
 		r := NewLightModulesSource("testdata/lightmodules")
 		t.Run(c.name, func(t *testing.T) {
-			_, err := r.loadModule(c.name)
+			_, err := r.loadModule(register, c.name)
 			if c.err {
 				assert.Error(t, err)
 			}
@@ -227,10 +228,20 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config: common.MapStr{"module": "service", "enabled": false},
 			err:    true,
 		},
+		"mixed module with standard and light metricsets": {
+			config:         common.MapStr{"module": "mixed", "metricsets": []string{"standard", "light"}},
+			expectedOption: "default",
+		},
+		"mixed module with unregistered and light metricsets": {
+			config: common.MapStr{"module": "mixedbroken", "metricsets": []string{"unregistered", "light"}},
+			err:    true,
+		},
 	}
 
 	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
+	r.MustAddMetricSet("foo", "light", newMetricSetWithOption)
+	r.MustAddMetricSet("mixed", "standard", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	for title, c := range cases {
