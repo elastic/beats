@@ -169,6 +169,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-sqs,sqs>>
 
+* <<metricbeat-metricset-aws-usage,usage>>
+
 include::aws/billing.asciidoc[]
 
 include::aws/cloudwatch.asciidoc[]
@@ -188,4 +190,6 @@ include::aws/s3_request.asciidoc[]
 include::aws/sns.asciidoc[]
 
 include::aws/sqs.asciidoc[]
+
+include::aws/usage.asciidoc[]
 
