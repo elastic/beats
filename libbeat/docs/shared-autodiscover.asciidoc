@@ -120,12 +120,14 @@ The Kubernetes autodiscover provider watches for Kubernetes nodes, pods, service
 
 These are the available fields during within config templating. The `kubernetes.*` fields will be available on each emitted event.
 
+[float]
 ====== Generic fields:
   * host
   * port (if exposed)
   * kubernetes.labels
   * kubernetes.annotations
 
+[float]
 ====== Pod specific:
   * kubernetes.container.id
   * kubernetes.container.image
@@ -135,10 +137,12 @@ These are the available fields during within config templating. The `kubernetes.
   * kubernetes.pod.name
   * kubernetes.pod.uid
 
+[float]
 ====== Node specific:
   * kubernetes.node.name
   * kubernetes.node.uid
 
+[float]
 ====== Service specific:
   * kubernetes.namespace
   * kubernetes.service.name
