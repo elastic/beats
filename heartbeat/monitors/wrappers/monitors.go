@@ -76,17 +76,17 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWr
 			trackerId := fmt.Sprintf("%s-%s", id, ip)
 
 			stateTrackerMtx.Lock()
-			cssId := stateTracker.getID(trackerId, trackerStatus)
+			sb := statusBlockTracker.getID(trackerId, trackerStatus)
 			stateTrackerMtx.Unlock()
 
 			eventext.MergeEventFields(
 				event,
 				common.MapStr{
 					"monitor": common.MapStr{
-						"id":                        thisID,
-						"name":                      name,
-						"type":                      typ,
-						"continuous_status_segment": cssId,
+						"id":           thisID,
+						"name":         name,
+						"type":         typ,
+						"status_block": sb,
 					},
 				},
 			)
@@ -244,12 +244,12 @@ func (mst *monitorStateTracker) getID(monitorId string, currentStatus stateStatu
 	return mst.get(monitorId, currentStatus).startedAt
 }
 
-// TODO this is obviously a memory leak and for the POC only
-var stateTracker = &monitorStateTracker{
-	states: map[string]*monitorState{},
-	mtx:    sync.Mutex{},
+func newStatusBlockTracker() *monitorStateTracker {
+	return &monitorStateTracker{
+		states: map[string]*monitorState{},
+		mtx:    sync.Mutex{},
+	}
 }
-var stateTrackerMtx = sync.Mutex{}
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
 func makeAddSummary() jobs.JobWrapper {
@@ -318,7 +318,7 @@ func makeAddSummary() jobs.JobWrapper {
 				}
 				monitorIdString, _ := monitorId.(string)
 				stateTrackerMtx.Lock()
-				cssId := stateTracker.getID(monitorIdString, trackerStatus)
+				cssId := statusBlockTracker.getID(monitorIdString, trackerStatus)
 				stateTrackerMtx.Unlock()
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
