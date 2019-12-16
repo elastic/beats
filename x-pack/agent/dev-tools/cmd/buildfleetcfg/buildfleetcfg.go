@@ -68,7 +68,6 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "problem to retrieve the license, error: %+v", err)
 		os.Exit(1)
-		return
 	}
 
 	data, err := gen(input, l)
@@ -80,9 +79,9 @@ func main() {
 	if output == "-" {
 		os.Stdout.Write(data)
 		return
-	} else {
-		ioutil.WriteFile(output, data, 0640)
 	}
+
+	ioutil.WriteFile(output, data, 0640)
 
 	return
 }
@@ -108,10 +107,5 @@ func gen(path string, l string) ([]byte, error) {
 		License: l,
 	})
 
-	formatted, err := format.Source(buf.Bytes())
-	if err != nil {
-		return nil, err
-	}
-
-	return formatted, nil
+	return format.Source(buf.Bytes())
 }
