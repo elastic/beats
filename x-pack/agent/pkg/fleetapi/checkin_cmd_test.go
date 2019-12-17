@@ -15,8 +15,8 @@ import (
 )
 
 func TestCheckin(t *testing.T) {
-	const agentID = "bob"
 	const withAPIKey = "secret"
+	agentID := func() string { return "bob" }
 
 	t.Run("Send back status of actions", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
@@ -27,7 +27,7 @@ func TestCheckin(t *testing.T) {
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 
@@ -95,7 +95,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprintf(w, raw)
@@ -146,7 +146,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -208,7 +208,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -246,7 +246,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)

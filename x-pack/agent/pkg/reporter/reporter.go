@@ -34,19 +34,21 @@ const (
 	EventSubTypeStopped = "STOPPED"
 )
 
+type agentIDRetriever func() string
+
 // Reporter uses multiple backends which needs to be non-blocking
 // to report various events.
 type Reporter struct {
-	id       string
+	agentID  agentIDRetriever
 	backends []Backend
 
 	l *logger.Logger
 }
 
 // NewReporter creates a new reporter with provided set of Backends.
-func NewReporter(logger *logger.Logger, id string, backends ...Backend) *Reporter {
+func NewReporter(logger *logger.Logger, agentID agentIDRetriever, backends ...Backend) *Reporter {
 	return &Reporter{
-		id:       id,
+		agentID:  agentID,
 		backends: backends,
 		l:        logger,
 	}
@@ -61,42 +63,42 @@ func (r *Reporter) Close() {
 
 // OnStarting reports application starting event.
 func (r *Reporter) OnStarting(application string) {
-	msg := fmt.Sprintf("Application: %s[%s]: State change: STARTING", application, r.id)
+	msg := fmt.Sprintf("Application: %s[%s]: State change: STARTING", application, r.agentID())
 	rec := generateRecord(EventTypeState, EventSubTypeStarting, msg)
 	r.report(rec)
 }
 
 // OnRunning reports application running event.
 func (r *Reporter) OnRunning(application string) {
-	msg := fmt.Sprintf("Application: %s[%s]: State change: IN_PROGRESS", application, r.id)
+	msg := fmt.Sprintf("Application: %s[%s]: State change: IN_PROGRESS", application, r.agentID())
 	rec := generateRecord(EventTypeState, EventSubTypeInProgress, msg)
 	r.report(rec)
 }
 
 // OnFailing reports application failed event.
 func (r *Reporter) OnFailing(application string, err error) {
-	msg := fmt.Sprintf("Application: %s[%s]: %v", application, r.id, err)
+	msg := fmt.Sprintf("Application: %s[%s]: %v", application, r.agentID(), err)
 	rec := generateRecord(EventTypeError, EventSubTypeConfig, msg)
 	r.report(rec)
 }
 
 // OnStopping reports application stopped event.
 func (r *Reporter) OnStopping(application string) {
-	msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPING", application, r.id)
+	msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPING", application, r.agentID())
 	rec := generateRecord(EventTypeState, EventSubTypeStopping, msg)
 	r.report(rec)
 }
 
 // OnStopped reports application stopped event.
 func (r *Reporter) OnStopped(application string) {
-	msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPED", application, r.id)
+	msg := fmt.Sprintf("Application: %s[%s]: State change: STOPPED", application, r.agentID())
 	rec := generateRecord(EventTypeState, EventSubTypeStopped, msg)
 	r.report(rec)
 }
 
 // OnFatal reports applications fatal event.
 func (r *Reporter) OnFatal(application string, err error) {
-	msg := fmt.Sprintf("Application: %s[%s]: %v", application, r.id, err)
+	msg := fmt.Sprintf("Application: %s[%s]: %v", application, r.agentID(), err)
 	rec := generateRecord(EventTypeError, EventSubTypeConfig, msg)
 	r.report(rec)
 }

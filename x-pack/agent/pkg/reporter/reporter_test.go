@@ -20,7 +20,8 @@ func (t *testReporter) Report(r Event) error {
 }
 
 func TestTypes(t *testing.T) {
-	rep := NewReporter(nil, "id", &testReporter{})
+	getID := func() string { return "id" }
+	rep := NewReporter(nil, getID, &testReporter{})
 	// test starting
 	rep.OnStarting("a1")
 	if r := result.Type(); r != EventTypeState {

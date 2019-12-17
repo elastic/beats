@@ -68,8 +68,10 @@ type Reporter struct {
 	closeOnce      sync.Once
 }
 
+type agentIDRetriever func() string
+
 // NewReporter creates a new fleet reporter.
-func NewReporter(agentID string, l *logger.Logger, c *ManagementConfig, client remoteClient) (*Reporter, error) {
+func NewReporter(agentID agentIDRetriever, l *logger.Logger, c *ManagementConfig, client remoteClient) (*Reporter, error) {
 	checkinClient := fleetapi.NewCheckinCmd(agentID, client)
 
 	frequency := time.Duration(c.ReportingCheckFrequency) * time.Second

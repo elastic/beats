@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/pkg/errors"
 
@@ -34,9 +35,11 @@ type apiClient interface {
 // Managed application, when the application is run in managed mode, most of the configuration are
 // coming from the Fleet App.
 type Managed struct {
-	log    *logger.Logger
-	Config FleetAgentConfig
-	api    apiClient
+	log         *logger.Logger
+	Config      FleetAgentConfig
+	api         apiClient
+	agentID     string
+	agentIDLock sync.Mutex
 }
 
 func newManaged(
@@ -44,7 +47,10 @@ func newManaged(
 	rawConfig *config.Config,
 ) (*Managed, error) {
 
-	agentID := getAgentID()
+	agentID, err := generateAgentID()
+	if err != nil {
+		return nil, err
+	}
 
 	path := fleetAgentConfigPath()
 
@@ -70,7 +76,13 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to create API client")
 	}
 
-	reporter, err := createFleetReporters(log, cfg, agentID, client)
+	managedApplication := &Managed{
+		log:     log,
+		api:     client,
+		agentID: agentID,
+	}
+
+	reporter, err := createFleetReporters(log, cfg, managedApplication.AgentID, client)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to create reporters")
 	}
@@ -81,10 +93,7 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
 
-	return &Managed{
-		log: log,
-		api: client,
-	}, nil
+	return managedApplication, nil
 }
 
 // Start starts a managed agent.
@@ -99,10 +108,18 @@ func (m *Managed) Stop() error {
 	return nil
 }
 
+// AgentID retrieves unique agent identifier.
+func (m *Managed) AgentID() string {
+	m.agentIDLock.Lock()
+	defer m.agentIDLock.Unlock()
+
+	return m.agentID
+}
+
 func createFleetReporters(
 	log *logger.Logger,
 	cfg *FleetAgentConfig,
-	agentID string,
+	agentID func() string,
 	client apiClient,
 ) (reporter, error) {
 
