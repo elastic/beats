@@ -113,7 +113,7 @@ func (l *Local) Stop() error {
 }
 
 // AgentID retrieves unique agent identifier.
-func (m *Local) AgentID() string {
+func (l *Local) AgentID() string {
 	return m.agentID
 }
 
