@@ -74,7 +74,7 @@ func Structured(
 ) Factory {
 	return func(out io.Writer) (Layout, error) {
 		logCtx := ctxtree.New(nil, nil)
-		logCtx.AddFields(fields)
+		logCtx.AddFields(fields...)
 
 		l := &structLayout{
 			out:         out,
@@ -115,7 +115,7 @@ func (l *structLayout) Log(msg backend.Message) {
 		ecs.Log.FileLine(msg.Caller.Line()),
 
 		ecs.Message(msg.Message),
-	})
+	}...)
 	if msg.Name != "" {
 		ctx.AddField(ecs.Log.Name(msg.Name))
 	}
