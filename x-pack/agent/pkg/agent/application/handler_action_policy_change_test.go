@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
 
@@ -25,6 +26,7 @@ func (m *mockEmitter) Emitter(policy *config.Config) error {
 }
 
 func TestPolicyChange(t *testing.T) {
+	log, _ := logger.New()
 	t.Run("Receive a policy change and successfully emits a raw configuration", func(t *testing.T) {
 		emitter := &mockEmitter{}
 
@@ -34,7 +36,7 @@ func TestPolicyChange(t *testing.T) {
 			Policy:     policy,
 		}
 
-		handler := &handlerPolicyChange{emitter: emitter.Emitter}
+		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(action)
 		require.NoError(t, err)
@@ -51,7 +53,7 @@ func TestPolicyChange(t *testing.T) {
 			Policy:     policy,
 		}
 
-		handler := &handlerPolicyChange{emitter: emitter.Emitter}
+		handler := &handlerPolicyChange{log: log, emitter: emitter.Emitter}
 
 		err := handler.Handle(action)
 		require.Error(t, err)

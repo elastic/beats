@@ -17,6 +17,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/scheduler"
 )
 
@@ -86,8 +87,10 @@ func withGateway(agentID string, fn withGatewayFunc) func(t *testing.T) {
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
+		log, _ := logger.New()
+
 		gateway, err := newFleetGatewayWithScheduler(
-			nil,
+			log,
 			&fleetGatewaySettings{},
 			agentID,
 			client,
@@ -202,8 +205,9 @@ func TestFleetGateway(t *testing.T) {
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
+		log, _ := logger.New()
 		gateway, err := newFleetGatewayWithScheduler(
-			nil,
+			log,
 			&fleetGatewaySettings{},
 			agentID,
 			client,
