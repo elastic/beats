@@ -1,0 +1,56 @@
+{
+    "@timestamp": "2019-12-17T09:18:26.062Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "agent": {
+        "hostname": "testnode1",
+        "id": "fbaf40e4-c9f2-4d9f-840f-b3d8de51b42c",
+        "version": "8.0.0",
+        "type": "metricbeat",
+        "ephemeral_id": "d9bd89a5-56fd-4502-b3c5-2a5c8b5b986b"
+    },
+    "ecs": {
+        "version": "1.2.0"
+    },
+    "service": {
+        "type": "aws"
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "eu-central-1"
+    },
+    "aws": {
+        "metrics": {
+            "SuccessfulRequestLatency": {
+                "max": 17.713318,
+                "avg": 4.457840625
+            }
+        },
+        "cloudwatch": {
+            "dimensions": {
+                "Operation": "Scan",
+                "TableName": "TryDaxTable"
+            },
+            "namespace": "AWS/DynamoDB"
+        }
+    },
+    "event": {
+        "module": "aws",
+        "duration": 1027498360,
+        "dataset": "aws.dynamodb"
+    },
+    "metricset": {
+        "name": "dynamodb",
+        "period": 60000
+    },
+    "host": {
+        "name": "testnode1"
+    }
+}
