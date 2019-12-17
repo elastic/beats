@@ -448,6 +448,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow `hosts` to be used to configure http monitors {pull}13703[13703]
 
 *Journalbeat*
+- Add `index` option to all inputs to directly set a per-input index value. {issue}15063[15063] {pull}15071[15071]
 
 *Metricbeat*
 
