@@ -42,19 +42,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Allow users to configure only `cluster_uuid` setting under `monitoring` namespace. {pull}14338[14338]
-- Fix `proxy_url` option in Elasticsearch output. {pull}14950[14950]
-- Fix bug with potential concurrent reads and writes from event.Meta map by Kafka output. {issue}14542[14542] {pull}14568[14568]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Change iis url path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225] {issue}7951[7951] {pull}13378[13378] {pull}14754[14754]
-- Fix azure filesets test files. {issue}14185[14185] {pull}14235[14235]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
-- Update Logstash module's Grok patterns to support Logstash 7.4 logs. {pull}14743[14743]
 
 *Heartbeat*
 
@@ -67,21 +62,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
-- Convert indexed ms-since-epoch timestamp fields in `elasticsearch/ml_job` metricset to ints from float64s. {issue}14220[14220] {pull}14222[14222]
-- Fix ARN parsing function to work for ELB ARNs. {pull}14316[14316]
-- Update azure configuration example. {issue}14224[14224]
-- Limit some of the error messages to the logs only {issue}14317[14317] {pull}14327[14327]
-- Fix cloudwatch metricset with names and dimensions in config. {issue}14376[14376] {pull}14391[14391]
-- Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
-- Fix perfmon expanding counter path/adding counter to query when OS language is not english. {issue}14684[14684] {pull}14800[14800]
-- Add extra check on `ignore_non_existent_counters` flag if the PdhExpandWildCardPathW returns no errors but does not expand the counter path successfully in windows/perfmon metricset. {pull}14797[14797]
-- Fix rds metricset from reporting same values for different instances. {pull}14702[14702]
-- Closing handler after verifying the registry key in diskio metricset. {issue}14683[14683] {pull}14759[14759]
-- Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
-- Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
-- Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
 
 *Packetbeat*
 
@@ -145,3 +127,4 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
