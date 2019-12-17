@@ -60,6 +60,12 @@ func Package() error {
 					continue
 				}
 
+				tarPackageArch, err := getOSArchName(target, TarGz)
+				if err != nil {
+					log.Printf("Skipping arch %v for package type %v: %v", target.Arch(), pkgType, err)
+					continue
+				}
+
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
@@ -69,7 +75,7 @@ func Package() error {
 					"GOARCH":      target.GOARCH(),
 					"GOARM":       target.GOARM(),
 					"Platform":    target,
-					"ArchName":    packageArch,
+					"TarArchName": tarPackageArch,
 					"PackageType": pkgType.String(),
 					"BinaryExt":   binaryExtension(target.GOOS()),
 				}
