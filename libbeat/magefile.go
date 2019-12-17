@@ -51,3 +51,8 @@ func GoTestUnit(ctx context.Context) error {
 func Config() error {
 	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
 }
+
+// GoIntegTest executes integration tests (it uses Docker to run the tests).
+func GoIntegTest() {
+	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
+}
