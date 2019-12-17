@@ -52,12 +52,4 @@ func TestElasticsearch(t *testing.T) {
 	assert.Equal(t, Active, license.Status)
 
 	assert.NotEmpty(t, license.UUID)
-
-	assert.NotNil(t, license.Features.Graph)
-	assert.NotNil(t, license.Features.Logstash)
-	assert.NotNil(t, license.Features.ML)
-	assert.NotNil(t, license.Features.Monitoring)
-	assert.NotNil(t, license.Features.Rollup)
-	assert.NotNil(t, license.Features.Security)
-	assert.NotNil(t, license.Features.Watcher)
 }
