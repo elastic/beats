@@ -1303,27 +1303,27 @@ func parseField(st *state, msg string, start, end int) (i int, err error) {
 	return i + 1, nil
 }
 
-func parseFlag(st *state, msg string, pos int) (i int, isflag bool) {
+func parseFlag(st *state, msg string, pos int) (int, bool) {
 	switch msg[pos] {
 	case '#':
 		st.flags.sharp = true
-		return i + 1, true
+		return pos + 1, true
 	case '+':
 		st.flags.plus = true
-		return i + 1, true
+		return pos + 1, true
 	case '-':
 		st.flags.minus = true
 		st.flags.zero = false
-		return i + 1, true
+		return pos + 1, true
 	case '0':
 		st.flags.zero = !st.flags.minus
-		return i + 1, true
+		return pos + 1, true
 	case ' ':
 		st.flags.space = true
-		return i + 1, true
+		return pos + 1, true
 	}
 
-	return i, false
+	return 0, false
 }
 
 func parseNum(msg string, start, end int) (num int, isnum bool, i int) {
