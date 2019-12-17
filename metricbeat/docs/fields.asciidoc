@@ -4282,6 +4282,33 @@ required: True
 
 --
 
+*`process.exit_code`*::
++
+--
+the exit code of a process
+
+type: long
+
+--
+
+*`systemd.fragment_path`*::
++
+--
+the location of the systemd unit path
+
+type: keyword
+
+--
+
+*`systemd.unit`*::
++
+--
+the unit name of the systemd service
+
+type: keyword
+
+--
+
 [[exported-fields-consul]]
 == consul fields
 
@@ -32213,6 +32240,146 @@ type: long
 --
 Number of blocks on the device that are in sync, in 1024-byte blocks.
 
+
+type: long
+
+--
+
+[float]
+=== service
+
+metrics for system services
+
+
+
+*`system.service.name`*::
++
+--
+The name of the service
+
+type: keyword
+
+--
+
+*`system.service.load_state`*::
++
+--
+The load state of the service
+
+type: keyword
+
+--
+
+*`system.service.state`*::
++
+--
+The activity state of the service
+
+type: keyword
+
+--
+
+*`system.service.sub_state`*::
++
+--
+The sub-state of the service
+
+type: keyword
+
+--
+
+*`system.service.state_since`*::
++
+--
+The timestamp of the last state change. If the service is active and running, this is its uptime.
+
+type: date
+
+--
+
+*`system.service.exec_code`*::
++
+--
+The SIGCHLD code from the service's main process
+
+type: keyword
+
+--
+
+[float]
+=== resources
+
+system metrics associated with the service
+
+
+*`system.service.resources.cpu.usage.ns`*::
++
+--
+CPU usage in nanoseconds
+
+type: long
+
+--
+
+*`system.service.resources.memory.usage.bytes`*::
++
+--
+memory usage in bytes
+
+type: long
+
+--
+
+*`system.service.resources.tasks.count`*::
++
+--
+number of tasks associated with the service
+
+type: long
+
+--
+
+[float]
+=== network
+
+network resource usage
+
+
+*`system.service.resources.network.in.bytes`*::
++
+--
+bytes in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.in.packets`*::
++
+--
+packets in
+
+type: long
+
+format: bytes
+
+--
+
+*`system.service.resources.network.out.packets`*::
++
+--
+packets out
+
+type: long
+
+--
+
+*`system.service.resources.network.out.bytes`*::
++
+--
+bytes out
 
 type: long
 
