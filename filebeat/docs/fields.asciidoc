@@ -21310,21 +21310,20 @@ type: long
 
 --
 
-
-*`zeek.connection.state.code`*::
+*`zeek.connection.state`*::
 +
 --
-Code indicating the state of the session.
+The state of the session.
 
 
 type: keyword
 
 --
 
-*`zeek.connection.state.msg`*::
+*`zeek.connection.state_code`*::
 +
 --
-The meaning of the state code.
+Code indicating the state of the session.
 
 
 type: keyword
