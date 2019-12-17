@@ -163,28 +163,3 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
-
-#============================== Autodiscover ===================================
-
-# Autodiscover allows you to detect changes in the system and spawn new modules
-# as they happen.
-logging.level: debug
-metricbeat.autodiscover:
-# List of enabled autodiscover providers
-  providers:
-    - type: aws_ec2
-      period: 1m
-      regions:
-        - us-east-1
-      credential_profile_name: elastic-beats
-      templates:
-        - condition:
-            equals:
-              meta.ec2.tags.created-by: "ks"
-          config:
-            - module: mysql
-              metricsets: ["status", "galera_status"]
-              period: 10s
-              hosts: ["root:password@tcp(${data.meta.ec2.public_ip}:3306)/"]
-              username: root
-              password: password
