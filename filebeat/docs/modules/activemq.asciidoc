@@ -3,11 +3,14 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[filebeat-module-activemq]]
-:modulename: activemq
+[role="xpack"]
 
+:modulename: activemq
 :has-dashboards: true
 
 == ActiveMQ module
+
+beta[]
 
 This module parses Apache ActiveMQ logs. It supports application and audit logs.
 

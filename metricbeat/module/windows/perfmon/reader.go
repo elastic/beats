@@ -59,7 +59,7 @@ func NewReader(config Config) (*Reader, error) {
 		config:        config,
 	}
 	for _, counter := range config.CounterConfig {
-		childQueries, err := query.ExpandWildCardPath(counter.Query)
+		childQueries, err := query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if config.IgnoreNECounters {
 				switch err {
@@ -100,7 +100,7 @@ func NewReader(config Config) (*Reader, error) {
 func (r *Reader) RefreshCounterPaths() error {
 	var newCounters []string
 	for _, counter := range r.config.CounterConfig {
-		childQueries, err := r.query.ExpandWildCardPath(counter.Query)
+		childQueries, err := r.query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if r.config.IgnoreNECounters {
 				switch err {

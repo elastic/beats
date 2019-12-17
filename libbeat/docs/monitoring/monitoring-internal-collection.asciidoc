@@ -16,17 +16,16 @@
 <titleabbrev>Internal collection</titleabbrev>
 ++++
 
-The following method involves sending the metrics to the production cluster, 
-which ultimately routes them to the monitoring cluster.
+The following method involves sending the metrics directly to the monitoring
+cluster.
 ifndef::serverless[]
 For an alternative method, see <<monitoring-metricbeat-collection>>.
 endif::[]
 
-To learn about monitoring in general, see 
-{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
-
-//TODO: Not sure if these docs need to be updated to be parallel with other
-//stack components since this is the old way of configuring monitoring. 
+//Commenting out this link temporarily until the general monitoring docs can be
+//updated. 
+//To learn about monitoring in general, see 
+//{ref}/monitor-elasticsearch-cluster.html[Monitor a cluster]. 
 
 . Create an API key or user that has appropriate authority to send system-level monitoring
 data to {es}. For example, you can use the built-in +{beat_monitoring_user}+ user or
