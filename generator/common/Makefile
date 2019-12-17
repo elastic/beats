@@ -15,7 +15,7 @@ test: prepare-test
 	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
-	$(MAKE) package
+	mage package
 
 .PHONY: prepare-test
 prepare-test:: ${GOPATH}/bin/mage
