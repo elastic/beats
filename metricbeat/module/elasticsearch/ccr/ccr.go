@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			m.lastCCRLicenseMessageTimestamp = time.Now()
 			err := fmt.Errorf(ccrUnavailableMessage)
 			r.Error(err)
-			m.Logger().Debug(ccrUnavailableMessage)
+			m.Log.Debug(ccrUnavailableMessage)
 		}
 		return
 	}
