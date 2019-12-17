@@ -4,6 +4,7 @@
 
 package application
 
+// AgentInfo is a collection of information about agent.
 type AgentInfo struct {
 	agentID string
 }
