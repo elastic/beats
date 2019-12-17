@@ -5,7 +5,7 @@
 package googlecloud
 
 const (
-	// Name of the module
+	// ModuleName in Metricbeat
 	ModuleName = "googlecloud"
 
 	// MinTimeIntervalDataWindowMinutes is the minimum time in minutes that we allow the user to specify when requesting past metrics. Less than 5 minutes
