@@ -60,7 +60,7 @@ func New(config PluginConfig) (*Processors, error) {
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to make if/then/else processor")
 			}
-			procs.add(p)
+			procs.AddProcessor(p)
 			continue
 		}
 
@@ -94,7 +94,7 @@ func New(config PluginConfig) (*Processors, error) {
 			return nil, err
 		}
 
-		procs.add(plugin)
+		procs.AddProcessor(plugin)
 	}
 
 	if len(procs.List) > 0 {
@@ -103,8 +103,25 @@ func New(config PluginConfig) (*Processors, error) {
 	return procs, nil
 }
 
-func (procs *Processors) add(p Processor) {
+// AddProcessor adds a single Processor to Processors
+func (procs *Processors) AddProcessor(p Processor) {
 	procs.List = append(procs.List, p)
+}
+
+// AddProcessors adds more Processors to Processors
+func (procs *Processors) AddProcessors(p Processors) {
+	// Subtlety: it is important here that we append the individual elements of
+	// p, rather than p itself, even though
+	// p implements the processors.Processor interface. This is
+	// because the contents of what we return are later pulled out into a
+	// processing.group rather than a processors.Processors, and the two have
+	// different error semantics: processors.Processors aborts processing on
+	// any error, whereas processing.group only aborts on fatal errors. The
+	// latter is the most common behavior, and the one we are preserving here for
+	// backwards compatibility.
+	// We are unhappy about this and have plans to fix this inconsistency at a
+	// higher level, but for now we need to respect the existing semantics.
+	procs.List = append(procs.List, p.List...)
 }
 
 // RunBC (run backwards-compatible) applies the processors, by providing the
