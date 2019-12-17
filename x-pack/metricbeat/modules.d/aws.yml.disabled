@@ -5,8 +5,6 @@
   period: 1m
   metricsets:
     - usage
-  regions:
-    - us-east-1
 - module: aws
   period: 5m
   metricsets:
@@ -19,8 +17,6 @@
       #  - name: InstanceId
       #    value: i-0686946e22cf9494a
       statistic: ["Average", "Maximum"]
-  regions:
-    - us-east-1
 - module: aws
   period: 5m
   metricsets:
@@ -30,8 +26,6 @@
     - sns
     - sqs
     - rds
-  regions:
-    - us-east-1
 - module: aws
   period: 12h
   metricsets:
@@ -43,5 +37,3 @@
   metricsets:
     - s3_daily_storage
     - s3_request
-  regions:
-    - us-east-1
