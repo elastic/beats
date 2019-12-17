@@ -19,6 +19,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
+	"github.com/elastic/beats/agent/release"
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/unittest"
@@ -262,6 +263,11 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
+	version, found := os.LookupEnv("BEAT_VERSION")
+	if !found {
+		version = release.Version()
+	}
+
 	packedBeats := []string{"filebeat", "metricbeat"}
 	requiredPackages := []string{
 		"darwin-amd64.tar.gz",
@@ -277,7 +283,7 @@ func Package() {
 			panic(err)
 		}
 
-		if requiredPackagesPresent(pwd, b, requiredPackages) {
+		if requiredPackagesPresent(pwd, b, version, requiredPackages) {
 			continue
 		}
 
@@ -300,10 +306,10 @@ func Package() {
 	mg.SerialDeps(devtools.Package)
 }
 
-func requiredPackagesPresent(basePath, beat string, requiredPackages []string) bool {
+func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
-		packageName := fmt.Sprintf("%s-%s", beat, pkg)
-		path := filepath.Join(basePath, "build", "package", packageName)
+		packageName := fmt.Sprintf("%s-%s-%s", beat, version, pkg)
+		path := filepath.Join(basePath, "build", "distributions", packageName)
 
 		if _, err := os.Stat(path); err != nil {
 			fmt.Printf("Package '%s' does not exist on path: %s\n", packageName, path)
