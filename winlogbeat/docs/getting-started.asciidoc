@@ -111,7 +111,7 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml
 [[config-winlogbeat-logstash]]
 === Step 3: Configure Winlogbeat to use Logstash
 
-include::{libbeat-dir}/outputs/output-logstash.asciidoc[tag=shared-logstash-config]
+include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[tag=shared-logstash-config]
 
 [[winlogbeat-template]]
 === Step 4: Load the index template in Elasticsearch
