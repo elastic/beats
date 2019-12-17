@@ -47,14 +47,14 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 	if in.Resource != nil && in.Resource.Labels != nil {
 		availabilityZone = in.Resource.Labels[TimeSeriesResponsePathForECSAvailabilityZone]
-		accountID = in.Resource.Labels[TimeSeriesResponsePathForECSAccountId]
+		accountID = in.Resource.Labels[TimeSeriesResponsePathForECSAccountID]
 	}
 
 	ecs := common.MapStr{
 		ECSCloud: common.MapStr{
 			ECSCloudAvailabilityZone: availabilityZone,
 			ECSCloudAccount: common.MapStr{
-				ECSCloudAccountId: accountID,
+				ECSCloudAccountID: accountID,
 			},
 			ECSCloudProvider: "googlecloud",
 		},
@@ -89,7 +89,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {
-			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceId || k == TimeSeriesResponsePathForECSAccountId {
+			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceID || k == TimeSeriesResponsePathForECSAccountID {
 				continue
 			}
 

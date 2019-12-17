@@ -5,10 +5,18 @@
 package googlecloud
 
 const (
-	ModuleName                       = "googlecloud"
-	MaxTimeIntervalDataWindowMinutes = 5
+	// Name of the module
+	ModuleName = "googlecloud"
+
+	// Minimum time in minutes that we allow the user to specify when requesting past metrics. Less than 5 minutes
+	// usually return no results.
+	MinTimeIntervalDataWindowMinutes = 5
+
+	// Max time in minutes that we allow the user to specify when requesting past metrics.
+	MaxTimeIntervalDataWindowMinutes = 60
 )
 
+// Metricsets / GCP services names
 const (
 	ServiceCompute   = "compute"
 	ServicePubsub    = "pubsub"
@@ -19,8 +27,8 @@ const (
 //Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
 const (
 	TimeSeriesResponsePathForECSAvailabilityZone = "zone"
-	TimeSeriesResponsePathForECSAccountId        = "project_id"
-	TimeSeriesResponsePathForECSInstanceId       = "instance_id"
+	TimeSeriesResponsePathForECSAccountID        = "project_id"
+	TimeSeriesResponsePathForECSInstanceID       = "instance_id"
 	TimeSeriesResponsePathForECSInstanceName     = "instance_name"
 )
 
@@ -36,12 +44,12 @@ const (
 	ECSCloudRegion = "region"
 
 	ECSCloudAccount   = "account"
-	ECSCloudAccountId = "id"
+	ECSCloudAccountID = "id"
 
 	ECSCloudInstance        = "instance"
 	ECSCloudInstanceKey     = ECSCloud + "." + ECSCloudInstance
-	ECSCloudInstanceId      = "id"
-	ECSCloudInstanceIdKey   = ECSCloudInstanceKey + "." + ECSCloudInstanceId
+	ECSCloudInstanceID      = "id"
+	ECSCloudInstanceIDKey   = ECSCloudInstanceKey + "." + ECSCloudInstanceID
 	ECSCloudInstanceName    = "name"
 	ECSCloudInstanceNameKey = ECSCloudInstanceKey + "." + ECSCloudInstanceName
 

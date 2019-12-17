@@ -20,11 +20,6 @@ type MetadataService interface {
 	Identity
 }
 
-type MetadataCollectorData struct {
-	Labels common.MapStr
-	ECS    common.MapStr
-}
-
 // MetadataCollector must be implemented by services that has special code needs that aren't fulfilled by the Stackdriver
 // metricset to collect their labels (most of them)
 type MetadataCollector interface {
@@ -61,6 +56,12 @@ type MetadataCollectorInputData struct {
 	Zone       string
 	Point      *monitoringpb.Point
 	Timestamp  *time.Time
+}
+
+// MetadataCollectorData contains the set of ECS and normal labels that we extract from GCP services
+type MetadataCollectorData struct {
+	Labels common.MapStr
+	ECS    common.MapStr
 }
 
 // Identity must be implemented by GCP services that can add some short of data to group their metrics (like instance

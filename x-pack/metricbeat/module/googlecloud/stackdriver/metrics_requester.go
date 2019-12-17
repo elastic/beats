@@ -112,9 +112,13 @@ func getTimeInterval(windowTime time.Duration) (*monitoringpb.TimeInterval, erro
 	if windowTime > 0 {
 		endTime = time.Now().UTC()
 		startTime = time.Now().UTC().Add(-windowTime)
-	} else if startTime.IsZero() && endTime.IsZero() {
-		return nil, errors.New("a window time or start and end time must be provided to create a time window to fetch metrics from")
-	} else if windowTime.Minutes() > googlecloud.MaxTimeIntervalDataWindowMinutes {
+	}
+
+	if windowTime.Minutes() < googlecloud.MinTimeIntervalDataWindowMinutes {
+		return nil, errors.Errorf("the provided window time is too small. No less than %d minutes can be fetched", googlecloud.MinTimeIntervalDataWindowMinutes)
+	}
+
+	if windowTime.Minutes() >= googlecloud.MaxTimeIntervalDataWindowMinutes {
 		return nil, errors.Errorf("the provided window time is too big. No more than %d minutes can be fetched", googlecloud.MaxTimeIntervalDataWindowMinutes)
 	}
 

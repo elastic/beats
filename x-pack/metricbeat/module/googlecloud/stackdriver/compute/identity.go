@@ -7,6 +7,7 @@ package compute
 import (
 	"context"
 	"errors"
+
 	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
 )
 

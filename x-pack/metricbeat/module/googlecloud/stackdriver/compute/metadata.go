@@ -6,11 +6,13 @@ package compute
 
 import (
 	"context"
-	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/pkg/errors"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
 )
@@ -65,7 +67,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
-		metadataCollectorData.ECS.Put(googlecloud.ECSCloudInstanceIdKey, resp.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceId])
+		metadataCollectorData.ECS.Put(googlecloud.ECSCloudInstanceIDKey, resp.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceID])
 	}
 
 	if resp.Metric.Labels != nil {
@@ -146,7 +148,7 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID, zone strin
 
 func (s *metadataCollector) instanceID(ts *monitoringpb.TimeSeries) string {
 	if ts.Resource != nil && ts.Resource.Labels != nil {
-		return ts.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceId]
+		return ts.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceID]
 	}
 
 	return ""
