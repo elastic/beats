@@ -126,9 +126,8 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 
 	// Build args list to Go.
 	args := []string{"test"}
-	if mg.Verbose() {
-		args = append(args, "-v")
-	}
+	args = append(args, "-v")
+
 	if params.Race {
 		args = append(args, "-race")
 	}
