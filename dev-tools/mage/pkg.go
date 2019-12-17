@@ -69,6 +69,7 @@ func Package() error {
 					"GOARCH":      target.GOARCH(),
 					"GOARM":       target.GOARM(),
 					"Platform":    target,
+					"ArchName":    packageArch,
 					"PackageType": pkgType.String(),
 					"BinaryExt":   binaryExtension(target.GOOS()),
 				}
