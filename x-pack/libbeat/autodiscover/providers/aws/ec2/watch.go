@@ -84,13 +84,13 @@ func (w *watcher) once() error {
 
 	// Increment the generation of all EC2s returned by the API request
 	for _, instance := range fetchedEC2s {
-		instanceId := awsauto.SafeStrp(instance.ec2Instance.InstanceId)
-		if _, exists := w.ec2Instances[instanceId]; !exists {
+		instanceID := awsauto.SafeStrp(instance.ec2Instance.InstanceId)
+		if _, exists := w.ec2Instances[instanceID]; !exists {
 			if w.onStart != nil {
-				w.onStart(instanceId, instance)
+				w.onStart(instanceID, instance)
 			}
 		}
-		w.ec2Instances[instanceId] = w.gen
+		w.ec2Instances[instanceID] = w.gen
 	}
 
 	// EC2s not seen in the API request get deleted
