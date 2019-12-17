@@ -79,7 +79,7 @@ class Test(BaseTest):
         for i in range(len(rules)):
             expected = rules[i]
             got = lines[i].strip()
-            assert expected == got, \
+            assert expected == got.decode("utf-8"), \
                 "rule {0} doesn't match. expected='{1}' got='{2}'".format(
                     i, expected, got.decode("utf-8")
                 )

@@ -573,7 +573,7 @@ class DNSTestCase:
               b"\x02co\x00" + q_bytes + b"\x00\x01"
         resp = b"\x74\xba\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00\x07elastic" \
                b"\x02co\x00" + q_bytes + b"\x00\x01\xc0\x0c" + q_bytes + b"\x00\x01\x00\x00" \
-               b"\x00\x9c" + bytes(struct.pack(">H", len(raw_addr)) + raw_addr, "utf-8")
+               b"\x00\x9c" + struct.pack(">H", len(raw_addr)) + raw_addr
 
         transaction_udp(dns_cli, self.dns_client_addr,
                         dns_srv, self.dns_server_addr,
@@ -583,8 +583,8 @@ class DNSTestCase:
         time.sleep(self.delay)
         self.transaction(client, self.client_addr,
                          server, self.server_addr,
-                         "GET / HTTP/1.1\r\nHost: elastic.co\r\n\r\n",
-                         "HTTP/1.1 404 Not Found\r\n\r\n")
+                         b"GET / HTTP/1.1\r\nHost: elastic.co\r\n\r\n",
+                         b"HTTP/1.1 404 Not Found\r\n\r\n")
         client.close()
         server.close()
 

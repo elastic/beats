@@ -57,7 +57,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
         # Waits until CPULoad is part of the status
         while not found:
             res = urllib.request.urlopen(hosts[0] + "/server-status?auto").read()
-            if "CPULoad" in res:
+            if b"CPULoad" in res:
                 found = True
             time.sleep(0.5)
 
