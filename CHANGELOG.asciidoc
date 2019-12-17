@@ -3,6 +3,21 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.6]]
+=== Beats version 6.8.6
+https://github.com/elastic/beats/compare/v6.8.5...v6.8.6[View commits]
+
+==== Bugfixes
+
+*Heartbeat*
+
+- Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
+
+*Metricbeat*
+
+- Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
+
 [[release-notes-6.8.5]]
 === Beats version 6.8.5
 https://github.com/elastic/beats/compare/v6.8.4...v6.8.5[View commits]

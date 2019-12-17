@@ -22,5 +22,3 @@ https://github.com/elastic/beats/compare/v6.8.1..6.8[Check the HEAD diff]
 
 ==== Added
 
-- Added support for using PYTHON_EXE to control what Python interpreter is used
-  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
