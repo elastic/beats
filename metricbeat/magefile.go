@@ -21,7 +21,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"time"
@@ -139,7 +141,25 @@ func GoTestUnit(ctx context.Context) error {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+	modulesFileInfo, err := ioutil.ReadDir("./module")
+	if err != nil {
+		return err
+	}
+
+	var failed bool
+	for _, fi := range modulesFileInfo {
+		if !fi.IsDir() {
+			continue
+		}
+		err := devtools.GoTest(ctx, devtools.GoTestIntegrationArgsForModule(fi.Name()))
+		if err != nil {
+			failed = true
+		}
+	}
+	if failed {
+		return errors.New("integration tests failed")
+	}
+	return nil
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory
