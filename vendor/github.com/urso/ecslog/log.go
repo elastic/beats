@@ -58,7 +58,7 @@ func (l *Logger) WithFields(fields ...fld.Field) *Logger {
 		ctx:     ctxtree.Make(&l.ctx, nil),
 		backend: l.backend,
 	}
-	nl.ctx.AddFields(fields)
+	nl.ctx.AddFields(fields...)
 	return nl
 }
 

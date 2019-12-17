@@ -78,7 +78,13 @@ func (c *Ctx) AddAll(args ...interface{}) {
 		arg := args[i]
 		switch v := arg.(type) {
 		case string:
-			c.AddField(fld.Any(v, args[i+1]))
+			switch val := args[i+1].(type) {
+			case fld.Value:
+				c.Add(v, val)
+			default:
+				c.AddField(fld.Any(v, args[i+1]))
+			}
+
 			i += 2
 		case fld.Field:
 			c.AddField(v)
@@ -100,7 +106,7 @@ func (c *Ctx) AddField(f fld.Field) {
 	}
 }
 
-func (c *Ctx) AddFields(fs []fld.Field) {
+func (c *Ctx) AddFields(fs ...fld.Field) {
 	c.fields = append(c.fields, fs...)
 	for i := range fs {
 		if fs[i].Standardized {
