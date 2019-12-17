@@ -13,7 +13,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/x-pack/agent/pkg/config"
+	"github.com/elastic/beats/agent/kibana"
+	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
 
 func authHandler(handler http.HandlerFunc, apiKey string) http.HandlerFunc {
@@ -46,15 +47,17 @@ func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, hos
 
 func withServerWithAuthClient(
 	m func(t *testing.T) *http.ServeMux,
-	accessToken string,
+	apiKey string,
 	test func(t *testing.T, client clienter),
 ) func(t *testing.T) {
 
 	return withServer(m, func(t *testing.T, host string) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
-			"host": host,
-		})
-		client, err := NewAuthWithConfig(nil, cfg, accessToken)
+		log, _ := logger.New()
+		cfg := &kibana.Config{
+			Host: host,
+		}
+
+		client, err := NewAuthWithConfig(log, apiKey, cfg)
 		require.NoError(t, err)
 		test(t, client)
 	})

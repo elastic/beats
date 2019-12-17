@@ -6,7 +6,7 @@ package log
 
 // Config is a configuration describing log reporter behavior
 type Config struct {
-	Format Format `config:"format"`
+	Format Format `config:"format" yaml:"format"`
 }
 
 // DefaultLogConfig initiates LogConfig with default values

@@ -5,18 +5,25 @@
 package application
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"net/url"
 	"runtime"
 
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/agent/kibana"
 	"github.com/elastic/beats/agent/release"
+	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
 )
+
+type store interface {
+	Save(io.Reader) error
+}
 
 type clienter interface {
 	Send(
@@ -48,7 +55,37 @@ func NewEnrollCmd(
 	enrollAPIKey string,
 	id string,
 	userProvidedMetadata map[string]interface{},
-	configStore store,
+	configPath string,
+) (*EnrollCmd, error) {
+
+	store := storage.NewReplaceOnSuccessStore(
+		configPath,
+		DefaultAgentFleetConfig,
+		storage.NewEncryptedDiskStore(fleetAgentConfigPath(), []byte("")),
+	)
+
+	return NewEnrollCmdWithStore(
+		log,
+		url,
+		CAs,
+		enrollAPIKey,
+		id,
+		userProvidedMetadata,
+		configPath,
+		store,
+	)
+}
+
+//NewEnrollCmdWithStore creates an new enrollment and accept a custom store.
+func NewEnrollCmdWithStore(
+	log *logger.Logger,
+	url string,
+	CAs []string,
+	enrollAPIKey string,
+	id string,
+	userProvidedMetadata map[string]interface{},
+	configPath string,
+	store store,
 ) (*EnrollCmd, error) {
 
 	cfg, err := kibana.NewConfigFromURL(url, CAs)
@@ -74,7 +111,7 @@ func NewEnrollCmd(
 		id:                   id,
 		userProvidedMetadata: userProvidedMetadata,
 		kibanaConfig:         cfg,
-		configStore:          configStore,
+		configStore:          store,
 	}, nil
 }
 
@@ -97,11 +134,18 @@ func (c *EnrollCmd) Execute() error {
 		return errors.Wrap(err, "fail to execute request to Kibana")
 	}
 
-	if err := c.configStore.Save(fleetConfig{
+	fleetConfig, err := createFleetConfigFromEnroll(&APIAccess{
 		AccessAPIKey: resp.Item.AccessAPIKey,
 		Kibana:       c.kibanaConfig,
-	}); err != nil {
-		return errors.Wrap(err, "could not save credentials")
+	})
+
+	reader, err := yamlToReader(fleetConfig)
+	if err != nil {
+		return err
+	}
+
+	if err := c.configStore.Save(reader); err != nil {
+		return errors.Wrap(err, "could not save enroll credentials")
 	}
 
 	return nil
@@ -112,4 +156,12 @@ func metadata() map[string]interface{} {
 		"platform": runtime.GOOS,
 		"version":  release.Version(),
 	}
+}
+
+func yamlToReader(in interface{}) (io.Reader, error) {
+	data, err := yaml.Marshal(in)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not marshal to YAML")
+	}
+	return bytes.NewReader(data), nil
 }

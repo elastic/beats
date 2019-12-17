@@ -62,8 +62,8 @@ func init() {
 // - Send the API Key on every HTTP request.
 // - Ensure a minimun version of Kibana is required.
 // - Send the Fleet User Agent on every HTTP request.
-func NewAuthWithConfig(log *logger.Logger, config *config.Config, apiKey string) (*kibana.Client, error) {
-	return kibana.NewWithRawConfig(log, config, func(rt http.RoundTripper) (http.RoundTripper, error) {
+func NewAuthWithConfig(log *logger.Logger, apiKey string, cfg *kibana.Config) (*kibana.Client, error) {
+	return kibana.NewWithConfig(log, cfg, func(rt http.RoundTripper) (http.RoundTripper, error) {
 		rt, err := baseRoundTrippers(rt)
 		if err != nil {
 			return nil, err
