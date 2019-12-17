@@ -14,6 +14,7 @@ import (
 
 	// register autodiscover providers
 	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/elb"
+	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/nomad"
 )
 
 const licenseDebugK = "license"
