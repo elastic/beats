@@ -6,9 +6,6 @@ package application
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-	_ "net/http/pprof"
 	"reflect"
 	"strings"
 
@@ -16,12 +13,6 @@ import (
 
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 )
-
-func init() {
-	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
-}
 
 type action interface{}
 
