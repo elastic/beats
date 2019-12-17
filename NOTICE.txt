@@ -5875,7 +5875,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/urso/ecslog
-Revision: 12ff8e866d497e0479943e68f9ed6c59c0cd8acb
+Revision: cb6164201e76e9e9450a36a2f9d30865da7d72ef
 License type (autodetected): Apache-2.0
 ./vendor/github.com/urso/ecslog/LICENSE:
 --------------------------------------------------------------------
