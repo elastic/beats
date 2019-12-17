@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "stan.stats",
+        "duration": 115000,
+        "module": "stan"
+    },
+    "metricset": {
+        "name": "stats",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:32768",
+        "type": "stan"
+    },
+    "stan": {
+        "cluster": {
+            "id": "test-cluster"
+        },
+        "server": {
+            "id": "IcYma3g7cxFU6AUhN9flMe"
+        },
+        "stats": {
+            "bytes": 0,
+            "channels": 0,
+            "clients": 0,
+            "messages": 0,
+            "state": "STANDALONE",
+            "subscriptions": 0
+        }
+    }
+}

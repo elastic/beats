@@ -2,11 +2,11 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-aws.html
 
 - module: aws
-  period: 300s
+  period: 1m
   metricsets:
     - usage
 - module: aws
-  period: 300s
+  period: 5m
   metricsets:
     - cloudwatch
   metrics:

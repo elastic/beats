@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "Class": "Standard/OnDemand",
+                "Resource": "vCPU",
+                "Service": "EC2",
+                "Type": "Resource"
+            },
+            "namespace": "AWS/Usage"
+        },
+        "metrics": {
+            "ResourceCount": {
+                "sum": 10
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.usage",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "usage",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

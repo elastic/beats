@@ -1,9 +1,9 @@
 - module: aws
-  period: 300s
+  period: 1m
   metricsets:
     - usage
 - module: aws
-  period: 300s
+  period: 5m
   metricsets:
     - cloudwatch
   metrics:
