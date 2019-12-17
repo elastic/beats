@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type watcher struct {
@@ -39,6 +40,7 @@ func newWatcher(
 		ticker:       time.NewTicker(period),
 		period:       period,
 		ec2Instances: map[string]uint64{},
+		logger:       logp.NewLogger("autodiscover-ec2-watcher"),
 	}
 }
 
@@ -75,20 +77,20 @@ func (w *watcher) once() error {
 	if err != nil {
 		return err
 	}
-	w.logger.Debug("autodiscover-ec2", "fetched %d ec2 instances from AWS for autodiscovery", len(fetchedEC2s))
+	w.logger.Debugf("autodiscover-ec2", "fetched %d ec2 instances from AWS for autodiscovery", len(fetchedEC2s))
 
 	oldGen := w.gen
 	w.gen++
 
 	// Increment the generation of all EC2s returned by the API request
 	for _, instance := range fetchedEC2s {
-		arn := instance.arn()
-		if _, exists := w.ec2Instances[arn]; !exists {
+		instanceId := awsauto.SafeStrp(instance.ec2Instance.InstanceId)
+		if _, exists := w.ec2Instances[instanceId]; !exists {
 			if w.onStart != nil {
-				w.onStart(arn, instance)
+				w.onStart(instanceId, instance)
 			}
 		}
-		w.ec2Instances[arn] = w.gen
+		w.ec2Instances[instanceId] = w.gen
 	}
 
 	// EC2s not seen in the API request get deleted

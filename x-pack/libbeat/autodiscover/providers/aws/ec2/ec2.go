@@ -5,7 +5,6 @@
 package ec2
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/pkg/errors"
 
@@ -21,7 +20,6 @@ type ec2Instance struct {
 // toMap converts this ec2Instance into the form consumed as metadata in the autodiscovery process.
 func (i *ec2Instance) toMap() common.MapStr {
 	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
-	fmt.Println("instance type = ", instanceType)
 	if err != nil {
 		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
 	}
@@ -37,13 +35,10 @@ func (i *ec2Instance) toMap() common.MapStr {
 	}
 
 	m := common.MapStr{
+		"instance_id":      awsauto.SafeStrp(i.ec2Instance.InstanceId),
 		"image_id":         awsauto.SafeStrp(i.ec2Instance.ImageId),
 		"vpc_id":           awsauto.SafeStrp(i.ec2Instance.VpcId),
 		"subnet_id":        awsauto.SafeStrp(i.ec2Instance.SubnetId),
-		"host_id":          awsauto.SafeStrp(i.ec2Instance.Placement.HostId),
-		"group_name":       awsauto.SafeStrp(i.ec2Instance.Placement.GroupName),
-		"arn":              awsauto.SafeStrp(i.ec2Instance.IamInstanceProfile.Arn),
-		"instance_id":      awsauto.SafeStrp(i.ec2Instance.IamInstanceProfile.Id),
 		"type":             instanceType,
 		"private_ip":       awsauto.SafeStrp(i.ec2Instance.PrivateIpAddress),
 		"private_dns_name": awsauto.SafeStrp(i.ec2Instance.PrivateDnsName),
@@ -54,8 +49,10 @@ func (i *ec2Instance) toMap() common.MapStr {
 		"root_device_name": awsauto.SafeStrp(i.ec2Instance.RootDeviceName),
 		"kernel_id":        awsauto.SafeStrp(i.ec2Instance.KernelId),
 		"state":            i.stateMap(),
-		"state_reason":     i.stateReasonMap(),
-		"tags":             i.tagMap(),
+	}
+
+	for _, tag := range i.ec2Instance.Tags {
+		m.Put("tags."+awsauto.SafeStrp(tag.Key), awsauto.SafeStrp(tag.Value))
 	}
 	return m
 }
@@ -67,13 +64,8 @@ func (i *ec2Instance) toCloudMap() common.MapStr {
 	m["provider"] = "aws"
 
 	// The region is just an AZ with the last character removed
-	m["region"] = availabilityZone[:len(availabilityZone)-2]
+	m["region"] = availabilityZone[:len(availabilityZone)-1]
 	return m
-}
-
-// arn returns a globally unique ID. In the case of an ec2Instance, that would be its listenerArn.
-func (i *ec2Instance) arn() string {
-	return awsauto.SafeStrp(i.ec2Instance.IamInstanceProfile.Arn)
 }
 
 // stateMap converts the State part of the ec2 struct into a friendlier map with 'reason' and 'code' fields.
@@ -82,37 +74,10 @@ func (i *ec2Instance) stateMap() (stateMap common.MapStr) {
 	stateMap = common.MapStr{}
 	nameString, err := state.Name.MarshalValue()
 	if err != nil {
-		logp.Error(errors.Wrap(err,"MarshalValue failed for instance state name: "))
+		logp.Error(errors.Wrap(err, "MarshalValue failed for instance state name: "))
 	}
 
 	stateMap["name"] = nameString
 	stateMap["code"] = state.Code
-
-	stateReason := i.ec2Instance.StateReason
-	stateMap["state_reason"] = awsauto.SafeStrp(stateReason.Code)
-	stateMap[""] = awsauto.SafeStrp(stateReason.Message)
 	return stateMap
-}
-
-// stateReasonMap converts the State Reason part of the ec2 struct into a friendlier map with 'reason' and 'code' fields.
-func (i *ec2Instance) stateReasonMap() (stateReasonMap common.MapStr) {
-	stateReasonMap = common.MapStr{}
-	stateReason := i.ec2Instance.StateReason
-	stateReasonMap["code"] = awsauto.SafeStrp(stateReason.Code)
-	stateReasonMap["message"] = awsauto.SafeStrp(stateReason.Message)
-	return stateReasonMap
-}
-
-// stateMap converts the State part of the ec2 struct into a friendlier map with 'reason' and 'code' fields.
-func (i *ec2Instance) tagMap() (tagsMap []common.MapStr) {
-	tags := i.ec2Instance.Tags
-	tagsMap = []common.MapStr{}
-	tagPair := common.MapStr{}
-	for _, tag := range tags {
-		tagPair["key"] = awsauto.SafeStrp(tag.Key)
-		tagPair["value"] = awsauto.SafeStrp(tag.Value)
-		tagsMap = append(tagsMap, tagPair)
-	}
-
-	return tagsMap
 }

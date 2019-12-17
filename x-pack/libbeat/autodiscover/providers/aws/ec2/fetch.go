@@ -11,8 +11,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"go.uber.org/multierr"
-	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
+
 	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 const logSelector = "autodiscover-ec2-fetch"
