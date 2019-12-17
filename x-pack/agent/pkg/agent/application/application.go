@@ -15,7 +15,7 @@ import (
 type Application interface {
 	Start() error
 	Stop() error
-	AgentID() string
+	AgentInfo() *AgentInfo
 }
 
 // New creates a new Agent and bootstrap the required subsystem.

@@ -30,9 +30,9 @@ var ErrNoConfiguration = errors.New("no configuration found")
 // Local represents a standalone agents, that will read his configuration directly from disk.
 // Some part of the configuration can be reloaded.
 type Local struct {
-	log     *logger.Logger
-	source  source
-	agentID string
+	log       *logger.Logger
+	source    source
+	agentInfo *AgentInfo
 }
 
 type source interface {
@@ -54,7 +54,7 @@ func newLocal(
 		}
 	}
 
-	agentID, err := generateAgentID()
+	agentInfo, err := NewAgentInfo()
 	if err != nil {
 		return nil, err
 	}
@@ -67,11 +67,11 @@ func newLocal(
 	logR := logreporter.NewReporter(log, c.Reporting)
 
 	localApplication := &Local{
-		log:     log,
-		agentID: agentID,
+		log:       log,
+		agentInfo: agentInfo,
 	}
 
-	reporter := reporting.NewReporter(log, localApplication.AgentID, logR)
+	reporter := reporting.NewReporter(log, localApplication.agentInfo, logR)
 
 	router, err := newRouter(log, streamFactory(config, nil, reporter))
 	if err != nil {
@@ -112,9 +112,9 @@ func (l *Local) Stop() error {
 	return l.source.Stop()
 }
 
-// AgentID retrieves unique agent identifier.
-func (l *Local) AgentID() string {
-	return m.agentID
+// AgentInfo retrieves agent information.
+func (l *Local) AgentInfo() *AgentInfo {
+	return l.agentInfo
 }
 
 func discoverer(patterns ...string) discoverFunc {

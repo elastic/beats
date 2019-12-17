@@ -35,11 +35,11 @@ type apiClient interface {
 // Managed application, when the application is run in managed mode, most of the configuration are
 // coming from the Fleet App.
 type Managed struct {
-	log         *logger.Logger
-	Config      FleetAgentConfig
-	api         apiClient
-	agentID     string
-	agentIDLock sync.Mutex
+	log       *logger.Logger
+	Config    FleetAgentConfig
+	api       apiClient
+	agentInfo *AgentInfo
+	infoLock  sync.Mutex
 }
 
 func newManaged(
@@ -47,8 +47,8 @@ func newManaged(
 	rawConfig *config.Config,
 ) (*Managed, error) {
 
-	agentID, err := generateAgentID()
-	if err != nil {
+	agentInfo, err := NewAgentInfo()
+	if agentInfo != nil {
 		return nil, err
 	}
 
@@ -77,12 +77,12 @@ func newManaged(
 	}
 
 	managedApplication := &Managed{
-		log:     log,
-		api:     client,
-		agentID: agentID,
+		log:       log,
+		api:       client,
+		agentInfo: agentInfo,
 	}
 
-	reporter, err := createFleetReporters(log, cfg, managedApplication.AgentID, client)
+	reporter, err := createFleetReporters(log, cfg, managedApplication.agentInfo, client)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to create reporters")
 	}
@@ -108,27 +108,27 @@ func (m *Managed) Stop() error {
 	return nil
 }
 
-// AgentID retrieves unique agent identifier.
-func (m *Managed) AgentID() string {
-	m.agentIDLock.Lock()
-	defer m.agentIDLock.Unlock()
+// AgentInfo retrieves agent information.
+func (m *Managed) AgentInfo() *AgentInfo {
+	m.infoLock.Lock()
+	defer m.infoLock.Unlock()
 
-	return m.agentID
+	return m.agentInfo
 }
 
 func createFleetReporters(
 	log *logger.Logger,
 	cfg *FleetAgentConfig,
-	agentID func() string,
+	agentInfo *AgentInfo,
 	client apiClient,
 ) (reporter, error) {
 
 	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
 
-	fleetR, err := fleetreporter.NewReporter(agentID, log, cfg.Reporting.Fleet, client)
+	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet, client)
 	if err != nil {
 		return nil, err
 	}
 
-	return reporting.NewReporter(log, agentID, logR, fleetR), nil
+	return reporting.NewReporter(log, agentInfo, logR, fleetR), nil
 }

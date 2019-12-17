@@ -55,16 +55,20 @@ func (e *CheckinResponse) Validate() error {
 
 // CheckinCmd is a fleet API command.
 type CheckinCmd struct {
-	client           clienter
-	agentIDRetriever func() string
+	client clienter
+	info   agentInfo
+}
+
+type agentInfo interface {
+	AgentID() string
 }
 
 // NewCheckinCmd creates a new api command.
-func NewCheckinCmd(agentID func() string, client clienter) *CheckinCmd {
+func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
 
 	return &CheckinCmd{
-		client:           client,
-		agentIDRetriever: agentID,
+		client: client,
+		info:   info,
 	}
 }
 
@@ -79,7 +83,7 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 		return nil, errors.Wrap(err, "fail to encode the checkin request")
 	}
 
-	cp := fmt.Sprintf(checkingPath, e.agentIDRetriever())
+	cp := fmt.Sprintf(checkingPath, e.info.AgentID())
 	resp, err := e.client.Send("POST", cp, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to checkin to fleet")
