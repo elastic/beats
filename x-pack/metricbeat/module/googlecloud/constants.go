@@ -8,11 +8,11 @@ const (
 	// Name of the module
 	ModuleName = "googlecloud"
 
-	// Minimum time in minutes that we allow the user to specify when requesting past metrics. Less than 5 minutes
+	// MinTimeIntervalDataWindowMinutes is the minimum time in minutes that we allow the user to specify when requesting past metrics. Less than 5 minutes
 	// usually return no results.
 	MinTimeIntervalDataWindowMinutes = 5
 
-	// Max time in minutes that we allow the user to specify when requesting past metrics.
+	// MaxTimeIntervalDataWindowMinutes is the max time in minutes that we allow the user to specify when requesting past metrics.
 	MaxTimeIntervalDataWindowMinutes = 60
 )
 
