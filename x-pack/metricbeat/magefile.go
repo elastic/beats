@@ -8,9 +8,7 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -24,6 +22,8 @@ import (
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
 )
 
 const (
@@ -132,13 +132,6 @@ func Update() {
 		devtools.GenerateModuleIncludeListGo)
 }
 
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
-	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
-	mg.SerialDeps(GoIntegTest, PythonIntegTest)
-}
-
 // UnitTest executes the unit tests.
 func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
@@ -151,48 +144,10 @@ func GoUnitTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
-// GoIntegTest executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoIntegTest(ctx context.Context) error {
-	return devtools.RunIntegTest("goIntegTest", func() error {
-		modulesFileInfo, err := ioutil.ReadDir("./module")
-		if err != nil {
-			return err
-		}
-
-		var failed bool
-		for _, fi := range modulesFileInfo {
-			if !fi.IsDir() {
-				continue
-			}
-			err := devtools.GoTest(ctx, devtools.GoTestIntegrationArgsForModule(fi.Name()))
-			if err != nil {
-				failed = true
-			}
-		}
-		if failed {
-			return errors.New("integration tests failed")
-		}
-		return nil
-	})
-}
-
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.Deps(devtools.BuildSystemTestBinary)
 	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
-func PythonIntegTest(ctx context.Context) error {
-	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
-	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
-		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	})
 }
 
 // prepareLightModules generates light modules

@@ -119,11 +119,9 @@ func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+// GoIntegTest executes integration tests (it uses Docker to run the tests).
+func GoIntegTest() {
+	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
 
 // -----------------------------------------------------------------------------

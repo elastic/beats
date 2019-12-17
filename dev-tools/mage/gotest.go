@@ -118,6 +118,33 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 	}
 }
 
+// GoTestIntegrationForModule executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoTestIntegrationForModule(ctx context.Context) error {
+	return RunIntegTest("goIntegTest", func() error {
+		modulesFileInfo, err := ioutil.ReadDir("./module")
+		if err != nil {
+			return err
+		}
+
+		var failed bool
+		for _, fi := range modulesFileInfo {
+			if !fi.IsDir() {
+				continue
+			}
+			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
+			if err != nil {
+				failed = true
+			}
+		}
+		if failed {
+			return errors.New("integration tests failed")
+		}
+		return nil
+	})
+}
+
 // GoTest invokes "go test" and reports the results to stdout. It returns an
 // error if there was any failure executing the tests or if there were any
 // test failures.

@@ -190,8 +190,8 @@ func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
 }
 
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
+// GoIntegTest executes integration tests (it uses Docker to run the tests).
+func GoIntegTest() {
 	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
 

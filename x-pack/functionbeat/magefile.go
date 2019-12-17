@@ -19,8 +19,6 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
-	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
@@ -149,4 +147,9 @@ func BuildSystemTestBinary() error {
 		}
 	}
 	return nil
+}
+
+// GoIntegTest executes integration tests (it uses Docker to run the tests).
+func GoIntegTest() {
+	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
