@@ -38,7 +38,10 @@ func (p *PromEvent) LabelsHash() string {
 	return prometheus.LabelHash(p.labels)
 }
 
-func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
+// getPromEventsFromMetricFamily reads given families and puts them in a list of PromEvents.
+// If ccache != nil it will be used to calculate rates whenever it makes sense:
+//   counters, histogram buckets, sums & counts
+func getPromEventsFromMetricFamily(mf *dto.MetricFamily, ccache prometheus.CounterCache) []PromEvent {
 	var events []PromEvent
 
 	name := *mf.Name
@@ -59,7 +62,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
 				events = append(events, PromEvent{
 					data: common.MapStr{
-						name: counter.GetValue(),
+						name: rateFloat64(ccache, name, labels, counter.GetValue()),
 					},
 					labels: labels,
 				})
@@ -83,8 +86,8 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 				events = append(events, PromEvent{
 					data: common.MapStr{
-						name + "_sum":   summary.GetSampleSum(),
-						name + "_count": summary.GetSampleCount(),
+						name + "_sum":   rateFloat64(ccache, name+"_sum", labels, summary.GetSampleSum()),
+						name + "_count": rateUint64(ccache, name+"_count", labels, summary.GetSampleCount()),
 					},
 					labels: labels,
 				})
@@ -99,7 +102,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 				quantileLabels["quantile"] = strconv.FormatFloat(quantile.GetQuantile(), 'f', -1, 64)
 				events = append(events, PromEvent{
 					data: common.MapStr{
-						name: quantile.GetValue(),
+						name: rateFloat64(ccache, name, quantileLabels, quantile.GetValue()),
 					},
 					labels: quantileLabels,
 				})
@@ -111,8 +114,8 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 			if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
 				events = append(events, PromEvent{
 					data: common.MapStr{
-						name + "_sum":   histogram.GetSampleSum(),
-						name + "_count": histogram.GetSampleCount(),
+						name + "_sum":   rateFloat64(ccache, name+"_sum", labels, histogram.GetSampleSum()),
+						name + "_count": rateUint64(ccache, name+"_count", labels, histogram.GetSampleCount()),
 					},
 					labels: labels,
 				})
@@ -128,7 +131,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 				events = append(events, PromEvent{
 					data: common.MapStr{
-						name + "_bucket": bucket.GetCumulativeCount(),
+						name + "_bucket": rateUint64(ccache, name+"_bucket", bucketLabels, bucket.GetCumulativeCount()),
 					},
 					labels: bucketLabels,
 				})
@@ -148,4 +151,18 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 		}
 	}
 	return events
+}
+
+func rateUint64(ccache prometheus.CounterCache, name string, labels common.MapStr, value uint64) uint64 {
+	if ccache != nil {
+		return ccache.RateUint64(name+labels.String(), value)
+	}
+	return value
+}
+
+func rateFloat64(ccache prometheus.CounterCache, name string, labels common.MapStr, value float64) float64 {
+	if ccache != nil {
+		return ccache.RateFloat64(name+labels.String(), value)
+	}
+	return value
 }

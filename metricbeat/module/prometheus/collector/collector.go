@@ -50,19 +50,36 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
+	counters   p.CounterCache
+	config     Config
 }
 
 // New creates a new metricset
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	config := defaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	prometheus, err := p.NewPrometheusClient(base)
 	if err != nil {
 		return nil, err
 	}
 
-	return &MetricSet{
+	metricset := MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-	}, nil
+	}
+
+	// Calculate rate on counters?
+	if config.RateCounters {
+		// use a counter cache with a timeout of 5x the period, as a safe value
+		// to make sure that all counters are available between fetches
+		metricset.counters = p.NewCounterCache(base.Module().Config().Period * 5)
+		metricset.counters.Start()
+	}
+
+	return &metricset, nil
 }
 
 // Fetch fetches data and reports it
@@ -76,7 +93,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	eventList := map[string]common.MapStr{}
 
 	for _, family := range families {
-		promEvents := getPromEventsFromMetricFamily(family)
+		promEvents := getPromEventsFromMetricFamily(family, m.counters)
 
 		for _, promEvent := range promEvents {
 			labelsHash := promEvent.LabelsHash()
@@ -115,5 +132,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
+	return nil
+}
+
+// Close stops the metricset
+func (m *MetricSet) Close() error {
+	if m.counters != nil {
+		m.counters.Stop()
+	}
 	return nil
 }

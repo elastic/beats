@@ -854,6 +854,10 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:9090"]
   metrics_path: /metrics
+
+  # Store counter rates instead of original cumulative counters (Default: false)
+  #rate_counters: true
+
   #username: "user"
   #password: "secret"
 
