@@ -6,7 +6,7 @@
   - name: type
     type: keyword
     description: >
-      @type property.
+      Type property.
   - name: authentication_info
     type: group
     description: >
@@ -28,7 +28,7 @@
       type: keyword
       description: >
         The resource being accessed, as a REST-style string. 
-        For example: bigquery.googlapis.com/projects/PROJECTID/datasets/DATASETID
+        For example, bigquery.googlapis.com/projects/PROJECTID/datasets/DATASETID
     - name: permission
       type: keyword
       description: >
@@ -42,8 +42,7 @@
     description: >
       The name of the service method or operation. For API calls, this 
       should be the name of the API method. 
-      For example, "google.datastore.v1.Datastore.RunQuery", 
-      "google.logging.v1.LoggingService.DeleteLog".
+      For example, google.datastore.v1.Datastore.RunQuery.
   - name: num_response_items
     type: long
     description: >
@@ -55,7 +54,7 @@
     - name: type
       type: keyword
       description: >
-        @type property of the request.
+        Type property of the request.
     - name: filter
       type: keyword
       description: >
@@ -82,12 +81,12 @@
     description: >
       The resource or collection that is the target of the operation. 
       The name is a scheme-less URI, not including the API service name. 
-      For example: "shelves/SHELF_ID/books", "shelves/SHELF_ID/books/BOOK_ID".
+      For example, shelves/SHELF_ID/books.
   - name: service_name
     type: keyword
     description: >
       The name of the API service performing the operation. 
-      For example, "datastore.googleapis.com".
+      For example, datastore.googleapis.com.
   - name: status
     type: group
     description: >
