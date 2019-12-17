@@ -65,6 +65,8 @@ func newManaged(
 		return nil, errors.Wrapf(err, "fail to read configuration %s for the agent", path)
 	}
 
+	rawConfig.Merge(config)
+
 	cfg := defaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack configuration from %s", path)
@@ -80,7 +82,7 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to create reporters")
 	}
 
-	router, err := newRouter(log, streamFactory(config, client, reporter))
+	router, err := newRouter(log, streamFactory(rawConfig, client, reporter))
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}

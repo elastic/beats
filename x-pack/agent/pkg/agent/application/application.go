@@ -55,7 +55,7 @@ func createApplication(
 		return newLocal(log, pathConfigFile, c.Management)
 	case fleetMode:
 		log.Info("Agent is managed by Fleet")
-		return newManaged(log, c.Management)
+		return newManaged(log, config)
 	default:
 		return nil, ErrInvalidMgmtMode
 	}
