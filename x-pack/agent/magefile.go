@@ -270,11 +270,11 @@ func Package() {
 
 	packedBeats := []string{"filebeat", "metricbeat"}
 	requiredPackages := []string{
-		"darwin-amd64.tar.gz",
-		"linux-386.tar.gz",
-		"linux-amd64.tar.gz",
-		"windows-386.zip",
-		"windows-amd64.zip",
+		"darwin-x86_64.tar.gz",
+		"linux-x86.tar.gz",
+		"linux-x86_64.tar.gz",
+		"windows-x86.zip",
+		"windows-x86_64.zip",
 	}
 
 	for _, b := range packedBeats {
