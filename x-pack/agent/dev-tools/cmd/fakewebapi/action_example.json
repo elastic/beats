@@ -12,7 +12,7 @@
               "id": "default",
               "name": "default",
               "type": "elasticsearch",
-              "url": "http://localhost:9200",
+              "hosts": "http://localhost:9200",
               "ingest_pipeline": "default"
             }
           },
