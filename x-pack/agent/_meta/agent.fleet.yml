@@ -2,6 +2,20 @@
 # Beats is configured under Fleet, you can define most settings
 # from the Kibana UI. You can update this file to configure the settings that
 # are not supported by Fleet.
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme
+
+streams:
+  - type: event/file
+    enabled: true
+    paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+
 management:
   #
   mode: "fleet"
