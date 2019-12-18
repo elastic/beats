@@ -22,8 +22,6 @@ import (
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
 )
 
 const (
@@ -220,4 +218,29 @@ func packageLightModules() error {
 		}
 	}
 	return nil
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	devtools.AddIntegTestUsage()
+	defer devtools.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoTestIntegrationForModule(ctx)
+}
+
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
+func PythonIntegTest(ctx context.Context) error {
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
+	return devtools.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(devtools.BuildSystemTestBinary)
+		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
+	})
 }

@@ -40,8 +40,6 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/docs"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
-	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/test"
@@ -163,4 +161,11 @@ func FieldsDocs() error {
 // CollectDocs creates the documentation under docs/
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoTestIntegrationForModule(ctx)
 }
