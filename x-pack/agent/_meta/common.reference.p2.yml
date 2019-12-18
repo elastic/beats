@@ -1,17 +1,19 @@
 ######################################
 # Fleet configuration
 ######################################
-inputs:
-  - type: log/docker
-    enabled: true
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme
 
-  - type: metric/docker
+streams:
+  - type: event/file
     enabled: true
-
-outputs.elasticsearch:
-  host: 127.0.0.1
-  username: elastic
-  password: changeme
+    paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
 
 management:
   # Mode of management, the agent currently only support the following mode:
