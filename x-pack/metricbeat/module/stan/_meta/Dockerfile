@@ -10,12 +10,17 @@ RUN cd src/github.com/nats-io/stan.go/examples/stan-bench && git checkout tags/v
 # create an enhanced container with nc command available since nats is based
 # on scratch image making healthcheck impossible
 FROM alpine:latest
-RUN apk add --no-cache --upgrade bash
+RUN apk add --no-cache --upgrade bash curl jq
 COPY --from=0 nats-streaming-server /nats-streaming-server
 COPY --from=build-env /go/src/github.com/nats-io/stan.go/examples/stan-bench/stan-bench /stan-bench
 # Expose client, management, and cluster ports
 EXPOSE 4222 8222
-HEALTHCHECK --interval=1s --retries=10 CMD nc -w 1 0.0.0.0 8222 </dev/null
+ADD healthcheck.sh /healthcheck.sh
+RUN ["chmod", "+x", "/healthcheck.sh"]
 ADD run.sh /run.sh
+
+# Healthcheck waits until channels have been created by the benchamrk that runs inside
+HEALTHCHECK --interval=1s --retries=100 CMD /healthcheck.sh
+
 # Run with default memory based store
 ENTRYPOINT ["/run.sh"]
