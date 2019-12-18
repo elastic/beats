@@ -74,7 +74,7 @@ func newAPIFetcher(clients []ec2iface.ClientAPI) fetcher {
 }
 
 // fetch attempts to request the full list of ec2Instance objects.
-// It accomplishes this by fetching a page of load balancers, then one go routine
+// It accomplishes this by fetching a page of EC2 instances, then one go routine
 // per listener API request. Each page of results has O(n)+1 perf since we need that
 // additional fetch per EC2. We let the goroutine scheduler sort things out, and use
 // a sync.Pool to limit the number of in-flight requests.
@@ -186,7 +186,7 @@ func (p *fetchRequest) dispatch(fn func()) {
 }
 
 func (p *fetchRequest) fetchInstances(instance ec2.Instance) {
-	describeInstancesInput := &ec2.DescribeInstancesInput{InstanceIds: []string{awsauto.SafeStrp(instance.InstanceId)}}
+	describeInstancesInput := &ec2.DescribeInstancesInput{InstanceIds: []string{awsauto.SafeString(instance.InstanceId)}}
 	req := p.client.DescribeInstancesRequest(describeInstancesInput)
 	listen := ec2.NewDescribeInstancesPaginator(req)
 

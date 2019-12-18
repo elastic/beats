@@ -84,7 +84,7 @@ func (w *watcher) once() error {
 
 	// Increment the generation of all EC2s returned by the API request
 	for _, instance := range fetchedEC2s {
-		instanceID := awsauto.SafeStrp(instance.ec2Instance.InstanceId)
+		instanceID := awsauto.SafeString(instance.ec2Instance.InstanceId)
 		if _, exists := w.ec2Instances[instanceID]; !exists {
 			if w.onStart != nil {
 				w.onStart(instanceID, instance)

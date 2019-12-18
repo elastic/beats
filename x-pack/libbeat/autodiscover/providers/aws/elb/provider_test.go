@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type testEventAccumulator struct {
@@ -65,7 +66,7 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher := newMockFetcher(lbls, nil)
 	pBus := bus.New("test")
 
-	cfg := &Config{
+	cfg := &awsauto.Config{
 		Regions: []string{"us-east-1a", "us-west-1b"},
 		Period:  time.Nanosecond,
 	}

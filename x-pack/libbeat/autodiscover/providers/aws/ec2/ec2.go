@@ -19,52 +19,99 @@ type ec2Instance struct {
 
 // toMap converts this ec2Instance into the form consumed as metadata in the autodiscovery process.
 func (i *ec2Instance) toMap() common.MapStr {
-	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
-	}
-
-	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for monitoring state: "))
-	}
-
 	architecture, err := i.ec2Instance.Architecture.MarshalValue()
 	if err != nil {
 		logp.Error(errors.Wrap(err, "MarshalValue failed for architecture: "))
 	}
 
 	m := common.MapStr{
-		"instance_id":      awsauto.SafeStrp(i.ec2Instance.InstanceId),
-		"image_id":         awsauto.SafeStrp(i.ec2Instance.ImageId),
-		"vpc_id":           awsauto.SafeStrp(i.ec2Instance.VpcId),
-		"subnet_id":        awsauto.SafeStrp(i.ec2Instance.SubnetId),
-		"type":             instanceType,
-		"private_ip":       awsauto.SafeStrp(i.ec2Instance.PrivateIpAddress),
-		"private_dns_name": awsauto.SafeStrp(i.ec2Instance.PrivateDnsName),
-		"public_ip":        awsauto.SafeStrp(i.ec2Instance.PublicIpAddress),
-		"public_dns_name":  awsauto.SafeStrp(i.ec2Instance.PublicDnsName),
-		"monitoring_state": monitoringState,
-		"architecture":     architecture,
-		"root_device_name": awsauto.SafeStrp(i.ec2Instance.RootDeviceName),
-		"kernel_id":        awsauto.SafeStrp(i.ec2Instance.KernelId),
+		"image":            i.toImage(),
+		"vpc":              i.toVpc(),
+		"subnet":           i.toSubnet(),
+		"private":          i.toPrivate(),
+		"public":           i.toPublic(),
+		"monitoring":       i.toMonitoringState(),
+		"kernel":           i.toKernel(),
 		"state":            i.stateMap(),
+		"architecture":     architecture,
+		"root_device_name": awsauto.SafeString(i.ec2Instance.RootDeviceName),
 	}
 
 	for _, tag := range i.ec2Instance.Tags {
-		m.Put("tags."+awsauto.SafeStrp(tag.Key), awsauto.SafeStrp(tag.Value))
+		m.Put("tags."+awsauto.SafeString(tag.Key), awsauto.SafeString(tag.Value))
 	}
+	return m
+}
+
+func (i *ec2Instance) toImage() common.MapStr {
+	m := common.MapStr{}
+	m["id"] = awsauto.SafeString(i.ec2Instance.ImageId)
+	return m
+}
+
+func (i *ec2Instance) toMonitoringState() common.MapStr {
+	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
+	if err != nil {
+		logp.Error(errors.Wrap(err, "MarshalValue failed for monitoring state: "))
+	}
+
+	m := common.MapStr{}
+	m["state"] = monitoringState
+	return m
+}
+
+func (i *ec2Instance) toPrivate() common.MapStr {
+	m := common.MapStr{}
+	m["ip"] = awsauto.SafeString(i.ec2Instance.PrivateIpAddress)
+	m["dns_name"] = awsauto.SafeString(i.ec2Instance.PrivateDnsName)
+	return m
+}
+
+func (i *ec2Instance) toPublic() common.MapStr {
+	m := common.MapStr{}
+	m["ip"] = awsauto.SafeString(i.ec2Instance.PublicIpAddress)
+	m["dns_name"] = awsauto.SafeString(i.ec2Instance.PublicDnsName)
+	return m
+}
+
+func (i *ec2Instance) toVpc() common.MapStr {
+	m := common.MapStr{}
+	m["id"] = awsauto.SafeString(i.ec2Instance.VpcId)
+	return m
+}
+
+func (i *ec2Instance) toSubnet() common.MapStr {
+	m := common.MapStr{}
+	m["id"] = awsauto.SafeString(i.ec2Instance.SubnetId)
+	return m
+}
+
+func (i *ec2Instance) toKernel() common.MapStr {
+	m := common.MapStr{}
+	m["id"] = awsauto.SafeString(i.ec2Instance.KernelId)
 	return m
 }
 
 func (i *ec2Instance) toCloudMap() common.MapStr {
 	m := common.MapStr{}
-	availabilityZone := awsauto.SafeStrp(i.ec2Instance.Placement.AvailabilityZone)
+	availabilityZone := awsauto.SafeString(i.ec2Instance.Placement.AvailabilityZone)
 	m["availability_zone"] = availabilityZone
 	m["provider"] = "aws"
 
 	// The region is just an AZ with the last character removed
 	m["region"] = availabilityZone[:len(availabilityZone)-1]
+
+	instance := common.MapStr{}
+	instance["id"] = awsauto.SafeString(i.ec2Instance.InstanceId)
+	m["instance"] = instance
+
+	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
+	if err != nil {
+		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
+	}
+	machine := common.MapStr{}
+	machine["type"] = instanceType
+	m["machine"] = machine
 	return m
 }
 

@@ -5,20 +5,19 @@
 package ec2
 
 import (
+	"context"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
-
-	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
-	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
-
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
+	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 )
 
 func init() {
@@ -29,8 +28,6 @@ func init() {
 type Provider struct {
 	config        *awsauto.Config
 	bus           bus.Bus
-	builders      autodiscover.Builders
-	appenders     autodiscover.Appenders
 	templates     *template.Mapper
 	startListener bus.Listener
 	stopListener  bus.Listener
@@ -48,15 +45,29 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
+	awsCfg, err := awscommon.GetAWSCredentials(
+		awscommon.ConfigAWS{
+			AccessKeyID:     config.AWSConfig.AccessKeyID,
+			SecretAccessKey: config.AWSConfig.SecretAccessKey,
+			SessionToken:    config.AWSConfig.SessionToken,
+			ProfileName:     config.AWSConfig.ProfileName,
+		})
+
+	// Construct MetricSet with a full regions list if there is no region specified.
+	if config.Regions == nil {
+		// set default region to make initial aws api call
+		awsCfg.Region = "us-west-1"
+		svcEC2 := ec2.New(awsCfg)
+		completeRegionsList, err := getRegions(svcEC2)
+		if err != nil {
+			return nil, err
+		}
+
+		config.Regions = completeRegionsList
+	}
+
 	var clients []ec2iface.ClientAPI
 	for _, region := range config.Regions {
-		awsCfg, err := awscommon.GetAWSCredentials(
-			awscommon.ConfigAWS{
-				AccessKeyID:     config.AWSConfig.AccessKeyID,
-				SecretAccessKey: config.AWSConfig.SecretAccessKey,
-				SessionToken:    config.AWSConfig.SessionToken,
-				ProfileName:     config.AWSConfig.ProfileName,
-			})
 		if err != nil {
 			logp.Error(errors.Wrap(err, "error loading AWS config for aws_ec2 autodiscover provider"))
 		}
@@ -75,21 +86,9 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	appenders, err := autodiscover.NewAppenders(config.Appenders)
-	if err != nil {
-		return nil, err
-	}
-
 	p := &Provider{
 		config:    config,
 		bus:       bus,
-		builders:  builders,
-		appenders: appenders,
 		templates: &mapper,
 		uuid:      uuid,
 	}
@@ -115,13 +114,12 @@ func (p *Provider) Stop() {
 }
 
 func (p *Provider) onWatcherStart(arn string, instance *ec2Instance) {
-	instanceMap := instance.toMap()
 	e := bus.Event{
 		"start":    true,
 		"provider": p.uuid,
 		"id":       arn,
 		"meta": common.MapStr{
-			"ec2":   instanceMap,
+			"ec2":   instance.toMap(),
 			"cloud": instance.toCloudMap(),
 		},
 	}
@@ -129,7 +127,6 @@ func (p *Provider) onWatcherStart(arn string, instance *ec2Instance) {
 	if configs := p.templates.GetConfig(e); configs != nil {
 		e["config"] = configs
 	}
-	p.appenders.Append(e)
 	p.bus.Publish(e)
 }
 
@@ -144,4 +141,18 @@ func (p *Provider) onWatcherStop(arn string) {
 
 func (p *Provider) String() string {
 	return "aws_ec2"
+}
+
+func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error) {
+	input := &ec2.DescribeRegionsInput{}
+	req := svc.DescribeRegionsRequest(input)
+	output, err := req.Send(context.TODO())
+	if err != nil {
+		err = errors.Wrap(err, "Failed DescribeRegions")
+		return
+	}
+	for _, region := range output.Regions {
+		completeRegionsList = append(completeRegionsList, *region.RegionName)
+	}
+	return
 }
