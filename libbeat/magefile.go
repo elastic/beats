@@ -50,7 +50,9 @@ func Config() error {
 	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
 }
 
-// GoIntegTest executes integration tests (it uses Docker to run the tests).
-func GoIntegTest() {
-	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
