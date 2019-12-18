@@ -31358,6 +31358,63 @@ type: long
 --
 
 [float]
+=== network_summary
+
+Metrics relating to global network activity
+
+
+
+*`system.network_summary.ip.*`*::
++
+--
+IP protocol counters
+
+
+type: object
+
+--
+
+*`system.network_summary.tcp.*`*::
++
+--
+TCP protocol counters
+
+
+type: object
+
+--
+
+*`system.network_summary.udp.*`*::
++
+--
+UDP protocol counters
+
+
+type: object
+
+--
+
+*`system.network_summary.udpLite.*`*::
++
+--
+UDP Lite protocol counters
+
+
+type: object
+
+--
+
+*`system.network_summary.icmp.*`*::
++
+--
+ICMP protocol counters
+
+
+type: object
+
+--
+
+[float]
 === process
 
 `process` contains process metadata, CPU metrics, and memory metrics.
