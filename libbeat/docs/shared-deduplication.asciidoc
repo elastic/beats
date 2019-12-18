@@ -1,0 +1,81 @@
+[id="{beatname_lc}-deduplication"]
+== Data deduplication
+
+The {beats} framework guarantees at-least-once delivery to ensure that no data
+is lost when events are sent to {es}. This is great if everything goes as
+planned. But if {beatname_uc} shuts down during processing, or the connection is
+lost before events are acknowledged, you can end up with duplicate events in
+{es}.
+
+[float]
+=== What causes duplicates?
+
+The {beats} retry mechanism may result in duplicate data in {es}.
+
+When an output is blocked, {beatname_uc} will attempt to resend events until
+they are acknowledged by the output. If the output receives the data, but is
+unable to send an acknowledgement, the data may be sent to {es} multiple times.
+When {es} processes the data, it looks for a document ID. If the ID exists,
+{es} overwrites the existing document. If not, {es} creates a new document.
+Because document IDs are typically set by {es} (by default), this problem is
+common for data sent by {beats} or {ls}.
+
+[float]
+=== How can I avoid duplicates?
+
+Rather than allowing {es} to set the document ID, set the ID in {beats}. The ID
+is stored in the {beats} `@metadata.id` field where it can be used to set the
+document ID during indexing. That way, if {beats} sends the same event to {es}
+more than once, {es} overwrites the existing document rather than creating a new
+one.
+
+The `@metadata.id` field is passed along with the event so that you can use
+it to set the document ID later in your processing pipeline, for example, in
+{ls}.
+
+There are several methods available for setting the document ID in {beats}. The
+one you use depends on your specific use case:
+
+TODO: Need some realistic examples to flesh out the following sections. Also need to test these...haha.
+
+* *`add_id` processor*
++
+Use the <<add-id,`add_id`>> processor when your logs have no natural key field,
+and you can’t derive a unique key from existing fields. 
++
+This example generates a unique ID for each event and adds it to the
+`@metadata.id` field:
++
+[source,yaml]
+----
+processors:
+ - add_id: ~
+----
+ 
+* *`fingerprint` processor*
++
+Use the <<fingerprint,`fingerprint`>> processor when you want to derive a unique
+key from multiple existing fields.
++
+This example combines the values of `field1` and `field2` to create a unique key
+that it adds to the `_id` field:
++
+[source,yaml]
+----
+processors:
+ - fingerprint:
+     fields: ["field1", "field2", ...]
+     target_field: "_id"
+----
++
+TODO: Test the syntax. I’m guessing here. 
+
+* *JSON input settings*
++
+Use the `json.document_id` input setting if you’re ingesting JSON-formatted
+data, and the data has a natural key field.
++
+This example sets the document ID to the value of field1 from the JSON document.
++
+TODO: Add an example here. Should show the input config in addition to the JSON
+settings to provide context.

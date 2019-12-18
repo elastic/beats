@@ -30,6 +30,7 @@ The following topics describe how to configure Filebeat:
 * <<load-balancing>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
+* <<{beatname_lc}-deduplication>>
 * <<configuring-ingest-node>>
 * <<{beatname_lc}-geoip>>
 * <<configuration-path>>
@@ -67,6 +68,8 @@ include::./load-balancing.asciidoc[]
 include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 include::./filebeat-filtering.asciidoc[]
+
+include::{libbeat-dir}/shared-deduplication.asciidoc[]
 
 include::{libbeat-dir}/shared-config-ingest.asciidoc[]
 
