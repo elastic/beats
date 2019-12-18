@@ -26,8 +26,6 @@ import (
 
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
 )
 
 // Build builds the Beat binary.
