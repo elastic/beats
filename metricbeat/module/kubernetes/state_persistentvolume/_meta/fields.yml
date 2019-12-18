@@ -16,10 +16,6 @@
     - name: storage_class
       type: keyword
       description: Storage class for the volume
-    - name: labels.*
-      type: object
-      object_type: keyword
-      description: Labels for volume
       
       
 

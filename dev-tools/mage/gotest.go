@@ -101,7 +101,10 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
 	// Build args list to Go.
-	args := []string{"test", "-v"}
+	args := []string{"test"}
+	if mg.Verbose() {
+		args = append(args, "-v")
+	}
 	if params.Race {
 		args = append(args, "-race")
 	}
@@ -123,9 +126,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	// Wire up the outputs.
 	bufferOutput := new(bytes.Buffer)
 	outputs := []io.Writer{bufferOutput}
-	if mg.Verbose() {
-		outputs = append(outputs, os.Stdout)
-	}
+
 	if params.OutputFile != "" {
 		fileOutput, err := os.Create(createDir(params.OutputFile))
 		if err != nil {
@@ -135,8 +136,8 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		outputs = append(outputs, fileOutput)
 	}
 	output := io.MultiWriter(outputs...)
-	goTest.Stdout = output
-	goTest.Stderr = output
+	goTest.Stdout = io.MultiWriter(output, os.Stdout)
+	goTest.Stderr = io.MultiWriter(output, os.Stderr)
 
 	// Execute 'go test' and measure duration.
 	start := time.Now()

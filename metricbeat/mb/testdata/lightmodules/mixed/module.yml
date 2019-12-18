@@ -1,0 +1,4 @@
+name: mixed
+metricsets:
+- light
+- standard

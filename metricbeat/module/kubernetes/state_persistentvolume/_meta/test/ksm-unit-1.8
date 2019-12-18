@@ -28,6 +28,8 @@ kube_persistentvolume_status_phase{persistentvolume="test-pv-available",phase="R
 # HELP kube_persistentvolume_info Information about persistentvolume.
 # TYPE kube_persistentvolume_info gauge
 kube_persistentvolume_info{persistentvolume="test-pv-available",storageclass=""} 1
+kube_persistentvolume_info{persistentvolume="test-labeled-pv",storageclass=""} 1
+kube_persistentvolume_info{persistentvolume="test-unlabeled-pv",storageclass="sc1"} 1
 # HELP kube_persistentvolume_labels Kubernetes labels converted to Prometheus labels.
 # TYPE kube_persistentvolume_labels gauge
 kube_persistentvolume_labels{label_app="mysql-server",persistentvolume="test-labeled-pv"} 1
@@ -35,3 +37,5 @@ kube_persistentvolume_labels{persistentvolume="test-unlabeled-pv"} 1
 # HELP kube_persistentvolume_capacity_bytes Persistentvolume capacity in bytes.
 # TYPE kube_persistentvolume_capacity_bytes gauge
 kube_persistentvolume_capacity_bytes{persistentvolume="test-pv"} 5.36870912e+09
+kube_persistentvolume_capacity_bytes{persistentvolume="test-labeled-pv"} 5.36870912e+09
+kube_persistentvolume_capacity_bytes{persistentvolume="test-unlabeled-pv"} 5.36870912e+09

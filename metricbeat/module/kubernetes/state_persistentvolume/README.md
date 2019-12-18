@@ -13,6 +13,20 @@ See the metricset documentation for the configuration reference.
 
 ## Manual testing
 
-// TODO
+Running a minikube cluster allows you to create persistent volume using the `/data/` directory at hostpath
 
-Then run metricbeat pointing to the kube-state-metrics endpoint.
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv0001
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /data/pv0001/
+```
+
+Try adding labels, and creating volumes from pods using PVC.

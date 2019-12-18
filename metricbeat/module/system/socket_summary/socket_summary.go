@@ -148,7 +148,7 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// all network connections
-	conns, err := net.Connections("inet")
+	conns, err := connections("inet")
 
 	if err != nil {
 		return errors.Wrap(err, "error getting connections")
