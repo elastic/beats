@@ -497,21 +497,22 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 		m["question"] = qMapStr
 
 		eTLDPlusOne, err := publicsuffix.EffectiveTLDPlusOne(q.Name)
-		if err == nil {
+		if err == nil && eTLDPlusOne != "" {
+			eTLDPlusOne = strings.TrimRight(eTLDPlusOne, ".")
+
 			// etld_plus_one should be removed for 8.0.0.
 			qMapStr["etld_plus_one"] = eTLDPlusOne
 			qMapStr["registered_domain"] = eTLDPlusOne
 
-			if eTLDPlusOne != "" && strings.Contains(eTLDPlusOne, ".") {
-				topLevelDomain := strings.Join(strings.Split(eTLDPlusOne, ".")[1:], ".")
-				qMapStr["top_level_domain"] = topLevelDomain
-
-				subdomain := strings.Trim(strings.TrimSuffix(q.Name, eTLDPlusOne), ".")
-				if subdomain != "" {
-					qMapStr["subdomain"] = subdomain
-				}
+			if idx := strings.IndexByte(eTLDPlusOne, '.'); idx != -1 {
+				qMapStr["top_level_domain"] = eTLDPlusOne[idx+1:]
 			}
-		} else if strings.Contains(err.Error(), "cannot derive eTLD+1 for domain") && strings.Count(q.Name, ".") == 1 {
+
+			subdomain := strings.TrimRight(strings.TrimSuffix(q.Name, eTLDPlusOne), ".")
+			if subdomain != "" {
+				qMapStr["subdomain"] = subdomain
+			}
+		} else if strings.Count(q.Name, ".") == 1 {
 			// Handle publicsuffix.EffectiveTLDPlusOne eTLD+1 error with 1 dot in the domain.
 			s := strings.Split(q.Name, ".")
 			if len(s) == 2 && s[1] != "" {
