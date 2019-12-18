@@ -23,6 +23,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("Skip flaky test")
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
