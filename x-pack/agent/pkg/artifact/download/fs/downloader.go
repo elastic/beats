@@ -21,13 +21,15 @@ const (
 
 // Downloader is a downloader able to fetch artifacts from elastic.co web page.
 type Downloader struct {
-	config *artifact.Config
+	dropPath string
+	config   *artifact.Config
 }
 
 // NewDownloader creates and configures Elastic Downloader
 func NewDownloader(config *artifact.Config) *Downloader {
 	return &Downloader{
-		config: config,
+		config:   config,
+		dropPath: getDropPath(config),
 	}
 }
 
@@ -60,7 +62,7 @@ func (e *Downloader) download(operatingSystem, programName, version string) (str
 		return "", errors.New(err, "generating package path failed")
 	}
 
-	sourcePath := filepath.Join(e.getDropPath(), filename)
+	sourcePath := filepath.Join(e.dropPath, filename)
 	sourceFile, err := os.Open(sourcePath)
 	if err != nil {
 		return "", errors.New(err, fmt.Sprintf("package '%s' not found", sourcePath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
@@ -77,19 +79,17 @@ func (e *Downloader) download(operatingSystem, programName, version string) (str
 	return fullPath, nil
 }
 
-func (e *Downloader) getDropPath() string {
-	fmt.Println("drop path?")
-	fmt.Println(e.config.DropPath)
+func getDropPath(cfg *artifact.Config) string {
 	// if drop path is not provided fallback to beats subfolder
-	if e.config.DropPath == "" {
+	if cfg == nil || cfg.DropPath == "" {
 		return beatsSubfolder
 	}
 
 	// if droppath does not exist fallback to beats subfolder
-	stat, err := os.Stat(e.config.DropPath)
+	stat, err := os.Stat(cfg.DropPath)
 	if err != nil || !stat.IsDir() {
 		return beatsSubfolder
 	}
 
-	return e.config.DropPath
+	return cfg.DropPath
 }
