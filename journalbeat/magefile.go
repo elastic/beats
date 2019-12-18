@@ -33,6 +33,8 @@ import (
 
 	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
 )
 
 func init() {
@@ -117,11 +119,6 @@ func Fields() error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoIntegTest executes integration tests (it uses Docker to run the tests).
-func GoIntegTest() {
-	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
 
 // -----------------------------------------------------------------------------
