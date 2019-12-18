@@ -18,13 +18,15 @@
 package network_summary
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
 // eventMapping maps the network counters to a MapStr that wil be sent to report.Event
 func eventMapping(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
-
+	fmt.Printf("%#v\n", raw)
 	eventByProto := common.MapStr{
 		"ip":      combineMap(raw.Netstat.IPExt, raw.SNMP.IP),
 		"tcp":     combineMap(raw.Netstat.TCPExt, raw.SNMP.TCP),
@@ -36,14 +38,13 @@ func eventMapping(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
 	return eventByProto
 }
 
+// combineMap concatinates two given maps
 func combineMap(map1, map2 map[string]int64) map[string]int64 {
-
-	var compMap map[string]int64
+	var compMap = make(map[string]int64)
 
 	for k, v := range map1 {
 		compMap[k] = v
 	}
-
 	for k, v := range map2 {
 		compMap[k] = v
 	}
