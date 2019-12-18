@@ -127,7 +127,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 func (s *metadataCollector) instance(ctx context.Context, instanceID, zone string) (i *compute.Instance, err error) {
 	service, err := compute.NewService(ctx, s.opt...)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "error getting client from Compute service")
 	}
 
 	instanceCachedData := s.instanceCache.Get(instanceID)
@@ -139,7 +139,7 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID, zone strin
 
 	instanceData, err := service.Instances.Get(s.projectID, zone, instanceID).Do()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "error getting instance information for instance with ID '%s'", instanceID)
 	}
 	s.instanceCache.Put(instanceID, instanceData)
 

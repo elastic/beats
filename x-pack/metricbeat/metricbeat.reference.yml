@@ -435,7 +435,7 @@ metricbeat.modules:
   zone: "your zone"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
-  include_labels: true
+  exclude_labels: false
   period: 300s
 
 #------------------------------- Graphite Module -------------------------------

@@ -26,6 +26,7 @@ type incomingFieldExtractor struct {
 	logger *logp.Logger
 }
 
+// KeyValuePoint is a struct to capture the information parsed in an instant of a single metric
 type KeyValuePoint struct {
 	Key       string
 	Value     interface{}

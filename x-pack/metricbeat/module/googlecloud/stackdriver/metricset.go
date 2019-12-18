@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	METRICSET_NAME = "stackdriver"
+	MetricsetName = "stackdriver"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -30,7 +30,7 @@ const (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(googlecloud.ModuleName, METRICSET_NAME, New)
+	mb.Registry.MustAddMetricSet(googlecloud.ModuleName, MetricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -46,17 +46,18 @@ type config struct {
 	Metrics             []string `config:"stackdriver.metrics" validate:"required"`
 	Zone                string   `config:"zone" validate:"required"`
 	ProjectID           string   `config:"project_id" validate:"required"`
-	IncludeLabels       bool     `config:"include_labels"`
+	ExcludeLabels       bool     `config:"exclude_labels"`
 	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 
-	opt []option.ClientOption
+	credentialsOption option.ClientOption
+	opt               []option.ClientOption
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The gcp '%s' metricset is beta.", METRICSET_NAME)
+	cfgwarn.Beta("The gcp '%s' metricset is beta.", MetricsetName)
 
 	m := &MetricSet{BaseMetricSet: base}
 
@@ -64,8 +65,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	m.config.opt = []option.ClientOption{
-		option.WithCredentialsFile(m.config.CredentialsFilePath),
+	m.config.credentialsOption = option.WithCredentialsFile(m.config.CredentialsFilePath)
+
+	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
+		return nil, err
 	}
 
 	return m, nil
@@ -81,11 +84,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	}
 
 	httpClientOption := option.WithHTTPClient(httpClient)
-	m.config.opt = append(m.config.opt, httpClientOption)
-
-	if err = validatePeriodForGCP(m.Module().Config().Period); err != nil {
-		return err
-	}
+	m.config.opt = []option.ClientOption{m.config.credentialsOption, httpClientOption}
 
 	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
 	if err != nil {
@@ -127,7 +126,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 	var gcpService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 	// Override default metadata service labels are ON and service is known
-	if m.config.IncludeLabels {
+	if m.config.ExcludeLabels {
 		if gcpService, err = NewMetadataServiceForConfig(m.config); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}

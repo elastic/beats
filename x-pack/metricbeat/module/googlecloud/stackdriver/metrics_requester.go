@@ -10,14 +10,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
 )
 
