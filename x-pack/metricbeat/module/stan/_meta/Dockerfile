@@ -19,7 +19,7 @@ ADD healthcheck.sh /healthcheck.sh
 RUN ["chmod", "+x", "/healthcheck.sh"]
 ADD run.sh /run.sh
 
-# Healthcheck waits until channels have been created by the benchamrk that runs inside
+# Healthcheck waits until channels have been created by the benchmark that runs inside
 HEALTHCHECK --interval=1s --retries=100 CMD /healthcheck.sh
 
 # Run with default memory based store
