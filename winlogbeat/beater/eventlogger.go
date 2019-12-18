@@ -59,7 +59,7 @@ func newEventLogger(
 		return nil, err
 	}
 
-	processors, err := processors.New(config.Processors)
+	processors, err := processorsForConfig(beatInfo, config)
 	if err != nil {
 		return nil, err
 	}
