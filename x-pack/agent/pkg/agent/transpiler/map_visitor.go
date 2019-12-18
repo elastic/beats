@@ -20,6 +20,11 @@ func (m *MapVisitor) OnInt(v int) {
 	m.Content = v
 }
 
+// OnUInt is called when we visit a UintVal.
+func (m *MapVisitor) OnUInt(v uint64) {
+	m.Content = v
+}
+
 // OnFloat is called when we visit a FloatVal.
 func (m *MapVisitor) OnFloat(v float64) {
 	m.Content = v
