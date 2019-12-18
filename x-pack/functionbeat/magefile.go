@@ -149,7 +149,7 @@ func BuildSystemTestBinary() error {
 	return nil
 }
 
-// GoIntegTest executes integration tests (it uses Docker to run the tests).
+// IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
