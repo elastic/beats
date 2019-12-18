@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -201,7 +200,6 @@ func TestNormalizeValue(t *testing.T) {
 	var nilStringPtr *string
 	var nilTimePtr *time.Time
 	someString := "foo"
-	uuidValue := uuid.NewV1()
 
 	type mybool bool
 	type myint int32
@@ -212,11 +210,10 @@ func TestNormalizeValue(t *testing.T) {
 		out interface{}
 	}{
 		{nil, nil},
-		{&someString, someString},       // Pointers are dereferenced.
-		{nilStringPtr, nil},             // Nil pointers are dropped.
-		{nilTimePtr, nil},               // Nil pointers are dropped.
-		{uuidValue, uuidValue.String()}, // Struct that honors the TextMarshaler contract.
-		{NetString("test"), "test"},     // It honors the TextMarshaler contract.
+		{&someString, someString},   // Pointers are dereferenced.
+		{nilStringPtr, nil},         // Nil pointers are dropped.
+		{nilTimePtr, nil},           // Nil pointers are dropped.
+		{NetString("test"), "test"}, // It honors the TextMarshaler contract.
 		{true, true},
 		{int8(8), int8(8)},
 		{uint8(8), uint8(8)},
