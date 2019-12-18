@@ -45,7 +45,7 @@ type testLogger struct {
 	t *testing.T
 }
 
-type silentLogger struct {}
+type silentLogger struct{}
 
 func init() {
 	flag.Int64Var(&seed, "seed", time.Now().UnixNano(), "test random seed")
@@ -157,9 +157,9 @@ func (l *testLogger) reportf(level string, str string, vs []interface{}) {
 	}
 }
 
-func (*silentLogger) Debug(vs ...interface{}) {}
+func (*silentLogger) Debug(vs ...interface{})              {}
 func (*silentLogger) Debugf(fmt string, vs ...interface{}) {}
-func (*silentLogger) Info(vs ...interface{})              {}
-func (*silentLogger) Infof(fmt string, vs ...interface{}) {}
-func (*silentLogger) Error(vs ...interface{}) {}
+func (*silentLogger) Info(vs ...interface{})               {}
+func (*silentLogger) Infof(fmt string, vs ...interface{})  {}
+func (*silentLogger) Error(vs ...interface{})              {}
 func (*silentLogger) Errorf(fmt string, vs ...interface{}) {}
