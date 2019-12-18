@@ -163,12 +163,12 @@ class Test(metricbeat.BaseTest):
 
     def start_basic(self, es):
         # Check if basic license is already enabled
-        response = es.transport.perform_request('GET', self.license_url)
+        response = es.transport.perform_request('GET', "/_xpack/license")
         if response["license"]["type"] == "basic":
             return
 
         try:
-            es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true")
+            es.transport.perform_request('POST', "/_xpack/license/start_basic?acknowledge=true")
         except:
             e = sys.exc_info()[0]
             print "Basic license already enabled. Error: {}".format(e)
