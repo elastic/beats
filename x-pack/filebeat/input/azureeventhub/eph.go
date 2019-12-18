@@ -1,7 +1,13 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package azureeventhub
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/Azure/azure-event-hubs-go/v2"
 	"github.com/Azure/azure-event-hubs-go/v2/eph"
 	"github.com/Azure/azure-event-hubs-go/v2/storage"
@@ -20,20 +26,18 @@ func (a azureInput) runWithEPH() error {
 	if err != nil {
 		return err
 	}
-	var eventProcessorHost *eph.EventProcessorHost
-	ctx, cancel := context.WithCancel(a.workerCtx)
-	defer cancel()
+	// adding a nil EventProcessorHostOption will break the code, this is why a condition is added and a.processor is assigned
 	if a.config.ConsumerGroup != "" {
-		eventProcessorHost, err = eph.NewFromConnectionString(
-			ctx,
-			a.config.ConnectionString+eventHubConnector+a.config.EventHubName,
+		a.processor, err = eph.NewFromConnectionString(
+			a.workerCtx,
+			fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName),
 			leaserCheckpointer,
 			leaserCheckpointer,
 			eph.WithConsumerGroup(a.config.ConsumerGroup))
 	} else {
-		eventProcessorHost, err = eph.NewFromConnectionString(
-			ctx,
-			a.config.ConnectionString+eventHubConnector+a.config.EventHubName,
+		a.processor, err = eph.NewFromConnectionString(
+			a.workerCtx,
+			fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName),
 			leaserCheckpointer,
 			leaserCheckpointer)
 	}
@@ -42,21 +46,21 @@ func (a azureInput) runWithEPH() error {
 	}
 
 	// register a message handler -- many can be registered
-	handlerID, err := eventProcessorHost.RegisterHandler(ctx,
+	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
-			return a.processEvents(e.Data)
+			return a.processEvents(e, "")
 		})
 	if err != nil {
 		return err
 	}
 
-	a.log.Info("handler id: %q is running\n", handlerID)
+	a.log.Infof("handler id: %q is running\n", handlerID)
 
 	// unregister a handler to stop that handler from receiving events
 	// processor.UnregisterHandler(ctx, handleID)
 
 	// start handling messages from all of the partitions balancing across multiple consumers
-	err = eventProcessorHost.StartNonBlocking(ctx)
+	err = a.processor.StartNonBlocking(a.workerCtx)
 	if err != nil {
 		return err
 	}

@@ -1,18 +1,20 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package azureeventhub
 
 import "errors"
 
 type azureInputConfig struct {
-	// Kafka hosts with port, e.g. "localhost:9092"
 	ConnectionString string `config:"connection_string" validate:"required"`
 	EventHubName     string `config:"eventhub" validate:"required"`
 	ConsumerGroup    string `config:"consumer_group"`
 	EPHEnabled       bool   `config:"enable_eph"`
-	SAName           string `config:"storage_account"`
-	SAKey            string `config:"storage_account_key"`
-	SAContainer      string `config:"storage_account_container"`
 	// Azure Storage container to store leases and checkpoints
-
+	SAName      string `config:"storage_account"`
+	SAKey       string `config:"storage_account_key"`
+	SAContainer string `config:"storage_account_container"`
 }
 
 const ephContainerName = "ephcontainer"

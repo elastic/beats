@@ -1,19 +1,27 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package azureeventhub
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/Azure/azure-event-hubs-go/v2/persist"
 	"sync"
 	"time"
+
+	"github.com/Azure/azure-event-hubs-go/v2/persist"
+
+	"github.com/elastic/beats/libbeat/paths"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/pkg/errors"
 
 	"github.com/Azure/azure-event-hubs-go/v2"
 	"github.com/Azure/azure-event-hubs-go/v2/eph"
@@ -22,16 +30,18 @@ import (
 var eventHubConnector = ";EntityPath="
 var expandEventListFromField = "records"
 
+// azureInput struct for the azure-eventhub input
 type azureInput struct {
-	config       azureInputConfig
+	config       azureInputConfig // azure-eventhub configuration
 	context      input.Context
 	outlet       channel.Outleter
-	log          *logp.Logger
-	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
-	workerCancel context.CancelFunc // Used to signal that the worker should stop.
-	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup     // Waits on worker goroutine.
-	processor    *eph.EventProcessorHost
+	log          *logp.Logger            // logging info and error messages
+	workerCtx    context.Context         // worker goroutine context. It's cancelled when the input stops or the worker exits.
+	workerCancel context.CancelFunc      // used to signal that the worker should stop.
+	workerOnce   sync.Once               // guarantees that the worker goroutine is only started once.
+	workerWg     sync.WaitGroup          // waits on worker goroutine.
+	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
+	hub          *eventhub.Hub           // hub will be assigned
 }
 
 const (
@@ -53,7 +63,7 @@ func NewInput(
 ) (input.Input, error) {
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading azure eventhub input config")
+		return nil, errors.Wrapf(err, "reading %s input config", inputName)
 	}
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
@@ -80,14 +90,14 @@ func NewInput(
 
 	input := &azureInput{
 		config:       config,
-		log:          logp.NewLogger("azure eventhub input").With("connection string", config.ConnectionString),
+		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", config.ConnectionString),
 		outlet:       out,
 		context:      inputContext,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 	}
 
-	input.log.Info("Initialized azure eventhub input.")
+	input.log.Infof("Initialized %s input.", inputName)
 	return input, nil
 }
 
@@ -97,8 +107,8 @@ func (a *azureInput) Run() {
 	a.workerOnce.Do(func() {
 		a.workerWg.Add(1)
 		go func() {
-			a.log.Info("azure eventhub input worker has started.")
-			defer a.log.Info("azure eventhub input worker has stopped.")
+			a.log.Infof("%s input worker has started.", inputName)
+			defer a.log.Infof("%s input worker has stopped.", inputName)
 			defer a.workerWg.Done()
 			defer a.workerCancel()
 			var err error
@@ -117,19 +127,20 @@ func (a *azureInput) Run() {
 
 // run runs the input
 func (a *azureInput) run() error {
-	persister, err := persist.NewFilePersister("C:\\Users\\Mariana\\Downloads\\New folder (2)\\Folder nou")
-	if err != nil {
-		// handle err
-	}
-	hub, err := eventhub.NewHubFromConnectionString(a.config.ConnectionString+eventHubConnector+a.config.EventHubName, eventhub.HubWithOffsetPersistence(persister))
-	ctx, cancel := context.WithCancel(a.workerCtx)
-	defer cancel()
+	persister, err := persist.NewFilePersister(fmt.Sprintf("%s/azureventhubpersister", paths.Data))
 	if err != nil {
 		return err
 	}
+	hubs, err := eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName), eventhub.HubWithOffsetPersistence(persister))
+	//ctx, cancel := context.WithCancel(a.workerCtx)
+	//defer cancel()
+	if err != nil {
+		return err
+	}
+	a.hub = hubs
 
 	// listen to each partition of the Event Hub
-	runtimeInfo, err := hub.GetRuntimeInformation(ctx)
+	runtimeInfo, err := a.hub.GetRuntimeInformation(a.workerCtx)
 	if err != nil {
 		return err
 	}
@@ -144,14 +155,13 @@ func (a *azureInput) run() error {
 		// Receive blocks while attempting to connect to hub, then runs until listenerHandle.Close() is called
 		// <- listenerHandle.Done() signals listener has stopped
 		// listenerHandle.Err() provides the last error the receiver encountered
-		listenerHandle, err := hub.Receive(
-			ctx,
+		_, err := a.hub.Receive(
+			a.workerCtx,
 			partitionID,
 			func(c context.Context, event *eventhub.Event) error {
-				return a.processEvents(event.Data)
+				return a.processEvents(event, partitionID)
 			},
 			receiveOption)
-		_ = listenerHandle
 		if err != nil {
 			return err
 		}
@@ -169,6 +179,18 @@ func (a *azureInput) run() error {
 
 // Stop stops TCP server
 func (a *azureInput) Stop() {
+	if a.hub != nil {
+		err := a.hub.Close(a.workerCtx)
+		if err != nil {
+			a.log.Errorw(fmt.Sprintf("error while closing eventhub"), "error", err)
+		}
+	}
+	if a.processor != nil {
+		err := a.processor.Close(a.workerCtx)
+		if err != nil {
+			a.log.Errorw(fmt.Sprintf("error while closing eventhostprocessor"), "error", err)
+		}
+	}
 	a.workerCancel()
 	a.workerWg.Wait()
 }
@@ -178,8 +200,31 @@ func (a *azureInput) Wait() {
 	a.Stop()
 }
 
-func (a *azureInput) processEvents(raw []byte) error {
-	events := a.createEvents(raw)
+func (a *azureInput) processEvents(event *eventhub.Event, partitionId string) error {
+	// timestamp temp disabled as the event date is applied for now, will be replaced
+	//timestamp := time.Now()
+	var events []beat.Event
+	azure := common.MapStr{
+		"partition_id":   partitionId,
+		"eventhub":       a.config.EventHubName,
+		"consumer_group": a.config.ConsumerGroup,
+	}
+	messages := a.parseMultipleMessages(event.Data)
+	for _, msg := range messages {
+		for key, value := range msg {
+			azure.Put("offset", event.SystemProperties.Offset)
+			azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+			azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+			event := beat.Event{
+				Timestamp: key,
+				Fields: common.MapStr{
+					"message": value,
+					"azure":   azure,
+				},
+			}
+			events = append(events, event)
+		}
+	}
 	for _, event := range events {
 		ok := a.outlet.OnEvent(event)
 		if !ok {
@@ -187,25 +232,6 @@ func (a *azureInput) processEvents(raw []byte) error {
 		}
 	}
 	return nil
-}
-
-func (a *azureInput) createEvents(message []byte) []beat.Event {
-	// timestamp temp disabled as the event date is applied for now, will be replaced
-	//timestamp := time.Now()
-	var events []beat.Event
-	messages := a.parseMultipleMessages(message)
-	for _, msg := range messages {
-		for key, value := range msg {
-			event := beat.Event{
-				Timestamp: key,
-				Fields: common.MapStr{
-					"message": value,
-				},
-			}
-			events = append(events, event)
-		}
-	}
-	return events
 }
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
