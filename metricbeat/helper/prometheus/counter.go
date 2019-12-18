@@ -49,7 +49,7 @@ type counterCache struct {
 	timeout time.Duration
 }
 
-// NewCounterCache initializes and returns a CounterCache. // The timeout parameter will be
+// NewCounterCache initializes and returns a CounterCache. The timeout parameter will be
 // used to automatically expire counters that hasn't been updated in a whole timeout period
 func NewCounterCache(timeout time.Duration) CounterCache {
 	return &counterCache{
