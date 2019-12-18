@@ -58,11 +58,8 @@ func (p *Periodic) WaitTick() <-chan time.Time {
 		return p.Ticker.C
 	}
 
-	rC := make(chan time.Time)
-	go func(c chan time.Time) {
-		c <- time.Now()
-	}(rC)
-
+	rC := make(chan time.Time, 1)
+	rC <- time.Now()
 	p.ran = true
 
 	return rC
