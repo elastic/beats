@@ -561,7 +561,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `index` option to all modules to specify a module-specific output index. {pull}15100[15100]
 - Add a `system/service` metricset for systemd data. {pull}14206[14206]
 
-
 *Packetbeat*
 
 - Update DNS protocol plugin to produce events with ECS fields for DNS. {issue}13320[13320] {pull}13354[13354]
