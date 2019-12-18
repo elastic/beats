@@ -5,9 +5,11 @@
 package ec2
 
 import (
-	"context"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -16,8 +18,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -58,7 +58,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		// set default region to make initial aws api call
 		awsCfg.Region = "us-west-1"
 		svcEC2 := ec2.New(awsCfg)
-		completeRegionsList, err := getRegions(svcEC2)
+		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
 			return nil, err
 		}
@@ -141,18 +141,4 @@ func (p *Provider) onWatcherStop(arn string) {
 
 func (p *Provider) String() string {
 	return "aws_ec2"
-}
-
-func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error) {
-	input := &ec2.DescribeRegionsInput{}
-	req := svc.DescribeRegionsRequest(input)
-	output, err := req.Send(context.TODO())
-	if err != nil {
-		err = errors.Wrap(err, "Failed DescribeRegions")
-		return
-	}
-	for _, region := range output.Regions {
-		completeRegionsList = append(completeRegionsList, *region.RegionName)
-	}
-	return
 }

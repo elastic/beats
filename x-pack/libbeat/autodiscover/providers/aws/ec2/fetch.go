@@ -16,8 +16,6 @@ import (
 	awsauto "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws"
 )
 
-const logSelector = "autodiscover-ec2-fetch"
-
 // fetcher is an interface that can fetch a list of ec2Instance objects without pagination being necessary.
 type fetcher interface {
 	fetch(ctx context.Context) ([]*ec2Instance, error)
@@ -91,6 +89,7 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 		taskPool:  sync.Pool{},
 		context:   ctx,
 		cancel:    cancel,
+		logger:    logp.NewLogger("autodiscover-ec2-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects
@@ -114,6 +113,7 @@ type fetchRequest struct {
 	pendingTasks sync.WaitGroup
 	context      context.Context
 	cancel       func()
+	logger       *logp.Logger
 }
 
 func (p *fetchRequest) fetch() ([]*ec2Instance, error) {
@@ -140,14 +140,14 @@ func (p *fetchRequest) fetchAllPages() {
 	for {
 		select {
 		case <-p.context.Done():
-			logp.Debug(logSelector, "done fetching EC2 instances, context cancelled")
+			p.logger.Debug("done fetching EC2 instances, context cancelled")
 			return
 		default:
 			if !p.fetchNextPage() {
-				logp.Debug(logSelector, "fetched all EC2 instances")
+				p.logger.Debug("fetched all EC2 instances")
 				return
 			}
-			logp.Debug(logSelector, "fetched EC2 instance")
+			p.logger.Debug("fetched EC2 instance")
 		}
 	}
 }

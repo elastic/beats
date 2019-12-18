@@ -5,8 +5,7 @@
 package elb
 
 import (
-	"context"
-
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"github.com/gofrs/uuid"
@@ -48,6 +47,26 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
+	awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+		AccessKeyID:     config.AWSConfig.AccessKeyID,
+		SecretAccessKey: config.AWSConfig.SecretAccessKey,
+		SessionToken:    config.AWSConfig.SessionToken,
+		ProfileName:     config.AWSConfig.ProfileName,
+	})
+
+	// Construct MetricSet with a full regions list if there is no region specified.
+	if config.Regions == nil {
+		// set default region to make initial aws api call
+		awsCfg.Region = "us-west-1"
+		svcEC2 := ec2.New(awsCfg)
+		completeRegionsList, err := awsauto.GetRegions(svcEC2)
+		if err != nil {
+			return nil, err
+		}
+
+		config.Regions = completeRegionsList
+	}
+
 	var clients []elasticloadbalancingv2iface.ClientAPI
 	for _, region := range config.Regions {
 		awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
@@ -63,7 +82,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		clients = append(clients, elasticloadbalancingv2.New(awsCfg))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(context.TODO(), clients))
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients))
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
