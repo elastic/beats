@@ -16,6 +16,10 @@ type dispatcher interface {
 	Dispatch(...action) error
 }
 
+// fleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
+// bidirectionnal commmmunication requirements. The gateway aggregates events and will periodically
+// call the API to send the events and will receive actions to be executed locally.
+// The only supported action for now is a "ActionPolicyChange".
 type fleetGateway struct {
 	log        *logger.Logger
 	dispatcher dispatcher
@@ -84,6 +88,7 @@ func (f *fleetGateway) worker() {
 			if err := f.dispatcher.Dispatch(actions...); err != nil {
 				f.log.Error(err)
 			}
+
 			f.log.Debug("FleetGateway sleeping")
 		case <-f.done:
 			return
@@ -92,6 +97,7 @@ func (f *fleetGateway) worker() {
 }
 
 func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
+	// TODO(ph): Aggregates and send events.
 	cmd := fleetapi.NewCheckinCmd(f.agentID, f.client)
 
 	req := &fleetapi.CheckinRequest{}
