@@ -10,7 +10,7 @@ RUN cd src/github.com/nats-io/stan.go/examples/stan-bench && git checkout tags/v
 # create an enhanced container with nc command available since nats is based
 # on scratch image making healthcheck impossible
 FROM alpine:latest
-RUN apk add --no-cache --upgrade bash curl jq
+RUN apk add --no-cache --upgrade bash
 COPY --from=0 nats-streaming-server /nats-streaming-server
 COPY --from=build-env /go/src/github.com/nats-io/stan.go/examples/stan-bench/stan-bench /stan-bench
 # Expose client, management, and cluster ports

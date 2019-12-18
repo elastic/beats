@@ -1,6 +1,6 @@
 #!/bin/bash
 
-res=$(curl -s http://0.0.0.0:8222/streaming/channelsz | jq '.count')
+res=$(wget -q -O - http://0.0.0.0:8222/streaming/channelsz | egrep -e '"count": (\d)+,' | cut -d":" -f2 |cut -d"," -f1 | xargs)
 
 if [[ $res = 0 ]]; then
 	exit 1
