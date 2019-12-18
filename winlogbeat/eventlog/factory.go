@@ -28,7 +28,7 @@ import (
 )
 
 var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
-	"tags", "processors"}
+	"tags", "processors", "index"}
 
 // ConfigCommon is the common configuration data used to instantiate a new
 // EventLog. Each implementation is free to support additional configuration
@@ -38,7 +38,6 @@ type ConfigCommon struct {
 	Name string `config:"name"`
 	// Name of the API to use. Optional.
 	API string `config:"api"`
-	// Index name for events from this event log. Optional.
 }
 
 type validator interface {
