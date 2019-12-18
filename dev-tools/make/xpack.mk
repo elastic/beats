@@ -44,7 +44,7 @@ stop-environment:
 
 .PHONY: testsuite
 testsuite: mage
-	-rm build/TEST-go-integration.out
+	rm -f build/TEST-go-integration.out
 	mage update build unitTest integTest || ( cat build/TEST-go-integration.out && false )
 
 .PHONY: update
