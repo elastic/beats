@@ -118,7 +118,13 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 	}
 }
 
-// GoTestIntegrationForModule executes the Go integration tests.
+// GoTestIntegrationForModule executes the Go integration tests sequentially.
+// Currently all test cases must be present under "./module" directory.
+//
+// Motivation: previous implementation executed all integration tests at once,
+// causing high CPU load, high memory usage and resulted in timeouts.
+//
+// This method executes integration tests for a single module at a time.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegrationForModule(ctx context.Context) error {
