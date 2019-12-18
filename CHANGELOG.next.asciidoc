@@ -41,16 +41,11 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Heartbeat*
 
-- Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
 
 *Journalbeat*
 
-- Use backoff when no new events are found. {pull}11861[11861]
-
 *Metricbeat*
 
-- Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
-- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 
 *Packetbeat*
 
@@ -114,3 +109,4 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 *Winlogbeat*
 
 *Functionbeat*
+
