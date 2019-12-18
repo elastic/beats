@@ -23,6 +23,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	// see: https://github.com/elastic/beats/issues/15180
 	t.Skip("Skip flaky test")
 	service := compose.EnsureUp(t, "stan")
 
