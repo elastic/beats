@@ -113,6 +113,29 @@ func TestAST(t *testing.T) {
 				},
 			},
 		},
+		"support unsigned integers": {
+			hashmap: map[string]interface{}{
+				"timeout": 12,
+				"range":   []uint64{20, 30, 40},
+			},
+			ast: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "range",
+							value: &List{
+								[]Node{
+									&UIntVal{value: uint64(20)},
+									&UIntVal{value: uint64(30)},
+									&UIntVal{value: uint64(40)},
+								},
+							},
+						},
+						&Key{name: "timeout", value: &IntVal{value: 12}},
+					},
+				},
+			},
+		},
 		"support floats": {
 			hashmap: map[string]interface{}{
 				"ratio":   0.5,

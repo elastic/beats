@@ -397,7 +397,9 @@ func load(val reflect.Value) (Node, error) {
 		return &StrVal{value: val.Interface().(string)}, nil
 	case reflect.Int, reflect.Int64:
 		return &IntVal{value: val.Interface().(int)}, nil
-	case reflect.Uint, reflect.Uint64:
+	case reflect.Uint:
+		return &UIntVal{value: uint64(val.Interface().(uint))}, nil
+	case reflect.Uint64:
 		return &UIntVal{value: val.Interface().(uint64)}, nil
 	case reflect.Float64:
 		return &FloatVal{value: val.Interface().(float64)}, nil
@@ -441,6 +443,8 @@ func (a *AST) dispatch(n Node, visitor Visitor) {
 		visitor.OnStr(t.value)
 	case *IntVal:
 		visitor.OnInt(t.value)
+	case *UIntVal:
+		visitor.OnUInt(t.value)
 	case *BoolVal:
 		visitor.OnBool(t.value)
 	case *FloatVal:
