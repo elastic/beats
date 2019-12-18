@@ -82,7 +82,6 @@ func main() {
 	}
 
 	ioutil.WriteFile(output, data, 0640)
-
 	return
 }
 

@@ -1,33 +1,39 @@
 {
-    "actions": [
-        {
-            "type": "POLICY_CHANGE",
-            "id": "id-1",
-            "data": {
-                "policy": {
-                    "id": "policy-id",
-                    "outputs": {
-                        "default": {
-                            "hosts": "https://localhost:9200"
-                        }
-                    },
-                    "streams": [
-                        {
-                            "id": "string",
-                            "type": "logs",
-                            "path": "/var/log/hello.log",
-                            "output": {
-                                "use_output": "default"
-                            }
-                        }
-                    ]
-                }
+  "action": "checkin",
+  "success": true,
+  "actions": [
+    {
+      "type": "POLICY_CHANGE",
+      "data": {
+        "policy": {
+          "id": "default",
+          "outputs": {
+            "default": {
+              "id": "default",
+              "name": "default",
+              "type": "elasticsearch",
+              "hosts": "http://localhost:9200",
+              "ingest_pipeline": "default"
             }
-        },
-        {
-            "type": "WHAT_TO_DO_WITH_IT",
-            "id": "id2"
+          },
+          "streams": [
+            {
+              "type": "metric/nginx",
+              "metricsets": [
+                "stubstatus"
+              ],
+              "period": "10s",
+              "enabled": true,
+              "hosts": "http://127.0.0.1",
+              "id": "stubstatus",
+              "output": {
+                "use_output": "default"
+              }
+            }
+          ]
         }
-    ],
-    "success": true
+      },
+      "id": "6d22f55a-d6e8-4e52-bcaa-16dde6091c5c"
+    }
+  ]
 }
