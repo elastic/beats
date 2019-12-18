@@ -10,6 +10,7 @@ type Visitor interface {
 	OnList() VisitorList
 	OnStr(string)
 	OnInt(int)
+	OnUInt(uint64)
 	OnFloat(float64)
 	OnBool(bool)
 }
