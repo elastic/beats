@@ -157,15 +157,11 @@ jobs:
       stage: test
 
     - os: osx
-      env:
-        - TARGETS="-C generator/metricbeat test"
-        - PLATFORMS="darwin/amd64"
+      env: TARGETS="-C generator/metricbeat test"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      env:
-        - TARGETS="-C generator/beat test"
-        - PLATFORMS="darwin/amd64"
+      env: TARGETS="-C generator/beat test"
       go: $TRAVIS_GO_VERSION
       stage: test
 
