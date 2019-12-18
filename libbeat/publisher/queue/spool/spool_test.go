@@ -34,7 +34,6 @@ import (
 
 var seed int64
 var debug bool
-var verboseLogger bool
 
 type testQueue struct {
 	*Spool
@@ -50,7 +49,6 @@ type silentLogger struct{}
 func init() {
 	flag.Int64Var(&seed, "seed", time.Now().UnixNano(), "test random seed")
 	flag.BoolVar(&debug, "noisy", false, "print test logs to console")
-	flag.BoolVar(&verboseLogger, "verboseLogger", false, "use verbose logger")
 }
 
 func TestProduceConsumer(t *testing.T) {
@@ -100,7 +98,7 @@ func makeTestQueue(
 		}()
 
 		var logger logger
-		if verboseLogger {
+		if debug {
 			logger = &testLogger{t}
 		} else {
 			logger = new(silentLogger)
@@ -144,17 +142,13 @@ func (l *testLogger) Errorf(fmt string, vs ...interface{}) { l.reportf("Error", 
 func (l *testLogger) report(level string, vs []interface{}) {
 	args := append([]interface{}{level, ":"}, vs...)
 	l.t.Log(args...)
-	if debug {
-		fmt.Println(args...)
-	}
+	fmt.Println(args...)
 }
 
 func (l *testLogger) reportf(level string, str string, vs []interface{}) {
 	str = level + ": " + str
 	l.t.Logf(str, vs...)
-	if debug {
-		fmt.Printf(str, vs...)
-	}
+	fmt.Printf(str, vs...)
 }
 
 func (*silentLogger) Debug(vs ...interface{})              {}
