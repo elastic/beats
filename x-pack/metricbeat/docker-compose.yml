@@ -23,7 +23,7 @@ services:
   kibana:
     # Copied configuration from OSS metricbeat because services with depends_on
     # cannot be extended with extends
-    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.4.0}-1
     build:
       context: ../../metricbeat/module/kibana/_meta
       args:

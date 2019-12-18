@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   redis:
-    image: docker.elastic.co/observability-ci/beats-integration-redis:${REDIS_VERSION:-3.2.12}-1
+    image: docker.elastic.co/integrations-ci/beats-redis:${REDIS_VERSION:-3.2.12}-1
     build:
       context: ./_meta
       args:

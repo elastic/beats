@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   envoyproxy:
-    image: docker.elastic.co/observability-ci/beats-integration-envoyproxy:v${ENVOYPROXY_VERSION:-1.7.0}-1
+    image: docker.elastic.co/integrations-ci/beats-envoyproxy:v${ENVOYPROXY_VERSION:-1.7.0}-1
     build:
       context: ./_meta
       args:

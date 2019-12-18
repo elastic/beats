@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   uwsgi_tcp:
-    image: docker.elastic.co/observability-ci/beats-integration-uwsgi:py${PYTHON_VERSION:-3.6}-1
+    image: docker.elastic.co/integrations-ci/beats-uwsgi:py${PYTHON_VERSION:-3.6}-1
     build:
       context: ./_meta
       args:
@@ -12,7 +12,7 @@ services:
       - 9191
 
   uwsgi_http:
-    image: docker.elastic.co/observability-ci/beats-integration-uwsgi:py${PYTHON_VERSION:-3.6}-1
+    image: docker.elastic.co/integrations-ci/beats-uwsgi:py${PYTHON_VERSION:-3.6}-1
     build:
       context: ./_meta
       args:

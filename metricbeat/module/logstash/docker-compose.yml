@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   logstash:
-    image: docker.elastic.co/observability-ci/beats-integration-logstash:${LOGSTASH_VERSION:-7.4.0}-1
+    image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-7.4.0}-1
     build:
       context: ./_meta
       args:

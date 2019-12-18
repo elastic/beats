@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   zookeeper:
-    image: docker.elastic.co/observability-ci/beats-integration-zookeeper:${ZOOKEEPER_VERSION:-3.5.5}-1
+    image: docker.elastic.co/integrations-ci/beats-zookeeper:${ZOOKEEPER_VERSION:-3.5.5}-1
     build:
       context: ./_meta
       args:

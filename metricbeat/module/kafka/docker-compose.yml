@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   kafka:
-    image: docker.elastic.co/observability-ci/beats-integration-kafka:${KAFKA_VERSION:-2.1.1}-2
+    image: docker.elastic.co/integrations-ci/beats-kafka:${KAFKA_VERSION:-2.1.1}-2
     build:
       context: ./_meta
       args:

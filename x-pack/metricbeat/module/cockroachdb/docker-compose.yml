@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   cockroachdb:
-    image: docker.elastic.co/observability-ci/beats-integration-cockroachdb:${COCKROACHDB_VERSION:-19.1.1}-1
+    image: docker.elastic.co/integrations-ci/beats-cockroachdb:${COCKROACHDB_VERSION:-19.1.1}-1
     build:
       context: ./_meta
       args:

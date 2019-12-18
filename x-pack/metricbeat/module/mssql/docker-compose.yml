@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   mssql:
-    image: docker.elastic.co/observability-ci/beats-integration-mssql:${MSSQL_VERSION:-2017-GA}-1
+    image: docker.elastic.co/integrations-ci/beats-mssql:${MSSQL_VERSION:-2017-GA}-1
     build:
       context: ./_meta
       args:

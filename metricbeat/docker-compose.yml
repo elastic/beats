@@ -15,7 +15,7 @@ services:
 
   # Used by base tests
   elasticsearch:
-    image: docker.elastic.co/observability-ci/beats-integration-elasticsearch:${ELASTICSEARCH_VERSION:-7.4.0}-1
+    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.4.0}-1
     build:
       context: ./module/elasticsearch/_meta
       args:
@@ -37,7 +37,7 @@ services:
 
   # Used by base tests
   kibana:
-    image: docker.elastic.co/observability-ci/beats-integration-kibana:${KIBANA_VERSION:-7.4.0}-1
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.4.0}-1
     build:
       context: ./module/kibana/_meta
       args:
@@ -49,7 +49,7 @@ services:
 
   # Used by base tests
   metricbeat:
-    image: docker.elastic.co/observability-ci/beats-integration-metricbeat:${BEAT_VERSION:-7.3.0}-1
+    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-7.3.0}-1
     build:
       context: ./module/beat/_meta
       args:

@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   dropwizard:
-    image: docker.elastic.co/observability-ci/beats-integration-dropwizard:${MAVEN_VERSION:-3.3-jdk-8}-1
+    image: docker.elastic.co/integrations-ci/beats-dropwizard:${MAVEN_VERSION:-3.3-jdk-8}-1
     build:
       context: ./_meta
       args:
