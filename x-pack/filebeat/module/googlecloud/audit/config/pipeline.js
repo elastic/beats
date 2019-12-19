@@ -105,20 +105,6 @@ function Audit(keep_original_message) {
         ignore_missing: true,
     });
 
-    var dropJsonFields = function(evt) {
-        evt.Delete("json");
-        evt.Delete("googlecloud.audit.request_metadata.requestAttributes");
-        evt.Delete("googlecloud.audit.request_metadata.destinationAttributes");
-    };
-
-    var RenameNestedFields = function(evt) {
-        var arr = evt.Get("googlecloud.audit.authorization_info");
-        for (var i = 0; i < arr.length; i++) {
-          arr[i].resource_attributes = arr[i].resourceAttributes;
-          delete arr[i].resourceAttributes;
-        }
-    };
-
     // Copy the caller.ip  to source.ip.
     var copyAddressFields = new processor.Convert({
         fields: [
@@ -135,6 +121,22 @@ function Audit(keep_original_message) {
         fail_on_error: false,
     });
 
+    // Drop extra fields
+    var dropExtraFields = function(evt) {
+        evt.Delete("json");
+        evt.Delete("googlecloud.audit.request_metadata.requestAttributes");
+        evt.Delete("googlecloud.audit.request_metadata.destinationAttributes");
+    };
+
+    // Rename nested fields 
+    var RenameNestedFields = function(evt) {
+        var arr = evt.Get("googlecloud.audit.authorization_info");
+        for (var i = 0; i < arr.length; i++) {
+          arr[i].resource_attributes = arr[i].resourceAttributes;
+          delete arr[i].resourceAttributes;
+        }
+    };
+
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
@@ -145,10 +147,10 @@ function Audit(keep_original_message) {
         .Add(setCloudMetadata)
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
-        .Add(dropJsonFields)
-        .Add(RenameNestedFields)
         .Add(copyAddressFields)
         .Add(copyCallerUserAgent)
+        .Add(dropExtraFields)
+        .Add(RenameNestedFields)
         .Build();
 
     return {
