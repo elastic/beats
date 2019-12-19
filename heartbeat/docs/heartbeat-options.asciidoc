@@ -237,7 +237,7 @@ to perform ICMP pings.
 On Linux regular users may perform pings if the right file capabilities are set. You can run
 `sudo setcap cap_net_raw+eip /path/to/heartbeat` to  grant {beatname_uc} ping capabilities on Linux.
 Alternatively, one may grant ping permissions the user {beatname_uc} runs as. To grant ping permissions
-in this way run `sudo sysctl -w net.ipv4.ping_group_range='myuserid myuserid'`.
+in this way, run `sudo sysctl -w net.ipv4.ping_group_range='myuserid myuserid'`.
 
 On other platforms running {beatname_uc} as root or administrator may be required to execute pings.
 
@@ -705,4 +705,3 @@ the following JSON objects in `dynamic.json`:
 restarts it with a schedule of 15 seconds between checks.
 <2> {beatname_uc} starts a new monitor that uses a TLS-based connection with a
 custom CA certificate.
-
