@@ -107,7 +107,7 @@ var security = (function () {
         "4781": "renamed-user-account",
         "4798": "group-membership-enumerated",
         "4799": "user-member-enumerated",
-    }
+    };
 
     var audit_actions = {
         "8448": "Success Removed",
