@@ -217,8 +217,6 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	var messages [][]byte
 	assert.NoError(t, conn.Err())
 	for conn.Err() == nil {
-		t.Logf("try collect message")
-
 		switch v := psc.Receive().(type) {
 		case redis.Message:
 			messages = append(messages, v.Data)

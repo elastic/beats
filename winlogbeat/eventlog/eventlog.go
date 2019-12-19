@@ -82,7 +82,7 @@ type Record struct {
 	Offset checkpoint.EventLogState // Position of the record within its source stream.
 }
 
-// ToMapStr returns a new MapStr containing the data from this Record.
+// ToEvent returns a new beat.Event containing the data from this Record.
 func (e Record) ToEvent() beat.Event {
 	// Windows Log Specific data
 	win := common.MapStr{
