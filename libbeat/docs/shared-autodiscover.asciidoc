@@ -116,20 +116,38 @@ endif::[]
 [float]
 ===== Kubernetes
 
-The Kubernetes autodiscover provider watches for Kubernetes pods to start, update, and stop.
+The Kubernetes autodiscover provider watches for Kubernetes nodes, pods, services to start, update, and stop.
 
 These are the available fields during within config templating. The `kubernetes.*` fields will be available on each emitted event.
 
+[float]
+====== Generic fields:
   * host
   * port (if exposed)
+  * kubernetes.labels
+  * kubernetes.annotations
+
+[float]
+====== Pod specific:
   * kubernetes.container.id
   * kubernetes.container.image
   * kubernetes.container.name
-  * kubernetes.labels
   * kubernetes.namespace
   * kubernetes.node.name
   * kubernetes.pod.name
   * kubernetes.pod.uid
+
+[float]
+====== Node specific:
+  * kubernetes.node.name
+  * kubernetes.node.uid
+
+[float]
+====== Service specific:
+  * kubernetes.namespace
+  * kubernetes.service.name
+  * kubernetes.service.uid
+  * kubernetes.annotations
 
 If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
 are added to the event.

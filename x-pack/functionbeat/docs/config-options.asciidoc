@@ -192,3 +192,16 @@ The default is trim_horizon.
 
 If this option is set to true, fields with `null` values will be published in
 the output document. By default, `keep_null` is set to `false`.
+
+[float]
+[id="{beatname_lc}-index"]
+==== `index`
+
+If present, this formatted string overrides the index for events from this function
+(for elasticsearch outputs), or sets the `raw_index` field of the event's
+metadata (for other outputs). This string can only refer to the agent name and
+version and the event timestamp; for access to dynamic fields, use
+`output.elasticsearch.index` or a processor.
+
+Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
+expand to `"functionbeat-myindex-2019.12.13"`.

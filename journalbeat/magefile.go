@@ -33,6 +33,8 @@ import (
 
 	// mage:import
 	"github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
 )
 
 func init() {
@@ -117,13 +119,6 @@ func Fields() error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // -----------------------------------------------------------------------------

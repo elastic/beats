@@ -108,7 +108,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.19+| .19+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.20+| .20+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -120,6 +120,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
+|<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>> experimental[]  
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
 |<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>   
 |<<metricbeat-metricset-kubernetes-state_resourcequota,state_resourcequota>>   
@@ -177,6 +178,12 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
 |<<metricbeat-metricset-redis-key,key>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
+|<<metricbeat-module-sql,sql>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-sql-query,query>> beta[]  
+|<<metricbeat-module-stan,Stan>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-stan-channels,channels>> beta[]  
+|<<metricbeat-metricset-stan-stats,stats>> beta[]  
+|<<metricbeat-metricset-stan-subscriptions,subscriptions>> beta[]  
 |<<metricbeat-module-statsd,Statsd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-statsd-server,server>> beta[]  
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -261,6 +268,8 @@ include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
+include::modules/sql.asciidoc[]
+include::modules/stan.asciidoc[]
 include::modules/statsd.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/tomcat.asciidoc[]

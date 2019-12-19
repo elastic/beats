@@ -34,6 +34,10 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
+        "NewUACList": [
+          "SCRIPT",
+          "LOCKOUT"
+        ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
         "PasswordLastSet": "%%1794",
@@ -50,7 +54,11 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1005",
         "TargetUserName": "elastictest1",
-        "UserAccountControl": "\n\t\t%%2080\n\t\t%%2082\n\t\t%%2084",
+        "UserAccountControl": [
+          "2080",
+          "2082",
+          "2084"
+        ],
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
@@ -110,6 +118,10 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
+        "NewUACList": [
+          "SCRIPT",
+          "LOCKOUT"
+        ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
         "PasswordLastSet": "%%1794",
@@ -126,7 +138,11 @@
         "TargetDomainName": "WIN-41OB2LO92CR",
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006",
         "TargetUserName": "audittest0609",
-        "UserAccountControl": "\n\t\t%%2080\n\t\t%%2082\n\t\t%%2084",
+        "UserAccountControl": [
+          "2080",
+          "2082",
+          "2084"
+        ],
         "UserParameters": "%%1793",
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
