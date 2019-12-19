@@ -239,7 +239,7 @@ On Linux regular users may perform pings if the right file capabilities are set.
 Alternatively, one may grant ping permissions the user {beatname_uc} runs as. To grant ping permissions
 in this way, run `sudo sysctl -w net.ipv4.ping_group_range='myuserid myuserid'`.
 
-On other platforms running {beatname_uc} as root or administrator may be required to execute pings.
+Other platforms may require {beatname_uc} to run as root or administrator to execute pings.
 
 [float]
 [[monitor-icmp-hosts]]
