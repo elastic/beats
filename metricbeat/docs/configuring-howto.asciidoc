@@ -79,6 +79,10 @@ include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :autodiscoverHints:
 include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 
+:autodiscoverAWSEC2:
+include::{libbeat-dir}/shared-autodiscover.asciidoc[]
+:autodiscoverAWSEC2!:
+
 :standalone:
 include::{libbeat-dir}/yaml.asciidoc[]
 :standalone!:
