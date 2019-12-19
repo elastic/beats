@@ -385,3 +385,36 @@ type opUnixTimestampValue struct {
 func (o opUnixTimestampValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
 	return field, common.Time(time.Unix(int64(value.(float64)), 0)), labels
 }
+
+// OpLabelKeyPrefixRemover removes prefix from label keys
+func OpLabelKeyPrefixRemover(prefix string) MetricOption {
+	return opLabelKeyPrefixRemover{prefix}
+}
+
+// opLabelKeyPrefixRemover is a metric option processor that removes a prefix from the key of a label set
+type opLabelKeyPrefixRemover struct {
+	Prefix string
+}
+
+// Process modifies the labels map, removing a prefix when found at keys of the labels set.
+// For each label, if the key is found a new key will be created hosting the same value and the
+// old key will be deleted.
+// Fields, values and not prefixed labels will remain unmodified.
+func (o opLabelKeyPrefixRemover) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	renameKeys := []string{}
+	for k := range labels {
+		if len(k) < len(o.Prefix) {
+			continue
+		}
+		if k[:6] == o.Prefix {
+			renameKeys = append(renameKeys, k)
+		}
+	}
+
+	for i := range renameKeys {
+		v := labels[renameKeys[i]]
+		delete(labels, renameKeys[i])
+		labels[renameKeys[i][len(o.Prefix):]] = v
+	}
+	return "", value, labels
+}
