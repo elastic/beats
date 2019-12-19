@@ -1,11 +1,6 @@
 - module: googlecloud
   metricsets:
     - compute
-    - pubsub
-    - firestore
-    - firebase
-    - storage
-    - loadbalancing
   zone: "your zone"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
