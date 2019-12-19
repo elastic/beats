@@ -93,21 +93,9 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	appenders, err := autodiscover.NewAppenders(config.Appenders)
-	if err != nil {
-		return nil, err
-	}
-
 	p := &Provider{
 		config:    config,
 		bus:       bus,
-		builders:  builders,
-		appenders: appenders,
 		templates: &mapper,
 		uuid:      uuid,
 	}
