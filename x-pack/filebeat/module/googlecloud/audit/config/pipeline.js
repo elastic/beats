@@ -73,9 +73,9 @@ function Audit(keep_original_message) {
         fields: [
             {from: "json.@type", to: "json.type"},
 
+            {from: "json.authenticationInfo.principalEmail", to: "json.authenticationInfo.principal_email"},
+            {from: "json.authenticationInfo.authoritySelector", to: "json.authenticationInfo.authority_selector"},
             {from: "json.authenticationInfo", to: "json.authentication_info"},
-            {from: "json.authentication_info.principalEmail", to: "json.authentication_info.principal_email"},
-            {from: "json.authentication_info.authoritySelector", to: "json.authentication_info.authority_selector"},
 
             {from: "json.authorizationInfo", to: "json.authorization_info"},
 
@@ -83,13 +83,19 @@ function Audit(keep_original_message) {
 
             {from: "json.numResponseItems", to: "json.num_response_items", type: "long"},
 
-            {from: "json.request.@type", to: "json.request.type"},
+            {from: "json.request.@type", to: "json.request.proto_name"},
+            {from: "json.request.filter", to: "json.request.filter"},
+            {from: "json.request.name", to: "json.request.name"},
+            {from: "json.request.resourceName", to: "json.request.resource_name"},
 
-            {from: "json.requestMetaData", to: "json.request_meta_data"},
-            {from: "json.request_meta_data.callerIp", to: "json.request_meta_data.caller_ip"},
-            {from: "json.request_meta_data.callerSuppliedUserAgent", to: "json.request_meta_data.caller_supplied_user_agent"},
+            {from: "json.requestMetadata.callerIp", to: "json.requestMetadata.caller_ip"},
+            {from: "json.requestMetadata.callerSuppliedUserAgent", to: "json.requestMetadata.caller_supplied_user_agent"},
+            {from: "json.requestMetadata", to: "json.request_metadata"},
 
             {from: "json.resourceName", to: "json.resource_name"},
+
+            {from: "json.resourceLocation.currentLocations", to: "json.resourceLocation.current_locations"},
+            {from: "json.resourceLocation", to: "json.resource_location"},
 
             {from: "json.serviceName", to: "json.service_name"},
 
@@ -99,10 +105,24 @@ function Audit(keep_original_message) {
         ignore_missing: true,
     });
 
+    var dropJsonFields = function(evt) {
+        evt.Delete("json");
+        evt.Delete("googlecloud.audit.request_metadata.requestAttributes");
+        evt.Delete("googlecloud.audit.request_metadata.destinationAttributes");
+    };
+
+    var RenameNestedFields = function(evt) {
+        var arr = evt.Get("googlecloud.audit.authorization_info");
+        for (var i = 0; i < arr.length; i++) {
+          arr[i]["resource_attributes"] = arr[i]["resourceAttributes"];
+          delete arr[i]["resourceAttributes"];
+        }
+    };
+
     // Copy the caller.ip  to source.ip.
     var copyAddressFields = new processor.Convert({
         fields: [
-            {from: "json.request_meta_data.caller_ip", to: "source.ip"},
+            {from: "googlecloud.audit.request_metadata.caller_ip", to: "source.ip"},
         ],
         fail_on_error: false,
     });
@@ -110,7 +130,7 @@ function Audit(keep_original_message) {
     // Copy caller_supplied_user_agent to user_agent.original.
     var copyCallerUserAgent = new processor.Convert({
         fields: [
-            {from: "json.request_meta_data.caller_supplied_user_agent", to: "user_agent.original"},
+            {from: "googlecloud.audit.request_metadata.caller_supplied_user_agent", to: "user_agent.original"},
         ],
         fail_on_error: false,
     });
@@ -125,6 +145,8 @@ function Audit(keep_original_message) {
         .Add(setCloudMetadata)
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
+        .Add(dropJsonFields)
+        .Add(RenameNestedFields)
         .Add(copyAddressFields)
         .Add(copyCallerUserAgent)
         .Build();

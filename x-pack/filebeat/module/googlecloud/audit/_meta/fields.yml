@@ -11,6 +11,7 @@
     type: group
     description: >
       Authentication information. 
+    fields:
     - name: principal_email
       type: keyword
       description: >
@@ -21,14 +22,10 @@
         The authority selector specified by the requestor, if any. It is not guaranteed 
         that the principal was allowed to use this authority. 
   - name: authorization_info
-    type: group
+    type: array
     description: >
       Authorization information for the operation.
-    - name: resource
-      type: keyword
-      description: >
-        The resource being accessed, as a REST-style string. 
-        For example, bigquery.googlapis.com/projects/PROJECTID/datasets/DATASETID
+    fields:
     - name: permission
       type: keyword
       description: >
@@ -37,12 +34,29 @@
       type: boolean
       description: >
         Whether or not authorization for resource and permission was granted. 
+    - name: resource_attributes
+      type: group
+      description: >
+        The attributes of the resource.
+      fields:
+      - name: service
+        type: keyword
+        description: >
+          The name of the service.
+      - name: name
+        type: keyword
+        description: >
+          The name of the resource.
+      - name: type
+        type: keyword
+        description: >
+          The type of the resource.
   - name: method_name
     type: keyword
     description: >
       The name of the service method or operation. For API calls, this 
       should be the name of the API method. 
-      For example, google.datastore.v1.Datastore.RunQuery.
+      For example, 'google.datastore.v1.Datastore.RunQuery'.
   - name: num_response_items
     type: long
     description: >
@@ -51,7 +65,8 @@
     type: group
     description: >
       The operation request.
-    - name: type
+    fields:
+    - name: proto_name
       type: keyword
       description: >
         Type property of the request.
@@ -63,10 +78,15 @@
       type: keyword
       description: >
         Name of the request. 
-  - name: request_meta_data
+    - name: resource_name
+      type: keyword
+      description: >
+        Name of the request resource. 
+  - name: request_metadata
     type: group
     description: >
       Metadata about the request.
+    fields:
     - name: caller_ip
       type: ip
       description: >
@@ -81,7 +101,16 @@
     description: >
       The resource or collection that is the target of the operation. 
       The name is a scheme-less URI, not including the API service name. 
-      For example, shelves/SHELF_ID/books.
+      For example, 'shelves/SHELF_ID/books'.
+  - name: resource_location
+    type: group
+    description: >
+      The location of the resource.
+    fields:
+    - name: current_locations
+      type: keyword
+      description: >
+        Current locations of the resource.
   - name: service_name
     type: keyword
     description: >
@@ -91,6 +120,7 @@
     type: group
     description: >
       The status of the overall operation. 
+    fields:
     - name: code
       type: integer
       description: >
@@ -101,7 +131,3 @@
         A developer-facing error message, which should be in English. Any user-facing 
         error message should be localized and sent in the google.rpc.Status.details 
         field, or localized by the client. 
-  
-      
-  
-
