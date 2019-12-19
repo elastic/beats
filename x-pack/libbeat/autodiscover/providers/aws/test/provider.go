@@ -12,12 +12,13 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 )
 
-// TestEventAccumulator
+// TestEventAccumulator defined a list of events for testing
 type TestEventAccumulator struct {
 	events []bus.Event
 	lock   sync.Mutex
 }
 
+// Add expends events
 func (tea *TestEventAccumulator) Add(e bus.Event) {
 	tea.lock.Lock()
 	defer tea.lock.Unlock()
@@ -25,6 +26,7 @@ func (tea *TestEventAccumulator) Add(e bus.Event) {
 	tea.events = append(tea.events, e)
 }
 
+// Len returns length of events
 func (tea *TestEventAccumulator) Len() int {
 	tea.lock.Lock()
 	defer tea.lock.Unlock()
@@ -32,6 +34,7 @@ func (tea *TestEventAccumulator) Len() int {
 	return len(tea.events)
 }
 
+// Get copies the event and return it
 func (tea *TestEventAccumulator) Get() []bus.Event {
 	tea.lock.Lock()
 	defer tea.lock.Unlock()
@@ -41,6 +44,7 @@ func (tea *TestEventAccumulator) Get() []bus.Event {
 	return res
 }
 
+// WaitForNumEvents waits to get target length of events
 func (tea *TestEventAccumulator) WaitForNumEvents(t *testing.T, targetLen int, timeout time.Duration) {
 	start := time.Now()
 
