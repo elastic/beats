@@ -19,7 +19,6 @@ package query
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -35,8 +34,9 @@ type prometheusData struct {
 	Results    []result `json:"result"`
 }
 type result struct {
-	Metric  interface{}   `json:"metric"`
-	Vectors []interface{} `json:"value"`
+	Metric          interface{}            `json:"metric"`
+	Vectors         []interface{}          `json:"value,omitempty"`
+	ReconciledValue map[string]interface{} `json:"reconciledValue"`
 }
 
 func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) mb.Event {
@@ -49,11 +49,15 @@ func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) mb.Event {
 	// Check if there is vector array.
 	// Vector [ <unix_timestamp>, "<query_result>" ] is not acceptable for Elasticsearch.
 	// Because there are two types in one array.
-	// So change Vector to [ "<unix_timestamp", "query_result" ]
+	// So change Vector to Object { unixtimestamp: "<unix_timestamp", value: "query_result" }
 	if res.Data.ResultType == "vector" {
-		for _, res := range res.Data.Results {
-			if len(res.Vectors) != 0 {
-				res.Vectors[0] = fmt.Sprintf("%f", res.Vectors[0])
+		for idx := range res.Data.Results {
+			if len(res.Data.Results[idx].Vectors) != 0 {
+				res.Data.Results[idx].ReconciledValue = map[string]interface{}{
+					"unixtimestamp": res.Data.Results[idx].Vectors[0],
+					"value":         res.Data.Results[idx].Vectors[1],
+				}
+				res.Data.Results[idx].Vectors = nil
 			}
 		}
 	}
