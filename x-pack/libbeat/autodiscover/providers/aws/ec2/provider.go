@@ -113,11 +113,11 @@ func (p *Provider) Stop() {
 	p.watcher.stop()
 }
 
-func (p *Provider) onWatcherStart(arn string, instance *ec2Instance) {
+func (p *Provider) onWatcherStart(instanceID string, instance *ec2Instance) {
 	e := bus.Event{
 		"start":    true,
 		"provider": p.uuid,
-		"id":       arn,
+		"id":       instanceID,
 		"meta": common.MapStr{
 			"ec2":   instance.toMap(),
 			"cloud": instance.toCloudMap(),
@@ -130,10 +130,10 @@ func (p *Provider) onWatcherStart(arn string, instance *ec2Instance) {
 	p.bus.Publish(e)
 }
 
-func (p *Provider) onWatcherStop(arn string) {
+func (p *Provider) onWatcherStop(instanceID string) {
 	e := bus.Event{
 		"stop":     true,
-		"id":       arn,
+		"id":       instanceID,
 		"provider": p.uuid,
 	}
 	p.bus.Publish(e)

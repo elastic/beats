@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package elb
+package ec2
 
 import (
 	"testing"
@@ -20,9 +20,9 @@ import (
 )
 
 func Test_internalBuilder(t *testing.T) {
-	lbl := fakeLbl()
-	lbls := []*lbListener{lbl}
-	fetcher := newMockFetcher(lbls, nil)
+	instance := fakeEC2Instance()
+	instances := []*ec2Instance{instance}
+	fetcher := newMockFetcher(instances, nil)
 	pBus := bus.New("test")
 
 	cfg := &awsauto.Config{
@@ -62,20 +62,18 @@ func Test_internalBuilder(t *testing.T) {
 	assert.Equal(t, 1, events.Len())
 
 	expectedStartEvent := bus.Event{
-		"id":       lbl.arn(),
+		"id":       instance.instanceID(),
 		"provider": uuid,
 		"start":    true,
-		"host":     *lbl.lb.DNSName,
-		"port":     *lbl.listener.Port,
 		"meta": common.MapStr{
-			"elb_listener": lbl.toMap(),
-			"cloud":        lbl.toCloudMap(),
+			"ec2":   instance.toMap(),
+			"cloud": instance.toCloudMap(),
 		},
 	}
 
 	require.Equal(t, expectedStartEvent, events.Get()[0])
 
-	fetcher.setLbls([]*lbListener{})
+	fetcher.setEC2s([]*ec2Instance{})
 
 	// Let run twice to ensure that duplicates don't cause an issue
 	provider.watcher.once()
@@ -86,7 +84,7 @@ func Test_internalBuilder(t *testing.T) {
 
 	expectedStopEvent := bus.Event{
 		"stop":     true,
-		"id":       lbl.arn(),
+		"id":       awsauto.SafeString(instance.ec2Instance.InstanceId),
 		"provider": uuid,
 	}
 

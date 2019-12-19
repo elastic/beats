@@ -43,6 +43,10 @@ func (i *ec2Instance) toMap() common.MapStr {
 	return m
 }
 
+func (i *ec2Instance) instanceID() string {
+	return awsauto.SafeString(i.ec2Instance.InstanceId)
+}
+
 func (i *ec2Instance) toImage() common.MapStr {
 	m := common.MapStr{}
 	m["id"] = awsauto.SafeString(i.ec2Instance.ImageId)
@@ -102,7 +106,7 @@ func (i *ec2Instance) toCloudMap() common.MapStr {
 	m["region"] = availabilityZone[:len(availabilityZone)-1]
 
 	instance := common.MapStr{}
-	instance["id"] = awsauto.SafeString(i.ec2Instance.InstanceId)
+	instance["id"] = i.instanceID()
 	m["instance"] = instance
 
 	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
