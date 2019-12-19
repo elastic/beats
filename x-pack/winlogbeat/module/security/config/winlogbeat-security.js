@@ -1324,7 +1324,7 @@ var security = (function () {
         var all_users=related_user.slice(0);
         all_users.push(user);
         evt.Put("related.user", all_users);
-    }
+    };
 
     var copyTargetUser = new processor.Chain()
         .Convert({
