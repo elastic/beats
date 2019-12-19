@@ -19297,6 +19297,49 @@ type: long
 --
 
 [float]
+=== persistentvolume
+
+kubernetes persistent volume metrics from kube-state-metrics
+
+
+
+*`kubernetes.persistentvolume.name`*::
++
+--
+Volume name.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolume.capacity.bytes`*::
++
+--
+Volume capacity
+
+type: long
+
+--
+
+*`kubernetes.persistentvolume.phase`*::
++
+--
+Volume phase according to kubernetes
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolume.storage_class`*::
++
+--
+Storage class for the volume
+
+type: keyword
+
+--
+
+[float]
 === persistentvolumeclaim
 
 kubernetes persistent volume clame metrics from kube-state-metrics
