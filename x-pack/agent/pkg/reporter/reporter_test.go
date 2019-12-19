@@ -19,8 +19,12 @@ func (t *testReporter) Report(r Event) error {
 	return nil
 }
 
+type info struct{}
+
+func (*info) AgentID() string { return "id" }
+
 func TestTypes(t *testing.T) {
-	rep := NewReporter(nil, "id", &testReporter{})
+	rep := NewReporter(nil, &info{}, &testReporter{})
 	// test starting
 	rep.OnStarting("a1")
 	if r := result.Type(); r != EventTypeState {

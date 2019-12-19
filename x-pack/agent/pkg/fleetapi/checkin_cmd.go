@@ -14,6 +14,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const checkingPath = "/api/fleet/agents/%s/checkin"
+
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
 	Events []SerializableEvent `json:"events"`
@@ -53,17 +55,20 @@ func (e *CheckinResponse) Validate() error {
 
 // CheckinCmd is a fleet API command.
 type CheckinCmd struct {
-	client      clienter
-	checkinPath string
+	client clienter
+	info   agentInfo
+}
+
+type agentInfo interface {
+	AgentID() string
 }
 
 // NewCheckinCmd creates a new api command.
-func NewCheckinCmd(agentID string, client clienter) *CheckinCmd {
-	const p = "/api/fleet/agents/%s/checkin"
+func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
 
 	return &CheckinCmd{
-		client:      client,
-		checkinPath: fmt.Sprintf(p, agentID),
+		client: client,
+		info:   info,
 	}
 }
 
@@ -78,7 +83,8 @@ func (e *CheckinCmd) Execute(r *CheckinRequest) (*CheckinResponse, error) {
 		return nil, errors.Wrap(err, "fail to encode the checkin request")
 	}
 
-	resp, err := e.client.Send("POST", e.checkinPath, nil, nil, bytes.NewBuffer(b))
+	cp := fmt.Sprintf(checkingPath, e.info.AgentID())
+	resp, err := e.client.Send("POST", cp, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to checkin to fleet")
 	}

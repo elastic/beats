@@ -15,6 +15,7 @@ import (
 type Application interface {
 	Start() error
 	Stop() error
+	AgentInfo() *AgentInfo
 }
 
 // New creates a new Agent and bootstrap the required subsystem.
@@ -59,9 +60,4 @@ func createApplication(
 	default:
 		return nil, ErrInvalidMgmtMode
 	}
-}
-
-func getAgentID() string {
-	// TODO: implement correct way of acquiring agent ID
-	return "default"
 }

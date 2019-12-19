@@ -81,7 +81,7 @@ func newTestingDispatcher() *testingDispatcher {
 
 type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper)
 
-func withGateway(agentID string, fn withGatewayFunc) func(t *testing.T) {
+func withGateway(agentInfo agentInfo, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
 		scheduler := scheduler.NewStepper()
 		client := newTestingClient()
@@ -92,7 +92,7 @@ func withGateway(agentID string, fn withGatewayFunc) func(t *testing.T) {
 		gateway, err := newFleetGatewayWithScheduler(
 			log,
 			&fleetGatewaySettings{},
-			agentID,
+			agentInfo,
 			client,
 			dispatcher,
 			scheduler,
@@ -132,8 +132,8 @@ func wrapStrToResp(code int, body string) *http.Response {
 }
 
 func TestFleetGateway(t *testing.T) {
-	agentID := "agent-secret"
-	t.Run("send no event and receive no action", withGateway(agentID, func(
+	agentInfo := &testAgentInfo{}
+	t.Run("send no event and receive no action", withGateway(agentInfo, func(
 		t *testing.T,
 		gateway *fleetGateway,
 		client *testingClient,
@@ -157,7 +157,7 @@ func TestFleetGateway(t *testing.T) {
 		<-received
 	}))
 
-	t.Run("Successfully connects and receives a series of actions", withGateway(agentID, func(
+	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, func(
 		t *testing.T,
 		gateway *fleetGateway,
 		client *testingClient,
@@ -209,7 +209,7 @@ func TestFleetGateway(t *testing.T) {
 		gateway, err := newFleetGatewayWithScheduler(
 			log,
 			&fleetGatewaySettings{},
-			agentID,
+			agentInfo,
 			client,
 			dispatcher,
 			scheduler,
@@ -248,3 +248,7 @@ func TestFleetGateway(t *testing.T) {
 func skip(t *testing.T) {
 	t.SkipNow()
 }
+
+type testAgentInfo struct{}
+
+func (testAgentInfo) AgentID() string { return "agent-secret" }

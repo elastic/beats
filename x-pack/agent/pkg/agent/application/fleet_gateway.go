@@ -16,8 +16,12 @@ type dispatcher interface {
 	Dispatch(...action) error
 }
 
+type agentInfo interface {
+	AgentID() string
+}
+
 // fleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
-// bidirectionnal commmmunication requirements. The gateway aggregates events and will periodically
+// bidirectional communication requirements. The gateway aggregates events and will periodically
 // call the API to send the events and will receive actions to be executed locally.
 // The only supported action for now is a "ActionPolicyChange".
 type fleetGateway struct {
@@ -25,7 +29,7 @@ type fleetGateway struct {
 	dispatcher dispatcher
 	client     clienter
 	scheduler  scheduler.Scheduler
-	agentID    string
+	agentInfo  agentInfo
 	done       chan struct{}
 }
 
@@ -36,7 +40,7 @@ type fleetGatewaySettings struct {
 func newFleetGateway(
 	log *logger.Logger,
 	settings *fleetGatewaySettings,
-	agentID string,
+	agentInfo agentInfo,
 	client clienter,
 	d dispatcher,
 ) (*fleetGateway, error) {
@@ -44,7 +48,7 @@ func newFleetGateway(
 	return newFleetGatewayWithScheduler(
 		log,
 		settings,
-		agentID,
+		agentInfo,
 		client,
 		d,
 		scheduler,
@@ -54,7 +58,7 @@ func newFleetGateway(
 func newFleetGatewayWithScheduler(
 	log *logger.Logger,
 	settings *fleetGatewaySettings,
-	agentID string,
+	agentInfo agentInfo,
 	client clienter,
 	d dispatcher,
 	scheduler scheduler.Scheduler,
@@ -63,7 +67,7 @@ func newFleetGatewayWithScheduler(
 		log:        log,
 		dispatcher: d,
 		client:     client,
-		agentID:    agentID, //TODO(ph): this need to be a struct.
+		agentInfo:  agentInfo, //TODO(ph): this need to be a struct.
 		scheduler:  scheduler,
 		done:       make(chan struct{}),
 	}, nil
@@ -98,7 +102,7 @@ func (f *fleetGateway) worker() {
 
 func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 	// TODO(ph): Aggregates and send events.
-	cmd := fleetapi.NewCheckinCmd(f.agentID, f.client)
+	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 
 	req := &fleetapi.CheckinRequest{}
 	resp, err := cmd.Execute(req)
