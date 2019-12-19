@@ -1579,7 +1579,7 @@ var security = (function () {
             addRelatedUser(evt,user)
         })
         .Build();
-        
+
     var event4689 = new processor.Chain()
         .Add(copySubjectUser)
         .Add(renameCommonAuthFields)
