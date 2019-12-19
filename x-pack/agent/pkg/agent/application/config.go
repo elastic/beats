@@ -72,14 +72,14 @@ type localConfig struct {
 }
 
 type localManagementConfig struct {
-	Reload    *reloadConfig       `config:"reload" yaml:"reload`
-	Path      string              `config:"path" yaml:"path`
-	Reporting *logreporter.Config `config:"reporting" yaml:"reporting`
+	Reload    *reloadConfig       `config:"reload" yaml:"reload"`
+	Path      string              `config:"path" yaml:"path"`
+	Reporting *logreporter.Config `config:"reporting" yaml:"reporting"`
 }
 
 type reloadConfig struct {
-	Enabled bool          `config:"enabled" yaml:"enabled`
-	Period  time.Duration `config:"period" yaml:"period`
+	Enabled bool          `config:"enabled" yaml:"enabled"`
+	Period  time.Duration `config:"period" yaml:"period"`
 }
 
 func (r *reloadConfig) Validate() error {
