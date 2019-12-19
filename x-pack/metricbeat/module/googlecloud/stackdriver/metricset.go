@@ -125,8 +125,8 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 
 	var gcpService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
-	// Override default metadata service labels are ON and service is known
-	if m.config.ExcludeLabels {
+
+	if !m.config.ExcludeLabels {
 		if gcpService, err = NewMetadataServiceForConfig(m.config); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}
