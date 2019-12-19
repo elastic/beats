@@ -60,7 +60,7 @@ func newLocal(
 		return nil, errors.Wrap(err, "initialize local mode")
 	}
 
-	logR := logreporter.NewReporter(log, c.Reporting)
+	logR := logreporter.NewReporter(log, c.Management.Reporting)
 
 	reporter := reporting.NewReporter(log, agentID, logR)
 
@@ -69,16 +69,16 @@ func newLocal(
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
 
-	discover := discoverer(pathConfigFile, c.Path)
+	discover := discoverer(pathConfigFile, c.Management.Path)
 	emit := emitter(log, router, injectMonitoring)
 
 	var cfgSource source
-	if !c.Reload.Enabled {
+	if !c.Management.Reload.Enabled {
 		log.Debug("Reloading of configuration is off")
 		cfgSource = newOnce(log, discover, emit)
 	} else {
-		log.Debugf("Reloading of configuration is on, frequency is set to %s", c.Reload.Period)
-		cfgSource = newPeriodic(log, c.Reload.Period, discover, emit)
+		log.Debugf("Reloading of configuration is on, frequency is set to %s", c.Management.Reload.Period)
+		cfgSource = newPeriodic(log, c.Management.Reload.Period, discover, emit)
 	}
 
 	return &Local{
