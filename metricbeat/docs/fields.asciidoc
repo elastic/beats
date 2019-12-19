@@ -13683,10 +13683,6 @@ GCP module
                   description: Count of packets sent over the network
     - release: beta
     - release: beta
-    - release: beta
-    - release: beta
-    - release: beta
-    - release: beta
 
 
 [[exported-fields-golang]]

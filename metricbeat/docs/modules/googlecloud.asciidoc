@@ -44,27 +44,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-compute,compute>>
 
-* <<metricbeat-metricset-googlecloud-firebase,firebase>>
-
-* <<metricbeat-metricset-googlecloud-firestore,firestore>>
-
-* <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
-
-* <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
-
 * <<metricbeat-metricset-googlecloud-stackdriver,stackdriver>>
 
 * <<metricbeat-metricset-googlecloud-storage,storage>>
 
 include::googlecloud/compute.asciidoc[]
-
-include::googlecloud/firebase.asciidoc[]
-
-include::googlecloud/firestore.asciidoc[]
-
-include::googlecloud/loadbalancing.asciidoc[]
-
-include::googlecloud/pubsub.asciidoc[]
 
 include::googlecloud/stackdriver.asciidoc[]
 
