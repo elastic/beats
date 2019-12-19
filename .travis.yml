@@ -188,6 +188,8 @@ jobs:
       stage: test
       addons:
         apt:
+          config:
+            retries: true
           update: true
           packages:
             - python-virtualenv
@@ -206,6 +208,8 @@ jobs:
 
 addons:
   apt:
+    config:
+      retries: true
     update: true
     packages:
       - python-virtualenv
