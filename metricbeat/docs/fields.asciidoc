@@ -19297,6 +19297,110 @@ type: long
 --
 
 [float]
+=== persistentvolume
+
+kubernetes persistent volume metrics from kube-state-metrics
+
+
+
+*`kubernetes.persistentvolume.name`*::
++
+--
+Volume name.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolume.capacity.bytes`*::
++
+--
+Volume capacity
+
+type: long
+
+--
+
+*`kubernetes.persistentvolume.phase`*::
++
+--
+Volume phase according to kubernetes
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolume.storage_class`*::
++
+--
+Storage class for the volume
+
+type: keyword
+
+--
+
+[float]
+=== persistentvolumeclaim
+
+kubernetes persistent volume clame metrics from kube-state-metrics
+
+
+
+*`kubernetes.persistentvolumeclaim.name`*::
++
+--
+PVC name.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.volume_name`*::
++
+--
+Binded volume name.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.request_storage.bytes`*::
++
+--
+Requested capacity.
+
+type: long
+
+--
+
+*`kubernetes.persistentvolumeclaim.phase`*::
++
+--
+PVC phase.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.access_mode`*::
++
+--
+Access mode.
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.storage_class`*::
++
+--
+Storage class for the PVC.
+
+type: keyword
+
+--
+
+[float]
 === pod
 
 kubernetes pod metrics

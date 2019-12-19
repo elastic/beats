@@ -96,8 +96,7 @@ func newSession(p *goja.Program, conf Config, test bool) (*session, error) {
 	}
 
 	// Register modules.
-	for name, registerModule := range sessionHooks {
-		s.log.Debugf("Registering module %v with the Javascript runtime.", name)
+	for _, registerModule := range sessionHooks {
 		registerModule(s)
 	}
 
