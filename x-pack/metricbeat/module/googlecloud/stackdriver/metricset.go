@@ -22,6 +22,7 @@ import (
 )
 
 const (
+	// MetricsetName is the name of this Metricset
 	MetricsetName = "stackdriver"
 )
 
