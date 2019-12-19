@@ -21313,17 +21313,17 @@ type: long
 *`zeek.connection.state`*::
 +
 --
-The state of the session.
+Code indicating the state of the session.
 
 
 type: keyword
 
 --
 
-*`zeek.connection.state_code`*::
+*`zeek.connection.state_message`*::
 +
 --
-Code indicating the state of the session.
+The state of the session.
 
 
 type: keyword

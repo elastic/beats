@@ -22,12 +22,12 @@
     - name: state
       type: keyword
       description: >
-        The state of the session.
+        Code indicating the state of the session.
 
-    - name: state_code
+    - name: state_message
       type: keyword
       description: >
-        Code indicating the state of the session.
+        The state of the session.
 
     - name: icmp
       type: group
