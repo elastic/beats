@@ -47,17 +47,23 @@ var security = (function () {
     ];
 
     // event.action Description Table
+    // event.action Description Table
     var eventActionTypes = {
+        "1100": "logging-shutdown",
+        "1102": "changed-audit-config",
+        "1104": "logging-full",
+        "1105": "auditlog-archieved",
+        "1108": "logging-processing-error",
         "4624": "logged-in",
         "4625": "logon-failed",
         "4634": "logged-out",
-        "4672": "logged-in-special",
-        "4688": "created-process",
-        "4689": "exited-process",
+        "4688": "process-created",
+        "4689": "process-exited",
+        "4719": "changed-audit-config",
         "4720": "added-user-account",
         "4722": "enabled-user-account",
         "4723": "changed-password",
-        "4724": "reset-password",
+        "4724": "reseted-password",
         "4725": "disabled-user-account",
         "4726": "deleted-user-account",
         "4727": "added-group-account",
@@ -72,16 +78,135 @@ var security = (function () {
         "4737": "modified-group-account",
         "4738": "modified-user-account",
         "4740": "locked-out-user-account",
+        "4741": "added-computer-account",
+        "4742": "changed-computer-account",
+        "4743": "deleted-computer-account",
+        "4744": "added-group-account",
+        "4745": "changed-group-account",
+        "4746": "added-group-account-to",
+        "4747": "deleted-group-account-from",
+        "4748": "deleted-group-account",
+        "4749": "added-group-account",
+        "4750": "changed-group-account",
+        "4751": "added-group-account-to",
+        "4752": "deleted-group-account-from",
+        "4753": "deleted-group-account",
         "4754": "added-group-account",
         "4755": "modified-group-account",
         "4756": "added-group-account-to",
         "4757": "deleted-group-account-from",
         "4758": "deleted-group-account",
+        "4759": "added-group-account",
+        "4760": "changed-group-account",
+        "4761": "added-group-account-to",
+        "4762": "deleted-group-account-from",
+        "4763": "deleted-group-account",
         "4764": "type-changed-group-account",
         "4767": "unlocked-user-account",
         "4781": "renamed-user-account",
         "4798": "group-membership-enumerated",
-        "4799": "user-member-enumerated",
+        "4799": "user-member-enumerated",        
+    }
+
+    var audit_actions = {
+        "8448": "Success Removed",
+        "8450": "Failure Removed",
+        "8449": "Success Added",
+        "8451": "Failure Added",
+    };
+
+    var group_types = {
+        "4727": ["Security-Enabled","Global"],
+        "4728": ["Security-Enabled","Global"],
+        "4729": ["Security-Enabled","Global"],
+        "4730": ["Security-Enabled","Global"],
+        "4731": ["Security-Enabled","Local"],
+        "4732": ["Security-Enabled","Local"],
+        "4733": ["Security-Enabled","Local"],
+        "4734": ["Security-Enabled","Local"],
+        "4735": ["Security-Enabled","Local"],
+        "4737": ["Security-Enabled","Global"],
+        "4744": ["Security-Disabled","Local"],
+        "4745": ["Security-Disabled","Local"],
+        "4746": ["Security-Disabled","Local"],
+        "4747": ["Security-Disabled","Local"],
+        "4748": ["Security-Disabled","Local"],
+        "4749": ["Security-Disabled","Global"],
+        "4750": ["Security-Disabled","Global"],
+        "4751": ["Security-Disabled","Global"],
+        "4752": ["Security-Disabled","Global"],
+        "4753": ["Security-Disabled","Global"],
+        "4754": ["Security-Enabled","Universal"],
+        "4755": ["Security-Enabled","Universal"],
+        "4756": ["Security-Enabled","Universal"],
+        "4757": ["Security-Enabled","Universal"],
+        "4758": ["Security-Enabled","Universal"],
+        "4759": ["Security-Disabled","Universal"],
+        "4759": ["Security-Disabled","Universal"],
+        "4760": ["Security-Disabled","Universal"],
+        "4761": ["Security-Disabled","Universal"],
+        "4762": ["Security-Disabled","Universal"],
+        "4763": ["Security-Disabled","Universal"],
+    };
+
+    var audit_description = {
+        "0CCE9210-69AE-11D9-BED3-505054503030":["Security State Change", "System"],
+        "0CCE9211-69AE-11D9-BED3-505054503030":["Security System Extension", "System"],
+        "0CCE9212-69AE-11D9-BED3-505054503030":["System Integrity", "System"],
+        "0CCE9213-69AE-11D9-BED3-505054503030":["IPsec Driver", "System"],
+        "0CCE9214-69AE-11D9-BED3-505054503030":["Other System Events", "System"],
+        "0CCE9215-69AE-11D9-BED3-505054503030":["Logon", "Logon/Logoff"],
+        "0CCE9216-69AE-11D9-BED3-505054503030":["Logoff","Logon/Logoff"],
+        "0CCE9217-69AE-11D9-BED3-505054503030":["Account Lockout","Logon/Logoff"],
+        "0CCE9218-69AE-11D9-BED3-505054503030":["IPsec Main Mode","Logon/Logoff"],
+        "0CCE9219-69AE-11D9-BED3-505054503030":["IPsec Quick Mode","Logon/Logoff"],
+        "0CCE921A-69AE-11D9-BED3-505054503030":["IPsec Extended Mode","Logon/Logoff"],
+        "0CCE921B-69AE-11D9-BED3-505054503030":["Special Logon","Logon/Logoff"],
+        "0CCE921C-69AE-11D9-BED3-505054503030":["Other Logon/Logoff Events","Logon/Logoff"],
+        "0CCE9243-69AE-11D9-BED3-505054503030":["Network Policy Server","Logon/Logoff"],
+        "0CCE9247-69AE-11D9-BED3-505054503030":["User / Device Claims","Logon/Logoff"],
+        "0CCE921D-69AE-11D9-BED3-505054503030":["File System","Object Access"],
+        "0CCE921E-69AE-11D9-BED3-505054503030":["Registry","Object Access"],
+        "0CCE921F-69AE-11D9-BED3-505054503030":["Kernel Object","Object Access"],
+        "0CCE9220-69AE-11D9-BED3-505054503030":["SAM","Object Access"],
+        "0CCE9221-69AE-11D9-BED3-505054503030":["Certification Services","Object Access"],
+        "0CCE9222-69AE-11D9-BED3-505054503030":["Application Generated","Object Access"],
+        "0CCE9223-69AE-11D9-BED3-505054503030":["Handle Manipulation","Object Access"],
+        "0CCE9224-69AE-11D9-BED3-505054503030":["File Share","Object Access"],
+        "0CCE9225-69AE-11D9-BED3-505054503030":["Filtering Platform Packet Drop","Object Access"],
+        "0CCE9226-69AE-11D9-BED3-505054503030":["Filtering Platform Connection ","Object Access"],
+        "0CCE9227-69AE-11D9-BED3-505054503030":["Other Object Access Events","Object Access"],
+        "0CCE9244-69AE-11D9-BED3-505054503030":["Detailed File Share","Object Access"],
+        "0CCE9245-69AE-11D9-BED3-505054503030":["Removable Storage","Object Access"],
+        "0CCE9246-69AE-11D9-BED3-505054503030":["Central Policy Staging","Object Access"],
+        "0CCE9228-69AE-11D9-BED3-505054503030":["Sensitive Privilege Use","Privilege Use"],
+        "0CCE9229-69AE-11D9-BED3-505054503030":["Non Sensitive Privilege Use","Privilege Use"],
+        "0CCE922A-69AE-11D9-BED3-505054503030":["Other Privilege Use Events","Privilege Use"],
+        "0CCE922B-69AE-11D9-BED3-505054503030":["Process Creation","Detailed Tracking"],
+        "0CCE922C-69AE-11D9-BED3-505054503030":["Process Termination","Detailed Tracking"],
+        "0CCE922D-69AE-11D9-BED3-505054503030":["DPAPI Activity","Detailed Tracking"],
+        "0CCE922E-69AE-11D9-BED3-505054503030":["RPC Events","Detailed Tracking"],
+        "0CCE9248-69AE-11D9-BED3-505054503030":["Plug and Play Events","Detailed Tracking"],
+        "0CCE922F-69AE-11D9-BED3-505054503030":["Audit Policy Change","Policy Change"],
+        "0CCE9230-69AE-11D9-BED3-505054503030":["Authentication Policy Change","Policy Change"],
+        "0CCE9231-69AE-11D9-BED3-505054503030":["Authorization Policy Change","Policy Change"],
+        "0CCE9232-69AE-11D9-BED3-505054503030":["MPSSVC Rule-Level Policy Change","Policy Change"],
+        "0CCE9233-69AE-11D9-BED3-505054503030":["Filtering Platform Policy Change","Policy Change"],
+        "0CCE9234-69AE-11D9-BED3-505054503030":["Other Policy Change Events","Policy Change"],
+        "0CCE9235-69AE-11D9-BED3-505054503030":["User Account Management","Account Management"],
+        "0CCE9236-69AE-11D9-BED3-505054503030":["Computer Account Management","Account Management"],
+        "0CCE9237-69AE-11D9-BED3-505054503030":["Security Group Management","Account Management"],
+        "0CCE9238-69AE-11D9-BED3-505054503030":["Distribution Group Management","Account Management"],
+        "0CCE9239-69AE-11D9-BED3-505054503030":["Application Group Management","Account Management"],
+        "0CCE923A-69AE-11D9-BED3-505054503030":["Other Account Management Events","Account Management"],
+        "0CCE923B-69AE-11D9-BED3-505054503030":["Directory Service Access","Account Management"],
+        "0CCE923C-69AE-11D9-BED3-505054503030":["Directory Service Changes","Account Management"],
+        "0CCE923D-69AE-11D9-BED3-505054503030":["Directory Service Replication","Account Management"],
+        "0CCE923E-69AE-11D9-BED3-505054503030":["Detailed Directory Service Replication","Account Management"],
+        "0CCE923F-69AE-11D9-BED3-505054503030":["Credential Validation","Account Logon"],
+        "0CCE9240-69AE-11D9-BED3-505054503030":["Kerberos Service Ticket Operations","Account Logon"],
+        "0CCE9241-69AE-11D9-BED3-505054503030":["Other Account Logon Events","Account Logon"],
+        "0CCE9242-69AE-11D9-BED3-505054503030":["Kerberos Authentication Service","Account Logon"],
     };
 
     // Descriptions of failure status codes.
@@ -1172,6 +1297,35 @@ var security = (function () {
         evt.Put("winlog.event_data.UserAccountControl",uac_list);
       };
 
+    var addAuditInfo = function(evt) {
+        var subcategoryGuid = evt.Get("winlog.event_data.SubcategoryGuid").replace("{",'').replace("}",'');
+        if (!subcategoryGuid) {
+            return;
+        }
+        if (!audit_description[subcategoryGuid]) {
+            return;
+        }
+        evt.Put("winlog.event_data.Category",audit_description[subcategoryGuid][1]);
+        evt.Put("winlog.event_data.SubCategory",audit_description[subcategoryGuid][0]);
+        var coded_actions=evt.Get("winlog.event_data.AuditPolicyChanges").split(",");
+        var action_results=[];
+        for (var j=0; j<coded_actions.length; j++) {
+            var action_code=coded_actions[j].replace("%%",'').replace(' ','');
+            action_results.push(audit_actions[action_code]);
+       }
+       evt.Put("winlog.event_data.AuditPolicyChangesDescription",action_results);
+    };
+
+    var addRelatedUser= function(evt,user) {
+        var related_user = evt.Get("related.user");
+        if (!related_user) {
+            related_user=[];
+        }
+        var all_users=related_user.slice(0)
+        all_users.push(user)
+        evt.Put("related.user", all_users);
+    }
+
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
@@ -1180,6 +1334,10 @@ var security = (function () {
                 {from: "winlog.event_data.TargetDomainName", to: "user.domain"},
             ],
             ignore_missing: true,
+        }) 
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            addRelatedUser(evt,user)
         })
         .Build();
 
@@ -1189,6 +1347,17 @@ var security = (function () {
                 {from: "winlog.event_data.TargetUserSid", to: "group.id"},
                 {from: "winlog.event_data.TargetUserName", to: "group.name"},
                 {from: "winlog.event_data.TargetDomainName", to: "group.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Build();
+
+    var copyTargetUserToComputerObject = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetSid", to: "winlog.computerObject.id"},
+                {from: "winlog.event_data.TargetUserName", to: "winlog.computerObject.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "winlog.computerObject.domain"},
             ],
             ignore_missing: true,
         })
@@ -1211,15 +1380,25 @@ var security = (function () {
                 {from: "winlog.event_data.SubjectDomainName", to: "user.domain"},
             ],
             ignore_missing: true,
+        })        
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.SubjectUserName");
+            addRelatedUser(evt,user)
         })
         .Build();
 
-    var copyOldTargetUser  = new processor.Chain()
+    var copySubjectUserFromUserData  = new processor.Chain()
         .Convert({
             fields: [
-                {from: "winlog.event_data.OldTargetUserName", to: "user.name"},
+                {from: "winlog.user_data.SubjectUserSid", to: "user.id"},
+                {from: "winlog.user_data.SubjectUserName", to: "user.name"},
+                {from: "winlog.user_data.SubjectDomainName", to: "user.domain"},
             ],
             ignore_missing: true,
+        })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.user_data.SubjectUserName");
+            addRelatedUser(evt,user)
         })
         .Build();
 
@@ -1227,6 +1406,15 @@ var security = (function () {
         .Convert({
             fields: [
                 {from: "winlog.event_data.SubjectLogonId", to: "winlog.logon.id"},
+            ],
+            ignore_missing: true,
+        })
+        .Build();
+
+    var copySubjectUserLogonIdFromUserData  = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.user_data.SubjectLogonId", to: "winlog.logon.id"},
             ],
             ignore_missing: true,
         })
@@ -1316,6 +1504,24 @@ var security = (function () {
         })
         .Build();
 
+    var addGroupType = function(evt) {
+        var code = evt.Get("event.code");
+        if (!code) {
+         return;
+        }
+        evt.Put("winlog.group.type", group_types[code][0]);
+        evt.Put("winlog.group.scope", group_types[code][1]);
+    };
+
+    var addComputerData = function(evt) {
+        var computer = evt.Get("winlog.computer_name");
+        if (!computer) {
+            return;
+    }
+        evt.Put("winlog.computer.name", computer.split(".")[0]);
+        evt.Put("winlog.computer.domain", computer.split(".")[1]);
+    };
+
     // Handles 4634 and 4647.
     var logoff = new processor.Chain()
         .Add(copyTargetUser)
@@ -1367,8 +1573,12 @@ var security = (function () {
             evt.Put("event.category", "process");
             evt.Put("event.type", "process_start");
         })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            addRelatedUser(evt,user)
+        })
         .Build();
-
+        
     var event4689 = new processor.Chain()
         .Add(copySubjectUser)
         .Add(renameCommonAuthFields)
@@ -1380,17 +1590,27 @@ var security = (function () {
         .Build();
 
     var userMgmtEvts = new processor.Chain()
-        .Add(copyTargetUser)
+        .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addUACDescription)
         .Add(addActionDesc)
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            addRelatedUser(evt,user)
+        })
         .Build();
 
     var userRenamed = new processor.Chain()
-        .Add(copyOldTargetUser)
+        .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(addActionDesc)
+        .Add(function(evt) {
+            var user_new = evt.Get("winlog.event_data.NewTargetUserName");
+            addRelatedUser(evt,user_new)
+            var user_old = evt.Get("winlog.event_data.OldTargetUserName");
+            addRelatedUser(evt,user_old)
+        })
         .Build();
 
     var groupMgmtEvts = new processor.Chain()
@@ -1398,10 +1618,65 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(copyTargetUserToGroup)
         .Add(renameCommonAuthFields)
+        .Add(addGroupType)
         .Add(addActionDesc)
         .Build();
 
+    var auditLogCleared = new processor.Chain()
+        .Add(copySubjectUserFromUserData)
+        .Add(copySubjectUserLogonIdFromUserData)
+        .Add(renameCommonAuthFields)
+        .Add(addActionDesc)
+        .Build();
+
+    var auditChanged = new processor.Chain()
+        .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
+        .Add(addComputerData)
+        .Add(renameCommonAuthFields)
+        .Add(addAuditInfo)
+        .Add(addActionDesc)
+        .Build();
+
+    var auditLogMgmt = new processor.Chain()
+        .Add(addComputerData)
+        .Add(renameCommonAuthFields)
+        .Add(addActionDesc)
+        .Build();
+        
+    var computerMgmtEvts = new processor.Chain()
+        .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
+        .Add(copyTargetUserToComputerObject)
+        .Add(renameCommonAuthFields)
+        .Add(addActionDesc)
+        .Add(addUACDescription)
+        .Add(function(evt) {
+            var privs = evt.Get("winlog.event_data.PrivilegeList");
+            if (!privs) {
+                return;
+            }
+            evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
+        })
+        .Build();
+
     return {
+
+        // 1100 - The event logging service has shut down.
+        1100: auditLogMgmt.Run,
+
+        // 1102 - The audit log was cleared.
+        1102: auditLogCleared.Run,
+
+        // 1104 - The security log is now full.
+        1104: auditLogMgmt.Run,
+
+        // 1105 - Event log automatic backup.
+        1105: auditLogMgmt.Run,
+
+        // 1108 - The event logging service encountered an error while processing an incoming event published from %1
+        1108: auditLogMgmt.Run,
+
         // 4624 - An account was successfully logged on.
         4624: logonSuccess.Run,
 
@@ -1425,6 +1700,9 @@ var security = (function () {
 
         // 4689 - A process has exited.
         4689: event4689.Run,
+
+        // 4719 -  System audit policy was changed.
+        4719: auditChanged.Run,
 
         // 4720 - A user account was created
         4720: userMgmtEvts.Run,
@@ -1480,6 +1758,45 @@ var security = (function () {
         // 4740 - An account was locked out
         4740: userMgmtEvts.Run,
 
+        // 4741 - A computer account was created.
+        4741: computerMgmtEvts.Run,
+    
+        // 4742 -  A computer account was changed.
+        4742: computerMgmtEvts.Run,
+        
+        // 4743 -  A computer account was deleted.
+        4743: computerMgmtEvts.Run,
+    
+        // 4744 -  A security-disabled local group was created.
+        4744: groupMgmtEvts.Run,
+    
+        // 4745 -  A security-disabled local group was changed.
+        4745: groupMgmtEvts.Run,
+    
+        // 4746 -  A member was added to a security-disabled local group.
+        4746: groupMgmtEvts.Run,
+    
+        // 4747 -  A member was removed from a security-disabled local group.
+        4747: groupMgmtEvts.Run,
+    
+        // 4748 -  A security-disabled local group was deleted.
+        4748: groupMgmtEvts.Run,
+    
+        // 4749 - A security-disabled global group was created.
+        4749: groupMgmtEvts.Run,
+    
+        // 4750 - A security-disabled global group was changed.
+        4750: groupMgmtEvts.Run,
+    
+       // 4751 - A member was added to a security-disabled global group.
+        4751: groupMgmtEvts.Run,
+    
+        // 4752 - A member was removed from a security-disabled global group.
+        4752: groupMgmtEvts.Run,
+    
+        // 4753 - A security-disabled global group was deleted.
+        4753: groupMgmtEvts.Run,
+    
         // 4754 -  A security-enabled universal group was created.
         4754: groupMgmtEvts.Run,
 
@@ -1494,6 +1811,21 @@ var security = (function () {
 
         // 4758 - A security-enabled universal group was deleted.
         4758: groupMgmtEvts.Run,
+
+        // 4759 - A security-disabled universal group was created.
+        4759: groupMgmtEvts.Run,
+
+        // 4760 - A security-disabled universal group was changed.
+        4760: groupMgmtEvts.Run,
+    
+       // 4761 - A member was added to a security-disabled universal group.
+        4761: groupMgmtEvts.Run,
+    
+        // 4762 - A member was removed from a security-disabled universal group.
+        4762: groupMgmtEvts.Run,
+    
+        // 4763 - A security-disabled global group was deleted.
+        4763: groupMgmtEvts.Run,
 
         // 4764 - A group\'s type was changed.
         4764: groupMgmtEvts.Run,
