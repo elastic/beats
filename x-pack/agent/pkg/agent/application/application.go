@@ -53,7 +53,7 @@ func createApplication(
 	switch mgmt.Mode {
 	case localMode:
 		log.Info("Agent is managed locally")
-		return newLocal(log, pathConfigFile, c.Management)
+		return newLocal(log, pathConfigFile, config)
 	case fleetMode:
 		log.Info("Agent is managed by Fleet")
 		return newManaged(log, config)

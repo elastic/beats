@@ -68,14 +68,18 @@ func defaultManagementConfig() *ManagementConfig {
 }
 
 type localConfig struct {
-	Reload    *reloadConfig       `config:"reload"`
-	Path      string              `config:"path"`
-	Reporting *logreporter.Config `config:"reporting"`
+	Management *localManagementConfig `config:"management" yaml:"management"`
+}
+
+type localManagementConfig struct {
+	Reload    *reloadConfig       `config:"reload" yaml:"reload"`
+	Path      string              `config:"path" yaml:"path"`
+	Reporting *logreporter.Config `config:"reporting" yaml:"reporting"`
 }
 
 type reloadConfig struct {
-	Enabled bool          `config:"enabled"`
-	Period  time.Duration `config:"period"`
+	Enabled bool          `config:"enabled" yaml:"enabled"`
+	Period  time.Duration `config:"period" yaml:"period"`
 }
 
 func (r *reloadConfig) Validate() error {
@@ -89,11 +93,13 @@ func (r *reloadConfig) Validate() error {
 
 func localConfigDefault() *localConfig {
 	return &localConfig{
-		Reload: &reloadConfig{
-			Enabled: true,
-			Period:  10 * time.Second,
+		Management: &localManagementConfig{
+			Reload: &reloadConfig{
+				Enabled: true,
+				Period:  10 * time.Second,
+			},
+			Reporting: logreporter.DefaultLogConfig(),
 		},
-		Reporting: logreporter.DefaultLogConfig(),
 	}
 }
 
