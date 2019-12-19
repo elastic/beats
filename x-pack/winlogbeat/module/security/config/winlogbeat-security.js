@@ -1337,7 +1337,7 @@ var security = (function () {
         }) 
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            addRelatedUser(evt,user)
+            addRelatedUser(evt,user);
         })
         .Build();
 
@@ -1383,7 +1383,7 @@ var security = (function () {
         })        
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
-            addRelatedUser(evt,user)
+            addRelatedUser(evt,user);
         })
         .Build();
 
