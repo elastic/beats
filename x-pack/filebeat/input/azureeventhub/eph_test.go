@@ -5,20 +5,12 @@
 package azureeventhub
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	config = azureInputConfig{
-		SAKey:            os.Getenv("STORAGE_ACCOUNT_NAME"),
-		SAName:           os.Getenv("STORAGE_ACCOUNT_KEY"),
-		SAContainer:      ephContainerName,
-		ConnectionString: os.Getenv("EVENTHUB_CONNECTION_STRING"),
-		ConsumerGroup:    os.Getenv("EVENTHUB_CONSUMERGROUP"),
-	}
 	invalidConfig = azureInputConfig{
 		SAKey:            "invalid_key",
 		SAName:           "storage",
