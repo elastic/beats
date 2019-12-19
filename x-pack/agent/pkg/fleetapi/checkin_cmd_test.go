@@ -14,9 +14,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type info struct{}
+
+func (*info) AgentID() string { return "id" }
+
 func TestCheckin(t *testing.T) {
-	const agentID = "bob"
 	const withAPIKey = "secret"
+	agentInfo := &info{}
 
 	t.Run("Send back status of actions", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
@@ -27,7 +31,7 @@ func TestCheckin(t *testing.T) {
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 
@@ -72,7 +76,7 @@ func TestCheckin(t *testing.T) {
 				},
 			}
 
-			cmd := NewCheckinCmd(agentID, client)
+			cmd := NewCheckinCmd(&info{}, client)
 
 			request := CheckinRequest{
 				Events: []SerializableEvent{
@@ -95,7 +99,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprintf(w, raw)
@@ -103,7 +107,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentID, client)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 
@@ -146,7 +150,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -154,7 +158,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentID, client)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 
@@ -208,7 +212,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -216,7 +220,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentID, client)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 
@@ -246,7 +250,7 @@ Something went wrong
 }
 `
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentID)
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -254,7 +258,7 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			cmd := NewCheckinCmd(agentID, client)
+			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
 

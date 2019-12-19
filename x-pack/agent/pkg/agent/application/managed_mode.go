@@ -37,11 +37,11 @@ type apiClient interface {
 // Managed application, when the application is run in managed mode, most of the configuration are
 // coming from the Fleet App.
 type Managed struct {
-	log     *logger.Logger
-	Config  FleetAgentConfig
-	api     apiClient
-	agentID string
-	gateway *fleetGateway
+	log       *logger.Logger
+	Config    FleetAgentConfig
+	api       apiClient
+	agentInfo *AgentInfo
+	gateway   *fleetGateway
 }
 
 func newManaged(
@@ -49,7 +49,10 @@ func newManaged(
 	rawConfig *config.Config,
 ) (*Managed, error) {
 
-	agentID := getAgentID()
+	agentInfo, err := NewAgentInfo()
+	if agentInfo != nil {
+		return nil, err
+	}
 
 	path := fleetAgentConfigPath()
 
@@ -77,7 +80,12 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to create API client")
 	}
 
-	reporter, err := createFleetReporters(log, cfg, agentID, client)
+	managedApplication := &Managed{
+		log:       log,
+		agentInfo: agentInfo,
+	}
+
+	reporter, err := createFleetReporters(log, cfg, managedApplication.agentInfo, client)
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to create reporters")
 	}
@@ -107,7 +115,7 @@ func newManaged(
 	gateway, err := newFleetGateway(
 		log,
 		&fleetGatewaySettings{Duration: durationTick},
-		agentID,
+		agentInfo,
 		client,
 		actionDispatcher,
 	)
@@ -115,11 +123,8 @@ func newManaged(
 		return nil, err
 	}
 
-	return &Managed{
-		log:     log,
-		agentID: agentID,
-		gateway: gateway,
-	}, nil
+	managedApplication.gateway = gateway
+	return managedApplication, nil
 }
 
 // Start starts a managed agent.
@@ -136,19 +141,24 @@ func (m *Managed) Stop() error {
 	return nil
 }
 
+// AgentInfo retrieves agent information.
+func (m *Managed) AgentInfo() *AgentInfo {
+	return m.agentInfo
+}
+
 func createFleetReporters(
 	log *logger.Logger,
 	cfg *FleetAgentConfig,
-	agentID string,
+	agentInfo *AgentInfo,
 	client apiClient,
 ) (reporter, error) {
 
 	logR := logreporter.NewReporter(log, cfg.Reporting.Log)
 
-	fleetR, err := fleetreporter.NewReporter(agentID, log, cfg.Reporting.Fleet, client)
+	fleetR, err := fleetreporter.NewReporter(agentInfo, log, cfg.Reporting.Fleet, client)
 	if err != nil {
 		return nil, err
 	}
 
-	return reporting.NewReporter(log, agentID, logR, fleetR), nil
+	return reporting.NewReporter(log, agentInfo, logR, fleetR), nil
 }
