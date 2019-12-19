@@ -241,7 +241,7 @@ before_install:
 install: true
 
 script:
-  - make $TARGETS
+  - travis_wait 30 make $TARGETS
 
 notifications:
   slack:
