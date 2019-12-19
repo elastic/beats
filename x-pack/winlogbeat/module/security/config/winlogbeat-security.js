@@ -64,7 +64,7 @@ var security = (function () {
         "4720": "added-user-account",
         "4722": "enabled-user-account",
         "4723": "changed-password",
-        "4724": "reseted-password",
+        "4724": "reset-password",
         "4725": "disabled-user-account",
         "4726": "deleted-user-account",
         "4727": "added-group-account",
