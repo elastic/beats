@@ -5626,8 +5626,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
+<<<<<<< HEAD
 Version: release-branch.go1.13
 Revision: fde4db37ae7ad8191b03d30d27f258b5291ae4e3
+=======
+Revision: 4a24b406529242041050cb1dec3e0e4c46a5f1b6
+>>>>>>> update notice
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
