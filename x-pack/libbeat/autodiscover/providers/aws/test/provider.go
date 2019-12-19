@@ -18,7 +18,7 @@ type TestEventAccumulator struct {
 	lock   sync.Mutex
 }
 
-// TestEventAccumulator.Add expends events
+// Add expends events
 func (tea *TestEventAccumulator) Add(e bus.Event) {
 	tea.lock.Lock()
 	defer tea.lock.Unlock()
@@ -26,7 +26,7 @@ func (tea *TestEventAccumulator) Add(e bus.Event) {
 	tea.events = append(tea.events, e)
 }
 
-// TestEventAccumulator.Len returns length of events
+// Len returns length of events
 func (tea *TestEventAccumulator) Len() int {
 	tea.lock.Lock()
 	defer tea.lock.Unlock()
@@ -34,7 +34,7 @@ func (tea *TestEventAccumulator) Len() int {
 	return len(tea.events)
 }
 
-// TestEventAccumulator.Get copies the event and return it
+// Get copies the event and return it
 func (tea *TestEventAccumulator) Get() []bus.Event {
 	tea.lock.Lock()
 	defer tea.lock.Unlock()
@@ -44,7 +44,7 @@ func (tea *TestEventAccumulator) Get() []bus.Event {
 	return res
 }
 
-// TestEventAccumulator.WaitForNumEvents waits to get target length of events
+// WaitForNumEvents waits to get target length of events
 func (tea *TestEventAccumulator) WaitForNumEvents(t *testing.T, targetLen int, timeout time.Duration) {
 	start := time.Now()
 
