@@ -231,7 +231,7 @@ the output document. By default, `keep_null` is set to `false`.
 
 These options configure {beatname_uc} to use ICMP (v4 and v6) Echo Requests to check
 the configured hosts. These options are valid when the <<monitor-type,`type`>> is
-`icmp`. Please not that on most platforms one must execute Heartbeat with elevated permissions
+`icmp`. Please note that on most platforms you must execute Heartbeat with elevated permissions
 to perform ICMP pings.
 
 On Linux regular users may perform pings if the right file capabilities are set. You can run
@@ -705,5 +705,4 @@ the following JSON objects in `dynamic.json`:
 restarts it with a schedule of 15 seconds between checks.
 <2> {beatname_uc} starts a new monitor that uses a TLS-based connection with a
 custom CA certificate.
-
 
