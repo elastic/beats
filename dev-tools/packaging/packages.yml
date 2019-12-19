@@ -54,6 +54,13 @@ shared:
       /etc/init.d/{{.BeatServiceName}}:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
         mode: 0755
+      /etc/{{.BeatName}}/beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      /etc/{{.BeatName}}/beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+
 
   # MacOS pkg spec for community beats.
   - &macos_agent_pkg_spec
@@ -90,6 +97,12 @@ shared:
         source: 'agent.yml'
         mode: 0600
         config: true
+      /etc/{{.BeatName}}/beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      /etc/{{.BeatName}}/beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
 
   - &agent_binary_files
     '{{.BeatName}}{{.BinaryExt}}':
@@ -118,6 +131,12 @@ shared:
     <<: *common
     files:
       <<: *agent_binary_files
+      'beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+      'beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
 
   # Binary package spec (zip for windows) for community beats.
   - &agent_windows_binary_spec
@@ -130,6 +149,12 @@ shared:
       uninstall-service-{{.BeatName}}.ps1:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
         mode: 0755
+      'beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+      'beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
 
   - &agent_docker_spec
     <<: *agent_binary_spec
@@ -478,6 +503,30 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
+  # Elastic Beat with Elastic License and binary taken the current directory.
+  elastic_beat_xpack_reduced:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: windows
+      types: [zip]
+      spec:
+        <<: *windows_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: darwin
+      types: [tgz]
+      spec:
+        <<: *binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      types: [tgz]
+      spec:
+        <<: *binary_spec
+        <<: *elastic_license_for_binaries
+
+
   # Elastic Beat with Elastic License and binary taken from the x-pack dir.
   elastic_beat_xpack_separate_binaries:
     ###
@@ -549,7 +598,6 @@ specs:
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
 
   # Elastic Beat with Elastic License and binary taken from the x-pack dir.
   elastic_beat_agent_binaries:

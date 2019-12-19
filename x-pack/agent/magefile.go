@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -18,6 +19,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
+	"github.com/elastic/beats/agent/release"
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/unittest"
@@ -261,11 +263,60 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
+	version, found := os.LookupEnv("BEAT_VERSION")
+	if !found {
+		version = release.Version()
+	}
+
+	packedBeats := []string{"filebeat", "metricbeat"}
+	requiredPackages := []string{
+		"darwin-x86_64.tar.gz",
+		"linux-x86.tar.gz",
+		"linux-x86_64.tar.gz",
+		"windows-x86.zip",
+		"windows-x86_64.zip",
+	}
+
+	for _, b := range packedBeats {
+		pwd, err := filepath.Abs(filepath.Join("..", b))
+		if err != nil {
+			panic(err)
+		}
+
+		if requiredPackagesPresent(pwd, b, version, requiredPackages) {
+			continue
+		}
+
+		cmd := exec.Command("mage", "package")
+		cmd.Dir = pwd
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+
+		if err := cmd.Run(); err != nil {
+			panic(err)
+		}
+	}
+
+	// package agent
 	devtools.UseElasticBeatAgentPackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package)
+}
+
+func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
+	for _, pkg := range requiredPackages {
+		packageName := fmt.Sprintf("%s-%s-%s", beat, version, pkg)
+		path := filepath.Join(basePath, "build", "distributions", packageName)
+
+		if _, err := os.Stat(path); err != nil {
+			fmt.Printf("Package '%s' does not exist on path: %s\n", packageName, path)
+			return false
+		}
+	}
+	return true
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).

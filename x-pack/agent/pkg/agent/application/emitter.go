@@ -18,12 +18,7 @@ import (
 type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program.Program, error)
 
 func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) emitterFunc {
-	return func(files []string) error {
-		c, err := config.LoadFiles(files...)
-		if err != nil {
-			return errors.Wrap(err, "could not load or merge configuration")
-		}
-
+	return func(c *config.Config) error {
 		log.Debug("Transforming configuration into a tree")
 		m, err := c.ToMapStr()
 		if err != nil {
@@ -54,4 +49,13 @@ func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) em
 
 		return router.Dispatch(ast.HashStr(), programsToRun)
 	}
+}
+
+func readfiles(files []string, emitter emitterFunc) error {
+	c, err := config.LoadFiles(files...)
+	if err != nil {
+		return errors.Wrap(err, "could not load or merge configuration")
+	}
+
+	return emitter(c)
 }

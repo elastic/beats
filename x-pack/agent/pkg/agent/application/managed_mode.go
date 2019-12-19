@@ -8,7 +8,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"sync"
+
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -16,11 +17,12 @@ import (
 	"github.com/elastic/beats/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/x-pack/agent/pkg/fleetapi"
-
 	reporting "github.com/elastic/beats/x-pack/agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
 )
+
+var durationTick = 10 * time.Second
 
 type apiClient interface {
 	Send(
@@ -39,7 +41,7 @@ type Managed struct {
 	Config    FleetAgentConfig
 	api       apiClient
 	agentInfo *AgentInfo
-	infoLock  sync.Mutex
+	gateway   *fleetGateway
 }
 
 func newManaged(
@@ -66,6 +68,8 @@ func newManaged(
 		return nil, errors.Wrapf(err, "fail to read configuration %s for the agent", path)
 	}
 
+	rawConfig.Merge(config)
+
 	cfg := defaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack configuration from %s", path)
@@ -78,7 +82,6 @@ func newManaged(
 
 	managedApplication := &Managed{
 		log:       log,
-		api:       client,
 		agentInfo: agentInfo,
 	}
 
@@ -87,32 +90,59 @@ func newManaged(
 		return nil, errors.Wrap(err, "fail to create reporters")
 	}
 
-	// TODO(michal, ph) Link router with configuration
-	_, err = newRouter(log, streamFactory(config, client, reporter))
+	router, err := newRouter(log, streamFactory(rawConfig, client, reporter))
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to initialize pipeline router")
 	}
 
+	emit := emitter(log, router)
+
+	actionDispatcher, err := newActionDispatcher(log, &handlerDefault{log: log})
+	if err != nil {
+		return nil, err
+	}
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionPolicyChange{},
+		&handlerPolicyChange{log: log, emitter: emit},
+	)
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionUnknown{},
+		&handlerUnknown{log: log},
+	)
+
+	gateway, err := newFleetGateway(
+		log,
+		&fleetGatewaySettings{Duration: durationTick},
+		agentInfo,
+		client,
+		actionDispatcher,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	managedApplication.gateway = gateway
 	return managedApplication, nil
 }
 
 // Start starts a managed agent.
 func (m *Managed) Start() error {
 	m.log.Info("Agent is starting")
-	defer m.log.Info("Agent is stopped")
+	m.gateway.Start()
 	return nil
 }
 
 // Stop stops a managed agent.
 func (m *Managed) Stop() error {
+	defer m.log.Info("Agent is stopped")
+	m.gateway.Stop()
 	return nil
 }
 
 // AgentInfo retrieves agent information.
 func (m *Managed) AgentInfo() *AgentInfo {
-	m.infoLock.Lock()
-	defer m.infoLock.Unlock()
-
 	return m.agentInfo
 }
 

@@ -59,7 +59,7 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 		p, ok := r.routes.Get(rk)
 		var err error
 		if !ok {
-			r.log.Debugf("Creating stream %s", rk)
+			r.log.Debugf("Creating stream: %s", rk)
 			p, err = r.streamFactory(r.log, rk)
 			if err != nil {
 				return err

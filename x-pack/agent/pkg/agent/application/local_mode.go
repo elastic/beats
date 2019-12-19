@@ -15,7 +15,7 @@ import (
 	logreporter "github.com/elastic/beats/x-pack/agent/pkg/reporter/log"
 )
 
-type emitterFunc func([]string) error
+type emitterFunc func(*config.Config) error
 
 // ConfigHandler is capable of handling config and perform actions at it.
 type ConfigHandler interface {

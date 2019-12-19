@@ -30,7 +30,7 @@ func (o *once) Start() error {
 		return ErrNoConfiguration
 	}
 
-	return o.emitter(files)
+	return readfiles(files, o.emitter)
 }
 
 func (o *once) Stop() error {
