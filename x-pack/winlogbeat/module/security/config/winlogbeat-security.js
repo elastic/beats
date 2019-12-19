@@ -143,7 +143,6 @@ var security = (function () {
         "4757": ["Security-Enabled","Universal"],
         "4758": ["Security-Enabled","Universal"],
         "4759": ["Security-Disabled","Universal"],
-        "4759": ["Security-Disabled","Universal"],
         "4760": ["Security-Disabled","Universal"],
         "4761": ["Security-Disabled","Universal"],
         "4762": ["Security-Disabled","Universal"],
@@ -1322,8 +1321,8 @@ var security = (function () {
         if (!related_user) {
             related_user=[];
         }
-        var all_users=related_user.slice(0)
-        all_users.push(user)
+        var all_users=related_user.slice(0);
+        all_users.push(user);
         evt.Put("related.user", all_users);
     }
 
@@ -1399,7 +1398,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.user_data.SubjectUserName");
-            addRelatedUser(evt,user)
+            addRelatedUser(evt,user);
         })
         .Build();
 
@@ -1576,7 +1575,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            addRelatedUser(evt,user)
+            addRelatedUser(evt,user);
         })
         .Build();
 
@@ -1598,7 +1597,7 @@ var security = (function () {
         .Add(addActionDesc)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            addRelatedUser(evt,user)
+            addRelatedUser(evt,user);
         })
         .Build();
 
@@ -1608,9 +1607,9 @@ var security = (function () {
         .Add(addActionDesc)
         .Add(function(evt) {
             var user_new = evt.Get("winlog.event_data.NewTargetUserName");
-            addRelatedUser(evt,user_new)
+            addRelatedUser(evt,user_new);
             var user_old = evt.Get("winlog.event_data.OldTargetUserName");
-            addRelatedUser(evt,user_old)
+            addRelatedUser(evt,user_old);
         })
         .Build();
 
