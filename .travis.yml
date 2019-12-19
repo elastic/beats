@@ -241,7 +241,10 @@ before_install:
 install: true
 
 script:
-  - travis_wait 30 make $TARGETS
+  # Replacement for travis_wait which doesn't print output in real time.
+  - while sleep 9m; do echo "=====[ ${SECONDS} seconds still running ]====="; done &
+  - make $TARGETS
+  - kill %1
 
 notifications:
   slack:
