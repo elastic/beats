@@ -106,7 +106,7 @@ var security = (function () {
         "4767": "unlocked-user-account",
         "4781": "renamed-user-account",
         "4798": "group-membership-enumerated",
-        "4799": "user-member-enumerated",        
+        "4799": "user-member-enumerated",
     }
 
     var audit_actions = {
