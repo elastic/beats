@@ -10576,67 +10576,13 @@ type: keyword
 
 --
 
-[float]
-=== authorization_info
-
+*`googlecloud.audit.authorization_info`*::
++
+--
 Authorization information for the operation.
 
 
-
-*`googlecloud.audit.authorization_info.permission`*::
-+
---
-The required IAM permission. 
-
-
-type: keyword
-
---
-
-*`googlecloud.audit.authorization_info.granted`*::
-+
---
-Whether or not authorization for resource and permission was granted. 
-
-
-type: boolean
-
---
-
-[float]
-=== resource_attributes
-
-The attributes of the resource.
-
-
-
-*`googlecloud.audit.authorization_info.resource_attributes.service`*::
-+
---
-The name of the service.
-
-
-type: keyword
-
---
-
-*`googlecloud.audit.authorization_info.resource_attributes.name`*::
-+
---
-The name of the resource.
-
-
-type: keyword
-
---
-
-*`googlecloud.audit.authorization_info.resource_attributes.type`*::
-+
---
-The type of the resource.
-
-
-type: keyword
+type: array
 
 --
 
