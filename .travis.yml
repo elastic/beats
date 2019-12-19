@@ -241,8 +241,8 @@ before_install:
 install: true
 
 script:
-  # Replacement for travis_wait which doesn't print output in real time.
-  - while sleep 9m; do echo "=====[ ${SECONDS} seconds still running ]====="; done &
+  # Replacement for travis_wait which doesn't print output in real time.q
+  - while sleep 540; do echo "=====[ ${SECONDS} seconds still running ]====="; done &
   - make $TARGETS
   - kill %1
 
