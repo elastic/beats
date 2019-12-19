@@ -12,7 +12,7 @@ download:
   # operating system [linux, windows, darwin]
   operating_system: "linux"
   # target architecture [32, 64]
-  arch: "32"
+  arch: "64"
   # source of the artifacts, requires elastic like structure and naming of the binaries
   # e.g /windows-x86.zip
   sourceURI: "https://artifacts.elastic.co/downloads/beats/"
