@@ -114,8 +114,8 @@ function Audit(keep_original_message) {
     var RenameNestedFields = function(evt) {
         var arr = evt.Get("googlecloud.audit.authorization_info");
         for (var i = 0; i < arr.length; i++) {
-          arr[i]["resource_attributes"] = arr[i]["resourceAttributes"];
-          delete arr[i]["resourceAttributes"];
+          arr[i].resource_attributes = arr[i].resourceAttributes;
+          delete arr[i].resourceAttributes;
         }
     };
 
