@@ -1,9 +1,6 @@
-// Copyright 2018 The Go Authors. All rights reserved.
+// Copyright 2019 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-
-<<<<<<< HEAD
-//+build !amd64,!amd64p32,!386
 
 package cpu
 
@@ -26,14 +23,15 @@ const (
 var hwCap uint
 var hwCap2 uint
 
-func init() {
+func readHWCAP() error {
 	buf, err := ioutil.ReadFile(procAuxv)
 	if err != nil {
 		// e.g. on android /proc/self/auxv is not accessible, so silently
-		// ignore the error and leave Initialized = false
-		return
+		// ignore the error and leave Initialized = false. On some
+		// architectures (e.g. arm64) doinit() implements a fallback
+		// readout and will set Initialized = true again.
+		return err
 	}
-
 	bo := hostByteOrder()
 	for len(buf) >= 2*(uintSize/8) {
 		var tag, val uint
@@ -54,30 +52,5 @@ func init() {
 			hwCap2 = val
 		}
 	}
-	doinit()
-
-	Initialized = true
+	return nil
 }
-=======
-<<<<<<< HEAD:vendor/golang.org/x/sys/cpu/cpu_mipsx.go
-// +build mips mipsle
-
-package cpu
-
-const cacheLineSize = 32
-
-func doinit() {}
-=======
-// +build !386,!amd64,!amd64p32,!arm64
-
-package cpu
-
-func init() {
-	if err := readHWCAP(); err != nil {
-		return
-	}
-	doinit()
-	Initialized = true
-}
->>>>>>> update golang.org/x/sys:vendor/golang.org/x/sys/cpu/cpu_linux.go
->>>>>>> update golang.org/x/sys

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+<<<<<<< HEAD:vendor/golang.org/x/sys/cpu/cpu_mipsx.go
 // +build mips mipsle
 
 package cpu
@@ -9,3 +10,16 @@ package cpu
 const cacheLineSize = 32
 
 func doinit() {}
+=======
+// +build !386,!amd64,!amd64p32,!arm64
+
+package cpu
+
+func init() {
+	if err := readHWCAP(); err != nil {
+		return
+	}
+	doinit()
+	Initialized = true
+}
+>>>>>>> update golang.org/x/sys:vendor/golang.org/x/sys/cpu/cpu_linux.go
