@@ -1474,13 +1474,13 @@ type: long
 --
 
 [float]
-=== web.duration
+=== web.response_time
 
 Dashboard response time metrics
 
 
 
-*`appsearch.stats.requests.web.duration.avg.ms`*::
+*`appsearch.stats.requests.web.response_time.avg.ms`*::
 +
 --
 Average response time in milliseconds
@@ -1490,7 +1490,7 @@ type: long
 
 --
 
-*`appsearch.stats.requests.web.duration.max.ms`*::
+*`appsearch.stats.requests.web.response_time.max.ms`*::
 +
 --
 Max response time in milliseconds
