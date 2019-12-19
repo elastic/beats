@@ -12,4 +12,39 @@ See the metricset documentation for the configuration reference.
 
 ## Manual testing
 
-// TODO
+Create Persistent Volume Claims.
+- Use non existent storage classes to stuck them pending
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim2
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: notexisting
+  volumeMode: Filesystem
+```
+
+- Add labels
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    category: disposable
+    team: observability
+  name: claim1
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 80Gi
+  storageClassName: standard
+  volumeMode: Filesystem
+```
+
