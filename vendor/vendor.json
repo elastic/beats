@@ -829,8 +829,8 @@
 		{
 			"checksumSHA1": "WF6GR2/MTAreZskxw9rvh+HCQc4=",
 			"path": "github.com/coreos/go-systemd/dbus",
-			"revision": "fd7a80b32e1fc73e890fde45604ed5009dc817a3",
-			"revisionTime": "2019-07-19T11:48:52Z",
+			"revision": "e64a0ec8b42a61e2a9801dc1d0abe539dea79197",
+			"revisionTime": "2019-06-20T07:13:33Z",
 			"version": "v20",
 			"versionExact": "v20"
 		},
