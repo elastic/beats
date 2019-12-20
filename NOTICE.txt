@@ -5832,7 +5832,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: d989b31c87461dc8ab2f1cac6792814e27fadea9
+Revision: fae7ac547cb717d141c433a2a173315e216b64c4
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
