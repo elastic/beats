@@ -6,6 +6,7 @@ package application
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/elastic/beats/x-pack/agent/pkg/agent/storage"
 	"github.com/gofrs/uuid"
@@ -17,6 +18,11 @@ const agentInfoKey = "agent-info"
 
 type persistentAgentInfo struct {
 	ID string `json:"ID" yaml:"ID"`
+}
+
+type ioStore interface {
+	store
+	Load() (io.ReadCloser, error)
 }
 
 func generateAgentID() (string, error) {
