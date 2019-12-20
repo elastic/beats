@@ -1133,7 +1133,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-perf
-Revision: 9bc9b58a3de9e63a1a8e27241ae3c61d3449782b
+Revision: 9c656876f595360525261b7db5bbbcd3c40b7dbb
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/elastic/go-perf/LICENSE:
 --------------------------------------------------------------------
