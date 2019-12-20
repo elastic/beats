@@ -104,7 +104,9 @@ func (f *fleetGateway) execute() (*fleetapi.CheckinResponse, error) {
 	// TODO(ph): Aggregates and send events.
 	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 
-	req := &fleetapi.CheckinRequest{}
+	req := &fleetapi.CheckinRequest{
+		Events: make([]fleetapi.SerializableEvent, 0),
+	}
 	resp, err := cmd.Execute(req)
 	if err != nil {
 		return nil, err
